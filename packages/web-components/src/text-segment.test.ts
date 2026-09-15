@@ -4,7 +4,7 @@ import {
   validateGetV3Texts200,
   type CoreV3TextsResponse,
   type CoreV3Version,
-} from "@sefaria/client";
+} from "@arithmomaniac/sefaria-client";
 import { describe, expect, it, vi } from "vitest";
 
 import spanningFixture from "../../client/test/fixtures/v3-text-spanning-2026-08-29.json";

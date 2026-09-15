@@ -1,4 +1,4 @@
-import type { GetLinksData } from "@sefaria/client";
+import type { GetLinksData } from "@arithmomaniac/sefaria-client";
 
 import type { ConnectionsRequest } from "./connections-panel.js";
 

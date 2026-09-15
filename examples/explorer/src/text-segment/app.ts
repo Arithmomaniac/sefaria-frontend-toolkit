@@ -1,11 +1,14 @@
-import { createSefariaClient, type SefariaClient } from "@sefaria/client";
-import "@sefaria/web-components";
+import {
+  createSefariaClient,
+  type SefariaClient,
+} from "@arithmomaniac/sefaria-client";
+import "@arithmomaniac/sefaria-web-components";
 import type {
   SefariaTextSegment,
   TextSegmentRequest,
   TextSegmentViewModel,
-} from "@sefaria/web-components";
-import { loadTextSegmentViewModel } from "@sefaria/web-components/text-segment";
+} from "@arithmomaniac/sefaria-web-components";
+import { loadTextSegmentViewModel } from "@arithmomaniac/sefaria-web-components/text-segment";
 
 import {
   startLiveDemo,

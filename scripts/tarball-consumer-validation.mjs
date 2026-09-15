@@ -12,12 +12,13 @@ export function validatePackedPackage({
     throw new Error(`${definition.name} packed manifest is incorrect.`);
   }
   if (
-    definition.name === "@sefaria/web-components" &&
-    (manifest.dependencies?.["@sefaria/client"] !== "0.0.0" ||
-      manifest.dependencies?.["@sefaria/text-transform"] !== "0.0.0")
+    definition.name === "@arithmomaniac/sefaria-web-components" &&
+    (manifest.dependencies?.["@arithmomaniac/sefaria-client"] !== "0.0.0" ||
+      manifest.dependencies?.["@arithmomaniac/sefaria-text-transform"] !==
+        "0.0.0")
   ) {
     throw new Error(
-      "@sefaria/web-components internal dependency versions were not packed exactly.",
+      "@arithmomaniac/sefaria-web-components internal dependency versions were not packed exactly.",
     );
   }
   if ([...contents].some((entry) => entry.startsWith("package/src/"))) {
@@ -89,7 +90,7 @@ export function validateConsumerLockfile(lockfile, definitions) {
       );
     }
   }
-  if (/https?:[^\n]*@sefaria/u.test(lockfile)) {
+  if (/https?:[^\n]*@arithmomaniac\/sefaria-/u.test(lockfile)) {
     throw new Error(
       "Consumer lockfile resolved a toolkit package from a registry.",
     );

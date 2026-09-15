@@ -4,11 +4,11 @@
 
 ## Status
 
-This specification defines the implemented `@sefaria/client` contract.
+This specification defines the implemented `@arithmomaniac/sefaria-client` contract.
 
 ## Responsibility
 
-`@sefaria/client` owns the complete public API transport boundary:
+`@arithmomaniac/sefaria-client` owns the complete public API transport boundary:
 
 - the commit-pinned upstream OpenAPI input
 - the checksum for that input
@@ -261,7 +261,7 @@ Reduced deployed captures preserve the nullable version metadata, HTTP 200 error
 
 ## Completion criteria
 
-`@sefaria/client` is complete for Core when:
+`@arithmomaniac/sefaria-client` is complete for Core when:
 
 - the repository contains the pinned input and checksum
 - ordinary generation uses no network

@@ -2,7 +2,7 @@
 
 # React Vite example
 
-This private standalone consumer uses React 19 with the existing `@sefaria/client` and `@sefaria/web-components` packages. It is an integration example, not a React wrapper package and not a toolkit runtime dependency.
+This private standalone consumer uses React 19 with the existing `@arithmomaniac/sefaria-client` and `@arithmomaniac/sefaria-web-components` packages. It is an integration example, not a React wrapper package and not a toolkit runtime dependency.
 
 Run it from the repository root:
 

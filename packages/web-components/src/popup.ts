@@ -4,7 +4,7 @@ import {
   type CoreV3TextValue,
   type CoreV3Version,
   type SefariaClient,
-} from "@sefaria/client";
+} from "@arithmomaniac/sefaria-client";
 
 import type { BilingualPairSide } from "./bilingual-pair.js";
 import { resolveBilingualSides } from "./bilingual-segment.js";

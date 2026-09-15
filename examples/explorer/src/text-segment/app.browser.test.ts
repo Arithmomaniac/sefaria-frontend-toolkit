@@ -1,7 +1,7 @@
 import type {
   SefariaTextSegment,
   TextSegmentDataViewModel,
-} from "@sefaria/web-components";
+} from "@arithmomaniac/sefaria-web-components";
 import { beforeEach, expect, test, vi } from "vitest";
 
 import { startTextSegmentLiveDemo, type TextSegmentLoader } from "./app.js";

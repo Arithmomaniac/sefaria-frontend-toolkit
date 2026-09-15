@@ -1,4 +1,4 @@
-import type { SefariaSourceCard } from "@sefaria/web-components";
+import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
 import type { DetailedHTMLProps, HTMLAttributes, Ref } from "react";
 
 declare module "react" {

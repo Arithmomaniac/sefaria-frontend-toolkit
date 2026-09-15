@@ -21,7 +21,7 @@ describe("documentation site build plan", () => {
   it("keeps typechecking in standalone builds and skips it after pnpm check", () => {
     expect(createSiteBuildSteps({ skipTypecheck: false })).toContainEqual({
       kind: "pnpm",
-      args: ["--filter", "@sefaria/web-components", "build"],
+      args: ["--filter", "@arithmomaniac/sefaria-web-components", "build"],
     });
     expect(createSiteBuildSteps({ skipTypecheck: false })).toContainEqual({
       kind: "pnpm",
@@ -29,7 +29,7 @@ describe("documentation site build plan", () => {
     });
     expect(createSiteBuildSteps({ skipTypecheck: true })).not.toContainEqual({
       kind: "pnpm",
-      args: ["--filter", "@sefaria/web-components", "build"],
+      args: ["--filter", "@arithmomaniac/sefaria-web-components", "build"],
     });
     expect(createSiteBuildSteps({ skipTypecheck: true })).not.toContainEqual({
       kind: "pnpm",

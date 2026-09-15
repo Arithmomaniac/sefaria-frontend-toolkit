@@ -4,7 +4,7 @@ import {
   type CoreLinkObject,
   type CoreLinkResponse,
   type CoreV3TextsResponse,
-} from "@sefaria/client";
+} from "@arithmomaniac/sefaria-client";
 import { html } from "lit";
 import { render } from "vitest-browser-lit";
 import { expect, test, vi } from "vitest";

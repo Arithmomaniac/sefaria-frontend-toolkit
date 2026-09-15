@@ -1,4 +1,4 @@
-import type { TextSegmentViewModel } from "@sefaria/web-components";
+import type { TextSegmentViewModel } from "@arithmomaniac/sefaria-web-components";
 
 export interface TextSegmentScenario {
   readonly id: "data" | "loading" | "empty" | "error";

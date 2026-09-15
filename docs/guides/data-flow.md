@@ -13,7 +13,7 @@ The toolkit separates three roles. An **element** displays a view model and emit
 ```mermaid
 flowchart TB
     API["Sefaria API"]
-    SITE["Regular website<br/>@sefaria/client + async factory"]
+    SITE["Regular website<br/>@arithmomaniac/sefaria-client + async factory"]
     ARTICLE["Authored article<br/>explicit anchor + popup async factory"]
     MCP["MCP App<br/>structuredContent + validation"]
     FACTORY["Component factory<br/>API payload → rendering data"]
@@ -39,7 +39,7 @@ The central layers are the same in every case:
 3. A **factory** projects the validated payload into a component-specific **view model**.
 4. A request-free **Web Component** renders that view model.
 
-The difference is where the request happens. A regular site supplies `@sefaria/client` to an async factory. The authored linked-article page calls the popup async factory when a reader activates an explicit citation anchor. In the MCP path, the server obtains the payload, the App validates `structuredContent`, and the App calls the same pure factory directly. None of these paths sends raw API JSON to the element.
+The difference is where the request happens. A regular site supplies `@arithmomaniac/sefaria-client` to an async factory. The authored linked-article page calls the popup async factory when a reader activates an explicit citation anchor. In the MCP path, the server obtains the payload, the App validates `structuredContent`, and the App calls the same pure factory directly. None of these paths sends raw API JSON to the element.
 
 Web Components are composable because the host can arrange several request-free elements and supply each one a view model. Composite data projection happens before rendering: a composite pure factory can call child pure factories using one captured payload. One element does not reach out to fetch data or ask another element to do so; interactive elements emit events and the host decides what data to obtain next.
 
@@ -62,8 +62,8 @@ A **pure factory** has the name `create...ViewModel`: it projects a payload you 
 
 1. **Your host** creates a client, chooses a reference and any edition selectors, and supplies a loading view model to the element.
 2. **`loadSourceCardViewModel`** calls the generated v3 text operation through that client.
-3. **`@sefaria/client`** validates the JSON response against the generated schema for the operation and HTTP status. A successful TypeScript type does not substitute for that runtime boundary.
-4. **`createSourceCardViewModel`** resolves the requested editions, aligns text by its actual array structure, and delegates text preparation to pure child projections. `@sefaria/text-transform` sanitizes HTML, extracts footnotes, and applies vocalization.
+3. **`@arithmomaniac/sefaria-client`** validates the JSON response against the generated schema for the operation and HTTP status. A successful TypeScript type does not substitute for that runtime boundary.
+4. **`createSourceCardViewModel`** resolves the requested editions, aligns text by its actual array structure, and delegates text preparation to pure child projections. `@arithmomaniac/sefaria-text-transform` sanitizes HTML, extracts footnotes, and applies vocalization.
 5. **Your host** assigns the returned view model to the element's `viewModel` JavaScript property.
 6. **The element** renders its Shadow DOM. Layout and side-order changes operate on the supplied model; they do not make another API call.
 
@@ -73,10 +73,10 @@ The [render-text guide](render-text.md#put-a-source-card-in-a-browser-app) imple
 
 | Owner | Responsibility | Not its responsibility |
 | --- | --- | --- |
-| `@sefaria/client` | Generated operations, API contracts, response validation, configurable API origin and `fetch`, and the bounded per-client response cache | Component methods, rendering, retries, or request coalescing |
-| `@sefaria/text-transform` | Pure processing of HTML and Hebrew text | Fetching, component state, or DOM rendering |
-| `@sefaria/web-components/source-card`, `@sefaria/web-components/popup`, and other non-DOM subpaths | Component request types, view-model unions, pure and async factories | Browser elements or the host's active selection |
-| `@sefaria/web-components` browser exports | Registered Lit elements, layout, theme, accessibility, and rendering | Fetching or interpreting raw API payloads |
+| `@arithmomaniac/sefaria-client` | Generated operations, API contracts, response validation, configurable API origin and `fetch`, and the bounded per-client response cache | Component methods, rendering, retries, or request coalescing |
+| `@arithmomaniac/sefaria-text-transform` | Pure processing of HTML and Hebrew text | Fetching, component state, or DOM rendering |
+| `@arithmomaniac/sefaria-web-components/source-card`, `@arithmomaniac/sefaria-web-components/popup`, and other non-DOM subpaths | Component request types, view-model unions, pure and async factories | Browser elements or the host's active selection |
+| `@arithmomaniac/sefaria-web-components` browser exports | Registered Lit elements, layout, theme, accessibility, and rendering | Fetching or interpreting raw API payloads |
 | Supplied Reader controller | Supported Reader requests, cancellation, semantic history, and navigation state | DOM rendering, host data-source policy, or lifecycle |
 | Your application or integration | Data-source choice, input, lifecycle, custom composition, and assigning or binding rendering state | A second copy of factory projection or supported Reader navigation |
 
@@ -87,11 +87,11 @@ Imports from the non-DOM component subpaths can run without loading custom eleme
 Validate unknown JSON where it enters your application, then call the same pure factory. This applies to stored data, fixtures, server responses, and tool results. A prior validation in another process does not make incoming bytes trusted.
 
 ```ts
-import { zGetV3TextsResponse } from "@sefaria/client/schemas";
+import { zGetV3TextsResponse } from "@arithmomaniac/sefaria-client/schemas";
 import {
   createSourceCardViewModel,
   type SourceCardRequest,
-} from "@sefaria/web-components/source-card";
+} from "@arithmomaniac/sefaria-web-components/source-card";
 
 export function projectReceivedText(
   value: unknown,

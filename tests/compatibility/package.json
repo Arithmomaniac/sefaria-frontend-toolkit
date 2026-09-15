@@ -5,8 +5,8 @@
   "type": "module",
   "exports": "./src/index.ts",
   "dependencies": {
-    "@sefaria/client": "workspace:*",
-    "@sefaria/text-transform": "workspace:*"
+    "@arithmomaniac/sefaria-client": "workspace:*",
+    "@arithmomaniac/sefaria-text-transform": "workspace:*"
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",

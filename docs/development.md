@@ -6,11 +6,11 @@ This contributor guide describes the current source tree as of September 15, 202
 
 The sections below separate delivered baseline behavior, changes from older plans, and work that remains intended. A runnable command is not proof that the corresponding integration is finished.
 
-## Unpublished toolkit integration branch
+## Replacement repository baseline
 
-The unpublished toolkit work is integrated through `feature/avilevin/frontend-toolkit-alpha`; implementation pull requests must target that branch rather than `main`. Its branch workflow is CI-only and requires the complete deterministic gate on both Ubuntu and Windows behind the stable `check` status for pull requests targeting `main` or the toolkit branch and for pushes to the toolkit branch. It deliberately has no Pages deployment, package publication, release action, OIDC permission, tag trigger, or manual-dispatch path. Failure-only artifacts are restricted to setup/check results and maintained browser diagnostics. `main` remains the separate website and Pages deployment source.
+The toolkit is maintained on `main` in `Arithmomaniac/sefaria-frontend-toolkit`; implementation pull requests target `main`. Its workflow requires the complete deterministic gate on both Ubuntu and Windows behind the stable `check` status for pull requests and pushes to `main`. Package publication and Pages deployment are separate guarded workflows. Failure-only CI artifacts are restricted to setup/check results and maintained browser diagnostics.
 
-The conditional GitHub-hosted Copilot setup workflow must also exist on the repository's default branch before GitHub can use it. On the toolkit branch it is implemented but activation remains pending until the setup-only bootstrap is merged to `main` and verified in real cloud sessions. The bootstrap does not merge toolkit source into `main`; selecting the toolkit branch when launching a task determines the task's code base. Merging the bootstrap can still rerun `main`'s existing Pages workflow.
+The conditional GitHub-hosted Copilot setup workflow exists on the default branch, but real cloud-agent activation and qualification remain separate delivery work. The workflow recognizes the toolkit from its package identity rather than a branch name.
 
 Run the deterministic workflow-policy regression with:
 
@@ -22,7 +22,7 @@ The `integration:check` stage also parses active paths, package manifests, workf
 
 The same stage reconciles committed source-stamped inventories containing the 73 test files from `Arithmomaniac/sefaria-web-components@7bc2d258fac2959beb5252ebdbcbddbaccd0c7b7` and the nine pre-retirement showcase tests from `Arithmomaniac/sefaria-web-components@d7e2d59645ebf7427dcff2cbdd78073e2e7df58c`. It requires every retained destination to appear in Vitest's actual static discovery output and records a specific reason for each presentation-only or superseded retirement. The gate does not query or fetch the source repository's Git objects.
 
-[`IMPLEMENTATION-PLAN.md`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/IMPLEMENTATION-PLAN.md) is a historical bootstrap artifact. Its follow-on waves are complete, and it is not a maintained execution handoff or a normative component or transport specification. Use this development guide for the current baseline and the [repository issues](https://github.com/Arithmomaniac/sefaria-web-components/issues) for remaining delivery work.
+[`IMPLEMENTATION-PLAN.md`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/IMPLEMENTATION-PLAN.md) is a historical bootstrap artifact. Its follow-on waves are complete, and it is not a maintained execution handoff or a normative component or transport specification. Use this development guide for the current baseline and the [repository issues](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/issues) for remaining delivery work.
 
 ## Contributor guides
 
@@ -53,13 +53,13 @@ For reader-oriented explanations, use the friendly guides rather than the archiv
 
 These are superseded decisions, not an uncompleted backlog:
 
-- The generalized `@sefaria/model` foundation and broad offline reference parser are no longer the delivery architecture. The corrected OpenAPI contract and thin `@sefaria/client` own transport data; component factories own projections.
+- The generalized `@sefaria/model` foundation and broad offline reference parser are no longer the delivery architecture. The corrected OpenAPI contract and thin `@arithmomaniac/sefaria-client` own transport data; component factories own projections.
 - The earlier unbounded or implicit cache proposal was removed from the baseline. The current client instead implements one bounded, default-on, per-client response cache with explicit opt-out; retries and request coalescing remain excluded.
 - A separate text-range request and view-model stack was replaced by a bounded source-card collection. A single segment is a one-item collection, while a range remains one outer request with card-level reference data.
 - Attribution belongs once at the source-card level for each displayed edition, not inside every repeated text segment.
 - The private `SourceCardData` MCP wire format is superseded. The current integration uses corrected API-shaped JSON, boundary validation, and the same source-card pure factory as client mode.
 
-The [historical decision record](evidence.md#historical-decision-provenance) explains the sources and supersession behind these changes. Work on other branches is not included in this baseline. Use the [repository issues](https://github.com/Arithmomaniac/sefaria-web-components/issues) page for live delivery tracking, not as the definition of a component contract.
+The [historical decision record](evidence.md#historical-decision-provenance) explains the sources and supersession behind these changes. Work on other branches is not included in this baseline. Use the [repository issues](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/issues) page for live delivery tracking, not as the definition of a component contract.
 
 ## Still intended
 
@@ -151,7 +151,7 @@ The command performs a frozen install, installs Chromium, and launches and close
 
 Preparation can use the network for dependencies and Chromium and fails at the exact unsuccessful step. `pnpm check` remains the offline validation boundary: it does not fetch Git history, refresh fixtures, or contact Sefaria.
 
-GitHub's `.github/workflows/copilot-setup-steps.yml` first checks for `packages/web-components/package.json` with package name `@sefaria/web-components`. Toolkit-derived branches prepare normally; an unrelated checkout logs an explicit skip. A checkout that looks like the toolkit but lacks the setup script fails rather than silently skipping. This capability-based behavior must be verified in real cloud sessions after the workflow is active on `main`.
+GitHub's `.github/workflows/copilot-setup-steps.yml` first checks for `packages/web-components/package.json` with package name `@arithmomaniac/sefaria-web-components`. Toolkit-derived branches prepare normally; an unrelated checkout logs an explicit skip. A checkout that looks like the toolkit but lacks the setup script fails rather than silently skipping. This capability-based behavior must be verified in real cloud sessions after the workflow is active on `main`.
 
 Copilot CLI and Desktop do not automatically run the hosted workflow. Run `pnpm setup:agent` in each fresh local worktree. Concurrent Vitest browser runs may begin with port `6338`; Vitest selects another port when it is occupied. Tests on September 15, 2026 confirmed this fallback, so no custom port allocator is required.
 
@@ -278,7 +278,7 @@ Candidate generation does not update `manifest.json`, tests, or other references
 
 ## Generated artifacts
 
-`@sefaria/client` commits:
+`@arithmomaniac/sefaria-client` commits:
 
 - the upstream OpenAPI input
 - the complete commit pin
@@ -457,9 +457,9 @@ pnpm build
 $repository = (Resolve-Path .).Path
 $destination = Join-Path $repository ".toolchain\tarballs"
 New-Item -ItemType Directory -Force $destination
-pnpm --filter @sefaria/client pack --pack-destination $destination
-pnpm --filter @sefaria/text-transform pack --pack-destination $destination
-pnpm --filter @sefaria/web-components pack --pack-destination $destination
+pnpm --filter @arithmomaniac/sefaria-client pack --pack-destination $destination
+pnpm --filter @arithmomaniac/sefaria-text-transform pack --pack-destination $destination
+pnpm --filter @arithmomaniac/sefaria-web-components pack --pack-destination $destination
 ```
 
 The packages remain private. There is no npm alpha installation command, publication workflow, tag, or release in this branch.

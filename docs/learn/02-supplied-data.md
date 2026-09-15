@@ -29,10 +29,10 @@ The maintained vanilla example validates its imported JSON fixture before projec
 import {
   type CoreV3TextsResponse,
   zCoreV3TextsResponse,
-} from "@sefaria/client";
-import "@sefaria/web-components";
-import type { SefariaSourceCard } from "@sefaria/web-components";
-import { createSourceCardViewModel } from "@sefaria/web-components/source-card";
+} from "@arithmomaniac/sefaria-client";
+import "@arithmomaniac/sefaria-web-components";
+import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
+import { createSourceCardViewModel } from "@arithmomaniac/sefaria-web-components/source-card";
 
 import payload from "./micah-6-8.json";
 
@@ -55,9 +55,9 @@ pnpm build
 $repository = (Resolve-Path .).Path
 $destination = Join-Path $repository ".artifacts\local-packages"
 New-Item -ItemType Directory -Force $destination
-pnpm --filter @sefaria/client pack --pack-destination $destination
-pnpm --filter @sefaria/text-transform pack --pack-destination $destination
-pnpm --filter @sefaria/web-components pack --pack-destination $destination
+pnpm --filter @arithmomaniac/sefaria-client pack --pack-destination $destination
+pnpm --filter @arithmomaniac/sefaria-text-transform pack --pack-destination $destination
+pnpm --filter @arithmomaniac/sefaria-web-components pack --pack-destination $destination
 Get-ChildItem $destination -Filter *.tgz
 ```
 
@@ -68,9 +68,9 @@ Get-ChildItem $destination -Filter *.tgz
   "private": true,
   "type": "module",
   "dependencies": {
-    "@sefaria/client": "file:./sefaria-client-0.0.0.tgz",
-    "@sefaria/text-transform": "file:./sefaria-text-transform-0.0.0.tgz",
-    "@sefaria/web-components": "file:./sefaria-web-components-0.0.0.tgz"
+    "@arithmomaniac/sefaria-client": "file:./arithmomaniac-sefaria-client-0.0.0.tgz",
+    "@arithmomaniac/sefaria-text-transform": "file:./arithmomaniac-sefaria-text-transform-0.0.0.tgz",
+    "@arithmomaniac/sefaria-web-components": "file:./arithmomaniac-sefaria-web-components-0.0.0.tgz"
   }
 }
 ```
@@ -79,9 +79,9 @@ Put the matching transitive overrides in `pnpm-workspace.yaml`, which is the pnp
 
 ```yaml
 overrides:
-  "@sefaria/client": "file:./sefaria-client-0.0.0.tgz"
-  "@sefaria/text-transform": "file:./sefaria-text-transform-0.0.0.tgz"
-  "@sefaria/web-components": "file:./sefaria-web-components-0.0.0.tgz"
+  "@arithmomaniac/sefaria-client": "file:./arithmomaniac-sefaria-client-0.0.0.tgz"
+  "@arithmomaniac/sefaria-text-transform": "file:./arithmomaniac-sefaria-text-transform-0.0.0.tgz"
+  "@arithmomaniac/sefaria-web-components": "file:./arithmomaniac-sefaria-web-components-0.0.0.tgz"
 
 allowBuilds:
   esbuild: true
@@ -106,9 +106,9 @@ Inspect `data-request-count` before and after the explicit client action. Then a
 ## Source and run links
 
 - Run: `pnpm dev:vanilla`
-- Source: [`examples/vanilla-vite/src/main.ts`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/vanilla-vite/src/main.ts)
-- Fixture transport and tests: [`examples/vanilla-vite`](https://github.com/Arithmomaniac/sefaria-web-components/tree/feature/avilevin/frontend-toolkit-alpha/examples/vanilla-vite)
-- Package artifact qualification: [`scripts/test-tarball-consumer.mjs`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/scripts/test-tarball-consumer.mjs)
+- Source: [`examples/vanilla-vite/src/main.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/vanilla-vite/src/main.ts)
+- Fixture transport and tests: [`examples/vanilla-vite`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/vanilla-vite)
+- Package artifact qualification: [`scripts/test-tarball-consumer.mjs`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/scripts/test-tarball-consumer.mjs)
 
 ## Next step
 

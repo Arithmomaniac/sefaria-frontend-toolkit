@@ -1,11 +1,14 @@
-import { createSefariaClient, type SefariaClient } from "@sefaria/client";
-import "@sefaria/web-components";
+import {
+  createSefariaClient,
+  type SefariaClient,
+} from "@arithmomaniac/sefaria-client";
+import "@arithmomaniac/sefaria-web-components";
 import type {
   BilingualSegmentRequest,
   BilingualSegmentViewModel,
   SefariaBilingualSegment,
-} from "@sefaria/web-components";
-import { loadBilingualSegmentViewModel } from "@sefaria/web-components/bilingual-segment";
+} from "@arithmomaniac/sefaria-web-components";
+import { loadBilingualSegmentViewModel } from "@arithmomaniac/sefaria-web-components/bilingual-segment";
 
 /** One host-owned bilingual-segment request operation. */
 export type BilingualSegmentLoader = (

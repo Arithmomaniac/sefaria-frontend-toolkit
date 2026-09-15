@@ -67,7 +67,7 @@ _Runtime paths, showing the browser capture-and-project variant. An existing asy
 | Controlled reader surface | Navigation bar, pane layout, accessible controls, presentation state supplied by the host, composed action events | Fetching or interpreting API payloads |
 | Existing child elements | Render their existing component view models and emit their existing events | Knowledge of the reader session |
 
-"Headless" means usable without a DOM element. The immutable session lives at `@sefaria/web-components/reader-session`; the supported stateful coordinator lives at `@sefaria/web-components/reader-controller`. The current `@sefaria/web-components/reader` projection and `<sefaria-reader>` element remain a request-free visual composition.
+"Headless" means usable without a DOM element. The immutable session lives at `@arithmomaniac/sefaria-web-components/reader-session`; the supported stateful coordinator lives at `@arithmomaniac/sefaria-web-components/reader-controller`. The current `@arithmomaniac/sefaria-web-components/reader` projection and `<sefaria-reader>` element remain a request-free visual composition.
 
 ### Browser execution
 

@@ -1,4 +1,4 @@
-import * as readerController from "@sefaria/web-components/reader-controller";
+import * as readerController from "@arithmomaniac/sefaria-web-components/reader-controller";
 import { expect, test } from "vitest";
 
 test("exports the reader controller without a DOM dependency", () => {

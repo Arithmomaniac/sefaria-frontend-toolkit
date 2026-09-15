@@ -3,14 +3,14 @@ import {
   type CoreV3TextsResponse,
   type SefariaClient,
   zCoreV3TextsResponse,
-} from "@sefaria/client";
-import "@sefaria/web-components";
-import type { SefariaSourceCard } from "@sefaria/web-components";
+} from "@arithmomaniac/sefaria-client";
+import "@arithmomaniac/sefaria-web-components";
+import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
 import {
   createSourceCardViewModel,
   loadSourceCardViewModel,
   type SourceCardViewModel,
-} from "@sefaria/web-components/source-card";
+} from "@arithmomaniac/sefaria-web-components/source-card";
 import {
   useCallback,
   useEffect,

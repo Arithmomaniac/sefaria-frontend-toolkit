@@ -1,4 +1,4 @@
-import type { RefLabelViewModel } from "@sefaria/web-components";
+import type { RefLabelViewModel } from "@arithmomaniac/sefaria-web-components";
 
 export interface RefLabelScenario {
   readonly id: "data" | "loading" | "empty" | "error";

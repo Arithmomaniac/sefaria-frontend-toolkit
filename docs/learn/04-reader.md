@@ -19,10 +19,10 @@ The controlled Reader is the shortest complete path. The toolkit supplies its co
 The supported path creates the browser client, loads a controller once, binds it to one persistent element, and disposes both:
 
 ```ts
-import { createSefariaClient } from "@sefaria/client";
-import "@sefaria/web-components";
-import { bindReaderController } from "@sefaria/web-components";
-import { loadReaderController } from "@sefaria/web-components/reader-controller";
+import { createSefariaClient } from "@arithmomaniac/sefaria-client";
+import "@arithmomaniac/sefaria-web-components";
+import { bindReaderController } from "@arithmomaniac/sefaria-web-components";
+import { loadReaderController } from "@arithmomaniac/sefaria-web-components/reader-controller";
 
 const element = document.createElement("sefaria-reader");
 document.body.append(element);
@@ -57,7 +57,7 @@ pnpm dev:reader
 
 The controlled Reader owns bounded semantic history, source-to-connections transitions, cancellation, and component event handling while the host owns creation and disposal. The spatial example can keep several panes visible, but its host also owns pane identity, placement, activation, pruning, compact layout, pins, and operation timing.
 
-The same Reader presentation can run with different data paths. A regular website controller can use `@sefaria/client`; an MCP App controller uses host-mediated tools because the sandbox cannot make the same direct requests. In both cases the element receives rendering data and emits events rather than fetching.
+The same Reader presentation can run with different data paths. A regular website controller can use `@arithmomaniac/sefaria-client`; an MCP App controller uses host-mediated tools because the sandbox cannot make the same direct requests. In both cases the element receives rendering data and emits events rather than fetching.
 
 **Explicit live actions:** after starting `pnpm dev:site`, <a href="../../examples/reader/controlled.html?tref=Micah%206%3A8" target="_self">open the controlled Reader</a> or <a href="../../examples/reader/index.html?tref=Micah%206%3A8" target="_self">open the spatial Reader</a>. The repository-relative links also open the maintained source pages on GitHub. The local routes load data from Sefaria; opening the lesson itself makes no live request.
 
@@ -77,8 +77,8 @@ In the controlled Reader, open connections, follow one connection, and use Back.
 ## Source and run links
 
 - Run: `pnpm dev:reader`
-- Controlled source: [`examples/reader/src/controlled-app.ts`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/reader/src/controlled-app.ts)
-- Spatial source: [`examples/reader/src/app.ts`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/reader/src/app.ts)
+- Controlled source: [`examples/reader/src/controlled-app.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/reader/src/controlled-app.ts)
+- Spatial source: [`examples/reader/src/app.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/reader/src/app.ts)
 - Illustrated ownership guide: [Reader navigation](../guides/reader-navigation.md)
 
 ## Next step

@@ -3,8 +3,8 @@ import {
   getLinks,
   type CoreLinkResponse,
   type SefariaClient,
-} from "@sefaria/client";
-import "@sefaria/web-components";
+} from "@arithmomaniac/sefaria-client";
+import "@arithmomaniac/sefaria-web-components";
 import type {
   ConnectionsProjection,
   ConnectionsRequest,
@@ -12,12 +12,12 @@ import type {
   SefariaSourceCard,
   SourceCardDataViewModel,
   SourceCardNavigation,
-} from "@sefaria/web-components";
-import { createConnectionsViewModel } from "@sefaria/web-components/connections-panel";
+} from "@arithmomaniac/sefaria-web-components";
+import { createConnectionsViewModel } from "@arithmomaniac/sefaria-web-components/connections-panel";
 import {
   loadSourceCardViewModel,
   type SourceCardViewModel,
-} from "@sefaria/web-components/source-card";
+} from "@arithmomaniac/sefaria-web-components/source-card";
 
 /** Host controls exposed for browser qualification and manual use. */
 export interface ConnectionsDemo {

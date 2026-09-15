@@ -3,7 +3,7 @@ import {
   SefariaContractError,
   validateGetRef200,
   type CoreRefResponse,
-} from "@sefaria/client";
+} from "@arithmomaniac/sefaria-client";
 import { describe, expect, it, vi } from "vitest";
 
 import rangeFixture from "../../client/test/fixtures/ref-genesis-range-2026-09-03.json";

@@ -17,17 +17,17 @@ flowchart LR
     VM --> ELEMENT["Request-free Lit element"]
     ELEMENT --> DOM["Shadow DOM"]
     REQUEST["Component request"] --> ASYNC["Async component factory"]
-    CLIENT["Supplied @sefaria/client"] --> ASYNC
+    CLIENT["Supplied @arithmomaniac/sefaria-client"] --> ASYNC
     ASYNC -->|"captured payload"| PURE
 ```
 
-The API payload is authoritative for transport fields, and the view model is authoritative for rendered data. Raw HTML can enter only the pure factory as a validated payload field; the factory applies the required `@sefaria/text-transform` operations before placing sanitized HTML fragments or typed text parts in the view model. The element does not read, validate, or project an API payload.
+The API payload is authoritative for transport fields, and the view model is authoritative for rendered data. Raw HTML can enter only the pure factory as a validated payload field; the factory applies the required `@arithmomaniac/sefaria-text-transform` operations before placing sanitized HTML fragments or typed text parts in the view model. The element does not read, validate, or project an API payload.
 
 A convenience API can accept a payload and return or configure a component, but it must delegate to the same pure factory and then supply its result to the request-free element.
 
 ## Component subpath contract
 
-Every endpoint-backed component has a non-DOM `@sefaria/web-components` subpath. The subpath owns:
+Every endpoint-backed component has a non-DOM `@arithmomaniac/sefaria-web-components` subpath. The subpath owns:
 
 - one component request type
 - one component-specific view-model union
@@ -56,7 +56,7 @@ The listed component names are current.
 
 ## Reader session [Current]
 
-`@sefaria/web-components/reader-session` is a DOM-free immutable navigation session over existing source-card and connections-panel contracts. It is not an element, generalized domain model, request facade, cache, or persistence format. Integrations own clients, requests, external validation, cancellation, and physical operation execution.
+`@arithmomaniac/sefaria-web-components/reader-session` is a DOM-free immutable navigation session over existing source-card and connections-panel contracts. It is not an element, generalized domain model, request facade, cache, or persistence format. Integrations own clients, requests, external validation, cancellation, and physical operation execution.
 
 The session owns semantic source history, stable entry and operation identities, selected source position, display settings, retained corrected payload captures, completion eligibility, and bounded admission. It exposes render-ready source-card and connections-panel view models but never exposes raw captures through its rendering projection.
 
@@ -80,7 +80,7 @@ The reader session does not expose a public serialized snapshot schema. Durable 
 
 ## Controlled reader [Current]
 
-`@sefaria/web-components/reader` is a DOM-free projection from `ReaderSessionView` to the rendering-only `ReaderViewModel`. The projection includes stable entry identity, breadcrumb labels, history bounds, source-card state, connections-panel state, presentation settings, and an exact selected target when one exists. It excludes requests, captures, operation identities, pin counts, retained-byte diagnostics, clients, and session mutation.
+`@arithmomaniac/sefaria-web-components/reader` is a DOM-free projection from `ReaderSessionView` to the rendering-only `ReaderViewModel`. The projection includes stable entry identity, breadcrumb labels, history bounds, source-card state, connections-panel state, presentation settings, and an exact selected target when one exists. It excludes requests, captures, operation identities, pin counts, retained-byte diagnostics, clients, and session mutation.
 
 `<sefaria-reader>` is a controlled request-free element. It renders one current source-and-connections workspace by composing `<sefaria-source-card>` and `<sefaria-connections-panel>`. It never performs a request, calls an async factory, mutates the reader session, or treats a reference string as a history identity.
 
@@ -94,7 +94,7 @@ An explicit chat-export control appears only when the host enables it and the mo
 
 ## Reader controller [Current]
 
-`@sefaria/web-components/reader-controller` is the stateful DOM-free convenience layer for consumers that want to provide an initial reader position and let the supported reader abstraction coordinate subsequent navigation. It privately owns one immutable `ReaderSession`, request cancellation, stale-result suppression, source and connections operation execution, retained captures, local connections reprojection, and subscriber notification. It exposes immutable controller snapshots rather than the mutable session API. It does not own spatial multi-pane placement, durable persistence, retries, request coalescing, fallback transport, or chat delivery.
+`@arithmomaniac/sefaria-web-components/reader-controller` is the stateful DOM-free convenience layer for consumers that want to provide an initial reader position and let the supported reader abstraction coordinate subsequent navigation. It privately owns one immutable `ReaderSession`, request cancellation, stale-result suppression, source and connections operation execution, retained captures, local connections reprojection, and subscriber notification. It exposes immutable controller snapshots rather than the mutable session API. It does not own spatial multi-pane placement, durable persistence, retries, request coalescing, fallback transport, or chat delivery.
 
 `loadReaderController(request, client)` is the ordinary website async factory. It uses the same source-card selectors and connections request semantics as the endpoint-backed component factories, resolves server-provided source context without parsing references, selects the exact returned row when available, admits the corrected source and links payload captures into the session, and returns one ready controller. Each navigation performs at most two text requests and one links request. A required contextual request must succeed before source commitment; there is no target-only fallback. A source transport, documented source error, empty/non-addressable source, qualification failure, or initialization abort rejects initialization. A links transport failure preserves the committed source and returns a controller whose current connections state is explicitly failed. A documented links 400 remains component content.
 
@@ -143,7 +143,7 @@ The factory:
 - makes no request
 - reads no global client or cache
 - uses no DOM state
-- uses `@sefaria/text-transform` for required text processing
+- uses `@arithmomaniac/sefaria-text-transform` for required text processing
 - applies HTML vocalization through the transform package rather than parsing HTML independently
 - preserves available attribution when the component owns its display
 - returns a component-specific partial or empty state for missing requested content
@@ -155,7 +155,7 @@ If a component contract rejects an invalid request, both factories reject it bef
 
 ## Async factories
 
-An async factory accepts a component request and a supplied `@sefaria/client`. It performs the smallest operation set needed for that component.
+An async factory accepts a component request and a supplied `@arithmomaniac/sefaria-client`. It performs the smallest operation set needed for that component.
 
 For a successful captured payload, its terminal view model must equal the pure factory result for that payload and the same deterministic inputs.
 
@@ -176,7 +176,7 @@ sequenceDiagram
     participant Host
     participant Boundary as Integration boundary
     participant Async as Async component factory
-    participant Client as @sefaria/client
+    participant Client as @arithmomaniac/sefaria-client
     participant Validator as Generated validator
     participant Pure as Pure component factory
     participant Element as Request-free element
@@ -209,7 +209,7 @@ A composite async factory makes one outer request when one endpoint payload cont
 ```mermaid
 flowchart TD
     HOST["Host"] --> OUTER["Composite async factory"]
-    OUTER -->|"one request"| CLIENT["@sefaria/client"]
+    OUTER -->|"one request"| CLIENT["@arithmomaniac/sefaria-client"]
     CLIENT -->|"one captured payload"| COMPOSITE["Composite pure factory"]
     COMPOSITE -->|"pure projection"| C1["Child pure factory 1"]
     COMPOSITE -->|"pure projection"| C2["Child pure factory 2"]
@@ -251,7 +251,7 @@ No element accepts:
 
 No element interprets raw API HTML. Sanitized render-ready HTML fragments are view-model data rather than transport payloads.
 
-An element must not call `fetch`, `@sefaria/client`, or an async component factory.
+An element must not call `fetch`, `@arithmomaniac/sefaria-client`, or an async component factory.
 
 ## Data and interaction state
 
@@ -474,7 +474,7 @@ Every selection control exposes the complete canonical ref through its accessibl
 
 ## Connections panel contract [Current]
 
-`@sefaria/web-components/connections-panel` owns the request, pure and async factories, and view-model union. The async factory performs one `getLinks` operation with explicit `with_text` and `with_sheet_links=0`; its pure projection is identical for the captured response. It never loads a connection's text separately. Loading, data, empty, API errors returned with HTTP 200, HTTP 400 errors, and projection failures are distinct. Network, abort, and JSON validation failures reject.
+`@arithmomaniac/sefaria-web-components/connections-panel` owns the request, pure and async factories, and view-model union. The async factory performs one `getLinks` operation with explicit `with_text` and `with_sheet_links=0`; its pure projection is identical for the captured response. It never loads a connection's text separately. Loading, data, empty, API errors returned with HTTP 200, HTTP 400 errors, and projection failures are distinct. Network, abort, and JSON validation failures reject.
 
 The request separates the reference and text-inclusion choice from local category/page projection. All text-link categories have summaries and detail pages; sheets are excluded. Category IDs retain the API's exact values, with Commentary first and the remaining categories in deterministic name order. Entries group by `index_title`, then sort by `anchorVerse`, `commentaryNum`, `sourceRef`, and `_id`. Collective titles and source reference labels come from the payload; missing translated category or rich reference metadata is not invented.
 
@@ -488,7 +488,7 @@ The element receives only its view model and interaction/presentation properties
 
 Direction comes from version or corrected API data. A factory must not infer direction from a language code.
 
-Text that can contain markup passes through `@sefaria/text-transform` before the view model reaches an element.
+Text that can contain markup passes through `@arithmomaniac/sefaria-text-transform` before the view model reaches an element.
 
 Edition attribution belongs to the source-card container. Text-segment and bilingual-segment elements do not render it. By default, the source card renders each visible resolved edition once; a host can set `hideAttributions` when its surface intentionally omits edition details. The Linker popup keeps attribution visible so the embedded preview identifies its source editions. When `versionSourceUrl` is present, the edition title is the link and the raw URL is not repeated. A non-URL or unsafe `versionSource` remains inert text.
 

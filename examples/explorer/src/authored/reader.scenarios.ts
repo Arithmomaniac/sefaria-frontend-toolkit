@@ -1,4 +1,4 @@
-import type { ReaderViewModel } from "@sefaria/web-components";
+import type { ReaderViewModel } from "@arithmomaniac/sefaria-web-components";
 
 /** One authored state for request-free reader development. */
 export interface ReaderScenario {

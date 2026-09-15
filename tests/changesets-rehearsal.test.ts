@@ -25,12 +25,16 @@ describe("private Changesets configuration", () => {
     };
 
     expect(config).toMatchObject({
-      baseBranch: "feature/avilevin/frontend-toolkit-alpha",
+      baseBranch: "main",
       commit: false,
       privatePackages: { version: true, tag: false },
     });
     expect(config.fixed).toEqual([
-      ["@sefaria/client", "@sefaria/text-transform", "@sefaria/web-components"],
+      [
+        "@arithmomaniac/sefaria-client",
+        "@arithmomaniac/sefaria-text-transform",
+        "@arithmomaniac/sefaria-web-components",
+      ],
     ]);
   });
 

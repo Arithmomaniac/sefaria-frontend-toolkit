@@ -10,7 +10,7 @@ Start with the complete Reader, use individual browser-standard Web Components f
 
 ## First run
 
-Start from a checkout of `feature/avilevin/frontend-toolkit-alpha`, or a work branch based on it. With Node.js 22.12 or later, pnpm 11.22.0, and Chromium:
+Start from `main`, or a work branch based on it. With Node.js 22.12 or later, pnpm 11.22.0, and Chromium:
 
 ```powershell
 corepack enable
@@ -46,9 +46,9 @@ The [documentation home](docs/README.md) is the repository-native index for guid
 
 ## Architecture in one minute
 
-1. `@sefaria/client` calls reviewed API operations and validates every JSON response.
-2. `@sefaria/text-transform` performs pure sanitization, vocalization, and footnote work.
-3. non-DOM `@sefaria/web-components/*` factories project validated payloads into component-specific view models.
+1. `@arithmomaniac/sefaria-client` calls reviewed API operations and validates every JSON response.
+2. `@arithmomaniac/sefaria-text-transform` performs pure sanitization, vocalization, and footnote work.
+3. non-DOM `@arithmomaniac/sefaria-web-components/*` factories project validated payloads into component-specific view models.
 4. browser elements render those view models and emit events; they never receive clients, references, raw payloads, or `fetch`.
 5. supplied controllers coordinate supported behavior such as Reader navigation; the application binds them to elements and chooses the permitted data source and lifecycle.
 

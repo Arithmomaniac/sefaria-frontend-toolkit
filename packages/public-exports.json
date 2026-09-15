@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "packages": [
     {
-      "name": "@sefaria/client",
+      "name": "@arithmomaniac/sefaria-client",
       "exports": [
         {
           "subpath": ".",
@@ -364,7 +364,7 @@
       ]
     },
     {
-      "name": "@sefaria/text-transform",
+      "name": "@arithmomaniac/sefaria-text-transform",
       "exports": [
         {
           "subpath": ".",
@@ -389,7 +389,7 @@
       ]
     },
     {
-      "name": "@sefaria/web-components",
+      "name": "@arithmomaniac/sefaria-web-components",
       "exports": [
         {
           "subpath": ".",

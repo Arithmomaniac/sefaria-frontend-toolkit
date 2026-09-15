@@ -2,7 +2,7 @@ import {
   createReaderConnectionsContent,
   createReaderSession,
   createReaderSourceContent,
-} from "@sefaria/web-components/reader-session";
+} from "@arithmomaniac/sefaria-web-components/reader-session";
 import { expect, test } from "vitest";
 
 test("the reader-session subpath is DOM-free", () => {

@@ -30,6 +30,7 @@ describe("Wave 4 integration policy", () => {
   it("requires private manifests and built package exports", () => {
     const valid = {
       "packages/client/package.json": {
+        name: "@arithmomaniac/sefaria-client",
         private: true,
         files: ["dist", "README.md"],
         exports: {
@@ -44,6 +45,7 @@ describe("Wave 4 integration policy", () => {
       validateManifestPolicy({
         ...valid,
         "packages/client/package.json": {
+          name: "@sefaria/client",
           private: false,
           files: ["src"],
           exports: { ".": "./src/index.ts" },
@@ -51,6 +53,7 @@ describe("Wave 4 integration policy", () => {
       }),
     ).toEqual([
       "non-private manifest: packages/client/package.json",
+      "unexpected package identity: packages/client/package.json -> @sefaria/client",
       "source export fallback at packages/client/package.json:exports.. -> ./src/index.ts",
       "package does not explicitly pack dist: packages/client/package.json",
     ]);
@@ -91,7 +94,7 @@ describe("Wave 4 integration policy", () => {
       .replace(/permissions:\r?\n {2}contents: read/u, "permissions: write-all")
       .replace("  push:", "  workflow_dispatch:\n  push:")
       .replace(
-        /(push:\r?\n {4}branches:\r?\n {6}- feature\/avilevin\/frontend-toolkit-alpha)/u,
+        /(push:\r?\n {4}branches:\r?\n {6}- main)/u,
         "$1\n    tags:\n      - v*",
       );
     expect(
@@ -141,7 +144,7 @@ describe("Wave 4 integration policy", () => {
     expect(
       validateDocumentationClaims({
         "README.md":
-          "This official Sefaria toolkit is deployed documentation.\n```powershell\nnpm install @sefaria/client\n```",
+          "This official Sefaria toolkit is deployed documentation.\n```powershell\nnpm install @arithmomaniac/sefaria-client\n```",
       }),
     ).toEqual([
       "unsupported registry installation command: README.md",

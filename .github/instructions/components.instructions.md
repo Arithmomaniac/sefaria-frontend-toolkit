@@ -12,7 +12,7 @@ applyTo: "packages/web-components/**,examples/explorer/src/authored/**,examples/
 - Keep component view models specific to one rendering surface.
 - Do not create a generalized data facade.
 - Make pure factories deterministic and independent of clients, caches, DOM state, and global state.
-- Make async factories accept a supplied `@sefaria/client`.
+- Make async factories accept a supplied `@arithmomaniac/sefaria-client`.
 - Make a successful async result equal the pure result for its captured payload.
 - Return a component error view model for documented HTTP error payloads.
 - Preserve network and abort rejections from the supplied client.

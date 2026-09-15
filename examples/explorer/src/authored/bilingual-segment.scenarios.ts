@@ -1,7 +1,7 @@
 import type {
   BilingualSegmentViewModel,
   TextSegmentDataViewModel,
-} from "@sefaria/web-components";
+} from "@arithmomaniac/sefaria-web-components";
 
 export interface BilingualSegmentScenario {
   readonly id: "data" | "loading" | "partial" | "empty" | "error";

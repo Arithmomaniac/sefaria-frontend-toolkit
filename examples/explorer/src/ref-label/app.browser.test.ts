@@ -1,7 +1,7 @@
 import type {
   RefLabelDataViewModel,
   SefariaRefLabel,
-} from "@sefaria/web-components";
+} from "@arithmomaniac/sefaria-web-components";
 import { beforeEach, expect, test, vi } from "vitest";
 
 import { startRefLabelLiveDemo, type RefLabelLoader } from "./app.js";

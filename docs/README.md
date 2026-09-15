@@ -12,8 +12,8 @@ You do not need to finish the tutorial before using the toolkit:
 
 | Need | Destination |
 | --- | --- |
-| Prebuilt stateful reading surface | [Controlled Reader lesson](learn/04-reader.md) and [`examples/reader/controlled.html`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/reader/controlled.html) |
-| Component states and live diagnostics | [Example catalog](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/README.md) |
+| Prebuilt stateful reading surface | [Controlled Reader lesson](learn/04-reader.md) and [`examples/reader/controlled.html`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/reader/controlled.html) |
+| Component states and live diagnostics | [Example catalog](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/README.md) |
 | A passage card in a browser app | [Render text](guides/render-text.md) |
 | Authored citation popups | [Linked article](linked-article.md) |
 | Reader in an MCP Apps host | [MCP App demonstration](mcp-app-demo.md) |
@@ -48,9 +48,9 @@ React users can branch from steps 2 and 3 into [Use the Web Components from Reac
 | --- | --- |
 | Set up the repository and run local/site checks | [Development](development.md) |
 | Review a change at the right depth | [Review](review.md) |
-| Use the validated transport package | [`@sefaria/client`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/packages/client/README.md) |
-| Use text transforms without components | [`@sefaria/text-transform`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/packages/text-transform/README.md) |
-| Choose component and Reader subpaths | [`@sefaria/web-components`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/packages/web-components/README.md) |
+| Use the validated transport package | [`@arithmomaniac/sefaria-client`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/client/README.md) |
+| Use text transforms without components | [`@arithmomaniac/sefaria-text-transform`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/text-transform/README.md) |
+| Choose component and Reader subpaths | [`@arithmomaniac/sefaria-web-components`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/web-components/README.md) |
 | Inspect generated element metadata | [Custom elements](reference/custom-elements.md) |
 | Inspect declaration-derived package exports | [Public package exports](reference/public-exports.md) |
 | Find historical removed material | [Documentation archive](archive/README.md) |

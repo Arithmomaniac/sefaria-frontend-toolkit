@@ -63,11 +63,11 @@ Disable JavaScript and follow the authored Micah 6:8 link. Re-enable JavaScript,
 ## Source and run links
 
 - Linked article guide: [Authored linked article](../linked-article.md)
-- Linked article source: [`examples/linked-article/src/app.ts`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/linked-article/src/app.ts)
+- Linked article source: [`examples/linked-article/src/app.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/linked-article/src/app.ts)
 - MCP guide and maintained screenshots: [MCP App demonstration](../mcp-app-demo.md)
-- MCP App source: [`examples/mcp-app/src/app.ts`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/mcp-app/src/app.ts)
-- MCP server source: [`examples/mcp-app/src/server`](https://github.com/Arithmomaniac/sefaria-web-components/tree/feature/avilevin/frontend-toolkit-alpha/examples/mcp-app/src/server)
+- MCP App source: [`examples/mcp-app/src/app.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/mcp-app/src/app.ts)
+- MCP server source: [`examples/mcp-app/src/server`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/mcp-app/src/server)
 
 ## Next step
 
-Return to the [documentation home](../README.md), inspect the [example catalog](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/README.md), or follow [Development](../development.md) to run the complete repository checks.
+Return to the [documentation home](../README.md), inspect the [example catalog](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/README.md), or follow [Development](../development.md) to run the complete repository checks.

@@ -1,7 +1,10 @@
-import { createSefariaClient, type SefariaClient } from "@sefaria/client";
-import "@sefaria/web-components";
-import type { PopupLoadingViewModel } from "@sefaria/web-components";
-import { loadPopupViewModel } from "@sefaria/web-components/popup";
+import {
+  createSefariaClient,
+  type SefariaClient,
+} from "@arithmomaniac/sefaria-client";
+import "@arithmomaniac/sefaria-web-components";
+import type { PopupLoadingViewModel } from "@arithmomaniac/sefaria-web-components";
+import { loadPopupViewModel } from "@arithmomaniac/sefaria-web-components/popup";
 
 const POPUP_ID = "linked-article-source-popup";
 const LINK_SELECTOR = "a[data-sefaria-ref]";

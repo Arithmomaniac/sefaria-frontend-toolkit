@@ -62,13 +62,13 @@ Each OpenAPI correction starts with the original Sefaria route, handler, respons
 
 | Owner | Responsibility | Must not own |
 | --- | --- | --- |
-| `@sefaria/client` | Pinned OpenAPI input, checksum, guarded overlay, generated contracts, Zod schemas, TypeScript validators, thin client, and bounded per-client response cache | Rendering, component view models, persistent or shared caches, retries, coalescing, stale fallback, or component methods |
-| `@sefaria/text-transform` | Pure sanitization, vocalization, and footnote operations | Requests, DOM rendering, or API contract correction |
-| Non-DOM `@sefaria/web-components` subpaths | Component request types, view-model unions, pure factories, and async factories | Hidden global clients or DOM state |
-| `@sefaria/web-components/reader-session` | Immutable source history, capture retention, stable identities, completion eligibility, and render projection over existing component contracts | Requests, cancellation, persistence, DOM state, or spatial pane placement |
-| `@sefaria/web-components/reader` | Request-free projection from session state to one controlled reader rendering model | Captures, operations, requests, session mutation, or arbitrary spatial pane management |
-| `@sefaria/web-components/reader-controller` | Stateful reader-session ownership, initial and interaction-driven execution, cancellation, stale-result suppression, and subscriber notification | DOM rendering, spatial pane policy, persistence, retries, fallback transport, or chat delivery |
-| `@sefaria/web-components` elements | Layout, interaction, accessibility, theming, and DOM rendering | References, raw JSON, clients, hosts, fetch functions, or requests |
+| `@arithmomaniac/sefaria-client` | Pinned OpenAPI input, checksum, guarded overlay, generated contracts, Zod schemas, TypeScript validators, thin client, and bounded per-client response cache | Rendering, component view models, persistent or shared caches, retries, coalescing, stale fallback, or component methods |
+| `@arithmomaniac/sefaria-text-transform` | Pure sanitization, vocalization, and footnote operations | Requests, DOM rendering, or API contract correction |
+| Non-DOM `@arithmomaniac/sefaria-web-components` subpaths | Component request types, view-model unions, pure factories, and async factories | Hidden global clients or DOM state |
+| `@arithmomaniac/sefaria-web-components/reader-session` | Immutable source history, capture retention, stable identities, completion eligibility, and render projection over existing component contracts | Requests, cancellation, persistence, DOM state, or spatial pane placement |
+| `@arithmomaniac/sefaria-web-components/reader` | Request-free projection from session state to one controlled reader rendering model | Captures, operations, requests, session mutation, or arbitrary spatial pane management |
+| `@arithmomaniac/sefaria-web-components/reader-controller` | Stateful reader-session ownership, initial and interaction-driven execution, cancellation, stale-result suppression, and subscriber notification | DOM rendering, spatial pane policy, persistence, retries, fallback transport, or chat delivery |
+| `@arithmomaniac/sefaria-web-components` elements | Layout, interaction, accessibility, theming, and DOM rendering | References, raw JSON, clients, hosts, fetch functions, or requests |
 | Package manifests and generated metadata | Built JavaScript/declaration export maps, tarball contents, custom-elements metadata, and declaration-derived public export inventory | Source aliases, registry publication, or alternate component contracts |
 | Repository integration policy | Active runtime/build path inventory, private manifests, built exports, CI permissions, portable lockfile resolution, maintained documentation claims, and old-to-new test disposition | Product contracts, publication, deployment, or historical-source censorship |
 | Website reader demonstrations | The supported page binds the public controller; the workspace page owns lower-level session coordination, pane placement, pane pin lifetime, compact selection, and spatial descendant pruning while reusing the shared browser data source | Public arbitrary-panel contracts, duplicate semantic history, or element-owned requests |
@@ -80,12 +80,12 @@ Each OpenAPI correction starts with the original Sefaria route, handler, respons
 
 ```mermaid
 flowchart LR
-    API["Sefaria API"] ==>|"external payload"| CLIENT["@sefaria/client"]
+    API["Sefaria API"] ==>|"external payload"| CLIENT["@arithmomaniac/sefaria-client"]
     PIN["Pinned OpenAPI + overlay"] -.->|"build-time generation input"| CLIENT
     CLIENT -.->|"type-only generated operation contracts"| ASYNC["Async component factories"]
     CLIENT -->|"runtime request result"| ASYNC
     ASYNC -->|"captured payload"| PURE["Pure component factories"]
-    XFORM["@sefaria/text-transform"] -->|"runtime pure transform"| PURE
+    XFORM["@arithmomaniac/sefaria-text-transform"] -->|"runtime pure transform"| PURE
     COMPOSITE["Composite pure factory"] -->|"factory orchestration"| CHILD["Child pure factories"]
     CHILD -->|"component view models"| ELEMENTS["Lit elements"]
     PURE -->|"component view models"| ELEMENTS
@@ -98,7 +98,7 @@ Solid arrows show runtime dependencies. Dotted arrows show build-time or type-on
 
 ## OpenAPI supply chain
 
-`@sefaria/client` owns one committed upstream OpenAPI input from Sefaria commit `1f7d0844ca6a9eddc8e48168962aacb09de75bd6`. A committed checksum makes accidental input changes visible.
+`@arithmomaniac/sefaria-client` owns one committed upstream OpenAPI input from Sefaria commit `1f7d0844ca6a9eddc8e48168962aacb09de75bd6`. A committed checksum makes accidental input changes visible.
 
 An explicit refresh operation can access the network. Ordinary generation reads only committed files.
 
@@ -128,11 +128,11 @@ Unknown inputs from MCP or another external boundary receive validation before c
 
 ## Component boundary
 
-Each component has a non-DOM public subpath. This subpath owns its request type, view-model union, pure projection factory, and async request factory. The pure factory converts a corrected API payload into one component view model. The async factory obtains the payload through a supplied client and passes it to the pure factory. The current subpaths are `@sefaria/web-components/text-segment`, `@sefaria/web-components/bilingual-segment`, `@sefaria/web-components/ref-label`, `@sefaria/web-components/source-card`, `@sefaria/web-components/popup`, and `@sefaria/web-components/connections-panel`.
+Each component has a non-DOM public subpath. This subpath owns its request type, view-model union, pure projection factory, and async request factory. The pure factory converts a corrected API payload into one component view model. The async factory obtains the payload through a supplied client and passes it to the pure factory. The current subpaths are `@arithmomaniac/sefaria-web-components/text-segment`, `@arithmomaniac/sefaria-web-components/bilingual-segment`, `@arithmomaniac/sefaria-web-components/ref-label`, `@arithmomaniac/sefaria-web-components/source-card`, `@arithmomaniac/sefaria-web-components/popup`, and `@arithmomaniac/sefaria-web-components/connections-panel`.
 
-The `@sefaria/web-components/reader-session` and `@sefaria/web-components/reader` subpaths are not endpoint-backed. The session composes existing component contracts and host-admitted corrected payload captures, so it has no client and no async factory. The reader subpath projects that session view into rendering-only state for `<sefaria-reader>`.
+The `@arithmomaniac/sefaria-web-components/reader-session` and `@arithmomaniac/sefaria-web-components/reader` subpaths are not endpoint-backed. The session composes existing component contracts and host-admitted corrected payload captures, so it has no client and no async factory. The reader subpath projects that session view into rendering-only state for `<sefaria-reader>`.
 
-`@sefaria/web-components/reader-controller` is the DOM-free stateful convenience layer. Its browser async factory uses a supplied client, while its seed factory accepts admitted content plus an integration-owned data source. The controller privately owns one reader session, request cancellation, and subscriptions. The package-root binder connects its snapshots and actions to one persistent request-free `<sefaria-reader>`. A spatial website workspace can still use the lower-level session and shared browser data source when it needs pane placement or pinning policy outside the controller contract.
+`@arithmomaniac/sefaria-web-components/reader-controller` is the DOM-free stateful convenience layer. Its browser async factory uses a supplied client, while its seed factory accepts admitted content plus an integration-owned data source. The controller privately owns one reader session, request cancellation, and subscriptions. The package-root binder connects its snapshots and actions to one persistent request-free `<sefaria-reader>`. A spatial website workspace can still use the lower-level session and shared browser data source when it needs pane placement or pinning policy outside the controller contract.
 
 A composite can resolve a child input by payload role before projection. The child subpath owns the pure resolved-input projection, so the composite does not repeat child transformation logic.
 
@@ -142,7 +142,7 @@ The source card owns the bounded text collection. Segment, flat range, chapter, 
 
 Request warnings remain with the selector-owning factory or composite. A resolved-version projection cannot assign a warning for another request selector.
 
-Raw HTML can enter the pure factory only as a field of a validated API payload. The factory uses `@sefaria/text-transform` to sanitize, extract structure from, and vocalize that field before constructing the view model. A view model can contain sanitized render-ready HTML fragments and typed text parts. It must not contain raw API HTML for the element to interpret.
+Raw HTML can enter the pure factory only as a field of a validated API payload. The factory uses `@arithmomaniac/sefaria-text-transform` to sanitize, extract structure from, and vocalize that field before constructing the view model. A view model can contain sanitized render-ready HTML fragments and typed text parts. It must not contain raw API HTML for the element to interpret.
 
 An integration can provide a payload-to-component operation. This operation is a facade over the same pure factory and request-free element. It does not create a second projection path or move payload interpretation into the element.
 
@@ -204,7 +204,7 @@ MCP `structuredContent` carries a corrected API payload. Namespaced tool-result 
 
 ## Text processing
 
-`@sefaria/text-transform` owns pure sanitization, vocalization, footnote processing, and the HTML parsing these operations require. It does not own API shapes or component view models. Component factories must not duplicate its parser. See the [text-processing specification](specs/text-processing.md).
+`@arithmomaniac/sefaria-text-transform` owns pure sanitization, vocalization, footnote processing, and the HTML parsing these operations require. It does not own API shapes or component view models. Component factories must not duplicate its parser. See the [text-processing specification](specs/text-processing.md).
 
 ## Integrations
 

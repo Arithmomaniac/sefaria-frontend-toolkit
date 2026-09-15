@@ -111,6 +111,12 @@ The conditional `copilot-setup-steps` workflow is repository source until separa
 
 The disposition gate retained its exact count, retirement-reason, destination-existence, and Vitest-discovery checks while reading only repository-local inventory data. Agent setup no longer invokes Git, and CI no longer requests full history. The complete `pnpm check` passed all stages with 84 test files and 618 tests while both historical commit objects remained absent from the replacement repository. A separate one-commit depth-1 clone then completed `pnpm setup:agent` and the disposition gate with both predecessor objects still absent.
 
+## Personal package identity qualification
+
+**Observed on September 15, 2026 with Node 26.8.1 and pnpm 11.22.0 on Windows:** the three private library manifests, workspace consumers, source imports, generated public-export metadata, Changesets fixed group, agent detector, documentation, and package-policy tests used `@arithmomaniac/sefaria-client`, `@arithmomaniac/sefaria-text-transform`, and `@arithmomaniac/sefaria-web-components`. Package metadata pointed to `Arithmomaniac/sefaria-frontend-toolkit`, and maintained source links targeted `main`; immutable predecessor links remained attached to the predecessor repository.
+
+The complete `pnpm check` passed all stages with 84 test files and 618 tests. The tarball qualification packed `arithmomaniac-sefaria-client-0.0.0.tgz`, `arithmomaniac-sefaria-text-transform-0.0.0.tgz`, and `arithmomaniac-sefaria-web-components-0.0.0.tgz`, installed all three into isolated vanilla and React consumers, resolved every public and transitive import from the installed packages, and completed both Chromium smokes. The Changesets rehearsal retained synchronized private prereleases under the new names.
+
 ## Historical decision provenance
 
 This section records the strongest session-history decisions that explain the current contract boundaries. It does not define product behavior; the current specifications and design document do that.

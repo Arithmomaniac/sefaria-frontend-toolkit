@@ -14,7 +14,7 @@ An integration can accept a reference or host input. It calls a non-DOM componen
 
 An integration must not give a reference, raw payload, client, host, or `fetch` function to an element.
 
-Unknown JSON must pass a generated `@sefaria/client` validator before component projection. Validation failures report structured paths.
+Unknown JSON must pass a generated `@arithmomaniac/sefaria-client` validator before component projection. Validation failures report structured paths.
 
 ## Local documentation site [Current]
 
@@ -56,7 +56,7 @@ The API has no transport paging parameter: UI paging bounds projection and rende
 
 ## Multi-pane website reader workspace [Current]
 
-The regular-website spatial demonstration uses one `@sefaria/web-components/reader-session` for semantic entries, selected positions, admitted source and links captures, operation eligibility, and bounded retention. Its host separately owns ordered stable pane IDs, source-to-connections and ancestor-to-child placement, active compact pane, pane pins, cancellation, and physical operation timing. It uses `createSefariaReaderDataSource` for source and links requests rather than duplicating the component-default selectors. This demo-private spatial state is not a public arbitrary-panel manager and is not part of `<sefaria-reader>`.
+The regular-website spatial demonstration uses one `@arithmomaniac/sefaria-web-components/reader-session` for semantic entries, selected positions, admitted source and links captures, operation eligibility, and bounded retention. Its host separately owns ordered stable pane IDs, source-to-connections and ancestor-to-child placement, active compact pane, pane pins, cancellation, and physical operation timing. It uses `createSefariaReaderDataSource` for source and links requests rather than duplicating the component-default selectors. This demo-private spatial state is not a public arbitrary-panel manager and is not part of `<sefaria-reader>`.
 
 The same demo package also serves an interactive supported-reader page. Its host calls `loadReaderController` with the initial reference and client, then calls `bindReaderController` for one persistent `<sefaria-reader>` element. The returned controller owns continuing session transitions, cancellation, captures, and event handling. This page proves the public stateful convenience path for a regular website; it does not make the element autonomous or add spatial pane policy to the controller.
 
@@ -76,7 +76,7 @@ The App is a self-contained HTML resource. The MCP server can package it without
 
 ### Reader-controller use [Current]
 
-The integrated reader keeps one `@sefaria/web-components/reader-controller` instance in the TypeScript App instance. Its first render constructs the controller from already validated source or connections content and performs zero requests. Later controller operations use an MCP-specific reader data source whose only transport is a supported host-proxied tool call. The browser-client `loadReaderController` path is not reachable from the MCP App.
+The integrated reader keeps one `@arithmomaniac/sefaria-web-components/reader-controller` instance in the TypeScript App instance. Its first render constructs the controller from already validated source or connections content and performs zero requests. Later controller operations use an MCP-specific reader data source whose only transport is a supported host-proxied tool call. The browser-client `loadReaderController` path is not reachable from the MCP App.
 
 The Node tools remain stateless. Each tool result must carry the corrected payload plus effective request metadata sufficient to construct admitted reader content: source reference and edition selectors for text, or reference and resolved `with_text` coverage for links. The App validates both payload and metadata before controller admission. The server does not store reader history, controller snapshots, operation IDs, or expiration state.
 
@@ -179,7 +179,7 @@ sequenceDiagram
     participant Tool as MCP tool
     participant Host as MCP host
     participant App as MCP App
-    participant Validator as @sefaria/client validator
+    participant Validator as @arithmomaniac/sefaria-client validator
     participant Controller as Reader controller
     participant Reader as sefaria-reader
 
@@ -214,7 +214,7 @@ sequenceDiagram
     participant Tool as MCP links tool
     participant Host as MCP host
     participant App as MCP App
-    participant Validator as @sefaria/client validator
+    participant Validator as @arithmomaniac/sefaria-client validator
     participant Controller as Reader controller
     participant Reader as sefaria-reader
 
@@ -250,7 +250,7 @@ Server-provided mode does not send rendered component HTML. The repository defin
 
 ## Node MCP resource contract
 
-**Source authority:** this specification owns intended integration behavior; the corrected `@sefaria/client` schemas own transport payload validation; the MCP Apps 1.7.5 and MCP TypeScript SDK 1.30.0 APIs own protocol and host mechanics.
+**Source authority:** this specification owns intended integration behavior; the corrected `@arithmomaniac/sefaria-client` schemas own transport payload validation; the MCP Apps 1.7.5 and MCP TypeScript SDK 1.30.0 APIs own protocol and host mechanics.
 
 **Data owner:** the Node MCP server owns Sefaria requests, decoded-response bounds, corrected payload validation, tool metadata, and textual summaries. Each initialized MCP protocol server instance owns its negotiated client capabilities. The App owns boundary validation and Reader admission. The local browser host owns MCP client transport, AppBridge, sandbox isolation, and host-mediated tool calls; it does not own Reader history.
 
@@ -385,7 +385,7 @@ sequenceDiagram
     participant Page as Authored article
     participant Integration as Page enhancement
     participant Factory as Popup async factory
-    participant Client as @sefaria/client
+    participant Client as @arithmomaniac/sefaria-client
     participant Element as sefaria-popup
 
     Page->>Page: render ordinary Sefaria anchor

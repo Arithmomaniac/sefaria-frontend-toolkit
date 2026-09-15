@@ -4,13 +4,13 @@
 
 ## Status
 
-This specification defines the current `@sefaria/text-transform` contract.
+This specification defines the current `@arithmomaniac/sefaria-text-transform` contract.
 
 The package remains in the architecture because sanitization, vocalization, and footnote handling are pure cross-component operations.
 
 ## Responsibility
 
-`@sefaria/text-transform` owns deterministic text changes. It has no network, DOM rendering, API transport, component view-model, or host responsibility.
+`@arithmomaniac/sefaria-text-transform` owns deterministic text changes. It has no network, DOM rendering, API transport, component view-model, or host responsibility.
 
 Component pure factories call these operations before unsafe or presentation-specific text enters a view model. Elements render the resulting view model without reparsing an API payload.
 
@@ -434,7 +434,7 @@ Request and component context owns the partial or unavailable state caused by an
 
 ## Processing boundary
 
-API schema validation and HTML sanitization are different controls. `@sefaria/client` validates unknown JSON structure. `@sefaria/text-transform` makes approved HTML safe for rendering.
+API schema validation and HTML sanitization are different controls. `@arithmomaniac/sefaria-client` validates unknown JSON structure. `@arithmomaniac/sefaria-text-transform` makes approved HTML safe for rendering.
 
 A component pure factory owns this sequence:
 
@@ -467,7 +467,7 @@ Broad corpus comparison and compatibility publication belong to #14. This packag
 
 ## Completion criteria
 
-`@sefaria/text-transform` is complete for Core when:
+`@arithmomaniac/sefaria-text-transform` is complete for Core when:
 
 - the specification classifies every approved, unwrapped, removed, and deferred markup family
 - evidence identifies whether each family is persisted, API-generated, Web-generated, legacy, live-confirmed, source-only, or synthetic

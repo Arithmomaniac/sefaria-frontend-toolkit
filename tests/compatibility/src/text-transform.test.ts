@@ -4,7 +4,7 @@ import {
   extractFootnotes,
   sanitize,
   type PaseqMode,
-} from "@sefaria/text-transform";
+} from "@arithmomaniac/sefaria-text-transform";
 import { describe, expect, it } from "vitest";
 
 import "./no-network.js";

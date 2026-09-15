@@ -1,4 +1,8 @@
-import { getLinks, getV3Texts, type SefariaClient } from "@sefaria/client";
+import {
+  getLinks,
+  getV3Texts,
+  type SefariaClient,
+} from "@arithmomaniac/sefaria-client";
 
 import { createConnectionsQuery } from "./connections-request.js";
 import type {
