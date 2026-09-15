@@ -4,13 +4,13 @@
 
 ## Objective
 
-Run the private toolkit from this workspace or locally packed tarballs, validate a supplied `Micah 6:8` payload, project it with the pure source-card factory, and render it with zero requests.
+Run the private toolkit from this workspace, an exact authenticated GitHub Packages prerelease, or locally packed tarballs; validate a supplied `Micah 6:8` payload; project it with the pure source-card factory; and render it with zero requests.
 
 ## Prerequisites
 
 - Complete [Web Components and ownership](01-web-components.md).
 - Node.js 22.12 or later, pnpm 11.22.0, and Chromium.
-- Repository access. The packages are private and unpublished; there is no npm or CDN installation command.
+- Repository access for the workspace path, or authenticated access to the private GitHub Packages prereleases. There is no public npm registry or CDN distribution.
 
 ## Try it
 

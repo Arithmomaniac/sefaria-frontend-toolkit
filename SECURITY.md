@@ -2,7 +2,7 @@
 
 # Security
 
-This is an experimental, unpublished project with no support guarantee. The toolkit is not deployed and is not an official Sefaria or Microsoft product or service.
+This is an experimental project with no support guarantee. Private GitHub Packages prereleases are available for authenticated development, but the toolkit is not a deployed service and is not an official Sefaria or Microsoft product or service.
 
 ## Reporting a vulnerability
 

@@ -6,7 +6,7 @@
 
 Start with the complete Reader, use individual browser-standard Web Components from vanilla JavaScript or React, or use the client, factories, and text transforms without rendering components. The current components focus on reading surfaces, but the project boundary is a reusable frontend/UI toolkit rather than a replacement for Sefaria's website.
 
-> **Experimental and unpublished.** This public source repository is a development project with no support or stability guarantee. It is not an official Sefaria product, and its private packages are not available from a public registry or CDN.
+> **Experimental.** This public source repository is a development project with no support or stability guarantee. It is not an official Sefaria product. Its synchronized prereleases are private GitHub Packages for authenticated use; there is no public registry, CDN, or stable release.
 
 ## First run
 
