@@ -126,7 +126,7 @@ The previous Reveal.js showcase, booth loop, Pages assembly, QR assets, presenta
 | `examples/vanilla-vite` | Minimal deterministic public-package consumption path |
 | `docs/.vitepress` and `scripts/build-site.mjs` | Local documentation presentation, navigation, styling, and isolated example assembly |
 
-Workspace dependencies use `workspace:*`. All workspace packages remain private during this unpublished development phase.
+Workspace dependencies use `workspace:*`, and committed manifests remain private. Successful `main` validation publishes synchronized private prereleases from isolated staged manifests; it does not change workspace dependency resolution.
 
 ## Required tools
 
@@ -462,13 +462,17 @@ pnpm --filter @arithmomaniac/sefaria-text-transform pack --pack-destination $des
 pnpm --filter @arithmomaniac/sefaria-web-components pack --pack-destination $destination
 ```
 
-The packages remain private. There is no npm alpha installation command, publication workflow, tag, or release in this branch.
+The committed packages remain private. After both hosted validation platforms and the fail-closed `check` succeed on a `main` push, the CI publish job stages copies with version `0.0.0-alpha.<run-id>.<run-attempt>`, rewrites toolkit dependencies to that exact version, and publishes the client, text transform, then Web Components package under the `alpha` tag. The job has repository-scoped `packages: write`; pull requests, failed validation, skipped aggregation, and non-`main` refs cannot publish. Main-push runs are not canceled after publication may have started.
+
+The staged manifests alone set `private: false` and the restricted GitHub npm registry. Committed manifests retain `private: true`, `0.0.0`, and `workspace:*`. Staging copies only built `dist`, package documentation, the root license, and Web Components metadata. Verification reads the exact version and repository metadata through the authenticated npm registry, requires the unauthenticated repository package page to return `404`, and installs all three versions into a temporary consumer whose lockfile contains no workspace, link, file, or tarball resolution. The verifier removes its token-referencing `.npmrc` and staged package directories before importing every Node-safe public subpath.
+
+Authenticated consumers configure the `@arithmomaniac` scope for `https://npm.pkg.github.com`, supply a token through `NODE_AUTH_TOKEN`, and request one exact synchronized prerelease version for all three packages. A repository `GITHUB_TOKEN` can install packages when that repository has package access; external users need an appropriately scoped classic personal access token. Do not commit either token or an expanded `.npmrc`.
 
 Run `pnpm package:smoke` to create an isolated Vite consumer, inspect each unchanged packed manifest and file list, override all three internal toolkit dependencies to their exact `file:` tarballs, inspect the lockfile and installed real paths, remove the producer tarballs, build, import the Node-safe subpaths, and render the source-card path in Chromium. Consumer-side overrides are required for this local private-tarball topology because pnpm otherwise attempts registry resolution for a packed package's internal toolkit dependency.
 
 Run `pnpm metadata:generate` after changing a public export or element contract. `pnpm metadata:check` rejects stale `packages/web-components/custom-elements.json`, `packages/public-exports.json`, and their readable summaries under `docs/reference/`.
 
-Run `pnpm changeset:rehearse` to exercise the pinned private fixed group in a disposable fixture. The current rehearsal proves the observed `0.1.1-alpha.0` to `0.1.1-alpha.1` sequence from a `0.1.0` fixture, synchronized internal dependencies and changelogs, retained private flags, and no automatic commit or tag. It does not publish anything or promise that a future authorized release starts at those versions.
+Run `pnpm changeset:rehearse` to exercise the pinned private fixed group in a disposable fixture. The current rehearsal proves the observed `0.1.1-alpha.0` to `0.1.1-alpha.1` sequence from a `0.1.0` fixture, synchronized internal dependencies and changelogs, retained private flags, and no automatic commit or tag. It remains a local Changesets qualification and is separate from the run-derived private GitHub Packages prerelease.
 
 ## Package index configuration
 

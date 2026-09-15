@@ -13,7 +13,7 @@ permissions:
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
   validation:
@@ -62,3 +62,42 @@ jobs:
             echo "Validation result: ${{ needs.validation.result }}"
             exit 1
           fi
+
+  publish:
+    name: publish private prerelease
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    env:
+      PUBLISH_VERSION: 0.0.0-alpha.${{ github.run_id }}.${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://npm.pkg.github.com
+          scope: "@arithmomaniac"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: node scripts/package-publication.mjs stage --version "$PUBLISH_VERSION"
+      - name: Require the current main head
+        run: |
+          git fetch --no-tags --depth=1 origin main
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
+      - run: pnpm publish .artifacts/publish/client --tag alpha --access restricted --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
+      - run: pnpm publish .artifacts/publish/text-transform --tag alpha --access restricted --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
+      - run: pnpm publish .artifacts/publish/web-components --tag alpha --access restricted --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
+      - run: node scripts/package-publication.mjs verify --version "$PUBLISH_VERSION"
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}

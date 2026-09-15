@@ -39,7 +39,11 @@ describe("agent-ready workflow policy", () => {
     const matrix = strategy.matrix as RecordValue;
     const check = jobs.check as RecordValue;
 
-    expect(Object.keys(jobs).sort()).toEqual(["check", "validation"]);
+    expect(Object.keys(jobs).sort()).toEqual([
+      "check",
+      "publish",
+      "validation",
+    ]);
     expect(strategy["fail-fast"]).toBe(false);
     expect(matrix.os).toEqual(["ubuntu-latest", "windows-latest"]);
     expect(validation["continue-on-error"]).toBeUndefined();
@@ -58,13 +62,35 @@ describe("agent-ready workflow policy", () => {
   it("retains the intended branch and permission boundary", () => {
     const workflow = parseWorkflow(ciSource);
 
+    const jobs = workflow.jobs as RecordValue;
+    const publish = jobs.publish as RecordValue;
+
     expect(workflow.permissions).toEqual({ contents: "read" });
     expect(workflow.on).toEqual({
       pull_request: { branches: ["main"] },
       push: { branches: ["main"] },
     });
+    expect(workflow.concurrency).toEqual({
+      group: "ci-${{ github.workflow }}-${{ github.ref }}",
+      "cancel-in-progress": "${{ github.event_name == 'pull_request' }}",
+    });
+    expect(publish.if).toBe(
+      "${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}",
+    );
+    expect(publish.needs).toBe("check");
+    expect(publish.permissions).toEqual({
+      contents: "read",
+      packages: "write",
+    });
+    expect(JSON.stringify(publish)).toContain("github.run_id");
+    expect(JSON.stringify(publish)).toContain("github.run_attempt");
+    expect(JSON.stringify(publish)).toContain("github.token");
+    expect(JSON.stringify(publish)).not.toContain("secrets.");
+    expect(JSON.stringify(publish)).toContain(
+      'test \\"$(git rev-parse HEAD)\\" = \\"$(git rev-parse origin/main)\\"',
+    );
     expect(ciSource).not.toMatch(
-      /deploy-pages|upload-pages-artifact|publish|release|pull_request_target/iu,
+      /deploy-pages|upload-pages-artifact|pull_request_target/iu,
     );
   });
 

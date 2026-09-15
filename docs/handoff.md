@@ -2,7 +2,7 @@
 
 # Source handoff
 
-This repository delivers reusable, source-level building blocks for placing Sefaria reading experiences in browser and MCP hosts. It is intentionally not a replacement for Sefaria.org, a published package release, or a claim of exhaustive corpus compatibility.
+This repository delivers reusable building blocks for placing Sefaria reading experiences in browser and MCP hosts. It is intentionally not a replacement for Sefaria.org, a public or stable package release, or a claim of exhaustive corpus compatibility. Private synchronized GitHub Packages prereleases support authenticated qualification.
 
 ## What is delivered
 

@@ -129,7 +129,7 @@ function validateCiWorkflow(workflow, issues, filename) {
   if (
     !isRecord(jobs) ||
     JSON.stringify(Object.keys(jobs).sort()) !==
-      JSON.stringify(["check", "validation"])
+      JSON.stringify(["check", "publish", "validation"])
   ) {
     issues.push(`unexpected CI jobs in ${filename}`);
     return;
@@ -137,9 +137,21 @@ function validateCiWorkflow(workflow, issues, filename) {
 
   const validation = jobs.validation;
   const check = jobs.check;
-  if (!isRecord(validation) || !isRecord(check)) {
+  const publish = jobs.publish;
+  if (!isRecord(validation) || !isRecord(check) || !isRecord(publish)) {
     issues.push(`invalid CI jobs in ${filename}`);
     return;
+  }
+  if (
+    JSON.stringify(workflow.concurrency) !==
+    JSON.stringify({
+      group: "ci-${{ github.workflow }}-${{ github.ref }}",
+      "cancel-in-progress": "${{ github.event_name == 'pull_request' }}",
+    })
+  ) {
+    issues.push(
+      `CI publication can be canceled after it starts in ${filename}`,
+    );
   }
   const strategy = validation.strategy;
   const matrix = isRecord(strategy) ? strategy.matrix : undefined;
@@ -183,6 +195,81 @@ function validateCiWorkflow(workflow, issues, filename) {
     )
   ) {
     issues.push(`CI check aggregation is not fail-closed in ${filename}`);
+  }
+  validatePublishJob(publish, issues, filename);
+}
+
+function validatePublishJob(publish, issues, filename) {
+  const expectedRuns = [
+    "pnpm install --frozen-lockfile",
+    "pnpm build",
+    'node scripts/package-publication.mjs stage --version "$PUBLISH_VERSION"',
+    [
+      "git fetch --no-tags --depth=1 origin main",
+      'test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"',
+    ].join("\n"),
+    "pnpm publish .artifacts/publish/client --tag alpha --access restricted --no-git-checks",
+    "pnpm publish .artifacts/publish/text-transform --tag alpha --access restricted --no-git-checks",
+    "pnpm publish .artifacts/publish/web-components --tag alpha --access restricted --no-git-checks",
+    'node scripts/package-publication.mjs verify --version "$PUBLISH_VERSION"',
+  ];
+  const steps = Array.isArray(publish.steps) ? publish.steps : [];
+  const runs = steps
+    .filter((step) => isRecord(step) && typeof step.run === "string")
+    .map((step) => step.run.trimEnd());
+  const tokenSteps = steps.filter(
+    (step) =>
+      isRecord(step) && isRecord(step.env) && "NODE_AUTH_TOKEN" in step.env,
+  );
+  const setupNode = steps.find(
+    (step) => isRecord(step) && step.uses === "actions/setup-node@v4",
+  );
+
+  if (
+    publish.name !== "publish private prerelease" ||
+    publish.if !==
+      "${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}" ||
+    publish.needs !== "check" ||
+    publish["runs-on"] !== "ubuntu-latest" ||
+    JSON.stringify(publish.permissions) !==
+      JSON.stringify({ contents: "read", packages: "write" }) ||
+    JSON.stringify(publish.env) !==
+      JSON.stringify({
+        PUBLISH_VERSION:
+          "0.0.0-alpha.${{ github.run_id }}.${{ github.run_attempt }}",
+      })
+  ) {
+    issues.push(`CI publication gate is not green-main-only in ${filename}`);
+  }
+  if (JSON.stringify(runs) !== JSON.stringify(expectedRuns)) {
+    issues.push(
+      `CI publication commands or dependency order are incorrect in ${filename}`,
+    );
+  }
+  if (
+    !isRecord(setupNode) ||
+    JSON.stringify(setupNode.with) !==
+      JSON.stringify({
+        "node-version": 22,
+        cache: "pnpm",
+        "registry-url": "https://npm.pkg.github.com",
+        scope: "@arithmomaniac",
+      })
+  ) {
+    issues.push(`CI npm registry configuration is incorrect in ${filename}`);
+  }
+  if (
+    tokenSteps.length !== 4 ||
+    tokenSteps.some(
+      (step) =>
+        step.env.NODE_AUTH_TOKEN !== "${{ github.token }}" ||
+        !(
+          step.run.startsWith("pnpm publish .artifacts/publish/") ||
+          step.run.startsWith("node scripts/package-publication.mjs verify")
+        ),
+    )
+  ) {
+    issues.push(`CI package token scope is incorrect in ${filename}`);
   }
 }
 
@@ -318,14 +405,27 @@ function walkWorkflow(value, valuePath, issues, filename) {
 
   for (const [key, entry] of Object.entries(value)) {
     const nextPath = [...valuePath, key];
-    if (CREDENTIAL_NAME.test(key)) {
+    const publishToken =
+      key === "NODE_AUTH_TOKEN" &&
+      valuePath[0] === "jobs" &&
+      valuePath[1] === "publish" &&
+      entry === "${{ github.token }}";
+    if (CREDENTIAL_NAME.test(key) && !publishToken) {
       issues.push(
         `publication credential in ${filename}:${nextPath.join(".")}`,
       );
     }
     if (key === "permissions" && isRecord(entry)) {
       for (const [permission, access] of Object.entries(entry)) {
-        if (permission !== "contents" || access !== "read") {
+        const publishPermission =
+          valuePath[0] === "jobs" &&
+          valuePath[1] === "publish" &&
+          ((permission === "contents" && access === "read") ||
+            (permission === "packages" && access === "write"));
+        if (
+          !publishPermission &&
+          (permission !== "contents" || access !== "read")
+        ) {
           issues.push(
             `unsafe workflow permission in ${filename}:${nextPath.join(".")}.${permission}`,
           );
@@ -345,7 +445,8 @@ function walkWorkflow(value, valuePath, issues, filename) {
     if (
       key === "run" &&
       typeof entry === "string" &&
-      PUBLISH_COMMAND.test(entry)
+      PUBLISH_COMMAND.test(entry) &&
+      !(valuePath[0] === "jobs" && valuePath[1] === "publish")
     ) {
       issues.push(`publication command in ${filename}:${nextPath.join(".")}`);
     }

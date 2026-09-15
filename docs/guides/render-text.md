@@ -6,7 +6,7 @@
 
 Start with a source card if you want a passage, its primary text and translation when available, a heading, and edition attribution. Use the smaller components when your application already supplies the surrounding context.
 
-These examples target the current private workspace packages. There is no published-package or CDN installation recipe yet.
+These examples target the current private workspace packages. Exact synchronized prereleases are also available through authenticated GitHub Packages; there is no public registry, CDN, or stable-release recipe.
 
 ## Try the existing demos
 
