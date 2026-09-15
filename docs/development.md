@@ -20,7 +20,7 @@ pnpm test -- tests/workflow-policy.test.ts
 
 The `integration:check` stage also parses active paths, package manifests, workflow YAML, and the lockfile. It rejects active Python runtime/build files, retired demo assembly, source export fallbacks, non-private manifests, publication or deployment capabilities, credential-like workflow fields, remote tarball resolutions, and unsupported installation, ownership, or deployment claims in maintained entry-point documentation. Historical evidence and immutable archive links are outside those active-path checks.
 
-The same stage reconciles the immutable 73-file test inventory from `7bc2d258fac2959beb5252ebdbcbddbaccd0c7b7` and the nine pre-retirement showcase tests from `d7e2d59645ebf7427dcff2cbdd78073e2e7df58c`. It requires every retained destination to appear in Vitest's actual static discovery output and records a specific reason for each presentation-only or superseded retirement.
+The same stage reconciles committed source-stamped inventories containing the 73 test files from `Arithmomaniac/sefaria-web-components@7bc2d258fac2959beb5252ebdbcbddbaccd0c7b7` and the nine pre-retirement showcase tests from `Arithmomaniac/sefaria-web-components@d7e2d59645ebf7427dcff2cbdd78073e2e7df58c`. It requires every retained destination to appear in Vitest's actual static discovery output and records a specific reason for each presentation-only or superseded retirement. The gate does not query or fetch the source repository's Git objects.
 
 [`IMPLEMENTATION-PLAN.md`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/IMPLEMENTATION-PLAN.md) is a historical bootstrap artifact. Its follow-on waves are complete, and it is not a maintained execution handoff or a normative component or transport specification. Use this development guide for the current baseline and the [repository issues](https://github.com/Arithmomaniac/sefaria-web-components/issues) for remaining delivery work.
 
@@ -147,9 +147,9 @@ After Node.js and the pinned pnpm are available, prepare a fresh toolkit checkou
 pnpm setup:agent
 ```
 
-The command performs a frozen install, checks the two immutable commits used to reconcile the historical test inventory, fetches only missing required objects from `origin`, installs Chromium, and launches and closes a headless browser. On Linux it also asks Playwright to install Chromium's system dependencies; that can require privileges supplied by the host. It uses the effective package-manager configuration and does not override registries.
+The command performs a frozen install, installs Chromium, and launches and closes a headless browser. On Linux it also asks Playwright to install Chromium's system dependencies; that can require privileges supplied by the host. It uses the effective package-manager configuration and does not override registries. Historical test inventories are committed with their source repository and complete commit SHA, so setup does not need the original repository's Git objects.
 
-Preparation can use the network and fails at the exact unsuccessful step. `pnpm check` remains the offline validation boundary: it does not fetch Git history, refresh fixtures, or contact Sefaria. If the historical objects are unavailable, the disposition error identifies `pnpm setup:agent` as the recovery command.
+Preparation can use the network for dependencies and Chromium and fails at the exact unsuccessful step. `pnpm check` remains the offline validation boundary: it does not fetch Git history, refresh fixtures, or contact Sefaria.
 
 GitHub's `.github/workflows/copilot-setup-steps.yml` first checks for `packages/web-components/package.json` with package name `@sefaria/web-components`. Toolkit-derived branches prepare normally; an unrelated checkout logs an explicit skip. A checkout that looks like the toolkit but lacks the setup script fails rather than silently skipping. This capability-based behavior must be verified in real cloud sessions after the workflow is active on `main`.
 
