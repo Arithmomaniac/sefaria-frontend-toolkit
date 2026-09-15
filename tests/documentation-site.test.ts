@@ -46,11 +46,9 @@ describe("documentation learning journey", () => {
 
     expect(index).toContain("Development preview");
     expect(config).toContain(
-      '"https://github.com/Arithmomaniac/sefaria-web-components"',
+      '"https://github.com/Arithmomaniac/sefaria-frontend-toolkit"',
     );
-    expect(config).toContain(
-      'const branch = "feature/avilevin/frontend-toolkit-alpha"',
-    );
+    expect(config).toContain('const branch = "main"');
     expect(config).toContain(
       "pattern: `${repository}/edit/${branch}/docs/:path`",
     );
@@ -157,7 +155,7 @@ describe("documentation learning journey", () => {
       "utf8",
     );
     expect(source).toContain(
-      "github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/",
+      "github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/",
     );
     expect(authored).not.toContain('href="/src/');
   });

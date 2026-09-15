@@ -1,12 +1,15 @@
-import { createSefariaClient, type SefariaClient } from "@sefaria/client";
-import "@sefaria/web-components";
+import {
+  createSefariaClient,
+  type SefariaClient,
+} from "@arithmomaniac/sefaria-client";
+import "@arithmomaniac/sefaria-web-components";
 import type {
   RefLabelLanguage,
   RefLabelRequest,
   RefLabelViewModel,
   SefariaRefLabel,
-} from "@sefaria/web-components";
-import { loadRefLabelViewModel } from "@sefaria/web-components/ref-label";
+} from "@arithmomaniac/sefaria-web-components";
+import { loadRefLabelViewModel } from "@arithmomaniac/sefaria-web-components/ref-label";
 
 import {
   startLiveDemo,

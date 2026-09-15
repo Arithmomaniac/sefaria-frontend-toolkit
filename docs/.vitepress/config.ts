@@ -2,8 +2,8 @@ import path from "node:path";
 
 import { defineConfig } from "vitepress";
 
-const repository = "https://github.com/Arithmomaniac/sefaria-web-components";
-const branch = "feature/avilevin/frontend-toolkit-alpha";
+const repository = "https://github.com/Arithmomaniac/sefaria-frontend-toolkit";
+const branch = "main";
 const repositoryRoot = path.resolve(import.meta.dirname, "..", "..");
 
 export default defineConfig({

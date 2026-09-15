@@ -2,13 +2,13 @@ import {
   createSefariaClient,
   type CoreV3TextsResponse,
   zCoreV3TextsResponse,
-} from "@sefaria/client";
-import "@sefaria/web-components";
-import type { SefariaSourceCard } from "@sefaria/web-components";
+} from "@arithmomaniac/sefaria-client";
+import "@arithmomaniac/sefaria-web-components";
+import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
 import {
   createSourceCardViewModel,
   loadSourceCardViewModel,
-} from "@sefaria/web-components/source-card";
+} from "@arithmomaniac/sefaria-web-components/source-card";
 
 import payload from "./micah-6-8.json";
 import { createMicahFixtureFetch } from "./fixture-transport.js";

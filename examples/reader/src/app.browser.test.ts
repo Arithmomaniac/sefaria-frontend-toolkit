@@ -5,12 +5,12 @@ import {
   type CoreLinkObject,
   type CoreLinkResponse,
   type CoreV3TextsResponse,
-} from "@sefaria/client";
+} from "@arithmomaniac/sefaria-client";
 import type {
   SefariaConnectionsPanel,
   SefariaReader,
   SefariaSourceCard,
-} from "@sefaria/web-components";
+} from "@arithmomaniac/sefaria-web-components";
 import { beforeEach, expect, test, vi } from "vitest";
 
 import linksFixture from "../../../packages/client/test/fixtures/links-targum-2026-08-30.json";

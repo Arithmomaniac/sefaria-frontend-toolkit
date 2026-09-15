@@ -1,9 +1,9 @@
-import type { CoreLinkResponse } from "@sefaria/client";
+import type { CoreLinkResponse } from "@arithmomaniac/sefaria-client";
 import type {
   ReaderViewModel,
   SefariaReader,
   SefariaSourceCard,
-} from "@sefaria/web-components";
+} from "@arithmomaniac/sefaria-web-components";
 import { beforeEach, expect, test, vi } from "vitest";
 
 import capturedLinks from "../../../packages/client/test/fixtures/links-connections-preview-2026-09-06.json";

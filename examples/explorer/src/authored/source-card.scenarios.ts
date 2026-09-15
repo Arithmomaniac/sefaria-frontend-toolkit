@@ -1,4 +1,4 @@
-import type { SourceCardViewModel } from "@sefaria/web-components";
+import type { SourceCardViewModel } from "@arithmomaniac/sefaria-web-components";
 
 import { primarySide, translationSide } from "./bilingual-segment.scenarios.js";
 

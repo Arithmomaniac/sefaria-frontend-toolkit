@@ -92,7 +92,7 @@ Review the initial corrections for:
 - [ ] For a captured successful payload, the async result equals the pure result.
 - [ ] Missing requested content becomes a component-specific partial or empty state.
 - [ ] The factory preserves the data owned by its rendering surface; source-card projection preserves edition attribution.
-- [ ] Unsafe HTML passes through `@sefaria/text-transform`.
+- [ ] Unsafe HTML passes through `@arithmomaniac/sefaria-text-transform`.
 - [ ] An abort does not become a data state.
 
 ### Text segment

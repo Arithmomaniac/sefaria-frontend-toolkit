@@ -8,16 +8,16 @@ This repository delivers reusable, source-level building blocks for placing Sefa
 
 The project addresses four steps between receiving JSON and presenting a reading experience:
 
-1. `@sefaria/client` validates the corrected transport contract and preserves documented HTTP, network, and abort semantics.
-2. `@sefaria/text-transform` safely prepares Sefaria's structured text markup and Hebrew vocalization.
-3. Pure `@sefaria/web-components` factories project transport payloads into component-specific rendering data.
+1. `@arithmomaniac/sefaria-client` validates the corrected transport contract and preserves documented HTTP, network, and abort semantics.
+2. `@arithmomaniac/sefaria-text-transform` safely prepares Sefaria's structured text markup and Hebrew vocalization.
+3. Pure `@arithmomaniac/sefaria-web-components` factories project transport payloads into component-specific rendering data.
 4. Request-free Web Components own layout, accessibility, interaction, and theming.
 
 The same pieces support both packaged and host-specific compositions:
 
 | Capability | Example |
 | --- | --- |
-| Text, bilingual, reference, source-card, and connections primitives | [Developer explorer source](https://github.com/Arithmomaniac/sefaria-web-components/tree/feature/avilevin/frontend-toolkit-alpha/examples/explorer) |
+| Text, bilingual, reference, source-card, and connections primitives | [Developer explorer source](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/explorer) |
 | Supported packaged Reader | `examples/reader/controlled.html` |
 | Custom host-owned spatial reading workflow | `examples/reader/index.html` |
 | Reading surfaces embedded in an ordinary page | [Authored linked article](linked-article.md) |

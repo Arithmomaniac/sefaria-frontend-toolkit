@@ -19,9 +19,9 @@ A Web Component is a browser-standard custom HTML element. One JavaScript import
 Register the browser elements, create one source card, and assign a render-ready object to its `viewModel` property:
 
 ```ts
-import "@sefaria/web-components";
-import type { SefariaSourceCard } from "@sefaria/web-components";
-import type { SourceCardViewModel } from "@sefaria/web-components/source-card";
+import "@arithmomaniac/sefaria-web-components";
+import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
+import type { SourceCardViewModel } from "@arithmomaniac/sefaria-web-components/source-card";
 
 const card = document.createElement("sefaria-source-card") as SefariaSourceCard;
 
@@ -37,7 +37,7 @@ card.addEventListener("sefaria-source-select", (event) => {
 document.body.append(card);
 ```
 
-The `import "@sefaria/web-components"` statement registers the custom elements in the browser. The non-DOM subpaths, such as `@sefaria/web-components/source-card`, export request types, view models, and factories without registering elements.
+The `import "@arithmomaniac/sefaria-web-components"` statement registers the custom elements in the browser. The non-DOM subpaths, such as `@arithmomaniac/sefaria-web-components/source-card`, export request types, view models, and factories without registering elements.
 
 An HTML attribute contains text. A component view model is a typed object, so the host assigns it as a property:
 
@@ -58,7 +58,7 @@ The element renders its loading state inside Shadow DOM. No network request occu
 
 | Layer | Owns | Does not own |
 | --- | --- | --- |
-| `@sefaria/client` | Corrected transport calls, response validation, and the bounded per-client response cache | Component state or rendering |
+| `@arithmomaniac/sefaria-client` | Corrected transport calls, response validation, and the bounded per-client response cache | Component state or rendering |
 | Pure/async component factories | Projection from validated payloads to one component's view model | DOM layout or host interaction state |
 | Web Component | Shadow DOM, accessibility, theme, layout, and event emission | References, requests, clients, or raw payloads |
 | Host application | Inputs, loading, cancellation, stale-result rejection, and assigning view models | Reimplementing factory projection |
@@ -74,7 +74,7 @@ Open the authored workbench, switch among loading, data, empty, and error source
 ## Source and run links
 
 - Run: `pnpm dev`, then open the authored workbench.
-- Source: [`development-status.ts`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/explorer/src/authored/development-status.ts)
+- Source: [`development-status.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/development-status.ts)
 - Component contract: [`docs/specs/components.md`](../specs/components.md)
 - Generated element metadata: [Custom elements](../reference/custom-elements.md)
 

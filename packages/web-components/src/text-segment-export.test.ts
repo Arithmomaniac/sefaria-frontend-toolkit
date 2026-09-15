@@ -1,7 +1,7 @@
 import {
   projectTextSegmentValue,
   projectTextSegmentVersion,
-} from "@sefaria/web-components/text-segment";
+} from "@arithmomaniac/sefaria-web-components/text-segment";
 import { expect, test } from "vitest";
 
 test("exports resolved-version projection from the text-segment subpath", () => {

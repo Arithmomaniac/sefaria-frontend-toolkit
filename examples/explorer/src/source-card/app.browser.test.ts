@@ -2,7 +2,7 @@ import type {
   SefariaSourceCard,
   SourceCardDataViewModel,
   SourceCardViewModel,
-} from "@sefaria/web-components";
+} from "@arithmomaniac/sefaria-web-components";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
 import { startSourceCardLiveDemo, type SourceCardLoader } from "./app.js";

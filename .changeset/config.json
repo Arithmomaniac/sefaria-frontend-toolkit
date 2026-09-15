@@ -3,11 +3,15 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "fixed": [
-    ["@sefaria/client", "@sefaria/text-transform", "@sefaria/web-components"]
+    [
+      "@arithmomaniac/sefaria-client",
+      "@arithmomaniac/sefaria-text-transform",
+      "@arithmomaniac/sefaria-web-components"
+    ]
   ],
   "linked": [],
   "access": "restricted",
-  "baseBranch": "feature/avilevin/frontend-toolkit-alpha",
+  "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [],
   "privatePackages": {

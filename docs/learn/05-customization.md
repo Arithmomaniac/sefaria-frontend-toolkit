@@ -16,7 +16,7 @@ Change theme, width, visible sides, side order, and layout without refetching, t
 Presentation properties operate on the current view model:
 
 ```ts
-import type { SefariaSourceCard } from "@sefaria/web-components";
+import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
 
 export function customizeCard(card: SefariaSourceCard): void {
   card.contentLanguage = "both";
@@ -33,9 +33,12 @@ Changing these values must not call a factory or client. Changing the reference 
 For a headless path, import only the layers you need:
 
 ```ts
-import { createSefariaClient } from "@sefaria/client";
-import { extractFootnotes, sanitize } from "@sefaria/text-transform";
-import { loadSourceCardViewModel } from "@sefaria/web-components/source-card";
+import { createSefariaClient } from "@arithmomaniac/sefaria-client";
+import {
+  extractFootnotes,
+  sanitize,
+} from "@arithmomaniac/sefaria-text-transform";
+import { loadSourceCardViewModel } from "@arithmomaniac/sefaria-web-components/source-card";
 
 const client = createSefariaClient({ cache: false });
 const viewModel = await loadSourceCardViewModel({ tref: "Micah 6:8" }, client);
@@ -55,7 +58,7 @@ Theme, container width, side visibility, side order, and layout update the curre
 
 ## Who owns what
 
-The element owns supported visual properties and CSS custom properties. The host owns the containing layout and decides when a changed input requires new data. `@sefaria/text-transform` owns pure markup handling; component factories own component-specific projection; the client owns transport and validation.
+The element owns supported visual properties and CSS custom properties. The host owns the containing layout and decides when a changed input requires new data. `@arithmomaniac/sefaria-text-transform` owns pure markup handling; component factories own component-specific projection; the client owns transport and validation.
 
 ## Exercise
 
@@ -64,10 +67,10 @@ Open the authored workbench, record its request count, then change theme, width,
 ## Source and run links
 
 - Run: `pnpm dev`
-- Authored controls: [`examples/explorer/src/authored/development-status.ts`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/explorer/src/authored/development-status.ts)
-- Client README: [`packages/client/README.md`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/packages/client/README.md)
-- Text-transform README: [`packages/text-transform/README.md`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/packages/text-transform/README.md)
-- Web-components README: [`packages/web-components/README.md`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/packages/web-components/README.md)
+- Authored controls: [`examples/explorer/src/authored/development-status.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/development-status.ts)
+- Client README: [`packages/client/README.md`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/client/README.md)
+- Text-transform README: [`packages/text-transform/README.md`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/text-transform/README.md)
+- Web-components README: [`packages/web-components/README.md`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/web-components/README.md)
 - Generated exports: [Public package exports](../reference/public-exports.md)
 
 ## Next step

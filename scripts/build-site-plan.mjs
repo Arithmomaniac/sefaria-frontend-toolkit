@@ -59,9 +59,9 @@ export function createSiteBuildSteps({ skipTypecheck }) {
   const steps = [];
   if (!skipTypecheck) {
     for (const packageName of [
-      "@sefaria/client",
-      "@sefaria/text-transform",
-      "@sefaria/web-components",
+      "@arithmomaniac/sefaria-client",
+      "@arithmomaniac/sefaria-text-transform",
+      "@arithmomaniac/sefaria-web-components",
     ]) {
       steps.push({
         kind: "pnpm",

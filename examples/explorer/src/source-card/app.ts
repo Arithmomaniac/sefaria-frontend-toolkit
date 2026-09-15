@@ -1,11 +1,14 @@
-import { createSefariaClient, type SefariaClient } from "@sefaria/client";
-import "@sefaria/web-components";
+import {
+  createSefariaClient,
+  type SefariaClient,
+} from "@arithmomaniac/sefaria-client";
+import "@arithmomaniac/sefaria-web-components";
 import type {
   SefariaSourceCard,
   SourceCardRequest,
   SourceCardViewModel,
-} from "@sefaria/web-components";
-import { loadSourceCardViewModel } from "@sefaria/web-components/source-card";
+} from "@arithmomaniac/sefaria-web-components";
+import { loadSourceCardViewModel } from "@arithmomaniac/sefaria-web-components/source-card";
 
 /** One host-owned source-card request operation. */
 export type SourceCardLoader = (

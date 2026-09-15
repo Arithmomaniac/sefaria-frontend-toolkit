@@ -9,19 +9,19 @@ describe("library package foundations", () => {
   const packages = [
     [
       "packages/client/package.json",
-      "@sefaria/client",
+      "@arithmomaniac/sefaria-client",
       7,
       ["dist", "!dist/*.tsbuildinfo", "README.md"],
     ],
     [
       "packages/text-transform/package.json",
-      "@sefaria/text-transform",
+      "@arithmomaniac/sefaria-text-transform",
       1,
       ["dist", "!dist/*.tsbuildinfo", "README.md"],
     ],
     [
       "packages/web-components/package.json",
-      "@sefaria/web-components",
+      "@arithmomaniac/sefaria-web-components",
       10,
       ["dist", "!dist/*.tsbuildinfo", "README.md", "custom-elements.json"],
     ],
@@ -37,9 +37,12 @@ describe("library package foundations", () => {
       expect(manifest.license).toBe("GPL-3.0-only");
       expect(manifest.repository).toEqual({
         type: "git",
-        url: "git+https://github.com/Arithmomaniac/sefaria-web-components.git",
+        url: "git+https://github.com/Arithmomaniac/sefaria-frontend-toolkit.git",
         directory: manifestPath.split("/").slice(0, -1).join("/"),
       });
+      expect(manifest.homepage).toBe(
+        "https://github.com/Arithmomaniac/sefaria-frontend-toolkit#readme",
+      );
       expect(manifest.files).toEqual(files);
 
       const exports =
@@ -119,6 +122,7 @@ interface PackageManifest {
   readonly private?: boolean;
   readonly license?: string;
   readonly repository?: unknown;
+  readonly homepage?: string;
   readonly files?: readonly string[];
   readonly sideEffects?: unknown;
   readonly scripts?: Record<string, string>;

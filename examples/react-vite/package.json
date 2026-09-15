@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@sefaria/client": "workspace:*",
-    "@sefaria/web-components": "workspace:*",
+    "@arithmomaniac/sefaria-client": "workspace:*",
+    "@arithmomaniac/sefaria-web-components": "workspace:*",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
   },

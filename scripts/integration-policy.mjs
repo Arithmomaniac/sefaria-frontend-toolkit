@@ -22,6 +22,17 @@ const PUBLISH_ACTION =
   /(?:deploy-pages|upload-pages-artifact|npm-publish|publish|release)/iu;
 const CREDENTIAL_NAME =
   /(?:npm|node)_auth_token|npm_token|github_token|id-token/iu;
+const EXPECTED_LIBRARY_NAMES = new Map([
+  ["packages/client/package.json", "@arithmomaniac/sefaria-client"],
+  [
+    "packages/text-transform/package.json",
+    "@arithmomaniac/sefaria-text-transform",
+  ],
+  [
+    "packages/web-components/package.json",
+    "@arithmomaniac/sefaria-web-components",
+  ],
+]);
 
 export function validateActivePaths(paths) {
   const issues = [];
@@ -48,6 +59,12 @@ export function validateManifestPolicy(manifests) {
       issues.push(`non-private manifest: ${filename}`);
     }
     if (filename.startsWith("packages/")) {
+      const expectedName = EXPECTED_LIBRARY_NAMES.get(filename);
+      if (expectedName !== undefined && manifest.name !== expectedName) {
+        issues.push(
+          `unexpected package identity: ${filename} -> ${String(manifest.name)}`,
+        );
+      }
       validatePackageExports(filename, manifest.exports, issues);
       if (!Array.isArray(manifest.files) || !manifest.files.includes("dist")) {
         issues.push(`package does not explicitly pack dist: ${filename}`);
@@ -100,11 +117,11 @@ function validateCiWorkflow(workflow, issues, filename) {
     !isRecord(events) ||
     JSON.stringify(events.pull_request) !==
       JSON.stringify({
-        branches: ["main", "feature/avilevin/frontend-toolkit-alpha"],
+        branches: ["main"],
       }) ||
     JSON.stringify(events.push) !==
       JSON.stringify({
-        branches: ["feature/avilevin/frontend-toolkit-alpha"],
+        branches: ["main"],
       })
   ) {
     issues.push(`unexpected CI branch scope in ${filename}`);
@@ -227,7 +244,11 @@ export function validateDocumentationClaims(files) {
   const issues = [];
   for (const [filename, source] of Object.entries(files)) {
     const prose = stripFencedCode(source);
-    if (/(?:npm install|pnpm add|yarn add)\s+@sefaria\//iu.test(source)) {
+    if (
+      /(?:npm install|pnpm add|yarn add)\s+@arithmomaniac\/sefaria-/iu.test(
+        source,
+      )
+    ) {
       issues.push(`unsupported registry installation command: ${filename}`);
     }
     for (const line of prose.split(/\r?\n/u)) {

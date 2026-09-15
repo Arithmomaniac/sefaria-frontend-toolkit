@@ -26,7 +26,7 @@ The `href` is the native authority. With JavaScript disabled, modifier navigatio
 
 ## Own the enhancement in the page
 
-[`examples/linked-article/src/app.ts`](../examples/linked-article/src/app.ts) creates a cache-disabled `@sefaria/client`, calls `loadPopupViewModel`, supplies loading and terminal component view models to one `<sefaria-popup>`, aborts superseded work, rejects obsolete completions, reports rejected integration operations outside the element, and removes only its owned listeners, accessibility attributes, request, popup, and status state during cleanup.
+[`examples/linked-article/src/app.ts`](../examples/linked-article/src/app.ts) creates a cache-disabled `@arithmomaniac/sefaria-client`, calls `loadPopupViewModel`, supplies loading and terminal component view models to one `<sefaria-popup>`, aborts superseded work, rejects obsolete completions, reports rejected integration operations outside the element, and removes only its owned listeners, accessibility attributes, request, popup, and status state during cleanup.
 
 The element receives only the popup view model, the authored anchor used for placement/focus restoration, and the open property. It receives no reference, payload, client, host, or fetch function.
 

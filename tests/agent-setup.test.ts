@@ -11,7 +11,7 @@ describe("Copilot agent setup", () => {
   it("recognizes the toolkit package without depending on a branch name", () => {
     expect(
       classifyToolkitManifest({
-        name: "@sefaria/web-components",
+        name: "@arithmomaniac/sefaria-web-components",
         private: true,
       }),
     ).toBe("toolkit");
@@ -51,7 +51,7 @@ describe("Copilot agent setup", () => {
         read: vi
           .fn()
           .mockResolvedValue(
-            JSON.stringify({ name: "@sefaria/web-components" }),
+            JSON.stringify({ name: "@arithmomaniac/sefaria-web-components" }),
           ),
         requireSetup,
       }),

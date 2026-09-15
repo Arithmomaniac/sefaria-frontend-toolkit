@@ -60,10 +60,8 @@ describe("agent-ready workflow policy", () => {
 
     expect(workflow.permissions).toEqual({ contents: "read" });
     expect(workflow.on).toEqual({
-      pull_request: {
-        branches: ["main", "feature/avilevin/frontend-toolkit-alpha"],
-      },
-      push: { branches: ["feature/avilevin/frontend-toolkit-alpha"] },
+      pull_request: { branches: ["main"] },
+      push: { branches: ["main"] },
     });
     expect(ciSource).not.toMatch(
       /deploy-pages|upload-pages-artifact|publish|release|pull_request_target/iu,

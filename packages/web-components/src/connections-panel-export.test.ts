@@ -2,7 +2,7 @@ import { expect, test } from "vitest";
 import {
   createConnectionsViewModel,
   loadConnectionsViewModel,
-} from "@sefaria/web-components/connections-panel";
+} from "@arithmomaniac/sefaria-web-components/connections-panel";
 
 test("the non-DOM subpath exposes both factories in Node", () => {
   expect(typeof createConnectionsViewModel).toBe("function");

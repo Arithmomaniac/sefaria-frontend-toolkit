@@ -3,7 +3,7 @@ import {
   type CoreRefResponse,
   type GetRefData,
   type SefariaClient,
-} from "@sefaria/client";
+} from "@arithmomaniac/sefaria-client";
 
 const DEFAULT_SITE_ORIGIN = "https://www.sefaria.org";
 const PATH_CHARACTER = /^[A-Za-z0-9\-._~!$&'()*+,;=:@]$/u;

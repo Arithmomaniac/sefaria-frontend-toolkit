@@ -1,5 +1,5 @@
-import type { SefariaClientOptions } from "@sefaria/client";
-import type { VocalizationOptions } from "@sefaria/text-transform";
+import type { SefariaClientOptions } from "@arithmomaniac/sefaria-client";
+import type { VocalizationOptions } from "@arithmomaniac/sefaria-text-transform";
 import { expect, test } from "vitest";
 
 import "./no-network.js";

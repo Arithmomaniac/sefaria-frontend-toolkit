@@ -4,7 +4,7 @@ import {
   type CoreV3TextsResponse,
   type CoreV3TextValue,
   type CoreV3Version,
-} from "@sefaria/client";
+} from "@arithmomaniac/sefaria-client";
 import { describe, expect, it, vi } from "vitest";
 
 import { v3SourceBackedPayload } from "../../../tests/compatibility/src/v3-source-backed.fixture.js";

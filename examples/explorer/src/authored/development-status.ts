@@ -1,4 +1,4 @@
-import { SefariaElement } from "@sefaria/web-components";
+import { SefariaElement } from "@arithmomaniac/sefaria-web-components";
 import { css, html, nothing } from "lit";
 
 import { bilingualSegmentScenarios } from "./bilingual-segment.scenarios.js";
@@ -21,42 +21,42 @@ type ComponentId = (typeof componentIds)[number];
 type Theme = "system" | "light" | "dark";
 
 const repositorySourceBase =
-  "https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/explorer/";
+  "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/";
 
 const componentDetails = {
   "ref-label": {
     label: "Reference label",
-    packagePath: "@sefaria/web-components/ref-label",
+    packagePath: "@arithmomaniac/sefaria-web-components/ref-label",
     source: "src/authored/ref-label.scenarios.ts",
     scenarios: refLabelScenarios,
   },
   "text-segment": {
     label: "Text segment",
-    packagePath: "@sefaria/web-components/text-segment",
+    packagePath: "@arithmomaniac/sefaria-web-components/text-segment",
     source: "src/authored/text-segment.scenarios.ts",
     scenarios: textSegmentScenarios,
   },
   "bilingual-segment": {
     label: "Bilingual segment",
-    packagePath: "@sefaria/web-components/bilingual-segment",
+    packagePath: "@arithmomaniac/sefaria-web-components/bilingual-segment",
     source: "src/authored/bilingual-segment.scenarios.ts",
     scenarios: bilingualSegmentScenarios,
   },
   "source-card": {
     label: "Source card",
-    packagePath: "@sefaria/web-components/source-card",
+    packagePath: "@arithmomaniac/sefaria-web-components/source-card",
     source: "src/authored/source-card.scenarios.ts",
     scenarios: sourceCardScenarios,
   },
   "connections-panel": {
     label: "Connections panel",
-    packagePath: "@sefaria/web-components/connections-panel",
+    packagePath: "@arithmomaniac/sefaria-web-components/connections-panel",
     source: "src/authored/connections-panel.scenarios.ts",
     scenarios: connectionsPanelScenarios,
   },
   reader: {
     label: "Controlled reader",
-    packagePath: "@sefaria/web-components/reader",
+    packagePath: "@arithmomaniac/sefaria-web-components/reader",
     source: "src/authored/reader.scenarios.ts",
     scenarios: readerScenarios,
   },
@@ -334,7 +334,7 @@ class SefariaDevelopmentStatus extends SefariaElement {
                       <code
                         >${
                           selectedDetail?.packagePath ??
-                          "@sefaria/web-components"
+                          "@arithmomaniac/sefaria-web-components"
                         }</code
                       >
                     </dd>

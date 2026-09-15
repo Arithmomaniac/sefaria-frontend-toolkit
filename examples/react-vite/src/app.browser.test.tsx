@@ -1,6 +1,9 @@
-import { createSefariaClient, zCoreV3TextsResponse } from "@sefaria/client";
-import "@sefaria/web-components";
-import type { SefariaSourceCard } from "@sefaria/web-components";
+import {
+  createSefariaClient,
+  zCoreV3TextsResponse,
+} from "@arithmomaniac/sefaria-client";
+import "@arithmomaniac/sefaria-web-components";
+import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
 import { act, StrictMode } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, expect, test, vi } from "vitest";

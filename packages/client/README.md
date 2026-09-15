@@ -1,15 +1,15 @@
 > Created/edited by GitHub Copilot; pending human review.
 
-# `@sefaria/client`
+# `@arithmomaniac/sefaria-client`
 
-`@sefaria/client` is the validated transport boundary for the Sefaria operations used by this workspace. It owns the pinned OpenAPI input, guarded corrections, generated contracts and Zod validators, thin fetch client, and bounded default-on per-client response cache.
+`@arithmomaniac/sefaria-client` is the validated transport boundary for the Sefaria operations used by this workspace. It owns the pinned OpenAPI input, guarded corrections, generated contracts and Zod validators, thin fetch client, and bounded default-on per-client response cache.
 
 This is a private source workspace package, not a published npm installation.
 
 ## Ordinary use
 
 ```ts
-import { createSefariaClient, getV3Texts } from "@sefaria/client";
+import { createSefariaClient, getV3Texts } from "@arithmomaniac/sefaria-client";
 
 const client = createSefariaClient();
 const result = await getV3Texts({
@@ -21,8 +21,8 @@ const result = await getV3Texts({
 Most component consumers should call an async component factory and supply this client rather than interpret the transport result themselves:
 
 ```ts
-import { createSefariaClient } from "@sefaria/client";
-import { loadSourceCardViewModel } from "@sefaria/web-components/source-card";
+import { createSefariaClient } from "@arithmomaniac/sefaria-client";
+import { loadSourceCardViewModel } from "@arithmomaniac/sefaria-web-components/source-card";
 
 const viewModel = await loadSourceCardViewModel(
   { tref: "Micah 6:8" },
@@ -34,13 +34,13 @@ const viewModel = await loadSourceCardViewModel(
 
 | Import | Purpose |
 | --- | --- |
-| `@sefaria/client` | Named client functions, generated types, validation helpers, and common errors |
-| `@sefaria/client/client` | Thin client implementation |
-| `@sefaria/client/contracts` | Generated transport declarations |
-| `@sefaria/client/schemas` | Generated Zod schemas |
-| `@sefaria/client/validators` | Generated operation/status validators |
-| `@sefaria/client/validation` | Shared validation helpers |
-| `@sefaria/client/errors` | Contract-validation error types |
+| `@arithmomaniac/sefaria-client` | Named client functions, generated types, validation helpers, and common errors |
+| `@arithmomaniac/sefaria-client/client` | Thin client implementation |
+| `@arithmomaniac/sefaria-client/contracts` | Generated transport declarations |
+| `@arithmomaniac/sefaria-client/schemas` | Generated Zod schemas |
+| `@arithmomaniac/sefaria-client/validators` | Generated operation/status validators |
+| `@arithmomaniac/sefaria-client/validation` | Shared validation helpers |
+| `@arithmomaniac/sefaria-client/errors` | Contract-validation error types |
 
 Documented HTTP errors remain typed response payloads. Network failures and aborts reject with Fetch API semantics. Undocumented statuses or invalid JSON reject as contract failures with structured paths; they are not converted to empty or success-shaped results.
 

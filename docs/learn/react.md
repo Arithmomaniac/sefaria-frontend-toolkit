@@ -14,7 +14,7 @@ This is an integration pattern, not a React wrapper package or toolkit runtime d
 - Include `examples/react-vite/src/custom-elements.d.ts` in the consumer's TypeScript project so JSX recognizes the element:
 
 ```tsx
-import type { SefariaSourceCard } from "@sefaria/web-components";
+import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
 import type { DetailedHTMLProps, HTMLAttributes, Ref } from "react";
 
 declare module "react" {
@@ -37,7 +37,7 @@ Run the maintained app:
 pnpm dev:react
 ```
 
-The app imports `@sefaria/web-components` once in its browser entry. Its reusable property helper assigns DOM properties during layout rather than serializing attributes:
+The app imports `@arithmomaniac/sefaria-web-components` once in its browser entry. Its reusable property helper assigns DOM properties during layout rather than serializing attributes:
 
 ```tsx
 function useElementProperty<
@@ -142,11 +142,11 @@ Select the Micah 6:8 segment and confirm the visible React event status changes 
 
 ## Source and run links
 
-- [`app.tsx`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/react-vite/src/app.tsx)
-- [`custom-elements.d.ts`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/react-vite/src/custom-elements.d.ts)
-- [`use-element-property.ts`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/react-vite/src/use-element-property.ts)
-- [`app.browser.test.tsx`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/react-vite/src/app.browser.test.tsx)
-- [React example README](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/react-vite/README.md)
+- [`app.tsx`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/react-vite/src/app.tsx)
+- [`custom-elements.d.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/react-vite/src/custom-elements.d.ts)
+- [`use-element-property.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/react-vite/src/use-element-property.ts)
+- [`app.browser.test.tsx`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/react-vite/src/app.browser.test.tsx)
+- [React example README](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/react-vite/README.md)
 
 ## Next step
 

@@ -29,9 +29,9 @@ export async function rehearseChangesets({
       "packages:\n  - packages/*\n",
     );
     for (const [directory, name] of [
-      ["client", "@sefaria/client"],
-      ["text-transform", "@sefaria/text-transform"],
-      ["web-components", "@sefaria/web-components"],
+      ["client", "@arithmomaniac/sefaria-client"],
+      ["text-transform", "@arithmomaniac/sefaria-text-transform"],
+      ["web-components", "@arithmomaniac/sefaria-web-components"],
     ]) {
       await mkdir(path.join(fixture, "packages", directory), {
         recursive: true,
@@ -40,11 +40,11 @@ export async function rehearseChangesets({
         name,
         version: "0.1.0",
         private: true,
-        ...(name === "@sefaria/web-components"
+        ...(name === "@arithmomaniac/sefaria-web-components"
           ? {
               dependencies: {
-                "@sefaria/client": "^0.1.0",
-                "@sefaria/text-transform": "^0.1.0",
+                "@arithmomaniac/sefaria-client": "^0.1.0",
+                "@arithmomaniac/sefaria-text-transform": "^0.1.0",
               },
             }
           : {}),
@@ -65,7 +65,7 @@ export async function rehearseChangesets({
     await writeChangeset(
       fixture,
       "first-alpha",
-      "@sefaria/client",
+      "@arithmomaniac/sefaria-client",
       "Exercise first alpha.",
     );
     runChangesets(fixture, ["pre", "enter", "alpha"]);
@@ -81,7 +81,7 @@ export async function rehearseChangesets({
     await writeChangeset(
       fixture,
       "second-alpha",
-      "@sefaria/text-transform",
+      "@arithmomaniac/sefaria-text-transform",
       "Exercise subsequent alpha.",
     );
     runChangesets(fixture, ["version"]);
@@ -97,7 +97,10 @@ export async function rehearseChangesets({
       fixture,
       "packages/web-components/package.json",
     );
-    for (const dependency of ["@sefaria/client", "@sefaria/text-transform"]) {
+    for (const dependency of [
+      "@arithmomaniac/sefaria-client",
+      "@arithmomaniac/sefaria-text-transform",
+    ]) {
       if (webManifest.dependencies[dependency] !== `^${secondVersions[0]}`) {
         throw new Error(
           `${dependency} was not updated to the synchronized fixed-group version.`,

@@ -1,5 +1,8 @@
-import { createSefariaClient, type SefariaClient } from "@sefaria/client";
-import "@sefaria/web-components";
+import {
+  createSefariaClient,
+  type SefariaClient,
+} from "@arithmomaniac/sefaria-client";
+import "@arithmomaniac/sefaria-web-components";
 import type {
   ConnectionsProjection,
   ConnectionsRequest,
@@ -8,11 +11,11 @@ import type {
   SourceCardDataViewModel,
   SourceCardNavigation,
   SourceCardRequest,
-} from "@sefaria/web-components";
+} from "@arithmomaniac/sefaria-web-components";
 import {
   createSefariaReaderDataSource,
   type ReaderControllerDataSource,
-} from "@sefaria/web-components/reader-controller";
+} from "@arithmomaniac/sefaria-web-components/reader-controller";
 import {
   createReaderSession,
   type ReaderConnectionsContent,
@@ -20,7 +23,7 @@ import {
   type ReaderSession,
   type ReaderSourceContent,
   type ReaderTransition,
-} from "@sefaria/web-components/reader-session";
+} from "@arithmomaniac/sefaria-web-components/reader-session";
 
 import {
   addConnectionsPane,

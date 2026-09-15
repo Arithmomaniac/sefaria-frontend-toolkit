@@ -30,6 +30,6 @@ features:
 
 ## Development preview
 
-Sefaria provides the text library and data source. This toolkit provides reusable frontend building blocks for developers creating niche interfaces and digital Jewish learning experiences; it is not a migration of or replacement for Sefaria's own website. This local site is an additional view of the repository's maintained Markdown and examples. The [repository documentation home](README.md) remains the best GitHub-native index, and the [root README](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/README.md) remains the short first-run entry point.
+Sefaria provides the text library and data source. This toolkit provides reusable frontend building blocks for developers creating niche interfaces and digital Jewish learning experiences; it is not a migration of or replacement for Sefaria's own website. This local site is an additional view of the repository's maintained Markdown and examples. The [repository documentation home](README.md) remains the best GitHub-native index, and the [root README](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/README.md) remains the short first-run entry point.
 
 Run `pnpm dev:site` for a local development server or `pnpm build:site` followed by `pnpm preview:site` for the production artifact. Neither command deploys a site.

@@ -1,7 +1,7 @@
 import {
   createPopupViewModel,
   loadPopupViewModel,
-} from "@sefaria/web-components/popup";
+} from "@arithmomaniac/sefaria-web-components/popup";
 import { expect, test } from "vitest";
 
 test("exports popup factories from the popup subpath", () => {

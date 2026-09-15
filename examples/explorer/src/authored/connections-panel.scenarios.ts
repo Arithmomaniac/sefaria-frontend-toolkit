@@ -1,4 +1,4 @@
-import type { ConnectionsViewModel } from "@sefaria/web-components";
+import type { ConnectionsViewModel } from "@arithmomaniac/sefaria-web-components";
 
 /** One authored state for request-free connections-panel development. */
 export interface ConnectionsPanelScenario {

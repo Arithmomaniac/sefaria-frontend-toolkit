@@ -1,8 +1,8 @@
 > Created/edited by GitHub Copilot; pending human review.
 
-# `@sefaria/text-transform`
+# `@arithmomaniac/sefaria-text-transform`
 
-`@sefaria/text-transform` provides deterministic, DOM-free operations for Sefaria text HTML and Hebrew vocalization.
+`@arithmomaniac/sefaria-text-transform` provides deterministic, DOM-free operations for Sefaria text HTML and Hebrew vocalization.
 
 For an illustrated tour of the input, read [Text markup](../../docs/guides/text-markup.md). For the surrounding client and component pipeline, read [How the pieces fit together](../../docs/guides/data-flow.md).
 
@@ -15,7 +15,7 @@ Component pure factories process text in this order:
 3. Call `applyVocalizationToHtml` on HTML body parts and note content, and `applyVocalization` on plain marker text.
 4. Add component rendering state such as accessible marker and note IDs.
 
-API validation and HTML sanitation are separate controls. `@sefaria/client` validates the JSON response shape; this package restricts markup inside valid string fields.
+API validation and HTML sanitation are separate controls. `@arithmomaniac/sefaria-client` validates the JSON response shape; this package restricts markup inside valid string fields.
 
 ## Implementation notes
 
@@ -40,7 +40,7 @@ Closing and reopening tags can make the output much larger for hostile deeply ne
 ### Bounded connected-text previews
 
 ```ts
-import { createTextPreview } from "@sefaria/text-transform";
+import { createTextPreview } from "@arithmomaniac/sefaria-text-transform";
 
 const preview = createTextPreview(apiHtml, 3500);
 ```
@@ -50,7 +50,7 @@ The operation sanitizes its input, removes footnotes and interaction metadata, a
 ## Vocalization
 
 ```ts
-import { applyVocalization } from "@sefaria/text-transform";
+import { applyVocalization } from "@arithmomaniac/sefaria-text-transform";
 
 const unpointed = applyVocalization("בְּרֵאשִׁ֖ית", "none");
 ```
@@ -64,7 +64,7 @@ Use `applyVocalizationToHtml` for an already-sanitized HTML fragment. It changes
 ## Sanitization
 
 ```ts
-import { sanitize } from "@sefaria/text-transform";
+import { sanitize } from "@arithmomaniac/sefaria-text-transform";
 
 const html = sanitize(apiText, {
   allowFootnotes: true,
@@ -83,7 +83,10 @@ Absolute links are limited to HTTPS on `sefaria.org`, `www.sefaria.org`, `sefari
 ## Footnotes
 
 ```ts
-import { extractFootnotes, sanitize } from "@sefaria/text-transform";
+import {
+  extractFootnotes,
+  sanitize,
+} from "@arithmomaniac/sefaria-text-transform";
 
 const result = extractFootnotes(sanitize(apiText));
 ```

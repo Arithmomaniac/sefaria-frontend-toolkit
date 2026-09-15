@@ -4,32 +4,32 @@ import {
   type CoreLinkResponse,
   type CoreV3TextsResponse,
   validateExternalResponse,
-} from "@sefaria/client";
+} from "@arithmomaniac/sefaria-client";
 import {
   bindReaderController,
   SefariaReader,
   SefariaSourceCard,
   type SourceCardViewModel,
-} from "@sefaria/web-components";
+} from "@arithmomaniac/sefaria-web-components";
 import {
   type ConnectionsProjection,
   type ConnectionsRequest,
-} from "@sefaria/web-components/connections-panel";
+} from "@arithmomaniac/sefaria-web-components/connections-panel";
 import {
   createReaderController,
   ReaderControllerError,
   type ReaderController,
   type ReaderControllerDataSource,
   type ReaderControllerSnapshot,
-} from "@sefaria/web-components/reader-controller";
+} from "@arithmomaniac/sefaria-web-components/reader-controller";
 import {
   createReaderConnectionsContent,
   createReaderSourceContent,
   type ReaderConnectionsContent,
   type ReaderEntrySeed,
   type ReaderSourceContent,
-} from "@sefaria/web-components/reader-session";
-import type { SourceCardRequest } from "@sefaria/web-components/source-card";
+} from "@arithmomaniac/sefaria-web-components/reader-session";
+import type { SourceCardRequest } from "@arithmomaniac/sefaria-web-components/source-card";
 
 const SOURCE_CARD_META_KEY = "sefaria/source-card";
 const CONNECTIONS_META_KEY = "sefaria/connections";

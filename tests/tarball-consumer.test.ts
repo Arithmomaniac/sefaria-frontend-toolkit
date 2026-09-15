@@ -13,12 +13,12 @@ import {
 } from "../scripts/tarball-consumer-validation.mjs";
 
 const clientDefinition = {
-  name: "@sefaria/client",
-  filename: "sefaria-client-0.0.0.tgz",
+  name: "@arithmomaniac/sefaria-client",
+  filename: "arithmomaniac-sefaria-client-0.0.0.tgz",
   subpaths: [".", "./client"],
 };
 const clientManifest = {
-  name: "@sefaria/client",
+  name: "@arithmomaniac/sefaria-client",
   private: true,
   exports: {
     ".": {
@@ -52,13 +52,13 @@ describe("tarball consumer validation", () => {
   it("rejects workspace and registry fallback in the consumer lockfile", () => {
     expect(() =>
       validateConsumerLockfile(
-        "dependencies:\n  '@sefaria/client':\n    specifier: workspace:*\n",
+        "dependencies:\n  '@arithmomaniac/sefaria-client':\n    specifier: workspace:*\n",
         [clientDefinition],
       ),
     ).toThrow("workspace source");
     expect(() =>
       validateConsumerLockfile(
-        "specifier: file:../tarballs/sefaria-client-0.0.0.tgz\nresolution: {tarball: https://registry.example/@sefaria/client.tgz}\n",
+        "specifier: file:../tarballs/arithmomaniac-sefaria-client-0.0.0.tgz\nresolution: {tarball: https://registry.example/@arithmomaniac/sefaria-client.tgz}\n",
         [clientDefinition],
       ),
     ).toThrow("registry");
@@ -70,7 +70,7 @@ describe("tarball consumer validation", () => {
 
     expect(() =>
       validateInstalledPath({
-        packageName: "@sefaria/client",
+        packageName: "@arithmomaniac/sefaria-client",
         installedPath: path.join(repository, "packages", "client", "dist"),
         consumer,
         repository,
@@ -125,13 +125,13 @@ describe("tarball consumer validation", () => {
 
     expect(() =>
       validateInstalledPath({
-        packageName: "@sefaria/client",
+        packageName: "@arithmomaniac/sefaria-client",
         installedPath: path.resolve(
           "temporary",
           "consumer",
           "node_modules",
-          "@sefaria",
-          "client",
+          "@arithmomaniac",
+          "sefaria-client",
           "dist",
           "index.js",
         ),

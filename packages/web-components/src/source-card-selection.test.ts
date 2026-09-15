@@ -1,7 +1,7 @@
 import {
   zCoreV3TextsResponse,
   type CoreV3TextsResponse,
-} from "@sefaria/client";
+} from "@arithmomaniac/sefaria-client";
 import { expect, test } from "vitest";
 import { v3SourceBackedPayload } from "../../../tests/compatibility/src/v3-source-backed.fixture.js";
 import { createSourceCardViewModel } from "./source-card.js";

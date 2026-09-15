@@ -1,4 +1,7 @@
-import type { CoreLinkResponse, CoreV3TextsResponse } from "@sefaria/client";
+import type {
+  CoreLinkResponse,
+  CoreV3TextsResponse,
+} from "@arithmomaniac/sefaria-client";
 
 import type {
   BilingualPairContentLanguage,

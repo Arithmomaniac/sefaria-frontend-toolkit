@@ -11,7 +11,7 @@ applyTo: "examples/mcp-app/**,examples/linked-article/**,docs/specs/integrations
 - Call non-DOM component factories outside elements.
 - Give elements only view models and visual or interaction properties.
 - Put a corrected API payload in MCP `structuredContent`; when MCP requires an object root for an array-shaped endpoint response, wrap the unchanged payload in the smallest specified integration envelope.
-- Validate unknown MCP or server JSON with a public corrected `@sefaria/client` schema or generated validator.
+- Validate unknown MCP or server JSON with a public corrected `@arithmomaniac/sefaria-client` schema or generated validator.
 - Report structured JSON paths before projection.
 - Call the same pure factory in server-provided and client modes.
 - Make the first MCP render use zero requests.

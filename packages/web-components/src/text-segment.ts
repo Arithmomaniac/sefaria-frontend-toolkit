@@ -4,14 +4,14 @@ import {
   type CoreV3Version,
   type GetV3TextsData,
   type SefariaClient,
-} from "@sefaria/client";
+} from "@arithmomaniac/sefaria-client";
 import {
   applyVocalizationToHtml,
   extractFootnotes,
   sanitize,
   type ExtractedFootnote,
   type FootnoteBodyPart,
-} from "@sefaria/text-transform";
+} from "@arithmomaniac/sefaria-text-transform";
 
 /** Selects one language or exact version for a text-segment request. */
 export interface TextSegmentVersionSelection {

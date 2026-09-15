@@ -5,7 +5,7 @@ import type {
   SefariaReader,
   SefariaSourceCard,
   SefariaTextSegment,
-} from "@sefaria/web-components";
+} from "@arithmomaniac/sefaria-web-components";
 import { html, type LitElement } from "lit";
 import { render } from "vitest-browser-lit";
 import { beforeEach, expect, test, vi } from "vitest";
@@ -296,7 +296,7 @@ test("links diagnostics to repository source instead of a Vite fallback", async 
     "src/authored/reader.scenarios.ts",
   );
   expect(sourceLink?.href).toBe(
-    "https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/explorer/src/authored/reader.scenarios.ts",
+    "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/reader.scenarios.ts",
   );
   expect(sourceLink?.origin).not.toBe(location.origin);
   expect(readerScenarios.map((scenario) => scenario.id)).toContain("paired");

@@ -4,7 +4,7 @@ import {
   type CoreLinkObject,
   type CoreLinkResponse,
   type CoreV3TextsResponse,
-} from "@sefaria/client";
+} from "@arithmomaniac/sefaria-client";
 import { describe, expect, it, vi } from "vitest";
 
 import linksFixture from "../../client/test/fixtures/links-targum-2026-08-30.json";

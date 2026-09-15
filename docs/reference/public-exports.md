@@ -2,7 +2,7 @@
 
 This file is generated from built declaration files and package export maps. Run `pnpm metadata:generate` after changing a supported subpath.
 
-## `@sefaria/client`
+## `@arithmomaniac/sefaria-client`
 
 | Subpath | JavaScript | Types | Declarations |
 | --- | --- | --- | --- |
@@ -14,13 +14,13 @@ This file is generated from built declaration files and package export maps. Run
 | `./validation` | `./dist/validation.js` | `./dist/validation.d.ts` | `ResponseSelector`, `ResponseValidationContext`, `ResponseValidatorLookup`, `ValidationResult`, `getResponseContract`, `getResponseValidator`, `validateExternalResponse`, `validateResponse` |
 | `./validators` | `./dist/generated/response-validators.gen.js` | `./dist/generated/response-validators.gen.d.ts` | `validateGetAsyncTaskStatus200`, `validateGetAsyncTaskStatus202`, `validateGetAsyncTaskStatus500`, `validateGetIndexV2200`, `validateGetLinks200`, `validateGetLinks400`, `validateGetRef200`, `validateGetRef404`, `validateGetShape200`, `validateGetTextVersions200`, `validateGetV3Texts200`, `validateGetV3Texts400`, `validateGetV3Texts404`, `validatePostFindRefs202` |
 
-## `@sefaria/text-transform`
+## `@arithmomaniac/sefaria-text-transform`
 
 | Subpath | JavaScript | Types | Declarations |
 | --- | --- | --- | --- |
 | `.` | `./dist/index.js` | `./dist/index.d.ts` | `ExtractFootnotesResult`, `ExtractedFootnote`, `FootnoteBodyPart`, `PaseqMode`, `SanitizeOptions`, `TextPreview`, `VocalizationMode`, `VocalizationOptions`, `applyVocalization`, `applyVocalizationToHtml`, `createTextPreview`, `extractFootnotes`, `sanitize` |
 
-## `@sefaria/web-components`
+## `@arithmomaniac/sefaria-web-components`
 
 | Subpath | JavaScript | Types | Declarations |
 | --- | --- | --- | --- |

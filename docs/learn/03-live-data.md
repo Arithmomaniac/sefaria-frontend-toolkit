@@ -17,13 +17,13 @@ Use the public client and async factory after an explicit user action, show load
 This host keeps one element mounted and gives each operation an identity:
 
 ```ts
-import { createSefariaClient } from "@sefaria/client";
-import "@sefaria/web-components";
-import type { SefariaSourceCard } from "@sefaria/web-components";
+import { createSefariaClient } from "@arithmomaniac/sefaria-client";
+import "@arithmomaniac/sefaria-web-components";
+import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
 import {
   loadSourceCardViewModel,
   type SourceCardViewModel,
-} from "@sefaria/web-components/source-card";
+} from "@arithmomaniac/sefaria-web-components/source-card";
 
 const client = createSefariaClient({ cache: false });
 const card = document.querySelector<SefariaSourceCard>("sefaria-source-card");
@@ -98,8 +98,8 @@ Start one load, immediately change the reference, and start another. Confirm tha
 ## Source and run links
 
 - Run: `pnpm dev:source-card`
-- Source: [`examples/explorer/src/source-card/app.ts`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/explorer/src/source-card/app.ts)
-- Connections interaction: [`examples/explorer/src/connections/app.ts`](https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/explorer/src/connections/app.ts)
+- Source: [`examples/explorer/src/source-card/app.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/source-card/app.ts)
+- Connections interaction: [`examples/explorer/src/connections/app.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/connections/app.ts)
 - Failure semantics: [Data-flow guide](../guides/data-flow.md#failures-stay-at-the-right-boundary)
 
 ## Next step

@@ -4,10 +4,9 @@ on:
   pull_request:
     branches:
       - main
-      - feature/avilevin/frontend-toolkit-alpha
   push:
     branches:
-      - feature/avilevin/frontend-toolkit-alpha
+      - main
 
 permissions:
   contents: read

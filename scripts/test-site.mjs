@@ -106,7 +106,7 @@ try {
       .getAttribute("href");
     if (
       authoredSource !==
-      "https://github.com/Arithmomaniac/sefaria-web-components/blob/feature/avilevin/frontend-toolkit-alpha/examples/explorer/src/authored/source-card.scenarios.ts"
+      "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/source-card.scenarios.ts"
     ) {
       const authoredFrame = page
         .frames()
@@ -199,7 +199,7 @@ try {
       .getAttribute("href");
     if (
       sourceHref !==
-      "https://github.com/Arithmomaniac/sefaria-web-components/tree/feature/avilevin/frontend-toolkit-alpha/examples/react-vite"
+      "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/react-vite"
     ) {
       throw new Error(`Unexpected React source link: ${sourceHref}`);
     }
