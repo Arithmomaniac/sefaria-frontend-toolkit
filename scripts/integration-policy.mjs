@@ -208,6 +208,7 @@ function validatePublishJob(publish, issues, filename) {
       "git fetch --no-tags --depth=1 origin main",
       'test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"',
     ].join("\n"),
+    "node scripts/package-publication.mjs preflight",
     "pnpm publish .artifacts/publish/client --tag alpha --access restricted --no-git-checks",
     "pnpm publish .artifacts/publish/text-transform --tag alpha --access restricted --no-git-checks",
     "pnpm publish .artifacts/publish/web-components --tag alpha --access restricted --no-git-checks",
@@ -259,12 +260,13 @@ function validatePublishJob(publish, issues, filename) {
     issues.push(`CI npm registry configuration is incorrect in ${filename}`);
   }
   if (
-    tokenSteps.length !== 4 ||
+    tokenSteps.length !== 5 ||
     tokenSteps.some(
       (step) =>
         step.env.NODE_AUTH_TOKEN !== "${{ github.token }}" ||
         !(
           step.run.startsWith("pnpm publish .artifacts/publish/") ||
+          step.run === "node scripts/package-publication.mjs preflight" ||
           step.run.startsWith("node scripts/package-publication.mjs verify")
         ),
     )

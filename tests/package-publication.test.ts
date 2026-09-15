@@ -17,7 +17,9 @@ import {
   createRegistryMetadataUrl,
   createPublishManifest,
   createPublishVersion,
+  preflightPublication,
   stagePublishPackages,
+  validatePublicationPreflight,
   validatePublishedPackage,
   validateRegistryConsumerLockfile,
 } from "../scripts/package-publication.mjs";
@@ -215,6 +217,153 @@ describe("private package publication", () => {
         version,
       }),
     ).toThrow("must be private");
+  });
+
+  it("requires every existing package record to have a private linked alpha version", () => {
+    const packages = PACKAGE_DEFINITIONS.map((definition) => ({
+      definition,
+      publicStatus: 404,
+      registryMetadata: {
+        name: definition.name,
+        "dist-tags": { alpha: version },
+        versions: {
+          [version]: {
+            name: definition.name,
+            version,
+            repository: {
+              type: "git",
+              url: `git+https://github.com/${repositoryFullName}.git`,
+            },
+            dependencies:
+              definition.name === "@arithmomaniac/sefaria-web-components"
+                ? {
+                    "@arithmomaniac/sefaria-client": version,
+                    "@arithmomaniac/sefaria-text-transform": version,
+                  }
+                : {},
+          },
+        },
+      },
+    }));
+
+    expect(
+      validatePublicationPreflight({
+        packages: packages.map((entry, index) =>
+          index === 1
+            ? {
+                ...entry,
+                registryMetadata: {
+                  ...entry.registryMetadata,
+                  "dist-tags": { alpha: "0.0.0-alpha.123455.1" },
+                  versions: {
+                    "0.0.0-alpha.123455.1": {
+                      ...entry.registryMetadata.versions[version],
+                      version: "0.0.0-alpha.123455.1",
+                    },
+                  },
+                },
+              }
+            : entry,
+        ),
+        repositoryFullName,
+      }),
+    ).toEqual([version, "0.0.0-alpha.123455.1", version]);
+    expect(() =>
+      validatePublicationPreflight({
+        packages: packages.map((entry, index) =>
+          index === 0 ? { ...entry, publicStatus: 200 } : entry,
+        ),
+        repositoryFullName,
+      }),
+    ).toThrow("must be private");
+    expect(() =>
+      validatePublicationPreflight({
+        packages: packages.map((entry, index) =>
+          index === 2
+            ? { ...entry, registryMetadata: { error: "not found" } }
+            : entry,
+        ),
+        repositoryFullName,
+      }),
+    ).toThrow("registry metadata is invalid");
+  });
+
+  it("authenticates every registry preflight while checking package pages anonymously", async () => {
+    const calls: Array<{
+      url: string;
+      headers: Record<string, string>;
+    }> = [];
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = (async (input, init) => {
+      const url = String(input);
+      const headers = (init?.headers ?? {}) as Record<string, string>;
+      calls.push({ url, headers });
+      const definition = PACKAGE_DEFINITIONS.find(
+        (candidate) =>
+          createRegistryMetadataUrl(candidate.name) === url ||
+          createPackagePageUrl({
+            serverUrl: "https://github.com",
+            repositoryFullName,
+            packageName: candidate.name,
+          }) === url,
+      );
+      if (definition === undefined) {
+        throw new Error(`Unexpected preflight URL ${url}`);
+      }
+      if (!url.startsWith("https://npm.pkg.github.com/")) {
+        return { status: 404 };
+      }
+      return {
+        ok: true,
+        status: 200,
+        statusText: "OK",
+        json: async () => ({
+          name: definition.name,
+          "dist-tags": { alpha: version },
+          versions: {
+            [version]: {
+              name: definition.name,
+              version,
+              repository: {
+                type: "git",
+                url: `git+https://github.com/${repositoryFullName}.git`,
+              },
+              dependencies:
+                definition.name === "@arithmomaniac/sefaria-web-components"
+                  ? {
+                      "@arithmomaniac/sefaria-client": version,
+                      "@arithmomaniac/sefaria-text-transform": version,
+                    }
+                  : {},
+            },
+          },
+        }),
+      };
+    }) as typeof fetch;
+
+    try {
+      await expect(
+        preflightPublication({
+          repositoryFullName,
+          serverUrl: "https://github.com",
+          token: "test-token",
+        }),
+      ).resolves.toEqual(PACKAGE_DEFINITIONS.map(() => version));
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+
+    expect(calls).toHaveLength(PACKAGE_DEFINITIONS.length * 2);
+    expect(
+      calls
+        .filter(({ url }) => url.startsWith("https://npm.pkg.github.com/"))
+        .every(({ headers }) => headers.Authorization === "Bearer test-token"),
+    ).toBe(true);
+    expect(
+      calls
+        .filter(({ url }) => url.startsWith("https://github.com/"))
+        .every(({ headers }) => headers.Authorization === undefined),
+    ).toBe(true);
   });
 
   it("rejects workspace, file, and mismatched registry consumer resolutions", () => {

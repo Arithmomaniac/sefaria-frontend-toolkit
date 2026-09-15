@@ -73,6 +73,13 @@ describe("Wave 4 integration policy", () => {
         "copilot-setup-steps.yml": setupWorkflow,
       }),
     ).toEqual([]);
+    const preflight = "node scripts/package-publication.mjs preflight";
+    const firstPublish =
+      "pnpm publish .artifacts/publish/client --tag alpha --access restricted --no-git-checks";
+    expect(workflow.indexOf(preflight)).toBeGreaterThan(-1);
+    expect(workflow.indexOf(preflight)).toBeLessThan(
+      workflow.indexOf(firstPublish),
+    );
 
     const unsafe = workflow
       .replace(

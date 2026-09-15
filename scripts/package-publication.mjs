@@ -230,6 +230,44 @@ export function validatePublishedPackage({
   }
 }
 
+export function validatePublicationPreflight({ packages, repositoryFullName }) {
+  if (
+    !Array.isArray(packages) ||
+    packages.length !== PACKAGE_DEFINITIONS.length
+  ) {
+    throw new Error("Publication preflight requires every package record.");
+  }
+
+  const alphaVersions = [];
+  for (const [index, definition] of PACKAGE_DEFINITIONS.entries()) {
+    const packageRecord = packages[index];
+    if (packageRecord?.definition?.name !== definition.name) {
+      throw new Error(
+        `Publication preflight package order is incorrect at ${definition.name}.`,
+      );
+    }
+    const { registryMetadata, publicStatus } = packageRecord;
+    if (
+      !isRecord(registryMetadata) ||
+      registryMetadata.name !== definition.name
+    ) {
+      throw new Error(`${definition.name} registry metadata is invalid.`);
+    }
+    const packageAlpha = registryMetadata["dist-tags"]?.alpha;
+    validatePublishVersion(packageAlpha);
+    alphaVersions.push(packageAlpha);
+    validatePublishedPackage({
+      definition,
+      registryMetadata,
+      publicStatus,
+      repositoryFullName,
+      version: packageAlpha,
+    });
+  }
+
+  return alphaVersions;
+}
+
 export function validateRegistryConsumerLockfile({ lockfile, version }) {
   validatePublishVersion(version);
   if (/\b(?:workspace:|link:|file:)/u.test(lockfile)) {
@@ -258,6 +296,24 @@ export function validateRegistryConsumerLockfile({ lockfile, version }) {
   }
 }
 
+export async function preflightPublication({
+  repositoryFullName,
+  serverUrl,
+  token,
+}) {
+  requirePublicationEnvironment({
+    repositoryFullName,
+    token,
+    operation: "preflight",
+  });
+  const packages = await fetchPackageRecords({
+    repositoryFullName,
+    serverUrl,
+    token,
+  });
+  return validatePublicationPreflight({ packages, repositoryFullName });
+}
+
 async function verifyPublication({
   repository,
   staging,
@@ -267,42 +323,70 @@ async function verifyPublication({
   token,
 }) {
   validatePublishVersion(version);
-  if (!token) {
-    throw new Error(
-      "NODE_AUTH_TOKEN is required for publication verification.",
-    );
-  }
-  if (!repositoryFullName.includes("/")) {
-    throw new Error("GITHUB_REPOSITORY must include an owner and repository.");
-  }
-
-  for (const definition of PACKAGE_DEFINITIONS) {
-    const [registryMetadata, packagePageResponse] = await Promise.all([
-      fetchRegistryJson(createRegistryMetadataUrl(definition.name), token),
-      globalThis.fetch(
-        createPackagePageUrl({
-          serverUrl,
-          repositoryFullName,
-          packageName: definition.name,
-        }),
-        {
-          headers: {
-            Accept: "text/html",
-            "User-Agent": "sefaria-frontend-toolkit-publication-verifier",
-          },
-        },
-      ),
-    ]);
+  requirePublicationEnvironment({
+    repositoryFullName,
+    token,
+    operation: "verification",
+  });
+  const packages = await fetchPackageRecords({
+    repositoryFullName,
+    serverUrl,
+    token,
+  });
+  for (const { definition, registryMetadata, publicStatus } of packages) {
     validatePublishedPackage({
       definition,
       registryMetadata,
-      publicStatus: packagePageResponse.status,
+      publicStatus,
       repositoryFullName,
       version,
     });
   }
 
   await verifyRegistryConsumer({ repository, staging, version });
+}
+
+async function fetchPackageRecords({ repositoryFullName, serverUrl, token }) {
+  return Promise.all(
+    PACKAGE_DEFINITIONS.map(async (definition) => {
+      const [registryMetadata, packagePageResponse] = await Promise.all([
+        fetchRegistryJson(createRegistryMetadataUrl(definition.name), token),
+        globalThis.fetch(
+          createPackagePageUrl({
+            serverUrl,
+            repositoryFullName,
+            packageName: definition.name,
+          }),
+          {
+            headers: {
+              Accept: "text/html",
+              "User-Agent": "sefaria-frontend-toolkit-publication-verifier",
+            },
+          },
+        ),
+      ]);
+      return {
+        definition,
+        registryMetadata,
+        publicStatus: packagePageResponse.status,
+      };
+    }),
+  );
+}
+
+function requirePublicationEnvironment({
+  repositoryFullName,
+  token,
+  operation,
+}) {
+  if (!token) {
+    throw new Error(
+      `NODE_AUTH_TOKEN is required for publication ${operation}.`,
+    );
+  }
+  if (!repositoryFullName.includes("/")) {
+    throw new Error("GITHUB_REPOSITORY must include an owner and repository.");
+  }
 }
 
 async function verifyRegistryConsumer({ repository, staging, version }) {
@@ -528,10 +612,10 @@ if (
   import.meta.url === pathToFileURL(path.resolve(entryPath)).href
 ) {
   const command = process.argv[2];
-  const version = readArgument("--version");
   const repository = path.resolve(import.meta.dirname, "..");
   const staging = path.join(repository, ".artifacts", "publish");
   if (command === "stage") {
+    const version = readArgument("--version");
     await stagePublishPackages({
       repository,
       destination: staging,
@@ -540,7 +624,17 @@ if (
     process.stdout.write(
       `Staged ${PACKAGE_DEFINITIONS.length} packages at ${version}.\n`,
     );
+  } else if (command === "preflight") {
+    await preflightPublication({
+      repositoryFullName: process.env.GITHUB_REPOSITORY ?? DEFAULT_REPOSITORY,
+      serverUrl: process.env.GITHUB_SERVER_URL ?? "https://github.com",
+      token: process.env.NODE_AUTH_TOKEN,
+    });
+    process.stdout.write(
+      `Preflight verified ${PACKAGE_DEFINITIONS.length} existing private registry packages.\n`,
+    );
   } else if (command === "verify") {
+    const version = readArgument("--version");
     await verifyPublication({
       repository,
       staging,
@@ -553,6 +647,6 @@ if (
       `Verified ${PACKAGE_DEFINITIONS.length} private registry packages at ${version}.\n`,
     );
   } else {
-    throw new Error("Expected the stage or verify command.");
+    throw new Error("Expected the stage, preflight, or verify command.");
   }
 }

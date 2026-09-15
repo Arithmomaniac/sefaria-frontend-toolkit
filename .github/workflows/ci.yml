@@ -89,6 +89,9 @@ jobs:
         run: |
           git fetch --no-tags --depth=1 origin main
           test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
+      - run: node scripts/package-publication.mjs preflight
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
       - run: pnpm publish .artifacts/publish/client --tag alpha --access restricted --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
