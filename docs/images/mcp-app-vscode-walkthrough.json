@@ -1,0 +1,30 @@
+{
+  "status": "passed",
+  "mode": "capture",
+  "launch": { "pid": 83584, "minimized": true, "cdpAttached": true },
+  "completedStages": [
+    "reader-initial",
+    "connections-category",
+    "connections-paging",
+    "connected-source",
+    "reader-hierarchy",
+    "reader-chat-export",
+    "reader-breadcrumb-middle",
+    "reader-breadcrumb-root"
+  ],
+  "selectedReference": "Agra DeKala, Balak 18",
+  "hierarchyReferences": ["Micah 6:8", "Agra DeKala, Balak 18", "Exodus 15:15"],
+  "artifacts": {
+    "reader-initial": "docs/images/mcp-app-vscode.png",
+    "reader-hierarchy": "docs/images/mcp-app-vscode-reader-hierarchy.png",
+    "chat-export": "docs/images/mcp-app-vscode-chat-export.png"
+  },
+  "deliveryModes": {
+    "connected-source": "same-app-tool",
+    "reader-hierarchy": "same-app-tool",
+    "chat-export": "host-message"
+  },
+  "executable": "Code.exe",
+  "hostVersions": { "vscode": "1.137.0", "copilotChat": "0.65.0" },
+  "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.137.0 Chrome/148.0.7778.280 Electron/42.10.0 Safari/537.36"
+}

@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "sefaria-components-demo": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["${workspaceFolder}/examples/mcp-app/dist/server/stdio.js"]
+    }
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "v3-text-spanning-2026-08-29.json": {
+    "source": "https://www.sefaria.org/api/v3/texts/Genesis%201:31-2:2?version=primary",
+    "capturedAt": "2026-08-29",
+    "reduction": "Retains deployed metadata and the observed two-level recursive text shape; text strings and optional collections are minimized for a stable focused fixture."
+  },
+  "index-genesis-2026-09-01.json": {
+    "source": "https://www.sefaria.org/api/v2/index/Genesis",
+    "capturedAt": "2026-09-01",
+    "reduction": "Retains the generated required title, categories, and schema fields; retains the deployed root schema structural fields and only its primary English and Hebrew titles; retains only alts.Parasha.nodes[0] as the nested schema node; omits all other top-level metadata and alternate nodes."
+  },
+  "versions-nullable-2026-08-30.json": {
+    "source": "https://www.sefaria.org/api/texts/versions/Rashi%20on%20Genesis",
+    "capturedAt": "2026-08-30",
+    "reduction": "Retains one deployed version record with a null versionSource; other version records are omitted."
+  },
+  "versions-error-2026-08-30.json": {
+    "source": "https://www.sefaria.org/api/texts/versions/__missing_generated_client_probe__",
+    "capturedAt": "2026-08-30",
+    "reduction": "Unmodified deployed HTTP 200 error payload."
+  },
+  "shape-genesis-2026-08-30.json": {
+    "source": "https://www.sefaria.org/api/shape/Genesis",
+    "capturedAt": "2026-08-30",
+    "reduction": "Unmodified deployed simple shape payload."
+  },
+  "shape-error-2026-08-30.json": {
+    "source": "https://www.sefaria.org/api/shape/Torah",
+    "capturedAt": "2026-08-30",
+    "reduction": "Unmodified deployed HTTP 200 error payload."
+  },
+  "links-error-2026-08-30.json": {
+    "source": "https://www.sefaria.org/api/links/__missing_generated_client_probe__",
+    "capturedAt": "2026-08-30",
+    "reduction": "Unmodified deployed HTTP 200 error payload."
+  },
+  "links-targum-2026-08-30.json": {
+    "source": "https://www.sefaria.org/api/links/Genesis%201%3A1?with_text=0&with_sheet_links=0&category=Targum",
+    "capturedAt": "2026-08-30",
+    "reduction": "Retains the first deployed Targum link record; other link records are omitted."
+  },
+  "ref-sheet-2026-08-30.json": {
+    "source": "https://www.sefaria.org/api/ref/Sheet%20643492",
+    "capturedAt": "2026-08-30",
+    "reduction": "Unmodified deployed SheetNode payload with conditional navigation fields."
+  },
+  "ref-genesis-segment-2026-09-03.json": {
+    "source": "https://www.sefaria.org/api/ref/Genesis%201%3A1",
+    "capturedAt": "2026-09-03",
+    "reduction": "Unmodified deployed segment-level JaggedArrayNode payload."
+  },
+  "ref-genesis-range-2026-09-03.json": {
+    "source": "https://www.sefaria.org/api/ref/Genesis%201%3A1-3",
+    "capturedAt": "2026-09-03",
+    "reduction": "Unmodified deployed same-section range payload."
+  },
+  "ref-genesis-spanning-2026-09-03.json": {
+    "source": "https://www.sefaria.org/api/ref/Genesis%201%3A31-2%3A2",
+    "capturedAt": "2026-09-03",
+    "reduction": "Unmodified deployed spanning-range payload."
+  },
+  "ref-rashi-commentary-2026-09-03.json": {
+    "source": "https://www.sefaria.org/api/ref/Rashi%20on%20Genesis%201%3A1%3A1",
+    "capturedAt": "2026-09-03",
+    "reduction": "Unmodified deployed three-level commentary payload."
+  },
+  "ref-unresolved-2026-09-03.json": {
+    "source": "https://www.sefaria.org/api/ref/__missing_ref_label_probe__",
+    "capturedAt": "2026-09-03",
+    "reduction": "Unmodified deployed HTTP 200 payload for an unparseable reference."
+  },
+  "find-refs-enqueued-2026-09-06.json": {
+    "source": "https://www.sefaria.org/api/find-refs?with_text=0&debug=0&max_segments=20",
+    "capturedAt": "2026-09-06",
+    "reduction": "Unmodified deployed HTTP 202 enqueue payload for authored public demo text without tracking metadata."
+  },
+  "find-refs-success-2026-09-06.json": {
+    "source": "https://www.sefaria.org/api/async/72a1b515-eb68-4df8-a9ec-ce541bb89195",
+    "capturedAt": "2026-09-06",
+    "reduction": "Unmodified deployed HTTP 200 success payload for the authored public demo text; includes resolved matches, dynamic refData keys, and a failed match with refs null."
+  },
+  "v3-connections-genesis-section-2026-09-06.json": {
+    "source": "https://www.sefaria.org/api/v3/texts/Genesis%201?version=primary&version=translation&return_format=default",
+    "capturedAt": "2026-09-06",
+    "reduction": "Unmodified validated deployed v3 payload for contextual reader qualification."
+  },
+  "v3-connections-genesis-target-2026-09-06.json": {
+    "source": "https://www.sefaria.org/api/v3/texts/Genesis%201%3A2?version=primary&version=translation&return_format=default",
+    "capturedAt": "2026-09-06",
+    "reduction": "Unmodified validated deployed v3 payload for contextual reader qualification."
+  },
+  "v3-connections-rashi-range-2026-09-06.json": {
+    "source": "https://www.sefaria.org/api/v3/texts/Rashi%20on%20Genesis%201%3A1%3A1-2?version=primary&version=translation&return_format=default",
+    "capturedAt": "2026-09-06",
+    "reduction": "Unmodified validated deployed v3 payload for contextual reader qualification."
+  },
+  "v3-connections-rashi-section-2026-09-06.json": {
+    "source": "https://www.sefaria.org/api/v3/texts/Rashi%20on%20Genesis%201%3A1?version=primary&version=translation&return_format=default",
+    "capturedAt": "2026-09-06",
+    "reduction": "Unmodified validated deployed v3 payload for contextual reader qualification."
+  },
+  "v3-connections-berakhot-section-2026-09-06.json": {
+    "source": "https://www.sefaria.org/api/v3/texts/Berakhot%202a?version=primary&version=translation&return_format=default",
+    "capturedAt": "2026-09-06",
+    "reduction": "Unmodified validated deployed v3 payload for contextual reader qualification."
+  },
+  "v3-connections-bahir-target-2026-09-06.json": {
+    "source": "https://www.sefaria.org/api/v3/texts/Sefer%20HaBahir%201?version=primary&version=translation&return_format=default",
+    "capturedAt": "2026-09-06",
+    "reduction": "Unmodified validated deployed v3 payload for contextual reader qualification."
+  },
+  "links-connections-preview-2026-09-06.json": {
+    "source": "https://www.sefaria.org/api/links/Genesis%201%3A1?with_text=1&with_sheet_links=0",
+    "capturedAt": "2026-09-06",
+    "reduction": "Retains complete Rashi on Genesis and Targum Jonathan on Genesis records; other records omitted. Counts apply to this reduced fixture only."
+  }
+}
