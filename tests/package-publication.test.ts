@@ -227,6 +227,22 @@ describe("private package publication", () => {
         version,
       }),
     ).not.toThrow();
+    expect(() =>
+      validateRegistryConsumerLockfile({
+        lockfile: JSON.stringify(
+          Object.fromEntries(
+            PACKAGE_DEFINITIONS.map((definition) => [
+              definition.name,
+              {
+                specifier: version,
+                version: `${version}(lit@3.3.3)`,
+              },
+            ]),
+          ),
+        ),
+        version,
+      }),
+    ).not.toThrow();
 
     for (const invalid of [
       "workspace:*",
