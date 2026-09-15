@@ -246,7 +246,11 @@ export function validateRegistryConsumerLockfile({ lockfile, version }) {
       typeof resolution === "string" ? resolution : resolution?.specifier;
     const resolvedVersion =
       typeof resolution === "string" ? resolution : resolution?.version;
-    if (specifier !== version || resolvedVersion !== version) {
+    const packageVersion =
+      typeof resolvedVersion === "string"
+        ? resolvedVersion.replace(/\(.+$/u, "")
+        : resolvedVersion;
+    if (specifier !== version || packageVersion !== version) {
       throw new Error(
         `${definition.name} did not resolve the exact published version.`,
       );
@@ -302,10 +306,11 @@ async function verifyPublication({
 }
 
 async function verifyRegistryConsumer({ repository, staging, version }) {
-  const consumer = await mkdtemp(
-    path.join(tmpdir(), "sefaria-registry-consumer-"),
-  );
+  const root = await mkdtemp(path.join(tmpdir(), "sefaria-registry-consumer-"));
+  const consumer = path.join(root, "consumer");
+  const npmrc = path.join(root, ".npmrc");
   try {
+    await mkdir(consumer, { recursive: true });
     await Promise.all([
       writeFile(
         path.join(consumer, "package.json"),
@@ -327,7 +332,7 @@ async function verifyRegistryConsumer({ repository, staging, version }) {
         )}\n`,
       ),
       writeFile(
-        path.join(consumer, ".npmrc"),
+        npmrc,
         [
           "@arithmomaniac:registry=https://npm.pkg.github.com",
           "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}",
@@ -337,8 +342,12 @@ async function verifyRegistryConsumer({ repository, staging, version }) {
       ),
     ]);
 
-    runPnpm(["install", "--lockfile-only"], consumer);
-    runPnpm(["install", "--frozen-lockfile"], consumer);
+    const installEnvironment = {
+      ...process.env,
+      NPM_CONFIG_USERCONFIG: npmrc,
+    };
+    runPnpm(["install", "--lockfile-only"], consumer, installEnvironment);
+    runPnpm(["install", "--frozen-lockfile"], consumer, installEnvironment);
     validateRegistryConsumerLockfile({
       lockfile: await readFile(path.join(consumer, "pnpm-lock.yaml"), "utf8"),
       version,
@@ -387,12 +396,12 @@ async function verifyRegistryConsumer({ repository, staging, version }) {
     }
 
     await Promise.all([
-      rm(path.join(consumer, ".npmrc"), { force: true }),
+      rm(npmrc, { force: true }),
       rm(staging, { force: true, recursive: true }),
     ]);
     runNodeImports(NODE_SAFE_IMPORTS, consumer);
   } finally {
-    await rm(consumer, { force: true, recursive: true });
+    await rm(root, { force: true, recursive: true });
   }
 }
 
@@ -412,7 +421,7 @@ async function fetchRegistryJson(url, token) {
   return response.json();
 }
 
-function runPnpm(args, cwd) {
+function runPnpm(args, cwd, env = process.env) {
   const windows = process.platform === "win32";
   const executable = windows ? (process.env.ComSpec ?? "cmd.exe") : "pnpm";
   const commandArgs = windows
@@ -420,7 +429,7 @@ function runPnpm(args, cwd) {
     : args;
   const result = spawnSync(executable, commandArgs, {
     cwd,
-    env: process.env,
+    env,
     stdio: "inherit",
   });
   if (result.status !== 0) {
