@@ -109,7 +109,7 @@ The conditional `copilot-setup-steps` workflow is repository source until separa
 
 **Observed on September 15, 2026 with Node 26.8.1 and pnpm 11.22.0 on Windows:** the public `Arithmomaniac/sefaria-frontend-toolkit` repository began with one root commit whose tree hash exactly matched `Arithmomaniac/sefaria-web-components@b6fec1c9293ffd4bdbf1505fed65b0d41f1d0fcb`. The replacement repository did not contain the historical commits used by the earlier test-disposition implementation. Its committed 73-file baseline and 9-file showcase inventories were compared exactly with the corresponding trees at `7bc2d258fac2959beb5252ebdbcbddbaccd0c7b7` and `d7e2d59645ebf7427dcff2cbdd78073e2e7df58c` before the source repository was detached.
 
-The disposition gate retained its exact count, retirement-reason, destination-existence, and Vitest-discovery checks while reading only repository-local inventory data. Agent setup no longer invokes Git, and CI no longer requests full history. The complete `pnpm check` passed all stages with 84 test files and 618 tests while both historical commit objects remained absent from the replacement repository.
+The disposition gate retained its exact count, retirement-reason, destination-existence, and Vitest-discovery checks while reading only repository-local inventory data. Agent setup no longer invokes Git, and CI no longer requests full history. The complete `pnpm check` passed all stages with 84 test files and 618 tests while both historical commit objects remained absent from the replacement repository. A separate one-commit depth-1 clone then completed `pnpm setup:agent` and the disposition gate with both predecessor objects still absent.
 
 ## Historical decision provenance
 
