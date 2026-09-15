@@ -4,28 +4,16 @@ import path from "node:path";
 import process from "node:process";
 import { pathToFileURL } from "node:url";
 
-import {
-  BASELINE_TEST_INVENTORY_COMMIT,
-  PRE_RETIREMENT_SHOWCASE_COMMIT,
-} from "./test-disposition.mjs";
-
-export const REQUIRED_HISTORY_COMMITS = [
-  BASELINE_TEST_INVENTORY_COMMIT,
-  PRE_RETIREMENT_SHOWCASE_COMMIT,
-];
-
 const browserProbe =
   "import { chromium } from 'playwright'; const browser = await chromium.launch({ headless: true }); await browser.close();";
 
 export async function runAgentSetup({
   platform = process.platform,
   run = runCommand,
-  hasGitObject = gitObjectExists,
 } = {}) {
   requireSupportedNode();
   await runChecked(run, "pnpm", ["--version"]);
   await runChecked(run, "pnpm", ["install", "--frozen-lockfile"]);
-  await ensureGitObjects(REQUIRED_HISTORY_COMMITS, { run, hasGitObject });
 
   const playwrightArgs = ["exec", "playwright", "install"];
   if (platform === "linux") playwrightArgs.push("--with-deps");
@@ -36,26 +24,6 @@ export async function runAgentSetup({
     "--eval",
     browserProbe,
   ]);
-}
-
-export async function ensureGitObjects(
-  commits,
-  { run = runCommand, hasGitObject = gitObjectExists } = {},
-) {
-  const missing = [];
-  for (const commit of commits) {
-    if (!(await hasGitObject(commit))) missing.push(commit);
-  }
-  if (missing.length === 0) return;
-
-  await runChecked(run, "git", ["fetch", "--no-tags", "origin", ...missing]);
-  for (const commit of missing) {
-    if (!(await hasGitObject(commit))) {
-      throw new Error(
-        `Required historical Git object is unavailable: ${commit}`,
-      );
-    }
-  }
 }
 
 async function runChecked(run, command, args) {
@@ -90,16 +58,6 @@ function runCommand(command, args) {
     const child = spawn(executable, commandArgs, { stdio: "inherit" });
     child.once("error", reject);
     child.once("exit", (code) => resolve(code ?? 1));
-  });
-}
-
-async function gitObjectExists(commit) {
-  return new Promise((resolve, reject) => {
-    const child = spawn("git", ["cat-file", "-e", `${commit}^{commit}`], {
-      stdio: "ignore",
-    });
-    child.once("error", reject);
-    child.once("exit", (code) => resolve(code === 0));
   });
 }
 

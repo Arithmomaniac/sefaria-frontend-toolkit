@@ -4,25 +4,23 @@ import path from "node:path";
 import process from "node:process";
 
 import {
-  BASELINE_TEST_INVENTORY_COMMIT,
+  BASELINE_TEST_INVENTORY,
   dispositionFor,
   EXPECTED_BASELINE_TEST_COUNT,
   EXPECTED_PRE_RETIREMENT_SHOWCASE_TEST_COUNT,
   EXPECTED_RETIRED_TEST_COUNT,
-  PRE_RETIREMENT_SHOWCASE_COMMIT,
+  PRE_RETIREMENT_SHOWCASE_INVENTORY,
 } from "./test-disposition.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
-const baselineTests = listTreeTests(BASELINE_TEST_INVENTORY_COMMIT);
+const baselineTests = BASELINE_TEST_INVENTORY;
 if (baselineTests.length !== EXPECTED_BASELINE_TEST_COUNT) {
   throw new Error(
     `Baseline test inventory changed: expected ${EXPECTED_BASELINE_TEST_COUNT}, found ${baselineTests.length}.`,
   );
 }
 
-const showcaseTests = listTreeTests(PRE_RETIREMENT_SHOWCASE_COMMIT).filter(
-  (filename) => filename.startsWith("demos/showcase/"),
-);
+const showcaseTests = PRE_RETIREMENT_SHOWCASE_INVENTORY;
 if (showcaseTests.length !== EXPECTED_PRE_RETIREMENT_SHOWCASE_TEST_COUNT) {
   throw new Error(
     `Pre-retirement showcase inventory changed: expected ${EXPECTED_PRE_RETIREMENT_SHOWCASE_TEST_COUNT}, found ${showcaseTests.length}.`,
@@ -79,13 +77,6 @@ process.stdout.write(
   `Test disposition: ${baselineTests.length - retired} retained baseline tests are discovered; ${retired} presentation or superseded tests have explicit reasons; ${showcaseTests.length} pre-retirement showcase tests were reconciled.\n`,
 );
 
-function listTreeTests(commit) {
-  return capture("git", ["ls-tree", "-r", "--name-only", commit])
-    .split(/\r?\n/u)
-    .filter((filename) => /\.test\.tsx?$/u.test(filename))
-    .sort();
-}
-
 function capture(command, args) {
   const windowsPnpm = process.platform === "win32" && command === "pnpm";
   const executable = windowsPnpm ? (process.env.ComSpec ?? "cmd.exe") : command;
@@ -98,7 +89,7 @@ function capture(command, args) {
   });
   if (result.status !== 0) {
     throw new Error(
-      `${command} ${args.join(" ")} failed. Run "pnpm setup:agent" in a fresh or shallow checkout before "pnpm check".\n${result.error?.message ?? result.stderr ?? result.stdout}`,
+      `${command} ${args.join(" ")} failed.\n${result.error?.message ?? result.stderr ?? result.stdout}`,
     );
   }
   return result.stdout;

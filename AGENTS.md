@@ -12,7 +12,7 @@ Use Node.js 22.12 or later and the pnpm version pinned in `package.json`. From a
 pnpm setup:agent
 ```
 
-The command installs the frozen workspace, obtains the immutable Git objects required by the test-disposition gate when they are missing, installs Chromium, and proves that Chromium launches. It is safe to rerun and does not replace validation. Run focused tests while developing and `pnpm check` before review.
+The command installs the frozen workspace, installs Chromium, and proves that Chromium launches. The test-disposition gate uses committed source-stamped inventories and does not require historical Git objects. The command is safe to rerun and does not replace validation. Run focused tests while developing and `pnpm check` before review.
 
 GitHub-hosted Copilot setup is conditional on the checked-out toolkit package identity, not on an exact branch name. Local Copilot CLI and Desktop worktrees run the same command explicitly. See [Development](docs/development.md#copilot-agent-and-fresh-worktree-setup) for platform requirements and failure handling.
 
