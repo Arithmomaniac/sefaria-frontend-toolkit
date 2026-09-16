@@ -80,8 +80,11 @@
       </section>
     </main>
     <script type="module">
+      const siteBase = globalThis.location.pathname
+        .split("/examples/explorer/", 1)[0]
+        .replace(/\/$/, "");
       for (const link of document.querySelectorAll("[data-local-target]")) {
-        link.href = link.dataset.localTarget;
+        link.href = `${siteBase}${link.dataset.localTarget}`;
       }
     </script>
   </body>

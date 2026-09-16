@@ -114,6 +114,10 @@ describe("library package foundations", () => {
     }
     expect(explorer).toContain('data-local-target="/examples/reader/"');
     expect(explorer).toContain('data-local-target="/examples/linked-article/"');
+    expect(explorer).toContain('.split("/examples/explorer/", 1)');
+    expect(explorer).toContain(
+      "link.href = `${siteBase}${link.dataset.localTarget}`",
+    );
   });
 });
 

@@ -130,7 +130,7 @@ The initial card comes from validated supplied data and reports zero requests. *
 
 React development StrictMode may repeat setup and cleanup. The maintained code removes the listener from the previous element, makes no mount-time request, aborts unmounted work, and rejects stale completion without adding request coalescing or a hidden singleton.
 
-<iframe class="example-frame react" title="React custom-element integration" src="/examples/react/index.html"></iframe>
+<iframe class="example-frame react" title="React custom-element integration" src="../examples/react/index.html"></iframe>
 
 ## Who owns what
 

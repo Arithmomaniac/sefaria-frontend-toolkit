@@ -18,7 +18,7 @@ pnpm install
 pnpm dev:site
 ```
 
-The command builds the maintained private examples and opens the local documentation source in development mode. It does not deploy anything or contact Sefaria until you explicitly use a live example action.
+The command builds the maintained private examples and opens the documentation source in development mode. It does not deploy anything or contact Sefaria until you explicitly use a live example action. The current published documentation is available at [arithmomaniac.github.io/sefaria-frontend-toolkit/](https://arithmomaniac.github.io/sefaria-frontend-toolkit/).
 
 If you want the shortest component proof instead of the documentation site:
 
@@ -42,7 +42,7 @@ That example validates a supplied `Micah 6:8` payload, projects it through the p
 | Integrate through MCP | [MCP App guide](docs/mcp-app-demo.md) |
 | Contribute or run all checks | [Development](docs/development.md) |
 
-The [documentation home](docs/README.md) is the repository-native index for guides, specifications, generated reference, evidence, and review guidance. The local VitePress site presents the same maintained Markdown and embeds isolated builds of the existing examples; it is not a separate wiki or documentation source.
+The [documentation home](docs/README.md) is the repository-native index for guides, specifications, generated reference, evidence, and review guidance. The VitePress site presents the same maintained Markdown and embeds isolated builds of the existing examples; it is not a separate wiki or documentation source.
 
 ## Architecture in one minute
 
@@ -65,7 +65,7 @@ Read [How the pieces fit together](docs/guides/data-flow.md) for the complete bo
 - `examples/linked-article`: progressively enhanced native citation links.
 - `examples/mcp-app`: compiled Node transports, AppBridge reference host, request-free first render, and a deterministic static fixture preview.
 
-Run `pnpm build:site` and `pnpm preview:site` to inspect the clean production documentation artifact under `dist/site`. The existing website deployed from `main` is a historical independent showcase and is not replaced or redeployed by this branch.
+Run `pnpm build:site` and `pnpm preview:site` to inspect the clean production documentation artifact under `dist/site`. The guarded Pages workflow builds and tests the same artifact under the repository project path before deployment.
 
 ## License and attribution
 

@@ -16,7 +16,7 @@ An integration must not give a reference, raw payload, client, host, or `fetch` 
 
 Unknown JSON must pass a generated `@arithmomaniac/sefaria-client` validator before component projection. Validation failures report structured paths.
 
-## Local documentation site [Current]
+## Documentation site [Current]
 
 The VitePress site presents the canonical Markdown learning path and embeds isolated production builds of the maintained browser examples. It does not import DOM-dependent toolkit registration into VitePress server rendering, render toolkit component HTML on the server, or hydrate toolkit elements.
 
@@ -26,7 +26,7 @@ Landing pages and authored-state previews are deterministic and make no unsolici
 
 The static MCP App route is labeled fixture-driven rendering evidence. It does not claim a tool call, transport, AppBridge, sandbox, request-count, or named-host proof. The compiled local Node reference host remains the protocol acceptance path.
 
-The local site artifact contains an allowlisted set of real built files. Source links point to actual files on the toolkit integration branch rather than same-origin source-looking paths that can resolve to an HTML fallback. Pull requests build and test the artifact without deploying it. The independent `main` website and its Pages deployment remain unchanged.
+The site artifact contains an allowlisted set of real built files. Source links point to actual files on `main` rather than same-origin source-looking paths that can resolve to an HTML fallback. Local builds use `/`; the Pages build uses `/sefaria-frontend-toolkit/` for VitePress, every included example, and browser acceptance. Pull requests build and test without deploying. A separate guarded workflow reruns the complete gate on `main`, uploads only `dist/site`, and deploys through the `github-pages` environment.
 
 ## Interaction task flow
 

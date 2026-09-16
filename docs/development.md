@@ -46,7 +46,7 @@ For reader-oriented explanations, use the friendly guides rather than the archiv
 | `examples/vanilla-vite` | Exercises installed public client, source-card factory, and custom-element registration paths with a deterministic validated `Micah 6:8` response. |
 | `examples/linked-article` | Progressively enhances authored Sefaria anchors with the public popup factory while preserving native navigation, page-owned cancellation, visible failures, and request-free rendering. |
 | `examples/mcp-app` | Exposes compiled Node stdio and Streamable HTTP `get_text` and adaptive `get_links_between_texts` tools, packages a single-file App, validates corrected payloads and metadata, includes a separate-origin AppBridge reference host and deterministic request-count proof, and retains the optional authenticated isolated VS Code hierarchy walkthrough with separate explicit chat export. |
-| `docs/` and `dist/site` | Provide one GitHub-readable learning sequence and a local VitePress presentation that embeds isolated builds of the maintained examples. |
+| `docs/` and `dist/site` | Provide one GitHub-readable learning sequence and a VitePress presentation that embeds isolated builds of the maintained examples and is published from validated `main`. |
 | `tests/compatibility` | Delivers focused pinned client and transform comparisons, a composed v3 validate-to-transform smoke case, and grouped qualification output without network access. The evidence is representative and non-exhaustive. |
 
 ## What changed from earlier plans
@@ -96,7 +96,7 @@ Run the development site:
 pnpm dev:site
 ```
 
-The command first builds isolated copies of the maintained browser examples, then starts VitePress over the canonical Markdown in `docs/`. The examples remain independent workspace projects and do not import one another at runtime. The site is local-only and does not add or change a deployment.
+The command first builds isolated copies of the maintained browser examples, then starts VitePress over the canonical Markdown in `docs/`. The examples remain independent workspace projects and do not import one another at runtime. The local server does not change the deployment.
 
 Build and preview the production artifact:
 
@@ -107,9 +107,9 @@ pnpm preview:site
 
 The generated `dist/site` directory contains the VitePress pages plus allowlisted example routes under `examples/`: explorer, Reader, vanilla, React, linked article, and the static MCP App fixture preview. The MCP preview is rendering evidence only; `pnpm dev:mcp` remains the protocol and AppBridge proof.
 
-`pnpm build:site` typechecks each included example before bundling it. `pnpm build:site:bundles` skips those repeated typechecks and is used inside `pnpm check` after workspace builds. Both commands verify required output files and reject a same-origin authored-source fallback.
+`pnpm build:site` typechecks each included example before bundling it. `pnpm build:site:bundles` skips those repeated typechecks and is used inside `pnpm check` after workspace builds. Both commands verify required output files and reject a same-origin authored-source fallback. `SITE_BASE_PATH` selects the normalized absolute base used by VitePress, every example bundle, and browser acceptance; local commands default to `/`, while the Pages workflow requires `/sefaria-frontend-toolkit/`.
 
-The previous Reveal.js showcase, booth loop, Pages assembly, QR assets, presentation media, and presentation-only tests are no longer active on this branch. They remain available through the full-SHA links in the [documentation archive](archive/README.md#september-14-2026-presentation-snapshot). The independently deployed `main` website remains unchanged.
+The separate Pages workflow runs the complete repository gate on Ubuntu with the project base, uploads only `dist/site`, and deploys only from `main` with `pages: write` and `id-token: write` scoped to the deployment job. Pull requests validate the workflow and both local and project-path contracts without deploying. The previous Reveal.js showcase, booth loop, Pages assembly, QR assets, presentation media, and presentation-only tests remain available through the full-SHA links in the [documentation archive](archive/README.md#september-14-2026-presentation-snapshot).
 
 ## Workspace
 
@@ -124,7 +124,7 @@ The previous Reveal.js showcase, booth loop, Pages assembly, QR assets, presenta
 | `examples/linked-article` | Authored native citation navigation and page-owned popup integration |
 | `examples/reader` | Interactive multi-pane website host and controlled `<sefaria-reader>` host over the DOM-free reader session |
 | `examples/vanilla-vite` | Minimal deterministic public-package consumption path |
-| `docs/.vitepress` and `scripts/build-site.mjs` | Local documentation presentation, navigation, styling, and isolated example assembly |
+| `docs/.vitepress` and `scripts/build-site.mjs` | Documentation presentation, project-path navigation, styling, and isolated example assembly |
 
 Workspace dependencies use `workspace:*`, and committed manifests remain private. Successful `main` validation publishes synchronized private prereleases from isolated staged manifests; it does not change workspace dependency resolution.
 

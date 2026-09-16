@@ -2,14 +2,18 @@ import path from "node:path";
 
 import { defineConfig } from "vitepress";
 
+import { normalizeSiteBasePath } from "../../scripts/build-site-plan.mjs";
+
 const repository = "https://github.com/Arithmomaniac/sefaria-frontend-toolkit";
+const site = "https://arithmomaniac.github.io/sefaria-frontend-toolkit/";
 const branch = "main";
 const repositoryRoot = path.resolve(import.meta.dirname, "..", "..");
+const siteBasePath = normalizeSiteBasePath(process.env.SITE_BASE_PATH);
 
 export default defineConfig({
+  base: siteBasePath,
   title: "Sefaria Frontend Toolkit",
-  description:
-    "Development documentation and local examples for the unpublished Sefaria Frontend Toolkit.",
+  description: "Documentation and examples for the Sefaria Frontend Toolkit.",
   head: [
     ["meta", { name: "sefaria-docs-site", content: "local-docs-site-wave-3" }],
   ],
@@ -76,7 +80,7 @@ export default defineConfig({
     },
     socialLinks: [{ icon: "github", link: repository }],
     footer: {
-      message: "Development preview for private, unpublished toolkit packages.",
+      message: `Published at ${site}; packages remain private prereleases.`,
       copyright: "GPL-3.0",
     },
   },

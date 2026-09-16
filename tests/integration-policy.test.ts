@@ -60,8 +60,9 @@ describe("Wave 4 integration policy", () => {
   });
 
   it("parses workflow structure and rejects publication capabilities", async () => {
-    const [workflow, setupWorkflow] = await Promise.all([
+    const [workflow, pagesWorkflow, setupWorkflow] = await Promise.all([
       readFile(path.join(root, ".github", "workflows", "ci.yml"), "utf8"),
+      readFile(path.join(root, ".github", "workflows", "pages.yml"), "utf8"),
       readFile(
         path.join(root, ".github", "workflows", "copilot-setup-steps.yml"),
         "utf8",
@@ -70,6 +71,7 @@ describe("Wave 4 integration policy", () => {
     expect(
       validateWorkflowPolicy({
         "ci.yml": workflow,
+        "pages.yml": pagesWorkflow,
         "copilot-setup-steps.yml": setupWorkflow,
       }),
     ).toEqual([]);
@@ -80,6 +82,65 @@ describe("Wave 4 integration policy", () => {
     expect(workflow.indexOf(preflight)).toBeLessThan(
       workflow.indexOf(firstPublish),
     );
+    expect(pagesWorkflow).toContain(
+      "SITE_BASE_PATH: /sefaria-frontend-toolkit/",
+    );
+    expect(pagesWorkflow.indexOf("pnpm check")).toBeLessThan(
+      pagesWorkflow.indexOf("actions/upload-pages-artifact@v5"),
+    );
+    expect(
+      pagesWorkflow.indexOf("actions/upload-pages-artifact@v5"),
+    ).toBeLessThan(pagesWorkflow.indexOf("actions/deploy-pages@v5"));
+    expect(
+      validateWorkflowPolicy({
+        "pages.yml": pagesWorkflow.replace(
+          "name: build Pages artifact",
+          "name: assemble site",
+        ),
+      }),
+    ).toEqual([]);
+    expect(
+      validateWorkflowPolicy({
+        "pages.yml": pagesWorkflow.replace(
+          "path: dist/site",
+          "path: dist/site-public",
+        ),
+      }),
+    ).toContain("Pages build/upload/deploy ordering is incorrect in pages.yml");
+    expect(
+      validateWorkflowPolicy({
+        "pages.yml": pagesWorkflow.replace(
+          "actions/configure-pages@v5",
+          "example/configure-pages@v1",
+        ),
+      }),
+    ).toContain("unapproved Pages action in pages.yml");
+    expect(
+      validateWorkflowPolicy({
+        "pages.yml": `${pagesWorkflow}
+  extra:
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo extra
+`,
+      }),
+    ).toContain("Pages workflow jobs are incorrect in pages.yml");
+    expect(
+      validateWorkflowPolicy({
+        "pages.yml": pagesWorkflow.replace(
+          "      - uses: actions/configure-pages@v5",
+          "      - run: echo injected\n      - uses: actions/configure-pages@v5",
+        ),
+      }),
+    ).toContain("Pages workflow steps are incorrect in pages.yml");
+    expect(
+      validateWorkflowPolicy({
+        "pages.yml": pagesWorkflow.replace(
+          "      - name: Deploy GitHub Pages",
+          "      - run: echo injected\n      - name: Deploy GitHub Pages",
+        ),
+      }),
+    ).toContain("Pages workflow steps are incorrect in pages.yml");
 
     const unsafe = workflow
       .replace(
@@ -128,6 +189,18 @@ describe("Wave 4 integration policy", () => {
       }),
     ).toContain(
       "unsafe workflow permission in copilot-setup-steps.yml:jobs.copilot-setup-steps.permissions.contents",
+    );
+    expect(
+      validateWorkflowPolicy({
+        "deploy-pages.yml": pagesWorkflow.replace(
+          "  workflow_dispatch:",
+          "  pull_request:",
+        ),
+      }),
+    ).toEqual(
+      expect.arrayContaining([
+        expect.stringMatching(/publication\/deployment action/),
+      ]),
     );
   });
 

@@ -3,13 +3,17 @@ import { setTimeout as delay } from "node:timers/promises";
 
 import { preview } from "vite";
 
+import { normalizeSiteBasePath } from "./build-site-plan.mjs";
+
 export const siteIdentity =
   '<meta name="sefaria-docs-site" content="local-docs-site-wave-3">';
 
-export async function startSitePreview({ root }) {
+export async function startSitePreview({ root, siteBasePath = "/" }) {
+  const base = normalizeSiteBasePath(siteBasePath);
   const server = await preview({
     root,
     configFile: false,
+    base,
     cacheDir: path.join(root, "dist", "site-preview-cache"),
     build: {
       outDir: path.join(root, "dist", "site"),
@@ -26,14 +30,16 @@ export async function startSitePreview({ root }) {
     throw new Error("The owned site preview did not expose an assigned port.");
   }
   const origin = `http://127.0.0.1:${address.port}`;
+  const siteUrl = `${origin}${base}`;
 
   return {
     origin,
+    siteUrl,
     async waitUntilReady() {
       const deadline = Date.now() + 10_000;
       while (Date.now() < deadline) {
         try {
-          const response = await globalThis.fetch(origin);
+          const response = await globalThis.fetch(siteUrl);
           const html = await response.text();
           if (response.ok && html.includes(siteIdentity)) return;
         } catch {

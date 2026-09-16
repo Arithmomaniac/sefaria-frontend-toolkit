@@ -5,6 +5,8 @@ import { spawnSync } from "node:child_process";
 
 import {
   createSiteBuildSteps,
+  hasSameOriginSourceLink,
+  readSiteBasePath,
   SITE_REQUIRED_FILES,
 } from "./build-site-plan.mjs";
 
@@ -13,6 +15,7 @@ const site = path.join(root, "dist", "site");
 const stagedPublic = path.join(root, "dist", "site-public");
 const skipTypecheck = process.argv.includes("--skip-typecheck");
 const examplesOnly = process.argv.includes("--examples-only");
+const siteBasePath = readSiteBasePath(process.argv.slice(2));
 
 await rm(stagedPublic, { recursive: true, force: true });
 await mkdir(path.join(stagedPublic, "examples"), { recursive: true });
@@ -25,7 +28,7 @@ if (!examplesOnly) {
   await rm(site, { recursive: true, force: true });
 }
 
-for (const step of createSiteBuildSteps({ skipTypecheck })) {
+for (const step of createSiteBuildSteps({ skipTypecheck, siteBasePath })) {
   if (step.kind === "pnpm") {
     runPnpm(step.args);
     continue;
@@ -38,7 +41,7 @@ for (const step of createSiteBuildSteps({ skipTypecheck })) {
       "exec",
       "vite",
       "build",
-      `--base=/examples/${step.route}/`,
+      `--base=${step.base}`,
       `--outDir=${destination}`,
       "--emptyOutDir",
     ]);
@@ -57,7 +60,10 @@ for (const step of createSiteBuildSteps({ skipTypecheck })) {
     continue;
   }
   if (!examplesOnly) {
-    runPnpm(["exec", "vitepress", "build", "docs"]);
+    runPnpm(["exec", "vitepress", "build", "docs"], {
+      ...process.env,
+      SITE_BASE_PATH: siteBasePath,
+    });
   }
 }
 
@@ -68,7 +74,7 @@ if (!examplesOnly) {
   await verifyBuiltRoutes();
 }
 
-function runPnpm(args) {
+function runPnpm(args, env = process.env) {
   const windows = process.platform === "win32";
   const executable = windows ? (process.env.ComSpec ?? "cmd.exe") : "pnpm";
   const executableArgs = windows
@@ -76,6 +82,7 @@ function runPnpm(args) {
     : args;
   const result = spawnSync(executable, executableArgs, {
     cwd: root,
+    env,
     stdio: "inherit",
   });
   if (result.status !== 0) {
@@ -101,7 +108,7 @@ async function verifyBuiltRoutes() {
     path.join(site, "examples", "explorer", "authored.html"),
     "utf8",
   );
-  if (/href=["']\/src\//u.test(authored)) {
+  if (hasSameOriginSourceLink(authored)) {
     throw new Error(
       "The authored explorer contains a same-origin source link.",
     );

@@ -5,7 +5,7 @@ title: Sefaria Frontend Toolkit
 hero:
   name: Sefaria Frontend Toolkit
   text: Build Jewish text and learning experiences without rebuilding the reading UI
-  tagline: Sefaria supplies a free digital library and APIs. This private development preview supplies reusable Reader behavior, browser-standard components, and headless tools.
+  tagline: Sefaria supplies a free digital library and APIs. This toolkit supplies reusable Reader behavior, browser-standard components, and headless tools.
   actions:
     - theme: brand
       text: Learn step by step
@@ -28,8 +28,8 @@ features:
 
 > Created/edited by GitHub Copilot; pending human review.
 
-## Development preview
+## Published documentation
 
-Sefaria provides the text library and data source. This toolkit provides reusable frontend building blocks for developers creating niche interfaces and digital Jewish learning experiences; it is not a migration of or replacement for Sefaria's own website. This local site is an additional view of the repository's maintained Markdown and examples. The [repository documentation home](README.md) remains the best GitHub-native index, and the [root README](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/README.md) remains the short first-run entry point.
+Sefaria provides the text library and data source. This toolkit provides reusable frontend building blocks for developers creating niche interfaces and digital Jewish learning experiences; it is not a migration of or replacement for Sefaria's own website. This site publishes the repository's maintained Markdown and isolated examples at [arithmomaniac.github.io/sefaria-frontend-toolkit/](https://arithmomaniac.github.io/sefaria-frontend-toolkit/). The [repository documentation home](README.md) remains the best GitHub-native index, and the [root README](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/README.md) remains the short first-run entry point.
 
-Run `pnpm dev:site` for a local development server or `pnpm build:site` followed by `pnpm preview:site` for the production artifact. Neither command deploys a site.
+Run `pnpm dev:site` for a local development server or `pnpm build:site` followed by `pnpm preview:site` for the production artifact. Local commands do not deploy; the guarded Pages workflow publishes a project-path build after `main` passes the complete repository gate.

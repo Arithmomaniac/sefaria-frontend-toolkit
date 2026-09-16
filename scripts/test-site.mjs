@@ -7,11 +7,15 @@ import { chromium } from "playwright";
 
 import { classifySiteRequest } from "./site-request-policy.mjs";
 import { startSitePreview } from "./site-preview-server.mjs";
+import { readSiteBasePath } from "./build-site-plan.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const screenshotDirectory = process.env.SITE_SCREENSHOT_DIR;
-const previewServer = await startSitePreview({ root });
-const { origin } = previewServer;
+const siteBasePath = readSiteBasePath(process.argv.slice(2));
+const previewServer = await startSitePreview({ root, siteBasePath });
+const { origin, siteUrl } = previewServer;
+const sitePath = (route) =>
+  `${siteBasePath === "/" ? "" : siteBasePath.slice(0, -1)}${route}`;
 
 try {
   await previewServer.waitUntilReady();
@@ -68,9 +72,9 @@ try {
       await route.abort("blockedbyclient");
     });
 
-    await page.goto(origin, { waitUntil: "networkidle" });
+    await page.goto(siteUrl, { waitUntil: "networkidle" });
     await assertText(page.locator("h1"), "Sefaria Frontend Toolkit");
-    await assertText(page.locator("body"), "Development preview");
+    await assertText(page.locator("body"), "Published documentation");
     await assertText(page.locator("body"), "free digital library");
     await assertText(page.locator("body"), "Bind the supplied controller");
     assertEqual(textRequests.length, 0, "landing request count");
@@ -131,7 +135,7 @@ try {
     };
     for (const [lesson, links] of Object.entries(liveLessons)) {
       textRequests.length = 0;
-      await page.goto(`${origin}/learn/${lesson}.html`, {
+      await page.goto(`${siteUrl}/learn/${lesson}.html`, {
         waitUntil: "networkidle",
       });
       assertEqual(
@@ -145,7 +149,7 @@ try {
         const href = await link.getAttribute("href");
         assertEqual(
           new URL(href, page.url()).pathname,
-          expectedPath,
+          sitePath(expectedPath),
           `${name} route`,
         );
         assertEqual(
@@ -174,8 +178,36 @@ try {
       }
     }
 
-    await page.goto(`${origin}/examples.html`, { waitUntil: "networkidle" });
-    await page.goto(`${origin}/examples/explorer/index.html`, {
+    await page.goto(`${siteUrl}/examples.html`, { waitUntil: "networkidle" });
+    const catalogLinks = [
+      ["/examples/explorer/authored.html", 0],
+      ["/examples/explorer/index.html", 1],
+      ["/examples/reader/controlled.html", 2],
+      ["/examples/vanilla/index.html", 3],
+      ["/examples/react/index.html", 4],
+      ["/examples/linked-article/index.html", 5],
+      ["/examples/mcp-app/index.html", 6],
+    ];
+    const previewLinks = page.getByRole("link", { name: "Open preview" });
+    assertEqual(
+      await previewLinks.count(),
+      catalogLinks.length,
+      "catalog link count",
+    );
+    for (const [expectedPath, index] of catalogLinks) {
+      const link = previewLinks.nth(index);
+      assertEqual(
+        new URL(await link.getAttribute("href"), page.url()).pathname,
+        sitePath(expectedPath),
+        `catalog route ${index}`,
+      );
+      assertEqual(
+        await link.getAttribute("target"),
+        "_self",
+        `catalog target ${index}`,
+      );
+    }
+    await page.goto(`${siteUrl}/examples/explorer/index.html`, {
       waitUntil: "networkidle",
     });
     for (const [name, expectedPath] of [
@@ -188,12 +220,12 @@ try {
           await page.getByRole("link", { name }).getAttribute("href"),
           origin,
         ).pathname,
-        expectedPath,
+        sitePath(expectedPath),
         `${name} route`,
       );
     }
 
-    await page.goto(`${origin}/examples.html`, { waitUntil: "networkidle" });
+    await page.goto(`${siteUrl}/examples.html`, { waitUntil: "networkidle" });
     const sourceHref = await page
       .getByRole("link", { name: "examples/react-vite" })
       .getAttribute("href");
@@ -205,7 +237,7 @@ try {
     }
 
     textRequests.length = 0;
-    await page.goto(`${origin}/learn/react.html`, {
+    await page.goto(`${siteUrl}/learn/react.html`, {
       waitUntil: "networkidle",
     });
     const reactLesson = page.frameLocator(
@@ -220,7 +252,7 @@ try {
     await capture(page, "site-react-lesson.png");
 
     textRequests.length = 0;
-    await page.goto(`${origin}/examples/vanilla/index.html`, {
+    await page.goto(`${siteUrl}/examples/vanilla/index.html`, {
       waitUntil: "networkidle",
     });
     await assertText(
@@ -245,7 +277,7 @@ try {
       "vanilla injected-client network count",
     );
 
-    await page.goto(`${origin}/examples/react/index.html`, {
+    await page.goto(`${siteUrl}/examples/react/index.html`, {
       waitUntil: "networkidle",
     });
     textRequests.length = 0;
@@ -297,7 +329,7 @@ try {
     await capture(page, "site-react.png");
 
     textRequests.length = 0;
-    await page.goto(`${origin}/examples/reader/controlled.html`, {
+    await page.goto(`${siteUrl}/examples/reader/controlled.html`, {
       waitUntil: "networkidle",
     });
     await page.locator("sefaria-reader").waitFor();
@@ -375,7 +407,7 @@ try {
 
     textRequests.length = 0;
     await page.setViewportSize({ width: 1280, height: 900 });
-    await page.goto(`${origin}/examples/linked-article/`, {
+    await page.goto(`${siteUrl}/examples/linked-article/`, {
       waitUntil: "networkidle",
     });
     const citation = page.getByRole("link", { name: "Micah 6:8", exact: true });
@@ -386,7 +418,7 @@ try {
     await capture(page, "site-linked-popup.png");
 
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto(`${origin}/learn/05-customization.html`, {
+    await page.goto(`${siteUrl}/learn/05-customization.html`, {
       waitUntil: "networkidle",
     });
     const widths = await page.evaluate(() => ({
@@ -406,7 +438,7 @@ try {
     );
     await capture(page, "site-mobile.png");
 
-    await page.goto(`${origin}/examples/mcp-app/index.html?fixture=1`, {
+    await page.goto(`${siteUrl}/examples/mcp-app/index.html?fixture=1`, {
       waitUntil: "networkidle",
     });
     await assertText(page.locator("body"), "Static fixture preview");

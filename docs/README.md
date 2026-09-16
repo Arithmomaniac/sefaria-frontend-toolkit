@@ -4,7 +4,7 @@
 
 Sefaria is a free digital library and data source for Jewish texts and translations. This project gives developers reusable frontend/UI building blocks for reading and learning experiences: a complete controlled Reader, smaller request-free Web Components, a validated client, component factories, and pure text processing. Start with a useful surface; the architecture and specifications are optional depth, not prerequisites.
 
-This Markdown page is the repository-native documentation home. `pnpm dev:site` presents the same maintained files through a local VitePress site with isolated interactive examples. The site is unpublished and is not required to use the source.
+This Markdown page is the repository-native documentation home. The [published documentation site](https://arithmomaniac.github.io/sefaria-frontend-toolkit/) presents the same maintained files through VitePress with isolated interactive examples. `pnpm dev:site` serves that content locally; neither the deployed site nor the local presentation is required to use the source.
 
 ## Start from a complete solution
 

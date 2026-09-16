@@ -93,7 +93,7 @@ Use the actual tarball filenames emitted by `pnpm pack`. `pnpm package:smoke` ex
 
 The card initially displays the supplied Micah 6:8 text and attribution with host request count zero. The browser's global `fetch` also remains unused. Selecting **Load through the public client** increments the host counter to one while the injected fixture transport keeps the example offline.
 
-<iframe class="example-frame" title="Vanilla supplied-data example" src="/examples/vanilla/index.html"></iframe>
+<iframe class="example-frame" title="Vanilla supplied-data example" src="../examples/vanilla/index.html"></iframe>
 
 ## Who owns what
 

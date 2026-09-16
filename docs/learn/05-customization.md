@@ -54,7 +54,7 @@ The non-DOM component subpaths are safe to use without registering custom elemen
 
 Theme, container width, side visibility, side order, and layout update the current component immediately while the host request counter is unchanged. Headless imports can validate, transform, or project data without accessing `window`, `document`, or custom-element registration.
 
-<iframe class="example-frame" title="Authored customization workbench" src="/examples/explorer/authored.html?component=source-card&amp;scenario=many-items&amp;diagnostics=1&amp;width=720"></iframe>
+<iframe class="example-frame" title="Authored customization workbench" src="../examples/explorer/authored.html?component=source-card&amp;scenario=many-items&amp;diagnostics=1&amp;width=720"></iframe>
 
 ## Who owns what
 
