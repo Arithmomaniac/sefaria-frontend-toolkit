@@ -54,12 +54,16 @@ for (const step of createSiteBuildSteps({ skipTypecheck, siteBasePath })) {
       runPnpm(["--filter", step.packageName, "build"]);
     }
     await copyFile(
-      path.join(root, "examples", "mcp-app", "dist", "app", "mcp-app.html"),
+      path.join(root, "examples", "mcp-app", "dist", "host", "live.html"),
       path.join(destination, "index.html"),
     );
     await copyFile(
       path.join(root, "examples", "mcp-app", "dist", "host", "live.html"),
       path.join(destination, "live.html"),
+    );
+    await copyFile(
+      path.join(root, "examples", "mcp-app", "dist", "app", "mcp-app.html"),
+      path.join(destination, "fixture.html"),
     );
     await copyFile(
       path.join(root, "examples", "mcp-app", "dist", "host", "mcp-app.html"),

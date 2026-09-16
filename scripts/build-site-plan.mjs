@@ -37,7 +37,7 @@ export const EXAMPLE_BUILDS = [
   {
     route: "mcp-app",
     packageName: "@sefaria-example/mcp-app",
-    pages: ["index.html", "live.html"],
+    pages: ["index.html", "live.html", "fixture.html"],
     mcpApp: true,
   },
 ];

@@ -44,7 +44,7 @@ pnpm dev:mcp
 
 The separate preview below uses a committed fixture and deliberately has no MCP host:
 
-<iframe class="example-frame mcp" title="Static MCP App fixture preview" src="../examples/mcp-app/index.html?fixture=1"></iframe>
+<iframe class="example-frame mcp" title="Static MCP App fixture preview" src="../examples/mcp-app/fixture.html?fixture=1"></iframe>
 
 ## Expected result
 
