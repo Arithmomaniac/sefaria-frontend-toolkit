@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sefaria live MCP Apps reference host</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: system-ui, sans-serif;
+      }
+      body {
+        margin: 0;
+        padding: 1rem;
+      }
+      button {
+        font: inherit;
+        padding: 0.65rem 1rem;
+      }
+      iframe {
+        width: 100%;
+        min-height: 42rem;
+        margin-block-start: 1rem;
+        border: 1px solid GrayText;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="app">
+      <h1>Sefaria live MCP Apps reference host</h1>
+      <p>
+        This static host makes no Sefaria request until you explicitly start the
+        live demo. It uses an in-memory MCP client/server pair and the packaged
+        request-free App.
+      </p>
+      <button id="start-live-demo" type="button">Start live demo</button>
+      <p id="status" role="status">The live demo has not started.</p>
+      <iframe id="sandbox" title="Opaque sandboxed Sefaria MCP App"></iframe>
+    </main>
+    <script type="module" src="../src/live-host/main.ts"></script>
+  </body>
+</html>

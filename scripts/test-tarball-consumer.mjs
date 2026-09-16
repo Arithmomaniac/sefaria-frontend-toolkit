@@ -319,6 +319,12 @@ async function inspectConsumerResolution(consumer) {
 }
 
 async function smokeVanillaChromium() {
+  const fixture = JSON.parse(
+    await readFile(
+      path.join(consumers.vanilla, "src", "micah-6-8.json"),
+      "utf8",
+    ),
+  );
   const server = await preview({
     root: consumers.vanilla,
     preview: {
@@ -336,6 +342,30 @@ async function smokeVanillaChromium() {
     const browser = await chromium.launch({ headless: true });
     try {
       const page = await browser.newPage();
+      await page.route(
+        "https://www.sefaria.org/api/v3/texts/**",
+        async (route) => {
+          const request = route.request();
+          const requestUrl = new globalThis.URL(request.url());
+          const expectedQuery = [
+            ["version", "primary"],
+            ["version", "translation"],
+            ["return_format", "default"],
+          ];
+          if (
+            request.method() !== "GET" ||
+            decodeURIComponent(requestUrl.pathname) !==
+              "/api/v3/texts/Micah 6:8" ||
+            JSON.stringify([...requestUrl.searchParams.entries()]) !==
+              JSON.stringify(expectedQuery)
+          ) {
+            throw new Error(
+              `Unexpected packed vanilla request: ${request.method()} ${requestUrl}`,
+            );
+          }
+          await route.fulfill({ json: fixture });
+        },
+      );
       await page.addInitScript(() => {
         const originalFetch = globalThis.fetch;
         globalThis.__exampleGlobalFetchCount = 0;
@@ -358,8 +388,11 @@ async function smokeVanillaChromium() {
           `Vanilla supplied-data render was not request-free: ${JSON.stringify(initial)}`,
         );
       }
-      await page.locator("#load-fixture").click();
-      await page.locator("#status[data-request-count='1']").waitFor();
+      await page.locator("#load-live").click();
+      await page
+        .locator("#status[data-request-count='1']")
+        .filter({ hasText: "Loaded live Micah 6:8 data" })
+        .waitFor();
       const result = await page.evaluate(() => {
         const card = globalThis.document.querySelector("sefaria-source-card");
         return {
@@ -385,7 +418,7 @@ async function smokeVanillaChromium() {
         !result.registered ||
         result.registeredTags.length !== 7 ||
         result.state !== "data" ||
-        result.globalFetchCount !== 0 ||
+        result.globalFetchCount !== 1 ||
         !result.text?.includes("Micah 6:8")
       ) {
         throw new Error(

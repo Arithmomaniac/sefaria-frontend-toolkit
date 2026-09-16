@@ -9,25 +9,25 @@ import {
   createSourceCardViewModel,
   loadSourceCardViewModel,
 } from "@arithmomaniac/sefaria-web-components/source-card";
-
 import payload from "./micah-6-8.json";
-import { createMicahFixtureFetch } from "./fixture-transport.js";
 import "./style.css";
 
 const status = requireElement<HTMLElement>("#status");
-const loadButton = requireElement<HTMLButtonElement>("#load-fixture");
+const loadButton = requireElement<HTMLButtonElement>("#load-live");
 const card = requireElement<SefariaSourceCard>("sefaria-source-card");
 
 const validatedPayload = zCoreV3TextsResponse.parse(
   payload,
 ) as CoreV3TextsResponse;
 let requestCount = 0;
+let activeController: AbortController | undefined;
+let activeOperation = 0;
 const client = createSefariaClient({
-  baseUrl: "https://example.invalid",
   cache: false,
   fetch: async (input, init) => {
     requestCount += 1;
-    return createMicahFixtureFetch(payload)(input, init);
+    updateStatus(status.textContent ?? "");
+    return fetch(input, init);
   },
 });
 
@@ -38,28 +38,42 @@ card.selectable = true;
 updateStatus("Rendered supplied Micah 6:8 data with zero requests.");
 
 loadButton.addEventListener("click", () => {
-  void loadThroughClient();
+  void loadLive();
 });
 
-async function loadThroughClient(): Promise<void> {
+async function loadLive(): Promise<void> {
+  activeController?.abort();
+  const controller = new AbortController();
+  activeController = controller;
+  const operation = ++activeOperation;
   const previousViewModel = card.viewModel;
   loadButton.disabled = true;
   card.viewModel = {
     state: "loading",
-    message: "Loading Micah 6:8 through the public client.",
+    message: "Loading live Micah 6:8 data.",
   };
-  updateStatus("Loading the deterministic response through the public client.");
+  updateStatus("Loading live Micah 6:8 data from Sefaria.");
   try {
-    card.viewModel = await loadSourceCardViewModel(
+    const viewModel = await loadSourceCardViewModel(
       { tref: "Micah 6:8" },
       client,
+      controller.signal,
     );
-    updateStatus("Loaded Micah 6:8 through the public client.");
+    if (operation !== activeOperation || controller.signal.aborted) {
+      return;
+    }
+    card.viewModel = viewModel;
+    updateStatus("Loaded live Micah 6:8 data from Sefaria.");
   } catch (error) {
+    if (operation !== activeOperation || controller.signal.aborted) {
+      return;
+    }
     card.viewModel = previousViewModel;
     updateStatus(error instanceof Error ? error.message : String(error));
   } finally {
-    loadButton.disabled = false;
+    if (operation === activeOperation) {
+      loadButton.disabled = false;
+    }
   }
 }
 

@@ -14,7 +14,7 @@ pnpm build
 pnpm dev:linked-article
 ```
 
-Open the loopback URL printed by Vite. Activate the `Micah 6:8` link for a live Sefaria popup. Disable JavaScript or use modifier/context-menu navigation to confirm that the authored `https://www.sefaria.org/Micah.6.8` destination remains usable.
+Open the loopback URL printed by Vite. No live data loads on page open. Click the `Micah 6:8` link, or focus it and press Enter, to start a live Sefaria popup. Disable JavaScript or use modifier/context-menu navigation to confirm that the authored `https://www.sefaria.org/Micah.6.8` destination remains usable.
 
 ## Ownership
 

@@ -12,7 +12,7 @@ pnpm build
 pnpm dev:linked-article
 ```
 
-Open the loopback URL printed by Vite. The maintained article uses the bounded `Micah 6:8` reference.
+Open the loopback URL printed by Vite. The maintained article uses the bounded `Micah 6:8` reference. Opening the page makes no Sefaria request; clicking the citation or focusing it and pressing Enter starts the live popup request.
 
 ## Author the native link
 

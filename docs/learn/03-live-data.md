@@ -81,9 +81,9 @@ Place the element inside `<div data-source-card-content>`. Call `load("Micah 6:8
 
 ## Expected result
 
-The live explorer starts its current bounded reference when you explicitly open the live page, displays loading or failure visibly, and rejects late completion when another selection supersedes it. Selecting a rendered source emits `sefaria-source-select`; the host receives the detail and decides what happens next.
+The live explorer opens in an idle state and makes no Sefaria request. Select **Start live demo** or an example preset to load the current bounded reference. The page displays loading or failure visibly and rejects late completion when another selection supersedes it. Selecting a rendered source emits `sefaria-source-select`; the host receives the detail and decides what happens next.
 
-**Explicit live action:** after starting `pnpm dev:site`, <SiteLink to="/examples/explorer/source-card.html">open the source-card explorer</SiteLink>. The route leaves the lesson and loads data from Sefaria; opening the lesson itself makes no live request. The maintained source is linked below.
+**Explicit live action:** after starting `pnpm dev:site`, <SiteLink to="/examples/explorer/source-card.html">open the source-card explorer</SiteLink>, then select **Start live demo**. Opening either the lesson or the live route makes no Sefaria request until that activation. The maintained source is linked below.
 
 ## Who owns what
 

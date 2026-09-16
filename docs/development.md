@@ -41,11 +41,11 @@ For reader-oriented explanations, use the friendly guides rather than the archiv
 | `packages/client` | Delivers eight named Core GET and POST SDK functions, committed corrected TypeScript contracts, reusable Core schemas, Zod validators, and a status-aware fetch client with a bounded default-on per-client response cache. The corrected Core OpenAPI document is temporary generation output. |
 | `packages/text-transform` | Delivers DOM-free sanitization, Hebrew vocalization modes, structured footnote extraction, and bounded connected-text previews. |
 | `packages/web-components` | Delivers the current component-specific view models, pure and async factory subpaths, request-free elements for the current text, bilingual, reference-label, selectable source-card, connections-panel, popup, and controlled reader surfaces, plus the DOM-free bounded reader session and stateful reader controller. |
-| `examples/explorer` | Provides one developer surface for request-free authored states and opt-in live pages for reference labels, text segments, bilingual segments, source cards, and contextual connections. Loading the landing page does not start every live request. |
+| `examples/explorer` | Provides one developer surface for request-free authored states and click-to-start live pages for reference labels, text segments, bilingual segments, source cards, and contextual connections. Opening a live route makes no Sefaria request before activation. |
 | `examples/reader` | Demonstrates a regular website host with viewport-height spatial panes over the lower-level reader session and shared browser data source, plus an interactive host that uses `loadReaderController` and `bindReaderController` with the supported `<sefaria-reader>` component. |
-| `examples/vanilla-vite` | Exercises installed public client, source-card factory, and custom-element registration paths with a deterministic validated `Micah 6:8` response. |
+| `examples/vanilla-vite` | Exercises installed public client, source-card factory, and custom-element registration paths with a validated supplied `Micah 6:8` response followed by an explicit live request. |
 | `examples/linked-article` | Progressively enhances authored Sefaria anchors with the public popup factory while preserving native navigation, page-owned cancellation, visible failures, and request-free rendering. |
-| `examples/mcp-app` | Exposes compiled Node stdio and Streamable HTTP `get_text` and adaptive `get_links_between_texts` tools, packages a single-file App, validates corrected payloads and metadata, includes a separate-origin AppBridge reference host and deterministic request-count proof, and retains the optional authenticated isolated VS Code hierarchy walkthrough with separate explicit chat export. |
+| `examples/mcp-app` | Exposes shared `get_text` and adaptive `get_links_between_texts` registration through compiled Node stdio and Streamable HTTP transports and a static in-browser MCP host, packages a single-file App, validates corrected payloads and metadata, proves AppBridge request counts and sandbox isolation, and retains the optional authenticated isolated VS Code hierarchy walkthrough with separate explicit chat export. |
 | `docs/` and `dist/site` | Provide one GitHub-readable learning sequence and a VitePress presentation that embeds isolated builds of the maintained examples and is published from validated `main`. |
 | `tests/compatibility` | Delivers focused pinned client and transform comparisons, a composed v3 validate-to-transform smoke case, and grouped qualification output without network access. The evidence is representative and non-exhaustive. |
 
@@ -105,7 +105,7 @@ pnpm build:site
 pnpm preview:site
 ```
 
-The generated `dist/site` directory contains the VitePress pages plus allowlisted example routes under `examples/`: explorer, Reader, vanilla, React, linked article, and the static MCP App fixture preview. The MCP preview is rendering evidence only; `pnpm dev:mcp` remains the protocol and AppBridge proof.
+The generated `dist/site` directory contains the VitePress pages plus allowlisted example routes under `examples/`: explorer, Reader, vanilla, React, linked article, the live static MCP host, and the MCP App fixture preview. The live MCP host proves in-memory protocol, resource, AppBridge, and opaque-sandbox behavior without an external backend. The separate fixture preview remains rendering evidence only; `pnpm dev:mcp` proves the compiled Streamable HTTP topology.
 
 `pnpm build:site` typechecks each included example before bundling it. `pnpm build:site:bundles` skips those repeated typechecks and is used inside `pnpm check` after workspace builds. Both commands verify required output files and reject a same-origin authored-source fallback. `SITE_BASE_PATH` selects the normalized absolute base used by VitePress, every example bundle, and browser acceptance; local commands default to `/`, while the Pages workflow requires `/sefaria-frontend-toolkit/`.
 
@@ -120,10 +120,10 @@ The separate Pages workflow runs the complete repository gate on Ubuntu with the
 | `packages/web-components` | Non-DOM component factories and request-free Lit elements |
 | `tests/compatibility` | Pinned compatibility evidence for retained pure behavior |
 | `examples/explorer` | Request-free authored states and opt-in live diagnostics for component primitives and contextual connections |
-| `examples/mcp-app` | Corrected-payload Node MCP boundary, compiled stdio and Streamable HTTP servers, self-contained App, separate-origin AppBridge reference host, static fixture preview, and isolated VS Code qualification tooling |
+| `examples/mcp-app` | Shared corrected-payload MCP registration, compiled stdio and Streamable HTTP servers, static in-browser MCP host, self-contained App, AppBridge sandbox hosts, static fixture preview, and isolated VS Code qualification tooling |
 | `examples/linked-article` | Authored native citation navigation and page-owned popup integration |
 | `examples/reader` | Interactive multi-pane website host and controlled `<sefaria-reader>` host over the DOM-free reader session |
-| `examples/vanilla-vite` | Minimal deterministic public-package consumption path |
+| `examples/vanilla-vite` | Minimal supplied-data and explicit-live public-package consumption path |
 | `docs/.vitepress` and `scripts/build-site.mjs` | Documentation presentation, project-path navigation, styling, and isolated example assembly |
 
 Workspace dependencies use `workspace:*`, and committed manifests remain private. Successful `main` validation publishes synchronized private prereleases from isolated staged manifests; it does not change workspace dependency resolution.
@@ -180,6 +180,14 @@ The current command checks stale OpenAPI output, then runs Prettier, Oxlint, wor
 Every run writes a bounded machine-readable result to `.artifacts/check/result.json`. CI uploads that result and allowlisted browser diagnostics only after a platform failure. A Linux success cannot hide a Windows failure: the required `check` aggregation succeeds only when the complete matrix succeeds.
 
 The MCP acceptance transport rejects unexpected requests and uses the compiled Node server, registered resource, separate host and sandbox origins, and packaged App. TypeScript projects use ignored incremental build-information files, which reduce repeated local typecheck and build work without changing emitted artifacts.
+
+The deterministic gate does not contact Sefaria. To opt into a bounded live-data qualification of every maintained click-to-start route, including one Reader navigation and the embedded MCP text-to-links flow, run:
+
+```powershell
+pnpm test:site:live
+```
+
+This command rebuilds the production site, requires zero Sefaria requests before each activation, validates the returned live data through the production clients and factories, and exits nonzero with the failing route and stage. It uses bounded Micah references and request limits but does not assert a fixed live connection count or rewrite committed fixtures. Passing locally qualifies current CORS and payload availability; deployed Pages-origin evidence remains separate.
 
 ## Current focused checks
 
@@ -297,7 +305,7 @@ Do not edit generated declarations by hand.
 pnpm dev
 ```
 
-The landing page links to authored states and opt-in live diagnostics. Authored states exercise production elements without requests; live pages use ordinary HTML controls, the production client, component factories, and request-free elements. Opening the landing page does not start all live requests.
+The landing page links to authored states and click-to-start live diagnostics. Authored states exercise production elements without requests; live pages use ordinary HTML controls, the production client, component factories, and request-free elements. Opening the landing page or any live route does not contact Sefaria before **Start live demo**, an example preset, or an authored citation is activated.
 
 ## Run the interactive text-segment page
 

@@ -296,7 +296,7 @@
           <form id="bilingual-request-form">
             <label>
               Sefaria reference
-              <input name="tref" value="Genesis 1:1" required />
+              <input name="tref" value="Micah 6:8" required />
             </label>
             <label>
               Exact primary version title
@@ -312,7 +312,7 @@
                 placeholder="Optional exact version title"
               />
             </label>
-            <button type="submit">Load from Sefaria</button>
+            <button type="submit">Start live demo</button>
           </form>
 
           <h3>Display</h3>
@@ -346,7 +346,8 @@
         <section class="panel" aria-labelledby="result-heading">
           <h2 id="result-heading">Component result</h2>
           <p id="request-state" data-state="initial">
-            Waiting for the first request.
+            Click Start live demo or a preset to load live data from Sefaria. No
+            live data has been loaded yet.
           </p>
           <p id="host-error" role="alert" hidden></p>
           <sefaria-bilingual-segment

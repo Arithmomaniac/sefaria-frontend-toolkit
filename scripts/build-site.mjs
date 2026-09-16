@@ -1,4 +1,4 @@
-import { access, copyFile, mkdir, readFile, rm } from "node:fs/promises";
+import { access, copyFile, cp, mkdir, readFile, rm } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { spawnSync } from "node:child_process";
@@ -56,6 +56,19 @@ for (const step of createSiteBuildSteps({ skipTypecheck, siteBasePath })) {
     await copyFile(
       path.join(root, "examples", "mcp-app", "dist", "app", "mcp-app.html"),
       path.join(destination, "index.html"),
+    );
+    await copyFile(
+      path.join(root, "examples", "mcp-app", "dist", "host", "live.html"),
+      path.join(destination, "live.html"),
+    );
+    await copyFile(
+      path.join(root, "examples", "mcp-app", "dist", "host", "mcp-app.html"),
+      path.join(destination, "mcp-app.html"),
+    );
+    await cp(
+      path.join(root, "examples", "mcp-app", "dist", "host", "assets"),
+      path.join(destination, "assets"),
+      { recursive: true },
     );
     continue;
   }

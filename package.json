@@ -48,6 +48,7 @@
     "walkthrough:mcp:vscode": "pnpm build:mcp && tsx examples/mcp-app/scripts/capture-vscode-host.ts",
     "test": "vitest run",
     "test:site": "node scripts/test-site.mjs",
+    "test:site:live": "pnpm build:site && node scripts/test-site-live.mjs",
     "test:watch": "vitest",
     "typecheck": "pnpm -r --if-present typecheck && tsc -p demos/tsconfig.json && node scripts/check-documentation-snippets.mjs"
   },

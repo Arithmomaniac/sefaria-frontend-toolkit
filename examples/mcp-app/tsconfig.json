@@ -1,12 +1,16 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": true
+    "noEmit": true,
+    "types": ["vite/client"]
   },
   "include": [
     "src/app.ts",
     "src/main.ts",
     "src/host/**/*.ts",
+    "src/live-host/**/*.ts",
+    "src/server/registration.ts",
+    "src/server/tool-logic.ts",
     "scripts/**/*.ts",
     "vite.config.ts",
     "vite.host.config.ts"

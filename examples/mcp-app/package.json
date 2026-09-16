@@ -24,6 +24,7 @@
     "preview:fixture": "pnpm build:app && vite preview --outDir dist/app --open /mcp-app.html?fixture=1",
     "start:http": "node dist/server/http.js",
     "start:stdio": "node dist/server/stdio.js",
+    "test:browser": "vitest run --config ../../vitest.config.ts --project browser src/live-host",
     "test:protocol": "vitest run src/server",
     "typecheck": "tsc -p tsconfig.json && tsc -p tsconfig.server.json"
   }

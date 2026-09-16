@@ -154,7 +154,7 @@ See the [component specification](specs/components.md) for the three-layer contr
 
 An element emits a composed event when a user action requests different data. The event describes the action and target. It does not select a transport.
 
-The host owns data-source choice. The reader controller owns cancellation and request execution for its supported stateful flow, while the reader session owns committed semantic selection, history, capture retention, and stable completion eligibility. A lower-level host can continue to coordinate the session directly when it needs spatial state outside the controller contract.
+The host owns data-source choice and the explicit activation that permits the first live request. Opening a maintained live route or reference deep link only prefills host input; it does not start data loading. The reader controller owns cancellation and request execution for its supported stateful flow after activation, while the reader session owns committed semantic selection, history, capture retention, and stable completion eligibility. A lower-level host can continue to coordinate the session directly when it needs spatial state outside the controller contract.
 
 The host can use authoritative captured data, validated server-provided data, or a supplied client. The first two paths call a pure factory. The client path calls an async factory.
 
@@ -184,7 +184,7 @@ It must not call child async factories. Ten child views from one composite respo
 
 ## MCP boundary
 
-MCP `structuredContent` carries a corrected API payload. Namespaced tool-result metadata carries the exact request reference and documented response status so the App can select the generated schema and construct the component request. The metadata carries no payload fields or view model. The App validates both boundaries, calls the same pure factory as client mode for a successful payload, and renders the resulting view model.
+MCP `structuredContent` carries a corrected API payload. Namespaced tool-result metadata carries the exact request reference and documented response status so the App can select the generated schema and construct the component request. The metadata carries no payload fields or view model. The App validates both boundaries, calls the same pure factory as client mode for a successful payload, and renders the resulting view model. The MCP server role owns Sefaria requests whether a Node transport or the trusted browser-embedded reference host executes it; the sandboxed App never calls Sefaria directly.
 
 ## Failure contracts
 

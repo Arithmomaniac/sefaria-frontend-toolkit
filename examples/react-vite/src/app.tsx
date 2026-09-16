@@ -161,6 +161,8 @@ export function ReactSourceCardExample({
         <p>
           The first card comes from validated supplied data. React owns every
           live request, cancellation, display property, and event listener.
+          Click Start live demo to replace the supplied example with live
+          Sefaria data.
         </p>
       </header>
 
@@ -176,7 +178,7 @@ export function ReactSourceCardExample({
             />
           </label>
           <button id="load-live" type="submit">
-            Load from Sefaria
+            Start live demo
           </button>
         </form>
         <div className="display-controls">

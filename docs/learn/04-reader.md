@@ -59,7 +59,7 @@ The controlled Reader owns bounded semantic history, source-to-connections trans
 
 The same Reader presentation can run with different data paths. A regular website controller can use `@arithmomaniac/sefaria-client`; an MCP App controller uses host-mediated tools because the sandbox cannot make the same direct requests. In both cases the element receives rendering data and emits events rather than fetching.
 
-**Explicit live actions:** after starting `pnpm dev:site`, <SiteLink to="/examples/reader/controlled.html?tref=Micah%206%3A8">open the controlled Reader</SiteLink> or <SiteLink to="/examples/reader/index.html?tref=Micah%206%3A8">open the spatial Reader</SiteLink>. The routes load data from Sefaria; opening the lesson itself makes no live request. The maintained sources are linked below.
+**Explicit live actions:** after starting `pnpm dev:site`, <SiteLink to="/examples/reader/controlled.html?tref=Micah%206%3A8">open the controlled Reader</SiteLink> or <SiteLink to="/examples/reader/index.html?tref=Micah%206%3A8">open the spatial Reader</SiteLink>, then select **Start live demo**. The route only prefills its `?tref=` value and makes no Sefaria request before activation. The maintained sources are linked below.
 
 ## Who owns what
 

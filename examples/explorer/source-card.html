@@ -132,7 +132,8 @@
         <h1>Live source-card demo</h1>
         <p>
           Each preset makes one v3 text request, then projects every recursive
-          leaf into the request-free source card.
+          leaf into the request-free source card. Click Start live demo or a
+          preset to make the first live request.
         </p>
       </header>
       <div class="workspace">
@@ -208,7 +209,7 @@
               >Exact translation version title
               <input name="translationVersionTitle" placeholder="Optional"
             /></label>
-            <button type="submit">Load source card</button>
+            <button type="submit">Start live demo</button>
           </form>
           <h3>Display</h3>
           <form id="display-form">
@@ -240,7 +241,8 @@
         <section class="panel">
           <h2>Result</h2>
           <p id="request-state" data-state="initial">
-            Waiting for the first request.
+            Click Start live demo or a preset to load live data from Sefaria. No
+            live data has been loaded yet.
           </p>
           <p id="host-error" role="alert" hidden></p>
           <div id="source-card-content">
