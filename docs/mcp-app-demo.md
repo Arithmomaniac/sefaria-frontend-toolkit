@@ -8,6 +8,14 @@ The stateful MCP reader is implemented and has completed an automated host walkt
 
 ![Captured source card in isolated VS Code Copilot Chat](images/mcp-app-vscode.png)
 
+## Try the static live host
+
+Open the <SiteLink to="/examples/mcp-app/live.html">live MCP App host</SiteLink>. The page is fully static: it does not require a deployed server, proxy, account, or second hosted origin. It also makes no Sefaria request until you select **Start live demo**.
+
+After activation, the trusted page creates a real MCP client and server, connects them with the pinned SDK's in-memory transport, reads the packaged App through `resources/read`, and renders it through AppBridge in an opaque-origin sandbox. The MCP server role makes the live Sefaria requests; the packaged App uses host-mediated MCP tools and cannot fetch Sefaria directly.
+
+This route proves the packaged resource, in-browser MCP exchange, AppBridge continuation, request ownership, and static sandbox topology. It does not prove stdio, Streamable HTTP, or compatibility with an external named host. Use the local command and VS Code walkthrough below for those separate paths.
+
 ## Try the reader in VS Code
 
 The launch-only command opens the repository minimized in the same isolated VS Code profile used by the accepted walkthrough. It does not enable the smoke-test driver or a debugging port, attach CDP, drive the UI, type or submit a prompt, or call a tool.
@@ -38,7 +46,7 @@ Run the automated assertions without publishing screenshots with `pnpm walkthrou
 
 ## Reader interaction
 
-The model calls `get_text` once. The Node server fetches one corrected Sefaria v3 texts payload and returns plain text for every host plus `structuredContent` and the App resource for MCP Apps hosts. The App validates the result, admits reader source content, creates one reader controller with zero initial requests, and binds one persistent request-free `<sefaria-reader>`.
+The initiating host calls `get_text` once. The MCP server role fetches one corrected Sefaria v3 texts payload and returns plain text for every host plus `structuredContent` and the App resource for MCP Apps hosts. That role runs in Node for stdio and Streamable HTTP or in the trusted page for the static live host. The App validates the result, admits reader source content, creates one reader controller with zero initial requests, and binds one persistent request-free `<sefaria-reader>`.
 
 ![Authored happy-path source card specification](images/mcp-app-source-card.svg)
 

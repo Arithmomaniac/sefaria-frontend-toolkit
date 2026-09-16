@@ -12,6 +12,6 @@ These previews are isolated builds of the maintained private examples. They are 
 | Vanilla supplied-data consumer | <SiteLink to="/examples/vanilla/index.html">Open preview</SiteLink> | [`examples/vanilla-vite`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/vanilla-vite) |
 | React consumer | <SiteLink to="/examples/react/index.html">Open preview</SiteLink> | [`examples/react-vite`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/react-vite) |
 | Authored linked article | <SiteLink to="/examples/linked-article/index.html">Open preview</SiteLink> | [`examples/linked-article`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/linked-article) |
-| MCP App fixture preview | <SiteLink to="/examples/mcp-app/index.html?fixture=1">Open preview</SiteLink> | [`examples/mcp-app`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/mcp-app) |
+| Live MCP App host | <SiteLink to="/examples/mcp-app/live.html">Open preview</SiteLink> | [`examples/mcp-app`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/mcp-app) |
 
-The MCP fixture route proves deterministic App rendering only. Run `pnpm dev:mcp` for the compiled Node server, separate host and sandbox origins, AppBridge calls, and protocol-level request-count proof.
+The live route makes no Sefaria request until **Start live demo**. It then connects a real in-browser MCP client/server pair, reads the packaged App through `resources/read`, and renders it through AppBridge in an opaque-origin sandbox. Run `pnpm dev:mcp` for the compiled Node server and Streamable HTTP reference host, or use the documented VS Code walkthrough for named-host evidence.

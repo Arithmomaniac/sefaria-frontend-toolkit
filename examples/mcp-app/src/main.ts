@@ -13,7 +13,6 @@ import {
   renderStatus,
   waitForMcpConnection,
 } from "./app.js";
-import capturedLinks from "../../../packages/client/test/fixtures/links-connections-preview-2026-09-06.json";
 
 function findRoot(): HTMLElement {
   const root = document.querySelector<HTMLElement>("#app");
@@ -39,32 +38,7 @@ const root = findRoot();
 
 const search = new URLSearchParams(window.location.search);
 
-if (search.has("fixture")) {
-  const label = document.createElement("p");
-  label.textContent =
-    "Static fixture preview: rendering evidence only, not MCP protocol or host qualification.";
-  root.before(label);
-  renderReaderToolResult(
-    root,
-    {
-      structuredContent: { payload: capturedLinks },
-      _meta: {
-        "sefaria/connections": {
-          operation: "getLinks",
-          method: "GET",
-          path: "/api/links/{tref}",
-          status: 200,
-          request: { tref: "Micah 6:8", withText: true },
-        },
-      },
-    },
-    createMcpReaderDataSource({
-      callServerTool: async () => {
-        throw new Error("Static fixture preview has no MCP host.");
-      },
-    }),
-  );
-} else if (search.has("standalone")) {
+if (search.has("standalone")) {
   renderStatus(
     root,
     "Call get_text or get_links_between_texts in an MCP Apps host to render Sefaria content.",

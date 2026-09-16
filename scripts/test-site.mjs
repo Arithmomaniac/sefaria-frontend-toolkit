@@ -122,6 +122,42 @@ try {
     }
     assertEqual(textRequests.length, 0, "authored lesson request count");
 
+    for (const [name, route, action] of [
+      [
+        "text-segment",
+        "/examples/explorer/text-segment.html",
+        "Start live demo",
+      ],
+      [
+        "bilingual-segment",
+        "/examples/explorer/bilingual-segment.html",
+        "Start live demo",
+      ],
+      [
+        "reference-label",
+        "/examples/explorer/ref-label.html",
+        "Start live demo",
+      ],
+      ["source-card", "/examples/explorer/source-card.html", "Start live demo"],
+      ["connections", "/examples/explorer/connections.html", "Start live demo"],
+      [
+        "controlled Reader",
+        "/examples/reader/controlled.html?tref=Micah%206%3A8",
+        "Start live demo",
+      ],
+      [
+        "spatial Reader",
+        "/examples/reader/index.html?tref=Micah%206%3A8",
+        "Start live demo",
+      ],
+    ]) {
+      textRequests.length = 0;
+      await page.goto(siteRouteUrl(route), { waitUntil: "networkidle" });
+      await page.getByRole("button", { name: action }).waitFor();
+      await assertText(page.locator("body"), "has been loaded yet.");
+      assertEqual(textRequests.length, 0, `${name} idle request count`);
+    }
+
     const liveLessons = {
       "03-live-data": [
         [
@@ -166,10 +202,11 @@ try {
         ]);
         await tabTo(
           page,
-          page.getByRole("button", { name: "Load source card" }),
+          page.getByRole("button", { name: "Start live demo" }),
           "source-card load action",
           30,
         );
+        await page.keyboard.press("Enter");
         await page.locator("#request-state[data-state='data']").waitFor();
         assertEqual(
           textRequests.length,
@@ -189,7 +226,7 @@ try {
       ["/examples/vanilla/index.html", 3],
       ["/examples/react/index.html", 4],
       ["/examples/linked-article/index.html", 5],
-      ["/examples/mcp-app/index.html", 6],
+      ["/examples/mcp-app/live.html", 6],
     ];
     const previewLinks = page.getByRole("link", { name: "Open preview" });
     assertEqual(
@@ -270,17 +307,18 @@ try {
       "vanilla supplied-data host request count",
     );
     assertEqual(textRequests.length, 0, "vanilla supplied-data request count");
-    await page.locator("#load-fixture").click();
-    await page.locator("#status[data-request-count='1']").waitFor();
+    await page.locator("#load-live").click();
+    await page.waitForFunction(
+      () =>
+        globalThis.document
+          .querySelector("#status")
+          ?.textContent?.includes("Loaded live Micah 6:8 data") === true,
+    );
     await assertText(
       page.locator("#status"),
-      "Loaded Micah 6:8 through the public client.",
+      "Loaded live Micah 6:8 data from Sefaria.",
     );
-    assertEqual(
-      textRequests.length,
-      0,
-      "vanilla injected-client network count",
-    );
+    assertEqual(textRequests.length, 1, "vanilla live-client network count");
 
     await page.goto(siteRouteUrl("/examples/react/index.html"), {
       waitUntil: "networkidle",
@@ -338,6 +376,15 @@ try {
       waitUntil: "networkidle",
     });
     await page.locator("sefaria-reader").waitFor();
+    await assertText(page.locator("#status"), "has been loaded yet.");
+    assertEqual(textRequests.length, 0, "controlled Reader idle request count");
+    await tabTo(
+      page,
+      page.getByRole("button", { name: "Start live demo" }),
+      "Reader start action",
+      10,
+    );
+    await page.keyboard.press("Enter");
     await page.waitForFunction(() => {
       const status = globalThis.document.querySelector("#status")?.textContent;
       return status !== undefined && !status.startsWith("Opening ");
@@ -348,12 +395,6 @@ try {
         `Controlled Reader did not load: ${readerStatus}; ${await page.locator("#host-error").textContent()}; fixtures: ${JSON.stringify(textRequests)}; denied: ${JSON.stringify(unexpectedRequests)}`,
       );
     }
-    await tabTo(
-      page,
-      page.getByRole("button", { name: "Open reader" }),
-      "Reader open action",
-      10,
-    );
     const sourceSelection = page
       .getByRole("button", { name: "Show connections for Micah 6:8" })
       .first();
@@ -443,17 +484,33 @@ try {
     );
     await capture(page, "site-mobile.png");
 
-    await page.goto(siteRouteUrl("/examples/mcp-app/index.html?fixture=1"), {
+    textRequests.length = 0;
+    await page.goto(siteRouteUrl("/examples/mcp-app/"), {
       waitUntil: "networkidle",
     });
-    await assertText(page.locator("body"), "Static fixture preview");
-    await tabTo(
-      page,
-      page.getByRole("button", { name: "Commentary (3)", exact: true }),
-      "static MCP preview Commentary action",
-      20,
-    );
-    await capture(page, "site-mcp-fixture.png");
+    await page.getByRole("button", { name: "Start live demo" }).waitFor();
+    await assertText(page.locator("#status"), "has not started");
+    assertEqual(textRequests.length, 0, "bare MCP route idle request count");
+
+    textRequests.length = 0;
+    await page.goto(siteRouteUrl("/examples/mcp-app/live.html"), {
+      waitUntil: "networkidle",
+    });
+    await assertText(page.locator("#status"), "has not started");
+    assertEqual(textRequests.length, 0, "live MCP idle request count");
+    await page.getByRole("button", { name: "Start live demo" }).click();
+    await page
+      .locator("#status")
+      .filter({ hasText: "Live MCP demo started" })
+      .waitFor();
+    await page
+      .frameLocator("#sandbox")
+      .locator("iframe")
+      .contentFrame()
+      .locator("sefaria-reader")
+      .waitFor();
+    assertEqual(textRequests.length, 2, "live MCP initial request count");
+    await capture(page, "site-mcp-live.png");
     assertEqual(
       unexpectedRequests.length,
       0,

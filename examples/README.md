@@ -21,7 +21,7 @@ Runnable scenario definitions live in [`explorer/src/authored`](explorer/src/aut
 
 ## Live data and interaction
 
-The [component explorer](explorer/README.md) keeps live actions separate from supplied-data selection. Each page owns its client and async factory call, shows loading or failure directly, and passes only a view model plus display properties to the element.
+The [component explorer](explorer/README.md) keeps live actions separate from supplied-data selection. Each page opens without a Sefaria request; **Start live demo** or an example preset begins the operation. The page owns its client and async factory call, shows loading or failure directly, and passes only a view model plus display properties to the element.
 
 | Destination | What to try | Public package/subpath |
 | --- | --- | --- |
@@ -33,11 +33,11 @@ The [component explorer](explorer/README.md) keeps live actions separate from su
 
 ## Supported Reader
 
-Open the [controlled Reader](reader/controlled.html?tref=Micah%206%3A8) when the host wants the supported controller to own Reader transitions. The host creates the client, loads `@arithmomaniac/sefaria-web-components/reader-controller`, binds the controller to `<sefaria-reader>`, and disposes both.
+Open the [controlled Reader](reader/controlled.html?tref=Micah%206%3A8) when the host wants the supported controller to own Reader transitions. The deep link prefills the reference; **Start live demo** creates the client-backed controller, binds it to `<sefaria-reader>`, and begins live loading. The host disposes both.
 
 ## Custom composition
 
-Open the [spatial Reader workspace](reader/index.html?tref=Micah%206%3A8) to see a website host assume additional responsibility for pane placement, activation, pruning, request cancellation, and session pins while reusing the same public factories and Reader semantics. It is intentionally distinct from the controlled Reader rather than a competing supported API.
+Open the [spatial Reader workspace](reader/index.html?tref=Micah%206%3A8) to see a website host assume additional responsibility for pane placement, activation, pruning, request cancellation, and session pins while reusing the same public factories and Reader semantics. The route waits for **Start live demo** before loading its prefilled reference. It is intentionally distinct from the controlled Reader rather than a competing supported API.
 
 The [React Vite example](react-vite/README.md) demonstrates custom host integration with a typed ref, object property assignment, a persistent element, explicit loading, stale suppression, StrictMode cleanup, theme/width controls, and a real `sefaria-source-select` event updating React state.
 
@@ -45,7 +45,7 @@ The [React Vite example](react-vite/README.md) demonstrates custom host integrat
 
 The [authored linked article](linked-article/) progressively enhances ordinary Micah 6:8 Sefaria anchors with a request-free popup while preserving JavaScript-disabled and modifier-key navigation. The page owns its cache-disabled client and factory calls, cancellation, stale suppression, visible failures, and cleanup; its [README](linked-article/README.md) identifies the public subpaths and runnable source.
 
-The private [MCP App guide](../docs/mcp-app-demo.md) packages the Reader as a self-contained MCP App served by compiled stdio or Streamable HTTP transports. Run `pnpm dev:mcp` for the real local reference host and sandbox; the maintained [App](mcp-app/src/app.ts), [host](mcp-app/src/host/), and [server](mcp-app/src/server/) sources keep tool requests host-mediated and transport logic separate from Reader state.
+The private [MCP App guide](../docs/mcp-app-demo.md) packages the Reader as a self-contained MCP App. The documentation site includes a click-to-start in-browser MCP client/server and opaque sandbox without an external backend. Run `pnpm dev:mcp` for the compiled Streamable HTTP reference host, or use the stdio and VS Code paths for their distinct transport and named-host evidence. The maintained [App](mcp-app/src/app.ts), [host](mcp-app/src/host/), and [server](mcp-app/src/server/) sources keep tool requests host-mediated and transport logic separate from Reader state.
 
 ## Curation disposition
 

@@ -4,7 +4,7 @@
 
 ## Status
 
-The standalone connections reader, multi-pane website reader workspace, stateful MCP reader, adaptive connections tool and rendering, authenticated VS Code reader walkthrough, and authored linked-article integration are current. MCP reader data operations use host-proxied server-tool calls. A successful App `ui/message` response applies only to the reader's separate explicit chat-export action and means the host accepted that message for enqueueing or composer placement.
+The standalone connections reader, multi-pane website reader workspace, stateful MCP reader, adaptive connections tool and rendering, static browser-embedded MCP reference host, authenticated VS Code reader walkthrough, and authored linked-article integration are current. MCP reader data operations use host-proxied server-tool calls. A successful App `ui/message` response applies only to the reader's separate explicit chat-export action and means the host accepted that message for enqueueing or composer placement.
 
 ## Shared integration rules
 
@@ -20,11 +20,23 @@ Unknown JSON must pass a generated `@arithmomaniac/sefaria-client` validator bef
 
 The VitePress site presents the canonical Markdown learning path and embeds isolated production builds of the maintained browser examples. It does not import DOM-dependent toolkit registration into VitePress server rendering, render toolkit component HTML on the server, or hydrate toolkit elements.
 
-The site build includes the explorer, controlled and spatial Reader, vanilla consumer, React consumer, authored linked article, and static MCP App fixture preview. Each example keeps its own request ownership, cancellation, stale-result handling, element lifecycle, and tests. No example imports another example at runtime.
+The site build includes the explorer, controlled and spatial Reader, vanilla consumer, React consumer, authored linked article, and live browser-embedded MCP host. The live MCP host requires no external server, proxy service, account, or additional hosted origin. Each example keeps its own request ownership, cancellation, stale-result handling, element lifecycle, and tests. No example imports another example at runtime.
 
-Landing pages and authored-state previews are deterministic and make no unsolicited Sefaria request. Live factory actions remain explicit, preserve network, abort, contract-validation, documented HTTP, projection, partial, and empty distinctions, and do not substitute fixture success after a failure.
+Landing pages, authored-state previews, live demo routes, and reference deep links make no unsolicited Sefaria request. A live route prefills its bounded initial input and presents an explicit start action. Only click, keyboard activation, or an equally explicit example-preset or authored-citation activation starts live data. Live operations preserve network, abort, contract-validation, documented HTTP, projection, partial, and empty distinctions and do not substitute fixture success after a failure.
 
-The static MCP App route is labeled fixture-driven rendering evidence. It does not claim a tool call, transport, AppBridge, sandbox, request-count, or named-host proof. The compiled local Node reference host remains the protocol acceptance path.
+The live MCP route is the static site's in-memory protocol and AppBridge acceptance path. The compiled local Node reference host remains the Streamable HTTP acceptance path.
+
+### Static browser-embedded MCP host [Current]
+
+The Pages artifact includes a browser reference host that creates one MCP client and one MCP server in the host page and connects them with the pinned SDK's in-memory transport. The browser server registers the same tools and resource contract as the Node server and calls the deployed Sefaria endpoints only after the user selects **Start live demo**. It does not accept an arbitrary server URL, arbitrary App HTML, credentials, or host policy from query parameters.
+
+The host obtains the self-contained App only through MCP `resources/read` and sends it through the official AppBridge sandbox-resource handshake. The App continues to make no direct Sefaria request. App-initiated navigation calls the same embedded server through the host's `serverTools` bridge.
+
+The static host uses an intermediate self-contained `data:` proxy document with an opaque origin and an inner sandboxed App frame. A same-origin HTTP or `srcdoc` outer proxy with both scripts and same-origin permission is not an acceptable substitute. The host and proxy validate expected window sources; an opaque `null` message origin alone is not identity. The fixed browser policy denies App network access, objects, base changes, and nested frames and cannot be widened by the App or URL input.
+
+The browser-embedded path proves static MCP initialization, tool discovery and calls, resource delivery, AppBridge rendering, sandbox isolation, exact browser request counts, and continuing same-App navigation. It does not prove stdio, Streamable HTTP, or compatibility with an external named host. The existing Node Inspector, local HTTP host, and optional VS Code walkthrough retain those roles.
+
+Deterministic browser acceptance proves the packaged App through this complete path, including zero pre-activation Sefaria requests, tool and resource discovery, the initial text request, the App-mediated links continuation, opaque isolation, bounded initialization failure, cancellation during startup, and cleanup. A runtime failure must remain visible rather than use unsandboxed rendering, direct App fetches, an external proxy, or fixture success.
 
 The site artifact contains an allowlisted set of real built files. Source links point to actual files on `main` rather than same-origin source-looking paths that can resolve to an HTML fallback. Local builds use `/`; the Pages build uses `/sefaria-frontend-toolkit/` for VitePress, every included example, and browser acceptance. Pull requests build and test without deploying. A separate guarded workflow reruns the complete gate on `main`, uploads only `dist/site`, and deploys through the `github-pages` environment.
 
@@ -97,7 +109,7 @@ The current MCP server exposes `get_text`, which progressively enhances the offi
 
 The tool keeps the official MCP server's `source`, `english`, and `both` input vocabulary, but maps those choices to the source-card rendering roles. `source` sends one `version=primary` query value, `english` sends one `version=translation` query value, and `both` sends repeated `version=primary` and `version=translation` query values. It always sends `return_format=default`. This distinction matters for texts such as Kuzari, where the API's original-language `source` version is not necessarily the database's `isPrimary` version consumed by the source-card factory.
 
-The Node server owns the live request to `https://www.sefaria.org/api/v3/texts/{tref}`. The App does not request Sefaria.
+The MCP server role owns the live request to `https://www.sefaria.org/api/v3/texts/{tref}`. The stdio and Streamable HTTP implementations execute that role in Node. The static reference host executes the same registered tool logic in its trusted browser host. The App does not request Sefaria in either topology.
 
 One tool result serves both host capabilities:
 
@@ -293,7 +305,9 @@ A `ui://` resource is an MCP resource, not an HTTP route. MCP handles `resources
 
 The server rejects a successful payload with more than 400 text leaves before it enters `structuredContent`. This bounds synchronous source-card projection and rendering; callers must request a narrower reference. It also rejects a decoded links body larger than 5 MiB or a successful links array larger than 10,000 entries. Textual links summaries may cover at most 20 entries and 8,000 characters, but accepted `structuredContent` is never truncated.
 
-## Local reference host and fixture preview
+## Reference hosts
+
+The static documentation-site host creates a real MCP client and registered server in the trusted page, connects them with `InMemoryTransport`, reads the packaged App through `resources/read`, and renders it through the official Apps bridge in an opaque-origin sandbox. It starts no MCP lifecycle or Sefaria request before **Start live demo**. Its initial accepted flow performs one text request and one App-mediated links request.
 
 One local command starts the loopback-only Streamable HTTP server, a host origin, and a distinct sandbox origin, then opens a reference browser host that uses the official Apps `AppBridge` and sandbox handshake. The MCP HTTP server validates its loopback Host header and accepts browser requests only from that run's host origin. The sandbox CSP is delivered through an HTTP `Content-Security-Policy` header; malformed optional CSP metadata falls back to the restrictive default instead of terminating the local process. The host reads the registered MCP resource and sends its HTML through the bridge; it does not implement a private replacement protocol.
 
@@ -305,8 +319,6 @@ The deterministic browser acceptance transport rejects every unexpected request 
 - Back, retained breadcrumb activation, category changes, paging, and covered-preview changes remain local
 - malformed or partial metadata and payloads report structured paths before projection
 - cancellation, stale completion, and failed or denied tool calls cannot update a newer admitted result
-
-A separate static fixture preview is labeled as fixture-driven rendering only. It is useful for visual inspection but is not protocol, resource, AppBridge, sandbox, or request-count evidence.
 
 ## MCP host acceptance
 

@@ -37,6 +37,8 @@ Run the maintained app:
 pnpm dev:react
 ```
 
+The initial card is validated supplied data. Select **Start live demo** to make the first Sefaria request; changing theme, width, or displayed sides does not fetch.
+
 The app imports `@arithmomaniac/sefaria-web-components` once in its browser entry. Its reusable property helper assigns DOM properties during layout rather than serializing attributes:
 
 ```tsx

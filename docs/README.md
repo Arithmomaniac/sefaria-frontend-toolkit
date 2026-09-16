@@ -27,7 +27,7 @@ The controlled Reader's navigation controller is supplied by the toolkit. The ap
 3. [Load data and handle interaction](learn/03-live-data.md): explicit async factory calls, loading, visible failures, component selection events, cancellation, and stale-result rejection.
 4. [Use the Reader or compose a custom host](learn/04-reader.md): the supplied controlled Reader controller and the extra responsibilities of custom spatial composition.
 5. [Customize presentation and use headless APIs](learn/05-customization.md): theme, width, side visibility/order, layout, client, factories, and text transforms.
-6. [Integrate an authored article or MCP host](learn/06-host-integration.md): native-link enhancement, server-provided data, host-proxied tools, and static-preview limits.
+6. [Integrate an authored article or MCP host](learn/06-host-integration.md): native-link enhancement, server-provided data, host-proxied tools, and the click-to-start static MCP host.
 
 React users can branch from steps 2 and 3 into [Use the Web Components from React](learn/react.md). Web Components are browser-standard custom elements, so React can host them without a toolkit-specific wrapper package.
 

@@ -137,7 +137,12 @@ export function startLiveDemo<
   const configureResult = (): void => {
     options.configureResult?.(page.result, page.form);
   };
+  let started = false;
   const loadCurrentRequest = async (): Promise<void> => {
+    if (!started) {
+      started = true;
+      page.submitButton.textContent = options.submitLabel;
+    }
     configureResult();
     await runner.run(options.createRequest(page.form));
   };
@@ -276,7 +281,7 @@ function createLiveDemoPage<
   );
   const submitButton = document.createElement("button");
   submitButton.type = "submit";
-  submitButton.textContent = options.submitLabel;
+  submitButton.textContent = "Start live demo";
   form.append(submitButton);
   requestPanel.append(requestHeading, presetContainer, form);
 
@@ -289,7 +294,8 @@ function createLiveDemoPage<
   const requestState = document.createElement("p");
   requestState.id = "request-state";
   requestState.dataset.state = "initial";
-  requestState.textContent = "Waiting for the first request.";
+  requestState.textContent =
+    "Click Start live demo or an example preset to load live data from Sefaria. No live data has been loaded yet.";
   const hostError = document.createElement("p");
   hostError.id = "host-error";
   hostError.setAttribute("role", "alert");

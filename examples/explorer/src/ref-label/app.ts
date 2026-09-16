@@ -45,7 +45,7 @@ export function startRefLabelLiveDemo(
         kind: "text",
         name: "tref",
         label: "Sefaria reference",
-        value: "Genesis 1:1",
+        value: "Micah 6:8",
         required: true,
       },
       {
