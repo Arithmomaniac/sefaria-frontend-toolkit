@@ -16,6 +16,7 @@ const previewServer = await startSitePreview({ root, siteBasePath });
 const { origin, siteUrl } = previewServer;
 const sitePath = (route) =>
   `${siteBasePath === "/" ? "" : siteBasePath.slice(0, -1)}${route}`;
+const siteRouteUrl = (route) => `${origin}${sitePath(route)}`;
 
 try {
   await previewServer.waitUntilReady();
@@ -135,7 +136,7 @@ try {
     };
     for (const [lesson, links] of Object.entries(liveLessons)) {
       textRequests.length = 0;
-      await page.goto(`${siteUrl}/learn/${lesson}.html`, {
+      await page.goto(siteRouteUrl(`/learn/${lesson}.html`), {
         waitUntil: "networkidle",
       });
       assertEqual(
@@ -178,7 +179,9 @@ try {
       }
     }
 
-    await page.goto(`${siteUrl}/examples.html`, { waitUntil: "networkidle" });
+    await page.goto(siteRouteUrl("/examples.html"), {
+      waitUntil: "networkidle",
+    });
     const catalogLinks = [
       ["/examples/explorer/authored.html", 0],
       ["/examples/explorer/index.html", 1],
@@ -207,7 +210,7 @@ try {
         `catalog target ${index}`,
       );
     }
-    await page.goto(`${siteUrl}/examples/explorer/index.html`, {
+    await page.goto(siteRouteUrl("/examples/explorer/index.html"), {
       waitUntil: "networkidle",
     });
     for (const [name, expectedPath] of [
@@ -225,7 +228,9 @@ try {
       );
     }
 
-    await page.goto(`${siteUrl}/examples.html`, { waitUntil: "networkidle" });
+    await page.goto(siteRouteUrl("/examples.html"), {
+      waitUntil: "networkidle",
+    });
     const sourceHref = await page
       .getByRole("link", { name: "examples/react-vite" })
       .getAttribute("href");
@@ -237,7 +242,7 @@ try {
     }
 
     textRequests.length = 0;
-    await page.goto(`${siteUrl}/learn/react.html`, {
+    await page.goto(siteRouteUrl("/learn/react.html"), {
       waitUntil: "networkidle",
     });
     const reactLesson = page.frameLocator(
@@ -252,7 +257,7 @@ try {
     await capture(page, "site-react-lesson.png");
 
     textRequests.length = 0;
-    await page.goto(`${siteUrl}/examples/vanilla/index.html`, {
+    await page.goto(siteRouteUrl("/examples/vanilla/index.html"), {
       waitUntil: "networkidle",
     });
     await assertText(
@@ -277,7 +282,7 @@ try {
       "vanilla injected-client network count",
     );
 
-    await page.goto(`${siteUrl}/examples/react/index.html`, {
+    await page.goto(siteRouteUrl("/examples/react/index.html"), {
       waitUntil: "networkidle",
     });
     textRequests.length = 0;
@@ -329,7 +334,7 @@ try {
     await capture(page, "site-react.png");
 
     textRequests.length = 0;
-    await page.goto(`${siteUrl}/examples/reader/controlled.html`, {
+    await page.goto(siteRouteUrl("/examples/reader/controlled.html"), {
       waitUntil: "networkidle",
     });
     await page.locator("sefaria-reader").waitFor();
@@ -407,7 +412,7 @@ try {
 
     textRequests.length = 0;
     await page.setViewportSize({ width: 1280, height: 900 });
-    await page.goto(`${siteUrl}/examples/linked-article/`, {
+    await page.goto(siteRouteUrl("/examples/linked-article/"), {
       waitUntil: "networkidle",
     });
     const citation = page.getByRole("link", { name: "Micah 6:8", exact: true });
@@ -418,7 +423,7 @@ try {
     await capture(page, "site-linked-popup.png");
 
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto(`${siteUrl}/learn/05-customization.html`, {
+    await page.goto(siteRouteUrl("/learn/05-customization.html"), {
       waitUntil: "networkidle",
     });
     const widths = await page.evaluate(() => ({
@@ -438,7 +443,7 @@ try {
     );
     await capture(page, "site-mobile.png");
 
-    await page.goto(`${siteUrl}/examples/mcp-app/index.html?fixture=1`, {
+    await page.goto(siteRouteUrl("/examples/mcp-app/index.html?fixture=1"), {
       waitUntil: "networkidle",
     });
     await assertText(page.locator("body"), "Static fixture preview");
