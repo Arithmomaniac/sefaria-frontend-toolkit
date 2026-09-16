@@ -88,13 +88,17 @@ export function validateWorkflowPolicy(workflows) {
           filename.endsWith("/copilot-setup-steps.yml") ||
           filename === "copilot-setup-steps.yml"
             ? ["pull_request", "push", "workflow_dispatch"]
-            : ["pull_request", "push"];
+            : isPagesWorkflow(filename)
+              ? ["push", "workflow_dispatch"]
+              : ["pull_request", "push"];
         if (JSON.stringify(eventNames) !== JSON.stringify(expectedEvents)) {
           issues.push(`unsupported workflow events in ${filename}`);
         }
       }
       if (filename.endsWith("/ci.yml") || filename === "ci.yml") {
         validateCiWorkflow(workflow, issues, filename);
+      } else if (isPagesWorkflow(filename)) {
+        validatePagesWorkflow(workflow, issues, filename);
       } else if (
         filename.endsWith("/copilot-setup-steps.yml") ||
         filename === "copilot-setup-steps.yml"
@@ -108,6 +112,132 @@ export function validateWorkflowPolicy(workflows) {
     walkWorkflow(workflow, [], issues, filename);
   }
   return issues;
+}
+
+function validatePagesWorkflow(workflow, issues, filename) {
+  const approvedActions = new Set([
+    "actions/checkout@v4",
+    "pnpm/action-setup@v4",
+    "actions/setup-node@v4",
+    "actions/configure-pages@v5",
+    "actions/upload-pages-artifact@v5",
+    "actions/deploy-pages@v5",
+  ]);
+  const events = workflow.on;
+  const jobs = workflow.jobs;
+  const build = isRecord(jobs) ? jobs.build : undefined;
+  const deploy = isRecord(jobs) ? jobs.deploy : undefined;
+  const buildSteps =
+    isRecord(build) && Array.isArray(build.steps) ? build.steps : [];
+  const deploySteps =
+    isRecord(deploy) && Array.isArray(deploy.steps) ? deploy.steps : [];
+  const expectedBuildSteps = [
+    { uses: "actions/checkout@v4" },
+    { uses: "pnpm/action-setup@v4" },
+    {
+      uses: "actions/setup-node@v4",
+      with: {
+        "node-version": 22,
+        cache: "pnpm",
+      },
+    },
+    { run: "pnpm setup:agent" },
+    { run: "pnpm check" },
+    { uses: "actions/configure-pages@v5" },
+    {
+      uses: "actions/upload-pages-artifact@v5",
+      with: { path: "dist/site" },
+    },
+  ];
+  const expectedDeploySteps = [
+    {
+      name: "Deploy GitHub Pages",
+      id: "deployment",
+      uses: "actions/deploy-pages@v5",
+    },
+  ];
+
+  if (
+    !isRecord(jobs) ||
+    JSON.stringify(Object.keys(jobs).sort()) !==
+      JSON.stringify(["build", "deploy"])
+  ) {
+    issues.push(`Pages workflow jobs are incorrect in ${filename}`);
+  }
+
+  if (
+    !isRecord(events) ||
+    !hasOnlyEntries(events.push, { branches: ["main"] })
+  ) {
+    issues.push(`Pages workflow gate is not main-only in ${filename}`);
+  }
+
+  if (
+    !hasOnlyEntries(workflow.permissions, { contents: "read" }) ||
+    !isRecord(build) ||
+    !hasOnlyEntries(build.permissions, {
+      contents: "read",
+      pages: "read",
+    }) ||
+    !isRecord(deploy) ||
+    !hasOnlyEntries(deploy.permissions, {
+      contents: "read",
+      pages: "write",
+      "id-token": "write",
+    })
+  ) {
+    issues.push(`Pages workflow permissions are incorrect in ${filename}`);
+  }
+
+  const unapprovedAction = [...buildSteps, ...deploySteps].find(
+    (step) =>
+      isRecord(step) &&
+      typeof step.uses === "string" &&
+      !approvedActions.has(step.uses),
+  );
+  if (unapprovedAction) {
+    issues.push(`unapproved Pages action in ${filename}`);
+  }
+
+  if (
+    JSON.stringify(buildSteps) !== JSON.stringify(expectedBuildSteps) ||
+    JSON.stringify(deploySteps) !== JSON.stringify(expectedDeploySteps)
+  ) {
+    issues.push(`Pages workflow steps are incorrect in ${filename}`);
+  }
+
+  const checkIndex = buildSteps.findIndex(
+    (step) => isRecord(step) && step.run === "pnpm check",
+  );
+  const configureIndex = buildSteps.findIndex(
+    (step) => isRecord(step) && step.uses === "actions/configure-pages@v5",
+  );
+  const uploadIndex = buildSteps.findIndex(
+    (step) =>
+      isRecord(step) && step.uses === "actions/upload-pages-artifact@v5",
+  );
+  const upload = buildSteps[uploadIndex];
+  const deployIndex = deploySteps.findIndex(
+    (step) => isRecord(step) && step.uses === "actions/deploy-pages@v5",
+  );
+  if (
+    !isRecord(build) ||
+    !hasOnlyEntries(build.env, {
+      SITE_BASE_PATH: "/sefaria-frontend-toolkit/",
+    }) ||
+    checkIndex === -1 ||
+    configureIndex <= checkIndex ||
+    uploadIndex <= configureIndex ||
+    !isRecord(upload) ||
+    !hasOnlyEntries(upload.with, { path: "dist/site" }) ||
+    !isRecord(deploy) ||
+    deploy.needs !== "build" ||
+    deployIndex === -1
+  ) {
+    issues.push(
+      `Pages build/upload/deploy ordering is incorrect in ${filename}`,
+    );
+  }
 }
 
 function validateCiWorkflow(workflow, issues, filename) {
@@ -412,7 +542,13 @@ function walkWorkflow(value, valuePath, issues, filename) {
       valuePath[0] === "jobs" &&
       valuePath[1] === "publish" &&
       entry === "${{ github.token }}";
-    if (CREDENTIAL_NAME.test(key) && !publishToken) {
+    const pagesIdentityToken =
+      key === "id-token" &&
+      valuePath[0] === "jobs" &&
+      valuePath[1] === "deploy" &&
+      isPagesWorkflow(filename) &&
+      entry === "write";
+    if (CREDENTIAL_NAME.test(key) && !publishToken && !pagesIdentityToken) {
       issues.push(
         `publication credential in ${filename}:${nextPath.join(".")}`,
       );
@@ -424,8 +560,19 @@ function walkWorkflow(value, valuePath, issues, filename) {
           valuePath[1] === "publish" &&
           ((permission === "contents" && access === "read") ||
             (permission === "packages" && access === "write"));
+        const pagesPermission =
+          isPagesWorkflow(filename) &&
+          valuePath[0] === "jobs" &&
+          ((valuePath[1] === "build" &&
+            ((permission === "contents" && access === "read") ||
+              (permission === "pages" && access === "read"))) ||
+            (valuePath[1] === "deploy" &&
+              ((permission === "contents" && access === "read") ||
+                (permission === "pages" && access === "write") ||
+                (permission === "id-token" && access === "write"))));
         if (
           !publishPermission &&
+          !pagesPermission &&
           (permission !== "contents" || access !== "read")
         ) {
           issues.push(
@@ -455,7 +602,14 @@ function walkWorkflow(value, valuePath, issues, filename) {
     if (
       key === "uses" &&
       typeof entry === "string" &&
-      PUBLISH_ACTION.test(entry)
+      PUBLISH_ACTION.test(entry) &&
+      !(
+        isPagesWorkflow(filename) &&
+        [
+          "actions/upload-pages-artifact@v5",
+          "actions/deploy-pages@v5",
+        ].includes(entry)
+      )
     ) {
       issues.push(
         `publication/deployment action in ${filename}:${nextPath.join(".")}`,
@@ -489,4 +643,21 @@ function normalizePath(candidate) {
 
 function isRecord(value) {
   return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function hasOnlyEntries(value, expected) {
+  if (!isRecord(value)) return false;
+  const actualEntries = Object.entries(value);
+  const expectedEntries = Object.entries(expected);
+  return (
+    actualEntries.length === expectedEntries.length &&
+    expectedEntries.every(
+      ([key, expectedValue]) =>
+        JSON.stringify(value[key]) === JSON.stringify(expectedValue),
+    )
+  );
+}
+
+function isPagesWorkflow(filename) {
+  return filename === "pages.yml" || filename.endsWith("/pages.yml");
 }

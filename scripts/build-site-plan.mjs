@@ -1,3 +1,5 @@
+import process from "node:process";
+
 export const EXAMPLE_BUILDS = [
   {
     route: "explorer",
@@ -55,7 +57,36 @@ export const SITE_REQUIRED_FILES = [
   ),
 ];
 
-export function createSiteBuildSteps({ skipTypecheck }) {
+export function normalizeSiteBasePath(value = "/") {
+  if (!value.startsWith("/") || !value.endsWith("/")) {
+    throw new Error("Site base path must start and end with /.");
+  }
+  if (value.includes("//") || value.includes("..")) {
+    throw new Error("Site base path must be a normalized absolute path.");
+  }
+  return value;
+}
+
+export function readSiteBasePath(args, environment = process.env) {
+  const options = args.filter((argument) =>
+    argument.startsWith("--site-base="),
+  );
+  if (options.length > 1) {
+    throw new Error("--site-base may be supplied only once.");
+  }
+  return normalizeSiteBasePath(
+    options[0]?.slice("--site-base=".length) ??
+      environment.SITE_BASE_PATH ??
+      "/",
+  );
+}
+
+export function hasSameOriginSourceLink(html) {
+  return /href=["']\/(?:[^"']*\/)?src\//u.test(html);
+}
+
+export function createSiteBuildSteps({ skipTypecheck, siteBasePath = "/" }) {
+  const base = normalizeSiteBasePath(siteBasePath);
   const steps = [];
   if (!skipTypecheck) {
     for (const packageName of [
@@ -88,6 +119,7 @@ export function createSiteBuildSteps({ skipTypecheck }) {
             kind: "vite",
             packageName: example.packageName,
             route: example.route,
+            base: `${base}examples/${example.route}/`,
           },
     );
   }

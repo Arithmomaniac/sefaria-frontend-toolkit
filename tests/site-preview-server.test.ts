@@ -16,3 +16,16 @@ test("owns a distinct assigned port for each concurrent preview", async () => {
     await Promise.all([first.close(), second.close()]);
   }
 });
+
+test("serves a project-path build from its configured base", async () => {
+  const preview = await startSitePreview({
+    root,
+    siteBasePath: "/sefaria-frontend-toolkit/",
+  });
+  try {
+    expect(preview.siteUrl).toBe(`${preview.origin}/sefaria-frontend-toolkit/`);
+    await preview.waitUntilReady();
+  } finally {
+    await preview.close();
+  }
+});

@@ -52,7 +52,7 @@ Do not add a `tref`, client, URL, payload, or `fetch` property to an element. Wh
 
 The element renders its loading state inside Shadow DOM. No network request occurs. The host can listen for the composed selection event without reaching into the component's internal markup.
 
-<iframe class="example-frame" title="Authored request-free component states" src="/examples/explorer/authored.html?component=source-card&amp;scenario=one-item&amp;diagnostics=1"></iframe>
+<iframe class="example-frame" title="Authored request-free component states" src="../examples/explorer/authored.html?component=source-card&amp;scenario=one-item&amp;diagnostics=1"></iframe>
 
 ## Who owns what
 

@@ -44,7 +44,7 @@ describe("documentation learning journey", () => {
       "utf8",
     );
 
-    expect(index).toContain("Development preview");
+    expect(index).toContain("Published documentation");
     expect(config).toContain(
       '"https://github.com/Arithmomaniac/sefaria-frontend-toolkit"',
     );
@@ -52,7 +52,10 @@ describe("documentation learning journey", () => {
     expect(config).toContain(
       "pattern: `${repository}/edit/${branch}/docs/:path`",
     );
-    expect(config).not.toContain("github.io");
+    expect(config).toContain("base: siteBasePath");
+    expect(config).toContain(
+      '"https://arithmomaniac.github.io/sefaria-frontend-toolkit/"',
+    );
   });
 
   it("documents package builds before direct example development servers", async () => {

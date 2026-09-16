@@ -3,6 +3,8 @@ import { describe, expect, it } from "vitest";
 import {
   EXAMPLE_BUILDS,
   createSiteBuildSteps,
+  hasSameOriginSourceLink,
+  normalizeSiteBasePath,
   SITE_REQUIRED_FILES,
 } from "../scripts/build-site-plan.mjs";
 
@@ -63,5 +65,43 @@ describe("documentation site build plan", () => {
     expect(SITE_REQUIRED_FILES).toContain("examples/reader/controlled.html");
     expect(SITE_REQUIRED_FILES).toContain("examples/react/index.html");
     expect(SITE_REQUIRED_FILES).toContain("examples/mcp-app/index.html");
+  });
+
+  it("builds every browser example under the selected project path", () => {
+    expect(normalizeSiteBasePath()).toBe("/");
+    expect(normalizeSiteBasePath("/sefaria-frontend-toolkit/")).toBe(
+      "/sefaria-frontend-toolkit/",
+    );
+    expect(() => normalizeSiteBasePath("sefaria-frontend-toolkit")).toThrow(
+      "start and end with /",
+    );
+
+    expect(
+      createSiteBuildSteps({
+        skipTypecheck: true,
+        siteBasePath: "/sefaria-frontend-toolkit/",
+      }),
+    ).toContainEqual({
+      kind: "vite",
+      packageName: "@sefaria-example/react-vite",
+      route: "react",
+      base: "/sefaria-frontend-toolkit/examples/react/",
+    });
+  });
+
+  it("rejects same-origin source fallbacks at root and project bases", () => {
+    expect(hasSameOriginSourceLink('<a href="/src/app.ts">Source</a>')).toBe(
+      true,
+    );
+    expect(
+      hasSameOriginSourceLink(
+        '<a href="/sefaria-frontend-toolkit/examples/explorer/src/app.ts">Source</a>',
+      ),
+    ).toBe(true);
+    expect(
+      hasSameOriginSourceLink(
+        '<a href="https://github.com/example/repo/blob/main/src/app.ts">Source</a>',
+      ),
+    ).toBe(false);
   });
 });
