@@ -227,7 +227,6 @@ try {
       ["/examples/react/index.html", 4],
       ["/examples/linked-article/index.html", 5],
       ["/examples/mcp-app/live.html", 6],
-      ["/examples/mcp-app/fixture.html", 7],
     ];
     const previewLinks = page.getByRole("link", { name: "Open preview" });
     assertEqual(
@@ -492,18 +491,6 @@ try {
     await page.getByRole("button", { name: "Start live demo" }).waitFor();
     await assertText(page.locator("#status"), "has not started");
     assertEqual(textRequests.length, 0, "bare MCP route idle request count");
-
-    await page.goto(siteRouteUrl("/examples/mcp-app/fixture.html?fixture=1"), {
-      waitUntil: "networkidle",
-    });
-    await assertText(page.locator("body"), "Static fixture preview");
-    await tabTo(
-      page,
-      page.getByRole("button", { name: "Commentary (3)", exact: true }),
-      "static MCP preview Commentary action",
-      20,
-    );
-    await capture(page, "site-mcp-fixture.png");
 
     textRequests.length = 0;
     await page.goto(siteRouteUrl("/examples/mcp-app/live.html"), {

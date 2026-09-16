@@ -62,10 +62,6 @@ for (const step of createSiteBuildSteps({ skipTypecheck, siteBasePath })) {
       path.join(destination, "live.html"),
     );
     await copyFile(
-      path.join(root, "examples", "mcp-app", "dist", "app", "mcp-app.html"),
-      path.join(destination, "fixture.html"),
-    );
-    await copyFile(
       path.join(root, "examples", "mcp-app", "dist", "host", "mcp-app.html"),
       path.join(destination, "mcp-app.html"),
     );

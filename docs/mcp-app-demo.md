@@ -14,7 +14,7 @@ Open the <SiteLink to="/examples/mcp-app/live.html">live MCP App host</SiteLink>
 
 After activation, the trusted page creates a real MCP client and server, connects them with the pinned SDK's in-memory transport, reads the packaged App through `resources/read`, and renders it through AppBridge in an opaque-origin sandbox. The MCP server role makes the live Sefaria requests; the packaged App uses host-mediated MCP tools and cannot fetch Sefaria directly.
 
-This route proves the packaged resource, in-browser MCP exchange, AppBridge continuation, request ownership, and static sandbox topology. It does not prove stdio, Streamable HTTP, or compatibility with an external named host. Use the local command and VS Code walkthrough below for those separate paths. The <SiteLink to="/examples/mcp-app/fixture.html?fixture=1">fixture preview</SiteLink> remains available for deterministic visual inspection only.
+This route proves the packaged resource, in-browser MCP exchange, AppBridge continuation, request ownership, and static sandbox topology. It does not prove stdio, Streamable HTTP, or compatibility with an external named host. Use the local command and VS Code walkthrough below for those separate paths.
 
 ## Try the reader in VS Code
 

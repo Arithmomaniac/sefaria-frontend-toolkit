@@ -4,7 +4,7 @@
 
 ## Objective
 
-Apply the same request, validation, pure projection, and request-free rendering boundaries in an ordinary authored page and in an MCP App, while distinguishing the static live host, deterministic fixture preview, and Node transport proof.
+Apply the same request, validation, pure projection, and request-free rendering boundaries in an ordinary authored page and in an MCP App, while distinguishing the static live host from Node transport proof.
 
 ## Prerequisites
 
@@ -42,15 +42,11 @@ For the independent Node transport path, run:
 pnpm dev:mcp
 ```
 
-The separate preview below uses a committed fixture and deliberately has no MCP host:
-
-<iframe class="example-frame mcp" title="Static MCP App fixture preview" src="../examples/mcp-app/fixture.html?fixture=1"></iframe>
-
 ## Expected result
 
 The linked article still navigates as ordinary HTML when enhancement is unavailable. With JavaScript, explicit activation opens a popup with visible loading, error, cancellation, and cleanup behavior.
 
-The static live host waits for explicit activation, then renders live Sefaria data through real in-memory MCP tools and the packaged App. The fixture preview renders a supplied links payload and labels itself as rendering evidence only. `pnpm dev:mcp` separately proves compiled stdio and Streamable HTTP transports, registered resources, separate host/sandbox origins, AppBridge calls, cancellation, validation failures, and exact request deltas.
+The static live host waits for explicit activation, then renders live Sefaria data through real in-memory MCP tools and the packaged App. `pnpm dev:mcp` separately proves compiled stdio and Streamable HTTP transports, registered resources, separate host/sandbox origins, AppBridge calls, cancellation, validation failures, and exact request deltas.
 
 ## Who owns what
 
@@ -61,13 +57,12 @@ The static live host waits for explicit activation, then renders live Sefaria da
 | Static MCP continuation | App through the browser host's server-tool bridge | In-memory MCP tool result -> validation -> controller/factory -> request-free Reader |
 | MCP first render | Node server before the tool result reaches the App | Unknown `structuredContent` -> public schema -> pure factory/controller seed -> request-free Reader |
 | MCP continuation | App through the host's supported server-tool bridge | Host-proxied tool result -> validation -> controller/factory -> request-free Reader |
-| Static MCP preview | No request owner; committed fixture only | Fixture -> validation/projection -> request-free Reader |
 
-The App does not call Sefaria directly. The static live host qualifies the browser/in-memory topology, while the fixture preview is not protocol qualification and the browser path does not replace Node stdio, HTTP, or named-host qualification.
+The App does not call Sefaria directly. The static live host qualifies the browser/in-memory topology, while the browser path does not replace Node stdio, HTTP, or named-host qualification.
 
 ## Exercise
 
-Disable JavaScript and follow the authored Micah 6:8 link. Re-enable JavaScript, activate it with the keyboard, then close the popup and confirm focus restoration. For MCP, open the static live host and confirm that no live result appears before **Start live demo**. Start it, compare the result with the fixture preview, then use the local Node reference host to identify which actions cross each topology's tool boundary.
+Disable JavaScript and follow the authored Micah 6:8 link. Re-enable JavaScript, activate it with the keyboard, then close the popup and confirm focus restoration. For MCP, open the static live host and confirm that no live result appears before **Start live demo**. Start it, then use the local Node reference host to identify which actions cross each topology's tool boundary.
 
 ## Source and run links
 

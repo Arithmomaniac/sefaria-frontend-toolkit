@@ -65,7 +65,6 @@ describe("documentation site build plan", () => {
     expect(SITE_REQUIRED_FILES).toContain("examples/reader/controlled.html");
     expect(SITE_REQUIRED_FILES).toContain("examples/react/index.html");
     expect(SITE_REQUIRED_FILES).toContain("examples/mcp-app/index.html");
-    expect(SITE_REQUIRED_FILES).toContain("examples/mcp-app/fixture.html");
   });
 
   it("builds every browser example under the selected project path", () => {

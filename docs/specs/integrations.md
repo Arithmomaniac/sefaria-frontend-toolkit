@@ -20,11 +20,11 @@ Unknown JSON must pass a generated `@arithmomaniac/sefaria-client` validator bef
 
 The VitePress site presents the canonical Markdown learning path and embeds isolated production builds of the maintained browser examples. It does not import DOM-dependent toolkit registration into VitePress server rendering, render toolkit component HTML on the server, or hydrate toolkit elements.
 
-The site build includes the explorer, controlled and spatial Reader, vanilla consumer, React consumer, authored linked article, live browser-embedded MCP host, and static MCP App fixture preview. The live MCP host requires no external server, proxy service, account, or additional hosted origin. Each example keeps its own request ownership, cancellation, stale-result handling, element lifecycle, and tests. No example imports another example at runtime.
+The site build includes the explorer, controlled and spatial Reader, vanilla consumer, React consumer, authored linked article, and live browser-embedded MCP host. The live MCP host requires no external server, proxy service, account, or additional hosted origin. Each example keeps its own request ownership, cancellation, stale-result handling, element lifecycle, and tests. No example imports another example at runtime.
 
 Landing pages, authored-state previews, live demo routes, and reference deep links make no unsolicited Sefaria request. A live route prefills its bounded initial input and presents an explicit start action. Only click, keyboard activation, or an equally explicit example-preset or authored-citation activation starts live data. Live operations preserve network, abort, contract-validation, documented HTTP, projection, partial, and empty distinctions and do not substitute fixture success after a failure.
 
-The live MCP route is the static site's in-memory protocol and AppBridge acceptance path. The separate fixture route remains labeled fixture-driven rendering evidence and does not claim a tool call, transport, AppBridge, sandbox, request-count, or named-host proof. The compiled local Node reference host remains the Streamable HTTP acceptance path.
+The live MCP route is the static site's in-memory protocol and AppBridge acceptance path. The compiled local Node reference host remains the Streamable HTTP acceptance path.
 
 ### Static browser-embedded MCP host [Current]
 
@@ -305,7 +305,7 @@ A `ui://` resource is an MCP resource, not an HTTP route. MCP handles `resources
 
 The server rejects a successful payload with more than 400 text leaves before it enters `structuredContent`. This bounds synchronous source-card projection and rendering; callers must request a narrower reference. It also rejects a decoded links body larger than 5 MiB or a successful links array larger than 10,000 entries. Textual links summaries may cover at most 20 entries and 8,000 characters, but accepted `structuredContent` is never truncated.
 
-## Reference hosts and fixture preview
+## Reference hosts
 
 The static documentation-site host creates a real MCP client and registered server in the trusted page, connects them with `InMemoryTransport`, reads the packaged App through `resources/read`, and renders it through the official Apps bridge in an opaque-origin sandbox. It starts no MCP lifecycle or Sefaria request before **Start live demo**. Its initial accepted flow performs one text request and one App-mediated links request.
 
@@ -319,8 +319,6 @@ The deterministic browser acceptance transport rejects every unexpected request 
 - Back, retained breadcrumb activation, category changes, paging, and covered-preview changes remain local
 - malformed or partial metadata and payloads report structured paths before projection
 - cancellation, stale completion, and failed or denied tool calls cannot update a newer admitted result
-
-A separate static fixture preview is labeled as fixture-driven rendering only. It is useful for visual inspection but is not protocol, resource, AppBridge, sandbox, or request-count evidence.
 
 ## MCP host acceptance
 

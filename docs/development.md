@@ -105,7 +105,7 @@ pnpm build:site
 pnpm preview:site
 ```
 
-The generated `dist/site` directory contains the VitePress pages plus allowlisted example routes under `examples/`: explorer, Reader, vanilla, React, linked article, the live static MCP host, and the MCP App fixture preview. The live MCP host proves in-memory protocol, resource, AppBridge, and opaque-sandbox behavior without an external backend. The separate fixture preview remains rendering evidence only; `pnpm dev:mcp` proves the compiled Streamable HTTP topology.
+The generated `dist/site` directory contains the VitePress pages plus allowlisted example routes under `examples/`: explorer, Reader, vanilla, React, linked article, and the live static MCP host. The live MCP host proves in-memory protocol, resource, AppBridge, and opaque-sandbox behavior without an external backend; `pnpm dev:mcp` proves the compiled Streamable HTTP topology.
 
 `pnpm build:site` typechecks each included example before bundling it. `pnpm build:site:bundles` skips those repeated typechecks and is used inside `pnpm check` after workspace builds. Both commands verify required output files and reject a same-origin authored-source fallback. `SITE_BASE_PATH` selects the normalized absolute base used by VitePress, every example bundle, and browser acceptance; local commands default to `/`, while the Pages workflow requires `/sefaria-frontend-toolkit/`.
 
@@ -120,7 +120,7 @@ The separate Pages workflow runs the complete repository gate on Ubuntu with the
 | `packages/web-components` | Non-DOM component factories and request-free Lit elements |
 | `tests/compatibility` | Pinned compatibility evidence for retained pure behavior |
 | `examples/explorer` | Request-free authored states and opt-in live diagnostics for component primitives and contextual connections |
-| `examples/mcp-app` | Shared corrected-payload MCP registration, compiled stdio and Streamable HTTP servers, static in-browser MCP host, self-contained App, AppBridge sandbox hosts, static fixture preview, and isolated VS Code qualification tooling |
+| `examples/mcp-app` | Shared corrected-payload MCP registration, compiled stdio and Streamable HTTP servers, static in-browser MCP host, self-contained App, AppBridge sandbox hosts, and isolated VS Code qualification tooling |
 | `examples/linked-article` | Authored native citation navigation and page-owned popup integration |
 | `examples/reader` | Interactive multi-pane website host and controlled `<sefaria-reader>` host over the DOM-free reader session |
 | `examples/vanilla-vite` | Minimal supplied-data and explicit-live public-package consumption path |
@@ -416,14 +416,6 @@ On Windows, the Node commands use a narrow PowerShell native-process helper that
 `VSCODE_MCP_PROFILE_ROOT` overrides the default profile root. `VSCODE_USER_DATA_DIR`, `VSCODE_EXTENSIONS_DIR`, `VSCODE_EXECUTABLE_PATH`, `VSCODE_MCP_SCREENSHOT`, and `VSCODE_MCP_RESULT` override their individual paths. Failed walkthrough diagnostics remain under `.artifacts/vscode-mcp` and do not replace maintained screenshots or the maintained result.
 
 The dedicated user-data, shared-data, Copilot home, and process-home directories are intentionally separate from the standard VS Code and Agent Host profiles. This guarantees a distinct Electron process, makes the CDP port reliable even while normal VS Code windows are open, excludes standard-profile MCP servers and shared application state, and avoids copying authentication or secret-storage files. A normal named profile can share standard-profile authentication, but it does not provide the same process or Agent Host configuration isolation.
-
-Preview a clearly labeled static fixture without an MCP host:
-
-```powershell
-pnpm --filter @sefaria-example/mcp-app preview:fixture
-```
-
-This preview proves fixture-driven rendering only. It is not protocol, resource, AppBridge, sandbox, or request-count evidence.
 
 ## Run the authored linked article
 
