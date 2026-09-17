@@ -11,10 +11,12 @@ export function createMicahFixtureFetch(
     const request = new Request(input, init);
     const url = new URL(request.url);
     const query = [...url.searchParams.entries()];
+    const path = decodeURIComponent(url.pathname);
     if (
       request.method !== "GET" ||
       url.origin !== "https://example.invalid" ||
-      decodeURIComponent(url.pathname) !== "/api/v3/texts/Micah 6:8" ||
+      (path !== "/api/v3/texts/Micah 6:8" &&
+        path !== "/api/v3/texts/micah 6:8") ||
       JSON.stringify(query) !== JSON.stringify(expectedQuery)
     ) {
       throw new Error(

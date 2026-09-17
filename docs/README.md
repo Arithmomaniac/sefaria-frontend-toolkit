@@ -31,7 +31,7 @@ The toolkit supplies the controller for Reader navigation. Your application crea
 5. [Change presentation or use APIs without UI components](learn/05-customization.md). Change the theme, width, text sides, layout, client, factories, and text tools.
 6. [Add an article or MCP host](learn/06-host-integration.md). Add citation links, supplied server data, host tools, or the static MCP host.
 
-React users can continue from steps 2 and 3 to [Use the Web Components from React](learn/react.md). Web Components are standard browser elements. React can use them without a toolkit wrapper package.
+React users can branch from steps 2 and 3 into [Use the Web Components from React](learn/react.md). Alpine users can follow the same controller and property flow in [Use the Web Components from Alpine](learn/alpine.md). Web Components are browser-standard custom elements, so neither framework needs a toolkit-specific wrapper package.
 
 ## Understand the design
 

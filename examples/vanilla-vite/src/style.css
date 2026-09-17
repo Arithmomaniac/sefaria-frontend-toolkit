@@ -12,7 +12,7 @@ body {
 main {
   display: grid;
   gap: 1rem;
-  width: min(52rem, calc(100% - 2rem));
+  width: min(64rem, calc(100% - 2rem));
   margin: 2rem auto;
 }
 
@@ -21,7 +21,21 @@ p {
   margin: 0;
 }
 
-button {
+form,
+.display-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+label {
+  display: grid;
+  gap: 0.3rem;
+}
+
+button,
+input,
+select {
   width: fit-content;
   min-height: 2.5rem;
   border: 1px solid currentColor;
@@ -56,4 +70,12 @@ button:disabled {
 :root[data-embedded-preview] #status {
   color: light-dark(#4f4a42, #d8d2c8);
   font-size: 0.9rem;
+}
+
+sefaria-source-card {
+  display: block;
+}
+
+#failure {
+  color: light-dark(#86171d, #ffbbb6);
 }

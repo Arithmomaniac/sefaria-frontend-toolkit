@@ -115,6 +115,8 @@ Review the initial corrections for:
 - [ ] Duplicate binding rejects; unbinding is idempotent and does not dispose the controller.
 - [ ] Deferred defaults honor `preventDefault()` after dispatch and verify that the same binding plus originating committed result or Reader entry remain current.
 - [ ] Reader remains specialized and its presentation snapshot remains separate from its rendering view model.
+- [ ] Optional Reader toolbar content is additive, absent from the no-view-model initial loading state, and uses current public host state rather than private DOM inspection.
+- [ ] Reader parts expose only `toolbar`, `history`, `source-pane`, and `connections-pane`; generated metadata matches template evidence in both directions and forwards no undeclared child part.
 
 ### Text segment
 
@@ -297,6 +299,10 @@ Review the initial corrections for:
 - [ ] The child policy denies connect, nested frame, worker, object, media, manifest, form, and base capabilities.
 - [ ] The current frame window plus cryptographic channel and run identifiers are required for bounded diagnostics.
 - [ ] Exact source, total, diagnostic, message, and active-preview limits have at-limit and over-limit tests.
+- [ ] Declared local assets have separate raw UTF-8 per-file and per-project limits with at-limit, over-limit, and non-ASCII tests.
+- [ ] The catalog contains exactly the maintained project IDs, and an unknown nonempty ID executes no fallback project.
+- [ ] Every project visibly responds to edits in HTML, CSS, and JavaScript, Reset restores maintained behavior, and one supported interaction is exercised.
+- [ ] Supplied Reader coverage resolves only declared requests and reports uncovered navigation without fabricated empty content or network access.
 - [ ] Pure subpath import, root registration, shared client identity, both deployment bases, ordinary-page embedding, and Chromium/Firefox/WebKit behavior are qualified without `bypassCSP`.
 - [ ] The review does not claim CPU, heap, process isolation, every Safari device, or tight-loop recovery.
 

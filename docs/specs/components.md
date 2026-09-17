@@ -100,6 +100,10 @@ The history trail uses real buttons for retained ancestors, while the current he
 
 An explicit chat-export control appears only when the host enables it and the model contains an exact selected target. Activating it emits an action; the element has no chat SDK dependency and does not claim delivery.
 
+The Reader exposes one optional `toolbar-actions` slot after its built-in compact-pane and chat-export controls. The slot is present only when a Reader view model is committed; the full initial loading state has no toolbar. A host contribution is additive and cannot replace the Reader's history, heading, loading status, pane controls, source, connections, errors, or attribution. The host reads any action target from its current controller snapshot or the current rendering model when the action is activated; slot content carries no request, reference, payload, or private Reader context. The built-in `chatExport` property and `sefaria-reader-chat-export` event remain the supported chat affordance, while the slot is for host-owned actions the toolkit does not model.
+
+The Reader exposes four coarse CSS parts: `toolbar` on the action row, `history` on the Back and retained-history row, `source-pane` on the source section, and `connections-pane` on the connections section. It does not forward child parts. Shared `--sefaria-*` custom properties remain the preferred theming surface for typography, color, radius, and scale. A host that changes layout or visibility through a CSS part owns the resulting responsive and accessibility behavior.
+
 ## Reader controller [Current]
 
 `@arithmomaniac/sefaria-web-components/reader-controller` is the stateful DOM-free convenience layer for consumers that want to provide an initial reader position and let the supported reader abstraction coordinate subsequent navigation. It privately owns one immutable `ReaderSession`, request cancellation, stale-result suppression, source and connections operation execution, retained captures, local connections reprojection, and subscriber notification. It exposes immutable controller snapshots rather than the mutable session API. It does not own spatial multi-pane placement, durable persistence, retries, request coalescing, fallback transport, or chat delivery.
@@ -596,6 +600,8 @@ A planned endpoint-backed component is complete when:
 - each named missing-content case has a partial or empty result
 - composite request-count tests pass
 - the element accepts no request input and makes no request
+- optional Reader toolbar content is additive, uses current public host state, and disappears with the toolbar in the no-view-model initial loading state
+- Reader CSS parts expose only the documented coarse regions, and no child parts are forwarded
 - text is safe before it reaches the element
 - direction and any component-owned attribution come from the view model
 - applicable keyboard and browser checks pass

@@ -21,6 +21,7 @@ Every maintained Markdown entry point has a primary audience and a navigation ow
 | `docs/learn/05-customization.md` | Developer changing presentation or choosing non-DOM entry points | Get started |
 | `docs/learn/06-host-integration.md` | Integration developer using authored links or MCP | Get started |
 | `docs/learn/react.md` | React developer assigning properties and handling events safely | Get started |
+| `docs/learn/alpine.md` | Alpine developer connecting controller state and custom-element properties without a toolkit wrapper | Get started |
 
 ## Guides and reference
 
@@ -48,6 +49,7 @@ Every maintained Markdown entry point has a primary audience and a navigation ow
 | `examples/explorer/README.md` | Developer working with authored states or live component diagnostics | Examples |
 | `examples/vanilla-vite/README.md` | Vanilla Vite consumer following the smallest supplied-data path | Examples |
 | `examples/react-vite/README.md` | React consumer integrating custom elements without wrappers | Examples |
+| `examples/alpine-vite/README.md` | Alpine consumer integrating the same controller and custom-element contract without wrappers | Examples |
 | `examples/reader/README.md` | Host developer comparing controlled and spatial Reader examples | Examples |
 | `examples/linked-article/README.md` | Site author progressively enhancing native citation links | Examples |
 

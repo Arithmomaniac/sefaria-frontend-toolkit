@@ -36,7 +36,15 @@ interface ConnectionSelectDetail {
   readonly targetRef: string;
 }
 
-/** Request-free controlled reader surface for one semantic reader entry. */
+/**
+ * Request-free controlled reader surface for one semantic reader entry.
+ *
+ * @slot toolbar-actions - Host-owned actions placed after the Reader's built-in toolbar controls.
+ * @csspart toolbar - Container for compact pane and host action controls.
+ * @csspart history - Back and retained-history controls.
+ * @csspart source-pane - Scrollable source-text pane.
+ * @csspart connections-pane - Scrollable connections pane.
+ */
 export class SefariaReader extends SefariaElement {
   /** Lit property metadata for host-supplied rendering and interaction state. */
   static override properties = {
@@ -407,7 +415,7 @@ export class SefariaReader extends SefariaElement {
     );
     return html`
       <header class="reader-header">
-        <div class="history-row">
+        <div class="history-row" part="history">
           <button
             class="back"
             data-action="back"
@@ -452,7 +460,7 @@ export class SefariaReader extends SefariaElement {
         >
           ${this.rootLoading ? "Opening a new Reader location..." : nothing}
         </p>
-        <div class="actions">
+        <div class="actions" part="toolbar">
           <div class="pane-switch" role="group" aria-label="Reader panes">
             <button
               type="button"
@@ -482,11 +490,13 @@ export class SefariaReader extends SefariaElement {
                 </button>`
               : nothing
           }
+          <slot name="toolbar-actions"></slot>
         </div>
       </header>
       <div class="panes" aria-busy=${String(this.rootLoading)}>
         <section
           class="pane"
+          part="source-pane"
           data-pane="source"
           data-active=${activePane === "source"}
           aria-label="Source text"
@@ -495,6 +505,7 @@ export class SefariaReader extends SefariaElement {
         </section>
         <section
           class="pane"
+          part="connections-pane"
           data-pane="connections"
           data-active=${activePane === "connections"}
           aria-label="Connections"

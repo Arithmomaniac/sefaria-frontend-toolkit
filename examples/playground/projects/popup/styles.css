@@ -1,0 +1,27 @@
+:root {
+  color: #231b17;
+  background: #f7f1e7;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+body {
+  min-height: 28rem;
+  margin: 0;
+  padding: 1.5rem;
+}
+.example {
+  max-width: 42rem;
+  margin: 0 auto;
+}
+.kicker {
+  color: #855c21;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+button {
+  padding: 0.35rem 0.55rem;
+  color: #6f3d08;
+  font-weight: 800;
+}
+sefaria-popup {
+  --sefaria-accent: #855c21;
+}

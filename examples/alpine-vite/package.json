@@ -1,0 +1,17 @@
+{
+  "name": "@sefaria-example/alpine-vite",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@arithmomaniac/sefaria-client": "workspace:*",
+    "@arithmomaniac/sefaria-web-components": "workspace:*",
+    "alpinejs": "3.17.2"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && vite build",
+    "dev": "vite",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}

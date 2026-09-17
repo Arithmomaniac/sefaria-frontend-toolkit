@@ -1,10 +1,10 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by avilevin.
 
 # Sefaria Frontend Toolkit
 
 [Sefaria](https://www.sefaria.org/) is a free digital library of Jewish texts and translations. This frontend toolkit helps developers build reading and learning experiences with that data without rebuilding bilingual text, footnotes, attribution, connection navigation, and accessible Reader behavior from scratch.
 
-Start with the complete Reader, add one of seven focused browser-standard components from vanilla JavaScript or React, or use the validated client, factories, and text transforms without rendering components.
+Start with the complete Reader, add one of seven focused browser-standard components from vanilla JavaScript, React, or Alpine, or use the validated client, factories, and text transforms without rendering components. The current components focus on reading surfaces, but the project boundary is a reusable frontend/UI toolkit rather than a replacement for Sefaria's website.
 
 > **Experimental.** This public source repository is a development project with no support or stability guarantee. It is not an official Sefaria product. Its synchronized prereleases are private GitHub Packages for authenticated use; there is no public registry, CDN, or stable release.
 
@@ -40,6 +40,7 @@ That example validates a supplied `Micah 6:8` payload, projects it through the p
 | Explore components and states | [Example catalog](examples/README.md) |
 | Customize display or build a host | [Customization and headless APIs](docs/learn/05-customization.md) |
 | Use React | [React integration path](docs/learn/react.md) and [`examples/react-vite`](examples/react-vite/README.md) |
+| Use Alpine | [Alpine integration path](docs/learn/alpine.md) and [`examples/alpine-vite`](examples/alpine-vite/README.md) |
 | Enhance an authored article | [Linked article guide](docs/linked-article.md) |
 | Integrate through MCP | [MCP App guide](docs/mcp-app-demo.md) |
 | Contribute or run all checks | [Development](docs/development.md) |

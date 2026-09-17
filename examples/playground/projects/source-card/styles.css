@@ -19,6 +19,15 @@ body {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+label {
+  display: inline-grid;
+  gap: 0.3rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+select {
+  padding: 0.45rem;
+}
 sefaria-source-card {
   --sefaria-accent: #855c21;
   --sefaria-surface: #fffdf8;

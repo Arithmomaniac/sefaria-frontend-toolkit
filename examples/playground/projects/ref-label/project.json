@@ -1,0 +1,19 @@
+{
+  "id": "ref-label",
+  "title": "Reference label",
+  "summary": "Validate a reference response and switch between a canonical link and the endpoint's unresolved state.",
+  "coverage": "Captured Micah 6:8 resolved response plus the corrected unresolved response; zero requests.",
+  "files": {
+    "html": "index.html",
+    "css": "styles.css",
+    "javascript": "main.js"
+  },
+  "assets": [
+    {
+      "specifier": "./reference.js",
+      "path": "../shared/micah-6-8-ref.js"
+    }
+  ],
+  "sourceBaseUrl": "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/projects/ref-label/",
+  "liveDemoUrl": "../explorer/ref-label.html"
+}

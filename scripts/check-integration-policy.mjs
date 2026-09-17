@@ -36,11 +36,13 @@ const journeyFiles = [
   "docs/learn/02-supplied-data.md",
   "docs/learn/03-live-data.md",
   "docs/learn/react.md",
+  "docs/learn/alpine.md",
   "docs/learn/04-reader.md",
   "docs/learn/05-customization.md",
   "docs/learn/06-host-integration.md",
   "examples/README.md",
   "examples/react-vite/README.md",
+  "examples/alpine-vite/README.md",
 ];
 
 const issues = [

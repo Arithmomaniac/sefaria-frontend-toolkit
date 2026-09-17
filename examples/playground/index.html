@@ -18,12 +18,17 @@
           Edit maintained HTML, CSS, and JavaScript. Drafts run only when you
           choose <strong>Run</strong>.
         </p>
+        <label class="project-picker">
+          Maintained project
+          <select id="project-select">
+            <option value="">Choose a project</option>
+          </select>
+        </label>
+        <p id="project-error" class="project-error" role="alert" hidden></p>
         <nav aria-label="Trusted project resources">
           <a href="../../learn/02-supplied-data.html">Package setup</a>
           <a id="source-link" href="#">View active source</a>
-          <a href="../explorer/source-card.html"
-            >Open the maintained live demo</a
-          >
+          <a id="live-link" href="#">Open the separate live demo</a>
         </nav>
       </header>
       <section class="workspace" aria-label="Editable supplied-data project">
@@ -31,9 +36,13 @@
           <div class="heading">
             <div>
               <p class="eyebrow">Project</p>
-              <h2>SourceCard · Micah 6:8</h2>
+              <h2 id="project-title">Loading project</h2>
             </div>
             <p id="draft-status" role="status">Maintained source loaded.</p>
+          </div>
+          <div class="project-description">
+            <p id="project-summary"></p>
+            <p id="project-coverage"></p>
           </div>
           <div class="tabs" role="tablist" aria-label="Project files">
             <button

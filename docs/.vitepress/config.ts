@@ -49,6 +49,10 @@ const learningPagers = {
     prev: lessonLink("3. Load and interact", "/learn/03-live-data.md"),
     next: lessonLink("4. Use the Reader", "/learn/04-reader.md"),
   },
+  "learn/alpine.md": {
+    prev: lessonLink("3. Load and interact", "/learn/03-live-data.md"),
+    next: lessonLink("4. Use the Reader", "/learn/04-reader.md"),
+  },
 } as const;
 
 export default defineConfig({
@@ -124,7 +128,10 @@ export default defineConfig({
         },
         {
           text: "Frameworks",
-          items: [{ text: "React path", link: "/learn/react.md" }],
+          items: [
+            { text: "React path", link: "/learn/react.md" },
+            { text: "Alpine path", link: "/learn/alpine.md" },
+          ],
         },
       ],
       "/guides/": [

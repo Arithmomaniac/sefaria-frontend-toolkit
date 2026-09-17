@@ -20,9 +20,13 @@ Request-free custom element that renders one bilingual-segment view model.
 
 None.
 
-### Slots and CSS parts
+### Slots
 
-No public slots or CSS parts.
+None.
+
+### CSS parts
+
+None.
 
 ## `<sefaria-connections-panel>`
 
@@ -45,9 +49,13 @@ Request-free category summaries and bounded connected-text details.
 | `sefaria-connections-page-change` | Requests a different page of captured connections. |
 | `sefaria-connection-select` | Reports selection of one connected reference. |
 
-### Slots and CSS parts
+### Slots
 
-No public slots or CSS parts.
+None.
+
+### CSS parts
+
+None.
 
 ## `<sefaria-popup>`
 
@@ -68,9 +76,13 @@ Request-free anchored dialog that renders one popup view model.
 | --------------------- | ------------------------------------ |
 | `sefaria-popup-close` | Reports that the popup should close. |
 
-### Slots and CSS parts
+### Slots
 
-No public slots or CSS parts.
+None.
+
+### CSS parts
+
+None.
 
 ## `<sefaria-reader>`
 
@@ -104,9 +116,20 @@ Request-free controlled reader surface for one semantic reader entry.
 | `sefaria-reader-connection-select` | Reports selection of one connected reference. |
 | `sefaria-reader-connections-preview-request` | Requests connection previews from the host. |
 
-### Slots and CSS parts
+### Slots
 
-No public slots or CSS parts.
+| Slot | Description |
+| --- | --- |
+| `toolbar-actions` | Host-owned actions placed after the Reader's built-in toolbar controls. |
+
+### CSS parts
+
+| Part               | Description                                          |
+| ------------------ | ---------------------------------------------------- |
+| `toolbar`          | Container for compact pane and host action controls. |
+| `history`          | Back and retained-history controls.                  |
+| `source-pane`      | Scrollable source-text pane.                         |
+| `connections-pane` | Scrollable connections pane.                         |
 
 ## `<sefaria-ref-label>`
 
@@ -124,9 +147,13 @@ Request-free custom element that renders one reference-label view model.
 
 None.
 
-### Slots and CSS parts
+### Slots
 
-No public slots or CSS parts.
+None.
+
+### CSS parts
+
+None.
 
 ## `<sefaria-source-card>`
 
@@ -153,9 +180,13 @@ Request-free custom element that renders one source-card view model.
 | ----------------------- | ------------------------------------------ |
 | `sefaria-source-select` | Reports selection of one source-card item. |
 
-### Slots and CSS parts
+### Slots
 
-No public slots or CSS parts.
+None.
+
+### CSS parts
+
+None.
 
 ## `<sefaria-text-segment>`
 
@@ -172,9 +203,13 @@ Request-free custom element that renders one text-segment view model.
 
 None.
 
-### Slots and CSS parts
+### Slots
 
-No public slots or CSS parts.
+None.
+
+### CSS parts
+
+None.
 
 ## Shared CSS custom properties
 

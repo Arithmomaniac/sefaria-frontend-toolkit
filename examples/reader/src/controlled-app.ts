@@ -27,6 +27,7 @@ export function startControlledReader(
   const form = requireElement<HTMLFormElement>(root, "#reader-form");
   const tref = requireInput(form, "tref");
   const status = requireElement<HTMLElement>(root, "#status");
+  const bookmarkStatus = requireElement<HTMLElement>(root, "#bookmark-status");
   const hostError = requireElement<HTMLElement>(root, "#host-error");
   const vocalizationMode = requireElement<HTMLSelectElement>(
     root,
@@ -34,6 +35,13 @@ export function startControlledReader(
   );
   const workspace = requireElement<HTMLElement>(root, "#workspace");
   const reader = document.createElement("sefaria-reader") as SefariaReader;
+  const bookmarkAction = document.createElement("button");
+  bookmarkAction.type = "button";
+  bookmarkAction.slot = "toolbar-actions";
+  bookmarkAction.className = "reader-bookmark";
+  bookmarkAction.disabled = true;
+  bookmarkAction.textContent = "Bookmark selected text";
+  reader.append(bookmarkAction);
   workspace.dataset.surface = "reader";
   workspace.replaceChildren(reader);
 
@@ -55,6 +63,15 @@ export function startControlledReader(
   };
 
   const renderStatus = (snapshot: ReaderControllerSnapshot): void => {
+    const bookmarkTarget = snapshot.reader.selectedTarget?.ref;
+    bookmarkAction.disabled =
+      snapshot.task.state === "loading-source" ||
+      snapshot.task.state === "loading-connections" ||
+      bookmarkTarget === undefined;
+    bookmarkAction.textContent =
+      bookmarkTarget === undefined
+        ? "Bookmark selected text"
+        : `Bookmark ${bookmarkTarget}`;
     switch (snapshot.task.state) {
       case "idle":
         status.textContent = `Showing ${snapshot.reader.label}.`;
@@ -164,6 +181,20 @@ export function startControlledReader(
     });
   };
   vocalizationMode.addEventListener("change", onVocalizationChange);
+  const onBookmark = (): void => {
+    const snapshot = controller?.snapshot;
+    if (
+      snapshot === undefined ||
+      snapshot.task.state === "loading-source" ||
+      snapshot.task.state === "loading-connections"
+    ) {
+      return;
+    }
+    const targetRef = snapshot.reader.selectedTarget?.ref;
+    if (targetRef === undefined) return;
+    bookmarkStatus.textContent = `Bookmarked ${targetRef} in this page.`;
+  };
+  bookmarkAction.addEventListener("click", onBookmark);
 
   return {
     navigate,
@@ -173,6 +204,7 @@ export function startControlledReader(
       releaseController();
       form.removeEventListener("submit", onSubmit);
       vocalizationMode.removeEventListener("change", onVocalizationChange);
+      bookmarkAction.removeEventListener("click", onBookmark);
       workspace.replaceChildren();
     },
   };

@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by avilevin.
 
 # Examples
 
@@ -18,6 +18,22 @@ The [authored component workbench](explorer/authored.html) renders prepared view
 | Reader | `@arithmomaniac/sefaria-web-components/reader` | paired, source-only, connections-only, loading, unavailable, truncated history | [Truncated history](explorer/authored.html?component=reader&scenario=truncated-history&width=720) |
 
 Runnable scenario definitions live in [`explorer/src/authored`](explorer/src/authored/). Selecting an authored scenario never starts a live operation.
+
+## Editable supplied-data projects
+
+The [component playground](playground/index.html?project=source-card) uses one reusable HTML/CSS/plain-JavaScript editor for seven maintained projects. Each project renders useful output beside the editable files, validates bounded local payloads through public client schemas, uses public component factories, controllers, and bindings, and makes zero Sefaria requests.
+
+| Project ID | Demonstrated local behavior |
+| --- | --- |
+| `ref-label` | Switch between a validated resolved reference and an unresolved state. |
+| `text-segment` | Select the exact Hebrew or English edition from the supplied response. |
+| `bilingual-segment` | Change side order while retaining payload-owned language roles and directions. |
+| `source-card` | Select a source row and change vocalization without requesting replacement data. |
+| `popup` | Open an anchored popup, close it with Escape, and restore trigger focus. |
+| `connections-panel` | Change captured category, page, and preview visibility with zero I/O. |
+| `reader` | Change local presentation over exact Micah 6:8 source and links coverage and show an explicit limitation for uncovered navigation. |
+
+Stable built routes use `playground/index.html?project=<id>`. Source and optional request-bearing live-demo links remain trusted controls outside the edited preview.
 
 ## Live data and interaction
 
@@ -39,7 +55,7 @@ Open the [controlled Reader](reader/controlled.html?tref=Micah%206%3A8) when the
 
 Open the [spatial Reader workspace](reader/index.html?tref=Micah%206%3A8) to see a website host assume additional responsibility for pane placement, activation, pruning, request cancellation, and session pins while reusing the same public factories and Reader semantics. The route waits for **Start live demo** before loading its prefilled reference. It is intentionally distinct from the controlled Reader rather than a competing supported API.
 
-The [React Vite example](react-vite/README.md) demonstrates custom host integration with a typed ref, object property assignment, a persistent element, explicit loading, stale suppression, StrictMode cleanup, theme/width controls, and a real `sefaria-source-select` event updating React state.
+The [React Vite example](react-vite/README.md) demonstrates React 19 custom-element properties, an effect-owned controller lifecycle, canonical committed and selected references, reversible vocalization, StrictMode cleanup, and a real `sefaria-source-select` event. The [Alpine Vite example](alpine-vite/README.md) demonstrates the same SourceCard journey with a closure-owned controller outside Alpine's proxy, element-local property effects, declarative event handling, and destroy cleanup.
 
 ## Article and MCP host integration
 
