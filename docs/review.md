@@ -185,6 +185,18 @@ Review the initial corrections for:
 - [ ] Category/page/preview-display changes over a captured response make zero requests.
 - [ ] Connection, category, page, and preview-request events are composed and keyboard reachable.
 
+### Reader session and controller
+
+- [ ] External root replacement keeps old committed source, selection, history, and presentation until qualified source admission succeeds.
+- [ ] Source, context, addressability, request-mismatch, pin, and budget failures do not partially replace or evict the old root.
+- [ ] A successful replacement creates one fresh entry, removes all old breadcrumbs, resets the truncated-history boundary, and never reuses entry, operation, or pin identities.
+- [ ] Any actual pinned entry rejects replacement until the owning host releases its real pin.
+- [ ] Source admission publishes before connections start; links failure preserves the new source with an explicit failed slot.
+- [ ] Requested, server-qualified, contextual, and committed selected references remain distinct, and no alias uses arbitrary string parsing or a first-row fallback.
+- [ ] An invalid replacement is rejected before superseding valid work; a newer valid action aborts older physical work and rejects ignored-abort completion.
+- [ ] Fresh-root presentation uses existing defaults unless explicitly supplied, while connection-follow navigation retains normal history behavior.
+- [ ] Browser and MCP data sources use the same controller action without direct element requests or a wire-format change.
+
 ## Composite request counts
 
 - [ ] The composite async factory owns the outer request.

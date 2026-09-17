@@ -585,6 +585,7 @@
             "ReaderControllerLoadOptions",
             "ReaderControllerPageSelection",
             "ReaderControllerPresentationAction",
+            "ReaderControllerRootOptions",
             "ReaderControllerSnapshot",
             "ReaderControllerSourceSelection",
             "ReaderControllerTask",

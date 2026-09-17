@@ -339,7 +339,7 @@ pnpm dev:reader
 
 The command serves two linked interactive pages. The root page is a realistic regular-website consumer rather than a component state gallery: its host uses one DOM-free reader session for semantic entries and capture retention, while demo-private state owns ordered pane IDs, parent relationships, compact selection, and the 20-visible-pane limit. Wide containers scroll horizontally across independently scrolling source and connections panes; compact containers show one selected pane and a path switch.
 
-`/controlled.html` demonstrates the public stateful convenience path. The host calls `loadReaderController` with the starting reference and client, then binds the returned controller to one persistent `<sefaria-reader>` with `bindReaderController`. The controller owns continuing requests, cancellation, session transitions, captures, Back, breadcrumbs, and local connections projection while the element remains request-free.
+`/controlled.html` demonstrates the public stateful convenience path. The host calls `loadReaderController` with the starting reference and client, then binds the returned controller to one persistent `<sefaria-reader>` with `bindReaderController`. Later form submissions call `replaceRoot` on that controller, retaining the old committed source until the replacement qualifies and resetting breadcrumbs only after atomic admission. The controller owns continuing requests, cancellation, session transitions, captures, Back, breadcrumbs, external root replacement, and local connections projection while the element remains request-free.
 
 ## Run the MCP App server
 

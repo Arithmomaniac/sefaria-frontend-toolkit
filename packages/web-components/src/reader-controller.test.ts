@@ -363,6 +363,300 @@ describe("reader controller state and operations", () => {
     expect(dataSource.loadConnections).not.toHaveBeenCalled();
   });
 
+  it("replaces the external root transactionally and publishes source before connections", async () => {
+    const loadSource = vi.fn(async (request: SourceCardRequest) =>
+      createReaderSourceContent(sectionSourcePayload(request.tref), request),
+    );
+    const loadConnections = vi.fn(async (request, projection) =>
+      createReaderConnectionsContent(
+        readerLinks(request.tref),
+        request,
+        projection,
+      ),
+    );
+    const controller = createReaderController(
+      {
+        source: sourceContent("Micah 6"),
+        selectedPosition: [7],
+        presentation: { vocalizationMode: "none" },
+      },
+      { loadSource, loadConnections },
+    );
+    const publications: {
+      readonly task: string;
+      readonly entryId: string;
+      readonly breadcrumbs: number;
+      readonly vocalizationMode: string;
+      readonly connections: string;
+    }[] = [];
+    controller.subscribe((snapshot) => {
+      publications.push({
+        task: snapshot.task.state,
+        entryId: snapshot.reader.currentEntryId,
+        breadcrumbs: snapshot.reader.breadcrumbs.length,
+        vocalizationMode: snapshot.presentation.vocalizationMode,
+        connections: snapshot.reader.connections?.state ?? "none",
+      });
+    });
+
+    await controller.replaceRoot(
+      {
+        tref: "Rashi on Micah 6",
+        primary: {
+          versionTitle: "Explicit source-backed compatibility composition",
+        },
+      },
+      {
+        presentation: { vocalizationMode: "nikkud" },
+        connections: {
+          withText: false,
+          projection: { category: "Commentary" },
+        },
+      },
+    );
+
+    expect(controller.snapshot.reader.currentEntryId).toBe("entry-2");
+    expect(controller.snapshot.reader.breadcrumbs).toHaveLength(1);
+    expect(controller.snapshot.reader.selectedTarget?.ref).toBe(
+      "Rashi on Micah 6:1",
+    );
+    expect(controller.snapshot.presentation.vocalizationMode).toBe("nikkud");
+    expect(loadSource).toHaveBeenCalledWith(
+      {
+        tref: "Rashi on Micah 6",
+        primary: {
+          versionTitle: "Explicit source-backed compatibility composition",
+        },
+      },
+      expect.any(AbortSignal),
+    );
+    expect(loadConnections).toHaveBeenCalledWith(
+      { tref: "Rashi on Micah 6:1", withText: false },
+      { category: "Commentary" },
+      expect.any(AbortSignal),
+    );
+    expect(publications).toEqual([
+      {
+        task: "idle",
+        entryId: "entry-1",
+        breadcrumbs: 1,
+        vocalizationMode: "none",
+        connections: "none",
+      },
+      {
+        task: "loading-source",
+        entryId: "entry-1",
+        breadcrumbs: 1,
+        vocalizationMode: "none",
+        connections: "none",
+      },
+      {
+        task: "idle",
+        entryId: "entry-2",
+        breadcrumbs: 1,
+        vocalizationMode: "nikkud",
+        connections: "none",
+      },
+      {
+        task: "loading-connections",
+        entryId: "entry-2",
+        breadcrumbs: 1,
+        vocalizationMode: "nikkud",
+        connections: "component",
+      },
+      {
+        task: "idle",
+        entryId: "entry-2",
+        breadcrumbs: 1,
+        vocalizationMode: "nikkud",
+        connections: "component",
+      },
+    ]);
+  });
+
+  it("preserves the old root on source or budget failure and the new root on links failure", async () => {
+    const root = sourceContent("Micah 6");
+    const sourceFailure = createReaderController(
+      {
+        source: root,
+        selectedPosition: [7],
+        presentation: { vocalizationMode: "none" },
+      },
+      {
+        loadSource: vi
+          .fn()
+          .mockResolvedValueOnce(
+            createReaderSourceContent(micahTarget, { tref: "micah 6:8" }),
+          )
+          .mockRejectedValueOnce(new TypeError("Context unavailable.")),
+        loadConnections: vi.fn(),
+      },
+    );
+    await sourceFailure.replaceRoot({ tref: "micah 6:8" });
+    expect(sourceFailure.snapshot).toMatchObject({
+      reader: {
+        currentEntryId: "entry-1",
+        selectedTarget: { ref: "Micah 6:8" },
+      },
+      presentation: { vocalizationMode: "none" },
+      task: {
+        state: "error",
+        code: "source-transport",
+        message: "Context unavailable.",
+      },
+    });
+
+    const budgetFailure = createReaderController(
+      { source: root, selectedPosition: [7] },
+      {
+        loadSource: async (request) => sourceContent(request.tref, 10_000),
+        loadConnections: vi.fn(),
+      },
+      { maxCaptureBytes: root.capture.byteSize + 20 },
+    );
+    await budgetFailure.replaceRoot({ tref: "Rashi on Micah 6" });
+    expect(budgetFailure.snapshot).toMatchObject({
+      reader: {
+        currentEntryId: "entry-1",
+        selectedTarget: { ref: "Micah 6:8" },
+      },
+      task: { state: "error", code: "budget-exceeded" },
+    });
+
+    const linksFailure = createReaderController(
+      { source: root, selectedPosition: [7] },
+      {
+        loadSource: async (request) => sourceContent(request.tref),
+        loadConnections: async () => {
+          throw new TypeError("Links unavailable.");
+        },
+      },
+    );
+    await linksFailure.replaceRoot({ tref: "Rashi on Micah 6" });
+    expect(linksFailure.snapshot).toMatchObject({
+      reader: {
+        currentEntryId: "entry-2",
+        breadcrumbs: [{ entryId: "entry-2", current: true }],
+        selectedTarget: { ref: "Rashi on Micah 6:1" },
+        connections: {
+          state: "unavailable",
+          reason: "failed",
+          message: "Links unavailable.",
+        },
+      },
+      presentation: { vocalizationMode: "taamim_and_nikkud" },
+      task: { state: "idle" },
+    });
+  });
+
+  it.each(["source-only", "links-only"] as const)(
+    "replaces a %s admitted seed through the same data source",
+    async (kind) => {
+      const dataSource = fixtureDataSource();
+      const controller = createReaderController(
+        kind === "source-only"
+          ? { source: sourceContent("Micah 6"), selectedPosition: [7] }
+          : { connections: connectionsContent("Micah 6:8") },
+        dataSource,
+      );
+
+      await controller.replaceRoot({ tref: "Rashi on Micah 6" });
+
+      expect(controller.snapshot.reader).toMatchObject({
+        currentEntryId: "entry-2",
+        breadcrumbs: [{ entryId: "entry-2", current: true }],
+        selectedTarget: { ref: "Rashi on Micah 6:1" },
+      });
+      expect(dataSource.loadSource).toHaveBeenCalledOnce();
+      expect(dataSource.loadConnections).toHaveBeenCalledOnce();
+    },
+  );
+
+  it("lets a newer root supersede an ignored-abort completion", async () => {
+    const late = deferred<ReaderSourceContent>();
+    let firstSignal: AbortSignal | undefined;
+    const loadSource = vi.fn(
+      (request: SourceCardRequest, signal: AbortSignal) => {
+        if (request.tref === "Rashi on Micah 6") {
+          firstSignal = signal;
+          return late.promise;
+        }
+        return Promise.resolve(sourceContent(request.tref));
+      },
+    );
+    const loadConnections = vi.fn(async (request, projection) =>
+      createReaderConnectionsContent(
+        readerLinks(request.tref),
+        request,
+        projection,
+      ),
+    );
+    const controller = createReaderController(
+      { source: sourceContent("Micah 6"), selectedPosition: [7] },
+      { loadSource, loadConnections },
+    );
+
+    const first = controller.replaceRoot({ tref: "Rashi on Micah 6" });
+    await vi.waitFor(() => expect(firstSignal).toBeDefined());
+    const second = controller.replaceRoot({ tref: "Ibn Ezra on Micah 6" });
+    await second;
+    expect(firstSignal?.aborted).toBe(true);
+    late.resolve(sourceContent("Rashi on Micah 6"));
+    await first;
+
+    expect(controller.snapshot.reader.currentEntryId).toBe("entry-2");
+    expect(controller.snapshot.reader.selectedTarget?.ref).toBe(
+      "Ibn Ezra on Micah 6:1",
+    );
+    expect(loadSource).toHaveBeenCalledTimes(2);
+    expect(loadConnections).toHaveBeenCalledOnce();
+  });
+
+  it("validates a replacement before superseding active work", async () => {
+    const pending = deferred<ReaderConnectionsContent>();
+    let signal: AbortSignal | undefined;
+    const loadConnections = vi.fn(
+      (
+        _request: { readonly tref: string },
+        _projection: object,
+        operationSignal: AbortSignal,
+      ) => {
+        signal = operationSignal;
+        return pending.promise;
+      },
+    );
+    const controller = createReaderController(
+      { source: sourceContent("Micah 6"), selectedPosition: [7] },
+      { loadSource: vi.fn(), loadConnections },
+    );
+    const valid = controller.selectSource({
+      originEntryId: "entry-1",
+      position: [7],
+      ref: "Micah 6:8",
+    });
+    await vi.waitFor(() => expect(signal).toBeDefined());
+    const snapshot = controller.snapshot;
+
+    await expect(controller.replaceRoot({ tref: " " })).rejects.toThrow(
+      "Source reference must not be blank.",
+    );
+    expect(signal?.aborted).toBe(false);
+    expect(controller.snapshot).toBe(snapshot);
+
+    await expect(
+      controller.replaceRoot({ tref: "Micah 6:7" }, {
+        presentation: {
+          vocalizationMode: "unsupported",
+        },
+      } as never),
+    ).rejects.toThrow("Reader presentation contains an unsupported value.");
+    expect(signal?.aborted).toBe(false);
+    expect(controller.snapshot).toBe(snapshot);
+
+    pending.resolve(connectionsContent("Micah 6:8"));
+    await valid;
+  });
+
   it("preserves the current entry when later required context fails", async () => {
     const dataSource: ReaderControllerDataSource = {
       loadSource: vi

@@ -41,6 +41,8 @@ controller.setPresentation({
   patch: { vocalizationMode: "nikkud" },
 });
 
+await controller.replaceRoot({ tref: "Micah 6:7" });
+
 window.addEventListener(
   "pagehide",
   () => {
@@ -51,7 +53,7 @@ window.addEventListener(
 );
 ```
 
-Hebrew-capable elements expose the typed `vocalizationMode` property and the `vocalization-mode` attribute with `taamim_and_nikkud`, `nikkud`, and `none` presets. The default preserves all marks. Changing the property is local presentation work over the existing safe view model; it does not refetch or rerun a component factory. A controlled Reader retains the setting per semantic history entry and exposes it separately as `controller.snapshot.presentation`.
+Hebrew-capable elements expose the typed `vocalizationMode` property and the `vocalization-mode` attribute with `taamim_and_nikkud`, `nikkud`, and `none` presets. The default preserves all marks. Changing the property is local presentation work over the existing safe view model; it does not refetch or rerun a component factory. A controlled Reader retains the setting per semantic history entry and exposes it separately as `controller.snapshot.presentation`. Following a connection pushes history, while `replaceRoot` starts a fresh root on the same controller and element after source qualification succeeds.
 
 Use a component's pure factory when corrected API-shaped JSON has already crossed a validated server, MCP, fixture, stored-data, or user-input boundary. Use its async factory for browser client mode. A successful async result is the same projection as the pure factory over its captured payload.
 

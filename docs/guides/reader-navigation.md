@@ -80,16 +80,19 @@ const controller = await loadReaderController(
 );
 const unbind = bindReaderController(element, controller);
 
+// An external search starts a fresh root on the same controller and element.
+await controller.replaceRoot({ tref: "Micah 6:7" });
+
 // During host teardown:
 unbind();
 controller.dispose();
 ```
 
-The controller uses the client for source and connections requests, retains admitted captures in its private session, and supplies rendering snapshots to the request-free element. A host can keep its own markup or use the lower-level session and `createSefariaReaderDataSource` when it needs spatial pane policy.
+The controller uses the client for source and connections requests, retains admitted captures in its private session, and supplies rendering snapshots to the request-free element. Connection selection pushes normal Reader history. An external search calls `replaceRoot`: the old root stays committed until the source qualifies and fits, successful admission removes the old breadcrumbs, and links failure leaves the new source open. A host can keep its own markup or use the lower-level session and `createSefariaReaderDataSource` when it needs spatial pane policy.
 
 The standalone page can eventually integrate reader navigation with its URL and browser Back, but that should be an explicit host feature. The session should not write global browser history itself.
 
-The current website example exposes both browser composition choices without pretending they have the same ownership needs. Its multi-pane page renders the existing source-card and connections-panel elements directly, uses one reader session for semantic entries and captures, uses `createSefariaReaderDataSource` for request parity, and keeps ordered pane identity, parent placement, compact selection, and pane closing private to the example. The local documentation site embeds that same isolated build rather than maintaining a simplified second implementation: selecting a segment opens adjacent connections, selecting a connected reference opens its contextual source with the exact segment selected, and the cycle can continue from that new source. The controlled page uses `loadReaderController` and `bindReaderController`, so the host supplies the starting reference and client while the controller owns continuing reader state. A committed spatial child source replaces the origin connections pane and gains its own connections pane; a pending or failed child source does not erase the committed origin.
+The current website example exposes both browser composition choices without pretending they have the same ownership needs. Its multi-pane page renders the existing source-card and connections-panel elements directly, uses one reader session for semantic entries and captures, uses `createSefariaReaderDataSource` for request parity, and keeps ordered pane identity, parent placement, compact selection, and pane closing private to the example. The local documentation site embeds that same isolated build rather than maintaining a simplified second implementation: selecting a segment opens adjacent connections, selecting a connected reference opens its contextual source with the exact segment selected, and the cycle can continue from that new source. The controlled page uses `loadReaderController`, `bindReaderController`, and later `replaceRoot` calls, so the host supplies external references and the client while one controller and element own continuing reader state. A committed spatial child source replaces the origin connections pane and gains its own connections pane; a pending or failed child source does not erase the committed origin.
 
 ### MCP execution
 

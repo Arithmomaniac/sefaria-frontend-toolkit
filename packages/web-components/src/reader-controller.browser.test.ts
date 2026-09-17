@@ -179,6 +179,7 @@ test("forwards every semantic reader event with its original detail", async () =
       return vi.fn();
     },
     selectSource: vi.fn(async () => undefined),
+    replaceRoot: vi.fn(async () => undefined),
     openConnection: vi.fn(async () => undefined),
     setConnectionsCategory: vi.fn(),
     setConnectionsPage: vi.fn(),

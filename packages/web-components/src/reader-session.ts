@@ -317,6 +317,8 @@ export interface ReaderSession {
     entryId: string,
     patch: ReaderPresentationPatch,
   ): ReaderTransition;
+  /** Replaces all semantic history with one newly identified root entry. */
+  replaceRoot(seed: ReaderEntrySeed): ReaderTransition;
   /** Removes the current entry and restores its retained predecessor. */
   back(): ReaderTransition;
   /** Activates an earlier retained breadcrumb and discards later entries. */
@@ -968,6 +970,34 @@ class ReaderSessionImpl implements ReaderSession {
     }
     return applied(
       this.with({ pins: removeMapKey(this.#state.pins, pinId) }),
+      undefined,
+    );
+  }
+
+  replaceRoot(seed: ReaderEntrySeed): ReaderTransition {
+    const entry = createEntry(`entry-${this.#state.nextEntry}`, seed);
+    if (this.#state.pins.size > 0) {
+      return rejected(
+        this,
+        "entry-pinned",
+        "Reader root cannot be replaced while an entry is pinned.",
+      );
+    }
+    if (captureBytes([entry]) > this.#state.maxCaptureBytes) {
+      return rejected(
+        this,
+        "budget-exceeded",
+        "Reader root exceeds the retained capture budget.",
+      );
+    }
+    return applied(
+      this.with({
+        entries: [entry],
+        operations: new Map(),
+        pins: new Map(),
+        nextEntry: this.#state.nextEntry + 1,
+        historyTruncated: false,
+      }),
       undefined,
     );
   }

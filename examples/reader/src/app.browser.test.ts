@@ -437,6 +437,113 @@ test("drives the supported reader component through navigation and Back", async 
   demo.dispose();
 });
 
+test("replaces an external root on one persistent controlled Reader", async () => {
+  const requests: string[] = [];
+  let rejectPending!: (reason: unknown) => void;
+  const pending = new Promise<Response>((_resolve, reject) => {
+    rejectPending = reject;
+  });
+  let resolveLate!: (response: Response) => void;
+  const late = new Promise<Response>((resolve) => {
+    resolveLate = resolve;
+  });
+  const responses = new Map<string, unknown>([
+    ["/api/v3/texts/Micah 6:8", sourcePayload("Micah 6:8", "Micah 6:8")],
+    ["/api/links/Micah 6:8", linksPayload("Micah 6:8", "Rashi on Micah 6:8:1")],
+    ["/api/v3/texts/Micah 6:7", sourcePayload("Micah 6:7", "Micah 6:7")],
+    ["/api/links/Micah 6:7", linksPayload("Micah 6:7", "Other 1:1")],
+  ]);
+  const demo = startControlledReader(
+    document,
+    createSefariaClient({
+      cache: false,
+      fetch: async (input) => {
+        const request = input instanceof Request ? input : new Request(input);
+        const requestPath = path(request);
+        requests.push(requestPath);
+        if (requestPath === "/api/v3/texts/Rashi on Micah 6:8:1") {
+          return pending;
+        }
+        if (requestPath === "/api/v3/texts/Micah 6:6") {
+          return late;
+        }
+        const payload = responses.get(requestPath);
+        if (payload === undefined) {
+          throw new Error(`Unexpected request: ${requestPath}`);
+        }
+        return Response.json(payload);
+      },
+    }),
+  );
+  await demo.navigate("Micah 6:8");
+  const reader = document.querySelector<SefariaReader>("sefaria-reader")!;
+  await reader.updateComplete;
+
+  const failed = demo.navigate("Rashi on Micah 6:8:1");
+  await vi.waitFor(() =>
+    expect(document.querySelector("#status")?.textContent).toContain(
+      "Opening Rashi on Micah 6:8:1",
+    ),
+  );
+  expect(reader.viewModel?.currentEntryId).toBe("entry-1");
+  expect(reader.viewModel?.selectedTarget?.ref).toBe("Micah 6:8");
+  rejectPending(new TypeError("Source unavailable."));
+  await failed;
+  expect(reader.viewModel?.currentEntryId).toBe("entry-1");
+  expect(reader.viewModel?.selectedTarget?.ref).toBe("Micah 6:8");
+  expect(document.querySelector("#host-error")?.textContent).toBe(
+    "Source unavailable.",
+  );
+  expect(document.querySelector<HTMLInputElement>('[name="tref"]')?.value).toBe(
+    "Micah 6:8",
+  );
+
+  const vocalization =
+    document.querySelector<HTMLSelectElement>("#vocalization-mode")!;
+  vocalization.value = "nikkud";
+  await demo.navigate("Micah 6:7");
+  await reader.updateComplete;
+
+  expect(document.querySelectorAll("sefaria-reader")).toHaveLength(1);
+  expect(document.querySelector("sefaria-reader")).toBe(reader);
+  expect(reader.viewModel?.currentEntryId).toBe("entry-2");
+  expect(reader.viewModel?.breadcrumbs).toHaveLength(1);
+  expect(reader.viewModel?.selectedTarget?.ref).toBe("Micah 6:7");
+  expect(reader.vocalizationMode).toBe("nikkud");
+  await vi.waitFor(() =>
+    expect(reader.shadowRoot?.activeElement).toBe(
+      reader.shadowRoot?.querySelector('[data-current-heading="true"]'),
+    ),
+  );
+
+  const superseded = demo.navigate("Micah 6:6");
+  await vi.waitFor(() =>
+    expect(document.querySelector("#status")?.textContent).toContain(
+      "Opening Micah 6:6",
+    ),
+  );
+  await demo.navigate("Micah 6:8");
+  resolveLate(Response.json(sourcePayload("Micah 6:6", "Micah 6:6")));
+  await superseded;
+
+  expect(reader.viewModel?.currentEntryId).toBe("entry-3");
+  expect(reader.viewModel?.selectedTarget?.ref).toBe("Micah 6:8");
+  expect(document.querySelector<HTMLInputElement>('[name="tref"]')?.value).toBe(
+    "Micah 6:8",
+  );
+  expect(requests).toEqual([
+    "/api/v3/texts/Micah 6:8",
+    "/api/links/Micah 6:8",
+    "/api/v3/texts/Rashi on Micah 6:8:1",
+    "/api/v3/texts/Micah 6:7",
+    "/api/links/Micah 6:7",
+    "/api/v3/texts/Micah 6:6",
+    "/api/v3/texts/Micah 6:8",
+    "/api/links/Micah 6:8",
+  ]);
+  demo.dispose();
+});
+
 test("source reselection prunes descendants and performs one links request", async () => {
   const requests: string[] = [];
   const responses = new Map<string, unknown>([

@@ -394,6 +394,116 @@ describe("reader history and completion identity", () => {
   });
 });
 
+describe("reader root replacement", () => {
+  it("replaces all history without reusing entry, operation, or pin identities", () => {
+    let session = createReaderSession({
+      source: source("Micah 6:8"),
+      presentation: { vocalizationMode: "none" },
+    });
+    const oldEntryId = session.view.currentEntryId;
+    const operation = session.beginSourceNavigation(oldEntryId, {
+      tref: "Ibn Ezra on Micah 6:8",
+    });
+    expect(operation.state).toBe("applied");
+    if (operation.state !== "applied") return;
+    session = operation.session;
+    const pinned = session.pin(oldEntryId);
+    expect(pinned.state).toBe("applied");
+    if (pinned.state !== "applied") return;
+    session = pinned.session;
+
+    const rejected = session.replaceRoot({
+      source: source("Rashi on Micah 6:8:1"),
+    });
+    expect(rejected).toMatchObject({
+      state: "rejected",
+      reason: "entry-pinned",
+    });
+    expect(rejected.session.view).toEqual(session.view);
+
+    const released = rejected.session.release(pinned.value.pinId);
+    expect(released.state).toBe("applied");
+    if (released.state !== "applied") return;
+    const replaced = released.session.replaceRoot({
+      source: source("Rashi on Micah 6:8:1"),
+    });
+    expect(replaced.state).toBe("applied");
+    if (replaced.state !== "applied") return;
+    session = replaced.session;
+
+    expect(session.view.entries).toHaveLength(1);
+    expect(session.view.currentEntryId).toBe("entry-2");
+    expect(session.view.currentEntryId).not.toBe(oldEntryId);
+    expect(session.view.historyTruncated).toBe(false);
+    expect(session.view.current.presentation.vocalizationMode).toBe(
+      "taamim_and_nikkud",
+    );
+    expect(
+      session.completeSourceNavigation(operation.value.operationId, {
+        source: source("Ibn Ezra on Micah 6:8"),
+      }),
+    ).toMatchObject({
+      state: "rejected",
+      reason: "operation-not-found",
+    });
+    expect(session.selectSourcePosition(oldEntryId, [0])).toMatchObject({
+      state: "rejected",
+      reason: "entry-not-current",
+    });
+
+    const newOperation = session.beginSourceNavigation(
+      session.view.currentEntryId,
+      { tref: "Ibn Ezra on Micah 6:8" },
+    );
+    expect(newOperation).toMatchObject({
+      state: "applied",
+      value: { operationId: "operation-2" },
+    });
+    const newPin = session.pin(session.view.currentEntryId);
+    expect(newPin).toMatchObject({
+      state: "applied",
+      value: { pinId: "pin-2" },
+    });
+    if (newPin.state !== "applied") return;
+    const oldRelease = newPin.session.release(pinned.value.pinId);
+    expect(oldRelease).toMatchObject({
+      state: "rejected",
+      reason: "pin-not-found",
+    });
+    expect(oldRelease.session.view.current.pinCount).toBe(1);
+  });
+
+  it("admits a fresh root atomically within the existing capture budget", () => {
+    const root = source("Micah 6:8");
+    const session = createReaderSession(
+      { source: root },
+      { maxCaptureBytes: root.capture.byteSize + 20 },
+    );
+    const before = session.view;
+    const rejected = session.replaceRoot({
+      source: largeSource("Rashi on Micah 6:8:1"),
+    });
+    expect(rejected).toMatchObject({
+      state: "rejected",
+      reason: "budget-exceeded",
+    });
+    expect(rejected.session.view).toEqual(before);
+
+    const connections = links(1, "Rashi on Micah 6:8:1");
+    const connectionsOnly = createReaderSession({ source: root }).replaceRoot({
+      connections,
+      presentation: { vocalizationMode: "nikkud" },
+    });
+    expect(connectionsOnly.state).toBe("applied");
+    if (connectionsOnly.state !== "applied") return;
+    expect(connectionsOnly.session.view.current.source).toBeUndefined();
+    expect(connectionsOnly.session.view.current).toMatchObject({
+      connections: { state: "view" },
+      presentation: { vocalizationMode: "nikkud" },
+    });
+  });
+});
+
 describe("reader retention", () => {
   it("uses the documented defaults and rejects a one-byte initial overflow", () => {
     const content = source("Micah 6:8");
