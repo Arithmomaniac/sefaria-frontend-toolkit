@@ -4,7 +4,7 @@
 
 ## Objective
 
-Change theme, width, visible sides, side order, layout, and Hebrew marks without refetching, then identify the non-DOM client, factory, Reader, and text-transform entry points available to a custom host.
+Change theme, width, visible sides, side order, layout, Hebrew marks, and coarse Reader regions without refetching; add one host-owned Reader action; then identify the non-DOM client, factory, Reader, and text-transform entry points available to a custom host.
 
 ## Prerequisites
 
@@ -31,6 +31,37 @@ export function customizeCard(card: SefariaSourceCard): void {
 
 Changing these values must not call a factory or client. `vocalizationMode` accepts `taamim_and_nikkud`, `nikkud`, or `none`; the full-mark default renders the original safe view-model content directly, while the other presets derive display text from that same immutable content. The equivalent HTML attribute is `vocalization-mode`. Changing the reference or exact edition selector is a data operation and belongs in the host's async lifecycle.
 
+The controlled Reader adds one optional host-action placement and four coarse styling regions:
+
+```ts
+const bookmark = document.createElement("button");
+bookmark.slot = "toolbar-actions";
+bookmark.textContent = "Bookmark selected text";
+reader.append(bookmark);
+
+bookmark.addEventListener("click", () => {
+  const targetRef = controller.snapshot.reader.selectedTarget?.ref;
+  if (targetRef === undefined) return;
+  bookmark.textContent = `Bookmarked ${targetRef}`;
+});
+```
+
+```css
+sefaria-reader::part(toolbar) {
+  gap: 0.75rem;
+}
+
+sefaria-reader::part(source-pane) {
+  background: var(--app-reading-surface);
+}
+
+sefaria-reader::part(connections-pane) {
+  background: var(--app-context-surface);
+}
+```
+
+The slot is available after a Reader view model commits; the full initial loading state intentionally has no toolbar. Read the action target from the current public controller snapshot when the action runs rather than capturing an earlier reference. `toolbar`, `history`, `source-pane`, and `connections-pane` are the complete Reader part set. There are no forwarded child parts. Prefer shared tokens for theme-wide changes; if a `::part` rule changes display, overflow, or layout, the host owns the resulting responsive and accessibility behavior.
+
 For a headless path, import only the layers you need:
 
 ```ts
@@ -53,22 +84,23 @@ The non-DOM component subpaths are safe to use without registering custom elemen
 
 ## Expected result
 
-Theme, container width, side visibility, side order, layout, and vocalization mode update the current component immediately while the host request counter is unchanged. Switching back to `taamim_and_nikkud` restores the original displayed marks. Headless imports can validate, transform, or project data without accessing `window`, `document`, or custom-element registration.
+Theme, container width, side visibility, side order, layout, vocalization mode, documented Reader parts, and the host-owned toolbar action update the current component while the host request counter is unchanged. The bookmark example records only page-local host state and reads the current exact selected target without inspecting `shadowRoot` or an event path. Switching back to `taamim_and_nikkud` restores the original displayed marks. Headless imports can validate, transform, or project data without accessing `window`, `document`, or custom-element registration.
 
 <iframe class="example-frame" title="Authored customization workbench" src="../examples/explorer/authored.html?component=source-card&amp;scenario=many-items&amp;diagnostics=1&amp;width=720"></iframe>
 
 ## Who owns what
 
-The element owns supported visual properties and CSS custom properties. The host owns the containing layout and decides when a changed input requires new data. `@arithmomaniac/sefaria-text-transform` owns pure markup handling; component factories own component-specific projection; the client owns transport and validation.
+The element owns supported visual properties, CSS custom properties, the Reader's required content, and the placement of its one optional toolbar slot. The host owns slotted action behavior, CSS-part overrides, the containing layout, and the decision that a changed input requires new data. `@arithmomaniac/sefaria-text-transform` owns pure markup handling; component factories own component-specific projection; the client owns transport and validation.
 
 ## Exercise
 
-Open the authored workbench, record its request count, then change theme, width, layout, side order, displayed language, and Hebrew marks. Confirm the count does not change and that returning to the full-mark preset restores the original text. Next, inspect the generated export inventory and choose the smallest non-DOM subpath for a host that never renders an element.
+Open the authored workbench, record its request count, then change theme, width, layout, side order, displayed language, and Hebrew marks. Confirm the count does not change and that returning to the full-mark preset restores the original text. Open the controlled Reader example, bookmark the current selected reference, navigate, and confirm the next activation uses the new selected reference. Remove the slotted action in DevTools and confirm the Reader's required controls and content remain. Next, inspect the generated export inventory and choose the smallest non-DOM subpath for a host that never renders an element.
 
 ## Source and run links
 
 - Run: `pnpm dev`
 - Authored controls: [`examples/explorer/src/authored/development-status.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/development-status.ts)
+- Controlled Reader customization: [`examples/reader/src/controlled-app.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/reader/src/controlled-app.ts)
 - Client README: [`packages/client/README.md`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/client/README.md)
 - Text-transform README: [`packages/text-transform/README.md`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/text-transform/README.md)
 - Web-components README: [`packages/web-components/README.md`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/web-components/README.md)

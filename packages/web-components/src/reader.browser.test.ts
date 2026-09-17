@@ -77,6 +77,9 @@ const paired: ReaderViewModel = {
 
 afterEach(() => {
   document.body.removeAttribute("style");
+  document.head
+    .querySelectorAll("[data-reader-customization-test]")
+    .forEach((element) => element.remove());
   vi.unstubAllGlobals();
 });
 
@@ -114,6 +117,12 @@ test("renders full initial loading and non-destructive replacement loading state
       ?.querySelector('[role="status"]')
       ?.closest('[aria-busy="true"]'),
   ).toBeNull();
+  const initialAction = document.createElement("button");
+  initialAction.slot = "toolbar-actions";
+  initialAction.textContent = "Bookmark";
+  initial.append(initialAction);
+  await initial.updateComplete;
+  expect(initialAction.assignedSlot).toBeNull();
 
   initial.viewModel = paired;
   await initial.updateComplete;
@@ -125,6 +134,7 @@ test("renders full initial loading and non-destructive replacement loading state
   expect(
     initial.shadowRoot?.querySelector("sefaria-source-card"),
   ).not.toBeNull();
+  expect(initialAction.assignedSlot?.name).toBe("toolbar-actions");
 
   initial.rootLoading = false;
   await initial.updateComplete;
@@ -141,6 +151,99 @@ test("renders full initial loading and non-destructive replacement loading state
     ).display,
   ).toBe("none");
   expect(initial.shadowRoot?.textContent).toContain("Micah 6:8");
+});
+
+test("exposes one optional toolbar slot and only the documented coarse parts", async () => {
+  const element = await mount();
+  const bookmark = document.createElement("button");
+  bookmark.slot = "toolbar-actions";
+  bookmark.textContent = `Bookmark ${element.viewModel?.selectedTarget?.ref}`;
+  element.append(bookmark);
+  await element.updateComplete;
+
+  const slot = element.shadowRoot?.querySelector<HTMLSlotElement>(
+    'slot[name="toolbar-actions"]',
+  );
+  expect(slot?.assignedElements()).toEqual([bookmark]);
+  expect(bookmark.assignedSlot).toBe(slot);
+
+  const parts = [
+    ...element.shadowRoot!.querySelectorAll<HTMLElement>("[part]"),
+  ].flatMap((target) => target.part.value.split(/\s+/u).filter(Boolean));
+  expect(parts.sort()).toEqual([
+    "connections-pane",
+    "history",
+    "source-pane",
+    "toolbar",
+  ]);
+  expect(element.shadowRoot?.querySelector("[exportparts]")).toBeNull();
+});
+
+test("removing the host toolbar action leaves all core reader content intact", async () => {
+  const element = await mount();
+  const bookmark = document.createElement("button");
+  bookmark.slot = "toolbar-actions";
+  bookmark.textContent = "Bookmark Micah 6:8";
+  element.append(bookmark);
+  await element.updateComplete;
+
+  bookmark.remove();
+  await element.updateComplete;
+
+  expect(
+    element.shadowRoot?.querySelector('slot[name="toolbar-actions"]'),
+  ).not.toBeNull();
+  expect(
+    element.shadowRoot?.querySelector<HTMLButtonElement>('[data-action="back"]')
+      ?.disabled,
+  ).toBe(false);
+  expect(element.shadowRoot?.textContent).toContain("Micah 6:8");
+  expect(
+    element.shadowRoot?.querySelector("sefaria-source-card"),
+  ).not.toBeNull();
+  expect(
+    element.shadowRoot?.querySelector("sefaria-connections-panel"),
+  ).not.toBeNull();
+});
+
+test("applies documented part styles and inherited tokens without exposing child parts", async () => {
+  const style = document.createElement("style");
+  style.dataset.readerCustomizationTest = "";
+  style.textContent = `
+    sefaria-reader::part(toolbar) { gap: 13px; }
+    sefaria-reader::part(history) { outline: 3px solid rgb(4, 5, 6); }
+    sefaria-reader::part(source-pane) { padding-inline-start: 23px; }
+    sefaria-reader::part(connections-pane) { padding-inline-end: 29px; }
+  `;
+  document.head.append(style);
+  const element = await mount();
+  element.style.setProperty("--sefaria-accent", "rgb(1, 2, 3)");
+  await element.updateComplete;
+
+  const toolbar =
+    element.shadowRoot!.querySelector<HTMLElement>('[part="toolbar"]')!;
+  const history =
+    element.shadowRoot!.querySelector<HTMLElement>('[part="history"]')!;
+  const sourcePane = element.shadowRoot!.querySelector<HTMLElement>(
+    '[part="source-pane"]',
+  )!;
+  const connectionsPane = element.shadowRoot!.querySelector<HTMLElement>(
+    '[part="connections-pane"]',
+  )!;
+  const back = element.shadowRoot!.querySelector<HTMLElement>(".back")!;
+  const sourceCard = element.shadowRoot!.querySelector<HTMLElement>(
+    "sefaria-source-card",
+  )!;
+
+  expect(getComputedStyle(toolbar).gap).toBe("13px");
+  expect(getComputedStyle(history).outlineWidth).toBe("3px");
+  expect(getComputedStyle(sourcePane).paddingLeft).toBe("23px");
+  expect(getComputedStyle(connectionsPane).paddingRight).toBe("29px");
+  expect(getComputedStyle(back).color).toBe("rgb(1, 2, 3)");
+  expect(
+    getComputedStyle(sourceCard).getPropertyValue("--sefaria-accent").trim(),
+  ).toBe("rgb(1, 2, 3)");
+  expect(sourceCard.getAttribute("exportparts")).toBeNull();
 });
 
 test("renders paired state and forwards each child action once with origin identity", async () => {

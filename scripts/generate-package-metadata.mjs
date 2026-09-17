@@ -6,6 +6,8 @@ import process from "node:process";
 import { ts } from "@custom-elements-manifest/analyzer";
 import { format, resolveConfig } from "prettier";
 
+import { verifyElementTemplateContract } from "./custom-element-template-contract.mjs";
+
 const repository = path.resolve(import.meta.dirname, "..");
 const webComponentsDirectory = path.join(
   repository,
@@ -281,15 +283,15 @@ async function buildCustomElementsManifest() {
     );
     if (declarations.length === 0) continue;
     const source = await readFile(path.join(repository, module.path), "utf8");
-    if (/<slot(?:\s|>)/u.test(source) || /\bpart\s*=/u.test(source)) {
-      throw new Error(
-        `${module.path} introduces a slot or CSS part without generated metadata support.`,
-      );
-    }
     for (const declaration of declarations) {
+      verifyElementTemplateContract({
+        declaration,
+        sourcePath: module.path,
+        source,
+      });
       declaration.events = eventCatalog[declaration.tagName];
-      declaration.slots = [];
-      declaration.cssParts = [];
+      declaration.slots ??= [];
+      declaration.cssParts ??= [];
       declaration.cssProperties = cssPropertyCatalog;
     }
     modules.push(
@@ -397,12 +399,28 @@ function renderCustomElementsMarkdown(manifest) {
       }
       lines.push("");
     }
-    lines.push(
-      "### Slots and CSS parts",
-      "",
-      "No public slots or CSS parts.",
-      "",
-    );
+    lines.push("### Slots", "");
+    if (declaration.slots.length === 0) {
+      lines.push("None.", "");
+    } else {
+      lines.push("| Slot | Description |", "| --- | --- |");
+      for (const entry of declaration.slots) {
+        lines.push(
+          `| ${entry.name ? `\`${entry.name}\`` : "Default"} | ${entry.description ?? ""} |`,
+        );
+      }
+      lines.push("");
+    }
+    lines.push("### CSS parts", "");
+    if (declaration.cssParts.length === 0) {
+      lines.push("None.", "");
+    } else {
+      lines.push("| Part | Description |", "| --- | --- |");
+      for (const entry of declaration.cssParts) {
+        lines.push(`| \`${entry.name}\` | ${entry.description ?? ""} |`);
+      }
+      lines.push("");
+    }
   }
   lines.push(
     "## Shared CSS custom properties",
