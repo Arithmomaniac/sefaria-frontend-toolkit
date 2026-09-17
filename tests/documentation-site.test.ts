@@ -265,6 +265,9 @@ describe("documentation learning journey", () => {
       "utf8",
     );
     expect(suppliedLesson).toContain("createSourceCardViewModel(validated, {");
+    expect(suppliedLesson).toContain("bindSourceCardController");
+    expect(suppliedLesson).toContain("controller.setSuppliedData");
+    expect(suppliedLesson).toContain("controller.load");
     expect(vanillaSource).toContain("controller.setSuppliedData(");
     expect(vanillaSource).toContain(
       "bindSourceCardController(card, controller)",

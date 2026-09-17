@@ -23,7 +23,7 @@ pnpm build
 pnpm dev:vanilla
 ```
 
-The maintained vanilla example validates its imported JSON fixture before projection. This is its initial render path:
+The maintained vanilla example validates its imported JSON fixture before projection. This code shows the equivalent pure-factory path:
 
 ```ts
 import {
@@ -46,7 +46,7 @@ card.viewModel = createSourceCardViewModel(validated, {
 card.selectable = true;
 ```
 
-The same maintained page also has **Start live demo**. That explicit action calls `loadSourceCardViewModel` through the public client against the deployed Sefaria API without changing the initial zero-request path.
+The maintained page creates a source-card controller and connects it with `bindSourceCardController`. It supplies the fixture through `controller.setSuppliedData`, which makes no request. **Start live demo** calls `controller.load` through the public client.
 
 For an external local-tarball consumer, first build and pack all three private packages:
 
@@ -97,7 +97,7 @@ The card initially displays the supplied Micah 6:8 text and attribution with hos
 
 ## Who owns what
 
-The fixture is unknown JSON until `zCoreV3TextsResponse` validates it. `createSourceCardViewModel` owns projection and text preparation. The element owns presentation. The initial path does not call the client. The explicit second path lets the host call the public async factory with an injected deterministic transport.
+The fixture is unknown JSON until `zCoreV3TextsResponse` validates it. `createSourceCardViewModel` owns projection and text preparation. The source-card controller calls that factory and manages live request state. The binding supplies controller view models to the element. The initial `controller.setSuppliedData` path does not call the client. The explicit `controller.load` path uses the public client.
 
 ## Exercise
 
