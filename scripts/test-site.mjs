@@ -864,8 +864,8 @@ try {
       .frameLocator('iframe[title="Editable component catalog"]')
       .locator("html")
       .evaluate(() => ({
-        viewport: document.documentElement.clientWidth,
-        content: document.documentElement.scrollWidth,
+        viewport: globalThis.document.documentElement.clientWidth,
+        content: globalThis.document.documentElement.scrollWidth,
       }));
     if (mobileEditorWidths.content > mobileEditorWidths.viewport + 1) {
       throw new Error(
@@ -1085,11 +1085,11 @@ async function qualifyInlinePlayground(
     .getByText("Preview rendered with supplied data.")
     .waitFor({ timeout: 30_000 });
   const parentState = await page.evaluate(() => {
-    localStorage.setItem("site-embed-proof", "unchanged");
+    globalThis.localStorage.setItem("site-embed-proof", "unchanged");
     return {
-      url: location.href,
-      childCount: document.body.childElementCount,
-      marker: document.body.dataset.previewMutation ?? null,
+      url: globalThis.location.href,
+      childCount: globalThis.document.body.childElementCount,
+      marker: globalThis.document.body.dataset.previewMutation ?? null,
     };
   });
   const edits = [
@@ -1111,7 +1111,7 @@ async function qualifyInlinePlayground(
           .locator("#preview iframe")
           .contentFrame()
           .locator("#docs-html-proof")
-          .evaluate((element) => getComputedStyle(element).color);
+          .evaluate((element) => globalThis.getComputedStyle(element).color);
         assertEqual(color, "rgb(97, 40, 84)", "inline CSS edit");
       },
     },
@@ -1136,10 +1136,10 @@ async function qualifyInlinePlayground(
   }
   assertEqual(textRequests.length, 0, `${project} inline editor requests`);
   const nextParentState = await page.evaluate(() => ({
-    url: location.href,
-    childCount: document.body.childElementCount,
-    marker: document.body.dataset.previewMutation ?? null,
-    storage: localStorage.getItem("site-embed-proof"),
+    url: globalThis.location.href,
+    childCount: globalThis.document.body.childElementCount,
+    marker: globalThis.document.body.dataset.previewMutation ?? null,
+    storage: globalThis.localStorage.getItem("site-embed-proof"),
   }));
   assertEqual(nextParentState.url, parentState.url, "parent history isolation");
   assertEqual(
@@ -1153,7 +1153,7 @@ async function qualifyInlinePlayground(
   await fullEditor.focus();
   await page.keyboard.press("Tab");
   assertEqual(
-    await page.evaluate(() => document.activeElement?.tagName),
+    await page.evaluate(() => globalThis.document.activeElement?.tagName),
     "IFRAME",
     "keyboard enters trusted editor",
   );
