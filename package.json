@@ -27,6 +27,7 @@
     "dev:mcp": "pnpm --filter @sefaria-example/mcp-app dev",
     "dev:playground": "pnpm --filter @sefaria-example/playground dev",
     "dev:reader": "pnpm --filter @sefaria-example/reader dev",
+    "dev:alpine": "pnpm --filter @sefaria-example/alpine-vite dev",
     "dev:react": "pnpm --filter @sefaria-example/react-vite dev",
     "dev:vanilla": "pnpm --filter @sefaria-example/vanilla-vite dev",
     "dev:ref-label": "pnpm build && vite . --open /examples/explorer/ref-label.html",

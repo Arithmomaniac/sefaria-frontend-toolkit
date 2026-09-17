@@ -10,14 +10,14 @@ export function createMicahFixtureFetch(
   return async (input, init) => {
     const request = new Request(input, init);
     const url = new URL(request.url);
-    const query = [...url.searchParams.entries()];
     const path = decodeURIComponent(url.pathname);
     if (
       request.method !== "GET" ||
       url.origin !== "https://example.invalid" ||
       (path !== "/api/v3/texts/Micah 6:8" &&
         path !== "/api/v3/texts/micah 6:8") ||
-      JSON.stringify(query) !== JSON.stringify(expectedQuery)
+      JSON.stringify([...url.searchParams.entries()]) !==
+        JSON.stringify(expectedQuery)
     ) {
       throw new Error(
         `Unexpected deterministic request: ${request.method} ${url}`,

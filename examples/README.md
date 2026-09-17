@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by avilevin.
 
 # Examples
 
@@ -39,7 +39,7 @@ Open the [controlled Reader](reader/controlled.html?tref=Micah%206%3A8) when the
 
 Open the [spatial Reader workspace](reader/index.html?tref=Micah%206%3A8) to see a website host assume additional responsibility for pane placement, activation, pruning, request cancellation, and session pins while reusing the same public factories and Reader semantics. The route waits for **Start live demo** before loading its prefilled reference. It is intentionally distinct from the controlled Reader rather than a competing supported API.
 
-The [React Vite example](react-vite/README.md) demonstrates custom host integration with a typed ref, object property assignment, a persistent element, explicit loading, stale suppression, StrictMode cleanup, theme/width controls, and a real `sefaria-source-select` event updating React state.
+The [React Vite example](react-vite/README.md) demonstrates React 19 custom-element properties, an effect-owned controller lifecycle, canonical committed and selected references, reversible vocalization, StrictMode cleanup, and a real `sefaria-source-select` event. The [Alpine Vite example](alpine-vite/README.md) demonstrates the same SourceCard journey with a closure-owned controller outside Alpine's proxy, element-local property effects, declarative event handling, and destroy cleanup.
 
 ## Article and MCP host integration
 

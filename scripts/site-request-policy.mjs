@@ -14,6 +14,7 @@ export function classifySiteRequest({ method, requestUrl, siteOrigin }) {
     [
       "Micah 6",
       "Micah 6:8",
+      "micah 6:8",
       "Rashi on Micah 6:8",
       "Rashi on Micah 6:8:1",
     ].includes(reference) &&

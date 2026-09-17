@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="light dark" />
+    <title>Sefaria Alpine integration example</title>
+  </head>
+  <body>
+    <main class="alpine-example" x-data="sourceCardExample">
+      <header class="intro">
+        <p class="eyebrow">Standalone Alpine consumer</p>
+        <h1>Bind Alpine state to a request-free Sefaria Web Component</h1>
+        <p>
+          Validated supplied data renders first. The controller stays outside
+          Alpine's reactive proxy. Alpine owns the form, presentation
+          properties, and canonical component event.
+        </p>
+      </header>
+
+      <section class="controls" aria-label="Alpine host controls">
+        <form @submit.prevent="loadReference">
+          <label>
+            Reference
+            <input name="tref" x-model="tref" required />
+          </label>
+          <button id="load-live" type="submit">Load reference</button>
+        </form>
+        <div class="display-controls">
+          <button
+            id="theme-toggle"
+            type="button"
+            @click="theme = theme === 'light' ? 'dark' : 'light'"
+            x-text="theme === 'light' ? 'Use dark theme' : 'Use light theme'"
+          ></button>
+          <label>
+            Preview width
+            <input
+              id="preview-width"
+              type="range"
+              min="320"
+              max="960"
+              step="20"
+              x-model.number="previewWidth"
+            />
+            <output x-text="`${previewWidth}px`"></output>
+          </label>
+          <label>
+            Text sides
+            <select id="content-language" x-model="contentLanguage">
+              <option value="both">Hebrew and translation</option>
+              <option value="primary">Primary only</option>
+              <option value="translation">Translation only</option>
+            </select>
+          </label>
+          <label>
+            Layout
+            <select id="layout" x-model="layout">
+              <option value="auto">Automatic</option>
+              <option value="side-by-side">Side by side</option>
+              <option value="stacked">Stacked</option>
+            </select>
+          </label>
+          <label>
+            Side order
+            <select id="side-order" x-model="sideOrder">
+              <option value="primary-first">Primary first</option>
+              <option value="translation-first">Translation first</option>
+            </select>
+          </label>
+          <label>
+            Hebrew marks
+            <select id="vocalization-mode" x-model="vocalizationMode">
+              <option value="taamim_and_nikkud">Cantillation and vowels</option>
+              <option value="nikkud">Vowels only</option>
+              <option value="none">No marks</option>
+            </select>
+          </label>
+        </div>
+      </section>
+
+      <p id="request-status" class="status" role="status" x-text="status"></p>
+      <p id="request-count" class="status">
+        Live load attempts: <span x-text="loadAttempts"></span>
+      </p>
+      <p
+        id="committed-ref"
+        class="status"
+        x-text="committedRef === undefined
+          ? 'Current result has no committed canonical reference.'
+          : `Current committed reference: ${committedRef}.`"
+      ></p>
+      <p
+        id="load-error"
+        class="failure"
+        role="alert"
+        x-show="failure !== undefined"
+        x-text="failure ?? ''"
+      ></p>
+
+      <section
+        id="preview"
+        class="preview"
+        :data-theme="theme"
+        :style="`max-width: ${previewWidth}px`"
+      >
+        <sefaria-source-card
+          x-ref="card"
+          x-init="$nextTick(() => attach($el, $data))"
+          x-effect="syncCard($el, contentLanguage, layout, sideOrder, vocalizationMode, selectable, selectedPosition)"
+          @sefaria-source-select="selectSource($event)"
+        ></sefaria-source-card>
+      </section>
+
+      <p
+        id="selected-ref"
+        class="event-state"
+        aria-live="polite"
+        x-text="selectedRef === undefined
+          ? 'Select the rendered segment to send its canonical component event to Alpine.'
+          : `Alpine received selection: ${selectedRef}.`"
+      ></p>
+    </main>
+    <script type="module" src="./src/main.ts"></script>
+  </body>
+</html>

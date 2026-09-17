@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by avilevin.
 
 # Documentation
 
@@ -29,7 +29,7 @@ The controlled Reader's navigation controller is supplied by the toolkit. The ap
 5. [Customize presentation and use headless APIs](learn/05-customization.md): theme, width, side visibility/order, layout, client, factories, and text transforms.
 6. [Integrate an authored article or MCP host](learn/06-host-integration.md): native-link enhancement, server-provided data, host-proxied tools, and the click-to-start static MCP host.
 
-React users can branch from steps 2 and 3 into [Use the Web Components from React](learn/react.md). Web Components are browser-standard custom elements, so React can host them without a toolkit-specific wrapper package.
+React users can branch from steps 2 and 3 into [Use the Web Components from React](learn/react.md). Alpine users can follow the same controller and property flow in [Use the Web Components from Alpine](learn/alpine.md). Web Components are browser-standard custom elements, so neither framework needs a toolkit-specific wrapper package.
 
 ## Understand the design
 

@@ -36,6 +36,7 @@ const tarballs = path.join(root, "tarballs");
 const consumers = {
   vanilla: path.join(root, "vanilla-consumer"),
   react: path.join(root, "react-consumer"),
+  alpine: path.join(root, "alpine-consumer"),
 };
 const packageDefinitions = [
   {
@@ -117,6 +118,11 @@ try {
     example: "react-vite",
     name: "sefaria-toolkit-tarball-react-consumer",
   });
+  await stageConsumer({
+    consumer: consumers.alpine,
+    example: "alpine-vite",
+    name: "sefaria-toolkit-tarball-alpine-consumer",
+  });
   for (const consumer of Object.values(consumers)) {
     run("pnpm", ["install", "--lockfile-only"], consumer);
     run("pnpm", ["install", "--frozen-lockfile"], consumer);
@@ -126,11 +132,13 @@ try {
   await rm(tarballs, { force: true, recursive: true });
   run("pnpm", ["build"], consumers.vanilla);
   run("pnpm", ["build"], consumers.react);
+  run("pnpm", ["build"], consumers.alpine);
   await smokeVanillaChromium();
   await smokeReactChromium();
+  await smokeAlpineChromium();
 
   process.stdout.write(
-    "Tarball consumers: manifests, contents, resolution, all exports, vanilla and React builds, Node paths, and Chromium smokes passed.\n",
+    "Tarball consumers: manifests, contents, resolution, all exports, vanilla, React, and Alpine builds, Node paths, and Chromium smokes passed.\n",
   );
 } finally {
   await rm(root, { force: true, recursive: true });
@@ -392,7 +400,7 @@ async function smokeVanillaChromium() {
       await page.locator("#load-live").click();
       await page
         .locator("#status[data-request-count='1']")
-        .filter({ hasText: "Loaded live Micah 6:8 data" })
+        .filter({ hasText: "Committed canonical reference Micah 6:8" })
         .waitFor();
       const result = await page.evaluate(() => {
         const card = globalThis.document.querySelector("sefaria-source-card");
@@ -469,11 +477,12 @@ async function smokeReactChromium() {
             ["version", "translation"],
             ["return_format", "default"],
           ];
+          const requestPath = decodeURIComponent(requestUrl.pathname);
           if (
             request.method() !== "GET" ||
             requestUrl.origin !== "https://www.sefaria.org" ||
-            decodeURIComponent(requestUrl.pathname) !==
-              "/api/v3/texts/Micah 6:8" ||
+            (requestPath !== "/api/v3/texts/Micah 6:8" &&
+              requestPath !== "/api/v3/texts/micah 6:8") ||
             JSON.stringify([...requestUrl.searchParams.entries()]) !==
               JSON.stringify(expectedQuery)
           ) {
@@ -503,7 +512,7 @@ async function smokeReactChromium() {
         !initial.registered ||
         initial.state !== "data" ||
         initial.serialized !== null ||
-        !initial.status?.includes("No request") ||
+        !initial.status?.includes("zero live loads") ||
         requestCount !== 0
       ) {
         throw new Error(
@@ -525,10 +534,11 @@ async function smokeReactChromium() {
         );
       }
 
+      await page.locator('input[name="tref"]').fill("micah 6:8");
       await page.locator("#load-live").click();
       await page
         .locator("#request-status")
-        .filter({ hasText: "Loaded Micah 6:8" })
+        .filter({ hasText: "Committed canonical reference Micah 6:8" })
         .waitFor();
       await page.evaluate(async () => {
         const card = globalThis.document.querySelector("sefaria-source-card");
@@ -568,6 +578,177 @@ async function smokeReactChromium() {
       ) {
         throw new Error(
           `Unexpected packed React live result: ${JSON.stringify(loaded)}`,
+        );
+      }
+    } finally {
+      await browser.close();
+    }
+  } finally {
+    await server.close();
+  }
+}
+
+async function smokeAlpineChromium() {
+  const consumer = consumers.alpine;
+  const fixture = JSON.parse(
+    await readFile(path.join(consumer, "src", "micah-6-8.json"), "utf8"),
+  );
+  const server = await preview({
+    root: consumer,
+    preview: {
+      host: "127.0.0.1",
+      port: 0,
+    },
+  });
+  try {
+    const address = server.httpServer.address();
+    if (!address || typeof address === "string") {
+      throw new Error(
+        "Alpine Vite preview did not expose its assigned address.",
+      );
+    }
+    const url = `http://127.0.0.1:${address.port}/`;
+    await waitForServer(url);
+    const browser = await chromium.launch({ headless: true });
+    try {
+      const page = await browser.newPage();
+      let requestCount = 0;
+      await page.route(
+        "https://www.sefaria.org/api/v3/texts/**",
+        async (route) => {
+          const request = route.request();
+          const requestUrl = new globalThis.URL(request.url());
+          const requestPath = decodeURIComponent(requestUrl.pathname);
+          const expectedQuery = [
+            ["version", "primary"],
+            ["version", "translation"],
+            ["return_format", "default"],
+          ];
+          if (
+            request.method() !== "GET" ||
+            requestUrl.origin !== "https://www.sefaria.org" ||
+            (requestPath !== "/api/v3/texts/Micah 6:8" &&
+              requestPath !== "/api/v3/texts/micah 6:8") ||
+            JSON.stringify([...requestUrl.searchParams.entries()]) !==
+              JSON.stringify(expectedQuery)
+          ) {
+            throw new Error(
+              `Unexpected packed Alpine request: ${request.method()} ${requestUrl}`,
+            );
+          }
+          requestCount += 1;
+          await route.fulfill({ json: fixture });
+        },
+      );
+      await page.goto(url);
+      const card = page.locator("sefaria-source-card");
+      await card.waitFor();
+      await page
+        .locator("#request-status")
+        .filter({ hasText: "zero live loads" })
+        .waitFor();
+      const initial = await page.evaluate(() => {
+        const element = globalThis.document.querySelector(
+          "sefaria-source-card",
+        );
+        Object.assign(globalThis, { __packedAlpineCard: element });
+        return {
+          registered:
+            globalThis.customElements.get("sefaria-source-card") !== undefined,
+          state: element?.viewModel?.state,
+          serialized: element?.getAttribute("viewModel"),
+        };
+      });
+      if (
+        !initial.registered ||
+        initial.state !== "data" ||
+        initial.serialized !== null ||
+        requestCount !== 0
+      ) {
+        throw new Error(
+          `Unexpected packed Alpine initial state: ${JSON.stringify(initial)}`,
+        );
+      }
+
+      await page.locator("#layout").selectOption("stacked");
+      await page.locator("#side-order").selectOption("translation-first");
+      await page.locator("#vocalization-mode").selectOption("none");
+      const visual = await page.evaluate(() => {
+        const element = globalThis.document.querySelector(
+          "sefaria-source-card",
+        );
+        return {
+          stable: element === globalThis.__packedAlpineCard,
+          layout: element?.layout,
+          sideOrder: element?.sideOrder,
+          vocalizationMode: element?.vocalizationMode,
+          selectedAttribute: element?.getAttribute("selectedPosition"),
+        };
+      });
+      if (
+        !visual.stable ||
+        visual.layout !== "stacked" ||
+        visual.sideOrder !== "translation-first" ||
+        visual.vocalizationMode !== "none" ||
+        visual.selectedAttribute !== null ||
+        requestCount !== 0
+      ) {
+        throw new Error(
+          `Packed Alpine visual controls changed request ownership: ${JSON.stringify(visual)}`,
+        );
+      }
+
+      await page.locator('input[name="tref"]').fill("micah 6:8");
+      await page.locator("#load-live").click();
+      await page
+        .locator("#request-status")
+        .filter({ hasText: "Committed canonical reference Micah 6:8" })
+        .waitFor();
+      await page.evaluate(async () => {
+        const element = globalThis.document.querySelector(
+          "sefaria-source-card",
+        );
+        if (!element) throw new Error("Packed Alpine source card is missing.");
+        await element.updateComplete;
+        const button = element.shadowRoot?.querySelector(
+          'button[aria-label="Show connections for Micah 6:8"]',
+        );
+        if (!(button instanceof globalThis.HTMLButtonElement)) {
+          throw new Error("Packed Alpine selection control is missing.");
+        }
+        button.click();
+      });
+      await page
+        .locator("#selected-ref")
+        .filter({ hasText: "Alpine received selection: Micah 6:8" })
+        .waitFor();
+      const loaded = await page.evaluate(() => {
+        const element = globalThis.document.querySelector(
+          "sefaria-source-card",
+        );
+        return {
+          stable: element === globalThis.__packedAlpineCard,
+          state: element?.viewModel?.state,
+          selected: element?.selectedPosition,
+          eventText:
+            globalThis.document.querySelector("#selected-ref")?.textContent,
+          requestText:
+            globalThis.document.querySelector("#request-count")?.textContent,
+          committedText:
+            globalThis.document.querySelector("#committed-ref")?.textContent,
+        };
+      });
+      if (
+        requestCount !== 1 ||
+        !loaded.stable ||
+        loaded.state !== "data" ||
+        JSON.stringify(loaded.selected) !== "[]" ||
+        !loaded.eventText?.includes("Alpine received selection: Micah 6:8") ||
+        !loaded.requestText?.includes("1") ||
+        !loaded.committedText?.includes("Micah 6:8")
+      ) {
+        throw new Error(
+          `Unexpected packed Alpine live result: ${JSON.stringify(loaded)}`,
         );
       }
     } finally {

@@ -99,7 +99,19 @@ try {
           await page.locator("#load-live").click();
           await page
             .locator("#request-status")
-            .filter({ hasText: "Loaded Micah 6:8." })
+            .filter({ hasText: "Committed canonical reference Micah 6:8." })
+            .waitFor();
+        },
+      },
+      {
+        name: "Alpine consumer",
+        route: "/examples/alpine/index.html",
+        maximumRequests: 1,
+        run: async () => {
+          await page.locator("#load-live").click();
+          await page
+            .locator("#request-status")
+            .filter({ hasText: "Committed canonical reference Micah 6:8." })
             .waitFor();
         },
       },
