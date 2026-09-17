@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self' data: 'sha256-__PLAYGROUND_IMPORT_MAP_HASH__'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-src data:; child-src data:; worker-src 'none'; object-src 'none'; form-action 'none'; base-uri 'none'"
+    />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Supplied-data component editor</title>
+  </head>
+  <body>
+    <main>
+      <header class="intro">
+        <p class="eyebrow">Supplied data · zero live requests</p>
+        <h1>Component editor</h1>
+        <p>
+          Edit maintained HTML, CSS, and JavaScript. Drafts run only when you
+          choose <strong>Run</strong>.
+        </p>
+        <nav aria-label="Trusted project resources">
+          <a href="../../learn/02-supplied-data.html">Package setup</a>
+          <a id="source-link" href="#">View active source</a>
+          <a href="../explorer/source-card.html"
+            >Open the maintained live demo</a
+          >
+        </nav>
+      </header>
+      <section class="workspace" aria-label="Editable supplied-data project">
+        <div class="panel editor-panel">
+          <div class="heading">
+            <div>
+              <p class="eyebrow">Project</p>
+              <h2>SourceCard · Micah 6:8</h2>
+            </div>
+            <p id="draft-status" role="status">Maintained source loaded.</p>
+          </div>
+          <div class="tabs" role="tablist" aria-label="Project files">
+            <button
+              id="tab-html"
+              role="tab"
+              aria-controls="editor"
+              type="button"
+            >
+              HTML
+            </button>
+            <button
+              id="tab-css"
+              role="tab"
+              aria-controls="editor"
+              type="button"
+            >
+              CSS
+            </button>
+            <button
+              id="tab-javascript"
+              role="tab"
+              aria-controls="editor"
+              type="button"
+            >
+              JavaScript
+            </button>
+          </div>
+          <div id="editor" role="tabpanel" aria-labelledby="tab-html"></div>
+          <div class="actions" aria-label="Editor actions">
+            <button id="run" type="button">Run</button>
+            <button id="reset" type="button">Reset</button>
+            <button id="stop" type="button">Stop preview</button>
+            <button id="copy" type="button">Copy active file</button>
+          </div>
+        </div>
+        <div class="panel preview-panel">
+          <div class="heading">
+            <div>
+              <p class="eyebrow">Opaque preview</p>
+              <h2>Result</h2>
+            </div>
+            <p id="preview-status" role="status">Preparing preview.</p>
+          </div>
+          <div id="preview"></div>
+          <section class="diagnostics" aria-labelledby="diagnostics-title">
+            <h3 id="diagnostics-title">Diagnostics</h3>
+            <ol id="diagnostic-list" aria-live="polite"></ol>
+          </section>
+        </div>
+      </section>
+    </main>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

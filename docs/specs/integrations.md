@@ -4,7 +4,7 @@
 
 ## Status
 
-The standalone connections reader, multi-pane website reader workspace, stateful MCP reader, adaptive connections tool and rendering, static browser-embedded MCP reference host, authenticated VS Code reader walkthrough, and authored linked-article integration are current. MCP reader data operations use host-proxied server-tool calls. A successful App `ui/message` response applies only to the reader's separate explicit chat-export action and means the host accepted that message for enqueueing or composer placement.
+The standalone connections reader, multi-pane website reader workspace, stateful MCP reader, adaptive connections tool and rendering, static browser-embedded MCP reference host, supplied-data component editor, authenticated VS Code reader walkthrough, and authored linked-article integration are current. MCP reader data operations use host-proxied server-tool calls. A successful App `ui/message` response applies only to the reader's separate explicit chat-export action and means the host accepted that message for enqueueing or composer placement.
 
 ## Shared integration rules
 
@@ -20,11 +20,25 @@ Unknown JSON must pass a generated `@arithmomaniac/sefaria-client` validator bef
 
 The VitePress site presents the canonical Markdown learning path and embeds isolated production builds of the maintained browser examples. It does not import DOM-dependent toolkit registration into VitePress server rendering, render toolkit component HTML on the server, or hydrate toolkit elements.
 
-The site build includes the explorer, controlled and spatial Reader, vanilla consumer, React consumer, authored linked article, and live browser-embedded MCP host. The live MCP host requires no external server, proxy service, account, or additional hosted origin. Each example keeps its own request ownership, cancellation, stale-result handling, element lifecycle, and tests. No example imports another example at runtime.
+The site build includes the supplied-data editor, explorer, controlled and spatial Reader, vanilla consumer, React consumer, authored linked article, and live browser-embedded MCP host. The live MCP host requires no external server, proxy service, account, or additional hosted origin. Each example keeps its own request ownership, cancellation, stale-result handling, element lifecycle, and tests. No example imports another example at runtime.
 
 Landing pages, authored-state previews, live demo routes, and reference deep links make no unsolicited Sefaria request. A live route prefills its bounded initial input and presents an explicit start action. Only click, keyboard activation, or an equally explicit example-preset or authored-citation activation starts live data. Live operations preserve network, abort, contract-validation, documented HTTP, projection, partial, and empty distinctions and do not substitute fixture success after a failure.
 
 The live MCP route is the static site's in-memory protocol and AppBridge acceptance path. The compiled local Node reference host remains the Streamable HTTP acceptance path.
+
+### Supplied-data component editor [Current]
+
+The component editor exposes maintained HTML, CSS, and plain JavaScript files for one Micah 6:8 SourceCard project. Editing changes only trusted-host draft state. **Run** snapshots the bounded files into one new preview, **Reset** restores the maintained bytes, and **Stop preview** removes the current frame. The project validates its fixed corrected payload, calls the public pure source-card factory, and assigns only the resulting view model to the registered element. It creates no client and makes no live Sefaria request.
+
+The editor host is a dedicated built page whose leading CSP meta applies `frame-src data:` and `child-src data:` only to that page. Its production JavaScript and CSS are self-hosted bundles. CodeMirror's trusted runtime style attributes require the host's narrowly scoped `style-src 'unsafe-inline'`; edited markup and code never enter the host document. Trusted package-setup, source, and live-demo links remain outside the edited frame.
+
+Each run uses one `sandbox="allow-scripts"` data-document iframe without `allow-same-origin`. The child has a fixed CSP before edited content: scripts are limited to `data:` modules plus the exact import-map hash, styles are inline because Lit and the edited CSS require them, images are data-only, and connect, nested frame, worker, object, media, manifest, form, and base capabilities are denied. The trusted host accepts diagnostics only from the current iframe window with the current cryptographic channel and run identifiers and a bounded schema. Opaque `null` origin is not treated as identity.
+
+The package graph is built from the real public ESM entries with Vite/Rollup. Generated chunk edges are parsed with `es-module-lexer`, rejected unless they name a generated chunk, rewritten to synthetic bare specifiers, and mapped to local data modules. Shared chunks preserve module identity. Importing the pure source-card subpath does not register an element; importing the root web-components entry performs its documented registration once.
+
+The editor rejects unsupported relative, absolute, URL, escaped, and dynamic project imports rather than adding a browser resolver. The one declared local payload module is parsed and converted to a data module by the trusted host. There is no service worker, runtime package installation, CDN, source alias, fetch broker, retry, cache, fixture transport, compiler, or live-data fallback.
+
+Source files, total project source, diagnostics, message envelopes, and active previews have finite tested limits. Chromium, Firefox, and WebKit acceptance runs at `/` and `/sefaria-frontend-toolkit/` without `bypassCSP`; WebKit evidence does not claim every Safari version or device. The sandbox is a browser capability boundary, not a CPU, heap, or process-isolation guarantee, and Stop/recreate does not promise recovery from every tight loop.
 
 ### Static browser-embedded MCP host [Current]
 
