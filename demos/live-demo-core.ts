@@ -4,23 +4,28 @@ export interface LiveDemoViewModel {
   readonly state: string;
 }
 
-/** Loads one component view model for a live-demo request. */
-export type LiveDemoLoader<TRequest, TViewModel extends LiveDemoViewModel> = (
-  request: TRequest,
-  signal: AbortSignal,
-) => Promise<TViewModel>;
+/** Owner controller contract used by a shared live-demo host. */
+export interface LiveDemoController<
+  TRequest,
+  TViewModel extends LiveDemoViewModel,
+> {
+  readonly snapshot: {
+    readonly result?: { readonly viewModel: TViewModel };
+    readonly attempt:
+      | { readonly state: "idle" }
+      | { readonly state: "loading" }
+      | { readonly state: "failed"; readonly error: unknown };
+  };
+  load(request: TRequest): Promise<TViewModel>;
+}
 
 /** Host bindings used by the shared live-demo request lifecycle. */
 export interface LiveDemoRunnerOptions<
   TRequest,
   TViewModel extends LiveDemoViewModel,
 > {
-  /** Component-specific async factory adapter. */
-  readonly loader: LiveDemoLoader<TRequest, TViewModel>;
-  /** Constructs the component-specific loading view model. */
-  readonly createLoadingViewModel: (request: TRequest) => TViewModel;
-  /** Supplies a loading or terminal view model to the component. */
-  readonly setViewModel: (viewModel: TViewModel) => void;
+  /** Component-specific owner controller. */
+  readonly controller: LiveDemoController<TRequest, TViewModel>;
   /** Formats the request for host-owned status text. */
   readonly formatRequest: (request: TRequest) => string;
   /** Host status element. */
@@ -96,10 +101,9 @@ export interface LiveDemoOptions<
   readonly presets: readonly LiveDemoPreset[];
   readonly submitLabel: string;
   readonly createResultElement: (document: Document) => TResult;
-  readonly loader: LiveDemoLoader<TRequest, TViewModel>;
+  readonly controller: LiveDemoController<TRequest, TViewModel>;
+  readonly bindController: (result: TResult) => void;
   readonly createRequest: (form: HTMLFormElement) => TRequest;
-  readonly createLoadingViewModel: (request: TRequest) => TViewModel;
-  readonly setViewModel: (result: TResult, viewModel: TViewModel) => void;
   readonly formatRequest: (request: TRequest) => string;
   readonly configureResult?: (result: TResult, form: HTMLFormElement) => void;
 }
@@ -121,13 +125,10 @@ export function startLiveDemo<
   const mount = requireElement<HTMLElement>(root, "#live-demo-root");
   const page = createLiveDemoPage(root, options);
   mount.replaceChildren(page.main);
+  options.bindController(page.result);
 
   const runner = createLiveDemoRunner({
-    loader: options.loader,
-    createLoadingViewModel: options.createLoadingViewModel,
-    setViewModel: (viewModel) => {
-      options.setViewModel(page.result, viewModel);
-    },
+    controller: options.controller,
     formatRequest: options.formatRequest,
     requestState: page.requestState,
     hostError: page.hostError,
@@ -179,17 +180,9 @@ export function createLiveDemoRunner<
 >(
   options: LiveDemoRunnerOptions<TRequest, TViewModel>,
 ): LiveDemoRunner<TRequest> {
-  let activeController: AbortController | undefined;
-  let activeOperation = 0;
-
   const run = async (request: TRequest): Promise<void> => {
-    activeController?.abort();
-    const controller = new AbortController();
-    activeController = controller;
-    const operation = ++activeOperation;
     const requestLabel = options.formatRequest(request);
 
-    options.setViewModel(options.createLoadingViewModel(request));
     options.requestState.dataset.state = "loading";
     options.requestState.textContent = `Loading ${requestLabel} from Sefaria.`;
     options.hostError.hidden = true;
@@ -197,15 +190,17 @@ export function createLiveDemoRunner<
     options.submitButton.disabled = true;
 
     try {
-      const viewModel = await options.loader(request, controller.signal);
-      if (operation !== activeOperation) {
+      const viewModel = await options.controller.load(request);
+      if (options.controller.snapshot.result?.viewModel !== viewModel) {
         return;
       }
-      options.setViewModel(viewModel);
       options.requestState.dataset.state = viewModel.state;
       options.requestState.textContent = `${requestLabel} produced ${viewModel.state}.`;
     } catch (error) {
-      if (controller.signal.aborted || operation !== activeOperation) {
+      if (
+        options.controller.snapshot.attempt.state !== "failed" ||
+        options.controller.snapshot.attempt.error !== error
+      ) {
         return;
       }
       options.requestState.dataset.state = "error";
@@ -214,7 +209,7 @@ export function createLiveDemoRunner<
       options.hostError.textContent =
         error instanceof Error ? error.message : String(error);
     } finally {
-      if (operation === activeOperation) {
+      if (options.controller.snapshot.attempt.state !== "loading") {
         options.submitButton.disabled = false;
       }
     }

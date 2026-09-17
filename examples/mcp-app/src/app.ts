@@ -6,11 +6,11 @@ import {
   validateExternalResponse,
 } from "@arithmomaniac/sefaria-client";
 import {
-  bindReaderController,
   SefariaReader,
   SefariaSourceCard,
   type SourceCardViewModel,
 } from "@arithmomaniac/sefaria-web-components";
+import { bindReaderController } from "@arithmomaniac/sefaria-web-components/bindings";
 import {
   type ConnectionsProjection,
   type ConnectionsRequest,

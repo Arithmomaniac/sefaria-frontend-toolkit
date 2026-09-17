@@ -2,10 +2,9 @@ import {
   createSefariaClient,
   type SefariaClient,
 } from "@arithmomaniac/sefaria-client";
-import {
-  bindReaderController,
-  type SefariaReader,
-} from "@arithmomaniac/sefaria-web-components";
+import "@arithmomaniac/sefaria-web-components";
+import type { SefariaReader } from "@arithmomaniac/sefaria-web-components";
+import { bindReaderController } from "@arithmomaniac/sefaria-web-components/bindings";
 import {
   loadReaderController,
   type ReaderController,
@@ -14,7 +13,7 @@ import {
 
 /** Browser controls exposed for qualification of the supported reader path. */
 export interface ControlledReaderDemo {
-  /** Opens a new root reference through the public controller async factory. */
+  /** Opens an initial or replacement root on one persistent controller. */
   readonly navigate: (targetRef: string) => Promise<void>;
   /** Removes host listeners and disposes controller-owned work. */
   readonly dispose: () => void;
@@ -84,14 +83,38 @@ export function startControlledReader(
   };
 
   const navigate = async (targetRef: string): Promise<void> => {
+    const normalized = targetRef.trim();
+    const currentGeneration = ++generation;
+    clearError();
+    if (controller !== undefined) {
+      const currentController = controller;
+      try {
+        await currentController.replaceRoot(
+          { tref: normalized },
+          {
+            presentation: {
+              vocalizationMode: readVocalizationMode(vocalizationMode.value),
+            },
+          },
+        );
+        if (
+          controller === currentController &&
+          generation === currentGeneration &&
+          currentController.snapshot.task.state !== "error"
+        ) {
+          tref.value = normalized;
+        }
+      } catch (error) {
+        status.textContent = `${normalized} could not be opened.`;
+        showError(error);
+      }
+      return;
+    }
+
     initialization?.abort();
     initialization = new AbortController();
     const currentInitialization = initialization;
-    const currentGeneration = ++generation;
-    releaseController();
-    reader.viewModel = undefined;
-    clearError();
-    const normalized = targetRef.trim();
+    reader.rootLoading = true;
     status.textContent = `Opening ${normalized}.`;
     try {
       const next = await loadReaderController({ tref: normalized }, client, {
@@ -118,6 +141,11 @@ export function startControlledReader(
       ) {
         status.textContent = `${normalized} could not be opened.`;
         showError(error);
+      }
+    } finally {
+      if (initialization === currentInitialization) {
+        initialization = undefined;
+        reader.rootLoading = false;
       }
     }
   };

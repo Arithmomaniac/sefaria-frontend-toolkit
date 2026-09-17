@@ -4,7 +4,7 @@
 
 ## Objective
 
-Use React 19 as the host for the same browser registration, source-card factories, view model, and event used by the vanilla path. Keep one custom-element instance mounted, assign object properties without attribute serialization, render a real selection event into React state, and clean up listeners and requests under StrictMode.
+Use React 19 as the host for the same browser registration, source-card controller, view model, and event used by the vanilla path. Keep one custom-element instance mounted, bind its headless controller, assign presentation properties without attribute serialization, render a real selection event into React state, and clean up listeners and requests under StrictMode.
 
 This is an integration pattern, not a React wrapper package or toolkit runtime dependency.
 
@@ -53,26 +53,32 @@ function useElementProperty<
 }
 ```
 
-The maintained component keeps the element stable, enables selection for rendered data, attaches the native event once per element, and displays the event through React state:
+The maintained component keeps the element stable, binds one source-card controller, enables selection for rendered data, attaches the native event once per element, and displays the event through React state:
 
 ```tsx
 const [selected, setSelected] = useState<SourceSelection>();
 const cardRef = useRef<SefariaSourceCard>(null);
+const unbind = useRef<(() => void) | undefined>(undefined);
 
-useElementProperty(cardRef, "viewModel", viewModel);
 useElementProperty(cardRef, "selectable", viewModel.state === "data");
 useElementProperty(cardRef, "selectedPosition", selected?.position);
 
-const setCardRef = useCallback((card: SefariaSourceCard | null): void => {
-  const previous = cardRef.current;
-  if (previous !== null) {
-    previous.removeEventListener("sefaria-source-select", onSourceSelection);
-  }
-  cardRef.current = card;
-  if (card !== null) {
-    card.addEventListener("sefaria-source-select", onSourceSelection);
-  }
-}, []);
+const setCardRef = useCallback(
+  (card: SefariaSourceCard | null): void => {
+    const previous = cardRef.current;
+    if (previous !== null) {
+      previous.removeEventListener("sefaria-source-select", onSourceSelection);
+    }
+    unbind.current?.();
+    unbind.current = undefined;
+    cardRef.current = card;
+    if (card !== null) {
+      unbind.current = bindSourceCardController(card, controller);
+      card.addEventListener("sefaria-source-select", onSourceSelection);
+    }
+  },
+  [controller],
+);
 
 function onSourceSelection(event: Event): void {
   const detail = (event as CustomEvent<SourceSelection>).detail;
@@ -91,52 +97,46 @@ return (
 );
 ```
 
-The host also owns request identity and cleanup. These are the load/unmount guards used by the maintained app:
+The component subpath's headless controller owns attempt identity, cancellation, and stale-result rejection. React subscribes only to keep its diagnostics and presentation state aligned, while the DOM binding supplies loading and terminal view models to the element:
 
 ```tsx
-const controller = useRef<AbortController | undefined>(undefined);
-const operation = useRef(0);
+const [controller] = useState(() => {
+  const next = createSourceCardController(client);
+  next.setSuppliedData({ tref: "Micah 6:8" }, suppliedPayload);
+  return next;
+});
 const mounted = useRef(true);
 
 useEffect(() => {
   mounted.current = true;
+  const unsubscribe = controller.subscribe((snapshot) => {
+    const displayed =
+      snapshot.attempt.state === "loading"
+        ? snapshot.attempt.viewModel
+        : snapshot.result?.viewModel;
+    if (displayed !== undefined) setViewModel(displayed);
+  });
   return () => {
     mounted.current = false;
-    operation.current += 1;
-    controller.current?.abort();
+    unsubscribe();
+    controller.cancel();
   };
-}, []);
+}, [controller]);
 
-controller.current?.abort();
-const currentController = new AbortController();
-controller.current = currentController;
-const currentOperation = ++operation.current;
-
-const next = await loadSourceCardViewModel(
-  { tref: normalized },
-  client,
-  currentController.signal,
-);
-if (
-  mounted.current &&
-  !currentController.signal.aborted &&
-  currentOperation === operation.current
-) {
-  setViewModel(next);
-}
+await controller.load({ tref: normalized });
 ```
 
 ## Expected result
 
-The initial card comes from validated supplied data and reports zero requests. **Load from Sefaria** is the only action that calls the public async factory. Selecting the rendered Micah 6:8 row emits `sefaria-source-select`, and the visible React status changes to `React received selection: Micah 6:8.` Theme, width, and displayed-side controls preserve the same element and do not refetch.
+The initial card comes from validated supplied data and reports zero requests. **Load from Sefaria** is the only action that calls the public controller's live operation. Selecting the rendered Micah 6:8 row emits `sefaria-source-select`, and the visible React status changes to `React received selection: Micah 6:8.` Theme, width, and displayed-side controls preserve the same element and do not refetch.
 
-React development StrictMode may repeat setup and cleanup. The maintained code removes the listener from the previous element, makes no mount-time request, aborts unmounted work, and rejects stale completion without adding request coalescing or a hidden singleton.
+React development StrictMode may repeat setup and cleanup. The maintained code unbinds the previous element, removes its listener, makes no mount-time request, cancels unmounted work, and rejects stale completion without adding request coalescing or a hidden singleton.
 
 <iframe class="example-frame react" title="React custom-element integration" src="../examples/react/index.html"></iframe>
 
 ## Who owns what
 
-React owns state, the typed ref, property assignment, event listener lifecycle, input, loading/error UI, cancellation, stale-result rejection, and element placement. The async factory owns one admitted request and projection. The custom element remains request-free and owns rendering and event emission.
+React owns state, the typed ref, presentation-property assignment, event listener and binding lifecycle, input, loading/error UI, and element placement. The source-card controller owns one surface's attempts, cancellation, stale-result rejection, supplied validation, request, and projection. The custom element remains request-free and owns rendering and event emission.
 
 ## Exercise
 

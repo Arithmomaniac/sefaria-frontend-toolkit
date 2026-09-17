@@ -5,9 +5,10 @@ import {
 } from "@arithmomaniac/sefaria-client";
 
 import { createConnectionsQuery } from "./connections-request.js";
-import type {
-  ConnectionsProjection,
-  ConnectionsRequest,
+import {
+  CONNECTIONS_PAGE_SIZE,
+  type ConnectionsProjection,
+  type ConnectionsRequest,
 } from "./connections-panel.js";
 import { createReaderViewModel, type ReaderViewModel } from "./reader.js";
 import {
@@ -30,6 +31,18 @@ import type {
   SourceCardNavigation,
   SourceCardRequest,
 } from "./source-card.js";
+
+interface RetainedSourceRoot {
+  readonly selectedRef: string;
+  readonly selectedPosition: readonly number[];
+}
+
+interface ReaderSessionWithRetainedSourceRoot extends ReaderSession {
+  replaceRootFromCurrentSource(
+    request: SourceCardRequest,
+    presentation?: ReaderPresentationPatch,
+  ): ReaderTransition<RetainedSourceRoot> | undefined;
+}
 
 /** Executes corrected source and connections operations for one reader controller. */
 export interface ReaderControllerDataSource {
@@ -123,6 +136,14 @@ export interface ReaderControllerLoadOptions extends ReaderSessionOptions {
   readonly connections?: ReaderControllerInitialConnections;
 }
 
+/** Options for replacing a controller's committed external root. */
+export interface ReaderControllerRootOptions {
+  /** Fresh-root display-state overrides. */
+  readonly presentation?: ReaderPresentationPatch;
+  /** Fresh-root connections request and projection options. */
+  readonly connections?: ReaderControllerInitialConnections;
+}
+
 /** Identified source-selection action emitted by the reader surface. */
 export interface ReaderControllerSourceSelection {
   /** Entry that emitted the action. */
@@ -181,6 +202,11 @@ export interface ReaderController {
   readonly snapshot: ReaderControllerSnapshot;
   /** Subscribes immediately and after every committed snapshot replacement. */
   subscribe(listener: (snapshot: ReaderControllerSnapshot) => void): () => void;
+  /** Replaces all committed history after qualifying one external root. */
+  replaceRoot(
+    request: SourceCardRequest,
+    options?: ReaderControllerRootOptions,
+  ): Promise<void>;
   /** Selects a source row and replaces its connections. */
   selectSource(action: ReaderControllerSourceSelection): Promise<void>;
   /** Opens a connected source as a new reader-history entry. */
@@ -358,6 +384,84 @@ class ReaderControllerImpl implements ReaderController {
     return () => {
       this.#listeners.delete(listener);
     };
+  }
+
+  async replaceRoot(
+    request: SourceCardRequest,
+    options: ReaderControllerRootOptions = {},
+  ): Promise<void> {
+    const targetRequest = normalizeSourceRequest(request);
+    validateRootOptions(options);
+    const retained = (
+      this.#session as ReaderSessionWithRetainedSourceRoot
+    ).replaceRootFromCurrentSource(targetRequest, options.presentation);
+    if (retained !== undefined) {
+      if (retained.state === "rejected") {
+        this.#session = retained.session;
+        this.failTask(retained.reason, retained.message);
+        return;
+      }
+      const active = this.startPhysicalOperation();
+      this.#session = retained.session;
+      this.#task = { state: "idle" };
+      this.publish();
+      try {
+        await this.loadConnections(
+          this.#session.view.currentEntryId,
+          normalizeConnectionsRequest({
+            tref: retained.value.selectedRef,
+            withText: options.connections?.withText !== false,
+          }),
+          options.connections?.projection ?? {},
+          active,
+        );
+      } finally {
+        this.finishPhysicalOperation(active);
+      }
+      return;
+    }
+    const active = this.startPhysicalOperation();
+    this.replaceTask({
+      state: "loading-source",
+      originEntryId: this.#session.view.currentEntryId,
+      targetRef: targetRequest.tref,
+    });
+    try {
+      const destination = await resolveDestination(
+        targetRequest,
+        this.#dataSource,
+        active.controller.signal,
+      );
+      if (!this.isActive(active)) return;
+      const replaced = this.#session.replaceRoot({
+        source: destination.content,
+        selectedPosition: destination.selectedPosition,
+        ...(options.presentation === undefined
+          ? {}
+          : { presentation: options.presentation }),
+      });
+      this.#session = replaced.session;
+      if (replaced.state === "rejected") {
+        this.failTask(replaced.reason, replaced.message);
+        return;
+      }
+      this.#task = { state: "idle" };
+      this.publish();
+      await this.loadConnections(
+        this.#session.view.currentEntryId,
+        normalizeConnectionsRequest({
+          tref: destination.selectedRef,
+          withText: options.connections?.withText !== false,
+        }),
+        options.connections?.projection ?? {},
+        active,
+      );
+    } catch (error) {
+      if (!this.isActive(active)) return;
+      this.failTask(classifySourceError(error), errorMessage(error));
+    } finally {
+      this.finishPhysicalOperation(active);
+    }
   }
 
   async selectSource(action: ReaderControllerSourceSelection): Promise<void> {
@@ -873,6 +977,7 @@ function requireMatchingRequest(
 }
 
 function normalizeSourceRequest(request: SourceCardRequest): SourceCardRequest {
+  validateSourceRequest(request);
   return deepFreeze({
     ...request,
     tref: request.tref.trim(),
@@ -883,6 +988,56 @@ function normalizeSourceRequest(request: SourceCardRequest): SourceCardRequest {
       ? {}
       : { translation: { ...request.translation } }),
   });
+}
+
+function validateSourceRequest(request: SourceCardRequest): void {
+  if (request.tref.trim().length === 0) {
+    throw new TypeError("Source reference must not be blank.");
+  }
+  for (const selection of [request.primary, request.translation]) {
+    if (selection !== undefined && selection.versionTitle.trim().length === 0) {
+      throw new TypeError("Source version title must not be blank.");
+    }
+  }
+}
+
+function validateRootOptions(options: ReaderControllerRootOptions): void {
+  const presentation = options.presentation;
+  if (
+    (presentation?.contentLanguage !== undefined &&
+      !["primary", "translation", "both"].includes(
+        presentation.contentLanguage,
+      )) ||
+    (presentation?.layout !== undefined &&
+      !["auto", "stacked", "side-by-side"].includes(presentation.layout)) ||
+    (presentation?.sideOrder !== undefined &&
+      !["primary-first", "translation-first"].includes(
+        presentation.sideOrder,
+      )) ||
+    (presentation?.vocalizationMode !== undefined &&
+      !["taamim_and_nikkud", "nikkud", "none"].includes(
+        presentation.vocalizationMode,
+      ))
+  ) {
+    throw new TypeError("Reader presentation contains an unsupported value.");
+  }
+  const projection = options.connections?.projection;
+  const page = projection?.page ?? 0;
+  if (
+    !Number.isSafeInteger(page) ||
+    page < 0 ||
+    page >= Number.MAX_SAFE_INTEGER / CONNECTIONS_PAGE_SIZE
+  ) {
+    throw new RangeError(
+      "Connections page must be a nonnegative bounded integer.",
+    );
+  }
+  if (
+    projection?.category !== undefined &&
+    projection.category.trim().length === 0
+  ) {
+    throw new TypeError("Connections category must not be blank.");
+  }
 }
 
 function normalizeConnectionsRequest(

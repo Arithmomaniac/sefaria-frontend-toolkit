@@ -15,6 +15,12 @@ import type {
   BilingualPairPresentSide,
   BilingualPairSide,
 } from "./bilingual-pair.js";
+import {
+  ComponentControllerEngine,
+  validateSuppliedComponentData,
+  type ComponentControllerAttempt,
+  type ComponentControllerSnapshot,
+} from "./component-controller.js";
 
 /** Payload role rendered on one bilingual side. */
 export type BilingualSegmentSide = BilingualPairSide;
@@ -123,6 +129,58 @@ export type BilingualSegmentViewModel =
   | BilingualSegmentProjectionErrorViewModel
   | BilingualSegmentHttpErrorViewModel;
 
+/** Terminal bilingual state committed by a headless controller. */
+export type BilingualSegmentTerminalViewModel = Exclude<
+  BilingualSegmentViewModel,
+  BilingualSegmentLoadingViewModel
+>;
+
+/** One committed bilingual request and terminal rendering result. */
+export interface BilingualSegmentControllerResult {
+  /** Effective request used for the committed result. */
+  readonly request: BilingualSegmentRequest;
+  /** Terminal component view model. */
+  readonly viewModel: BilingualSegmentTerminalViewModel;
+}
+
+/** Current bilingual controller attempt. */
+export type BilingualSegmentControllerAttempt = ComponentControllerAttempt<
+  BilingualSegmentRequest,
+  BilingualSegmentLoadingViewModel
+>;
+
+/** Immutable bilingual controller publication. */
+export type BilingualSegmentControllerSnapshot = ComponentControllerSnapshot<
+  BilingualSegmentControllerResult,
+  BilingualSegmentRequest,
+  BilingualSegmentLoadingViewModel
+>;
+
+/** Stateful DOM-free bilingual-segment loading lifecycle. */
+export interface BilingualSegmentController {
+  /** Current committed result and pending or failed attempt. */
+  readonly snapshot: BilingualSegmentControllerSnapshot;
+  /** Subscribes immediately and after each snapshot replacement. */
+  subscribe(
+    listener: (snapshot: BilingualSegmentControllerSnapshot) => void,
+  ): () => void;
+  /** Loads and commits one bilingual request. */
+  load(
+    request: BilingualSegmentRequest,
+    signal?: AbortSignal,
+  ): Promise<BilingualSegmentTerminalViewModel>;
+  /** Validates and commits supplied corrected response data with zero I/O. */
+  setSuppliedData(
+    request: BilingualSegmentRequest,
+    payload: unknown,
+    status?: 200 | 400 | 404,
+  ): BilingualSegmentTerminalViewModel;
+  /** Cancels active work without disposing committed content. */
+  cancel(reason?: unknown): void;
+  /** Aborts active work and permanently closes the controller. */
+  dispose(): void;
+}
+
 const SIDES: readonly BilingualSegmentSide[] = ["primary", "translation"];
 
 /**
@@ -218,6 +276,100 @@ export async function loadBilingualSegmentViewModel(
   client: SefariaClient,
   signal?: AbortSignal,
 ): Promise<BilingualSegmentViewModel> {
+  const response = await requestBilingualSegmentResponse(
+    request,
+    client,
+    signal,
+  );
+  return projectBilingualSegmentResponse(
+    request,
+    response.payload,
+    response.status,
+  );
+}
+
+/** Creates a zero-request bilingual controller with an optional live client. */
+export function createBilingualSegmentController(
+  client?: SefariaClient,
+): BilingualSegmentController {
+  const engine = new ComponentControllerEngine({
+    ...(client === undefined ? {} : { client }),
+    cloneRequest: cloneBilingualSegmentRequest,
+    createLoading: (request: BilingualSegmentRequest) => ({
+      state: "loading" as const,
+      message: `Loading ${request.tref}.`,
+    }),
+    load: requestBilingualSegmentResponse,
+    project: (request, payload, status) => {
+      const viewModel = projectBilingualSegmentResponse(
+        request,
+        payload,
+        status,
+      );
+      const result = {
+        request: {
+          ...request,
+          ...(request.primary === undefined
+            ? {}
+            : { primary: { ...request.primary } }),
+          ...(request.translation === undefined
+            ? {}
+            : { translation: { ...request.translation } }),
+        },
+        viewModel,
+      };
+      return { committed: result, result, viewModel };
+    },
+    validateStatus: assertBilingualSegmentStatus,
+  });
+  return {
+    get snapshot() {
+      return engine.snapshot;
+    },
+    subscribe: (listener) => engine.subscribe(listener),
+    load: (request, signal) => {
+      requireNonblankTref(request.tref);
+      serializeSelectors(request);
+      return engine.load(request, signal);
+    },
+    setSuppliedData: (request, payload, status = 200) => {
+      requireNonblankTref(request.tref);
+      serializeSelectors(request);
+      return engine.setSuppliedData(request, payload, status);
+    },
+    cancel: (reason) => engine.cancel(reason),
+    dispose: () => engine.dispose(),
+  };
+}
+
+function cloneBilingualSegmentRequest(
+  request: BilingualSegmentRequest,
+): BilingualSegmentRequest {
+  return {
+    ...request,
+    ...(request.primary === undefined
+      ? {}
+      : { primary: { ...request.primary } }),
+    ...(request.translation === undefined
+      ? {}
+      : { translation: { ...request.translation } }),
+  };
+}
+
+function requireNonblankTref(tref: string): void {
+  if (tref.trim().length === 0) {
+    throw new TypeError("Bilingual segment reference must not be blank.");
+  }
+}
+
+async function requestBilingualSegmentResponse(
+  request: BilingualSegmentRequest,
+  client: SefariaClient,
+  signal?: AbortSignal,
+): Promise<{
+  readonly payload: CoreV3TextsResponse | { readonly error: string };
+  readonly status: 200 | 400 | 404;
+}> {
   const version = serializeSelectors(request);
   const result = await getV3Texts({
     client,
@@ -227,20 +379,44 @@ export async function loadBilingualSegmentViewModel(
   });
 
   if (result.data !== undefined) {
-    return createBilingualSegmentViewModel(result.data, request);
+    return { payload: result.data, status: 200 };
   }
 
   const status = result.response?.status;
   if (result.error !== undefined && (status === 400 || status === 404)) {
-    return {
-      state: "error",
-      errorKind: "http",
-      status,
-      message: result.error.error,
-    };
+    return { payload: result.error, status };
   }
 
   throw new Error("The v3 texts request returned no data or documented error.");
+}
+
+function projectBilingualSegmentResponse(
+  request: BilingualSegmentRequest,
+  payload: unknown,
+  status: 200 | 400 | 404,
+): BilingualSegmentTerminalViewModel {
+  const validated = validateSuppliedComponentData<
+    CoreV3TextsResponse | { readonly error: string }
+  >({ method: "GET", path: "/api/v3/texts/{tref}", status }, payload);
+  return status === 200
+    ? (createBilingualSegmentViewModel(
+        validated as CoreV3TextsResponse,
+        request,
+      ) as BilingualSegmentTerminalViewModel)
+    : {
+        state: "error",
+        errorKind: "http",
+        status,
+        message: (validated as { readonly error: string }).error,
+      };
+}
+
+function assertBilingualSegmentStatus(
+  status: number,
+): asserts status is 200 | 400 | 404 {
+  if (status !== 200 && status !== 400 && status !== 404) {
+    throw new RangeError("Bilingual-segment status must be 200, 400, or 404.");
+  }
 }
 
 /** Resolves primary and translation roles without projecting their text. */

@@ -1,20 +1,12 @@
-import {
-  createSefariaClient,
-  type SefariaClient,
-} from "@arithmomaniac/sefaria-client";
+import { createSefariaClient } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 import type {
   SefariaSourceCard,
+  SourceCardController,
   SourceCardRequest,
-  SourceCardViewModel,
 } from "@arithmomaniac/sefaria-web-components";
-import { loadSourceCardViewModel } from "@arithmomaniac/sefaria-web-components/source-card";
-
-/** One host-owned source-card request operation. */
-export type SourceCardLoader = (
-  request: SourceCardRequest,
-  signal: AbortSignal,
-) => Promise<SourceCardViewModel>;
+import { bindSourceCardController } from "@arithmomaniac/sefaria-web-components/bindings";
+import { createSourceCardController } from "@arithmomaniac/sefaria-web-components/source-card";
 
 /** Controls the interactive live source-card demonstration. */
 export interface SourceCardLiveDemo {
@@ -25,7 +17,9 @@ export interface SourceCardLiveDemo {
 /** Connects the request form, presets, and display controls to the source card. */
 export function startSourceCardLiveDemo(
   root: Document,
-  loader: SourceCardLoader = createDefaultLoader(),
+  controller: SourceCardController = createSourceCardController(
+    createSefariaClient(),
+  ),
 ): SourceCardLiveDemo {
   const form = requireElement<HTMLFormElement>(root, "#source-card-form");
   const trefInput = requireNamedInput(form, "tref");
@@ -46,9 +40,7 @@ export function startSourceCardLiveDemo(
     "#source-card-content",
   );
   const result = requireElement<SefariaSourceCard>(root, "#source-card-result");
-  let activeController: AbortController | undefined;
-  let activeOperation = 0;
-  let committedViewModel: SourceCardViewModel | undefined;
+  bindSourceCardController(result, controller);
 
   const applyDisplaySettings = (): void => {
     const values = new FormData(displayForm);
@@ -61,20 +53,12 @@ export function startSourceCardLiveDemo(
   };
 
   const loadCurrentRequest = async (): Promise<void> => {
-    activeController?.abort();
-    const controller = new AbortController();
-    activeController = controller;
-    const operation = ++activeOperation;
     const request = createRequest(
       trefInput.value,
       primaryTitleInput.value,
       translationTitleInput.value,
     );
     resultContent.hidden = false;
-    result.viewModel = {
-      state: "loading",
-      message: `Loading ${request.tref}.`,
-    };
     requestState.dataset.state = "loading";
     requestState.textContent = `Loading ${request.tref} from Sefaria.`;
     hostError.hidden = true;
@@ -82,33 +66,32 @@ export function startSourceCardLiveDemo(
     submitButton.disabled = true;
 
     try {
-      const viewModel = await loader(request, controller.signal);
-      if (operation !== activeOperation) {
+      const viewModel = await controller.load(request);
+      if (controller.snapshot.result?.viewModel !== viewModel) {
         return;
       }
-      result.viewModel = viewModel;
-      committedViewModel = viewModel;
       requestState.dataset.state = viewModel.state;
       requestState.textContent =
         viewModel.state === "data"
           ? `${request.tref} produced ${viewModel.items.length} items from one request.`
           : `${request.tref} produced ${viewModel.state}.`;
     } catch (error) {
-      if (controller.signal.aborted || operation !== activeOperation) {
+      if (
+        controller.snapshot.attempt.state !== "failed" ||
+        controller.snapshot.attempt.error !== error
+      ) {
         return;
       }
       requestState.dataset.state = "error";
       requestState.textContent = `${request.tref} could not complete.`;
-      if (committedViewModel === undefined) {
+      if (controller.snapshot.result === undefined) {
         resultContent.hidden = true;
-      } else {
-        result.viewModel = committedViewModel;
       }
       hostError.hidden = false;
       hostError.textContent =
         error instanceof Error ? error.message : String(error);
     } finally {
-      if (operation === activeOperation) {
+      if (controller.snapshot.attempt.state !== "loading") {
         submitButton.disabled = false;
       }
     }
@@ -145,12 +128,6 @@ export function startSourceCardLiveDemo(
   }
 
   return { loadCurrentRequest };
-}
-
-function createDefaultLoader(): SourceCardLoader {
-  const client: SefariaClient = createSefariaClient();
-  return async (request, signal) =>
-    await loadSourceCardViewModel(request, client, signal);
 }
 
 function createRequest(

@@ -1,25 +1,17 @@
-import {
-  createSefariaClient,
-  type SefariaClient,
-} from "@arithmomaniac/sefaria-client";
+import { createSefariaClient } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 import type {
   SefariaTextSegment,
+  TextSegmentController,
   TextSegmentRequest,
-  TextSegmentViewModel,
 } from "@arithmomaniac/sefaria-web-components";
-import { loadTextSegmentViewModel } from "@arithmomaniac/sefaria-web-components/text-segment";
+import { bindTextSegmentController } from "@arithmomaniac/sefaria-web-components/bindings";
+import { createTextSegmentController } from "@arithmomaniac/sefaria-web-components/text-segment";
 
 import {
   startLiveDemo,
   requireNamedInput,
 } from "../../../../demos/live-demo-core.js";
-
-/** One host-owned text-segment request operation. */
-export type TextSegmentLoader = (
-  request: TextSegmentRequest,
-  signal: AbortSignal,
-) => Promise<TextSegmentViewModel>;
 
 /** Controls the interactive live text-segment demonstration. */
 export interface TextSegmentLiveDemo {
@@ -30,7 +22,9 @@ export interface TextSegmentLiveDemo {
 /** Connects the demo form and presets to the production text-segment factory. */
 export function startTextSegmentLiveDemo(
   root: Document,
-  loader: TextSegmentLoader = createDefaultLoader(),
+  controller: TextSegmentController = createTextSegmentController(
+    createSefariaClient(),
+  ),
 ): TextSegmentLiveDemo {
   return startLiveDemo(root, {
     title: "Live text-segment demo",
@@ -100,28 +94,18 @@ export function startTextSegmentLiveDemo(
     submitLabel: "Load from Sefaria",
     createResultElement: (document) =>
       document.createElement("sefaria-text-segment") as SefariaTextSegment,
-    loader,
+    controller,
+    bindController: (result) => {
+      bindTextSegmentController(result, controller);
+    },
     createRequest: (form) =>
       createRequest(
         requireNamedInput(form, "tref").value,
         requireNamedInput(form, "language").value,
         requireNamedInput(form, "versionTitle").value,
       ),
-    createLoadingViewModel: (request): TextSegmentViewModel => ({
-      state: "loading",
-      message: `Loading ${request.tref}.`,
-    }),
-    setViewModel: (result, viewModel) => {
-      result.viewModel = viewModel;
-    },
     formatRequest,
   });
-}
-
-function createDefaultLoader(): TextSegmentLoader {
-  const client: SefariaClient = createSefariaClient();
-  return async (request, signal) =>
-    await loadTextSegmentViewModel(request, client, signal);
 }
 
 function createRequest(

@@ -237,6 +237,7 @@ test("builds a reader hierarchy and restores any retained breadcrumb locally", a
       },
     }),
   );
+  await Promise.resolve();
   expect(readerViewModel(reader).currentEntryId).toBe(childEntryId);
   expect(callServerTool).toHaveBeenCalledTimes(6);
 
@@ -248,12 +249,13 @@ test("builds a reader hierarchy and restores any retained breadcrumb locally", a
       },
     }),
   );
+  await Promise.resolve();
   expect(readerViewModel(reader).currentEntryId).toBe(rootEntryId);
   expect(callServerTool).toHaveBeenCalledTimes(6);
   cleanup();
 });
 
-test("reprojects retained connections locally", () => {
+test("reprojects retained connections locally", async () => {
   const callServerTool = vi.fn();
   const cleanup = renderReaderToolResult(
     root(),
@@ -268,11 +270,13 @@ test("reprojects retained connections locally", () => {
       detail: { originEntryId, category: "Commentary" },
     }),
   );
+  await Promise.resolve();
   reader.dispatchEvent(
     new CustomEvent("sefaria-reader-connections-page-change", {
       detail: { originEntryId, page: 1 },
     }),
   );
+  await Promise.resolve();
 
   const connections = readerViewModel(reader).connections;
   expect(connections?.state).toBe("component");
