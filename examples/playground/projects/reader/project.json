@@ -1,0 +1,23 @@
+{
+  "id": "reader",
+  "title": "Supplied-data Reader",
+  "summary": "Seed the controlled Reader from exact root captures and keep uncovered navigation explicit.",
+  "coverage": "Exact Micah 6:8 source and text-inclusive links requests only; covered local projection is zero-I/O and other targets are unavailable.",
+  "files": {
+    "html": "index.html",
+    "css": "styles.css",
+    "javascript": "main.js"
+  },
+  "assets": [
+    {
+      "specifier": "./micah-6-8.js",
+      "path": "../source-card/micah-6-8.js"
+    },
+    {
+      "specifier": "./links.js",
+      "path": "../shared/micah-6-8-links.js"
+    }
+  ],
+  "sourceBaseUrl": "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/projects/reader/",
+  "liveDemoUrl": "../reader/controlled.html?tref=Micah%206%3A8"
+}

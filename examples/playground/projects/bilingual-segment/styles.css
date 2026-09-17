@@ -1,0 +1,26 @@
+:root {
+  color: #231b17;
+  background: #f7f1e7;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+body {
+  margin: 0;
+  padding: 1.5rem;
+}
+.example {
+  max-width: 58rem;
+  margin: 0 auto;
+}
+.kicker {
+  color: #855c21;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+button {
+  padding: 0.55rem 0.8rem;
+}
+sefaria-bilingual-segment {
+  --sefaria-accent: #855c21;
+  --sefaria-surface: white;
+  display: block;
+}

@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { Buffer } from "node:buffer";
 import crypto from "node:crypto";
+import { readFileSync } from "node:fs";
 import { writeFile } from "node:fs/promises";
 import http from "node:http";
 import path from "node:path";
@@ -13,6 +14,15 @@ import { preview } from "vite";
 const root = path.resolve(import.meta.dirname, "..");
 const playground = path.join(root, "examples", "playground");
 const browsers = { chromium, firefox, webkit };
+const projects = {
+  "ref-label": "sefaria-ref-label",
+  "text-segment": "sefaria-text-segment",
+  "bilingual-segment": "sefaria-bilingual-segment",
+  "source-card": "sefaria-source-card",
+  popup: "sefaria-popup",
+  "connections-panel": "sefaria-connections-panel",
+  reader: "sefaria-reader",
+};
 const probeHits = [];
 const probeServer = http.createServer((request, response) => {
   probeHits.push(request.url);
@@ -116,11 +126,13 @@ async function qualifyBrowser(browser, name, editorUrl, origin, graph) {
   );
   assertEqual(externalRequests.length, 0, `${name} initial external requests`);
   assertEqual(pageErrors.length, 0, `${name} page errors`);
+  await qualifyProjectRenders(page, name);
 
   await page.getByRole("button", { name: "Stop preview" }).click();
   const graphResult = await runGraphQualification(page, graph);
   assertEqual(graphResult.pureRegistered, false, `${name} pure registration`);
   assertEqual(graphResult.clientIdentity, true, `${name} client identity`);
+  assertEqual(graphResult.entriesReady, true, `${name} public project entries`);
   assertEqual(graphResult.rootRegistered, true, `${name} root registration`);
   assertEqual(
     graphResult.rootStable,
@@ -137,8 +149,14 @@ async function qualifyBrowser(browser, name, editorUrl, origin, graph) {
     `${name} denied child resources and navigation`,
   );
 
+  const primaryBase = new URL(editorUrl).pathname === "/";
+  if (name === "chromium" && primaryBase) {
+    await qualifyInvalidProject(page, editorUrl);
+    await qualifyProjectEditingAndInteraction(page, probeOrigin);
+  } else if (name !== "chromium" && primaryBase) {
+    await qualifyRepresentativeEditingAndPopup(page, name);
+  }
   if (name === "chromium") {
-    await qualifyEditorInteraction(page, probeOrigin);
     const narrow = await browser.newPage({
       viewport: { width: 195, height: 422 },
     });
@@ -168,7 +186,61 @@ async function qualifyBrowser(browser, name, editorUrl, origin, graph) {
   process.stdout.write(`✓ playground ${name} ${new URL(editorUrl).pathname}\n`);
 }
 
-async function qualifyEditorInteraction(page, destination) {
+async function qualifyProjectRenders(page, name) {
+  for (const [project, tag] of Object.entries(projects)) {
+    await selectProject(page, project);
+    const frame = previewFrame(page);
+    await frame.locator(tag).waitFor({ state: "attached" });
+    assertEqual(
+      await frame.locator(tag).count(),
+      1,
+      `${name} ${project} element`,
+    );
+    assertEqual(
+      await frame.getByRole("button", { name: "Load previews" }).count(),
+      0,
+      `${name} ${project} no network-bearing preview control`,
+    );
+  }
+}
+
+async function qualifyInvalidProject(page, editorUrl) {
+  await page.goto(`${editorUrl}?project=not-maintained`, {
+    waitUntil: "networkidle",
+  });
+  await page
+    .getByRole("alert")
+    .filter({ hasText: "Unknown project" })
+    .waitFor();
+  assertEqual(
+    await page.locator("#preview iframe").count(),
+    0,
+    "unknown project executes no fallback preview",
+  );
+  assertEqual(
+    await page.getByRole("button", { name: "Run" }).isDisabled(),
+    true,
+    "unknown project disables Run",
+  );
+  await page.selectOption("#project-select", "source-card");
+  await page
+    .getByText("Preview rendered with supplied data.")
+    .waitFor({ timeout: 30_000 });
+  assertEqual(
+    new URL(page.url()).searchParams.get("project"),
+    "source-card",
+    "chooser recovers URL state",
+  );
+}
+
+async function qualifyProjectEditingAndInteraction(page, destination) {
+  for (const project of Object.keys(projects)) {
+    await selectProject(page, project);
+    await editEveryFile(page, project);
+    await interactWithProject(page, project);
+  }
+
+  await selectProject(page, "source-card");
   await page.getByRole("button", { name: "Run" }).click();
   await page
     .getByText("Preview rendered with supplied data.")
@@ -180,30 +252,7 @@ async function qualifyEditorInteraction(page, destination) {
     "true",
     "keyboard tab selection",
   );
-  await page.getByRole("tab", { name: "HTML" }).click();
   const editor = page.locator(".cm-content");
-  await editor.fill(
-    '<article class="example"><h1>Edited supplied data</h1><sefaria-source-card id="source-card"></sefaria-source-card></article>',
-  );
-  const frame = page.frameLocator(
-    'iframe[title="Supplied-data component preview"]',
-  );
-  assertEqual(
-    await frame.getByText("Edited supplied data").count(),
-    0,
-    "draft isolation",
-  );
-  await page.getByRole("button", { name: "Run" }).click();
-  await frame.getByText("Edited supplied data").waitFor();
-  assertEqual(
-    await page.locator("#preview iframe").count(),
-    1,
-    "single active preview",
-  );
-  await page.getByRole("button", { name: "Reset" }).click();
-  if (!(await editor.innerText()).includes("Micah 6:8")) {
-    throw new Error("Reset did not restore the maintained HTML source.");
-  }
   await page.getByRole("tab", { name: "JavaScript" }).click();
   await editor.fill(
     'setTimeout(() => { throw new Error("editor boom"); }, 0);',
@@ -225,6 +274,222 @@ async function qualifyEditorInteraction(page, destination) {
   await page.getByRole("button", { name: "Reset" }).click();
 }
 
+async function editEveryFile(page, project) {
+  const frame = previewFrame(page);
+  const edits = {
+    HTML: {
+      suffix: `\n<p id="html-proof">HTML ${project}</p>`,
+      prove: async () => frame.getByText(`HTML ${project}`).waitFor(),
+    },
+    CSS: {
+      suffix: "\n.example { outline: 7px solid rgb(1, 2, 3); }",
+      prove: async () =>
+        assertEqual(
+          await frame
+            .locator(".example")
+            .evaluate((element) => getComputedStyle(element).outlineWidth),
+          "7px",
+          `${project} CSS edit`,
+        ),
+    },
+    JavaScript: {
+      suffix: `\ndocument.body.insertAdjacentHTML("beforeend", '<p id="javascript-proof">JavaScript ${project}</p>');`,
+      prove: async () => frame.getByText(`JavaScript ${project}`).waitFor(),
+    },
+  };
+  for (const [tab, edit] of Object.entries(edits)) {
+    await page.getByRole("tab", { name: tab }).click();
+    const editor = page.locator(".cm-content");
+    const maintained = projectSource(project, tab);
+    await editor.fill(`${maintained}${edit.suffix}`);
+    assertEqual(
+      await frame.getByText(`${tab} ${project}`).count(),
+      0,
+      `${project} ${tab} draft isolation`,
+    );
+    await page.getByRole("button", { name: "Run" }).click();
+    try {
+      await page
+        .getByText("Preview rendered with supplied data.")
+        .waitFor({ timeout: 30_000 });
+    } catch (error) {
+      throw new Error(
+        `${project} ${tab} edit did not render: ${await page.locator("#preview-status").textContent()} ${await page.locator("#diagnostic-list").textContent()}`,
+        { cause: error },
+      );
+    }
+    await edit.prove();
+    assertEqual(
+      await page.locator("#preview iframe").count(),
+      1,
+      `${project} single active preview`,
+    );
+    await page.getByRole("button", { name: "Reset" }).click();
+    await page.getByText("Maintained source restored exactly.").waitFor();
+  }
+  await page.getByRole("button", { name: "Run" }).click();
+  await page
+    .getByText("Preview rendered with supplied data.")
+    .waitFor({ timeout: 30_000 });
+}
+
+async function interactWithProject(page, project) {
+  const frame = previewFrame(page);
+  switch (project) {
+    case "ref-label":
+      await frame.getByRole("button", { name: "Unresolved" }).click();
+      await frame
+        .getByText("Showing the endpoint's unresolved state.")
+        .waitFor();
+      break;
+    case "text-segment":
+      await frame.locator("#edition").selectOption("english");
+      await frame.getByText("en · ltr").waitFor();
+      await frame
+        .getByText(
+          "He has shown you what is good: do justice, love mercy, and walk humbly with your God.",
+        )
+        .waitFor();
+      break;
+    case "bilingual-segment":
+      await frame
+        .getByRole("button", { name: "Show translation first" })
+        .click();
+      await frame.getByText("Translation side first.").waitFor();
+      assertEqual(
+        (await frame.locator('[lang="he"][dir="rtl"]').count()) > 0,
+        true,
+        "bilingual Hebrew direction",
+      );
+      assertEqual(
+        (await frame.locator('[lang="en"][dir="ltr"]').count()) > 0,
+        true,
+        "bilingual English direction",
+      );
+      break;
+    case "source-card":
+      await frame
+        .getByRole("button", { name: "Show connections for Micah 6:8" })
+        .first()
+        .click();
+      await frame.getByText(/Selected Micah 6:8 at position/u).waitFor();
+      await frame.locator("#vocalization").selectOption("none");
+      await frame.locator("#vocalization").selectOption("taamim_and_nikkud");
+      break;
+    case "popup": {
+      const anchor = frame.getByRole("button", { name: "Preview Micah 6:8" });
+      await anchor.click();
+      const close = frame.getByRole("button", {
+        name: "Close source preview",
+      });
+      await close.waitFor();
+      assertEqual(
+        await close.evaluate(
+          (element) =>
+            element === document.activeElement ||
+            element.getRootNode().activeElement === element,
+        ),
+        true,
+        "popup close focus",
+      );
+      await close.press("Escape");
+      await frame.getByText("Popup closed and focus restored.").waitFor();
+      assertEqual(
+        await anchor.evaluate((element) => document.activeElement === element),
+        true,
+        "popup anchor focus restoration",
+      );
+      break;
+    }
+    case "connections-panel":
+      await frame.getByRole("button", { name: "More" }).click();
+      await frame.getByText("Page 2").waitFor();
+      await frame.getByLabel("Show captured previews").uncheck();
+      await frame
+        .getByText("Captured previews hidden without changing data.")
+        .waitFor();
+      break;
+    case "reader": {
+      await frame.locator("#vocalization").selectOption("none");
+      const connectionsPane = frame.getByRole("button", {
+        name: "Connections",
+        exact: true,
+      });
+      if (await connectionsPane.isVisible()) {
+        await connectionsPane.click();
+      }
+      await frame
+        .getByRole("button", { name: /Open .* in context/u })
+        .first()
+        .click();
+      await frame.getByText(/source-unavailable:/u).waitFor();
+      await frame
+        .getByRole("heading", { name: "Micah 6:8", exact: true })
+        .waitFor();
+      break;
+    }
+    default:
+      throw new Error(`Missing interaction proof for ${project}.`);
+  }
+}
+
+async function qualifyRepresentativeEditingAndPopup(page, name) {
+  await selectProject(page, "popup");
+  await page.getByRole("tab", { name: "HTML" }).click();
+  const editor = page.locator(".cm-content");
+  const maintained = projectSource("popup", "HTML");
+  await editor.fill(`${maintained}\n<p id="engine-proof">${name} edit</p>`);
+  await page.getByRole("button", { name: "Run" }).click();
+  await previewFrame(page).getByText(`${name} edit`).waitFor();
+  await page.getByRole("button", { name: "Reset" }).click();
+  await page.getByText("Maintained source restored exactly.").waitFor();
+  await page.getByRole("button", { name: "Run" }).click();
+  await previewFrame(page)
+    .getByRole("button", { name: "Preview Micah 6:8" })
+    .click();
+  const close = previewFrame(page).getByRole("button", {
+    name: "Close source preview",
+  });
+  await close.press("Escape");
+  await previewFrame(page)
+    .getByText("Popup closed and focus restored.")
+    .waitFor();
+}
+
+async function selectProject(page, project) {
+  if ((await page.locator("#project-select").inputValue()) !== project) {
+    await page.selectOption("#project-select", project);
+  }
+  try {
+    await page
+      .getByText("Preview rendered with supplied data.")
+      .waitFor({ timeout: 30_000 });
+  } catch (error) {
+    const status = await page.locator("#preview-status").textContent();
+    const diagnostics = await page.locator("#diagnostic-list").textContent();
+    throw new Error(`${project} did not render: ${status} ${diagnostics}`, {
+      cause: error,
+    });
+  }
+}
+
+function previewFrame(page) {
+  return page.frameLocator('iframe[title="Supplied-data component preview"]');
+}
+
+function projectSource(project, tab) {
+  const directory = path.join(playground, "projects", project);
+  const manifest = JSON.parse(
+    readFileSync(path.join(directory, "project.json"), "utf8"),
+  );
+  const kind = tab.toLowerCase();
+  const file = manifest.files[kind];
+  if (typeof file !== "string") {
+    throw new Error(`Missing ${project} ${tab} maintained source.`);
+  }
+  return readFileSync(path.join(directory, file), "utf8");
+}
+
 async function runGraphQualification(page, graph) {
   const importMap = JSON.stringify({ imports: graph.imports }).replaceAll(
     "<",
@@ -240,10 +505,30 @@ async function runGraphQualification(page, graph) {
       const pureRegistered = customElements.get("sefaria-source-card") !== undefined;
       const client = await import("@arithmomaniac/sefaria-client");
       const validation = await import("@arithmomaniac/sefaria-client/validation");
+      const refLabel = await import("@arithmomaniac/sefaria-web-components/ref-label");
+      const textSegment = await import("@arithmomaniac/sefaria-web-components/text-segment");
+      const bilingualSegment = await import("@arithmomaniac/sefaria-web-components/bilingual-segment");
+      const popup = await import("@arithmomaniac/sefaria-web-components/popup");
+      const connections = await import("@arithmomaniac/sefaria-web-components/connections-panel");
+      const readerController = await import("@arithmomaniac/sefaria-web-components/reader-controller");
+      const readerSession = await import("@arithmomaniac/sefaria-web-components/reader-session");
+      const bindings = await import("@arithmomaniac/sefaria-web-components/bindings");
+      const entriesReady = [
+        refLabel.createRefLabelViewModel,
+        textSegment.createTextSegmentViewModel,
+        bilingualSegment.createBilingualSegmentViewModel,
+        pure.createSourceCardViewModel,
+        popup.createPopupController,
+        connections.createConnectionsController,
+        readerController.createReaderController,
+        readerSession.createReaderSourceContent,
+        readerSession.createReaderConnectionsContent,
+        bindings.bindReaderController,
+      ].every((value) => typeof value === "function");
       const root = await import("@arithmomaniac/sefaria-web-components");
       const registered = customElements.get("sefaria-source-card");
       const second = await import("@arithmomaniac/sefaria-web-components");
-      parent.postMessage({type:"graph-result", pureRegistered, clientIdentity:client.getResponseContract === validation.getResponseContract, rootRegistered:registered === root.SefariaSourceCard, rootStable:second.SefariaSourceCard === registered, factory:typeof pure.createSourceCardViewModel === "function"},"*");
+      parent.postMessage({type:"graph-result", pureRegistered, clientIdentity:client.getResponseContract === validation.getResponseContract, entriesReady, rootRegistered:registered === root.SefariaSourceCard, rootStable:second.SefariaSourceCard === registered},"*");
     } catch (error) {
       parent.postMessage({type:"graph-error", message:error instanceof Error ? error.message : String(error)},"*");
     } })();

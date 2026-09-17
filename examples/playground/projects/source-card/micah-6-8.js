@@ -1,3 +1,10 @@
+export const provenance = {
+  kind: "locally-authored-corrected-payload",
+  authoredFor: "Supplied-data component examples",
+  reference: "Micah 6:8",
+  note: "Deterministic CC0 teaching text shaped to the corrected v3 response schema.",
+};
+
 export default {
   versions: [
     {

@@ -19,6 +19,22 @@ The [authored component workbench](explorer/authored.html) renders prepared view
 
 Runnable scenario definitions live in [`explorer/src/authored`](explorer/src/authored/). Selecting an authored scenario never starts a live operation.
 
+## Editable supplied-data projects
+
+The [component playground](playground/index.html?project=source-card) uses one reusable HTML/CSS/plain-JavaScript editor for seven maintained projects. Each project renders useful output beside the editable files, validates bounded local payloads through public client schemas, uses public component factories, controllers, and bindings, and makes zero Sefaria requests.
+
+| Project ID | Demonstrated local behavior |
+| --- | --- |
+| `ref-label` | Switch between a validated resolved reference and an unresolved state. |
+| `text-segment` | Select the exact Hebrew or English edition from the supplied response. |
+| `bilingual-segment` | Change side order while retaining payload-owned language roles and directions. |
+| `source-card` | Select a source row and change vocalization without requesting replacement data. |
+| `popup` | Open an anchored popup, close it with Escape, and restore trigger focus. |
+| `connections-panel` | Change captured category, page, and preview visibility with zero I/O. |
+| `reader` | Change local presentation over exact Micah 6:8 source and links coverage and show an explicit limitation for uncovered navigation. |
+
+Stable built routes use `playground/index.html?project=<id>`. Source and optional request-bearing live-demo links remain trusted controls outside the edited preview.
+
 ## Live data and interaction
 
 The [component explorer](explorer/README.md) keeps live actions separate from supplied-data selection. Each page opens without a Sefaria request; **Start live demo** or an example preset begins the operation. The page owns its client and async factory call, shows loading or failure directly, and passes only a view model plus display properties to the element.

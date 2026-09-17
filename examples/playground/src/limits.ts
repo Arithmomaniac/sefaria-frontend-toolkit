@@ -1,5 +1,7 @@
 export const SOURCE_FILE_LIMIT = 100_000;
 export const SOURCE_TOTAL_LIMIT = 250_000;
+export const ASSET_FILE_LIMIT = 50_000;
+export const ASSET_TOTAL_LIMIT = 100_000;
 export const DIAGNOSTIC_COUNT_LIMIT = 20;
 export const DIAGNOSTIC_TEXT_LIMIT = 1_000;
 export const MESSAGE_SIZE_LIMIT = 4_096;

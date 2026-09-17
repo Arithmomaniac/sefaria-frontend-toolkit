@@ -1,0 +1,19 @@
+{
+  "id": "text-segment",
+  "title": "Text segment",
+  "summary": "Choose one exact edition from a validated response and render its payload-provided language and direction.",
+  "coverage": "Two locally authored Micah 6:8 editions in one corrected response; zero requests.",
+  "files": {
+    "html": "index.html",
+    "css": "styles.css",
+    "javascript": "main.js"
+  },
+  "assets": [
+    {
+      "specifier": "./micah-6-8.js",
+      "path": "../source-card/micah-6-8.js"
+    }
+  ],
+  "sourceBaseUrl": "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/projects/text-segment/",
+  "liveDemoUrl": "../explorer/text-segment.html"
+}

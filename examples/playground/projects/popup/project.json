@@ -1,0 +1,18 @@
+{
+  "id": "popup",
+  "title": "Anchored popup",
+  "summary": "Open a request-free source preview from a real anchor and close it with Escape.",
+  "coverage": "One locally authored corrected Micah 6:8 payload; placement, focus, open, and close are element-owned.",
+  "files": {
+    "html": "index.html",
+    "css": "styles.css",
+    "javascript": "main.js"
+  },
+  "assets": [
+    {
+      "specifier": "./micah-6-8.js",
+      "path": "../source-card/micah-6-8.js"
+    }
+  ],
+  "sourceBaseUrl": "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/projects/popup/"
+}
