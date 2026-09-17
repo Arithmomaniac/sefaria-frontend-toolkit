@@ -9,6 +9,9 @@ import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
 import { bindSourceCardController } from "@arithmomaniac/sefaria-web-components/bindings";
 import {
   createSourceCardController,
+  type SourceCardController,
+  type SourceCardControllerSnapshot,
+  type SourceCardTerminalViewModel,
   type SourceCardViewModel,
 } from "@arithmomaniac/sefaria-web-components/source-card";
 import {
@@ -16,16 +19,17 @@ import {
   useEffect,
   useRef,
   useState,
+  useSyncExternalStore,
   type FormEvent,
 } from "react";
 
 import payload from "./micah-6-8.json";
 import { reactSourceCardSnippet } from "./source-snippet.js";
-import { useElementProperty } from "./use-element-property.js";
 
 const suppliedPayload = zCoreV3TextsResponse.parse(
   payload,
 ) as CoreV3TextsResponse;
+
 interface SourceSelection {
   readonly position: readonly number[];
   readonly ref: string;
@@ -43,113 +47,109 @@ export function ReactSourceCardExample({
   const [client] = useState(
     () => suppliedClient ?? createSefariaClient({ cache: false }),
   );
-  const [controller] = useState(() => {
+  const [controller, setController] = useState<SourceCardController>();
+
+  useEffect(() => {
     const next = createSourceCardController(client);
     next.setSuppliedData({ tref: "Micah 6:8" }, suppliedPayload);
-    return next;
-  });
-  const [tref, setTref] = useState(initialTref);
-  const [viewModel, setViewModel] = useState<SourceCardViewModel>(
-    controller.snapshot.result!.viewModel,
+    setController(next);
+    return () => {
+      setController((current) => (current === next ? undefined : current));
+      next.dispose();
+    };
+  }, [client]);
+
+  if (controller === undefined) {
+    return (
+      <main className="react-example">
+        <p role="status">Preparing the validated supplied example.</p>
+      </main>
+    );
+  }
+
+  return (
+    <ActiveReactSourceCardExample
+      controller={controller}
+      initialTref={initialTref}
+    />
   );
+}
+
+function ActiveReactSourceCardExample({
+  controller,
+  initialTref,
+}: {
+  readonly controller: SourceCardController;
+  readonly initialTref: string;
+}) {
+  const snapshot = useSourceCardSnapshot(controller);
+  const [card, setCard] = useState<SefariaSourceCard | null>(null);
+  const [tref, setTref] = useState(initialTref);
   const [selected, setSelected] = useState<SourceSelection>();
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [previewWidth, setPreviewWidth] = useState(720);
   const [contentLanguage, setContentLanguage] = useState<
     "both" | "primary" | "translation"
   >("both");
-  const [requestCount, setRequestCount] = useState(0);
-  const [requestStatus, setRequestStatus] = useState(
-    "Supplied data rendered. No request has run.",
+  const [layout, setLayout] = useState<"auto" | "side-by-side" | "stacked">(
+    "auto",
   );
+  const [sideOrder, setSideOrder] = useState<
+    "primary-first" | "translation-first"
+  >("primary-first");
+  const [vocalizationMode, setVocalizationMode] = useState<
+    "taamim_and_nikkud" | "nikkud" | "none"
+  >("taamim_and_nikkud");
+  const [loadAttempts, setLoadAttempts] = useState(0);
   const [inputFailure, setInputFailure] = useState<string>();
-  const [loadFailure, setLoadFailure] = useState<string>();
-  const cardRef = useRef<SefariaSourceCard>(null);
-  const unbind = useRef<(() => void) | undefined>(undefined);
-  const mounted = useRef(true);
-
-  useElementProperty(cardRef, "contentLanguage", contentLanguage);
-  useElementProperty(cardRef, "selectable", viewModel.state === "data");
-  useElementProperty(cardRef, "selectedPosition", selected?.position);
+  const previousResult = useRef(snapshot.result);
 
   useEffect(() => {
-    mounted.current = true;
-    const unsubscribe = controller.subscribe((snapshot) => {
-      const displayed =
-        snapshot.attempt.state === "loading"
-          ? snapshot.attempt.viewModel
-          : snapshot.result?.viewModel;
-      if (displayed !== undefined) setViewModel(displayed);
-    });
-    return () => {
-      mounted.current = false;
-      unsubscribe();
-      controller.cancel();
-    };
-  }, [controller]);
+    if (card === null) return;
+    return bindSourceCardController(card, controller);
+  }, [card, controller]);
 
-  const setCardRef = useCallback(
-    (card: SefariaSourceCard | null): void => {
-      const previous = cardRef.current;
-      if (previous !== null) {
-        previous.removeEventListener(
-          "sefaria-source-select",
-          onSourceSelection,
-        );
-      }
-      unbind.current?.();
-      unbind.current = undefined;
-      cardRef.current = card;
-      if (card !== null) {
-        unbind.current = bindSourceCardController(card, controller);
-        card.addEventListener("sefaria-source-select", onSourceSelection);
-      }
+  useEffect(() => {
+    if (
+      previousResult.current !== undefined &&
+      snapshot.result !== undefined &&
+      snapshot.result !== previousResult.current
+    ) {
+      setSelected(undefined);
+    }
+    previousResult.current = snapshot.result;
+  }, [snapshot.result]);
+
+  const onSourceSelection = useCallback(
+    (event: CustomEvent<SourceSelection>): void => {
+      setSelected({
+        position: [...event.detail.position],
+        ref: event.detail.ref,
+      });
     },
-    [controller],
+    [],
   );
 
-  function onSourceSelection(event: Event): void {
-    const detail = (event as CustomEvent<SourceSelection>).detail;
-    setSelected({
-      position: [...detail.position],
-      ref: detail.ref,
-    });
-  }
-
-  const loadLive = useCallback(async (): Promise<void> => {
+  const onSubmit = (event: FormEvent): void => {
+    event.preventDefault();
     const normalized = tref.trim();
     if (normalized.length === 0) {
       setInputFailure("Enter a non-blank Sefaria reference.");
       return;
     }
-    setRequestCount((count) => count + 1);
-    setSelected(undefined);
     setInputFailure(undefined);
-    setLoadFailure(undefined);
-    setRequestStatus(`Loading ${normalized} through the public controller.`);
-    try {
-      await controller.load({ tref: normalized });
-      if (mounted.current) {
-        setLoadFailure(undefined);
-        setRequestStatus(`Loaded ${normalized}.`);
-      }
-    } catch (error) {
-      if (
-        mounted.current &&
-        controller.snapshot.attempt.state === "failed" &&
-        controller.snapshot.attempt.error === error
-      ) {
-        const message = error instanceof Error ? error.message : String(error);
-        setLoadFailure(message);
-        setRequestStatus(`Could not load ${normalized}.`);
-      }
-    }
-  }, [controller, tref]);
-
-  const onSubmit = (event: FormEvent): void => {
-    event.preventDefault();
-    void loadLive();
+    setLoadAttempts((count) => count + 1);
+    void controller.load({ tref: normalized }).catch(() => undefined);
   };
+
+  const viewModel = displayedViewModel(snapshot);
+  const canonicalRef = committedCanonicalRef(snapshot);
+  const failure =
+    inputFailure ??
+    (snapshot.attempt.state === "failed"
+      ? errorMessage(snapshot.attempt.error)
+      : undefined);
+  const requestStatus = describeStatus(snapshot, loadAttempts, canonicalRef);
 
   return (
     <main className="react-example">
@@ -157,10 +157,10 @@ export function ReactSourceCardExample({
         <p className="eyebrow">Standalone React consumer</p>
         <h1>Bind React state to a request-free Sefaria Web Component</h1>
         <p>
-          The first card comes from validated supplied data. React owns every
-          live request, cancellation, display property, and event listener.
-          Click Start live demo to replace the supplied example with live
-          Sefaria data.
+          Validated supplied data renders first. Submitting the form is the only
+          live activation. React owns presentation properties and receives the
+          component&apos;s canonical selection event; the shared controller and
+          binder own loading, stale-result rejection, and view-model delivery.
         </p>
       </header>
 
@@ -176,7 +176,7 @@ export function ReactSourceCardExample({
             />
           </label>
           <button id="load-live" type="submit">
-            Start live demo
+            Load reference
           </button>
         </form>
         <div className="display-controls">
@@ -207,6 +207,7 @@ export function ReactSourceCardExample({
           <label>
             Text sides
             <select
+              id="content-language"
               value={contentLanguage}
               onChange={(event) =>
                 setContentLanguage(
@@ -220,6 +221,56 @@ export function ReactSourceCardExample({
               <option value="translation">Translation only</option>
             </select>
           </label>
+          <label>
+            Layout
+            <select
+              id="layout"
+              value={layout}
+              onChange={(event) =>
+                setLayout(
+                  event.currentTarget.value as
+                    "auto" | "side-by-side" | "stacked",
+                )
+              }
+            >
+              <option value="auto">Automatic</option>
+              <option value="side-by-side">Side by side</option>
+              <option value="stacked">Stacked</option>
+            </select>
+          </label>
+          <label>
+            Side order
+            <select
+              id="side-order"
+              value={sideOrder}
+              onChange={(event) =>
+                setSideOrder(
+                  event.currentTarget.value as
+                    "primary-first" | "translation-first",
+                )
+              }
+            >
+              <option value="primary-first">Primary first</option>
+              <option value="translation-first">Translation first</option>
+            </select>
+          </label>
+          <label>
+            Hebrew marks
+            <select
+              id="vocalization-mode"
+              value={vocalizationMode}
+              onChange={(event) =>
+                setVocalizationMode(
+                  event.currentTarget.value as
+                    "taamim_and_nikkud" | "nikkud" | "none",
+                )
+              }
+            >
+              <option value="taamim_and_nikkud">Cantillation and vowels</option>
+              <option value="nikkud">Vowels only</option>
+              <option value="none">No marks</option>
+            </select>
+          </label>
         </div>
       </section>
 
@@ -227,12 +278,22 @@ export function ReactSourceCardExample({
         {requestStatus}
       </p>
       <p id="request-count" className="status">
-        Host request count: {requestCount}
+        Live load attempts: {loadAttempts}
+      </p>
+      <p id="committed-ref" className="status">
+        {canonicalRef === undefined
+          ? "Current result has no committed canonical reference."
+          : `Current committed reference: ${canonicalRef}.`}
       </p>
 
-      {loadFailure === undefined && inputFailure === undefined ? null : (
+      {failure === undefined ? null : (
         <p id="load-error" className="failure" role="alert">
-          {inputFailure ?? loadFailure}
+          {failure}
+          {inputFailure === undefined &&
+          snapshot.attempt.state === "failed" &&
+          canonicalRef !== undefined
+            ? ` The prior committed ${canonicalRef} card remains displayed.`
+            : ""}
         </p>
       )}
 
@@ -240,16 +301,24 @@ export function ReactSourceCardExample({
         id="preview"
         className="preview"
         data-theme={theme}
-        hidden={loadFailure !== undefined}
         style={{ maxWidth: `${previewWidth}px` }}
       >
-        <sefaria-source-card ref={setCardRef} />
+        <sefaria-source-card
+          ref={setCard}
+          contentLanguage={contentLanguage}
+          layout={layout}
+          sideOrder={sideOrder}
+          vocalizationMode={vocalizationMode}
+          selectable={viewModel?.state === "data"}
+          selectedPosition={selected?.position}
+          onsefaria-source-select={onSourceSelection}
+        />
       </section>
 
       <p id="selected-ref" className="event-state" aria-live="polite">
         {selected
           ? `React received selection: ${selected.ref}.`
-          : "Select the rendered segment to send its component event to React."}
+          : "Select the rendered segment to send its canonical component event to React."}
       </p>
 
       <section className="diagnostics" aria-label="Optional diagnostics">
@@ -274,4 +343,58 @@ export function ReactSourceCardExample({
       </section>
     </main>
   );
+}
+
+function useSourceCardSnapshot(
+  controller: SourceCardController,
+): SourceCardControllerSnapshot {
+  return useSyncExternalStore(
+    (notify) => controller.subscribe(() => notify()),
+    () => controller.snapshot,
+  );
+}
+
+function displayedViewModel(
+  snapshot: SourceCardControllerSnapshot,
+): SourceCardViewModel | undefined {
+  return snapshot.attempt.state === "loading"
+    ? snapshot.attempt.viewModel
+    : snapshot.result?.viewModel;
+}
+
+function committedCanonicalRef(
+  snapshot: SourceCardControllerSnapshot,
+): string | undefined {
+  const viewModel: SourceCardTerminalViewModel | undefined =
+    snapshot.result?.viewModel;
+  return viewModel?.state === "data" || viewModel?.state === "empty"
+    ? viewModel.header.ref
+    : undefined;
+}
+
+function describeStatus(
+  snapshot: SourceCardControllerSnapshot,
+  loadAttempts: number,
+  canonicalRef: string | undefined,
+): string {
+  if (snapshot.attempt.state === "loading") {
+    return `Loading ${snapshot.attempt.request.tref} through the public controller.`;
+  }
+  if (snapshot.attempt.state === "failed") {
+    return canonicalRef === undefined
+      ? "The live load failed. No canonical result is committed."
+      : `The live load failed. Showing the prior committed ${canonicalRef} result.`;
+  }
+  if (loadAttempts === 0) {
+    return canonicalRef === undefined
+      ? "Supplied component content rendered with zero live loads."
+      : `Supplied ${canonicalRef} data rendered with zero live loads.`;
+  }
+  return canonicalRef === undefined
+    ? "The component committed an error result without a canonical reference."
+    : `Committed canonical reference ${canonicalRef}.`;
+}
+
+function errorMessage(error: unknown): string {
+  return error instanceof Error ? error.message : String(error);
 }

@@ -225,8 +225,9 @@ try {
       ["/examples/reader/controlled.html", 2],
       ["/examples/vanilla/index.html", 3],
       ["/examples/react/index.html", 4],
-      ["/examples/linked-article/index.html", 5],
-      ["/examples/mcp-app/live.html", 6],
+      ["/examples/alpine/index.html", 5],
+      ["/examples/linked-article/index.html", 6],
+      ["/examples/mcp-app/live.html", 7],
     ];
     const previewLinks = page.getByRole("link", { name: "Open preview" });
     assertEqual(
@@ -299,7 +300,7 @@ try {
     });
     await assertText(
       page.locator("#status"),
-      "Rendered supplied Micah 6:8 data with zero requests.",
+      "Supplied Micah 6:8 data rendered with zero live loads.",
     );
     assertEqual(
       await page.locator("#status").getAttribute("data-request-count"),
@@ -312,11 +313,12 @@ try {
       () =>
         globalThis.document
           .querySelector("#status")
-          ?.textContent?.includes("Loaded live Micah 6:8 data") === true,
+          ?.textContent?.includes("Committed canonical reference Micah 6:8") ===
+        true,
     );
     await assertText(
       page.locator("#status"),
-      "Loaded live Micah 6:8 data from Sefaria.",
+      "Committed canonical reference Micah 6:8.",
     );
     assertEqual(textRequests.length, 1, "vanilla live-client network count");
 
@@ -324,7 +326,7 @@ try {
       waitUntil: "networkidle",
     });
     textRequests.length = 0;
-    await assertText(page.locator("#request-count"), "Host request count: 0");
+    await assertText(page.locator("#request-count"), "Live load attempts: 0");
     const preview = page.locator("#preview");
     const initialCard = page.locator("sefaria-source-card");
     const initialHandle = await initialCard.elementHandle();
@@ -335,20 +337,27 @@ try {
       "React theme",
     );
     await page.locator("#preview-width").fill("480");
+    await page.locator("#vocalization-mode").selectOption("none");
     assertEqual(
       await preview.evaluate((element) => element.style.maxWidth),
       "480px",
       "React preview width",
     );
+    await page.locator('input[name="tref"]').fill("micah 6:8");
     await page.locator("#load-live").click();
     await page.waitForFunction(
       () =>
         globalThis.document
           .querySelector("#request-status")
-          ?.textContent?.includes("Loaded Micah 6:8.") === true,
+          ?.textContent?.includes(
+            "Committed canonical reference Micah 6:8.",
+          ) === true,
     );
-    await assertText(page.locator("#request-count"), "Host request count: 1");
-    await assertText(page.locator("#request-status"), "Loaded Micah 6:8.");
+    await assertText(page.locator("#request-count"), "Live load attempts: 1");
+    await assertText(
+      page.locator("#request-status"),
+      "Committed canonical reference Micah 6:8.",
+    );
     assertEqual(textRequests.length, 1, "React explicit request count");
     const nextHandle = await initialCard.elementHandle();
     assertEqual(
@@ -370,6 +379,64 @@ try {
       .filter({ hasText: "React received selection: Micah 6:8." })
       .waitFor();
     await capture(page, "site-react.png");
+
+    textRequests.length = 0;
+    await page.goto(siteRouteUrl("/learn/alpine.html"), {
+      waitUntil: "networkidle",
+    });
+    const alpineLesson = page.frameLocator(
+      'iframe[title="Alpine custom-element integration"]',
+    );
+    await alpineLesson.locator("sefaria-source-card").waitFor();
+    await assertText(
+      alpineLesson.locator("#selected-ref"),
+      "Select the rendered segment",
+    );
+    assertEqual(
+      textRequests.length,
+      0,
+      "embedded Alpine initial request count",
+    );
+    await capture(page, "site-alpine-lesson.png");
+
+    await page.goto(siteRouteUrl("/examples/alpine/index.html"), {
+      waitUntil: "networkidle",
+    });
+    textRequests.length = 0;
+    await assertText(page.locator("#request-count"), "Live load attempts: 0");
+    const alpineCard = page.locator("sefaria-source-card");
+    const alpineHandle = await alpineCard.elementHandle();
+    await page.locator("#layout").selectOption("stacked");
+    await page.locator("#side-order").selectOption("translation-first");
+    await page.locator("#vocalization-mode").selectOption("none");
+    assertEqual(textRequests.length, 0, "Alpine display-only request count");
+    await page.locator('input[name="tref"]').fill("micah 6:8");
+    await page.locator("#load-live").click();
+    await assertText(
+      page.locator("#request-status"),
+      "Committed canonical reference Micah 6:8.",
+    );
+    assertEqual(textRequests.length, 1, "Alpine explicit request count");
+    const nextAlpineHandle = await alpineCard.elementHandle();
+    assertEqual(
+      await alpineHandle.evaluate(
+        (element, next) => element === next,
+        nextAlpineHandle,
+      ),
+      true,
+      "Alpine element identity",
+    );
+    await alpineCard
+      .getByRole("button", {
+        name: "Show connections for Micah 6:8",
+      })
+      .first()
+      .click();
+    await page
+      .locator("#selected-ref")
+      .filter({ hasText: "Alpine received selection: Micah 6:8." })
+      .waitFor();
+    await capture(page, "site-alpine.png");
 
     textRequests.length = 0;
     await page.goto(siteRouteUrl("/examples/reader/controlled.html"), {
@@ -564,7 +631,9 @@ function createFixtureResponse(requestUrl, policy, textFixture, linksFixture) {
   const url = new URL(requestUrl);
   const reference = decodeURIComponent(url.pathname.split("/").at(-1) ?? "");
   if (policy === "text-fixture") {
-    if (reference === "Micah 6:8") return textFixture;
+    if (reference === "Micah 6:8" || reference === "micah 6:8") {
+      return textFixture;
+    }
     const target = globalThis.structuredClone(textFixture);
     const rashi = reference.startsWith("Rashi");
     const section =

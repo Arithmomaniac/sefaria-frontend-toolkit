@@ -1,8 +1,10 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by avilevin.
 
 # Vanilla Vite example
 
-This private example first validates supplied `Micah 6:8` JSON, projects it with the pure source-card factory, and renders it without creating a request. **Start live demo** then exercises the public client and source-card async factory against the deployed Sefaria API. The host owns request counting, cancellation, stale-result suppression, and visible failures; a failed live request restores the clearly labeled supplied example rather than presenting it as live data.
+This private example first validates supplied `Micah 6:8` JSON and commits it through the public source-card controller with zero requests. Submitting the form then exercises the public client against the deployed Sefaria API. The controller and public binder own cancellation, stale-result suppression, and view-model delivery. The host owns draft input, presentation properties, canonical committed and selected-reference readouts, and visible failure labeling.
+
+Changing displayed sides, layout, side order, or Hebrew vocalization performs zero requests. A failed replacement leaves the prior card visible with an explicit prior-result label rather than presenting fixture content as live success.
 
 From a fresh toolkit-branch checkout, build the private workspace packages before starting the Vite server:
 

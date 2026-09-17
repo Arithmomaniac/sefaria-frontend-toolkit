@@ -24,7 +24,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-test("keeps one request-free element while React changes display state and receives a real selection event", async () => {
+test("keeps one request-free element while React assigns reversible display properties and receives a real selection event", async () => {
   const fetch = vi.fn(createMicahFixtureFetch(fixture));
   const container = document.createElement("div");
   document.body.append(container);
@@ -50,13 +50,28 @@ test("keeps one request-free element while React changes display state and recei
   await act(async () => {
     click(container, "#theme-toggle");
     setRange(container, "#preview-width", "520");
+    setSelect(container, "#layout", "stacked");
+    setSelect(container, "#side-order", "translation-first");
+    setSelect(container, "#vocalization-mode", "none");
   });
 
   expect(requireCard(container)).toBe(card);
   expect(fetch).not.toHaveBeenCalled();
+  expect(card.layout).toBe("stacked");
+  expect(card.sideOrder).toBe("translation-first");
+  expect(card.vocalizationMode).toBe("none");
+  expect(card.getAttribute("selectedPosition")).toBeNull();
   expect(container.querySelector<HTMLElement>("#preview")?.dataset.theme).toBe(
     "dark",
   );
+  const withoutMarks = await renderedHebrew(card);
+
+  await act(async () => {
+    setSelect(container, "#vocalization-mode", "taamim_and_nikkud");
+  });
+  const withMarks = await renderedHebrew(card);
+  expect(withMarks).not.toBe(withoutMarks);
+  expect(fetch).not.toHaveBeenCalled();
 
   await card.updateComplete;
   await act(async () => {
@@ -106,6 +121,22 @@ test("loads only on explicit actions and rejects stale overlapping results", asy
   });
   expect(fetch).not.toHaveBeenCalled();
 
+  await act(async () => {
+    setTextInput(container, 'input[name="tref"]', "micah 6:8");
+  });
+  const initialCard = requireCard(container);
+  await initialCard.updateComplete;
+  await act(async () => {
+    initialCard.shadowRoot
+      ?.querySelector<HTMLButtonElement>(
+        'button[aria-label="Show connections for Micah 6:8"]',
+      )
+      ?.click();
+  });
+  expect(container.querySelector("#selected-ref")?.textContent).toContain(
+    "Micah 6:8",
+  );
+
   await act(async () => click(container, "#load-live"));
   await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
   await act(async () => click(container, "#load-live"));
@@ -113,8 +144,17 @@ test("loads only on explicit actions and rejects stale overlapping results", asy
   await act(async () => {
     await waitForReact();
   });
-  expect(container.querySelector("#request-status")?.textContent).toContain(
-    "Loaded Micah 6:8",
+  expect(container.querySelector("#request-status")?.textContent).toBe(
+    "Committed canonical reference Micah 6:8.",
+  );
+  expect(container.querySelector("#committed-ref")?.textContent).toContain(
+    "Micah 6:8",
+  );
+  expect(container.querySelector("#committed-ref")?.textContent).not.toContain(
+    "micah 6:8",
+  );
+  expect(container.querySelector("#selected-ref")?.textContent).toContain(
+    "Select the rendered segment",
   );
   expect(fetch).toHaveBeenCalledTimes(2);
   expect(firstSignal?.aborted).toBe(true);
@@ -127,7 +167,9 @@ test("loads only on explicit actions and rejects stale overlapping results", asy
   expect(
     card.viewModel.state === "data" ? card.viewModel.header.ref : undefined,
   ).toBe("Micah 6:8");
-  expect(container.querySelector("#request-count")?.textContent).toContain("2");
+  expect(container.querySelector("#request-count")?.textContent).toBe(
+    "Live load attempts: 2",
+  );
 });
 
 test("blank validation does not cancel an admitted request", async () => {
@@ -177,12 +219,12 @@ test("blank validation does not cancel an admitted request", async () => {
     { timeout: 5_000 },
   );
   expect(requireCard(container).viewModel.state).toBe("data");
-  expect(container.querySelector("#request-status")?.textContent).toContain(
-    "Loaded Micah 6:8",
+  expect(container.querySelector("#request-status")?.textContent).toBe(
+    "Committed canonical reference Micah 6:8.",
   );
 });
 
-test("StrictMode does not request on mount and unmount removes listeners and aborts work", async () => {
+test("StrictMode recreates disposed controllers, makes no mount request, and disposes pending work", async () => {
   let resolveRequest!: (response: Response) => void;
   let requestSignal: AbortSignal | undefined;
   const strictFetch = createMicahFixtureFetch(fixture);
@@ -222,6 +264,11 @@ test("StrictMode does not request on mount and unmount removes listeners and abo
 
   expect(requestSignal?.aborted).toBe(true);
   expect(
+    requestSignal?.reason instanceof Error
+      ? requestSignal.reason.message
+      : String(requestSignal?.reason),
+  ).toContain("disposed");
+  expect(
     additions.mock.calls.filter(([type]) => type === "sefaria-source-select"),
   ).toHaveLength(
     removals.mock.calls.filter(([type]) => type === "sefaria-source-select")
@@ -230,7 +277,7 @@ test("StrictMode does not request on mount and unmount removes listeners and abo
   await act(async () => resolveRequest(Response.json(fixture)));
 });
 
-test("shows thrown and local validation failures without a success fallback", async () => {
+test("labels failed replacements as prior committed data and keeps local validation distinct", async () => {
   let rejectRequest!: (reason: unknown) => void;
   const fetch = vi.fn(
     async () =>
@@ -259,13 +306,19 @@ test("shows thrown and local validation failures without a success fallback", as
     rejectRequest(new Error("Network unavailable."));
     await waitForReact();
   });
-  expect(container.querySelector("#load-error")?.textContent).toBe(
+  expect(container.querySelector("#load-error")?.textContent).toContain(
     "Network unavailable.",
+  );
+  expect(container.querySelector("#load-error")?.textContent).toContain(
+    "prior committed Micah 6:8",
   );
   const failedPreview = container.querySelector<HTMLElement>("#preview");
   if (!failedPreview) throw new Error("The React preview is missing.");
-  expect(failedPreview.hidden).toBe(true);
-  expect(getComputedStyle(failedPreview).display).toBe("none");
+  expect(failedPreview.hidden).toBe(false);
+  expect(requireCard(container).viewModel.state).toBe("data");
+  expect(container.querySelector("#request-status")?.textContent).toContain(
+    "Showing the prior committed Micah 6:8 result",
+  );
   expect(fetch).toHaveBeenCalledOnce();
   expect(container.querySelector("#request-count")?.textContent).toContain("1");
 
@@ -351,8 +404,49 @@ function setTextInput(
   input.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
+function setSelect(
+  rootElement: ParentNode,
+  selector: string,
+  value: string,
+): void {
+  const select = rootElement.querySelector<HTMLSelectElement>(selector);
+  if (!select) throw new Error(`${selector} is missing.`);
+  const setValue = Object.getOwnPropertyDescriptor(
+    HTMLSelectElement.prototype,
+    "value",
+  )?.set;
+  if (!setValue) throw new Error("The native select value setter is missing.");
+  setValue.call(select, value);
+  select.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
 async function waitForReact(): Promise<void> {
   for (let index = 0; index < 3; index += 1) {
     await new Promise(requestAnimationFrame);
   }
+}
+
+async function renderedHebrew(card: SefariaSourceCard): Promise<string> {
+  await card.updateComplete;
+  await waitForReact();
+  const segment = [
+    ...(card.shadowRoot?.querySelectorAll("sefaria-text-segment") ?? []),
+  ].find(
+    (candidate) =>
+      (
+        candidate as HTMLElement & {
+          viewModel?: { readonly language?: string };
+        }
+      ).viewModel?.language === "he",
+  ) as
+    | (HTMLElement & {
+        readonly updateComplete: Promise<boolean>;
+        readonly shadowRoot: ShadowRoot | null;
+      })
+    | undefined;
+  if (segment === undefined) {
+    throw new Error("The rendered Hebrew segment is missing.");
+  }
+  await segment.updateComplete;
+  return segment.shadowRoot?.textContent ?? "";
 }

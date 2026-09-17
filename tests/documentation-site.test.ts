@@ -12,6 +12,7 @@ const lessons = [
   "05-customization.md",
   "06-host-integration.md",
   "react.md",
+  "alpine.md",
 ];
 
 describe("documentation learning journey", () => {
@@ -70,6 +71,10 @@ describe("documentation learning journey", () => {
         "pnpm --filter @sefaria-example/react-vite dev",
       ],
       [
+        "examples/alpine-vite/README.md",
+        "pnpm --filter @sefaria-example/alpine-vite dev",
+      ],
+      [
         "examples/reader/README.md",
         "pnpm --filter @sefaria-example/reader dev",
       ],
@@ -98,7 +103,7 @@ describe("documentation learning journey", () => {
       "bindSourceCardController(card, controller)",
     );
     expect(vanillaSource).toContain(
-      'updateStatus("Rendered supplied Micah 6:8 data with zero requests.")',
+      "`Supplied ${canonicalRef} data rendered with zero live loads.`",
     );
     expect(suppliedLesson).toContain("pnpm-workspace.yaml");
     expect(suppliedLesson).not.toContain('"pnpm": {\n    "overrides"');
@@ -116,17 +121,41 @@ describe("documentation learning journey", () => {
       "utf8",
     );
     for (const sourceFragment of [
-      'useElementProperty(cardRef, "selectable", viewModel.state === "data")',
-      "unbind.current?.()",
+      "useSyncExternalStore(",
       "bindSourceCardController(card, controller)",
-      "controller.cancel()",
+      "onsefaria-source-select={onSourceSelection}",
       "setSelected({",
     ]) {
       expect(reactSource).toContain(sourceFragment);
       expect(reactLesson).toContain(sourceFragment);
     }
+    expect(reactSource).toContain("next.dispose()");
+    expect(reactLesson).toContain("controller.dispose()");
     expect(declarations).toContain('"sefaria-source-card"');
     expect(reactLesson).toContain('"sefaria-source-card"');
+
+    const alpineLesson = await readFile(
+      path.join(root, "docs", "learn", "alpine.md"),
+      "utf8",
+    );
+    const alpineSource = await readFile(
+      path.join(
+        root,
+        "examples",
+        "alpine-vite",
+        "src",
+        "source-card-example.ts",
+      ),
+      "utf8",
+    );
+    for (const sourceFragment of [
+      "createSourceCardController(client)",
+      "bindSourceCardController(element, controller)",
+      "controller.dispose()",
+    ]) {
+      expect(alpineSource).toContain(sourceFragment);
+      expect(alpineLesson).toContain(sourceFragment);
+    }
   });
 
   it("builds distinct example files instead of fallback responses", async () => {
@@ -137,6 +166,7 @@ describe("documentation learning journey", () => {
       "examples/explorer/authored.html",
       "examples/reader/controlled.html",
       "examples/react/index.html",
+      "examples/alpine/index.html",
       "examples/mcp-app/index.html",
     ]) {
       await expect(

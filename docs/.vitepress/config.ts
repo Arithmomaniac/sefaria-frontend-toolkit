@@ -51,6 +51,7 @@ export default defineConfig({
             link: "/learn/03-live-data.md",
           },
           { text: "React path", link: "/learn/react.md" },
+          { text: "Alpine path", link: "/learn/alpine.md" },
           { text: "4. Use the Reader", link: "/learn/04-reader.md" },
           {
             text: "5. Customize or go headless",
