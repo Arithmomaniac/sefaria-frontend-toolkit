@@ -237,6 +237,14 @@ export interface ReaderPinHandle {
   readonly pinId: string;
 }
 
+/** Exact current-source destination reused internally for a fresh reader root. */
+interface ReaderRetainedSourceRoot {
+  /** Canonical selected reference already represented by the source capture. */
+  readonly selectedRef: string;
+  /** Addressable source-card position selected by the fresh root. */
+  readonly selectedPosition: readonly number[];
+}
+
 /** Explicit reason a reader transition could not be applied. */
 export type ReaderTransitionRejection =
   | "budget-exceeded"
@@ -972,6 +980,39 @@ class ReaderSessionImpl implements ReaderSession {
       this.with({ pins: removeMapKey(this.#state.pins, pinId) }),
       undefined,
     );
+  }
+
+  replaceRootFromCurrentSource(
+    request: SourceCardRequest,
+    presentation?: ReaderPresentationPatch,
+  ): ReaderTransition<ReaderRetainedSourceRoot> | undefined {
+    const current = this.#state.entries.at(-1);
+    if (!current) throw new Error("Reader session has no current entry.");
+    const source = current.source;
+    if (
+      source?.request.primary?.versionTitle !== request.primary?.versionTitle ||
+      source?.request.translation?.versionTitle !==
+        request.translation?.versionTitle
+    ) {
+      return undefined;
+    }
+    const item =
+      source?.viewModel.state === "data"
+        ? source.viewModel.items.find(
+            (candidate) => candidate.ref === request.tref,
+          )
+        : undefined;
+    if (source === undefined || item?.ref === undefined) return undefined;
+    const replaced = this.replaceRoot({
+      source,
+      selectedPosition: item.position,
+      ...(presentation === undefined ? {} : { presentation }),
+    });
+    if (replaced.state === "rejected") return replaced;
+    return applied(replaced.session, {
+      selectedRef: item.ref,
+      selectedPosition: item.position,
+    });
   }
 
   replaceRoot(seed: ReaderEntrySeed): ReaderTransition {
