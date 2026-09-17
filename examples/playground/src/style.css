@@ -1,0 +1,170 @@
+:root {
+  color: #211b17;
+  background: #f4efe6;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+}
+button,
+a {
+  font: inherit;
+}
+button:focus-visible,
+a:focus-visible {
+  outline: 3px solid #9a5d13;
+  outline-offset: 3px;
+}
+main {
+  max-width: 100rem;
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 2.5rem);
+}
+.intro {
+  max-width: 68rem;
+  margin-bottom: 1.5rem;
+}
+.intro h1 {
+  margin: 0;
+  font-family: Georgia, serif;
+  font-size: clamp(2.3rem, 6vw, 5rem);
+}
+.intro h1,
+.heading h2 {
+  overflow-wrap: anywhere;
+}
+.intro nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.intro a {
+  color: #71430c;
+  font-weight: 700;
+}
+.eyebrow {
+  margin: 0 0 0.35rem;
+  color: #855c21;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(20rem, 1fr) minmax(20rem, 1fr);
+  gap: 1rem;
+}
+.panel {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid #cbbda8;
+  border-radius: 1rem;
+  background: #fffdf8;
+  box-shadow: 0 0.8rem 2.5rem #3f2c1514;
+}
+.heading {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid #ded3c4;
+}
+.heading h2 {
+  margin: 0;
+  font-family: Georgia, serif;
+}
+.heading [role="status"] {
+  max-width: 18rem;
+  margin: 0;
+  color: #5f5348;
+  text-align: right;
+}
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  padding: 0.75rem 0.75rem 0;
+}
+.tabs button {
+  padding: 0.55rem 0.85rem;
+  border: 0;
+  border-radius: 0.55rem 0.55rem 0 0;
+  background: #eee5d9;
+  color: #4b3b2f;
+  font-weight: 700;
+}
+.tabs button[aria-selected="true"] {
+  background: #33261d;
+  color: #fff;
+}
+#editor {
+  border-block: 1px solid #ded3c4;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  padding: 0.85rem;
+}
+.actions button {
+  padding: 0.65rem 0.85rem;
+  border: 1px solid #8c7359;
+  border-radius: 0.55rem;
+  background: #fff;
+  color: #33261d;
+  font-weight: 700;
+}
+#run {
+  background: #855c21;
+  color: #fff;
+}
+#preview {
+  min-height: 32rem;
+  background: #f7f1e7;
+}
+#preview iframe {
+  display: block;
+  width: 100%;
+  min-height: 32rem;
+  border: 0;
+}
+.diagnostics {
+  padding: 1rem 1.2rem;
+  border-top: 1px solid #ded3c4;
+}
+.diagnostics h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+.diagnostics ol:empty::after {
+  content: "No diagnostics.";
+  color: #6d6258;
+}
+.diagnostics li[data-category="runtime"],
+.diagnostics li[data-category="import"],
+.diagnostics li[data-category="csp"],
+.diagnostics li[data-category="syntax"] {
+  color: #8b1e16;
+}
+
+@media (max-width: 800px) {
+  main {
+    padding: 0.5rem;
+  }
+  .workspace {
+    grid-template-columns: 1fr;
+  }
+  .heading {
+    display: block;
+  }
+  .heading [role="status"] {
+    margin-top: 0.5rem;
+    text-align: left;
+  }
+}

@@ -61,7 +61,7 @@ describe("Copilot agent setup", () => {
     );
   });
 
-  it("prepares dependencies, Chromium, and a launch probe", async () => {
+  it("prepares dependencies, qualified browsers, and a launch probe", async () => {
     const run = vi.fn().mockResolvedValue(0);
 
     await expect(
@@ -71,19 +71,18 @@ describe("Copilot agent setup", () => {
       }),
     ).resolves.toBeUndefined();
 
-    expect(run.mock.calls).toEqual([
+    expect(run.mock.calls.slice(0, 3)).toEqual([
       ["pnpm", ["--version"]],
       ["pnpm", ["install", "--frozen-lockfile"]],
-      ["pnpm", ["exec", "playwright", "install", "chromium"]],
       [
-        "node",
-        [
-          "--input-type=module",
-          "--eval",
-          expect.stringContaining("chromium.launch"),
-        ],
+        "pnpm",
+        ["exec", "playwright", "install", "chromium", "firefox", "webkit"],
       ],
     ]);
+    expect(run.mock.calls[3]?.[0]).toBe("node");
+    expect(run.mock.calls[3]?.[1]?.join(" ")).toContain(
+      "chromium, firefox, webkit",
+    );
   });
 
   it("installs Linux browser dependencies without accessing Git history", async () => {
@@ -101,6 +100,8 @@ describe("Copilot agent setup", () => {
       "install",
       "--with-deps",
       "chromium",
+      "firefox",
+      "webkit",
     ]);
   });
 
