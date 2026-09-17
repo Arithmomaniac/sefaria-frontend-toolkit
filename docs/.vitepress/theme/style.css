@@ -151,7 +151,7 @@
   font-size: clamp(1.55rem, 3vw, 2.35rem);
 }
 
-.landing-preview__proofs {
+.vp-doc .landing-preview__proofs {
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem;
@@ -160,7 +160,8 @@
   list-style: none;
 }
 
-.landing-preview__proofs li {
+.vp-doc .landing-preview__proofs li {
+  margin: 0;
   border: 1px solid color-mix(in srgb, var(--site-ink) 20%, transparent);
   border-radius: 999px;
   padding: 0.28rem 0.65rem;
