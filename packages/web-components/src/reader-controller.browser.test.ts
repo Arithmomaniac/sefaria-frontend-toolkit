@@ -11,7 +11,7 @@ import { expect, test, vi } from "vitest";
 
 import linksFixture from "../../client/test/fixtures/links-connections-preview-2026-09-06.json";
 import sectionFixture from "../../client/test/fixtures/v3-connections-genesis-section-2026-09-06.json";
-import { bindReaderController } from "./reader-controller-binding.js";
+import { bindReaderController } from "./bindings.js";
 import {
   createReaderController,
   type ReaderController,
@@ -92,6 +92,7 @@ test("binds one persistent reader, forwards navigation, resets its pane, and cle
       detail: { originEntryId: "entry-1", pane: "connections" },
     }),
   );
+  await Promise.resolve();
   expect(element.activePane).toBe("connections");
 
   element.dispatchEvent(
@@ -113,6 +114,7 @@ test("binds one persistent reader, forwards navigation, resets its pane, and cle
       detail: { originEntryId: "entry-2" },
     }),
   );
+  await Promise.resolve();
   expect(element.viewModel?.currentEntryId).toBe("entry-1");
   const sourceCalls = dataSource.loadSource.mock.calls.length;
   unbind();

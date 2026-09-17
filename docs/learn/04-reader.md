@@ -21,7 +21,7 @@ The supported path creates the browser client, loads a controller once, binds it
 ```ts
 import { createSefariaClient } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
-import { bindReaderController } from "@arithmomaniac/sefaria-web-components";
+import { bindReaderController } from "@arithmomaniac/sefaria-web-components/bindings";
 import { loadReaderController } from "@arithmomaniac/sefaria-web-components/reader-controller";
 
 const element = document.createElement("sefaria-reader");

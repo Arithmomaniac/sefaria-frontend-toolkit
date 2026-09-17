@@ -533,6 +533,7 @@ export class SefariaReader extends SefariaElement {
         detail: { originEntryId, ...detail },
         bubbles: true,
         composed: true,
+        cancelable: true,
       }),
     );
   }

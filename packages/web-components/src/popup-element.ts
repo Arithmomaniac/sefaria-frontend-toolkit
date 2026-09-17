@@ -294,6 +294,7 @@ export class SefariaPopup extends SefariaElement {
     this.dispatchEvent(
       new CustomEvent("sefaria-popup-close", {
         bubbles: true,
+        cancelable: true,
         composed: true,
       }),
     );

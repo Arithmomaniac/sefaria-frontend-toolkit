@@ -5,10 +5,8 @@ import {
 } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
-import {
-  createSourceCardViewModel,
-  loadSourceCardViewModel,
-} from "@arithmomaniac/sefaria-web-components/source-card";
+import { bindSourceCardController } from "@arithmomaniac/sefaria-web-components/bindings";
+import { createSourceCardController } from "@arithmomaniac/sefaria-web-components/source-card";
 import payload from "./micah-6-8.json";
 import "./style.css";
 
@@ -20,8 +18,6 @@ const validatedPayload = zCoreV3TextsResponse.parse(
   payload,
 ) as CoreV3TextsResponse;
 let requestCount = 0;
-let activeController: AbortController | undefined;
-let activeOperation = 0;
 const client = createSefariaClient({
   cache: false,
   fetch: async (input, init) => {
@@ -30,10 +26,15 @@ const client = createSefariaClient({
     return fetch(input, init);
   },
 });
+const controller = createSourceCardController(client);
+const unbind = bindSourceCardController(card, controller);
 
-card.viewModel = createSourceCardViewModel(validatedPayload, {
-  tref: "Micah 6:8",
-});
+controller.setSuppliedData(
+  {
+    tref: "Micah 6:8",
+  },
+  validatedPayload,
+);
 card.selectable = true;
 updateStatus("Rendered supplied Micah 6:8 data with zero requests.");
 
@@ -42,40 +43,26 @@ loadButton.addEventListener("click", () => {
 });
 
 async function loadLive(): Promise<void> {
-  activeController?.abort();
-  const controller = new AbortController();
-  activeController = controller;
-  const operation = ++activeOperation;
-  const previousViewModel = card.viewModel;
   loadButton.disabled = true;
-  card.viewModel = {
-    state: "loading",
-    message: "Loading live Micah 6:8 data.",
-  };
   updateStatus("Loading live Micah 6:8 data from Sefaria.");
   try {
-    const viewModel = await loadSourceCardViewModel(
-      { tref: "Micah 6:8" },
-      client,
-      controller.signal,
-    );
-    if (operation !== activeOperation || controller.signal.aborted) {
-      return;
-    }
-    card.viewModel = viewModel;
+    await controller.load({ tref: "Micah 6:8" });
     updateStatus("Loaded live Micah 6:8 data from Sefaria.");
   } catch (error) {
-    if (operation !== activeOperation || controller.signal.aborted) {
-      return;
-    }
-    card.viewModel = previousViewModel;
     updateStatus(error instanceof Error ? error.message : String(error));
   } finally {
-    if (operation === activeOperation) {
-      loadButton.disabled = false;
-    }
+    loadButton.disabled = false;
   }
 }
+
+window.addEventListener(
+  "pagehide",
+  () => {
+    unbind();
+    controller.dispose();
+  },
+  { once: true },
+);
 
 function updateStatus(message: string): void {
   status.textContent = message;

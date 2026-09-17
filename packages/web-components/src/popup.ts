@@ -14,6 +14,12 @@ import {
   type SourceCardEmptyViewModel,
   type SourceCardRequest,
 } from "./source-card.js";
+import {
+  ComponentControllerEngine,
+  validateSuppliedComponentData,
+  type ComponentControllerAttempt,
+  type ComponentControllerSnapshot,
+} from "./component-controller.js";
 
 /** Maximum number of aligned source positions rendered in one popup preview. */
 export const POPUP_PREVIEW_POSITION_LIMIT = 20;
@@ -68,6 +74,56 @@ export type PopupViewModel =
   | PopupEmptyViewModel
   | PopupErrorViewModel;
 
+/** Terminal popup state committed by a headless controller. */
+export type PopupTerminalViewModel = Exclude<
+  PopupViewModel,
+  PopupLoadingViewModel
+>;
+
+/** One committed popup request and terminal rendering result. */
+export interface PopupControllerResult {
+  /** Effective request used for the committed result. */
+  readonly request: PopupRequest;
+  /** Terminal component view model. */
+  readonly viewModel: PopupTerminalViewModel;
+}
+
+/** Current popup controller attempt. */
+export type PopupControllerAttempt = ComponentControllerAttempt<
+  PopupRequest,
+  PopupLoadingViewModel
+>;
+
+/** Immutable popup controller publication. */
+export type PopupControllerSnapshot = ComponentControllerSnapshot<
+  PopupControllerResult,
+  PopupRequest,
+  PopupLoadingViewModel
+>;
+
+/** Stateful DOM-free popup loading lifecycle. */
+export interface PopupController {
+  /** Current committed result and pending or failed attempt. */
+  readonly snapshot: PopupControllerSnapshot;
+  /** Subscribes immediately and after each snapshot replacement. */
+  subscribe(listener: (snapshot: PopupControllerSnapshot) => void): () => void;
+  /** Loads and commits one popup request. */
+  load(
+    request: PopupRequest,
+    signal?: AbortSignal,
+  ): Promise<PopupTerminalViewModel>;
+  /** Validates and commits supplied corrected response data with zero I/O. */
+  setSuppliedData(
+    request: PopupRequest,
+    payload: unknown,
+    status?: 200 | 400 | 404,
+  ): PopupTerminalViewModel;
+  /** Cancels active work without disposing committed content. */
+  cancel(reason?: unknown): void;
+  /** Aborts active work and permanently closes the controller. */
+  dispose(): void;
+}
+
 /**
  * Projects one validated v3 response into a bounded popup view model.
  */
@@ -110,6 +166,71 @@ export async function loadPopupViewModel(
   client: SefariaClient,
   signal?: AbortSignal,
 ): Promise<PopupViewModel> {
+  const response = await requestPopupResponse(request, client, signal);
+  return projectPopupResponse(request, response.payload, response.status);
+}
+
+/** Creates a zero-request popup controller with an optional live client. */
+export function createPopupController(client?: SefariaClient): PopupController {
+  const engine = new ComponentControllerEngine({
+    ...(client === undefined ? {} : { client }),
+    createLoading: (request: PopupRequest) => ({
+      state: "loading" as const,
+      message: `Loading ${request.tref}.`,
+    }),
+    load: requestPopupResponse,
+    project: (request, payload, status) => {
+      const viewModel = projectPopupResponse(request, payload, status);
+      const result = {
+        request: {
+          ...request,
+          ...(request.primary === undefined
+            ? {}
+            : { primary: { ...request.primary } }),
+          ...(request.translation === undefined
+            ? {}
+            : { translation: { ...request.translation } }),
+        },
+        viewModel,
+      };
+      return { committed: result, result, viewModel };
+    },
+    validateStatus: assertPopupStatus,
+  });
+  return {
+    get snapshot() {
+      return engine.snapshot;
+    },
+    subscribe: (listener) => engine.subscribe(listener),
+    load: (request, signal) => {
+      requireNonblankTref(request.tref);
+      serializePopupSelectors(request);
+      return engine.load(request, signal);
+    },
+    setSuppliedData: (request, payload, status = 200) => {
+      requireNonblankTref(request.tref);
+      serializePopupSelectors(request);
+      return engine.setSuppliedData(request, payload, status);
+    },
+    cancel: (reason) => engine.cancel(reason),
+    dispose: () => engine.dispose(),
+  };
+}
+
+function requireNonblankTref(tref: string): void {
+  if (tref.trim().length === 0) {
+    throw new TypeError("Popup reference must not be blank.");
+  }
+}
+
+async function requestPopupResponse(
+  request: PopupRequest,
+  client: SefariaClient,
+  signal?: AbortSignal,
+): Promise<{
+  readonly payload: CoreV3TextsResponse | { readonly error: string };
+  readonly status: 200 | 400 | 404;
+}> {
   const version = serializePopupSelectors(request);
   const result = await getV3Texts({
     client,
@@ -119,20 +240,42 @@ export async function loadPopupViewModel(
   });
 
   if (result.data !== undefined) {
-    return createPopupViewModel(result.data, request);
+    return { payload: result.data, status: 200 };
   }
 
   const status = result.response?.status;
   if (result.error !== undefined && (status === 400 || status === 404)) {
-    return {
-      state: "error",
-      errorKind: "http",
-      status,
-      message: result.error.error,
-    };
+    return { payload: result.error, status };
   }
 
   throw new Error("The popup request returned no data or documented error.");
+}
+
+function projectPopupResponse(
+  request: PopupRequest,
+  payload: unknown,
+  status: 200 | 400 | 404,
+): PopupTerminalViewModel {
+  const validated = validateSuppliedComponentData<
+    CoreV3TextsResponse | { readonly error: string }
+  >({ method: "GET", path: "/api/v3/texts/{tref}", status }, payload);
+  return status === 200
+    ? (createPopupViewModel(
+        validated as CoreV3TextsResponse,
+        request,
+      ) as PopupTerminalViewModel)
+    : {
+        state: "error",
+        errorKind: "http",
+        status,
+        message: (validated as { readonly error: string }).error,
+      };
+}
+
+function assertPopupStatus(status: number): asserts status is 200 | 400 | 404 {
+  if (status !== 200 && status !== 400 && status !== 404) {
+    throw new RangeError("Popup status must be 200, 400, or 404.");
+  }
 }
 
 function boundPopupPayload(

@@ -4,6 +4,12 @@ import {
   type GetRefData,
   type SefariaClient,
 } from "@arithmomaniac/sefaria-client";
+import {
+  ComponentControllerEngine,
+  validateSuppliedComponentData,
+  type ComponentControllerAttempt,
+  type ComponentControllerSnapshot,
+} from "./component-controller.js";
 
 const DEFAULT_SITE_ORIGIN = "https://www.sefaria.org";
 const PATH_CHARACTER = /^[A-Za-z0-9\-._~!$&'()*+,;=:@]$/u;
@@ -76,6 +82,58 @@ export type RefLabelViewModel =
   | RefLabelEmptyViewModel
   | RefLabelHttpErrorViewModel;
 
+/** Terminal reference-label state committed by a headless controller. */
+export type RefLabelTerminalViewModel = Exclude<
+  RefLabelViewModel,
+  RefLabelLoadingViewModel
+>;
+
+/** One committed reference-label request and terminal rendering result. */
+export interface RefLabelControllerResult {
+  /** Effective request used for the committed result. */
+  readonly request: RefLabelRequest;
+  /** Terminal component view model. */
+  readonly viewModel: RefLabelTerminalViewModel;
+}
+
+/** Current reference-label controller attempt. */
+export type RefLabelControllerAttempt = ComponentControllerAttempt<
+  RefLabelRequest,
+  RefLabelLoadingViewModel
+>;
+
+/** Immutable reference-label controller publication. */
+export type RefLabelControllerSnapshot = ComponentControllerSnapshot<
+  RefLabelControllerResult,
+  RefLabelRequest,
+  RefLabelLoadingViewModel
+>;
+
+/** Stateful DOM-free reference-label loading lifecycle. */
+export interface RefLabelController {
+  /** Current committed result and pending or failed attempt. */
+  readonly snapshot: RefLabelControllerSnapshot;
+  /** Subscribes immediately and after each snapshot replacement. */
+  subscribe(
+    listener: (snapshot: RefLabelControllerSnapshot) => void,
+  ): () => void;
+  /** Loads and commits one reference-label request. */
+  load(
+    request: RefLabelRequest,
+    signal?: AbortSignal,
+  ): Promise<RefLabelTerminalViewModel>;
+  /** Validates and commits supplied corrected response data with zero I/O. */
+  setSuppliedData(
+    request: RefLabelRequest,
+    payload: unknown,
+    status?: 200 | 404,
+  ): RefLabelTerminalViewModel;
+  /** Cancels active work without disposing committed content. */
+  cancel(reason?: unknown): void;
+  /** Aborts active work and permanently closes the controller. */
+  dispose(): void;
+}
+
 /** Projects one validated reference response into a render-ready label. */
 export function createRefLabelViewModel(
   payload: CoreRefResponse,
@@ -111,8 +169,69 @@ export async function loadRefLabelViewModel(
   signal?: AbortSignal,
   options: RefLabelFactoryOptions = {},
 ): Promise<RefLabelViewModel> {
-  const tref = requireTref(request.tref);
   requireSiteOrigin(options.siteOrigin);
+  const response = await requestRefLabelResponse(request, client, signal);
+  return projectRefLabelResponse(
+    request,
+    response.payload,
+    response.status,
+    options,
+  );
+}
+
+/** Creates a zero-request reference-label controller with deterministic options. */
+export function createRefLabelController(
+  client?: SefariaClient,
+  factoryOptions: RefLabelFactoryOptions = {},
+): RefLabelController {
+  requireSiteOrigin(factoryOptions.siteOrigin);
+  const options = Object.freeze({ ...factoryOptions });
+  const engine = new ComponentControllerEngine({
+    ...(client === undefined ? {} : { client }),
+    createLoading: (request: RefLabelRequest) => ({
+      state: "loading" as const,
+      message: `Loading ${request.tref}.`,
+    }),
+    load: requestRefLabelResponse,
+    project: (request, payload, status) => {
+      const viewModel = projectRefLabelResponse(
+        request,
+        payload,
+        status,
+        options,
+      );
+      const result = { request: { ...request }, viewModel };
+      return { committed: result, result, viewModel };
+    },
+    validateStatus: assertRefLabelStatus,
+  });
+  return {
+    get snapshot() {
+      return engine.snapshot;
+    },
+    subscribe: (listener) => engine.subscribe(listener),
+    load: (request, signal) => {
+      requireTref(request.tref);
+      return engine.load(request, signal);
+    },
+    setSuppliedData: (request, payload, status = 200) => {
+      requireTref(request.tref);
+      return engine.setSuppliedData(request, payload, status);
+    },
+    cancel: (reason) => engine.cancel(reason),
+    dispose: () => engine.dispose(),
+  };
+}
+
+async function requestRefLabelResponse(
+  request: RefLabelRequest,
+  client: SefariaClient,
+  signal?: AbortSignal,
+): Promise<{
+  readonly payload: CoreRefResponse | { readonly error: string };
+  readonly status: 200 | 404;
+}> {
+  const tref = requireTref(request.tref);
   const result = await getRef({
     client,
     path: { tref },
@@ -120,21 +239,45 @@ export async function loadRefLabelViewModel(
   });
 
   if (result.data !== undefined) {
-    return createRefLabelViewModel(result.data, { tref }, options);
+    return { payload: result.data, status: 200 };
   }
 
   if (result.error !== undefined && result.response?.status === 404) {
-    return {
-      state: "error",
-      errorKind: "http",
-      status: 404,
-      message: result.error.error,
-    };
+    return { payload: result.error, status: 404 };
   }
 
   throw new Error(
     "The reference request returned no data or documented error.",
   );
+}
+
+function projectRefLabelResponse(
+  request: RefLabelRequest,
+  payload: unknown,
+  status: 200 | 404,
+  options: RefLabelFactoryOptions,
+): RefLabelTerminalViewModel {
+  const validated = validateSuppliedComponentData<
+    CoreRefResponse | { readonly error: string }
+  >({ method: "GET", path: "/api/ref/{tref}", status }, payload);
+  return status === 200
+    ? (createRefLabelViewModel(
+        validated as CoreRefResponse,
+        request,
+        options,
+      ) as RefLabelTerminalViewModel)
+    : {
+        state: "error",
+        errorKind: "http",
+        status: 404,
+        message: (validated as { readonly error: string }).error,
+      };
+}
+
+function assertRefLabelStatus(status: number): asserts status is 200 | 404 {
+  if (status !== 200 && status !== 404) {
+    throw new RangeError("Reference-label status must be 200 or 404.");
+  }
 }
 
 function requireTref(tref: string): string {

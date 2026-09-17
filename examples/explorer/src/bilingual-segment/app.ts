@@ -1,20 +1,12 @@
-import {
-  createSefariaClient,
-  type SefariaClient,
-} from "@arithmomaniac/sefaria-client";
+import { createSefariaClient } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 import type {
+  BilingualSegmentController,
   BilingualSegmentRequest,
-  BilingualSegmentViewModel,
   SefariaBilingualSegment,
 } from "@arithmomaniac/sefaria-web-components";
-import { loadBilingualSegmentViewModel } from "@arithmomaniac/sefaria-web-components/bilingual-segment";
-
-/** One host-owned bilingual-segment request operation. */
-export type BilingualSegmentLoader = (
-  request: BilingualSegmentRequest,
-  signal: AbortSignal,
-) => Promise<BilingualSegmentViewModel>;
+import { bindBilingualSegmentController } from "@arithmomaniac/sefaria-web-components/bindings";
+import { createBilingualSegmentController } from "@arithmomaniac/sefaria-web-components/bilingual-segment";
 
 /** Controls the interactive live bilingual-segment demonstration. */
 export interface BilingualSegmentLiveDemo {
@@ -25,7 +17,9 @@ export interface BilingualSegmentLiveDemo {
 /** Connects the demo form, presets, and display controls to the production factory. */
 export function startBilingualSegmentLiveDemo(
   root: Document,
-  loader: BilingualSegmentLoader = createDefaultLoader(),
+  controller: BilingualSegmentController = createBilingualSegmentController(
+    createSefariaClient(),
+  ),
 ): BilingualSegmentLiveDemo {
   const form = requireElement<HTMLFormElement>(root, "#bilingual-request-form");
   const trefInput = requireNamedInput(form, "tref");
@@ -45,8 +39,7 @@ export function startBilingualSegmentLiveDemo(
     root,
     "#bilingual-result",
   );
-  let activeController: AbortController | undefined;
-  let activeOperation = 0;
+  bindBilingualSegmentController(result, controller);
 
   const applyDisplaySettings = (): void => {
     const values = new FormData(displayForm);
@@ -59,20 +52,12 @@ export function startBilingualSegmentLiveDemo(
   };
 
   const loadCurrentRequest = async (): Promise<void> => {
-    activeController?.abort();
-    const controller = new AbortController();
-    activeController = controller;
-    const operation = ++activeOperation;
     const request = createRequest(
       trefInput.value,
       primaryTitleInput.value,
       translationTitleInput.value,
     );
 
-    result.viewModel = {
-      state: "loading",
-      message: `Loading ${request.tref}.`,
-    };
     requestState.dataset.state = "loading";
     requestState.textContent = `Loading ${formatRequest(request)} from Sefaria.`;
     hostError.hidden = true;
@@ -80,15 +65,17 @@ export function startBilingualSegmentLiveDemo(
     submitButton.disabled = true;
 
     try {
-      const viewModel = await loader(request, controller.signal);
-      if (operation !== activeOperation) {
+      const viewModel = await controller.load(request);
+      if (controller.snapshot.result?.viewModel !== viewModel) {
         return;
       }
-      result.viewModel = viewModel;
       requestState.dataset.state = viewModel.state;
       requestState.textContent = `${formatRequest(request)} produced ${viewModel.state}.`;
     } catch (error) {
-      if (controller.signal.aborted || operation !== activeOperation) {
+      if (
+        controller.snapshot.attempt.state !== "failed" ||
+        controller.snapshot.attempt.error !== error
+      ) {
         return;
       }
       requestState.dataset.state = "error";
@@ -97,7 +84,7 @@ export function startBilingualSegmentLiveDemo(
       hostError.textContent =
         error instanceof Error ? error.message : String(error);
     } finally {
-      if (operation === activeOperation) {
+      if (controller.snapshot.attempt.state !== "loading") {
         submitButton.disabled = false;
       }
     }
@@ -124,12 +111,6 @@ export function startBilingualSegmentLiveDemo(
   }
 
   return { loadCurrentRequest };
-}
-
-function createDefaultLoader(): BilingualSegmentLoader {
-  const client: SefariaClient = createSefariaClient();
-  return async (request, signal) =>
-    await loadBilingualSegmentViewModel(request, client, signal);
 }
 
 function createRequest(

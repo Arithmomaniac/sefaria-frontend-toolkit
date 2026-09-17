@@ -24,6 +24,12 @@ import {
   type TextSegmentDataViewModel,
 } from "./text-segment.js";
 import { sourceCardAddresses } from "./source-card-addresses.js";
+import {
+  ComponentControllerEngine,
+  validateSuppliedComponentData,
+  type ComponentControllerAttempt,
+  type ComponentControllerSnapshot,
+} from "./component-controller.js";
 
 /** Proven contextual navigation capability, independent of rendered text presence. */
 export type SourceCardNavigation =
@@ -160,6 +166,58 @@ export type SourceCardViewModel =
   | SourceCardProjectionErrorViewModel
   | SourceCardHttpErrorViewModel;
 
+/** Terminal source-card state committed by a headless controller. */
+export type SourceCardTerminalViewModel = Exclude<
+  SourceCardViewModel,
+  SourceCardLoadingViewModel
+>;
+
+/** One committed source-card request and terminal rendering result. */
+export interface SourceCardControllerResult {
+  /** Effective request used for the committed result. */
+  readonly request: SourceCardRequest;
+  /** Terminal component view model. */
+  readonly viewModel: SourceCardTerminalViewModel;
+}
+
+/** Current source-card controller attempt. */
+export type SourceCardControllerAttempt = ComponentControllerAttempt<
+  SourceCardRequest,
+  SourceCardLoadingViewModel
+>;
+
+/** Immutable source-card controller publication. */
+export type SourceCardControllerSnapshot = ComponentControllerSnapshot<
+  SourceCardControllerResult,
+  SourceCardRequest,
+  SourceCardLoadingViewModel
+>;
+
+/** Stateful DOM-free source-card loading lifecycle. */
+export interface SourceCardController {
+  /** Current committed result and pending or failed attempt. */
+  readonly snapshot: SourceCardControllerSnapshot;
+  /** Subscribes immediately and after each snapshot replacement. */
+  subscribe(
+    listener: (snapshot: SourceCardControllerSnapshot) => void,
+  ): () => void;
+  /** Loads and commits one source-card request. */
+  load(
+    request: SourceCardRequest,
+    signal?: AbortSignal,
+  ): Promise<SourceCardTerminalViewModel>;
+  /** Validates and commits supplied corrected response data with zero I/O. */
+  setSuppliedData(
+    request: SourceCardRequest,
+    payload: unknown,
+    status?: 200 | 400 | 404,
+  ): SourceCardTerminalViewModel;
+  /** Cancels active work without disposing committed content. */
+  cancel(reason?: unknown): void;
+  /** Aborts active work and permanently closes the controller. */
+  dispose(): void;
+}
+
 const SIDES: readonly BilingualPairSide[] = ["primary", "translation"];
 
 /**
@@ -245,6 +303,72 @@ export async function loadSourceCardViewModel(
   client: SefariaClient,
   signal?: AbortSignal,
 ): Promise<SourceCardViewModel> {
+  const response = await requestSourceCardResponse(request, client, signal);
+  return projectSourceCardResponse(request, response.payload, response.status);
+}
+
+/** Creates a zero-request source-card controller with an optional live client. */
+export function createSourceCardController(
+  client?: SefariaClient,
+): SourceCardController {
+  const engine = new ComponentControllerEngine({
+    ...(client === undefined ? {} : { client }),
+    createLoading: (request: SourceCardRequest) => ({
+      state: "loading" as const,
+      message: `Loading ${request.tref}.`,
+    }),
+    load: requestSourceCardResponse,
+    project: (request, payload, status) => {
+      const viewModel = projectSourceCardResponse(request, payload, status);
+      const result = {
+        request: {
+          ...request,
+          ...(request.primary === undefined
+            ? {}
+            : { primary: { ...request.primary } }),
+          ...(request.translation === undefined
+            ? {}
+            : { translation: { ...request.translation } }),
+        },
+        viewModel,
+      };
+      return { committed: result, result, viewModel };
+    },
+    validateStatus: assertSourceCardStatus,
+  });
+  return {
+    get snapshot() {
+      return engine.snapshot;
+    },
+    subscribe: (listener) => engine.subscribe(listener),
+    load: (request, signal) => {
+      validateSourceCardRequest(request);
+      return engine.load(request, signal);
+    },
+    setSuppliedData: (request, payload, status = 200) => {
+      validateSourceCardRequest(request);
+      return engine.setSuppliedData(request, payload, status);
+    },
+    cancel: (reason) => engine.cancel(reason),
+    dispose: () => engine.dispose(),
+  };
+}
+
+function validateSourceCardRequest(request: SourceCardRequest): void {
+  if (request.tref.trim().length === 0) {
+    throw new TypeError("Source card reference must not be blank.");
+  }
+  serializeSourceCardSelectors(request);
+}
+
+async function requestSourceCardResponse(
+  request: SourceCardRequest,
+  client: SefariaClient,
+  signal?: AbortSignal,
+): Promise<{
+  readonly payload: CoreV3TextsResponse | { readonly error: string };
+  readonly status: 200 | 400 | 404;
+}> {
   const version = serializeSourceCardSelectors(request);
   const result = await getV3Texts({
     client,
@@ -254,20 +378,51 @@ export async function loadSourceCardViewModel(
   });
 
   if (result.data !== undefined) {
-    return createSourceCardViewModel(result.data, request);
+    return { payload: result.data, status: 200 };
   }
 
   const status = result.response?.status;
   if (result.error !== undefined && (status === 400 || status === 404)) {
-    return {
-      state: "error",
-      errorKind: "http",
-      status,
-      message: result.error.error,
-    };
+    return { payload: result.error, status };
   }
 
   throw new Error("The v3 texts request returned no data or documented error.");
+}
+
+function projectSourceCardResponse(
+  request: SourceCardRequest,
+  payload: unknown,
+  status: 200 | 400 | 404,
+): SourceCardTerminalViewModel {
+  const validated = validateSuppliedComponentData<
+    CoreV3TextsResponse | { readonly error: string }
+  >(
+    {
+      method: "GET",
+      path: "/api/v3/texts/{tref}",
+      status,
+    },
+    payload,
+  );
+  return status === 200
+    ? (createSourceCardViewModel(
+        validated as CoreV3TextsResponse,
+        request,
+      ) as SourceCardTerminalViewModel)
+    : {
+        state: "error",
+        errorKind: "http",
+        status,
+        message: (validated as { readonly error: string }).error,
+      };
+}
+
+function assertSourceCardStatus(
+  status: number,
+): asserts status is 200 | 400 | 404 {
+  if (status !== 200 && status !== 400 && status !== 404) {
+    throw new RangeError("Source-card status must be 200, 400, or 404.");
+  }
 }
 
 function projectAlignedItems(
