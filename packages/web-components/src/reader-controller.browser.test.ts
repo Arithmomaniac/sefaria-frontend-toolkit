@@ -11,7 +11,7 @@ import { expect, test, vi } from "vitest";
 
 import linksFixture from "../../client/test/fixtures/links-connections-preview-2026-09-06.json";
 import sectionFixture from "../../client/test/fixtures/v3-connections-genesis-section-2026-09-06.json";
-import { bindReaderController } from "./reader-controller-binding.js";
+import { bindReaderController } from "./bindings.js";
 import {
   createReaderController,
   type ReaderController,
@@ -92,6 +92,7 @@ test("binds one persistent reader, forwards navigation, resets its pane, and cle
       detail: { originEntryId: "entry-1", pane: "connections" },
     }),
   );
+  await Promise.resolve();
   expect(element.activePane).toBe("connections");
 
   element.dispatchEvent(
@@ -113,6 +114,7 @@ test("binds one persistent reader, forwards navigation, resets its pane, and cle
       detail: { originEntryId: "entry-2" },
     }),
   );
+  await Promise.resolve();
   expect(element.viewModel?.currentEntryId).toBe("entry-1");
   const sourceCalls = dataSource.loadSource.mock.calls.length;
   unbind();
@@ -176,6 +178,7 @@ test("binds pending root qualification without replacing committed Reader conten
     ),
   );
 
+  expect(element.rootLoading).toBe(true);
   expect(element.viewModel).toStrictEqual(committed);
   expect(element.viewModel?.selectedTarget?.ref).toBe("Micah 6:8");
   expect(element.activePane).toBe("connections");
@@ -205,6 +208,55 @@ test("binds pending root qualification without replacing committed Reader conten
     "Opening a new Reader location",
   );
   unbind();
+});
+
+test("rolls back and clears root loading without cancelling caller-owned work", async () => {
+  render(html`<sefaria-reader></sefaria-reader>`);
+  const element = document.querySelector<SefariaReader>("sefaria-reader");
+  if (!element) throw new Error("Reader was not rendered.");
+  let resolveSource!: (content: ReturnType<typeof sourceContent>) => void;
+  const pendingSource = new Promise<ReturnType<typeof sourceContent>>(
+    (resolve) => {
+      resolveSource = resolve;
+    },
+  );
+  const controller = createReaderController(
+    {
+      source: sourceContent("Micah 6"),
+      selectedPosition: [7],
+    },
+    {
+      loadSource: vi.fn(async () => pendingSource),
+      loadConnections: vi.fn(async (request, projection) =>
+        createReaderConnectionsContent(
+          links(request.tref),
+          request,
+          projection,
+        ),
+      ),
+    },
+  );
+  const replacement = controller.replaceRoot({ tref: "Micah 7" });
+  const failure = new Error("Listener setup failed");
+  const add = vi.spyOn(element, "addEventListener");
+  add.mockImplementationOnce(() => {
+    throw failure;
+  });
+
+  expect(() => bindReaderController(element, controller)).toThrow(failure);
+  expect(element.rootLoading).toBe(false);
+
+  add.mockRestore();
+  const unbind = bindReaderController(element, controller);
+  expect(element.rootLoading).toBe(true);
+  const committed = element.viewModel;
+  unbind();
+  expect(element.rootLoading).toBe(false);
+
+  resolveSource(sourceContent("Micah 7"));
+  await replacement;
+  expect(element.viewModel).toBe(committed);
+  expect(element.rootLoading).toBe(false);
 });
 
 test("leaves chat export entirely with the host", async () => {

@@ -1,21 +1,18 @@
 import {
   createSefariaClient,
-  getLinks,
-  type CoreLinkResponse,
   type SefariaClient,
 } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 import type {
-  ConnectionsProjection,
-  ConnectionsRequest,
   SefariaConnectionsPanel,
   SefariaSourceCard,
   SourceCardDataViewModel,
   SourceCardNavigation,
 } from "@arithmomaniac/sefaria-web-components";
-import { createConnectionsViewModel } from "@arithmomaniac/sefaria-web-components/connections-panel";
+import { bindConnectionsController } from "@arithmomaniac/sefaria-web-components/bindings";
+import { createConnectionsController } from "@arithmomaniac/sefaria-web-components/connections-panel";
 import {
-  loadSourceCardViewModel,
+  createSourceCardController,
   type SourceCardViewModel,
 } from "@arithmomaniac/sefaria-web-components/source-card";
 
@@ -28,12 +25,6 @@ export interface ConnectionsDemo {
   ) => Promise<void>;
   /** Removes host listeners and aborts active operations. */
   readonly dispose: () => void;
-}
-
-interface LinksCapture {
-  readonly payload: CoreLinkResponse;
-  readonly request: ConnectionsRequest;
-  readonly status: 200 | 400;
 }
 
 interface AddressableCard {
@@ -83,12 +74,15 @@ export function startConnectionsDemo(
   const status = requireElement<HTMLElement>(root, "#status");
   const hostError = requireElement<HTMLElement>(root, "#host-error");
   const requestCounts = requireElement<HTMLElement>(root, "#request-counts");
+  const sourceController = createSourceCardController(client);
+  const connectionsController = createConnectionsController(client);
+  const unbindConnections = bindConnectionsController(
+    connections,
+    connectionsController,
+  );
 
   let controller: AbortController | undefined;
   let operation = 0;
-  let capture: LinksCapture | undefined;
-  let projection: ConnectionsProjection = {};
-  let activeRef: string | undefined;
   let textRequests = 0;
   let linksRequests = 0;
 
@@ -111,18 +105,11 @@ export function startConnectionsDemo(
     hostError.hidden = true;
     hostError.textContent = "";
   };
-
-  const projectCapture = (): void => {
-    if (!capture) {
-      return;
+  const unsubscribeConnections = connectionsController.subscribe((snapshot) => {
+    if (snapshot.attempt.state === "failed") {
+      showError(snapshot.attempt.error);
     }
-    connections.viewModel = createConnectionsViewModel(
-      capture.payload,
-      capture.request,
-      projection,
-      capture.status,
-    );
-  };
+  });
 
   const loadLinks = async (
     ref: string,
@@ -133,67 +120,11 @@ export function startConnectionsDemo(
     if (signal.aborted || expectedOperation !== operation) {
       return;
     }
-    const sameRef = capture?.request.tref === ref;
-    const previousCapture = capture;
-    const previousProjection = projection;
-    const previousViewModel = connections.viewModel;
-    if (!sameRef) {
-      capture = undefined;
-      projection = {};
-      activeRef = ref;
-    }
-    connections.viewModel = {
-      state: "loading",
-      message: `Loading connections for ${ref}.`,
-    };
     linksRequests += 1;
     updateCounts();
-    try {
-      const result = await getLinks({
-        client,
-        path: { tref: ref },
-        query: {
-          with_text: withText ? "1" : "0",
-          with_sheet_links: "0",
-        },
-        signal,
-      });
-      if (signal.aborted || expectedOperation !== operation) {
-        return;
-      }
-      const payload = result.data ?? result.error;
-      if (payload === undefined) {
-        throw new Error("The links request returned no documented response.");
-      }
-      const nextCapture: LinksCapture = {
-        payload,
-        request: { tref: ref, withText },
-        status: result.response.status === 400 ? 400 : 200,
-      };
-      const nextProjection = capture?.request.tref === ref ? projection : {};
-      const nextViewModel = createConnectionsViewModel(
-        nextCapture.payload,
-        nextCapture.request,
-        nextProjection,
-        nextCapture.status,
-      );
-      capture = nextCapture;
-      projection = nextProjection;
-      activeRef = ref;
-      connections.viewModel = nextViewModel;
-    } catch (error) {
-      if (!signal.aborted && expectedOperation === operation) {
-        if (sameRef) {
-          capture = previousCapture;
-          projection = previousProjection;
-          connections.viewModel = previousViewModel;
-        } else {
-          capture = undefined;
-          projection = {};
-          connections.viewModel = undefined;
-        }
-      }
-      throw error;
+    await connectionsController.load({ tref: ref, withText }, { signal });
+    if (signal.aborted || expectedOperation !== operation) {
+      return;
     }
   };
 
@@ -203,7 +134,7 @@ export function startConnectionsDemo(
   ): Promise<SourceCardViewModel> => {
     textRequests += 1;
     updateCounts();
-    return await loadSourceCardViewModel({ tref: ref }, client, signal);
+    return await sourceController.load({ tref: ref }, signal);
   };
 
   const requireAddressableData = (
@@ -399,39 +330,12 @@ export function startConnectionsDemo(
       },
     );
   };
-  const onCategoryChange = (event: Event): void => {
-    const category = (
-      event as CustomEvent<{ readonly category: string | null }>
-    ).detail.category;
-    projection = category === null ? {} : { category, page: 0 };
-    projectCapture();
-  };
-  const onPageChange = (event: Event): void => {
-    const page = (event as CustomEvent<{ readonly page: number }>).detail.page;
-    projection = { ...projection, page };
-    projectCapture();
-  };
   const onPreviewRequest = (): void => {
-    if (!activeRef || capture?.request.withText !== false) {
-      return;
+    if (connectionsController.snapshot.result?.request.withText === false) {
+      clearError();
+      linksRequests += 1;
+      updateCounts();
     }
-    controller?.abort();
-    const currentController = new AbortController();
-    controller = currentController;
-    const expectedOperation = ++operation;
-    void loadLinks(
-      activeRef,
-      true,
-      expectedOperation,
-      currentController.signal,
-    ).catch((error: unknown) => {
-      if (
-        !currentController.signal.aborted &&
-        expectedOperation === operation
-      ) {
-        showError(error);
-      }
-    });
   };
   const onConnectionSelect = (event: Event): void => {
     const detail = (event as CustomEvent<{ readonly targetRef: string }>)
@@ -464,11 +368,6 @@ export function startConnectionsDemo(
 
   form.addEventListener("submit", onSubmit);
   reader.addEventListener("sefaria-source-select", onSourceSelect);
-  connections.addEventListener(
-    "sefaria-connections-category-change",
-    onCategoryChange,
-  );
-  connections.addEventListener("sefaria-connections-page-change", onPageChange);
   connections.addEventListener("sefaria-connection-select", onConnectionSelect);
   connections.addEventListener(
     "sefaria-connections-preview-request",
@@ -492,16 +391,12 @@ export function startConnectionsDemo(
     navigate,
     dispose: () => {
       controller?.abort();
+      unbindConnections();
+      unsubscribeConnections();
+      sourceController.dispose();
+      connectionsController.dispose();
       form.removeEventListener("submit", onSubmit);
       reader.removeEventListener("sefaria-source-select", onSourceSelect);
-      connections.removeEventListener(
-        "sefaria-connections-category-change",
-        onCategoryChange,
-      );
-      connections.removeEventListener(
-        "sefaria-connections-page-change",
-        onPageChange,
-      );
       connections.removeEventListener(
         "sefaria-connections-preview-request",
         onPreviewRequest,

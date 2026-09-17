@@ -65,6 +65,7 @@ const packageDefinitions = [
     subpaths: [
       ".",
       "./bilingual-segment",
+      "./bindings",
       "./connections-panel",
       "./popup",
       "./reader",

@@ -1,18 +1,23 @@
 import type {
+  BilingualSegmentController,
+  BilingualSegmentControllerSnapshot,
   BilingualSegmentDataViewModel,
+  BilingualSegmentRequest,
+  BilingualSegmentTerminalViewModel,
   BilingualSegmentViewModel,
   SefariaBilingualSegment,
   TextSegmentDataViewModel,
 } from "@arithmomaniac/sefaria-web-components";
 import { beforeEach, expect, test, vi } from "vitest";
 
-import {
-  startBilingualSegmentLiveDemo,
-  type BilingualSegmentLoader,
-} from "./app.js";
+import { startBilingualSegmentLiveDemo } from "./app.js";
 
 const FIRST_RESULT = createDataViewModel("First result");
 const SECOND_RESULT = createDataViewModel("Second result");
+type BilingualSegmentLoader = (
+  request: BilingualSegmentRequest,
+  signal: AbortSignal,
+) => Promise<BilingualSegmentViewModel>;
 
 beforeEach(() => {
   document.body.innerHTML = `
@@ -56,10 +61,10 @@ beforeEach(() => {
 
 test("loads a preset through the host and supplies its view model to the element", async () => {
   const loader = vi.fn<BilingualSegmentLoader>(async () => FIRST_RESULT);
-  startBilingualSegmentLiveDemo(document, loader);
+  startBilingualSegmentLiveDemo(document, controllerFromLoader(loader));
 
   document.querySelector<HTMLButtonElement>("[data-demo-request]")?.click();
-  await vi.waitFor(() => expect(loader).toHaveBeenCalledOnce());
+  await vi.waitFor(() => expect(requestState().dataset.state).toBe("data"));
 
   expect(loader.mock.calls[0]?.[0]).toEqual({
     tref: "Genesis 1:1",
@@ -74,7 +79,7 @@ test("loads a preset through the host and supplies its view model to the element
 
 test("omits an unfilled edition instead of requesting a blank version title", async () => {
   const loader = vi.fn<BilingualSegmentLoader>(async () => FIRST_RESULT);
-  startBilingualSegmentLiveDemo(document, loader);
+  startBilingualSegmentLiveDemo(document, controllerFromLoader(loader));
 
   const presets = document.querySelectorAll<HTMLButtonElement>(
     "[data-demo-request]",
@@ -87,7 +92,7 @@ test("omits an unfilled edition instead of requesting a blank version title", as
 
 test("applies the display settings to the element without a request", async () => {
   const loader = vi.fn<BilingualSegmentLoader>(async () => FIRST_RESULT);
-  startBilingualSegmentLiveDemo(document, loader);
+  startBilingualSegmentLiveDemo(document, controllerFromLoader(loader));
 
   expect(resultElement().contentLanguage).toBe("both");
   expect(resultElement().layout).toBe("auto");
@@ -119,7 +124,7 @@ test("aborts the old operation and ignores its stale result", async () => {
     signals.push(signal);
     return signals.length === 1 ? await first : await second;
   });
-  startBilingualSegmentLiveDemo(document, loader);
+  startBilingualSegmentLiveDemo(document, controllerFromLoader(loader));
 
   const presets = document.querySelectorAll<HTMLButtonElement>(
     "[data-demo-request]",
@@ -143,7 +148,7 @@ test("shows a network failure outside the component view model", async () => {
   const loader = vi.fn<BilingualSegmentLoader>(async () => {
     throw new Error("Network unavailable");
   });
-  startBilingualSegmentLiveDemo(document, loader);
+  startBilingualSegmentLiveDemo(document, controllerFromLoader(loader));
 
   document.querySelector<HTMLButtonElement>("[data-demo-request]")?.click();
   await vi.waitFor(() => expect(requestState().dataset.state).toBe("error"));
@@ -151,8 +156,93 @@ test("shows a network failure outside the component view model", async () => {
   const hostError = document.querySelector<HTMLElement>("#host-error");
   expect(hostError?.hidden).toBe(false);
   expect(hostError?.textContent).toContain("Network unavailable");
-  expect(resultElement().viewModel.state).toBe("loading");
+  expect(resultElement().viewModel).toBeUndefined();
 });
+
+function controllerFromLoader(
+  loader: BilingualSegmentLoader,
+): BilingualSegmentController {
+  let snapshot: BilingualSegmentControllerSnapshot = {
+    attempt: { state: "idle" },
+  };
+  const listeners = new Set<
+    (value: BilingualSegmentControllerSnapshot) => void
+  >();
+  let active: AbortController | undefined;
+  let nextId = 1;
+  const publish = (next: BilingualSegmentControllerSnapshot): void => {
+    snapshot = next;
+    for (const listener of listeners) listener(snapshot);
+  };
+  return {
+    get snapshot() {
+      return snapshot;
+    },
+    subscribe: (listener) => {
+      listeners.add(listener);
+      listener(snapshot);
+      return () => listeners.delete(listener);
+    },
+    load: async (request) => {
+      active?.abort();
+      const current = new AbortController();
+      active = current;
+      const id = nextId++;
+      publish({
+        ...(snapshot.result === undefined ? {} : { result: snapshot.result }),
+        attempt: {
+          state: "loading",
+          id,
+          request,
+          viewModel: {
+            state: "loading",
+            message: `Loading ${request.tref}.`,
+          },
+        },
+      });
+      try {
+        const viewModel = await loader(request, current.signal);
+        if (active !== current || current.signal.aborted) {
+          throw current.signal.reason;
+        }
+        const terminal = viewModel as BilingualSegmentTerminalViewModel;
+        active = undefined;
+        publish({
+          result: { request, viewModel: terminal },
+          attempt: { state: "idle" },
+        });
+        return terminal;
+      } catch (error) {
+        if (active !== current || current.signal.aborted) {
+          throw current.signal.reason;
+        }
+        active = undefined;
+        publish({
+          ...(snapshot.result === undefined ? {} : { result: snapshot.result }),
+          attempt: { state: "failed", id, request, error },
+        });
+        throw error;
+      }
+    },
+    setSuppliedData: () => {
+      throw new Error("Not used by this test controller.");
+    },
+    cancel: (reason = new DOMException("Cancelled", "AbortError")) => {
+      active?.abort(reason);
+      active = undefined;
+      publish({
+        ...(snapshot.result === undefined ? {} : { result: snapshot.result }),
+        attempt: { state: "idle" },
+      });
+    },
+    dispose: () => {
+      active?.abort();
+      active = undefined;
+      listeners.clear();
+      snapshot = { attempt: { state: "idle" } };
+    },
+  };
+}
 
 function selectValue(
   form: HTMLFormElement | null,

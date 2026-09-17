@@ -52,7 +52,7 @@ describe("generated public metadata", () => {
     }
   });
 
-  it("publishes declaration-derived inventory for all 18 supported subpaths", async () => {
+  it("publishes declaration-derived inventory for all 19 supported subpaths", async () => {
     const inventory = JSON.parse(
       await readFile(
         path.join(repository, "packages/public-exports.json"),
@@ -67,7 +67,7 @@ describe("generated public metadata", () => {
         (count, packageEntry) => count + packageEntry.exports.length,
         0,
       ),
-    ).toBe(18);
+    ).toBe(19);
     for (const packageEntry of inventory.packages) {
       for (const exportEntry of packageEntry.exports) {
         expect(exportEntry.declarations.length).toBeGreaterThan(0);

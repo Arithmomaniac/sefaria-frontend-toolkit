@@ -234,7 +234,12 @@ export class SefariaConnectionsPanel extends SefariaElement {
 
   #emit(name: string, detail: object): void {
     this.dispatchEvent(
-      new CustomEvent(name, { detail, bubbles: true, composed: true }),
+      new CustomEvent(name, {
+        detail,
+        bubbles: true,
+        composed: true,
+        cancelable: true,
+      }),
     );
   }
 }

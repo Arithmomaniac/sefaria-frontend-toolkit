@@ -2,10 +2,9 @@ import {
   createSefariaClient,
   type SefariaClient,
 } from "@arithmomaniac/sefaria-client";
-import {
-  bindReaderController,
-  type SefariaReader,
-} from "@arithmomaniac/sefaria-web-components";
+import "@arithmomaniac/sefaria-web-components";
+import type { SefariaReader } from "@arithmomaniac/sefaria-web-components";
+import { bindReaderController } from "@arithmomaniac/sefaria-web-components/bindings";
 import {
   loadReaderController,
   type ReaderController,
@@ -140,13 +139,13 @@ export function startControlledReader(
         !currentInitialization.signal.aborted &&
         currentGeneration === generation
       ) {
-        reader.rootLoading = false;
         status.textContent = `${normalized} could not be opened.`;
         showError(error);
       }
     } finally {
       if (initialization === currentInitialization) {
         initialization = undefined;
+        reader.rootLoading = false;
       }
     }
   };
