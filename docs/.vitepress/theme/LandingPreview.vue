@@ -13,6 +13,11 @@ const noscriptHtml = `<style>.landing-preview__frame{display:none}</style><div c
       <div>
         <p class="landing-preview__eyebrow">Supplied data · zero requests</p>
         <h2 id="landing-preview-title">See the toolkit in action</h2>
+        <ul class="landing-preview__proofs" aria-label="Preview qualities">
+          <li>Real source card</li>
+          <li>Keyboard-selectable</li>
+          <li>No API call on entry</li>
+        </ul>
       </div>
       <a :href="previewUrl" target="_self">Open supplied-data preview</a>
     </div>

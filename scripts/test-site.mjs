@@ -92,6 +92,11 @@ try {
     await assertText(page.locator("body"), "See the toolkit in action");
     await assertText(page.locator("body"), "Start with the Reader");
     await assertText(page.locator("body"), "Use the headless APIs");
+    assertEqual(
+      await page.locator(".VPFeatures").count(),
+      0,
+      "generic landing feature row count",
+    );
     if (
       (await page.locator("body").textContent())?.includes(
         "Created/edited by GitHub Copilot",
@@ -105,6 +110,14 @@ try {
       'iframe[title="Interactive supplied-data source card"]',
     );
     await landingPreview.locator("sefaria-source-card").waitFor();
+    const previewPosition = await page
+      .locator(".landing-preview__stage")
+      .boundingBox();
+    if (!previewPosition || previewPosition.y >= 700) {
+      throw new Error(
+        `Interactive landing preview starts too far below the first viewport: ${JSON.stringify(previewPosition)}.`,
+      );
+    }
     await assertText(
       landingPreview.locator("#status"),
       "Rendered supplied Micah 6:8 data with zero requests.",
@@ -630,6 +643,22 @@ try {
       30,
     );
     await capture(page, "site-mobile.png");
+
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await page.goto(siteRouteUrl("/components.html"), {
+      waitUntil: "networkidle",
+    });
+    const compactDesktopWidths = await page.evaluate(() => ({
+      viewport: globalThis.document.documentElement.clientWidth,
+      content: globalThis.document.documentElement.scrollWidth,
+    }));
+    if (compactDesktopWidths.content > compactDesktopWidths.viewport + 1) {
+      throw new Error(
+        `Compact desktop navigation overflows horizontally: ${JSON.stringify(compactDesktopWidths)}`,
+      );
+    }
+    await page.getByRole("button", { name: "Search" }).waitFor();
+    await page.getByRole("link", { name: "Reference", exact: true }).waitFor();
 
     await page.setViewportSize({ width: 640, height: 900 });
     await page.goto(siteRouteUrl("/"), { waitUntil: "networkidle" });

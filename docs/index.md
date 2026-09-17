@@ -16,14 +16,6 @@ hero:
     - theme: alt
       text: Browse components
       link: /components.md
-
-features:
-  - title: Read a passage and follow connections
-    details: Start with the controlled Reader for bilingual text, source selection, commentary navigation, history, and responsive panes.
-  - title: Add one focused surface
-    details: Render a source card, reference label, text segment, connections panel, or authored-link popup in vanilla JavaScript or React.
-  - title: Use the headless APIs
-    details: Validate Sefaria responses, transform text markup, and project component-specific view models without registering browser elements.
 ---
 
 > Created/edited by GitHub Copilot; pending human review.

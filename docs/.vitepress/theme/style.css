@@ -27,39 +27,84 @@
 
 .VPHome {
   background:
-    radial-gradient(circle at 82% 8%, rgb(217 170 82 / 17%), transparent 27rem),
-    linear-gradient(180deg, var(--site-paper), var(--vp-c-bg) 48rem);
+    radial-gradient(circle at 82% 5%, rgb(217 170 82 / 22%), transparent 24rem),
+    linear-gradient(180deg, var(--site-paper), var(--vp-c-bg) 52rem);
+}
+
+.VPHomeHero {
+  padding: 1rem 1.5rem 2.5rem;
 }
 
 .VPHomeHero .container {
-  align-items: center;
+  display: block;
+  max-width: 70rem;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 2rem;
+  padding: clamp(1.75rem, 3.5vw, 2.5rem);
+  background:
+    radial-gradient(
+      circle at 90% 15%,
+      rgb(217 170 82 / 28%),
+      transparent 18rem
+    ),
+    linear-gradient(135deg, #173f3a, #102d2a 68%);
+  box-shadow: 0 2rem 5rem rgb(20 48 44 / 22%);
 }
 
 .VPHomeHero .main {
-  max-width: 44rem;
+  max-width: 58rem;
 }
 
 .VPHomeHero .name {
-  max-width: 16ch;
-  font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(2.8rem, 7vw, 5.2rem);
-  line-height: 0.98;
-  letter-spacing: -0.045em;
+  max-width: none;
+  color: #f1c875;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size: 0.78rem;
+  line-height: 1.2;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
 .VPHomeHero .text {
-  max-width: 20ch;
-  color: var(--site-ink);
+  max-width: 18ch;
+  color: #fffaf0;
   font-family: Georgia, "Times New Roman", serif;
-  font-size: clamp(1.8rem, 4vw, 3rem);
-  line-height: 1.08;
-  letter-spacing: -0.025em;
+  font-size: clamp(2.25rem, 4vw, 3.4rem);
+  line-height: 1;
+  letter-spacing: -0.04em;
 }
 
 .VPHomeHero .tagline {
-  max-width: 38rem;
-  font-size: 1.08rem;
-  line-height: 1.7;
+  max-width: 44rem;
+  color: #dceae5;
+  font-size: clamp(1rem, 1.6vw, 1.1rem);
+  line-height: 1.5;
+}
+
+.VPHomeHero .actions {
+  padding-top: 1rem;
+}
+
+.VPHomeHero .VPButton.brand {
+  border-color: #f1c875;
+  color: #173f3a;
+  background: #f1c875;
+}
+
+.VPHomeHero .VPButton.brand:hover {
+  border-color: #ffe2a5;
+  background: #ffe2a5;
+}
+
+.VPHomeHero .VPButton.alt {
+  border-color: rgb(255 255 255 / 38%);
+  color: #fffaf0;
+  background: rgb(255 255 255 / 8%);
+}
+
+.VPHomeHero .VPButton.alt:hover {
+  border-color: rgb(255 255 255 / 65%);
+  background: rgb(255 255 255 / 14%);
 }
 
 .VPFeature {
@@ -74,8 +119,10 @@
 }
 
 .landing-preview {
+  position: relative;
+  z-index: 2;
   width: min(70rem, calc(100% - 3rem));
-  margin: 1rem auto 4rem;
+  margin: -5rem auto 4rem;
   border: 1px solid color-mix(in srgb, var(--site-ink) 20%, transparent);
   border-radius: 1.25rem;
   padding: clamp(1rem, 3vw, 1.75rem);
@@ -102,6 +149,25 @@
   padding: 0;
   font-family: Georgia, "Times New Roman", serif;
   font-size: clamp(1.55rem, 3vw, 2.35rem);
+}
+
+.landing-preview__proofs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin: 0.8rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.landing-preview__proofs li {
+  border: 1px solid color-mix(in srgb, var(--site-ink) 20%, transparent);
+  border-radius: 999px;
+  padding: 0.28rem 0.65rem;
+  color: var(--site-ink);
+  background: color-mix(in srgb, var(--site-sage) 58%, transparent);
+  font-size: 0.78rem;
+  font-weight: 650;
 }
 
 .landing-preview__eyebrow {
@@ -217,9 +283,48 @@
   color: var(--site-ink);
 }
 
+@media (min-width: 768px) and (max-width: 959px) {
+  .VPNavBarMenuLink {
+    padding: 0 0.3125rem !important;
+    font-size: 0.8125rem !important;
+  }
+
+  .VPNavBarSearch {
+    padding-left: 0.25rem !important;
+  }
+
+  .VPNavBarSearch .DocSearch-Button {
+    width: 2.5rem !important;
+    padding: 0 0.625rem !important;
+  }
+
+  .VPNavBarSearch .DocSearch-Button-Placeholder,
+  .VPNavBarSearch .DocSearch-Button-Keys {
+    display: none !important;
+  }
+}
+
 @media (max-width: 640px) {
+  .VPHomeHero {
+    padding: 1rem 0.75rem 4rem;
+  }
+
+  .VPHomeHero .container {
+    border-radius: 1.25rem;
+    padding: 1.5rem;
+  }
+
+  .VPHomeHero .text {
+    font-size: clamp(2.15rem, 12vw, 3.1rem);
+  }
+
+  .VPHomeHero .actions {
+    gap: 0.5rem;
+  }
+
   .landing-preview {
     width: calc(100% - 1.5rem);
+    margin-top: -3rem;
     margin-bottom: 2.5rem;
     padding: 0.75rem;
   }
