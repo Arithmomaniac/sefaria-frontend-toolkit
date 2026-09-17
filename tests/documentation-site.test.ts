@@ -265,8 +265,9 @@ describe("documentation learning journey", () => {
       "utf8",
     );
     expect(suppliedLesson).toContain("createSourceCardViewModel(validated, {");
+    expect(vanillaSource).toContain("controller.setSuppliedData(");
     expect(vanillaSource).toContain(
-      "createSourceCardViewModel(validatedPayload, {",
+      "bindSourceCardController(card, controller)",
     );
     expect(vanillaSource).toContain(
       'updateStatus("Rendered supplied Micah 6:8 data with zero requests.")',
@@ -288,8 +289,9 @@ describe("documentation learning journey", () => {
     );
     for (const sourceFragment of [
       'useElementProperty(cardRef, "selectable", viewModel.state === "data")',
-      'previous.removeEventListener("sefaria-source-select"',
-      "controller.current?.abort()",
+      "unbind.current?.()",
+      "bindSourceCardController(card, controller)",
+      "controller.cancel()",
       "setSelected({",
     ]) {
       expect(reactSource).toContain(sourceFragment);

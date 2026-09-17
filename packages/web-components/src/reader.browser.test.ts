@@ -96,6 +96,53 @@ async function mount(
   return element;
 }
 
+test("renders full initial loading and non-destructive replacement loading states", async () => {
+  render(html`<sefaria-reader root-loading></sefaria-reader>`);
+  const initial = document.querySelector<SefariaReader>("sefaria-reader");
+  if (!initial) throw new Error("Reader was not rendered.");
+  await initial.updateComplete;
+
+  expect(
+    initial.shadowRoot
+      ?.querySelector(".initial-loading")
+      ?.getAttribute("aria-busy"),
+  ).toBe("true");
+  expect(initial.shadowRoot?.textContent).toContain("Opening Reader");
+  expect(initial.shadowRoot?.querySelector(".panes")).toBeNull();
+  expect(
+    initial.shadowRoot
+      ?.querySelector('[role="status"]')
+      ?.closest('[aria-busy="true"]'),
+  ).toBeNull();
+
+  initial.viewModel = paired;
+  await initial.updateComplete;
+
+  expect(initial.shadowRoot?.textContent).toContain(
+    "Opening a new Reader location",
+  );
+  expect(initial.shadowRoot?.textContent).toContain("Micah 6:8");
+  expect(
+    initial.shadowRoot?.querySelector("sefaria-source-card"),
+  ).not.toBeNull();
+
+  initial.rootLoading = false;
+  await initial.updateComplete;
+
+  expect(
+    initial.shadowRoot?.querySelector(".panes")?.getAttribute("aria-busy"),
+  ).toBe("false");
+  expect(initial.shadowRoot?.textContent).not.toContain(
+    "Opening a new Reader location",
+  );
+  expect(
+    getComputedStyle(
+      initial.shadowRoot!.querySelector<HTMLElement>(".root-loading")!,
+    ).display,
+  ).toBe("none");
+  expect(initial.shadowRoot?.textContent).toContain("Micah 6:8");
+});
+
 test("renders paired state and forwards each child action once with origin identity", async () => {
   const fetch = vi.fn();
   vi.stubGlobal("fetch", fetch);

@@ -50,6 +50,11 @@ export class SefariaReader extends SefariaElement {
       type: Boolean,
       attribute: "show-connection-previews",
     },
+    rootLoading: {
+      type: Boolean,
+      attribute: "root-loading",
+      reflect: true,
+    },
     vocalizationMode: { type: String, attribute: "vocalization-mode" },
   };
 
@@ -58,6 +63,7 @@ export class SefariaReader extends SefariaElement {
     ...SefariaElement.styles,
     css`
       :host {
+        position: relative;
         container-type: inline-size;
         display: grid;
         grid-template-rows: auto minmax(0, 1fr);
@@ -178,6 +184,49 @@ export class SefariaReader extends SefariaElement {
         font-size: 0.875rem;
       }
 
+      .root-loading {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        width: fit-content;
+        margin: 0;
+        color: var(--_sefaria-accent);
+        font-family: var(--_sefaria-font-label-english);
+        font-size: 0.9rem;
+        font-weight: 700;
+      }
+
+      .root-loading[hidden] {
+        display: none;
+      }
+
+      .root-loading::before {
+        width: 0.8rem;
+        height: 0.8rem;
+        border: 2px solid
+          color-mix(in srgb, var(--_sefaria-accent) 25%, transparent);
+        border-block-start-color: var(--_sefaria-accent);
+        border-radius: 50%;
+        content: "";
+        animation: reader-root-loading 0.8s linear infinite;
+      }
+
+      .initial-loading {
+        display: grid;
+        min-height: 14rem;
+        place-items: center;
+        padding: 2rem;
+        background: var(--_sefaria-surface-muted);
+      }
+
+      .root-loading[data-initial="true"] {
+        position: absolute;
+        z-index: 1;
+        inset: 0;
+        justify-self: center;
+        pointer-events: none;
+      }
+
       .actions {
         justify-content: space-between;
       }
@@ -254,6 +303,18 @@ export class SefariaReader extends SefariaElement {
         color: var(--_sefaria-fg-muted);
       }
 
+      @keyframes reader-root-loading {
+        to {
+          transform: rotate(1turn);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .root-loading::before {
+          animation: none;
+        }
+      }
+
       @container (max-width: 40rem) {
         .actions {
           align-items: stretch;
@@ -297,6 +358,8 @@ export class SefariaReader extends SefariaElement {
   declare sideOrder: BilingualPairSideOrder;
   /** Whether captured connection previews are visible. */
   declare showConnectionPreviews: boolean;
+  /** Shows host-controlled root loading without replacing committed content. */
+  declare rootLoading: boolean;
   /** Hebrew vocalization preset applied to source and preview text. */
   declare vocalizationMode: VocalizationMode;
 
@@ -308,13 +371,36 @@ export class SefariaReader extends SefariaElement {
     this.layout = "auto";
     this.sideOrder = "primary-first";
     this.showConnectionPreviews = true;
+    this.rootLoading = false;
     this.vocalizationMode = "taamim_and_nikkud";
   }
 
   protected override render(): TemplateResult | typeof nothing {
     assertVocalizationMode(this.vocalizationMode);
     const viewModel = this.viewModel;
-    if (viewModel === undefined) return nothing;
+    if (viewModel === undefined) {
+      return html`
+        <p
+          class="root-loading"
+          data-initial="true"
+          role="status"
+          aria-live="polite"
+          ?hidden=${!this.rootLoading}
+        >
+          ${this.rootLoading ? "Opening Reader..." : nothing}
+        </p>
+        ${
+          this.rootLoading
+            ? html`<div
+                class="initial-loading"
+                role="region"
+                aria-label="Reader content"
+                aria-busy="true"
+              ></div>`
+            : nothing
+        }
+      `;
+    }
     const activePane = this.#effectivePane(viewModel);
     const ancestors = viewModel.breadcrumbs.filter(
       (breadcrumb) => !breadcrumb.current,
@@ -358,6 +444,14 @@ export class SefariaReader extends SefariaElement {
         <h2 data-current-heading="true" tabindex="-1" aria-current="page">
           ${viewModel.label}
         </h2>
+        <p
+          class="root-loading"
+          role="status"
+          aria-live="polite"
+          ?hidden=${!this.rootLoading}
+        >
+          ${this.rootLoading ? "Opening a new Reader location..." : nothing}
+        </p>
         <div class="actions">
           <div class="pane-switch" role="group" aria-label="Reader panes">
             <button
@@ -390,7 +484,7 @@ export class SefariaReader extends SefariaElement {
           }
         </div>
       </header>
-      <div class="panes">
+      <div class="panes" aria-busy=${String(this.rootLoading)}>
         <section
           class="pane"
           data-pane="source"
@@ -533,6 +627,7 @@ export class SefariaReader extends SefariaElement {
         detail: { originEntryId, ...detail },
         bubbles: true,
         composed: true,
+        cancelable: true,
       }),
     );
   }

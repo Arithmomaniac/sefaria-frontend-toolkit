@@ -1,10 +1,10 @@
-> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # Component specification
 
 ## Status
 
-The text-segment, bilingual-segment, reference-label, source-card, popup, connections-panel, DOM-free reader-session, and controlled reader vertical slices are current.
+The text-segment, bilingual-segment, reference-label, source-card, popup, connections-panel, shared optional component-controller lifecycle, registration-free DOM bindings, DOM-free reader-session, and controlled reader vertical slices are current.
 
 ## Boundary
 
@@ -19,6 +19,11 @@ flowchart LR
     REQUEST["Component request"] --> ASYNC["Async component factory"]
     CLIENT["Supplied @arithmomaniac/sefaria-client"] --> ASYNC
     ASYNC -->|"captured payload"| PURE
+    REQUEST --> CONTROLLER["Optional headless owner controller"]
+    CLIENT --> CONTROLLER
+    CONTROLLER -->|"same owner projection"| VM
+    CONTROLLER --> BINDING["Registration-free DOM binding"]
+    BINDING --> ELEMENT
 ```
 
 The API payload is authoritative for transport fields, and the view model is authoritative for rendered data. Raw HTML can enter only the pure factory as a validated payload field; the factory applies the required `@arithmomaniac/sefaria-text-transform` operations before placing sanitized HTML fragments or typed text parts in the view model. The element does not read, validate, or project an API payload.
@@ -33,24 +38,25 @@ Every endpoint-backed component has a non-DOM `@arithmomaniac/sefaria-web-compon
 - one component-specific view-model union
 - a deterministic pure API-payload-to-view-model factory
 - an async request-and-client factory
+- an optional headless controller factory with owner-specific request and result types
 - component-specific construction for the states that component supports
 
 The package does not define a generalized normalized client result or shared domain model.
 
-Every supported subpath resolves to built JavaScript and declarations. Importing the package root registers the current custom elements as an intentional browser side effect. Importing the source-card, reader, reader-controller, or reader-session subpaths in Node does not access DOM globals or import registration modules. The generated custom-elements manifest owns element properties, attributes, events, slots, CSS parts, CSS custom properties, and defaults; built declarations own TypeScript exports.
+Every supported subpath resolves to built JavaScript and declarations. Importing the package root registers the current custom elements as an intentional browser side effect. Importing a component, reader, reader-controller, reader-session, or `bindings` subpath in Node does not access DOM globals or import registration modules. The generated custom-elements manifest owns element properties, attributes, events, slots, CSS parts, CSS custom properties, and defaults; built declarations own TypeScript exports.
 
 A non-requesting composition or session subpath can combine existing component requests, view models, and host-admitted corrected payload captures. It does not invent an endpoint-backed request type or async factory. It remains deterministic, DOM-free, and independent of clients, caches, promises, abort controllers, and global state.
 
 Current public names follow this pattern:
 
-| Component | Request | View model | Pure factory | Async factory |
-| --- | --- | --- | --- | --- |
-| Text segment | `TextSegmentRequest` | `TextSegmentViewModel` | `createTextSegmentViewModel`; `projectTextSegmentVersion` after role resolution; `projectTextSegmentValue` for a resolved leaf | `loadTextSegmentViewModel` |
-| Bilingual segment | `BilingualSegmentRequest` | `BilingualSegmentViewModel` | `createBilingualSegmentViewModel` | `loadBilingualSegmentViewModel` |
-| Reference label | `RefLabelRequest` | `RefLabelViewModel` | `createRefLabelViewModel` | `loadRefLabelViewModel` |
-| Source card | `SourceCardRequest` | `SourceCardViewModel` | `createSourceCardViewModel` | `loadSourceCardViewModel` |
-| Popup | `PopupRequest` | `PopupViewModel` | `createPopupViewModel` | `loadPopupViewModel` |
-| Connections panel | `ConnectionsRequest` | `ConnectionsViewModel` | `createConnectionsViewModel` | `loadConnectionsViewModel` |
+| Component | Request | View model | Pure factory | Async factory | Controller factory |
+| --- | --- | --- | --- | --- | --- |
+| Text segment | `TextSegmentRequest` | `TextSegmentViewModel` | `createTextSegmentViewModel`; `projectTextSegmentVersion` after role resolution; `projectTextSegmentValue` for a resolved leaf | `loadTextSegmentViewModel` | `createTextSegmentController` |
+| Bilingual segment | `BilingualSegmentRequest` | `BilingualSegmentViewModel` | `createBilingualSegmentViewModel` | `loadBilingualSegmentViewModel` | `createBilingualSegmentController` |
+| Reference label | `RefLabelRequest` | `RefLabelViewModel` | `createRefLabelViewModel` | `loadRefLabelViewModel` | `createRefLabelController` |
+| Source card | `SourceCardRequest` | `SourceCardViewModel` | `createSourceCardViewModel` | `loadSourceCardViewModel` | `createSourceCardController` |
+| Popup | `PopupRequest` | `PopupViewModel` | `createPopupViewModel` | `loadPopupViewModel` | `createPopupController` |
+| Connections panel | `ConnectionsRequest` | `ConnectionsViewModel` | `createConnectionsViewModel` | `loadConnectionsViewModel` | `createConnectionsController` |
 
 The listed component names are current.
 
@@ -61,6 +67,8 @@ The listed component names are current.
 The session owns semantic source history, stable entry and operation identities, selected source position, display settings including vocalization mode, retained corrected payload captures, completion eligibility, and bounded admission. It exposes render-ready source-card and connections-panel view models but never exposes raw captures through its rendering projection.
 
 An initial session accepts exactly one source-only, connections-only, or source-plus-connections seed. A links-only seed does not imply a text request. Repeated equal references create distinct entry identities.
+
+`replaceRoot(seed)` transactionally replaces every retained entry with one newly identified root. It rejects without changing committed entries when any actual entry is pinned or when the candidate root exceeds the existing capture budget. A successful replacement removes all breadcrumbs, resets `historyTruncated`, invalidates all old operations, clears the now-obsolete empty pin set, and carries the entry, operation, and pin counters forward so old handles and entry events cannot identify new state. Fresh presentation uses the existing defaults unless the seed supplies explicit overrides. The controller's package-private retained-source transition applies those same pure admission and identity rules when the current authoritative source capture contains an exact addressable item whose canonical reference and effective primary and translation edition selectors equal the request. Aliases, uncovered references, unavailable addressability, and different editions leave the session unchanged; the transition does not parse references, inspect older history, or expose the retained capture.
 
 Source navigation begins against an identified retained entry and pushes history only after the host supplies committed contextual source content. A source completion is rejected when its operation is missing, stale, duplicated, or its origin was removed. Selection, display, connections category, and connections page changes update the identified current entry rather than push history.
 
@@ -100,11 +108,25 @@ An explicit chat-export control appears only when the host enables it and the mo
 
 `createReaderController(seed, dataSource)` performs no request. It accepts already admitted reader content and a data source for later source and connections operations. A source seed must be renderable and addressable under the same rules as later source navigation.
 
+`replaceRoot(request, options)` is the supported external search or router action on an existing controller. It validates the source-card request and root options before superseding active work. When the current authoritative source capture contains an exact addressable canonical item for the normalized request and the effective primary and translation edition selectors match, the controller reuses that capture, publishes a fresh root identity with no old breadcrumbs, performs zero source requests, and performs one links request. Aliases, uncovered references, unavailable addressability, and edition changes use the normal data-source qualification path; a cache hit or an item in older unrelated history does not establish coverage. Normal qualification uses the existing data source and destination rules without parsing references or selecting an arbitrary first row. While source qualification is pending, snapshots keep the old committed Reader and presentation, expose the normalized requested target through `loading-source`, and let the controller binding set the request-free element's `rootLoading` presentation flag. The element keeps committed text, selection, history, pane, and focus rendered while showing an in-surface live status outside the `aria-busy` content region; it receives no request or reference. Before an initial controller commits, a host may set the same flag on an element without a view model to render the full empty Reader loading state with the same accessible status pattern. Source, context, addressability, request-mismatch, pin, or budget failure leaves the old committed root and history intact with an explicit controller error and clears the loading treatment. Successful admission publishes one fresh root before starting its links operation; a later links failure preserves that new source with an explicit failed connections slot. Default replacement presentation and connections behavior match a fresh controller load, while explicit root options can override presentation, `withText`, and the local connections projection.
+
 Controller actions require the originating entry identity. Source selection resolves the authoritative item from the current entry and supplied position, requires the informational event reference to equal that item's canonical reference, and rejects a stale, absent, non-addressable, or mismatched selection before state mutation, cancellation, subscriber publication, or I/O. Back, breadcrumb activation, valid source selection, connection selection, connections category/page changes, preview replacement, and presentation changes update the internal session and notify subscribers. Superseding valid actions abort physical work, cancel the active session operation before replacement begins, and make obsolete completions ineligible even when the data source ignores the signal. Category and page changes covered by a retained links capture perform zero I/O. A preview request performs zero I/O when the capture already includes text; otherwise it performs one text-inclusive links request and replaces the capture while retaining the current projection.
 
 The controller normalizes each effective request once and supplies equal request and projection values to both the reader-session operation and data source. A mismatched returned content request is an explicit terminal controller error, not a perpetual loading state. Snapshots contain the projected `ReaderViewModel` plus one task-state discriminator. Connections terminal outcomes remain in the reader view rather than being duplicated as controller task errors.
 
-`bindReaderController(element, controller)` is the DOM adapter. It immediately supplies `controller.snapshot.reader` and maps `controller.snapshot.presentation` to the public presentation properties of one persistent `<sefaria-reader>`. It forwards all reader events except chat export to controller actions and keeps compact pane selection as binding-local presentation state. Chat export remains an independent host action. The binding does not move requests, captures, or session mutation into the element. Unbinding removes listeners and subscription; disposing the controller aborts active work.
+`bindReaderController(element, controller)` is exported from the registration-free `@arithmomaniac/sefaria-web-components/bindings` subpath. It immediately supplies `controller.snapshot.reader` and maps `controller.snapshot.presentation` to the public presentation properties of one persistent `<sefaria-reader>`. It forwards all reader events except chat export to controller actions and keeps compact pane selection as binding-local presentation state. Chat export remains an independent host action. The binding does not move requests, captures, or session mutation into the element. Unbinding removes listeners and subscription; disposing the controller aborts active work.
+
+## Optional component controllers [Current]
+
+Each endpoint-backed owner subpath exports one typed headless controller factory. Headless means DOM-free and framework-neutral; these controllers are not Lit `ReactiveController` implementations and do not require a `ReactiveControllerHost`. The six public owner interfaces remain distinct even though they delegate cancellation, attempt identity, immutable publication, subscriptions, supplied-response handling, and disposal to one private mechanical engine.
+
+A snapshot separates an optional committed `{ request, viewModel }` result from the current named attempt. An attempt is idle, loading with its own request and loading view model, or failed with its own request and original error. Starting a valid load publishes loading, aborts older work, and commits only the latest terminal projection. A superseded or externally aborted promise rejects with the actual abort reason even if the underlying transport ignores the signal. Network, schema, and programmer failures reject without becoming component content; a failed replacement can retain the previous result only as that explicitly older committed result. Without a previous result, a failed attempt leaves no loading view model.
+
+Construction, import, subscription, and binding make zero requests. `load` requires the controller's supplied client. `setSuppliedData` accepts unknown corrected API-shaped JSON, validates the owner operation and explicit documented status, performs the same pure projection and deterministic options as live mode, then supersedes pending work only after validation and projection succeed. Status defaults to 200; the controller does not infer a non-200 status from an error-shaped value.
+
+Reference-label controllers capture validated `RefLabelFactoryOptions` once and apply them identically to live and supplied projection. Connections controllers alone retain one immutable current links payload, effective request, status, and projection so category/page changes perform zero I/O and preview replacement can make one text-inclusive request when required. A failed new attempt retains the older committed capture and view model as older content; disposal releases the capture. No controller adds retry, request coalescing, stale fallback, persistence, a payload-size policy, or a public universal loader descriptor.
+
+`@arithmomaniac/sefaria-web-components/bindings` exports one thin adapter for each of the six controllers plus Reader. The module uses type-only element dependencies, registers zero custom elements, and supplies no transport or domain facade. One element can have only one active binding. Unbinding is idempotent, removes subscriptions and action listeners, and does not dispose the caller controller. Deferred default actions run only when the event remains unprevented, the same binding is active, and the originating committed result or Reader entry is still current.
 
 ## View-model states
 
@@ -159,15 +181,15 @@ An async factory accepts a component request and a supplied `@arithmomaniac/sefa
 
 For a successful captured payload, its terminal view model must equal the pure factory result for that payload and the same deterministic inputs.
 
-The host sets a component-specific loading view model before it awaits the async factory.
+The host sets a component-specific loading view model before it awaits the async factory, or uses the optional owner controller and DOM binding to publish that state.
 
 An async factory returns its component error view model for a documented HTTP error payload. It must not return a transport error object.
 
 A network failure or abort rejects the async factory operation. An abort used to cancel obsolete work remains an abort.
 
-An async factory owns one operation. It does not own the active selection, loading state, task history, available data sources, retries, or stale-result suppression.
+An async factory owns one operation. It does not own the active selection, loading state, task history, available data sources, retries, or stale-result suppression. The optional owner controller adds only the bounded lifecycle for one component surface.
 
-The host owns the task lifecycle. A Lit host can use `@lit/task`, a reactive controller, or an equivalent local mechanism. This choice is not part of the public component contract.
+The host owns whether to use the owner controller or another task mechanism. A Lit host can instead use `@lit/task` or its own Lit `ReactiveController`; the toolkit's headless controller is framework-neutral and must not be described as a Lit controller.
 
 ## Client and server convergence
 

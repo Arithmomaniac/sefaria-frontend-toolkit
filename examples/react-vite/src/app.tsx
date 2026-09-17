@@ -6,9 +6,9 @@ import {
 } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
+import { bindSourceCardController } from "@arithmomaniac/sefaria-web-components/bindings";
 import {
-  createSourceCardViewModel,
-  loadSourceCardViewModel,
+  createSourceCardController,
   type SourceCardViewModel,
 } from "@arithmomaniac/sefaria-web-components/source-card";
 import {
@@ -26,14 +26,6 @@ import { useElementProperty } from "./use-element-property.js";
 const suppliedPayload = zCoreV3TextsResponse.parse(
   payload,
 ) as CoreV3TextsResponse;
-const suppliedViewModel = createSourceCardViewModel(suppliedPayload, {
-  tref: "Micah 6:8",
-});
-const loadingViewModel: SourceCardViewModel = {
-  state: "loading",
-  message: "Loading source text.",
-};
-
 interface SourceSelection {
   readonly position: readonly number[];
   readonly ref: string;
@@ -51,9 +43,15 @@ export function ReactSourceCardExample({
   const [client] = useState(
     () => suppliedClient ?? createSefariaClient({ cache: false }),
   );
+  const [controller] = useState(() => {
+    const next = createSourceCardController(client);
+    next.setSuppliedData({ tref: "Micah 6:8" }, suppliedPayload);
+    return next;
+  });
   const [tref, setTref] = useState(initialTref);
-  const [viewModel, setViewModel] =
-    useState<SourceCardViewModel>(suppliedViewModel);
+  const [viewModel, setViewModel] = useState<SourceCardViewModel>(
+    controller.snapshot.result!.viewModel,
+  );
   const [selected, setSelected] = useState<SourceSelection>();
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [previewWidth, setPreviewWidth] = useState(720);
@@ -67,34 +65,48 @@ export function ReactSourceCardExample({
   const [inputFailure, setInputFailure] = useState<string>();
   const [loadFailure, setLoadFailure] = useState<string>();
   const cardRef = useRef<SefariaSourceCard>(null);
-  const controller = useRef<AbortController | undefined>(undefined);
-  const operation = useRef(0);
+  const unbind = useRef<(() => void) | undefined>(undefined);
   const mounted = useRef(true);
 
-  useElementProperty(cardRef, "viewModel", viewModel);
   useElementProperty(cardRef, "contentLanguage", contentLanguage);
   useElementProperty(cardRef, "selectable", viewModel.state === "data");
   useElementProperty(cardRef, "selectedPosition", selected?.position);
 
   useEffect(() => {
     mounted.current = true;
+    const unsubscribe = controller.subscribe((snapshot) => {
+      const displayed =
+        snapshot.attempt.state === "loading"
+          ? snapshot.attempt.viewModel
+          : snapshot.result?.viewModel;
+      if (displayed !== undefined) setViewModel(displayed);
+    });
     return () => {
       mounted.current = false;
-      operation.current += 1;
-      controller.current?.abort();
+      unsubscribe();
+      controller.cancel();
     };
-  }, []);
+  }, [controller]);
 
-  const setCardRef = useCallback((card: SefariaSourceCard | null): void => {
-    const previous = cardRef.current;
-    if (previous !== null) {
-      previous.removeEventListener("sefaria-source-select", onSourceSelection);
-    }
-    cardRef.current = card;
-    if (card !== null) {
-      card.addEventListener("sefaria-source-select", onSourceSelection);
-    }
-  }, []);
+  const setCardRef = useCallback(
+    (card: SefariaSourceCard | null): void => {
+      const previous = cardRef.current;
+      if (previous !== null) {
+        previous.removeEventListener(
+          "sefaria-source-select",
+          onSourceSelection,
+        );
+      }
+      unbind.current?.();
+      unbind.current = undefined;
+      cardRef.current = card;
+      if (card !== null) {
+        unbind.current = bindSourceCardController(card, controller);
+        card.addEventListener("sefaria-source-select", onSourceSelection);
+      }
+    },
+    [controller],
+  );
 
   function onSourceSelection(event: Event): void {
     const detail = (event as CustomEvent<SourceSelection>).detail;
@@ -110,43 +122,29 @@ export function ReactSourceCardExample({
       setInputFailure("Enter a non-blank Sefaria reference.");
       return;
     }
-    controller.current?.abort();
-    const currentController = new AbortController();
-    controller.current = currentController;
-    const currentOperation = ++operation.current;
     setRequestCount((count) => count + 1);
     setSelected(undefined);
     setInputFailure(undefined);
     setLoadFailure(undefined);
-    setViewModel(loadingViewModel);
-    setRequestStatus(`Loading ${normalized} through the public factory.`);
+    setRequestStatus(`Loading ${normalized} through the public controller.`);
     try {
-      const next = await loadSourceCardViewModel(
-        { tref: normalized },
-        client,
-        currentController.signal,
-      );
-      if (
-        mounted.current &&
-        !currentController.signal.aborted &&
-        currentOperation === operation.current
-      ) {
+      await controller.load({ tref: normalized });
+      if (mounted.current) {
         setLoadFailure(undefined);
-        setViewModel(next);
         setRequestStatus(`Loaded ${normalized}.`);
       }
     } catch (error) {
       if (
         mounted.current &&
-        !currentController.signal.aborted &&
-        currentOperation === operation.current
+        controller.snapshot.attempt.state === "failed" &&
+        controller.snapshot.attempt.error === error
       ) {
         const message = error instanceof Error ? error.message : String(error);
         setLoadFailure(message);
         setRequestStatus(`Could not load ${normalized}.`);
       }
     }
-  }, [client, tref]);
+  }, [controller, tref]);
 
   const onSubmit = (event: FormEvent): void => {
     event.preventDefault();

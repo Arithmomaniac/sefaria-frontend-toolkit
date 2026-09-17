@@ -21,7 +21,7 @@ The supported path creates the browser client, loads a controller once, binds it
 ```ts
 import { createSefariaClient } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
-import { bindReaderController } from "@arithmomaniac/sefaria-web-components";
+import { bindReaderController } from "@arithmomaniac/sefaria-web-components/bindings";
 import { loadReaderController } from "@arithmomaniac/sefaria-web-components/reader-controller";
 
 const element = document.createElement("sefaria-reader");
@@ -32,6 +32,8 @@ const controller = await loadReaderController(
   createSefariaClient({ cache: false }),
 );
 const unbind = bindReaderController(element, controller);
+
+await controller.replaceRoot({ tref: "Micah 6:7" });
 
 window.addEventListener(
   "pagehide",
@@ -55,7 +57,7 @@ pnpm dev:reader
 
 ## Expected result
 
-The controlled Reader owns bounded semantic history, source-to-connections transitions, cancellation, and component event handling while the host owns creation and disposal. The spatial example can keep several panes visible, but its host also owns pane identity, placement, activation, pruning, compact layout, pins, and operation timing.
+The controlled Reader owns bounded semantic history, transactional external root replacement, source-to-connections transitions, cancellation, and component event handling while the host owns creation and disposal. Following a connection pushes history. Calling `replaceRoot` for a new external search keeps the old source visible until the new source qualifies, then starts one fresh breadcrumb trail on the same controller and element. The spatial example can keep several panes visible, but its host also owns pane identity, placement, activation, pruning, compact layout, pins, and operation timing.
 
 The same Reader presentation can run with different data paths. A regular website controller can use `@arithmomaniac/sefaria-client`; an MCP App controller uses host-mediated tools because the sandbox cannot make the same direct requests. In both cases the element receives rendering data and emits events rather than fetching.
 
@@ -72,7 +74,7 @@ The spatial example is a distinct option, not a second supported all-purpose Rea
 
 ## Exercise
 
-In the controlled Reader, open connections, follow one connection, and use Back. In the spatial Reader, perform the same navigation and identify which behavior belongs to the custom host rather than the shared reader session.
+In the controlled Reader, open connections, follow one connection, and use Back. Then submit another reference and confirm that the element stays mounted while its breadcrumb trail starts over. In the spatial Reader, perform connection navigation and identify which behavior belongs to the custom host rather than the shared reader session.
 
 ## Source and run links
 

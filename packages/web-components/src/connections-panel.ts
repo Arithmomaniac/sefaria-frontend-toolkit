@@ -12,6 +12,12 @@ import {
 } from "@arithmomaniac/sefaria-text-transform";
 
 import { createConnectionsQuery } from "./connections-request.js";
+import {
+  ComponentControllerEngine,
+  validateSuppliedComponentData,
+  type ComponentControllerAttempt,
+  type ComponentControllerSnapshot,
+} from "./component-controller.js";
 
 /** Transport inputs for one connections operation. */
 export interface ConnectionsRequest {
@@ -64,9 +70,26 @@ export interface ConnectionCategory {
   readonly count: number;
 }
 
+/** Host-supplied state displayed while a connections request is pending. */
+export interface ConnectionsLoadingViewModel {
+  /** State discriminator. */
+  readonly state: "loading";
+  /** Status announcement supplied by the host. */
+  readonly message: string;
+}
+
+/** Valid links response with no text connections. */
+export interface ConnectionsEmptyViewModel {
+  /** State discriminator. */
+  readonly state: "empty";
+  /** Human-readable empty-state message. */
+  readonly message: string;
+}
+
 /** Complete bounded connections rendering state. */
 export type ConnectionsViewModel =
-  | { readonly state: "loading" | "empty"; readonly message: string }
+  | ConnectionsLoadingViewModel
+  | ConnectionsEmptyViewModel
   | {
       readonly state: "error";
       readonly errorKind: "api" | "http" | "projection";
@@ -84,6 +107,82 @@ export type ConnectionsViewModel =
       readonly pageSize: number;
       readonly previewsIncluded: boolean;
     };
+
+/** Terminal connections state committed by a headless controller. */
+export type ConnectionsTerminalViewModel = Exclude<
+  ConnectionsViewModel,
+  ConnectionsLoadingViewModel
+>;
+
+/** One committed links request, local projection, and terminal result. */
+export interface ConnectionsControllerResult {
+  /** Effective request used for the committed capture. */
+  readonly request: ConnectionsRequest;
+  /** Current zero-I/O projection over the committed capture. */
+  readonly projection: ConnectionsProjection;
+  /** Terminal component view model. */
+  readonly viewModel: ConnectionsTerminalViewModel;
+}
+
+/** Current connections controller attempt. */
+export type ConnectionsControllerAttempt = ComponentControllerAttempt<
+  ConnectionsRequest,
+  ConnectionsLoadingViewModel
+>;
+
+/** Immutable connections controller publication. */
+export type ConnectionsControllerSnapshot = ComponentControllerSnapshot<
+  ConnectionsControllerResult,
+  ConnectionsRequest,
+  ConnectionsLoadingViewModel
+>;
+
+/** Options for one live connections operation. */
+export interface ConnectionsControllerLoadOptions {
+  /** Local projection applied to the returned payload. */
+  readonly projection?: ConnectionsProjection;
+  /** External cancellation signal. */
+  readonly signal?: AbortSignal;
+}
+
+/** Options for one supplied links response. */
+export interface ConnectionsControllerSuppliedDataOptions {
+  /** Local projection applied to the supplied payload. */
+  readonly projection?: ConnectionsProjection;
+  /** Documented response status; defaults to 200. */
+  readonly status?: 200 | 400;
+}
+
+/** Stateful DOM-free connections loading and local projection lifecycle. */
+export interface ConnectionsController {
+  /** Current committed result and pending or failed attempt. */
+  readonly snapshot: ConnectionsControllerSnapshot;
+  /** Subscribes immediately and after each snapshot replacement. */
+  subscribe(
+    listener: (snapshot: ConnectionsControllerSnapshot) => void,
+  ): () => void;
+  /** Loads and commits one links request. */
+  load(
+    request: ConnectionsRequest,
+    options?: ConnectionsControllerLoadOptions,
+  ): Promise<ConnectionsTerminalViewModel>;
+  /** Validates and commits supplied corrected response data with zero I/O. */
+  setSuppliedData(
+    request: ConnectionsRequest,
+    payload: unknown,
+    options?: ConnectionsControllerSuppliedDataOptions,
+  ): ConnectionsTerminalViewModel;
+  /** Reprojects the current capture with zero I/O. */
+  setProjection(
+    projection: ConnectionsProjection,
+  ): ConnectionsTerminalViewModel;
+  /** Loads preview text only when the current capture omitted it. */
+  requestPreviews(signal?: AbortSignal): Promise<ConnectionsTerminalViewModel>;
+  /** Cancels active work without disposing committed content. */
+  cancel(reason?: unknown): void;
+  /** Aborts active work, releases the capture, and closes the controller. */
+  dispose(): void;
+}
 
 /** Fixed page size for this library slice, not an API pagination parameter. */
 export const CONNECTIONS_PAGE_SIZE = 20;
@@ -167,18 +266,213 @@ export async function loadConnectionsViewModel(
   projection: ConnectionsProjection = {},
 ): Promise<ConnectionsViewModel> {
   validateInputs(request, projection);
+  const response = await requestConnectionsResponse(request, client, signal);
+  return projectConnectionsResponse(
+    request,
+    response.payload,
+    response.status,
+    projection,
+  );
+}
+
+interface ConnectionsCommit {
+  readonly payload: CoreLinkResponse;
+  readonly status: 200 | 400;
+  readonly request: ConnectionsRequest;
+  readonly projection: ConnectionsProjection;
+}
+
+/** Creates a zero-request connections controller with an optional live client. */
+export function createConnectionsController(
+  client?: SefariaClient,
+): ConnectionsController {
+  const attemptProjections = new WeakMap<
+    ConnectionsRequest,
+    ConnectionsProjection
+  >();
+  const engine = new ComponentControllerEngine({
+    ...(client === undefined ? {} : { client }),
+    cloneRequest: (request: ConnectionsRequest) => {
+      const projection = attemptProjections.get(request);
+      if (projection === undefined) {
+        throw new Error("Connections attempt projection is missing.");
+      }
+      const cloned = { ...request };
+      attemptProjections.set(cloned, projection);
+      return cloned;
+    },
+    createLoading: (request: ConnectionsRequest) => ({
+      state: "loading" as const,
+      message: `Loading connections for ${request.tref}.`,
+    }),
+    load: requestConnectionsResponse,
+    project: (request, payload, status) => {
+      const projection = attemptProjections.get(request);
+      if (projection === undefined) {
+        throw new Error("Connections attempt projection is missing.");
+      }
+      return createConnectionsCommit(request, payload, status, projection);
+    },
+    validateStatus: assertConnectionsStatus,
+  });
+  return {
+    get snapshot() {
+      return engine.snapshot;
+    },
+    subscribe: (listener) => engine.subscribe(listener),
+    load: (request, options = {}) => {
+      validateInputs(request, options.projection ?? {});
+      if (client === undefined) {
+        throw new Error("This component controller has no supplied client.");
+      }
+      const effectiveRequest = { ...request };
+      attemptProjections.set(
+        effectiveRequest,
+        Object.freeze({ ...(options.projection ?? {}) }),
+      );
+      return engine.load(effectiveRequest, options.signal);
+    },
+    setSuppliedData: (request, payload, options = {}) => {
+      validateInputs(request, options.projection ?? {});
+      const nextProjection = Object.freeze({
+        ...(options.projection ?? {}),
+      });
+      const status = options.status ?? 200;
+      assertConnectionsStatus(status);
+      const projected = createConnectionsCommit(
+        request,
+        payload,
+        status,
+        nextProjection,
+      );
+      return engine.replaceCommitted(projected);
+    },
+    setProjection: (next) => {
+      engine.assertUsable();
+      const current = engine.committed;
+      if (current === undefined) {
+        throw new Error("Connections have no committed capture to project.");
+      }
+      validateInputs(current.request, next);
+      const projected = createConnectionsCommit(
+        current.request,
+        current.payload,
+        current.status,
+        Object.freeze({ ...next }),
+      );
+      return engine.replaceCommitted(projected);
+    },
+    requestPreviews: async (signal) => {
+      engine.assertUsable();
+      const current = engine.committed;
+      if (current === undefined) {
+        throw new Error("Connections have no committed capture to replace.");
+      }
+      if (current.request.withText !== false) return currentResult(engine);
+      const request = { ...current.request, withText: true };
+      attemptProjections.set(request, current.projection);
+      return await engine.load(request, signal);
+    },
+    cancel: (reason) => engine.cancel(reason),
+    dispose: () => engine.dispose(),
+  };
+}
+
+async function requestConnectionsResponse(
+  request: ConnectionsRequest,
+  client: SefariaClient,
+  signal?: AbortSignal,
+): Promise<{
+  readonly payload: CoreLinkResponse;
+  readonly status: 200 | 400;
+}> {
   const result = await getLinks({
     client,
     path: { tref: request.tref },
     query: createConnectionsQuery(request),
     ...(signal === undefined ? {} : { signal }),
   });
-  if (result.data !== undefined)
-    return createConnectionsViewModel(result.data, request, projection);
+  if (result.data !== undefined) return { payload: result.data, status: 200 };
   if (result.error !== undefined && result.response.status === 400) {
-    return createConnectionsViewModel(result.error, request, projection, 400);
+    return { payload: result.error, status: 400 };
   }
   throw new Error("The links request returned no data or documented error.");
+}
+
+function createConnectionsCommit(
+  request: ConnectionsRequest,
+  payload: unknown,
+  status: 200 | 400,
+  projection: ConnectionsProjection,
+): {
+  readonly committed: ConnectionsCommit;
+  readonly result: ConnectionsControllerResult;
+  readonly viewModel: ConnectionsTerminalViewModel;
+} {
+  const validated = validateSuppliedComponentData<CoreLinkResponse>(
+    { method: "GET", path: "/api/links/{tref}", status },
+    payload,
+  );
+  const capture = structuredClone(validated);
+  const viewModel = projectConnectionsResponse(
+    request,
+    capture,
+    status,
+    projection,
+  );
+  const committed = {
+    payload: capture,
+    status,
+    request: Object.freeze({ ...request }),
+    projection: Object.freeze({ ...projection }),
+  };
+  const result = {
+    request: committed.request,
+    projection: committed.projection,
+    viewModel,
+  };
+  return { committed, result, viewModel };
+}
+
+function projectConnectionsResponse(
+  request: ConnectionsRequest,
+  payload: unknown,
+  status: 200 | 400,
+  projection: ConnectionsProjection,
+): ConnectionsTerminalViewModel {
+  const validated = validateSuppliedComponentData<CoreLinkResponse>(
+    { method: "GET", path: "/api/links/{tref}", status },
+    payload,
+  );
+  return createConnectionsViewModel(
+    validated,
+    request,
+    projection,
+    status,
+  ) as ConnectionsTerminalViewModel;
+}
+
+function assertConnectionsStatus(status: number): asserts status is 200 | 400 {
+  if (status !== 200 && status !== 400) {
+    throw new RangeError("Connections status must be 200 or 400.");
+  }
+}
+
+function currentResult(
+  engine: ComponentControllerEngine<
+    ConnectionsRequest,
+    ConnectionsLoadingViewModel,
+    ConnectionsTerminalViewModel,
+    200 | 400,
+    ConnectionsCommit,
+    ConnectionsControllerResult
+  >,
+): ConnectionsTerminalViewModel {
+  const result = engine.snapshot.result;
+  if (result === undefined) {
+    throw new Error("Connections have no committed result.");
+  }
+  return result.viewModel;
 }
 
 function validateInputs(

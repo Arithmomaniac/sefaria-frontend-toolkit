@@ -1,15 +1,23 @@
 import type {
   SefariaSourceCard,
+  SourceCardController,
+  SourceCardControllerSnapshot,
   SourceCardDataViewModel,
+  SourceCardRequest,
+  SourceCardTerminalViewModel,
   SourceCardViewModel,
 } from "@arithmomaniac/sefaria-web-components";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
-import { startSourceCardLiveDemo, type SourceCardLoader } from "./app.js";
+import { startSourceCardLiveDemo } from "./app.js";
 import v3Fixture from "../../../../packages/client/test/fixtures/v3-text-spanning-2026-08-29.json" with { type: "json" };
 
 const FIRST_RESULT = createDataViewModel("First");
 const SECOND_RESULT = createDataViewModel("Second");
+type SourceCardLoader = (
+  request: SourceCardRequest,
+  signal: AbortSignal,
+) => Promise<SourceCardViewModel>;
 
 beforeEach(() => {
   document.body.innerHTML = `
@@ -57,10 +65,12 @@ test("reuses the default client's cached response when revisiting a request", as
 
 test("loads a preset and supplies the result to the request-free element", async () => {
   const loader = vi.fn<SourceCardLoader>(async () => FIRST_RESULT);
-  startSourceCardLiveDemo(document, loader);
+  startSourceCardLiveDemo(document, controllerFromLoader(loader));
 
   document.querySelector<HTMLButtonElement>("[data-demo-request]")?.click();
-  await vi.waitFor(() => expect(loader).toHaveBeenCalledOnce());
+  await vi.waitFor(() =>
+    expect(requestState().textContent).toContain("1 items from one request"),
+  );
 
   expect(loader.mock.calls[0]?.[0]).toEqual({ tref: "Likutei Moharan 1" });
   expect(resultElement().viewModel).toEqual(FIRST_RESULT);
@@ -69,7 +79,7 @@ test("loads a preset and supplies the result to the request-free element", async
 
 test("applies display settings without requesting", () => {
   const loader = vi.fn<SourceCardLoader>(async () => FIRST_RESULT);
-  startSourceCardLiveDemo(document, loader);
+  startSourceCardLiveDemo(document, controllerFromLoader(loader));
   const form = document.querySelector<HTMLFormElement>("#display-form");
 
   selectValue(form, "contentLanguage", "primary");
@@ -85,7 +95,7 @@ test("applies display settings without requesting", () => {
 
 test("enables selection and reports the real component event", () => {
   const loader = vi.fn<SourceCardLoader>(async () => FIRST_RESULT);
-  startSourceCardLiveDemo(document, loader);
+  startSourceCardLiveDemo(document, controllerFromLoader(loader));
   const result = resultElement();
 
   expect(result.selectable).toBe(true);
@@ -108,7 +118,7 @@ test("restores committed content after a transport failure", async () => {
       rejectSecond = reject;
     });
   });
-  const demo = startSourceCardLiveDemo(document, loader);
+  const demo = startSourceCardLiveDemo(document, controllerFromLoader(loader));
   const result = resultElement();
 
   await demo.loadCurrentRequest();
@@ -128,7 +138,7 @@ test("hides an initial loading placeholder after a transport failure", async () 
   const loader = vi.fn<SourceCardLoader>(async () => {
     throw new Error("Network unavailable.");
   });
-  const demo = startSourceCardLiveDemo(document, loader);
+  const demo = startSourceCardLiveDemo(document, controllerFromLoader(loader));
 
   await demo.loadCurrentRequest();
 
@@ -155,7 +165,7 @@ test("aborts the old operation and ignores its stale result", async () => {
     signals.push(signal);
     return signals.length === 1 ? await first : await second;
   });
-  const demo = startSourceCardLiveDemo(document, loader);
+  const demo = startSourceCardLiveDemo(document, controllerFromLoader(loader));
 
   const firstLoad = demo.loadCurrentRequest();
   await vi.waitFor(() => expect(loader).toHaveBeenCalledTimes(1));
@@ -169,6 +179,87 @@ test("aborts the old operation and ignores its stale result", async () => {
   await firstLoad;
   expect(resultElement().viewModel).toEqual(SECOND_RESULT);
 });
+
+function controllerFromLoader(loader: SourceCardLoader): SourceCardController {
+  let snapshot: SourceCardControllerSnapshot = {
+    attempt: { state: "idle" },
+  };
+  const listeners = new Set<(value: SourceCardControllerSnapshot) => void>();
+  let active: AbortController | undefined;
+  let nextId = 1;
+  const publish = (next: SourceCardControllerSnapshot): void => {
+    snapshot = next;
+    for (const listener of listeners) listener(snapshot);
+  };
+  return {
+    get snapshot() {
+      return snapshot;
+    },
+    subscribe: (listener) => {
+      listeners.add(listener);
+      listener(snapshot);
+      return () => listeners.delete(listener);
+    },
+    load: async (request) => {
+      active?.abort();
+      const current = new AbortController();
+      active = current;
+      const id = nextId++;
+      publish({
+        ...(snapshot.result === undefined ? {} : { result: snapshot.result }),
+        attempt: {
+          state: "loading",
+          id,
+          request,
+          viewModel: {
+            state: "loading",
+            message: `Loading ${request.tref}.`,
+          },
+        },
+      });
+      try {
+        const viewModel = await loader(request, current.signal);
+        if (active !== current || current.signal.aborted) {
+          throw current.signal.reason;
+        }
+        const terminal = viewModel as SourceCardTerminalViewModel;
+        active = undefined;
+        publish({
+          result: { request, viewModel: terminal },
+          attempt: { state: "idle" },
+        });
+        return terminal;
+      } catch (error) {
+        if (active !== current || current.signal.aborted) {
+          throw current.signal.reason;
+        }
+        active = undefined;
+        publish({
+          ...(snapshot.result === undefined ? {} : { result: snapshot.result }),
+          attempt: { state: "failed", id, request, error },
+        });
+        throw error;
+      }
+    },
+    setSuppliedData: () => {
+      throw new Error("Not used by this test controller.");
+    },
+    cancel: (reason = new DOMException("Cancelled", "AbortError")) => {
+      active?.abort(reason);
+      active = undefined;
+      publish({
+        ...(snapshot.result === undefined ? {} : { result: snapshot.result }),
+        attempt: { state: "idle" },
+      });
+    },
+    dispose: () => {
+      active?.abort();
+      active = undefined;
+      listeners.clear();
+      snapshot = { attempt: { state: "idle" } };
+    },
+  };
+}
 
 function selectValue(
   form: HTMLFormElement | null,

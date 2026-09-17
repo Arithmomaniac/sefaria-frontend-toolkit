@@ -11,6 +11,12 @@ import {
   type ExtractedFootnote,
   type FootnoteBodyPart,
 } from "@arithmomaniac/sefaria-text-transform";
+import {
+  ComponentControllerEngine,
+  validateSuppliedComponentData,
+  type ComponentControllerAttempt,
+  type ComponentControllerSnapshot,
+} from "./component-controller.js";
 
 /** Selects one language or exact version for a text-segment request. */
 export interface TextSegmentVersionSelection {
@@ -99,6 +105,58 @@ export type TextSegmentViewModel =
   | TextSegmentEmptyViewModel
   | TextSegmentProjectionErrorViewModel
   | TextSegmentHttpErrorViewModel;
+
+/** Terminal text-segment state committed by a headless controller. */
+export type TextSegmentTerminalViewModel = Exclude<
+  TextSegmentViewModel,
+  TextSegmentLoadingViewModel
+>;
+
+/** One committed text-segment request and terminal rendering result. */
+export interface TextSegmentControllerResult {
+  /** Effective request used for the committed result. */
+  readonly request: TextSegmentRequest;
+  /** Terminal component view model. */
+  readonly viewModel: TextSegmentTerminalViewModel;
+}
+
+/** Current text-segment controller attempt. */
+export type TextSegmentControllerAttempt = ComponentControllerAttempt<
+  TextSegmentRequest,
+  TextSegmentLoadingViewModel
+>;
+
+/** Immutable text-segment controller publication. */
+export type TextSegmentControllerSnapshot = ComponentControllerSnapshot<
+  TextSegmentControllerResult,
+  TextSegmentRequest,
+  TextSegmentLoadingViewModel
+>;
+
+/** Stateful DOM-free text-segment loading lifecycle. */
+export interface TextSegmentController {
+  /** Current committed result and pending or failed attempt. */
+  readonly snapshot: TextSegmentControllerSnapshot;
+  /** Subscribes immediately and after each snapshot replacement. */
+  subscribe(
+    listener: (snapshot: TextSegmentControllerSnapshot) => void,
+  ): () => void;
+  /** Loads and commits one text-segment request. */
+  load(
+    request: TextSegmentRequest,
+    signal?: AbortSignal,
+  ): Promise<TextSegmentTerminalViewModel>;
+  /** Validates and commits supplied corrected response data with zero I/O. */
+  setSuppliedData(
+    request: TextSegmentRequest,
+    payload: unknown,
+    status?: 200 | 400 | 404,
+  ): TextSegmentTerminalViewModel;
+  /** Cancels active work without disposing committed content. */
+  cancel(reason?: unknown): void;
+  /** Aborts active work and permanently closes the controller. */
+  dispose(): void;
+}
 
 const RESERVED_VERSION_SELECTORS = new Set([
   "all",
@@ -207,6 +265,69 @@ export async function loadTextSegmentViewModel(
   client: SefariaClient,
   signal?: AbortSignal,
 ): Promise<TextSegmentViewModel> {
+  const response = await requestTextSegmentResponse(request, client, signal);
+  return projectTextSegmentResponse(request, response.payload, response.status);
+}
+
+/** Creates a zero-request text-segment controller with an optional live client. */
+export function createTextSegmentController(
+  client?: SefariaClient,
+): TextSegmentController {
+  const engine = new ComponentControllerEngine({
+    ...(client === undefined ? {} : { client }),
+    cloneRequest: (request: TextSegmentRequest) => ({
+      ...request,
+      version: { ...request.version },
+    }),
+    createLoading: (request: TextSegmentRequest) => ({
+      state: "loading" as const,
+      message: `Loading ${request.tref}.`,
+    }),
+    load: requestTextSegmentResponse,
+    project: (request, payload, status) => {
+      const viewModel = projectTextSegmentResponse(request, payload, status);
+      const result = {
+        request: { ...request, version: { ...request.version } },
+        viewModel,
+      };
+      return { committed: result, result, viewModel };
+    },
+    validateStatus: assertTextSegmentStatus,
+  });
+  return {
+    get snapshot() {
+      return engine.snapshot;
+    },
+    subscribe: (listener) => engine.subscribe(listener),
+    load: (request, signal) => {
+      requireNonblankTref(request.tref);
+      serializeVersionSelection(request.version);
+      return engine.load(request, signal);
+    },
+    setSuppliedData: (request, payload, status = 200) => {
+      requireNonblankTref(request.tref);
+      serializeVersionSelection(request.version);
+      return engine.setSuppliedData(request, payload, status);
+    },
+    cancel: (reason) => engine.cancel(reason),
+    dispose: () => engine.dispose(),
+  };
+}
+
+function requireNonblankTref(tref: string): void {
+  if (tref.trim().length === 0) {
+    throw new TypeError("Text segment reference must not be blank.");
+  }
+}
+
+async function requestTextSegmentResponse(
+  request: TextSegmentRequest,
+  client: SefariaClient,
+  signal?: AbortSignal,
+): Promise<{
+  readonly payload: CoreV3TextsResponse | { readonly error: string };
+  readonly status: 200 | 400 | 404;
+}> {
   const version = serializeVersionSelection(request.version);
   const result = await getV3Texts({
     client,
@@ -219,20 +340,44 @@ export async function loadTextSegmentViewModel(
   });
 
   if (result.data !== undefined) {
-    return createTextSegmentViewModel(result.data, request);
+    return { payload: result.data, status: 200 };
   }
 
   const status = result.response?.status;
   if (result.error !== undefined && (status === 400 || status === 404)) {
-    return {
-      state: "error",
-      errorKind: "http",
-      status,
-      message: result.error.error,
-    };
+    return { payload: result.error, status };
   }
 
   throw new Error("The v3 texts request returned no data or documented error.");
+}
+
+function projectTextSegmentResponse(
+  request: TextSegmentRequest,
+  payload: unknown,
+  status: 200 | 400 | 404,
+): TextSegmentTerminalViewModel {
+  const validated = validateSuppliedComponentData<
+    CoreV3TextsResponse | { readonly error: string }
+  >({ method: "GET", path: "/api/v3/texts/{tref}", status }, payload);
+  return status === 200
+    ? (createTextSegmentViewModel(
+        validated as CoreV3TextsResponse,
+        request,
+      ) as TextSegmentTerminalViewModel)
+    : {
+        state: "error",
+        errorKind: "http",
+        status,
+        message: (validated as { readonly error: string }).error,
+      };
+}
+
+function assertTextSegmentStatus(
+  status: number,
+): asserts status is 200 | 400 | 404 {
+  if (status !== 200 && status !== 400 && status !== 404) {
+    throw new RangeError("Text-segment status must be 200, 400, or 404.");
+  }
 }
 
 function createEmptyViewModel(

@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # Design: Generated API Contracts and Request-Free Components
 
@@ -6,7 +6,7 @@ For a first explanation with examples, read [How the pieces fit together](guides
 
 ## Summary
 
-This design defines a generated API foundation with corrections and component-owned view models. Elements render view models and never request data. The client, text-processing packages, text-segment, bilingual-segment, reference-label, source-card, popup, connections-panel, DOM-free reader session and controller, controlled reader surface, regular-website reader workspace, MCP App, and authored linked-article vertical slices are current.
+This design defines a generated API foundation with corrections and component-owned view models. Elements render view models and never request data. The client, text-processing packages, text-segment, bilingual-segment, reference-label, source-card, popup, connections-panel, shared optional component-controller lifecycle, registration-free DOM bindings, DOM-free reader session and controller, controlled reader surface, regular-website reader workspace, MCP App, and authored linked-article vertical slices are current.
 
 ## Scope
 
@@ -53,7 +53,7 @@ Each OpenAPI correction starts with the original Sefaria route, handler, respons
 | Public API data | Generated API contracts consumed directly |
 | Component data | One view-model union per component |
 | Element input | View models only |
-| Request ownership | Async non-DOM factories own request orchestration |
+| Request ownership | Async non-DOM factories own one operation; optional headless owner controllers own one component surface's lifecycle |
 | Reader history | DOM-free reader session over admitted component state |
 | Server-provided data | Corrected API-shaped JSON, validation, and the same pure factory |
 | Reference operations | Generated API contracts and component factories |
@@ -64,10 +64,11 @@ Each OpenAPI correction starts with the original Sefaria route, handler, respons
 | --- | --- | --- |
 | `@arithmomaniac/sefaria-client` | Pinned OpenAPI input, checksum, guarded overlay, generated contracts, Zod schemas, TypeScript validators, thin client, and bounded per-client response cache | Rendering, component view models, persistent or shared caches, retries, coalescing, stale fallback, or component methods |
 | `@arithmomaniac/sefaria-text-transform` | Pure sanitization, vocalization, and footnote operations | Requests, DOM rendering, or API contract correction |
-| Non-DOM `@arithmomaniac/sefaria-web-components` subpaths | Component request types, view-model unions, pure factories, and async factories | Hidden global clients or DOM state |
-| `@arithmomaniac/sefaria-web-components/reader-session` | Immutable source history, capture retention, stable identities, completion eligibility, and render projection over existing component contracts | Requests, cancellation, persistence, DOM state, or spatial pane placement |
+| Non-DOM `@arithmomaniac/sefaria-web-components` component subpaths | Component request types, view-model unions, pure factories, async factories, and typed headless controllers over one private lifecycle engine | Hidden global clients, DOM state, a universal loader descriptor, retries, coalescing, stale fallback, or persistence |
+| `@arithmomaniac/sefaria-web-components/bindings` | Registration-free DOM adapters for the six owner controllers and Reader | Transport, raw payload projection, element registration, controller disposal, or a shared domain facade |
+| `@arithmomaniac/sefaria-web-components/reader-session` | Immutable source history, transactional root replacement, capture retention, stable identities, completion eligibility, and render projection over existing component contracts | Requests, cancellation, persistence, DOM state, or spatial pane placement |
 | `@arithmomaniac/sefaria-web-components/reader` | Request-free projection from session state to one controlled reader rendering model | Captures, operations, requests, session mutation, or arbitrary spatial pane management |
-| `@arithmomaniac/sefaria-web-components/reader-controller` | Stateful reader-session ownership, initial and interaction-driven execution, cancellation, stale-result suppression, and subscriber notification | DOM rendering, spatial pane policy, persistence, retries, fallback transport, or chat delivery |
+| `@arithmomaniac/sefaria-web-components/reader-controller` | Stateful reader-session ownership, initial and external-root execution, interaction-driven execution, cancellation, stale-result suppression, and subscriber notification | DOM rendering, general URL routing, spatial pane policy, persistence, retries, fallback transport, or chat delivery |
 | `@arithmomaniac/sefaria-web-components` elements | Layout, interaction, accessibility, theming, and DOM rendering | References, raw JSON, clients, hosts, fetch functions, or requests |
 | Package manifests and generated metadata | Built JavaScript/declaration export maps, tarball contents, custom-elements metadata, and declaration-derived public export inventory | Source aliases, registry publication, or alternate component contracts |
 | Repository integration policy | Active runtime/build path inventory, private manifests, built exports, CI permissions, portable lockfile resolution, maintained documentation claims, and old-to-new test disposition | Product contracts, publication, deployment, or historical-source censorship |
@@ -128,11 +129,13 @@ Unknown inputs from MCP or another external boundary receive validation before c
 
 ## Component boundary
 
-Each component has a non-DOM public subpath. This subpath owns its request type, view-model union, pure projection factory, and async request factory. The pure factory converts a corrected API payload into one component view model. The async factory obtains the payload through a supplied client and passes it to the pure factory. The current subpaths are `@arithmomaniac/sefaria-web-components/text-segment`, `@arithmomaniac/sefaria-web-components/bilingual-segment`, `@arithmomaniac/sefaria-web-components/ref-label`, `@arithmomaniac/sefaria-web-components/source-card`, `@arithmomaniac/sefaria-web-components/popup`, and `@arithmomaniac/sefaria-web-components/connections-panel`.
+Each endpoint-backed component has a non-DOM public subpath. This subpath owns its request type, view-model union, pure projection factory, async request factory, and optional typed headless controller. The pure factory converts a corrected API payload into one component view model. The async factory obtains the payload through a supplied client and passes it to the pure factory. The controller adds one component surface's loading attempt, cancellation, stale suppression, committed terminal result, supplied-response validation, and subscriptions while delegating to the same owner operation and projection. The current subpaths are `@arithmomaniac/sefaria-web-components/text-segment`, `@arithmomaniac/sefaria-web-components/bilingual-segment`, `@arithmomaniac/sefaria-web-components/ref-label`, `@arithmomaniac/sefaria-web-components/source-card`, `@arithmomaniac/sefaria-web-components/popup`, and `@arithmomaniac/sefaria-web-components/connections-panel`.
 
 The `@arithmomaniac/sefaria-web-components/reader-session` and `@arithmomaniac/sefaria-web-components/reader` subpaths are not endpoint-backed. The session composes existing component contracts and host-admitted corrected payload captures, so it has no client and no async factory. The reader subpath projects that session view into rendering-only state for `<sefaria-reader>`.
 
-`@arithmomaniac/sefaria-web-components/reader-controller` is the DOM-free stateful convenience layer. Its browser async factory uses a supplied client, while its seed factory accepts admitted content plus an integration-owned data source. The controller privately owns one reader session, request cancellation, and subscriptions. The package-root binder connects its snapshots and actions to one persistent request-free `<sefaria-reader>`. A spatial website workspace can still use the lower-level session and shared browser data source when it needs pane placement or pinning policy outside the controller contract.
+`@arithmomaniac/sefaria-web-components/reader-controller` is the DOM-free stateful convenience layer. Its browser async factory uses a supplied client, while its seed factory accepts admitted content plus an integration-owned data source. The controller privately owns one reader session, request cancellation, and subscriptions. Its external-root action reuses the same source qualification and data-source boundary, keeps old committed state until atomic source admission, then starts links without rolling the source back on links failure. The registration-free `bindings` subpath connects its snapshots and actions to one persistent request-free `<sefaria-reader>`. A spatial website workspace can still use the lower-level session and shared browser data source when it needs pane placement or pinning policy outside the controller contract.
+
+The six endpoint-backed controllers share private mechanics, not a public data abstraction. Their owner modules retain fixed generated operation paths, request validation, documented statuses, deterministic options, and component-specific terminal view models. Connections alone retains one current corrected links payload for local projection; ordinary controllers retain only their request and terminal rendering result. These controllers are framework-neutral headless objects, not Lit `ReactiveController` implementations.
 
 A composite can resolve a child input by payload role before projection. The child subpath owns the pure resolved-input projection, so the composite does not repeat child transformation logic.
 
@@ -152,19 +155,19 @@ See the [component specification](specs/components.md) for the three-layer contr
 
 ## Interactive task ownership
 
-An element emits a composed event when a user action requests different data. The event describes the action and target. It does not select a transport.
+An element emits a composed event when a user action requests different data. The event describes the action and target. It does not select a transport. The optional `bindings` adapter can map that event to its owner controller after dispatch, provided the event was not prevented and the originating committed state remains current.
 
-The host owns data-source choice and the explicit activation that permits the first live request. Opening a maintained live route or reference deep link only prefills host input; it does not start data loading. The reader controller owns cancellation and request execution for its supported stateful flow after activation, while the reader session owns committed semantic selection, history, capture retention, and stable completion eligibility. A lower-level host can continue to coordinate the session directly when it needs spatial state outside the controller contract.
+The host owns data-source choice and the explicit activation that permits the first live request. Opening a maintained live route or reference deep link only prefills host input; it does not start data loading. An endpoint-backed owner controller can own the activated lifecycle for one component surface. The reader controller owns cancellation and request execution for its supported stateful flow after activation, while the reader session owns committed semantic selection, history, capture retention, and stable completion eligibility. A lower-level host can continue to coordinate the session directly when it needs spatial state outside the controller contract.
 
 The host can use authoritative captured data, validated server-provided data, or a supplied client. The first two paths call a pure factory. The client path calls an async factory.
 
 The captured-data owner declares which targets the payload covers. An empty pure-factory result does not prove that the payload covered the target.
 
-The connections demo explicitly captures a generated links response and invokes the component pure factory for local paging. Only the current response is retained with exact request coverage. The reader session generalizes that explicit ownership only across its bounded retained history: captures stay outside element view models, retain exact coverage, and are released when no retained entry references them. The standalone async view-model factory remains a one-operation convenience returning only rendering data.
+The connections owner controller captures one generated links response with exact request and status coverage and invokes the component pure factory for local paging. The reader session generalizes capture ownership only across its bounded retained history: captures stay outside element view models, retain exact coverage, and are released when no retained entry references them. The standalone async view-model factory remains a one-operation convenience returning only rendering data.
 
 If the host has no permitted data source, the integration shows its unavailable state outside the target element. It must not construct an unsupported component state.
 
-A Lit host can use `@lit/task` or a reactive controller. A non-Lit host can use `AbortController` and equivalent local state. These mechanisms do not change the component contract.
+A host can use the owner controller, `@lit/task`, a Lit `ReactiveController`, or equivalent local state. The toolkit owner controller is headless and framework-neutral; it does not implement Lit's reactive-controller interface.
 
 The host must not use task rendering and component view-model rendering as two state owners for one surface. The target element receives one loading or terminal view model.
 

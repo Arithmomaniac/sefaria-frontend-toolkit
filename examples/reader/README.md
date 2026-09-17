@@ -14,9 +14,9 @@ The build step is required on a fresh checkout because this Vite consumer resolv
 
 ## Supported controlled Reader
 
-[Open `controlled.html`](controlled.html?tref=Micah%206%3A8) for the shortest supported path. The page creates an `@arithmomaniac/sefaria-client` instance, calls `loadReaderController` from `@arithmomaniac/sefaria-web-components/reader-controller`, binds it to `<sefaria-reader>`, reports controller task state, and disposes requests, subscriptions, and bindings.
+[Open `controlled.html`](controlled.html?tref=Micah%206%3A8) for the shortest supported path. The page creates an `@arithmomaniac/sefaria-client` instance, calls `loadReaderController` from `@arithmomaniac/sefaria-web-components/reader-controller`, binds it to `<sefaria-reader>`, routes later form submissions through `replaceRoot` on the same controller, reports controller task state, and disposes requests, subscriptions, and bindings.
 
-The deep link prefills the reference but makes no request. Select **Start live demo** to initialize the controller. The element remains request-free. Source selection, connection navigation, history, and errors flow through the controller owned by the host.
+The deep link prefills the reference but makes no request. Select **Start live demo** to initialize the controller. Later submissions keep the old source visible until the replacement qualifies, then start a fresh breadcrumb trail without replacing the element or controller. The element remains request-free. Source selection, connection navigation, history, external root replacement, and errors flow through the controller owned by the host.
 
 ## Website-owned spatial workspace
 

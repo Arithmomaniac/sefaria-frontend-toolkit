@@ -1,27 +1,18 @@
-import {
-  createSefariaClient,
-  type SefariaClient,
-} from "@arithmomaniac/sefaria-client";
+import { createSefariaClient } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 import type {
   RefLabelLanguage,
-  RefLabelRequest,
-  RefLabelViewModel,
+  RefLabelController,
   SefariaRefLabel,
 } from "@arithmomaniac/sefaria-web-components";
-import { loadRefLabelViewModel } from "@arithmomaniac/sefaria-web-components/ref-label";
+import { bindRefLabelController } from "@arithmomaniac/sefaria-web-components/bindings";
+import { createRefLabelController } from "@arithmomaniac/sefaria-web-components/ref-label";
 
 import {
   startLiveDemo,
   requireNamedInput,
   requireNamedSelect,
 } from "../../../../demos/live-demo-core.js";
-
-/** One host-owned reference-label request operation. */
-export type RefLabelLoader = (
-  request: RefLabelRequest,
-  signal: AbortSignal,
-) => Promise<RefLabelViewModel>;
 
 /** Controls the interactive live reference-label demonstration. */
 export interface RefLabelLiveDemo {
@@ -32,7 +23,9 @@ export interface RefLabelLiveDemo {
 /** Connects the demo controls to the production reference-label factory. */
 export function startRefLabelLiveDemo(
   root: Document,
-  loader: RefLabelLoader = createDefaultLoader(),
+  controller: RefLabelController = createRefLabelController(
+    createSefariaClient(),
+  ),
 ): RefLabelLiveDemo {
   return startLiveDemo(root, {
     title: "Live reference-label demo",
@@ -97,17 +90,13 @@ export function startRefLabelLiveDemo(
     submitLabel: "Load from Sefaria",
     createResultElement: (document) =>
       document.createElement("sefaria-ref-label") as SefariaRefLabel,
-    loader,
+    controller,
+    bindController: (result) => {
+      bindRefLabelController(result, controller);
+    },
     createRequest: (form) => ({
       tref: requireNamedInput(form, "tref").value.trim(),
     }),
-    createLoadingViewModel: (request): RefLabelViewModel => ({
-      state: "loading",
-      message: `Loading ${request.tref}.`,
-    }),
-    setViewModel: (result, viewModel) => {
-      result.viewModel = viewModel;
-    },
     formatRequest: (request) => request.tref,
     configureResult: (result, form) => {
       result.labelLanguage = requireLabelLanguage(
@@ -116,12 +105,6 @@ export function startRefLabelLiveDemo(
       result.linked = requireNamedInput(form, "linked").checked;
     },
   });
-}
-
-function createDefaultLoader(): RefLabelLoader {
-  const client: SefariaClient = createSefariaClient();
-  return async (request, signal) =>
-    await loadRefLabelViewModel(request, client, signal);
 }
 
 function requireLabelLanguage(value: string): RefLabelLanguage {

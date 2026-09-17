@@ -125,9 +125,11 @@ test("local paging/category/preview display use only the current capture", async
       detail: { category: "Commentary" },
     }),
   );
+  await Promise.resolve();
   panel().dispatchEvent(
     new CustomEvent("sefaria-connections-page-change", { detail: { page: 1 } }),
   );
+  await Promise.resolve();
   expect(panel().viewModel).toMatchObject({ category: "Commentary", page: 1 });
   document.querySelector<HTMLInputElement>("#show-previews")!.click();
   expect(panel().showPreviews).toBe(false);
@@ -158,9 +160,11 @@ test("loading previews preserves the active category and page", async () => {
       detail: { category: "Commentary" },
     }),
   );
+  await Promise.resolve();
   panel().dispatchEvent(
     new CustomEvent("sefaria-connections-page-change", { detail: { page: 1 } }),
   );
+  await Promise.resolve();
   panel().dispatchEvent(new CustomEvent("sefaria-connections-preview-request"));
   await vi.waitFor(() =>
     expect(panel().viewModel).toMatchObject({
@@ -220,7 +224,10 @@ test("a failed row links request keeps the new selection and ends loading", asyn
     ).toContain("links unavailable"),
   );
   expect(reader().selectedPosition).toEqual([0]);
-  expect(panel().viewModel).toBeUndefined();
+  expect(panel().viewModel).toMatchObject({
+    state: "data",
+    reference: "Genesis 1:2",
+  });
   demo.dispose();
 });
 
