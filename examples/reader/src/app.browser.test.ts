@@ -437,6 +437,96 @@ test("drives the supported reader component through navigation and Back", async 
   demo.dispose();
 });
 
+test("shows full initial loading before one persistent controlled Reader commits", async () => {
+  let resolveSource!: (response: Response) => void;
+  const pendingSource = new Promise<Response>((resolve) => {
+    resolveSource = resolve;
+  });
+  const demo = startControlledReader(
+    document,
+    createSefariaClient({
+      cache: false,
+      fetch: async (input) => {
+        const request = input instanceof Request ? input : new Request(input);
+        if (path(request) === "/api/v3/texts/Micah 6:8") {
+          return pendingSource;
+        }
+        if (path(request) === "/api/links/Micah 6:8") {
+          return Response.json([]);
+        }
+        throw new Error(`Unexpected request: ${path(request)}`);
+      },
+    }),
+  );
+
+  const navigation = demo.navigate("Micah 6:8");
+  const reader = document.querySelector<SefariaReader>("sefaria-reader")!;
+  await vi.waitFor(() =>
+    expect(reader.shadowRoot?.textContent).toContain("Opening Reader"),
+  );
+
+  expect(reader.viewModel).toBeUndefined();
+  expect(
+    reader.shadowRoot
+      ?.querySelector(".initial-loading")
+      ?.getAttribute("aria-busy"),
+  ).toBe("true");
+  expect(reader.shadowRoot?.textContent).toContain("Opening Reader");
+
+  resolveSource(Response.json(sourcePayload("Micah 6:8", "Micah 6:8")));
+  await navigation;
+  await reader.updateComplete;
+
+  expect(reader.rootLoading).toBe(false);
+  expect(reader.viewModel?.selectedTarget?.ref).toBe("Micah 6:8");
+  demo.dispose();
+});
+
+test("clears full loading when an initial load is aborted and its replacement fails", async () => {
+  const demo = startControlledReader(
+    document,
+    createSefariaClient({
+      cache: false,
+      fetch: async (input) => {
+        const request = input instanceof Request ? input : new Request(input);
+        if (path(request) === "/api/v3/texts/Micah 6:7") {
+          return await new Promise<Response>((_resolve, reject) => {
+            request.signal.addEventListener(
+              "abort",
+              () => reject(request.signal.reason),
+              { once: true },
+            );
+          });
+        }
+        if (path(request) === "/api/v3/texts/Micah 6:8") {
+          throw new TypeError("Initial source unavailable.");
+        }
+        throw new Error(`Unexpected request: ${path(request)}`);
+      },
+    }),
+  );
+
+  const aborted = demo.navigate("Micah 6:7");
+  const reader = document.querySelector<SefariaReader>("sefaria-reader")!;
+  await vi.waitFor(() =>
+    expect(reader.shadowRoot?.textContent).toContain("Opening Reader"),
+  );
+  await demo.navigate("Micah 6:8");
+  await aborted;
+  await reader.updateComplete;
+
+  expect(reader.rootLoading).toBe(false);
+  expect(reader.viewModel).toBeUndefined();
+  expect(reader.shadowRoot?.textContent).not.toContain("Opening Reader");
+  expect(document.querySelector("#status")?.textContent).toBe(
+    "Micah 6:8 could not be opened.",
+  );
+  expect(document.querySelector("#host-error")?.textContent).toBe(
+    "Initial source unavailable.",
+  );
+  demo.dispose();
+});
+
 test("replaces an external root on one persistent controlled Reader", async () => {
   const requests: string[] = [];
   let rejectPending!: (reason: unknown) => void;
@@ -485,10 +575,20 @@ test("replaces an external root on one persistent controlled Reader", async () =
       "Opening Rashi on Micah 6:8:1",
     ),
   );
+  await vi.waitFor(() =>
+    expect(reader.shadowRoot?.textContent).toContain(
+      "Opening a new Reader location",
+    ),
+  );
   expect(reader.viewModel?.currentEntryId).toBe("entry-1");
   expect(reader.viewModel?.selectedTarget?.ref).toBe("Micah 6:8");
+  expect(reader.shadowRoot?.textContent).toContain(
+    "Opening a new Reader location",
+  );
   rejectPending(new TypeError("Source unavailable."));
   await failed;
+  await reader.updateComplete;
+  expect(reader.rootLoading).toBe(false);
   expect(reader.viewModel?.currentEntryId).toBe("entry-1");
   expect(reader.viewModel?.selectedTarget?.ref).toBe("Micah 6:8");
   expect(document.querySelector("#host-error")?.textContent).toBe(
@@ -522,7 +622,17 @@ test("replaces an external root on one persistent controlled Reader", async () =
       "Opening Micah 6:6",
     ),
   );
-  await demo.navigate("Micah 6:8");
+  expect(reader.rootLoading).toBe(true);
+  const latest = demo.navigate("Micah 6:8");
+  await vi.waitFor(() =>
+    expect(document.querySelector("#status")?.textContent).toContain(
+      "Opening Micah 6:8",
+    ),
+  );
+  expect(document.querySelector("#status")?.textContent).not.toContain(
+    "Micah 6:6",
+  );
+  await latest;
   resolveLate(Response.json(sourcePayload("Micah 6:6", "Micah 6:6")));
   await superseded;
 

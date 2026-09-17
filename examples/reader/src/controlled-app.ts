@@ -115,6 +115,7 @@ export function startControlledReader(
     initialization?.abort();
     initialization = new AbortController();
     const currentInitialization = initialization;
+    reader.rootLoading = true;
     status.textContent = `Opening ${normalized}.`;
     try {
       const next = await loadReaderController({ tref: normalized }, client, {
@@ -139,6 +140,7 @@ export function startControlledReader(
         !currentInitialization.signal.aborted &&
         currentGeneration === generation
       ) {
+        reader.rootLoading = false;
         status.textContent = `${normalized} could not be opened.`;
         showError(error);
       }

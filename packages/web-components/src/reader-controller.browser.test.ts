@@ -133,6 +133,80 @@ test("binds one persistent reader, forwards navigation, resets its pane, and cle
   expect(dispose).toHaveBeenCalledOnce();
 });
 
+test("binds pending root qualification without replacing committed Reader content", async () => {
+  render(html`<sefaria-reader></sefaria-reader>`);
+  const element = document.querySelector<SefariaReader>("sefaria-reader");
+  if (!element) throw new Error("Reader was not rendered.");
+  let resolveSource!: (content: ReturnType<typeof sourceContent>) => void;
+  const pendingSource = new Promise<ReturnType<typeof sourceContent>>(
+    (resolve) => {
+      resolveSource = resolve;
+    },
+  );
+  const dataSource: ReaderControllerDataSource = {
+    loadSource: vi.fn(async () => pendingSource),
+    loadConnections: vi.fn(async (request, projection) =>
+      createReaderConnectionsContent(links(request.tref), request, projection),
+    ),
+  };
+  const controller = createReaderController(
+    {
+      source: sourceContent("Micah 6"),
+      selectedPosition: [7],
+      connections: connectionsContent("Micah 6:8"),
+    },
+    dataSource,
+  );
+  const unbind = bindReaderController(element, controller);
+  const committed = element.viewModel;
+  element.dispatchEvent(
+    new CustomEvent("sefaria-reader-pane-change", {
+      detail: { originEntryId: "entry-1", pane: "connections" },
+    }),
+  );
+  const heading = element.shadowRoot?.querySelector<HTMLElement>(
+    '[data-current-heading="true"]',
+  );
+  heading?.focus();
+
+  const replacement = controller.replaceRoot({ tref: "Micah 7" });
+  await vi.waitFor(() =>
+    expect(element.shadowRoot?.textContent).toContain(
+      "Opening a new Reader location",
+    ),
+  );
+
+  expect(element.viewModel).toStrictEqual(committed);
+  expect(element.viewModel?.selectedTarget?.ref).toBe("Micah 6:8");
+  expect(element.activePane).toBe("connections");
+  expect(element.shadowRoot?.activeElement).toBe(heading);
+  expect(
+    element.shadowRoot?.querySelector(".panes")?.getAttribute("aria-busy"),
+  ).toBe("true");
+  expect(
+    element.shadowRoot
+      ?.querySelector('[role="status"]')
+      ?.closest('[aria-busy="true"]'),
+  ).toBeNull();
+  expect(element.shadowRoot?.textContent).toContain(
+    "Opening a new Reader location",
+  );
+
+  resolveSource(sourceContent("Micah 7"));
+  await replacement;
+  await element.updateComplete;
+
+  expect(element.rootLoading).toBe(false);
+  expect(
+    element.shadowRoot?.querySelector(".panes")?.getAttribute("aria-busy"),
+  ).toBe("false");
+  expect(element.viewModel?.selectedTarget?.ref).toBe("Micah 7:1");
+  expect(element.shadowRoot?.textContent).not.toContain(
+    "Opening a new Reader location",
+  );
+  unbind();
+});
+
 test("leaves chat export entirely with the host", async () => {
   render(html`<sefaria-reader></sefaria-reader>`);
   const element = document.querySelector<SefariaReader>("sefaria-reader");

@@ -838,6 +838,18 @@
             },
             {
               "kind": "field",
+              "name": "rootLoading",
+              "privacy": "public",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Shows host-controlled root loading without replacing committed content.",
+              "default": "false",
+              "attribute": "root-loading",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "vocalizationMode",
               "privacy": "public",
               "type": {
@@ -1199,6 +1211,15 @@
               "description": "Whether captured connection previews are visible.",
               "default": "true",
               "fieldName": "showConnectionPreviews"
+            },
+            {
+              "name": "root-loading",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Shows host-controlled root loading without replacing committed content.",
+              "default": "false",
+              "fieldName": "rootLoading"
             },
             {
               "name": "vocalization-mode",

@@ -26,6 +26,7 @@ export function bindReaderController(
     element.sideOrder = snapshot.presentation.sideOrder;
     element.showConnectionPreviews =
       snapshot.presentation.showConnectionPreviews;
+    element.rootLoading = snapshot.task.state === "loading-source";
     element.vocalizationMode = snapshot.presentation.vocalizationMode;
     element.activePane = activePane;
   };
@@ -88,6 +89,7 @@ export function bindReaderController(
   const unsubscribe = controller.subscribe(render);
   return () => {
     unsubscribe();
+    element.rootLoading = false;
     for (const [name, listener] of listeners) {
       element.removeEventListener(name, listener);
     }
