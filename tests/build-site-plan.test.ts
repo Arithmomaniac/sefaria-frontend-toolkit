@@ -16,6 +16,7 @@ describe("documentation site build plan", () => {
       "reader",
       "vanilla",
       "react",
+      "alpine",
       "linked-article",
       "mcp-app",
     ]);
@@ -72,6 +73,7 @@ describe("documentation site build plan", () => {
     expect(SITE_REQUIRED_FILES).toContain("examples/playground/index.html");
     expect(SITE_REQUIRED_FILES).toContain("examples/reader/controlled.html");
     expect(SITE_REQUIRED_FILES).toContain("examples/react/index.html");
+    expect(SITE_REQUIRED_FILES).toContain("examples/alpine/index.html");
     expect(SITE_REQUIRED_FILES).toContain("examples/mcp-app/index.html");
   });
 
@@ -94,6 +96,17 @@ describe("documentation site build plan", () => {
       packageName: "@sefaria-example/react-vite",
       route: "react",
       base: "/sefaria-frontend-toolkit/examples/react/",
+    });
+    expect(
+      createSiteBuildSteps({
+        skipTypecheck: true,
+        siteBasePath: "/sefaria-frontend-toolkit/",
+      }),
+    ).toContainEqual({
+      kind: "vite",
+      packageName: "@sefaria-example/alpine-vite",
+      route: "alpine",
+      base: "/sefaria-frontend-toolkit/examples/alpine/",
     });
   });
 

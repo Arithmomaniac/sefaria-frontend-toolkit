@@ -8,10 +8,60 @@
   </head>
   <body>
     <main>
-      <h1>Sefaria Frontend Toolkit</h1>
+      <h1>Sefaria Frontend Toolkit with vanilla JavaScript</h1>
+      <p>
+        The validated supplied card renders without a request. The form is the
+        only live activation; display controls change element properties only.
+      </p>
+      <form id="reference-form">
+        <label>
+          Reference
+          <input name="tref" value="Micah 6:8" required />
+        </label>
+        <button id="load-live" type="submit">Load reference</button>
+      </form>
+      <div class="display-controls">
+        <label>
+          Text sides
+          <select id="content-language">
+            <option value="both">Hebrew and translation</option>
+            <option value="primary">Primary only</option>
+            <option value="translation">Translation only</option>
+          </select>
+        </label>
+        <label>
+          Layout
+          <select id="layout">
+            <option value="auto">Automatic</option>
+            <option value="side-by-side">Side by side</option>
+            <option value="stacked">Stacked</option>
+          </select>
+        </label>
+        <label>
+          Side order
+          <select id="side-order">
+            <option value="primary-first">Primary first</option>
+            <option value="translation-first">Translation first</option>
+          </select>
+        </label>
+        <label>
+          Hebrew marks
+          <select id="vocalization-mode">
+            <option value="taamim_and_nikkud">Cantillation and vowels</option>
+            <option value="nikkud">Vowels only</option>
+            <option value="none">No marks</option>
+          </select>
+        </label>
+      </div>
       <p id="status" role="status">Rendering supplied Micah 6:8 data…</p>
-      <button id="load-live" type="button">Start live demo</button>
+      <p id="request-count">Live load attempts: 0</p>
+      <p id="committed-ref">Current committed reference: Micah 6:8.</p>
+      <p id="failure" role="alert" hidden></p>
       <sefaria-source-card></sefaria-source-card>
+      <p id="selected-ref" aria-live="polite">
+        Select the rendered segment to send its canonical component event to the
+        host.
+      </p>
     </main>
   </body>
 </html>

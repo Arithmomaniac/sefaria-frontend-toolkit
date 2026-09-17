@@ -36,6 +36,11 @@ export const EXAMPLE_BUILDS = [
     pages: ["index.html"],
   },
   {
+    route: "alpine",
+    packageName: "@sefaria-example/alpine-vite",
+    pages: ["index.html"],
+  },
+  {
     route: "linked-article",
     packageName: "@sefaria-example/linked-article",
     pages: ["index.html"],
@@ -58,6 +63,7 @@ export const SITE_REQUIRED_FILES = [
   "learn/05-customization.html",
   "learn/06-host-integration.html",
   "learn/react.html",
+  "learn/alpine.html",
   ...EXAMPLE_BUILDS.flatMap(({ route, pages }) =>
     pages.map((page) => `examples/${route}/${page}`),
   ),
