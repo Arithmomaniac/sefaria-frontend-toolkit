@@ -32,6 +32,18 @@ import type {
   SourceCardRequest,
 } from "./source-card.js";
 
+interface RetainedSourceRoot {
+  readonly selectedRef: string;
+  readonly selectedPosition: readonly number[];
+}
+
+interface ReaderSessionWithRetainedSourceRoot extends ReaderSession {
+  replaceRootFromCurrentSource(
+    request: SourceCardRequest,
+    presentation?: ReaderPresentationPatch,
+  ): ReaderTransition<RetainedSourceRoot> | undefined;
+}
+
 /** Executes corrected source and connections operations for one reader controller. */
 export interface ReaderControllerDataSource {
   /** Loads admitted source content for the exact effective request. */
@@ -380,6 +392,34 @@ class ReaderControllerImpl implements ReaderController {
   ): Promise<void> {
     const targetRequest = normalizeSourceRequest(request);
     validateRootOptions(options);
+    const retained = (
+      this.#session as ReaderSessionWithRetainedSourceRoot
+    ).replaceRootFromCurrentSource(targetRequest, options.presentation);
+    if (retained !== undefined) {
+      if (retained.state === "rejected") {
+        this.#session = retained.session;
+        this.failTask(retained.reason, retained.message);
+        return;
+      }
+      const active = this.startPhysicalOperation();
+      this.#session = retained.session;
+      this.#task = { state: "idle" };
+      this.publish();
+      try {
+        await this.loadConnections(
+          this.#session.view.currentEntryId,
+          normalizeConnectionsRequest({
+            tref: retained.value.selectedRef,
+            withText: options.connections?.withText !== false,
+          }),
+          options.connections?.projection ?? {},
+          active,
+        );
+      } finally {
+        this.finishPhysicalOperation(active);
+      }
+      return;
+    }
     const active = this.startPhysicalOperation();
     this.replaceTask({
       state: "loading-source",

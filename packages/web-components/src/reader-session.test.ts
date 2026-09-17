@@ -13,7 +13,11 @@ import {
   createReaderConnectionsContent,
   createReaderSession,
   createReaderSourceContent,
+  type ReaderPresentationPatch,
+  type ReaderSession,
+  type ReaderTransition,
 } from "./reader-session.js";
+import type { SourceCardRequest } from "./source-card.js";
 
 function source(tref: string) {
   if (!validateGetV3Texts200(v3SourceBackedPayload)) {
@@ -395,6 +399,52 @@ describe("reader history and completion identity", () => {
 });
 
 describe("reader root replacement", () => {
+  it("reuses an exact addressable current source without exposing its capture", () => {
+    const session = createReaderSession({
+      source: source("Micah 6:8"),
+      presentation: { vocalizationMode: "none" },
+    }) as ReaderSession & {
+      replaceRootFromCurrentSource(
+        request: SourceCardRequest,
+        presentation?: ReaderPresentationPatch,
+      ):
+        | ReaderTransition<{
+            readonly selectedRef: string;
+            readonly selectedPosition: readonly number[];
+          }>
+        | undefined;
+    };
+    const retainedViewModel = session.view.current.source?.viewModel;
+
+    const replaced = session.replaceRootFromCurrentSource({
+      tref: "Micah 6:8",
+    });
+
+    expect(replaced?.state).toBe("applied");
+    if (replaced?.state !== "applied") return;
+    expect(replaced.value).toEqual({
+      selectedRef: "Micah 6:8",
+      selectedPosition: [],
+    });
+    expect(replaced.session.view.currentEntryId).toBe("entry-2");
+    expect(replaced.session.view.breadcrumbs).toHaveLength(1);
+    expect(replaced.session.view.current.source?.viewModel).toBe(
+      retainedViewModel,
+    );
+    expect(replaced.session.view.current.presentation.vocalizationMode).toBe(
+      "taamim_and_nikkud",
+    );
+    expect(
+      session.replaceRootFromCurrentSource({ tref: "micah 6:8" }),
+    ).toBeUndefined();
+    expect(
+      session.replaceRootFromCurrentSource({
+        tref: "Micah 6:8",
+        primary: { versionTitle: "Different edition" },
+      }),
+    ).toBeUndefined();
+  });
+
   it("replaces all history without reusing entry, operation, or pin identities", () => {
     let session = createReaderSession({
       source: source("Micah 6:8"),

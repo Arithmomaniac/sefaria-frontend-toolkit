@@ -88,7 +88,7 @@ unbind();
 controller.dispose();
 ```
 
-The controller uses the client for source and connections requests, retains admitted captures in its private session, and supplies rendering snapshots to the request-free element. Connection selection pushes normal Reader history. An external search calls `replaceRoot`: the old root stays committed until the source qualifies and fits, successful admission removes the old breadcrumbs, and links failure leaves the new source open. A host can keep its own markup or use the lower-level session and `createSefariaReaderDataSource` when it needs spatial pane policy.
+The controller uses the client for source and connections requests, retains admitted captures in its private session, and supplies rendering snapshots to the request-free element. Connection selection pushes normal Reader history. An external search calls `replaceRoot`: an exact canonical item covered by the current source capture with the same edition selectors reuses that capture without a source request, but still creates a fresh root and loads its connections. Aliases, references outside the current capture, and edition changes take the normal qualification path. On that path, the old root stays committed until the source qualifies and fits; successful admission removes the old breadcrumbs, and links failure leaves the new source open. A host can keep its own markup or use the lower-level session and `createSefariaReaderDataSource` when it needs spatial pane policy.
 
 The standalone page can eventually integrate reader navigation with its URL and browser Back, but that should be an explicit host feature. The session should not write global browser history itself.
 
