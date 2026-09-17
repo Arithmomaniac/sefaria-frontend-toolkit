@@ -100,6 +100,91 @@ try {
         name: "1. Understand Web Components and toolkit ownership",
       })
       .waitFor();
+    const coreLessonRoutes = [
+      "/learn/01-web-components.html",
+      "/learn/02-supplied-data.html",
+      "/learn/03-live-data.html",
+      "/learn/04-reader.html",
+      "/learn/05-customization.html",
+      "/learn/06-host-integration.html",
+    ];
+    for (let index = 0; index < coreLessonRoutes.length; index += 1) {
+      await page.goto(siteRouteUrl(coreLessonRoutes[index]), {
+        waitUntil: "networkidle",
+      });
+      if (index > 0) {
+        assertEqual(
+          new URL(
+            await page
+              .locator(".VPDocFooter .pager-link.prev")
+              .getAttribute("href"),
+            page.url(),
+          ).pathname,
+          sitePath(coreLessonRoutes[index - 1]),
+          `lesson ${index + 1} previous-page route`,
+        );
+      }
+      if (index < coreLessonRoutes.length - 1) {
+        assertEqual(
+          new URL(
+            await page
+              .locator(".VPDocFooter .pager-link.next")
+              .getAttribute("href"),
+            page.url(),
+          ).pathname,
+          sitePath(coreLessonRoutes[index + 1]),
+          `lesson ${index + 1} next-page route`,
+        );
+      }
+    }
+    await page.goto(siteRouteUrl("/learn/03-live-data.html"), {
+      waitUntil: "networkidle",
+    });
+    await Promise.all([
+      page.waitForURL("**/learn/04-reader.html"),
+      page.locator(".VPDocFooter .pager-link.next").click(),
+    ]);
+    await Promise.all([
+      page.waitForURL("**/learn/03-live-data.html"),
+      page.locator(".VPDocFooter .pager-link.prev").click(),
+    ]);
+    for (const framework of ["react", "alpine"]) {
+      await page.goto(siteRouteUrl(`/learn/${framework}.html`), {
+        waitUntil: "networkidle",
+      });
+      assertEqual(
+        new URL(
+          await page
+            .locator(".VPDocFooter .pager-link.prev")
+            .getAttribute("href"),
+          page.url(),
+        ).pathname,
+        sitePath("/learn/03-live-data.html"),
+        `${framework} previous-page route`,
+      );
+      assertEqual(
+        new URL(
+          await page
+            .locator(".VPDocFooter .pager-link.next")
+            .getAttribute("href"),
+          page.url(),
+        ).pathname,
+        sitePath("/learn/04-reader.html"),
+        `${framework} next-page route`,
+      );
+    }
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(siteRouteUrl("/learn/03-live-data.html"), {
+      waitUntil: "networkidle",
+    });
+    await Promise.all([
+      page.waitForURL("**/learn/04-reader.html"),
+      page.locator(".VPDocFooter .pager-link.next").click(),
+    ]);
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.goto(siteRouteUrl("/learn/01-web-components.html"), {
+      waitUntil: "networkidle",
+    });
     const authored = page.frameLocator(
       'iframe[title="Authored request-free component states"]',
     );
@@ -412,6 +497,18 @@ try {
     assertEqual(textRequests.length, 0, "Alpine display-only request count");
     await page.locator('input[name="tref"]').fill("micah 6:8");
     await page.locator("#load-live").click();
+    await page
+      .locator("#request-status")
+      .filter({ hasText: "Committed canonical reference Micah 6:8." })
+      .waitFor({ timeout: 5_000 });
+    await page
+      .locator("#request-count")
+      .filter({ hasText: "Live load attempts: 1" })
+      .waitFor({ timeout: 5_000 });
+    await page
+      .locator("#committed-ref")
+      .filter({ hasText: "Current committed reference: Micah 6:8." })
+      .waitFor({ timeout: 5_000 });
     await assertText(
       page.locator("#request-status"),
       "Committed canonical reference Micah 6:8.",

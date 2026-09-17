@@ -102,6 +102,7 @@ function ActiveReactSourceCardExample({
   >("taamim_and_nikkud");
   const [loadAttempts, setLoadAttempts] = useState(0);
   const [inputFailure, setInputFailure] = useState<string>();
+  const inputFailureAttemptId = useRef<number | undefined>(undefined);
   const previousResult = useRef(snapshot.result);
 
   useEffect(() => {
@@ -134,12 +135,30 @@ function ActiveReactSourceCardExample({
     event.preventDefault();
     const normalized = tref.trim();
     if (normalized.length === 0) {
+      inputFailureAttemptId.current =
+        snapshot.attempt.state === "loading" ? snapshot.attempt.id : undefined;
       setInputFailure("Enter a non-blank Sefaria reference.");
       return;
     }
+    inputFailureAttemptId.current = undefined;
     setInputFailure(undefined);
     setLoadAttempts((count) => count + 1);
-    void controller.load({ tref: normalized }).catch(() => undefined);
+    const load = controller.load({ tref: normalized });
+    const admittedAttempt = controller.snapshot.attempt;
+    const admittedAttemptId =
+      admittedAttempt.state === "loading" ? admittedAttempt.id : undefined;
+    void load.then(
+      () => {
+        if (
+          admittedAttemptId !== undefined &&
+          inputFailureAttemptId.current === admittedAttemptId
+        ) {
+          inputFailureAttemptId.current = undefined;
+          setInputFailure(undefined);
+        }
+      },
+      () => undefined,
+    );
   };
 
   const viewModel = displayedViewModel(snapshot);

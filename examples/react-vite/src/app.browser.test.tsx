@@ -222,6 +222,71 @@ test("blank validation does not cancel an admitted request", async () => {
   expect(container.querySelector("#request-status")?.textContent).toBe(
     "Committed canonical reference Micah 6:8.",
   );
+  expect(container.querySelector("#load-error")).toBeNull();
+});
+
+test("blank validation survives current failure and a superseded completion", async () => {
+  let resolveFirst!: (response: Response) => void;
+  let rejectSecond!: (reason: unknown) => void;
+  const fetch = vi
+    .fn()
+    .mockImplementationOnce(
+      async () =>
+        await new Promise<Response>((resolve) => {
+          resolveFirst = resolve;
+        }),
+    )
+    .mockImplementationOnce(
+      async () =>
+        await new Promise<Response>((_resolve, reject) => {
+          rejectSecond = reject;
+        }),
+    );
+  const container = document.createElement("div");
+  document.body.append(container);
+  root = createRoot(container);
+
+  await act(async () => {
+    root?.render(
+      <ReactSourceCardExample
+        client={createSefariaClient({
+          baseUrl: "https://example.invalid",
+          cache: false,
+          fetch,
+        })}
+      />,
+    );
+  });
+  await act(async () => click(container, "#load-live"));
+  await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+  await act(async () => {
+    setTextInput(container, 'input[name="tref"]', "Micah 6:7");
+    click(container, "#load-live");
+  });
+  await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+  await act(async () => {
+    setTextInput(container, 'input[name="tref"]', "   ");
+    click(container, "#load-live");
+  });
+  expect(container.querySelector("#load-error")?.textContent).toBe(
+    "Enter a non-blank Sefaria reference.",
+  );
+
+  await act(async () => {
+    resolveFirst(Response.json({ ...fixture, ref: "Obadiah 1:1" }));
+    await waitForReact();
+  });
+  expect(container.querySelector("#load-error")?.textContent).toBe(
+    "Enter a non-blank Sefaria reference.",
+  );
+
+  await act(async () => {
+    rejectSecond(new Error("Current request failed."));
+    await waitForReact();
+  });
+  expect(container.querySelector("#load-error")?.textContent).toBe(
+    "Enter a non-blank Sefaria reference.",
+  );
 });
 
 test("StrictMode recreates disposed controllers, makes no mount request, and disposes pending work", async () => {

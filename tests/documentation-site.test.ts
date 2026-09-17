@@ -59,6 +59,39 @@ describe("documentation learning journey", () => {
     );
   });
 
+  it("keeps framework paths optional without breaking core lesson paging", async () => {
+    const config = await readFile(
+      path.join(root, "docs", ".vitepress", "config.ts"),
+      "utf8",
+    );
+    const stepThree = config.indexOf(
+      '{ text: "3. Load and interact", link: "/learn/03-live-data.md" }',
+    );
+    const stepFour = config.indexOf(
+      '{ text: "4. Use the Reader", link: "/learn/04-reader.md" }',
+    );
+    const frameworks = config.indexOf('text: "Frameworks"');
+
+    expect(stepThree).toBeGreaterThan(-1);
+    expect(stepFour).toBeGreaterThan(stepThree);
+    expect(frameworks).toBeGreaterThan(stepFour);
+    expect(config.slice(stepThree, stepFour)).not.toContain("React path");
+    expect(config.slice(stepThree, stepFour)).not.toContain("Alpine path");
+    expect(config).toContain('"learn/03-live-data.md": {');
+    expect(config).toContain(
+      'next: lessonLink("4. Use the Reader", "/learn/04-reader.md")',
+    );
+    for (const framework of ["react", "alpine"]) {
+      expect(config).toContain(`"learn/${framework}.md": {`);
+      expect(config).toContain(
+        'prev: lessonLink("3. Load and interact", "/learn/03-live-data.md")',
+      );
+      expect(config).toContain(
+        'next: lessonLink("4. Use the Reader", "/learn/04-reader.md")',
+      );
+    }
+  });
+
   it("documents package builds before direct example development servers", async () => {
     for (const [filename, command] of [
       ["README.md", "pnpm dev:vanilla"],
