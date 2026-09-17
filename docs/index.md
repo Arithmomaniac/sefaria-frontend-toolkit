@@ -16,6 +16,8 @@ hero:
     - theme: alt
       text: Try the editor
       link: /examples/playground/index.html
+      target: _blank
+      rel: noreferrer
 ---
 
 > Created/edited by GitHub Copilot with human review/feedback by Avi Levin.

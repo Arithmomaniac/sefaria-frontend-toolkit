@@ -200,6 +200,19 @@ try {
       "landing skip link",
     );
     await capture(page, "site-landing.png");
+    const editorPagePromise = page.context().waitForEvent("page", {
+      timeout: 5_000,
+    });
+    await page.getByRole("link", { name: "Try the editor" }).click();
+    const editorPage = await editorPagePromise;
+    await editorPage.waitForLoadState("networkidle");
+    assertEqual(
+      new URL(editorPage.url()).pathname,
+      sitePath("/examples/playground/index.html"),
+      "activated editor path",
+    );
+    await assertText(editorPage.locator("h1"), "Component editor");
+    await editorPage.close();
 
     const learnLink = page
       .getByRole("link", {
@@ -349,7 +362,7 @@ try {
         );
         assertEqual(
           await link.getAttribute("target"),
-          "_self",
+          expectedPath.includes("/index.html") ? "_blank" : "_self",
           `${name} target`,
         );
       }
@@ -378,17 +391,42 @@ try {
       waitUntil: "networkidle",
     });
     const catalogLinks = [
-      ["Authored component states", "/examples/explorer/authored.html"],
-      ["Live component explorer", "/examples/explorer/index.html"],
-      ["Controlled and spatial Reader", "/examples/reader/controlled.html"],
-      ["Vanilla supplied-data consumer", "/examples/vanilla/index.html"],
-      ["React consumer", "/examples/react/index.html"],
-      ["Authored linked article", "/examples/linked-article/index.html"],
-      ["Live MCP App host", "/examples/mcp-app/live.html"],
+      [
+        "Supplied-data component editor",
+        "/examples/playground/index.html",
+        "Edit and run a source card",
+      ],
+      [
+        "Authored component states",
+        "/examples/explorer/authored.html",
+        "Open preview",
+      ],
+      [
+        "Live component explorer",
+        "/examples/explorer/index.html",
+        "Open preview",
+      ],
+      [
+        "Controlled and spatial Reader",
+        "/examples/reader/controlled.html",
+        "Open preview",
+      ],
+      [
+        "Vanilla supplied-data consumer",
+        "/examples/vanilla/index.html",
+        "Open preview",
+      ],
+      ["React consumer", "/examples/react/index.html", "Open preview"],
+      [
+        "Authored linked article",
+        "/examples/linked-article/index.html",
+        "Open preview",
+      ],
+      ["Live MCP App host", "/examples/mcp-app/live.html", "Open preview"],
     ];
-    for (const [exampleName, expectedPath] of catalogLinks) {
+    for (const [exampleName, expectedPath, linkName] of catalogLinks) {
       const row = page.getByRole("row").filter({ hasText: exampleName });
-      const link = row.getByRole("link", { name: "Open preview" });
+      const link = row.getByRole("link", { name: linkName });
       assertEqual(
         new URL(await link.getAttribute("href"), page.url()).pathname,
         sitePath(expectedPath),
@@ -396,7 +434,7 @@ try {
       );
       assertEqual(
         await link.getAttribute("target"),
-        "_self",
+        expectedPath.includes("/index.html") ? "_blank" : "_self",
         `${exampleName} catalog target`,
       );
     }

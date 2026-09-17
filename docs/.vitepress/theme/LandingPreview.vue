@@ -19,7 +19,9 @@ const noscriptHtml = `<style>.landing-preview__frame{display:none}</style><div c
           <li>No API call on entry</li>
         </ul>
       </div>
-      <a :href="previewUrl" target="_self">Open supplied-data preview</a>
+      <a :href="previewUrl" target="_blank" rel="noreferrer"
+        >Open supplied-data preview</a
+      >
     </div>
     <div class="landing-preview__stage">
       <img
