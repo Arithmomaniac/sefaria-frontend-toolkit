@@ -13,7 +13,7 @@ You do not need to finish the tutorial before using the toolkit:
 | Need | Destination |
 | --- | --- |
 | Prebuilt stateful reading surface | [Controlled Reader lesson](learn/04-reader.md) and [`examples/reader/controlled.html`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/reader/controlled.html) |
-| Edit a supplied-data component | [`examples/playground/index.html`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/index.html) |
+| Edit a supplied-data component | [Seven-project editor](examples.md) and [`examples/playground/index.html`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/index.html) |
 | Compare all rendering surfaces | [Component catalog](components.md) |
 | Component states and live diagnostics | [Example catalog](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/README.md) |
 | A passage card in a browser app | [Render text](guides/render-text.md) |
@@ -24,11 +24,11 @@ The toolkit supplies the controller for Reader navigation. Your application crea
 
 ## Learn step by step
 
-1. [Choose a component and learn ownership](learn/01-web-components.md). Start with a component or the Reader. Learn who owns registration, properties, events, and requests.
-2. [Set up and render supplied data](learn/02-supplied-data.md). Set up the workspace or local packages. Render Micah 6:8 without a request.
-3. [Load data and handle interaction](learn/03-live-data.md). Add factory calls, loading, visible failures, selection events, cancellation, and protection from old results.
-4. [Use the Reader or build a custom host](learn/04-reader.md). Use the supplied Reader controller. Learn what a custom layout must manage.
-5. [Change presentation or use APIs without UI components](learn/05-customization.md). Change the theme, width, text sides, layout, client, factories, and text tools.
+1. [Choose a component and learn ownership](learn/01-web-components.md). Edit a reference label while learning registration, properties, events, and requests.
+2. [Set up and render supplied data](learn/02-supplied-data.md). Edit and render the maintained Micah 6:8 source card without a request.
+3. [Load data and handle interaction](learn/03-live-data.md). Compare that supplied-data project with an explicit live host, then add loading, visible failures, selection events, cancellation, and protection from old results.
+4. [Use the Reader or build a custom host](learn/04-reader.md). Edit the finite supplied-data Reader, then use the supplied Reader controller and learn what a custom layout must manage.
+5. [Change presentation or use APIs without UI components](learn/05-customization.md). Edit source-card presentation, use the controlled Reader's host-owned action, and choose client, factory, or text-transform APIs.
 6. [Add an article or MCP host](learn/06-host-integration.md). Add citation links, supplied server data, host tools, or the static MCP host.
 
 React users can branch from steps 2 and 3 into [Use the Web Components from React](learn/react.md). Alpine users can follow the same controller and property flow in [Use the Web Components from Alpine](learn/alpine.md). Web Components are browser-standard custom elements, so neither framework needs a toolkit-specific wrapper package.

@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by avilevin.
 
 # 3. Load data and handle interaction
 
@@ -77,13 +77,17 @@ card.addEventListener("sefaria-source-select", (event) => {
 });
 ```
 
-Place the element inside `<div data-source-card-content>`. Call `load("Micah 6:8")` only from an explicit form submission or button. This version tracks only settled view models, so overlapping requests cannot preserve another operation's loading placeholder. After a rejected transport request it restores committed content, or hides the light-DOM container when no settled content exists, and reports the failure separately. A documented HTTP 400 or 404 still resolves to the factory's typed error view model; neither path becomes an empty success.
+Place the element inside `<div data-source-card-content>`. Call `load("Micah 6:8")` only from an explicit form submission or button. This version tracks only settled view models, so overlapping requests cannot preserve another operation's loading placeholder. After a rejected transport request it restores previous committed content, or hides the light-DOM container when no settled content exists, and reports the failure separately. The host reads canonical committed state from the accepted view model or component event instead of echoing draft input. A documented HTTP 400 or 404 still resolves to the factory's typed error view model; neither path becomes an empty success.
 
 ## Expected result
 
 The live explorer opens in an idle state and makes no Sefaria request. Select **Start live demo** or an example preset to load the current bounded reference. The page displays loading or failure visibly and rejects late completion when another selection supersedes it. Selecting a rendered source emits `sefaria-source-select`; the host receives the detail and decides what happens next.
 
 **Explicit live action:** after starting `pnpm dev:site`, <SiteLink to="/examples/explorer/source-card.html">open the source-card explorer</SiteLink>, then select **Start live demo**. Opening either the lesson or the live route makes no Sefaria request until that activation. The maintained source is linked below.
+
+The editor below is the request-free half of that comparison. It runs the same maintained source-card project from supplied data; use the separate explorer only when you are ready to exercise a real client request.
+
+<PlaygroundEmbed project="source-card" title="Edit before adding live data" />
 
 ## Who owns what
 
@@ -98,6 +102,7 @@ Start one load, immediately change the reference, and start another. Confirm tha
 ## Source and run links
 
 - Run: `pnpm dev:source-card`
+- Full supplied-data editor: <SiteLink to="/examples/playground/index.html?project=source-card">source-card project</SiteLink>
 - Source: [`examples/explorer/src/source-card/app.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/source-card/app.ts)
 - Connections interaction: [`examples/explorer/src/connections/app.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/connections/app.ts)
 - Failure semantics: [Data-flow guide](../guides/data-flow.md#failures-stay-at-the-right-boundary)

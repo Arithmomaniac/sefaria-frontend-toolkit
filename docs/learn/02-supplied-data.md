@@ -48,6 +48,8 @@ card.selectable = true;
 
 The maintained page creates a source-card controller and connects it with `bindSourceCardController`. It supplies the fixture through `controller.setSuppliedData`, which makes no request. **Start live demo** calls `controller.load` through the public client.
 
+The embedded Playground is a trusted same-site editor application. It owns the project picker, CodeMirror editors, and Run controls. Your edited code executes only in its existing opaque inner preview, whose CSP and origin keep that code away from the documentation DOM, history, and storage.
+
 For an external local-tarball consumer, first build and pack all three private packages:
 
 ```powershell
@@ -93,7 +95,7 @@ Use the actual tarball filenames emitted by `pnpm pack`. `pnpm package:smoke` ex
 
 The card initially displays the supplied Micah 6:8 text and attribution with host request count zero. The browser's global `fetch` also remains unused. Selecting **Start live demo** increments the host counter and replaces the supplied example only after the live Sefaria request succeeds. A rejected request remains visible and does not relabel the supplied example as live data.
 
-<iframe class="example-frame" title="Vanilla supplied-data example" src="../examples/vanilla/index.html"></iframe>
+<PlaygroundEmbed project="source-card" title="Edit the supplied-data source card" />
 
 ## Who owns what
 
@@ -101,11 +103,13 @@ The fixture is unknown JSON until `zCoreV3TextsResponse` validates it. `createSo
 
 ## Exercise
 
-Inspect `data-request-count` before and after the explicit client action. Then add a counter around `globalThis.fetch` before the module loads and confirm it stays zero because the example's admitted client action uses its injected fixture transport.
+Edit the HTML, CSS, and JavaScript in the embedded source-card project. Choose **Run** after each change and confirm that the real component changes while the preview still reports supplied data. Then open the separate vanilla example and inspect `data-request-count` before and after its explicit live action.
 
 ## Source and run links
 
 - Run: `pnpm dev:vanilla`
+- Full editor: <SiteLink to="/examples/playground/index.html?project=source-card">source-card project</SiteLink>
+- Maintained editor source: [`examples/playground/projects/source-card/`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground/projects/source-card)
 - Source: [`examples/vanilla-vite/src/main.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/vanilla-vite/src/main.ts)
 - Fixture transport and tests: [`examples/vanilla-vite`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/vanilla-vite)
 - Package artifact qualification: [`scripts/test-tarball-consumer.mjs`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/scripts/test-tarball-consumer.mjs)

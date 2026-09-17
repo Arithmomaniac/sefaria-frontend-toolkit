@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by avilevin.
 
 # 1. Choose a surface and understand ownership
 
@@ -41,7 +41,7 @@ document.body.append(card);
 
 The `import "@arithmomaniac/sefaria-web-components"` statement registers the custom elements in the browser. The non-DOM subpaths, such as `@arithmomaniac/sefaria-web-components/source-card`, export request types, view models, and factories without registering elements.
 
-An HTML attribute contains text. A component view model is a typed object, so the host assigns it as a property:
+An HTML attribute contains text. Properties can carry objects and arrays, so the host assigns a component view model as a JavaScript property:
 
 ```html
 <!-- This creates an element, but it does not load or render a passage. -->
@@ -52,9 +52,9 @@ Do not add a `tref`, client, URL, payload, or `fetch` property to an element. Wh
 
 ## Expected result
 
-The element renders its loading state inside Shadow DOM. No network request occurs. The host can listen for the composed selection event without reaching into the component's internal markup.
+The element renders its loading state inside Shadow DOM. No network request occurs. The host can listen for the composed selection event without reaching into the component's internal markup. In the editor below, the reference-label controller receives validated supplied data and the binding assigns its view model to the element.
 
-<iframe class="example-frame" title="Authored request-free component states" src="../examples/explorer/authored.html?component=source-card&amp;scenario=one-item&amp;diagnostics=1"></iframe>
+<PlaygroundEmbed project="ref-label" title="Edit a request-free reference label" />
 
 ## Who owns what
 
@@ -71,11 +71,13 @@ The complete low-level flow is `client -> pure/async factory -> component-specif
 
 ## Exercise
 
-Open the authored workbench, switch among loading, data, empty, and error source-card scenarios, then change theme and width. Confirm that the diagnostics request count remains zero.
+Change the editor's HTML to move the reference label, change its CSS, then change the JavaScript message shown after selecting **Unresolved**. Choose **Run** after each edit and confirm that the preview changes while the request count stays zero.
 
 ## Source and run links
 
 - Run: `pnpm dev`, then open the authored workbench.
+- Full editor: <SiteLink to="/examples/playground/index.html?project=ref-label">reference-label project</SiteLink>
+- Maintained editor source: [`examples/playground/projects/ref-label/`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground/projects/ref-label)
 - Source: [`development-status.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/development-status.ts)
 - Component contract: [`docs/specs/components.md`](../specs/components.md)
 - Generated element metadata: [Custom elements](../reference/custom-elements.md)

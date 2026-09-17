@@ -46,6 +46,8 @@ bookmark.addEventListener("click", () => {
 });
 ```
 
+The equivalent authored markup is `<button slot="toolbar-actions">Bookmark selected text</button>`. The generic supplied-data Reader project demonstrates editable Reader HTML, CSS, and JavaScript, but the maintained controlled Reader linked below is the proof for this host-owned bookmark action.
+
 ```css
 sefaria-reader::part(toolbar) {
   gap: 0.75rem;
@@ -86,7 +88,7 @@ The non-DOM component subpaths are safe to use without registering custom elemen
 
 Theme, container width, side visibility, side order, layout, vocalization mode, documented Reader parts, and the host-owned toolbar action update the current component while the host request counter is unchanged. The bookmark example records only page-local host state and reads the current exact selected target without inspecting `shadowRoot` or an event path. Switching back to `taamim_and_nikkud` restores the original displayed marks. Headless imports can validate, transform, or project data without accessing `window`, `document`, or custom-element registration.
 
-<iframe class="example-frame" title="Authored customization workbench" src="../examples/explorer/authored.html?component=source-card&amp;scenario=many-items&amp;diagnostics=1&amp;width=720"></iframe>
+<PlaygroundEmbed project="source-card" title="Edit source-card presentation" />
 
 ## Who owns what
 
@@ -94,11 +96,12 @@ The element owns supported visual properties, CSS custom properties, the Reader'
 
 ## Exercise
 
-Open the authored workbench, record its request count, then change theme, width, layout, side order, displayed language, and Hebrew marks. Confirm the count does not change and that returning to the full-mark preset restores the original text. Open the controlled Reader example, bookmark the current selected reference, navigate, and confirm the next activation uses the new selected reference. Remove the slotted action in DevTools and confirm the Reader's required controls and content remain. Next, inspect the generated export inventory and choose the smallest non-DOM subpath for a host that never renders an element.
+Edit the source-card project's CSS and JavaScript to change presentation, choose **Run**, and confirm that no request occurs. Then open the actual controlled Reader example, bookmark the current selected reference, navigate, and confirm the next activation uses the new selected reference. Remove the slotted action in DevTools and confirm the Reader's required controls and content remain. Next, inspect the generated export inventory and choose the smallest non-DOM subpath for a host that never renders an element.
 
 ## Source and run links
 
 - Run: `pnpm dev`
+- Full editor: <SiteLink to="/examples/playground/index.html?project=source-card">source-card project</SiteLink>
 - Authored controls: [`examples/explorer/src/authored/development-status.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/development-status.ts)
 - Controlled Reader customization: [`examples/reader/src/controlled-app.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/reader/src/controlled-app.ts)
 - Client README: [`packages/client/README.md`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/client/README.md)

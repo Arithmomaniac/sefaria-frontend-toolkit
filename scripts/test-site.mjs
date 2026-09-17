@@ -344,6 +344,14 @@ try {
         `${framework} next-page route`,
       );
     }
+    await qualifyInlinePlayground(page, {
+      route: "/learn/02-supplied-data.html",
+      project: "source-card",
+      title: "Edit the supplied-data source card",
+      sitePath,
+      textRequests,
+    });
+    await qualifyCatalogPlayground(page, sitePath, textRequests);
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(siteRouteUrl("/learn/03-live-data.html"), {
       waitUntil: "networkidle",
@@ -356,27 +364,22 @@ try {
     await page.goto(siteRouteUrl("/learn/01-web-components.html"), {
       waitUntil: "networkidle",
     });
-    const authored = page.frameLocator(
-      'iframe[title="Authored request-free component states"]',
+    const refLabelEditor = page.frameLocator(
+      'iframe[title="Edit a request-free reference label"]',
     );
-    await authored
-      .getByRole("heading", { name: "Source card", exact: true })
-      .waitFor();
-    const authoredSource = await authored
-      .locator("[data-repository-source]")
+    await refLabelEditor
+      .getByText("Preview rendered with supplied data.")
+      .waitFor({ timeout: 30_000 });
+    const refLabelSource = await refLabelEditor
+      .getByRole("link", { name: "View active source" })
       .getAttribute("href");
     if (
-      authoredSource !==
-      "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/source-card.scenarios.ts"
+      refLabelSource !==
+      "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/projects/ref-label/index.html"
     ) {
-      const authoredFrame = page
-        .frames()
-        .find((frame) => frame.url().includes("/examples/explorer/authored"));
-      throw new Error(
-        `Unexpected authored source link: ${authoredSource}; frame: ${authoredFrame?.url()}`,
-      );
+      throw new Error(`Unexpected reference-label source: ${refLabelSource}`);
     }
-    assertEqual(textRequests.length, 0, "authored lesson request count");
+    assertEqual(textRequests.length, 0, "reference-label lesson request count");
 
     for (const [name, route, action] of [
       [
@@ -479,7 +482,8 @@ try {
       [
         "Supplied-data component editor",
         "/examples/playground/index.html",
-        "Edit and run a source card",
+        "Edit and run any of seven projects",
+        "source-card",
       ],
       [
         "Authored component states",
@@ -510,14 +514,22 @@ try {
       ],
       ["Live MCP App host", "/examples/mcp-app/live.html", "Open preview"],
     ];
-    for (const [exampleName, expectedPath, linkName] of catalogLinks) {
+    for (const [exampleName, expectedPath, linkName, project] of catalogLinks) {
       const row = page.getByRole("row").filter({ hasText: exampleName });
       const link = row.getByRole("link", { name: linkName });
+      const linkUrl = new URL(await link.getAttribute("href"), page.url());
       assertEqual(
-        new URL(await link.getAttribute("href"), page.url()).pathname,
+        linkUrl.pathname,
         sitePath(expectedPath),
         `${exampleName} catalog route`,
       );
+      if (project) {
+        assertEqual(
+          linkUrl.searchParams.get("project"),
+          project,
+          `${exampleName} catalog project`,
+        );
+      }
       assertEqual(
         await link.getAttribute("target"),
         expectedPath.includes("/index.html") ? "_blank" : "_self",
@@ -835,6 +847,31 @@ try {
         `Mobile documentation overflows horizontally: ${JSON.stringify(widths)}`,
       );
     }
+    const mobileEditor = page.locator(
+      'iframe[title="Editable component catalog"]',
+    );
+    const mobileEditorBounds = await mobileEditor.boundingBox();
+    if (
+      !mobileEditorBounds ||
+      mobileEditorBounds.width > 390 ||
+      mobileEditorBounds.height < 600
+    ) {
+      throw new Error(
+        `Mobile inline editor geometry is invalid: ${JSON.stringify(mobileEditorBounds)}.`,
+      );
+    }
+    const mobileEditorWidths = await page
+      .frameLocator('iframe[title="Editable component catalog"]')
+      .locator("html")
+      .evaluate(() => ({
+        viewport: document.documentElement.clientWidth,
+        content: document.documentElement.scrollWidth,
+      }));
+    if (mobileEditorWidths.content > mobileEditorWidths.viewport + 1) {
+      throw new Error(
+        `Mobile inline editor overflows horizontally: ${JSON.stringify(mobileEditorWidths)}.`,
+      );
+    }
     await page.locator(".VPNavBarHamburger").click();
     await page
       .locator(".VPNavScreen")
@@ -865,6 +902,7 @@ try {
             if (text) {
               textRange.selectNodeContents(text);
             }
+
             const textBounds = text ? textRange.getBoundingClientRect() : null;
             return {
               action: {
@@ -1000,6 +1038,199 @@ try {
   }
 } finally {
   await previewServer.close();
+}
+
+async function qualifyInlinePlayground(
+  page,
+  { route, project, title, sitePath, textRequests },
+) {
+  textRequests.length = 0;
+  await page.goto(siteRouteUrl(route), { waitUntil: "networkidle" });
+  const frameElement = page.locator(`iframe[title="${title}"]`);
+  await frameElement.waitFor();
+  const frameUrl = new URL(await frameElement.getAttribute("src"), page.url());
+  assertEqual(
+    frameUrl.pathname,
+    sitePath("/examples/playground/index.html"),
+    `${project} inline editor path`,
+  );
+  assertEqual(
+    frameUrl.searchParams.get("project"),
+    project,
+    `${project} inline editor selection`,
+  );
+  const fullEditor = page.getByRole("link", { name: "Open full editor" });
+  const fullEditorUrl = new URL(
+    await fullEditor.getAttribute("href"),
+    page.url(),
+  );
+  assertEqual(
+    fullEditorUrl.pathname,
+    sitePath("/examples/playground/index.html"),
+    `${project} full editor path`,
+  );
+  assertEqual(
+    fullEditorUrl.searchParams.get("project"),
+    project,
+    `${project} full editor selection`,
+  );
+  assertEqual(
+    await fullEditor.getAttribute("target"),
+    "_blank",
+    `${project} full editor target`,
+  );
+
+  const editor = page.frameLocator(`iframe[title="${title}"]`);
+  await editor
+    .getByText("Preview rendered with supplied data.")
+    .waitFor({ timeout: 30_000 });
+  const parentState = await page.evaluate(() => {
+    localStorage.setItem("site-embed-proof", "unchanged");
+    return {
+      url: location.href,
+      childCount: document.body.childElementCount,
+      marker: document.body.dataset.previewMutation ?? null,
+    };
+  });
+  const edits = [
+    {
+      tab: "HTML",
+      suffix: '\n<p id="docs-html-proof">HTML changed in the lesson.</p>',
+      prove: () =>
+        editor
+          .locator("#preview iframe")
+          .contentFrame()
+          .getByText("HTML changed in the lesson.")
+          .waitFor(),
+    },
+    {
+      tab: "CSS",
+      suffix: "\n#docs-html-proof { color: rgb(97, 40, 84); }",
+      prove: async () => {
+        const color = await editor
+          .locator("#preview iframe")
+          .contentFrame()
+          .locator("#docs-html-proof")
+          .evaluate((element) => getComputedStyle(element).color);
+        assertEqual(color, "rgb(97, 40, 84)", "inline CSS edit");
+      },
+    },
+    {
+      tab: "JavaScript",
+      suffix:
+        '\nconst proof = document.createElement("p"); proof.textContent = "JavaScript changed in the lesson."; document.body.append(proof); try { parent.document.body.dataset.previewMutation = "bad"; } catch {} try { localStorage.setItem("site-embed-proof", "bad"); } catch {} try { parent.history.pushState(null, "", "/bad-preview-route"); } catch {}',
+      prove: () =>
+        editor
+          .locator("#preview iframe")
+          .contentFrame()
+          .getByText("JavaScript changed in the lesson.")
+          .waitFor(),
+    },
+  ];
+  for (const edit of edits) {
+    await editor.getByRole("tab", { name: edit.tab }).click();
+    const code = editor.locator(".cm-content");
+    await code.fill(`${await code.textContent()}${edit.suffix}`);
+    await editor.getByRole("button", { name: "Run" }).click();
+    await edit.prove();
+  }
+  assertEqual(textRequests.length, 0, `${project} inline editor requests`);
+  const nextParentState = await page.evaluate(() => ({
+    url: location.href,
+    childCount: document.body.childElementCount,
+    marker: document.body.dataset.previewMutation ?? null,
+    storage: localStorage.getItem("site-embed-proof"),
+  }));
+  assertEqual(nextParentState.url, parentState.url, "parent history isolation");
+  assertEqual(
+    nextParentState.childCount,
+    parentState.childCount,
+    "parent DOM isolation",
+  );
+  assertEqual(nextParentState.marker, null, "parent marker isolation");
+  assertEqual(nextParentState.storage, "unchanged", "parent storage isolation");
+  await capture(page, "site-inline-editor.png");
+  await fullEditor.focus();
+  await page.keyboard.press("Tab");
+  assertEqual(
+    await page.evaluate(() => document.activeElement?.tagName),
+    "IFRAME",
+    "keyboard enters trusted editor",
+  );
+  await page.keyboard.press("Shift+Tab");
+  assertEqual(
+    await fullEditor.evaluate((element) => element.matches(":focus")),
+    true,
+    "keyboard returns to documentation",
+  );
+}
+
+async function qualifyCatalogPlayground(page, sitePath, textRequests) {
+  textRequests.length = 0;
+  await page.goto(siteRouteUrl("/components.html"), {
+    waitUntil: "networkidle",
+  });
+  const editor = page.frameLocator(
+    'iframe[title="Editable component catalog"]',
+  );
+  await editor
+    .getByText("Preview rendered with supplied data.")
+    .waitFor({ timeout: 30_000 });
+  const projects = [
+    "ref-label",
+    "text-segment",
+    "bilingual-segment",
+    "source-card",
+    "popup",
+    "connections-panel",
+    "reader",
+  ];
+  for (const project of projects) {
+    await editor.locator("#project-select").selectOption(project);
+    await editor
+      .getByText("Preview rendered with supplied data.")
+      .waitFor({ timeout: 30_000 });
+    const fullEditorUrl = new URL(
+      await page
+        .getByRole("link", { name: `Open ${project} in the full editor` })
+        .first()
+        .getAttribute("href"),
+      page.url(),
+    );
+    assertEqual(
+      fullEditorUrl.pathname,
+      sitePath("/examples/playground/index.html"),
+      `${project} catalog full editor route`,
+    );
+    assertEqual(
+      fullEditorUrl.searchParams.get("project"),
+      project,
+      `${project} catalog full editor selection`,
+    );
+  }
+  assertEqual(
+    await editor.locator("#preview iframe").count(),
+    1,
+    "catalog active preview count",
+  );
+  assertEqual(textRequests.length, 0, "catalog inline editor requests");
+  for (const project of ["source-card", "reader"]) {
+    const openedPagePromise = page.context().waitForEvent("page");
+    await page
+      .getByRole("link", { name: `Open ${project} in the full editor` })
+      .first()
+      .click();
+    const openedPage = await openedPagePromise;
+    await openedPage.waitForLoadState("networkidle");
+    assertEqual(
+      new URL(openedPage.url()).searchParams.get("project"),
+      project,
+      `${project} activated full editor selection`,
+    );
+    await assertText(openedPage.locator("h1"), "Component editor");
+    await openedPage.close();
+  }
+  await capture(page, "site-component-catalog.png");
 }
 
 async function assertText(locator, expected) {

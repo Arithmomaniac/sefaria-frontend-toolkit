@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by avilevin.
 
 # 4. Use the Reader or compose a custom host
 
@@ -57,7 +57,9 @@ pnpm dev:reader
 
 ## Expected result
 
-The controlled Reader owns bounded semantic history, transactional external root replacement, source-to-connections transitions, cancellation, and component event handling while the host owns creation and disposal. Following a connection pushes history. Calling `replaceRoot` for a new external search keeps the old source visible until the new source qualifies, then starts one fresh breadcrumb trail on the same controller and element. The spatial example can keep several panes visible, but its host also owns pane identity, placement, activation, pruning, compact layout, pins, and operation timing.
+The controlled Reader owns bounded semantic history, transactional external root replacement, source-to-connections transitions, cancellation, and component event handling while the host owns creation and disposal. The host can set `rootLoading` while the first controller is being created; later replacement keeps the previous committed root visible while the new source qualifies. Following a connection pushes history. Calling `replaceRoot` for an exact canonical item already covered by the committed source reuses that capture, then loads its connections. A target outside the finite supplied project reports `source-unavailable` instead of making I/O or inventing empty text. The spatial example can keep several panes visible, but its host also owns pane identity, placement, activation, pruning, compact layout, pins, and operation timing.
+
+<PlaygroundEmbed project="reader" title="Edit the finite supplied-data Reader" />
 
 The same Reader presentation can run with different data paths. A regular website controller can use `@arithmomaniac/sefaria-client`; an MCP App controller uses host-mediated tools because the sandbox cannot make the same direct requests. In both cases the element receives rendering data and emits events rather than fetching.
 
@@ -74,11 +76,13 @@ The spatial example is a distinct option, not a second supported all-purpose Rea
 
 ## Exercise
 
-In the controlled Reader, open connections, follow one connection, and use Back. Then submit another reference and confirm that the element stays mounted while its breadcrumb trail starts over. In the spatial Reader, perform connection navigation and identify which behavior belongs to the custom host rather than the shared reader session.
+In the embedded Reader, change HTML or CSS and choose **Run**. Follow a covered Micah connection, then choose a target outside the supplied capture and confirm that the explicit unavailable message leaves the committed Reader visible. In the controlled live Reader, use Back and submit another reference; confirm that the element stays mounted while its breadcrumb trail starts over.
 
 ## Source and run links
 
 - Run: `pnpm dev:reader`
+- Full editor: <SiteLink to="/examples/playground/index.html?project=reader">reader project</SiteLink>
+- Maintained editor source: [`examples/playground/projects/reader/`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground/projects/reader)
 - Controlled source: [`examples/reader/src/controlled-app.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/reader/src/controlled-app.ts)
 - Spatial source: [`examples/reader/src/app.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/reader/src/app.ts)
 - Illustrated ownership guide: [Reader navigation](../guides/reader-navigation.md)

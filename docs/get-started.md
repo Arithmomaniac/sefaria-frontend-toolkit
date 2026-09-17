@@ -31,7 +31,7 @@ A view model is data that a component renders. A factory prepares API data for a
 3. Assign the returned view model to `<sefaria-source-card>`.
 4. Listen for `sefaria-source-select` when selection is enabled.
 
-The [supplied-data lesson](learn/02-supplied-data.md) shows a complete example with no request. The [live-data lesson](learn/03-live-data.md) adds loading, cancellation, and visible failures. It ignores results from old requests.
+The [supplied-data lesson](learn/02-supplied-data.md) includes a complete inline HTML, CSS, and JavaScript editor with no request. The [live-data lesson](learn/03-live-data.md) contrasts that supplied project with a separate live host that adds loading, cancellation, and visible failures. It ignores results from old requests.
 
 ## Headless client, transform, and factory path
 

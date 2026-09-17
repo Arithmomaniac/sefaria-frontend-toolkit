@@ -14,6 +14,15 @@ const lessons = [
   "react.md",
   "alpine.md",
 ];
+const playgroundProjects = [
+  "ref-label",
+  "text-segment",
+  "bilingual-segment",
+  "source-card",
+  "popup",
+  "connections-panel",
+  "reader",
+] as const;
 
 describe("documentation learning journey", () => {
   it.each(lessons)("%s remains complete on GitHub", async (lesson) => {
@@ -116,11 +125,62 @@ describe("documentation learning journey", () => {
         `@arithmomaniac/sefaria-web-components/${subpath}`,
       );
     }
+    expect(catalog).toContain(
+      '<PlaygroundEmbed project="source-card" title="Editable component catalog"',
+    );
     expect(catalog).toContain("Open supplied-data preview");
-    expect(catalog).toContain("supplied-data editor");
-    expect(catalog).toContain("Edit the source-card project");
-    expect(catalog).toContain("/examples/playground/index.html");
+    expect(catalog).toContain("maintained supplied-data projects");
+    for (const project of playgroundProjects) {
+      expect(catalog).toContain(
+        `/examples/playground/index.html?project=${project}`,
+      );
+      expect(catalog).toContain(`examples/playground/projects/${project}/`);
+    }
     expect(catalog).toContain("Start with the complete Reader");
+  });
+
+  it("places maintained editable projects in the learning path", async () => {
+    const expectedEmbeds = new Map([
+      ["01-web-components.md", "ref-label"],
+      ["02-supplied-data.md", "source-card"],
+      ["03-live-data.md", "source-card"],
+      ["04-reader.md", "reader"],
+      ["05-customization.md", "source-card"],
+    ]);
+
+    for (const [lesson, project] of expectedEmbeds) {
+      const markdown = await readFile(
+        path.join(root, "docs", "learn", lesson),
+        "utf8",
+      );
+      expect(markdown).toContain(`<PlaygroundEmbed project="${project}"`);
+      expect(markdown).toContain(
+        `/examples/playground/index.html?project=${project}`,
+      );
+    }
+  });
+
+  it("uses one base-aware trusted editor wrapper without copying project data", async () => {
+    const theme = await readFile(
+      path.join(root, "docs", ".vitepress", "theme", "index.ts"),
+      "utf8",
+    );
+    const embed = await readFile(
+      path.join(root, "docs", ".vitepress", "theme", "PlaygroundEmbed.vue"),
+      "utf8",
+    );
+
+    expect(theme).toContain(
+      'app.component("PlaygroundEmbed", PlaygroundEmbed)',
+    );
+    expect(embed).toContain("withBase(");
+    expect(embed).toContain(
+      "`/examples/playground/index.html?project=${props.project}`",
+    );
+    expect(embed).toContain('class="playground-embed__frame"');
+    expect(embed).toContain("Open full editor");
+    expect(embed).not.toContain("project-catalog");
+    expect(embed).not.toContain("sandbox=");
   });
 
   it("describes all seven implemented components as current", async () => {
@@ -188,8 +248,9 @@ describe("documentation learning journey", () => {
     expect(components).toContain("The toolkit provides seven UI components.");
     expect(components).not.toContain("host-admitted Reader view model");
     expect(examples).toContain(
-      "An opaque preview uses a separate browser origin.",
+      "The component editor is a trusted same-site application",
     );
+    expect(examples).toContain("opaque inner preview");
     expect(documentation).not.toContain("host-mediated tools");
     expect(documentation).not.toContain("field-level transport definitions");
   });
@@ -238,14 +299,8 @@ describe("documentation learning journey", () => {
       "utf8",
     );
     const sidebar = config.indexOf("sidebar: {");
-    const stepThree = config.indexOf(
-      'link: "/learn/03-live-data.md"',
-      sidebar,
-    );
-    const stepFour = config.indexOf(
-      'link: "/learn/04-reader.md"',
-      stepThree,
-    );
+    const stepThree = config.indexOf('link: "/learn/03-live-data.md"', sidebar);
+    const stepFour = config.indexOf('link: "/learn/04-reader.md"', stepThree);
     const frameworks = config.indexOf('text: "Frameworks"', stepFour);
 
     expect(sidebar).toBeGreaterThan(-1);
@@ -369,6 +424,60 @@ describe("documentation learning journey", () => {
       expect(alpineSource).toContain(sourceFragment);
       expect(alpineLesson).toContain(sourceFragment);
     }
+  });
+
+  it("teaches current controller, Reader, and customization behavior", async () => {
+    const lessonsByName = Object.fromEntries(
+      await Promise.all(
+        lessons.map(async (lesson) => [
+          lesson,
+          await readFile(path.join(root, "docs", "learn", lesson), "utf8"),
+        ]),
+      ),
+    );
+    const dataFlow = await readFile(
+      path.join(root, "docs", "guides", "data-flow.md"),
+      "utf8",
+    );
+    const readerNavigation = await readFile(
+      path.join(root, "docs", "guides", "reader-navigation.md"),
+      "utf8",
+    );
+
+    expect(lessonsByName["01-web-components.md"]).toContain(
+      "Properties can carry objects and arrays",
+    );
+    expect(lessonsByName["02-supplied-data.md"]).toContain(
+      "trusted same-site editor",
+    );
+    expect(lessonsByName["02-supplied-data.md"]).toContain(
+      "opaque inner preview",
+    );
+    expect(lessonsByName["03-live-data.md"]).toContain(
+      "previous committed content",
+    );
+    expect(lessonsByName["03-live-data.md"]).toContain(
+      "canonical committed state",
+    );
+    expect(lessonsByName["04-reader.md"]).toContain("rootLoading");
+    expect(lessonsByName["04-reader.md"]).toContain("reuses that capture");
+    expect(lessonsByName["04-reader.md"]).toContain("source-unavailable");
+    expect(lessonsByName["05-customization.md"]).toContain(
+      'slot="toolbar-actions"',
+    );
+    for (const part of [
+      "toolbar",
+      "history",
+      "source-pane",
+      "connections-pane",
+    ]) {
+      expect(lessonsByName["05-customization.md"]).toContain(part);
+    }
+    expect(dataFlow).toContain(
+      "application input -> controller or factory -> component view model -> binding -> request-free element",
+    );
+    expect(readerNavigation).toContain("rootLoading");
+    expect(readerNavigation).toContain("previous committed root");
   });
 
   it("builds distinct example files instead of fallback responses", async () => {

@@ -45,7 +45,7 @@ Every maintained Markdown entry point has a primary audience and a navigation ow
 | `packages/text-transform/README.md` | Consumer of DOM-free sanitization, vocalization, and footnotes | Reference / package |
 | `packages/web-components/README.md` | Consumer choosing component, Reader, or factory subpaths | Components / package |
 | `examples/README.md` | Developer browsing every maintained runnable example | Examples |
-| `examples/playground/index.html` | Developer editing a supplied-data component in the browser | Examples / supplied-data editor |
+| `examples/playground/index.html` and `examples/playground/projects/{ref-label,text-segment,bilingual-segment,source-card,popup,connections-panel,reader}/` | Developer editing one of seven maintained supplied-data projects in the trusted editor and opaque preview | Examples / supplied-data editor |
 | `examples/explorer/README.md` | Developer working with authored states or live component diagnostics | Examples |
 | `examples/vanilla-vite/README.md` | Vanilla Vite consumer following the smallest supplied-data path | Examples |
 | `examples/react-vite/README.md` | React consumer integrating custom elements without wrappers | Examples |
