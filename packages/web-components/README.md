@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
 
 # `@arithmomaniac/sefaria-web-components`
 
@@ -36,6 +36,11 @@ const controller = await loadReaderController(
 );
 const unbind = bindReaderController(reader, controller);
 
+controller.setPresentation({
+  originEntryId: controller.snapshot.reader.currentEntryId,
+  patch: { vocalizationMode: "nikkud" },
+});
+
 window.addEventListener(
   "pagehide",
   () => {
@@ -45,6 +50,8 @@ window.addEventListener(
   { once: true },
 );
 ```
+
+Hebrew-capable elements expose the typed `vocalizationMode` property and the `vocalization-mode` attribute with `taamim_and_nikkud`, `nikkud`, and `none` presets. The default preserves all marks. Changing the property is local presentation work over the existing safe view model; it does not refetch or rerun a component factory. A controlled Reader retains the setting per semantic history entry and exposes it separately as `controller.snapshot.presentation`.
 
 Use a component's pure factory when corrected API-shaped JSON has already crossed a validated server, MCP, fixture, stored-data, or user-input boundary. Use its async factory for browser client mode. A successful async result is the same projection as the pure factory over its captured payload.
 

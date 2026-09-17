@@ -21,6 +21,12 @@ export function bindReaderController(
     }
     currentEntryId = snapshot.reader.currentEntryId;
     element.viewModel = snapshot.reader;
+    element.contentLanguage = snapshot.presentation.contentLanguage;
+    element.layout = snapshot.presentation.layout;
+    element.sideOrder = snapshot.presentation.sideOrder;
+    element.showConnectionPreviews =
+      snapshot.presentation.showConnectionPreviews;
+    element.vocalizationMode = snapshot.presentation.vocalizationMode;
     element.activePane = activePane;
   };
   const onBack = (event: Event): void => {

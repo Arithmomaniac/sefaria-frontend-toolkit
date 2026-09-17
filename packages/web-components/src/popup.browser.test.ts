@@ -98,6 +98,9 @@ test("renders supplied data without requesting", async () => {
   );
   await card?.updateComplete;
   expect(card?.hideAttributions).toBe(false);
+  popup.vocalizationMode = "none";
+  await popup.updateComplete;
+  expect(card?.vocalizationMode).toBe("none");
   expect(card?.shadowRoot?.querySelector(".attributions")).not.toBeNull();
   expect(fetchMock).not.toHaveBeenCalled();
 });

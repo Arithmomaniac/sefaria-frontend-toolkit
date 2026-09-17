@@ -97,6 +97,12 @@ describe("reader history and completion identity", () => {
       connections: links(),
     });
     const rootId = session.view.currentEntryId;
+    const presented = session.setPresentation(rootId, {
+      vocalizationMode: "none",
+    });
+    expect(presented.state).toBe("applied");
+    if (presented.state !== "applied") return;
+    session = presented.session;
     const projected = session.projectConnections(rootId, {
       category: "Commentary",
       page: 1,
@@ -124,6 +130,9 @@ describe("reader history and completion identity", () => {
     session = committed.session;
     const childId = session.view.currentEntryId;
     expect(childId).not.toBe(rootId);
+    expect(session.view.current.presentation.vocalizationMode).toBe(
+      "taamim_and_nikkud",
+    );
     expect(session.view.breadcrumbs.map((crumb) => crumb.label)).toEqual([
       "Micah 6:8",
       "Rashi on Micah 6:8",
@@ -133,6 +142,9 @@ describe("reader history and completion identity", () => {
     expect(restored.state).toBe("applied");
     if (restored.state !== "applied") return;
     expect(restored.session.view.currentEntryId).toBe(rootId);
+    expect(restored.session.view.current.presentation.vocalizationMode).toBe(
+      "none",
+    );
     expect(restored.session.view.current.connections).toMatchObject({
       state: "view",
       projection: { page: 1 },
@@ -173,6 +185,7 @@ describe("reader history and completion identity", () => {
       layout: "stacked",
       sideOrder: "translation-first",
       showConnectionPreviews: false,
+      vocalizationMode: "none",
     });
     expect(displayed.state).toBe("applied");
     if (displayed.state !== "applied") return;
@@ -184,6 +197,7 @@ describe("reader history and completion identity", () => {
         layout: "stacked",
         sideOrder: "translation-first",
         showConnectionPreviews: false,
+        vocalizationMode: "none",
       },
     });
   });

@@ -47,7 +47,7 @@ const baseLink: CoreLinkObject = parsedLinks[0];
 beforeEach(() => {
   document.body.innerHTML = `<div id="reader-site">
     <header id="site-header">
-      <form id="reader-form"><input name="tref" value="Micah 6:8"><button>Open</button></form>
+      <form id="reader-form"><input name="tref" value="Micah 6:8"><button>Open</button><select id="vocalization-mode"><option value="taamim_and_nikkud">Full</option><option value="nikkud">Vowels</option><option value="none">None</option></select></form>
       <nav id="pane-path" aria-label="Open reader panes"></nav>
       <p id="status"></p><p id="host-error" hidden></p>
     </header>

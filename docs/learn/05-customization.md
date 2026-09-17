@@ -1,10 +1,10 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
 
 # 5. Customize presentation and use headless APIs
 
 ## Objective
 
-Change theme, width, visible sides, side order, and layout without refetching, then identify the non-DOM client, factory, Reader, and text-transform entry points available to a custom host.
+Change theme, width, visible sides, side order, layout, and Hebrew marks without refetching, then identify the non-DOM client, factory, Reader, and text-transform entry points available to a custom host.
 
 ## Prerequisites
 
@@ -22,13 +22,14 @@ export function customizeCard(card: SefariaSourceCard): void {
   card.contentLanguage = "both";
   card.layout = "side-by-side";
   card.sideOrder = "translation-first";
+  card.vocalizationMode = "nikkud";
   card.style.setProperty("--sefaria-surface", "#fffaf2");
   card.style.setProperty("--sefaria-accent", "#6f3f20");
   card.style.maxWidth = "48rem";
 }
 ```
 
-Changing these values must not call a factory or client. Changing the reference or exact edition selector is a data operation and belongs in the host's async lifecycle.
+Changing these values must not call a factory or client. `vocalizationMode` accepts `taamim_and_nikkud`, `nikkud`, or `none`; the full-mark default renders the original safe view-model content directly, while the other presets derive display text from that same immutable content. The equivalent HTML attribute is `vocalization-mode`. Changing the reference or exact edition selector is a data operation and belongs in the host's async lifecycle.
 
 For a headless path, import only the layers you need:
 
@@ -52,7 +53,7 @@ The non-DOM component subpaths are safe to use without registering custom elemen
 
 ## Expected result
 
-Theme, container width, side visibility, side order, and layout update the current component immediately while the host request counter is unchanged. Headless imports can validate, transform, or project data without accessing `window`, `document`, or custom-element registration.
+Theme, container width, side visibility, side order, layout, and vocalization mode update the current component immediately while the host request counter is unchanged. Switching back to `taamim_and_nikkud` restores the original displayed marks. Headless imports can validate, transform, or project data without accessing `window`, `document`, or custom-element registration.
 
 <iframe class="example-frame" title="Authored customization workbench" src="../examples/explorer/authored.html?component=source-card&amp;scenario=many-items&amp;diagnostics=1&amp;width=720"></iframe>
 
@@ -62,7 +63,7 @@ The element owns supported visual properties and CSS custom properties. The host
 
 ## Exercise
 
-Open the authored workbench, record its request count, then change theme, width, layout, side order, and displayed language. Confirm the count does not change. Next, inspect the generated export inventory and choose the smallest non-DOM subpath for a host that never renders an element.
+Open the authored workbench, record its request count, then change theme, width, layout, side order, displayed language, and Hebrew marks. Confirm the count does not change and that returning to the full-mark preset restores the original text. Next, inspect the generated export inventory and choose the smallest non-DOM subpath for a host that never renders an element.
 
 ## Source and run links
 

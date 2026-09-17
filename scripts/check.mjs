@@ -14,6 +14,7 @@ export const CHECK_STAGES = [
   { name: "Workspace builds", args: ["build"] },
   { name: "Documentation site", args: ["build:site:bundles"] },
   { name: "Documentation site browser acceptance", args: ["test:site"] },
+  { name: "Playground browser acceptance", args: ["test:playground"] },
   {
     name: "MCP Inspector stdio acceptance",
     args: ["--filter", "@sefaria-example/mcp-app", "inspect:stdio"],

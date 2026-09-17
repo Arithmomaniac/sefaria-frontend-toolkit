@@ -16,6 +16,7 @@ import {
   createReaderSourceContent,
   type ReaderConnectionsContent,
   type ReaderEntrySeed,
+  type ReaderPresentation,
   type ReaderPresentationPatch,
   type ReaderSession,
   type ReaderSessionOptions,
@@ -98,6 +99,8 @@ export type ReaderControllerTask =
 export interface ReaderControllerSnapshot {
   /** Rendering-only model for `<sefaria-reader>`. */
   readonly reader: ReaderViewModel;
+  /** Current entry-specific presentation supplied separately to the element. */
+  readonly presentation: ReaderPresentation;
   /** Current controller-owned execution state. */
   readonly task: ReaderControllerTask;
 }
@@ -324,6 +327,7 @@ class ReaderControllerImpl implements ReaderController {
   readonly #dataSource: ReaderControllerDataSource;
   #task: ReaderControllerTask = { state: "idle" };
   #snapshot: ReaderControllerSnapshot;
+  #reader: ReaderViewModel;
   #listeners = new Set<Listener>();
   #controller: AbortController | undefined;
   #operationId: string | undefined;
@@ -339,6 +343,7 @@ class ReaderControllerImpl implements ReaderController {
     requireNavigableSeed(seed);
     this.#session = createReaderSession(seed, options);
     this.#dataSource = dataSource;
+    this.#reader = createReaderViewModel(this.#session.view);
     this.#snapshot = this.createSnapshot();
   }
 
@@ -357,6 +362,7 @@ class ReaderControllerImpl implements ReaderController {
 
   async selectSource(action: ReaderControllerSourceSelection): Promise<void> {
     this.requireCurrent(action.originEntryId);
+    const selectedRef = this.requireSourceSelection(action);
     const active = this.startPhysicalOperation();
     const selected = this.apply(
       this.#session.selectSourcePosition(action.originEntryId, action.position),
@@ -367,7 +373,7 @@ class ReaderControllerImpl implements ReaderController {
     }
     await this.loadConnections(
       action.originEntryId,
-      normalizeConnectionsRequest({ tref: action.ref, withText: true }),
+      normalizeConnectionsRequest({ tref: selectedRef, withText: true }),
       {},
       active,
     );
@@ -496,6 +502,7 @@ class ReaderControllerImpl implements ReaderController {
     this.requireCurrent(action.originEntryId);
     this.apply(
       this.#session.setPresentation(action.originEntryId, action.patch),
+      false,
     );
   }
 
@@ -651,14 +658,37 @@ class ReaderControllerImpl implements ReaderController {
     );
   }
 
-  private apply(transition: ReaderTransition): boolean {
+  private requireSourceSelection(
+    action: ReaderControllerSourceSelection,
+  ): string {
+    const source = this.#session.view.current.source?.viewModel;
+    const selected =
+      source?.state === "data"
+        ? source.items.find((item) => sameJson(item.position, action.position))
+        : undefined;
+    if (selected?.ref === undefined) {
+      throw new ReaderControllerError(
+        "invalid-selection",
+        "Selected position has no addressable source reference.",
+      );
+    }
+    if (selected.ref !== action.ref) {
+      throw new ReaderControllerError(
+        "invalid-selection",
+        `Selected position resolves to ${selected.ref}, not ${action.ref}.`,
+      );
+    }
+    return selected.ref;
+  }
+
+  private apply(transition: ReaderTransition, readerChanged = true): boolean {
     this.#session = transition.session;
     if (transition.state === "rejected") {
       this.failTask(transition.reason, transition.message);
       return false;
     }
     this.#task = { state: "idle" };
-    this.publish();
+    this.publish(readerChanged);
     return true;
   }
 
@@ -682,7 +712,10 @@ class ReaderControllerImpl implements ReaderController {
     this.publish();
   }
 
-  private publish(): void {
+  private publish(readerChanged = true): void {
+    if (readerChanged) {
+      this.#reader = createReaderViewModel(this.#session.view);
+    }
     this.#snapshot = this.createSnapshot();
     for (const listener of [...this.#listeners]) {
       this.notify(listener);
@@ -690,8 +723,10 @@ class ReaderControllerImpl implements ReaderController {
   }
 
   private createSnapshot(): ReaderControllerSnapshot {
+    const view = this.#session.view;
     return deepFreeze({
-      reader: createReaderViewModel(this.#session.view),
+      reader: this.#reader,
+      presentation: view.current.presentation,
       task: { ...this.#task },
     });
   }
@@ -735,6 +770,12 @@ async function resolveDestination(
   let selectedRef = targetData.viewModel.items.find(
     (item) => item.ref === request.tref,
   )?.ref;
+  if (
+    selectedRef === undefined &&
+    targetData.navigation.state === "available"
+  ) {
+    selectedRef = targetData.navigation.firstRef;
+  }
   let content = target;
   let navigation = targetData.navigation;
   if (navigation.state === "context-required") {

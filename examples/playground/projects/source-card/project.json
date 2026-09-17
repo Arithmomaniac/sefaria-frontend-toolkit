@@ -1,0 +1,11 @@
+{
+  "id": "source-card",
+  "title": "Supplied-data SourceCard",
+  "files": {
+    "html": "index.html",
+    "css": "styles.css",
+    "javascript": "main.js"
+  },
+  "assets": ["micah-6-8.js"],
+  "sourceBaseUrl": "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/projects/source-card/"
+}

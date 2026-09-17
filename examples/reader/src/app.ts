@@ -87,6 +87,10 @@ export function startReaderWorkspace(
 ): ReaderWorkspace {
   const form = requireElement<HTMLFormElement>(root, "#reader-form");
   const tref = requireInput(form, "tref");
+  const vocalizationMode = requireElement<HTMLSelectElement>(
+    root,
+    "#vocalization-mode",
+  );
   const panePath = requireElement<HTMLElement>(root, "#pane-path");
   const status = requireElement<HTMLElement>(root, "#status");
   const hostError = requireElement<HTMLElement>(root, "#host-error");
@@ -267,6 +271,7 @@ export function startReaderWorkspace(
     source.contentLanguage = entry.presentation.contentLanguage;
     source.layout = entry.presentation.layout;
     source.sideOrder = entry.presentation.sideOrder;
+    source.vocalizationMode = entry.presentation.vocalizationMode;
     source.selectable = entry.source.viewModel.state === "data";
     source.addEventListener("sefaria-source-select", (event) => {
       const detail = (
@@ -299,6 +304,7 @@ export function startReaderWorkspace(
     ) as SefariaConnectionsPanel;
     connections.viewModel = entry.connections?.viewModel;
     connections.showPreviews = entry.presentation.showConnectionPreviews;
+    connections.vocalizationMode = entry.presentation.vocalizationMode;
     connections.addEventListener(
       "sefaria-connections-category-change",
       (event) => {
@@ -495,6 +501,9 @@ export function startReaderWorkspace(
       session = createReaderSession({
         source: destination.content,
         selectedPosition: destination.selectedPosition,
+        presentation: {
+          vocalizationMode: readVocalizationMode(vocalizationMode.value),
+        },
       });
       spatial = createWorkspaceState(
         session.view.currentEntryId,
@@ -715,6 +724,16 @@ export function startReaderWorkspace(
     void navigate(tref.value);
   };
   form.addEventListener("submit", onSubmit);
+  const onVocalizationChange = (): void => {
+    if (!session) return;
+    session = requireApplied(
+      session.setPresentation(session.view.currentEntryId, {
+        vocalizationMode: readVocalizationMode(vocalizationMode.value),
+      }),
+    ).session;
+    render();
+  };
+  vocalizationMode.addEventListener("change", onVocalizationChange);
 
   return {
     get view() {
@@ -735,10 +754,17 @@ export function startReaderWorkspace(
       cancelActive();
       releasePanes(spatial?.panes ?? []);
       form.removeEventListener("submit", onSubmit);
+      vocalizationMode.removeEventListener("change", onVocalizationChange);
       workspace.replaceChildren();
       panePath.replaceChildren();
     },
   };
+}
+
+function readVocalizationMode(
+  value: string,
+): SefariaSourceCard["vocalizationMode"] {
+  return value === "nikkud" || value === "none" ? value : "taamim_and_nikkud";
 }
 
 function requireAvailable(

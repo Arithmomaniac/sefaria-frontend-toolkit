@@ -5,13 +5,8 @@ vi.mock("@arithmomaniac/sefaria-client", () => {
     "The browser root must not load @arithmomaniac/sefaria-client.",
   );
 });
-vi.mock("@arithmomaniac/sefaria-text-transform", () => {
-  throw new Error(
-    "The browser root must not load @arithmomaniac/sefaria-text-transform.",
-  );
-});
 
-test("imports the browser root without factory runtime dependencies", async () => {
+test("imports the browser root without the request-capable client", async () => {
   vi.resetModules();
 
   await expect(import("./index.js")).resolves.toMatchObject({

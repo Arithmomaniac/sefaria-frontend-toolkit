@@ -55,6 +55,9 @@ export function startSourceCardLiveDemo(
     result.contentLanguage = readContentLanguage(values.get("contentLanguage"));
     result.layout = readLayout(values.get("layout"));
     result.sideOrder = readSideOrder(values.get("sideOrder"));
+    result.vocalizationMode = readVocalizationMode(
+      values.get("vocalizationMode"),
+    );
   };
 
   const loadCurrentRequest = async (): Promise<void> => {
@@ -182,6 +185,12 @@ function readSideOrder(
   value: FormDataEntryValue | null,
 ): SefariaSourceCard["sideOrder"] {
   return value === "translation-first" ? value : "primary-first";
+}
+
+function readVocalizationMode(
+  value: FormDataEntryValue | null,
+): SefariaSourceCard["vocalizationMode"] {
+  return value === "nikkud" || value === "none" ? value : "taamim_and_nikkud";
 }
 
 function requireNamedInput(

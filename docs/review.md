@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot with human review/feedback by avilevin.
+> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
 
 # Review guide
 
@@ -107,7 +107,7 @@ Review the initial corrections for:
 - [ ] `projectTextSegmentVersion` projects an already-selected `CoreV3Version` without language-family reselection.
 - [ ] Request-based text-segment projection delegates post-selection work to `projectTextSegmentVersion`.
 - [ ] Role-based composites resolve sides before they call `projectTextSegmentVersion`.
-- [ ] The resolved-version projection owns sanitization, vocalization, footnotes, direction, and language.
+- [ ] The resolved-version projection owns sanitization, full-mark footnotes, direction, and language; the element derives non-full vocalization only from the immutable safe view model.
 - [ ] Request warnings remain with the selector-owning factory or composite.
 - [ ] The resolved-version projection does not assign payload warnings to an existing selected version.
 - [ ] A composite maps a missing role and its warning without calling the resolved-version projection.
@@ -255,6 +255,17 @@ Review the initial corrections for:
 - [ ] Destroy removes only owned listeners, popup state, and accessibility attributes.
 - [ ] Each popup activation makes one v3 request; the popup element makes none.
 - [ ] CSP, mixed-content, CORS, and restricted-page limitations are documented.
+
+## Supplied-data editor
+
+- [ ] The dedicated editor host has a leading CSP meta before executable assets and does not impose its `frame-src data:` policy on unrelated VitePress pages.
+- [ ] Edited HTML, CSS, and JavaScript enter only the opaque sandboxed data-document frame.
+- [ ] Trusted setup, source, and live-demo links remain outside the edited frame.
+- [ ] The child policy denies connect, nested frame, worker, object, media, manifest, form, and base capabilities.
+- [ ] The current frame window plus cryptographic channel and run identifiers are required for bounded diagnostics.
+- [ ] Exact source, total, diagnostic, message, and active-preview limits have at-limit and over-limit tests.
+- [ ] Pure subpath import, root registration, shared client identity, both deployment bases, ordinary-page embedding, and Chromium/Firefox/WebKit behavior are qualified without `bypassCSP`.
+- [ ] The review does not claim CPU, heap, process isolation, every Safari device, or tight-loop recovery.
 
 ## Text processing
 

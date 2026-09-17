@@ -6,7 +6,6 @@ import {
   type SefariaClient,
 } from "@arithmomaniac/sefaria-client";
 import {
-  applyVocalizationToHtml,
   extractFootnotes,
   sanitize,
   type ExtractedFootnote,
@@ -186,8 +185,7 @@ export function projectTextSegmentValue(
     return createSelectedVersionEmptyViewModel(payload, version);
   }
 
-  const vocalized = applyVocalizationToHtml(sanitized, "taamim_and_nikkud");
-  const footnotes = extractFootnotes(vocalized);
+  const footnotes = extractFootnotes(sanitized);
 
   return {
     state: "data",

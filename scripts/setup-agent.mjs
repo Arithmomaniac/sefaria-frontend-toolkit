@@ -5,7 +5,7 @@ import process from "node:process";
 import { pathToFileURL } from "node:url";
 
 const browserProbe =
-  "import { chromium } from 'playwright'; const browser = await chromium.launch({ headless: true }); await browser.close();";
+  "import { chromium, firefox, webkit } from 'playwright'; for (const launcher of [chromium, firefox, webkit]) { const browser = await launcher.launch({ headless: true }); await browser.close(); }";
 
 export async function runAgentSetup({
   platform = process.platform,
@@ -17,7 +17,7 @@ export async function runAgentSetup({
 
   const playwrightArgs = ["exec", "playwright", "install"];
   if (platform === "linux") playwrightArgs.push("--with-deps");
-  playwrightArgs.push("chromium");
+  playwrightArgs.push("chromium", "firefox", "webkit");
   await runChecked(run, "pnpm", playwrightArgs);
   await runChecked(run, "node", [
     "--input-type=module",
