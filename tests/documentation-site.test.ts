@@ -12,6 +12,7 @@ const lessons = [
   "05-customization.md",
   "06-host-integration.md",
   "react.md",
+  "alpine.md",
 ];
 
 describe("documentation learning journey", () => {
@@ -58,6 +59,39 @@ describe("documentation learning journey", () => {
     );
   });
 
+  it("keeps framework paths optional without breaking core lesson paging", async () => {
+    const config = await readFile(
+      path.join(root, "docs", ".vitepress", "config.ts"),
+      "utf8",
+    );
+    const stepThree = config.indexOf(
+      '{ text: "3. Load and interact", link: "/learn/03-live-data.md" }',
+    );
+    const stepFour = config.indexOf(
+      '{ text: "4. Use the Reader", link: "/learn/04-reader.md" }',
+    );
+    const frameworks = config.indexOf('text: "Frameworks"');
+
+    expect(stepThree).toBeGreaterThan(-1);
+    expect(stepFour).toBeGreaterThan(stepThree);
+    expect(frameworks).toBeGreaterThan(stepFour);
+    expect(config.slice(stepThree, stepFour)).not.toContain("React path");
+    expect(config.slice(stepThree, stepFour)).not.toContain("Alpine path");
+    expect(config).toContain('"learn/03-live-data.md": {');
+    expect(config).toContain(
+      'next: lessonLink("4. Use the Reader", "/learn/04-reader.md")',
+    );
+    for (const framework of ["react", "alpine"]) {
+      expect(config).toContain(`"learn/${framework}.md": {`);
+      expect(config).toContain(
+        'prev: lessonLink("3. Load and interact", "/learn/03-live-data.md")',
+      );
+      expect(config).toContain(
+        'next: lessonLink("4. Use the Reader", "/learn/04-reader.md")',
+      );
+    }
+  });
+
   it("documents package builds before direct example development servers", async () => {
     for (const [filename, command] of [
       ["README.md", "pnpm dev:vanilla"],
@@ -68,6 +102,10 @@ describe("documentation learning journey", () => {
       [
         "examples/react-vite/README.md",
         "pnpm --filter @sefaria-example/react-vite dev",
+      ],
+      [
+        "examples/alpine-vite/README.md",
+        "pnpm --filter @sefaria-example/alpine-vite dev",
       ],
       [
         "examples/reader/README.md",
@@ -98,7 +136,7 @@ describe("documentation learning journey", () => {
       "bindSourceCardController(card, controller)",
     );
     expect(vanillaSource).toContain(
-      'updateStatus("Rendered supplied Micah 6:8 data with zero requests.")',
+      "`Supplied ${canonicalRef} data rendered with zero live loads.`",
     );
     expect(suppliedLesson).toContain("pnpm-workspace.yaml");
     expect(suppliedLesson).not.toContain('"pnpm": {\n    "overrides"');
@@ -116,17 +154,41 @@ describe("documentation learning journey", () => {
       "utf8",
     );
     for (const sourceFragment of [
-      'useElementProperty(cardRef, "selectable", viewModel.state === "data")',
-      "unbind.current?.()",
+      "useSyncExternalStore(",
       "bindSourceCardController(card, controller)",
-      "controller.cancel()",
+      "onsefaria-source-select={onSourceSelection}",
       "setSelected({",
     ]) {
       expect(reactSource).toContain(sourceFragment);
       expect(reactLesson).toContain(sourceFragment);
     }
+    expect(reactSource).toContain("next.dispose()");
+    expect(reactLesson).toContain("controller.dispose()");
     expect(declarations).toContain('"sefaria-source-card"');
     expect(reactLesson).toContain('"sefaria-source-card"');
+
+    const alpineLesson = await readFile(
+      path.join(root, "docs", "learn", "alpine.md"),
+      "utf8",
+    );
+    const alpineSource = await readFile(
+      path.join(
+        root,
+        "examples",
+        "alpine-vite",
+        "src",
+        "source-card-example.ts",
+      ),
+      "utf8",
+    );
+    for (const sourceFragment of [
+      "createSourceCardController(client)",
+      "bindSourceCardController(element, controller)",
+      "controller.dispose()",
+    ]) {
+      expect(alpineSource).toContain(sourceFragment);
+      expect(alpineLesson).toContain(sourceFragment);
+    }
   });
 
   it("builds distinct example files instead of fallback responses", async () => {
@@ -137,6 +199,7 @@ describe("documentation learning journey", () => {
       "examples/explorer/authored.html",
       "examples/reader/controlled.html",
       "examples/react/index.html",
+      "examples/alpine/index.html",
       "examples/mcp-app/index.html",
     ]) {
       await expect(

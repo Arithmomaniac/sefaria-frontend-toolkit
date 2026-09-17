@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by avilevin.
 
 # React Vite example
 
@@ -14,8 +14,8 @@ pnpm --filter @sefaria-example/react-vite dev
 
 The build step is required on a fresh checkout because this Vite consumer resolves the private toolkit packages through their `dist` exports.
 
-The initial source card is projected from validated supplied data and makes no request. Select **Start live demo** to let React call the public client and `loadSourceCardViewModel`; React owns the input, loading status, cancellation, stale-result suppression, and visible transport failures. Theme, preview width, and displayed text sides are element properties and do not fetch.
+The initial source card is committed from validated supplied data and makes no request. Submitting the form lets React call the public source-card controller. The controller owns cancellation and stale-result suppression; the binder owns `viewModel` assignment; React owns draft input, presentation properties, canonical readouts, and visible transport failures. Theme, preview width, displayed sides, layout, side order, and Hebrew vocalization are element properties and do not fetch.
 
-Select the rendered Micah 6:8 segment to emit `sefaria-source-select`. A page-owned listener updates React state, while the same `<sefaria-source-card>` instance remains mounted across rerenders. The optional source, view-model, and event diagnostics show the public API and object-property flow used by the running page.
+Select the rendered Micah 6:8 segment to emit `sefaria-source-select`. The literal React 19 `onsefaria-source-select` prop updates React state, while the same `<sefaria-source-card>` instance remains mounted across rerenders. A failed replacement leaves the prior committed card visible with an explicit prior-result label.
 
 The example is currently available only from this unpublished workspace or from locally packed private tarballs. It does not imply an official React package, public registry release, server rendering, hydration, or Sefaria ownership.
