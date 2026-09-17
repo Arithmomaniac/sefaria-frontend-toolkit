@@ -4,7 +4,7 @@
 
 [Documentation](../README.md) / How the pieces fit together
 
-**Current:** the text-segment, bilingual-segment, reference-label, source-card, popup, controlled Reader, authored linked-article, and MCP paths described here are implemented. The same pattern is intended for later components, but their names and integration examples are not current APIs.
+**Current:** the reference label, text segment, bilingual segment, source card, connections panel, popup, and controlled Reader are implemented. The authored linked-article and MCP paths described here are also implemented. The same pattern is intended for later components, but their names and integration examples are not current APIs.
 
 The toolkit separates three roles. An **element** displays a view model and emits events. Supplied **factories and controllers** provide reusable projection and supported behavior. The **application host** chooses the data source, creates and disposes the pieces, and owns any integration-specific policy. Elements do not fetch.
 

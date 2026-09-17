@@ -72,6 +72,27 @@ describe("documentation learning journey", () => {
     expect(config).toContain('search: { provider: "local" }');
   });
 
+  it("keeps the numbered lessons contiguous and React optional", async () => {
+    const config = await readFile(
+      path.join(root, "docs", ".vitepress", "config.ts"),
+      "utf8",
+    );
+    const lessonTwo = await readFile(
+      path.join(root, "docs", "learn", "02-supplied-data.md"),
+      "utf8",
+    );
+
+    expect(config).toContain('text: "Frameworks"');
+    expect(config).toContain('"learn/03-live-data.md":');
+    expect(config).toContain('next: lessonLink("4. Use the Reader"');
+    expect(config).toContain('"learn/04-reader.md":');
+    expect(config).toContain('prev: lessonLink("3. Load and interact"');
+    expect(config).toContain('"learn/react.md":');
+    expect(config).toContain('prev: lessonLink("3. Load and interact"');
+    expect(config).toContain('next: lessonLink("4. Use the Reader"');
+    expect(lessonTwo).not.toContain("parallel [React path]");
+  });
+
   it("catalogs all seven current rendering surfaces without inventing APIs", async () => {
     const catalog = await readFile(
       path.join(root, "docs", "components.md"),
@@ -99,6 +120,17 @@ describe("documentation learning journey", () => {
     expect(catalog).toContain("Edit the source-card project");
     expect(catalog).toContain("/examples/playground/index.html");
     expect(catalog).toContain("Start with the complete Reader");
+  });
+
+  it("describes all seven implemented components as current", async () => {
+    const dataFlow = await readFile(
+      path.join(root, "docs", "guides", "data-flow.md"),
+      "utf8",
+    );
+
+    expect(dataFlow).toContain(
+      "the reference label, text segment, bilingual segment, source card, connections panel, popup, and controlled Reader",
+    );
   });
 
   it("makes the delivered supplied-data editor discoverable", async () => {

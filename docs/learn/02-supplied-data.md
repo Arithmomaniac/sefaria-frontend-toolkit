@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
 
 # 2. Set up and render supplied data
 
@@ -112,4 +112,4 @@ Inspect `data-request-count` before and after the explicit client action. Then a
 
 ## Next step
 
-Continue to [Load live data and handle interaction](03-live-data.md), or take the parallel [React path](react.md).
+Continue to [Load live data and handle interaction](03-live-data.md).
