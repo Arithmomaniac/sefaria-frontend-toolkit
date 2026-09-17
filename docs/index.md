@@ -14,11 +14,11 @@ hero:
       text: Start with the Reader
       link: /learn/04-reader.md
     - theme: alt
-      text: Browse components
-      link: /components.md
+      text: Try the editor
+      link: /examples/playground/index.html
 ---
 
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
 
 <LandingPreview />
 

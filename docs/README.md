@@ -1,8 +1,8 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
 
 # Documentation
 
-Sefaria is a free digital library and data source for Jewish texts and translations. This project gives developers reusable frontend/UI building blocks for reading and learning experiences: a complete controlled Reader, smaller request-free Web Components, a validated client, component factories, and pure text processing. Start with a useful surface; the architecture and specifications are optional depth, not prerequisites.
+Sefaria is a free digital library and data source for Jewish texts and translations. This project gives developers reusable frontend/UI building blocks for reading and learning experiences: a complete controlled Reader, smaller request-free Web Components, a supplied-data component editor, a validated client, component factories, and pure text processing. Start with a useful surface; the architecture and specifications are optional depth, not prerequisites.
 
 Choose a path by the result you want: [get started](get-started.md), compare the [seven current components](components.md), run an [isolated example](examples.md), or use a [task-focused guide](guides/index.md). The [product site](https://arithmomaniac.github.io/sefaria-frontend-toolkit/) presents these maintained files with interactive previews; the Markdown remains useful directly on GitHub.
 
@@ -13,6 +13,7 @@ You do not need to finish the tutorial before using the toolkit:
 | Need | Destination |
 | --- | --- |
 | Prebuilt stateful reading surface | [Controlled Reader lesson](learn/04-reader.md) and [`examples/reader/controlled.html`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/reader/controlled.html) |
+| Edit a supplied-data component | [`examples/playground/index.html`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/index.html) |
 | Compare all rendering surfaces | [Component catalog](components.md) |
 | Component states and live diagnostics | [Example catalog](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/README.md) |
 | A passage card in a browser app | [Render text](guides/render-text.md) |

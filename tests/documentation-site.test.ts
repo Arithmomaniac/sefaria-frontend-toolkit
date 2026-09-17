@@ -46,6 +46,8 @@ describe("documentation learning journey", () => {
 
     expect(index).toContain("<LandingPreview />");
     expect(index).toContain("Build a useful Jewish text experience");
+    expect(index).toContain("Try the editor");
+    expect(index).toContain("/examples/playground/index.html");
     expect(index).not.toContain("Published documentation");
     expect(config).toContain(
       '"https://github.com/Arithmomaniac/sefaria-frontend-toolkit"',
@@ -93,7 +95,32 @@ describe("documentation learning journey", () => {
       );
     }
     expect(catalog).toContain("Open supplied-data preview");
+    expect(catalog).toContain("supplied-data editor");
+    expect(catalog).toContain("Edit the source-card project");
+    expect(catalog).toContain("/examples/playground/index.html");
     expect(catalog).toContain("Start with the complete Reader");
+  });
+
+  it("makes the delivered supplied-data editor discoverable", async () => {
+    const examples = await readFile(
+      path.join(root, "docs", "examples.md"),
+      "utf8",
+    );
+    const documentation = await readFile(
+      path.join(root, "docs", "README.md"),
+      "utf8",
+    );
+    const map = await readFile(
+      path.join(root, "docs", "reference", "documentation-map.md"),
+      "utf8",
+    );
+
+    for (const markdown of [examples, documentation, map]) {
+      expect(markdown).toContain("examples/playground");
+    }
+    expect(examples).toContain("Supplied-data component editor");
+    expect(documentation).toContain("Edit a supplied-data component");
+    expect(map).toContain("supplied-data editor");
   });
 
   it("classifies maintained reader-facing Markdown in the documentation map", async () => {
@@ -210,6 +237,7 @@ describe("documentation learning journey", () => {
       "examples/explorer/authored.html",
       "examples/reader/controlled.html",
       "examples/react/index.html",
+      "examples/playground/index.html",
       "examples/mcp-app/index.html",
     ]) {
       await expect(

@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
 
 # Components
 
@@ -6,7 +6,9 @@ The toolkit currently provides seven request-free rendering surfaces. Give an el
 
 > Start with the smallest surface that completes the user task. Choose the Reader when the task includes navigation rather than rebuilding that behavior from smaller parts.
 
-<SiteLink to="/examples/vanilla/index.html">Open supplied-data preview</SiteLink>
+Text-bearing elements can switch among `taamim_and_nikkud`, `nikkud`, and `none` without replacing the supplied view model or making another request.
+
+Try a source card in the <SiteLink to="/examples/playground/index.html">supplied-data editor</SiteLink>, or <SiteLink to="/examples/vanilla/index.html">Open supplied-data preview</SiteLink>.
 
 ## Start with the complete Reader
 
@@ -26,6 +28,7 @@ The toolkit currently provides seven request-free rendering surfaces. Give an el
     <h3><code>&lt;sefaria-source-card&gt;</code></h3>
     <p>A passage or bounded range with primary and translation text, reference context, edition attribution, and optional source selection.</p>
     <p><code>@arithmomaniac/sefaria-web-components/source-card</code></p>
+    <p><SiteLink to="/examples/playground/index.html">Edit the source-card project</SiteLink></p>
     <p><SiteLink to="/examples/explorer/authored.html?component=source-card&amp;scenario=one-item">View supplied state</SiteLink></p>
   </article>
   <article class="surface-card">

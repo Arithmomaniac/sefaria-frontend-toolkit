@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
 
 # Documentation map
 
@@ -44,6 +44,7 @@ Every maintained Markdown entry point has a primary audience and a navigation ow
 | `packages/text-transform/README.md` | Consumer of DOM-free sanitization, vocalization, and footnotes | Reference / package |
 | `packages/web-components/README.md` | Consumer choosing component, Reader, or factory subpaths | Components / package |
 | `examples/README.md` | Developer browsing every maintained runnable example | Examples |
+| `examples/playground/index.html` | Developer editing a supplied-data component in the browser | Examples / supplied-data editor |
 | `examples/explorer/README.md` | Developer working with authored states or live component diagnostics | Examples |
 | `examples/vanilla-vite/README.md` | Vanilla Vite consumer following the smallest supplied-data path | Examples |
 | `examples/react-vite/README.md` | React consumer integrating custom elements without wrappers | Examples |

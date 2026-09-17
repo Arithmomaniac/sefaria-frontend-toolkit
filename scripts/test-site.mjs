@@ -91,6 +91,7 @@ try {
     await assertText(page.locator("body"), "free digital library");
     await assertText(page.locator("body"), "See the toolkit in action");
     await assertText(page.locator("body"), "Start with the Reader");
+    await assertText(page.locator("body"), "Try the editor");
     await assertText(page.locator("body"), "Use the headless APIs");
     assertEqual(
       await page.locator(".VPFeatures").count(),
@@ -147,6 +148,7 @@ try {
     for (const [name, expectedPath] of [
       ["Build the Reader path", "/learn/04-reader.html"],
       ["Browse the component catalog", "/components.html"],
+      ["Try the editor", "/examples/playground/index.html"],
       [
         "Follow the headless path",
         "/get-started.html#headless-client-transform-and-factory-path",
