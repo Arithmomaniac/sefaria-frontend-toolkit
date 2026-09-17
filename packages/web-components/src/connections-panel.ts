@@ -286,16 +286,33 @@ interface ConnectionsCommit {
 export function createConnectionsController(
   client?: SefariaClient,
 ): ConnectionsController {
-  let projection: ConnectionsProjection = {};
+  const attemptProjections = new WeakMap<
+    ConnectionsRequest,
+    ConnectionsProjection
+  >();
   const engine = new ComponentControllerEngine({
     ...(client === undefined ? {} : { client }),
+    cloneRequest: (request: ConnectionsRequest) => {
+      const projection = attemptProjections.get(request);
+      if (projection === undefined) {
+        throw new Error("Connections attempt projection is missing.");
+      }
+      const cloned = { ...request };
+      attemptProjections.set(cloned, projection);
+      return cloned;
+    },
     createLoading: (request: ConnectionsRequest) => ({
       state: "loading" as const,
       message: `Loading connections for ${request.tref}.`,
     }),
     load: requestConnectionsResponse,
-    project: (request, payload, status) =>
-      createConnectionsCommit(request, payload, status, projection),
+    project: (request, payload, status) => {
+      const projection = attemptProjections.get(request);
+      if (projection === undefined) {
+        throw new Error("Connections attempt projection is missing.");
+      }
+      return createConnectionsCommit(request, payload, status, projection);
+    },
     validateStatus: assertConnectionsStatus,
   });
   return {
@@ -308,8 +325,12 @@ export function createConnectionsController(
       if (client === undefined) {
         throw new Error("This component controller has no supplied client.");
       }
-      projection = Object.freeze({ ...(options.projection ?? {}) });
-      return engine.load(request, options.signal);
+      const effectiveRequest = { ...request };
+      attemptProjections.set(
+        effectiveRequest,
+        Object.freeze({ ...(options.projection ?? {}) }),
+      );
+      return engine.load(effectiveRequest, options.signal);
     },
     setSuppliedData: (request, payload, options = {}) => {
       validateInputs(request, options.projection ?? {});
@@ -324,7 +345,6 @@ export function createConnectionsController(
         status,
         nextProjection,
       );
-      projection = nextProjection;
       return engine.replaceCommitted(projected);
     },
     setProjection: (next) => {
@@ -340,7 +360,6 @@ export function createConnectionsController(
         current.status,
         Object.freeze({ ...next }),
       );
-      projection = projected.committed.projection;
       return engine.replaceCommitted(projected);
     },
     requestPreviews: async (signal) => {
@@ -350,7 +369,9 @@ export function createConnectionsController(
         throw new Error("Connections have no committed capture to replace.");
       }
       if (current.request.withText !== false) return currentResult(engine);
-      return await engine.load({ ...current.request, withText: true }, signal);
+      const request = { ...current.request, withText: true };
+      attemptProjections.set(request, current.projection);
+      return await engine.load(request, signal);
     },
     cancel: (reason) => engine.cancel(reason),
     dispose: () => engine.dispose(),

@@ -174,6 +174,7 @@ export async function loadPopupViewModel(
 export function createPopupController(client?: SefariaClient): PopupController {
   const engine = new ComponentControllerEngine({
     ...(client === undefined ? {} : { client }),
+    cloneRequest: clonePopupRequest,
     createLoading: (request: PopupRequest) => ({
       state: "loading" as const,
       message: `Loading ${request.tref}.`,
@@ -214,6 +215,18 @@ export function createPopupController(client?: SefariaClient): PopupController {
     },
     cancel: (reason) => engine.cancel(reason),
     dispose: () => engine.dispose(),
+  };
+}
+
+function clonePopupRequest(request: PopupRequest): PopupRequest {
+  return {
+    ...request,
+    ...(request.primary === undefined
+      ? {}
+      : { primary: { ...request.primary } }),
+    ...(request.translation === undefined
+      ? {}
+      : { translation: { ...request.translation } }),
   };
 }
 

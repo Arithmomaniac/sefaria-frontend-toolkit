@@ -313,6 +313,7 @@ export function createSourceCardController(
 ): SourceCardController {
   const engine = new ComponentControllerEngine({
     ...(client === undefined ? {} : { client }),
+    cloneRequest: cloneSourceCardRequest,
     createLoading: (request: SourceCardRequest) => ({
       state: "loading" as const,
       message: `Loading ${request.tref}.`,
@@ -351,6 +352,18 @@ export function createSourceCardController(
     },
     cancel: (reason) => engine.cancel(reason),
     dispose: () => engine.dispose(),
+  };
+}
+
+function cloneSourceCardRequest(request: SourceCardRequest): SourceCardRequest {
+  return {
+    ...request,
+    ...(request.primary === undefined
+      ? {}
+      : { primary: { ...request.primary } }),
+    ...(request.translation === undefined
+      ? {}
+      : { translation: { ...request.translation } }),
   };
 }
 

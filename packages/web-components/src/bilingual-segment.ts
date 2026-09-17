@@ -294,6 +294,7 @@ export function createBilingualSegmentController(
 ): BilingualSegmentController {
   const engine = new ComponentControllerEngine({
     ...(client === undefined ? {} : { client }),
+    cloneRequest: cloneBilingualSegmentRequest,
     createLoading: (request: BilingualSegmentRequest) => ({
       state: "loading" as const,
       message: `Loading ${request.tref}.`,
@@ -338,6 +339,20 @@ export function createBilingualSegmentController(
     },
     cancel: (reason) => engine.cancel(reason),
     dispose: () => engine.dispose(),
+  };
+}
+
+function cloneBilingualSegmentRequest(
+  request: BilingualSegmentRequest,
+): BilingualSegmentRequest {
+  return {
+    ...request,
+    ...(request.primary === undefined
+      ? {}
+      : { primary: { ...request.primary } }),
+    ...(request.translation === undefined
+      ? {}
+      : { translation: { ...request.translation } }),
   };
 }
 

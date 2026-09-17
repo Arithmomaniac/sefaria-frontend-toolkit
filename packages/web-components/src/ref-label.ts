@@ -188,6 +188,7 @@ export function createRefLabelController(
   const options = Object.freeze({ ...factoryOptions });
   const engine = new ComponentControllerEngine({
     ...(client === undefined ? {} : { client }),
+    cloneRequest: (request: RefLabelRequest) => ({ ...request }),
     createLoading: (request: RefLabelRequest) => ({
       state: "loading" as const,
       message: `Loading ${request.tref}.`,

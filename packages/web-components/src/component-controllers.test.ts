@@ -300,6 +300,35 @@ test("immutable publications do not freeze caller-owned request objects", () => 
   expect(controller.snapshot.result?.request.primary).not.toBe(request.primary);
 });
 
+test("loading and failed publications do not freeze caller-owned request objects", async () => {
+  const failure = new Error("Offline");
+  const response = deferred<Response>();
+  const controller = createSourceCardController(
+    createSefariaClient({
+      cache: false,
+      fetch: async () => await response.promise,
+    }),
+  );
+  const request = {
+    tref: "Micah 6:8",
+    primary: { versionTitle: "Tanakh: The Holy Scriptures, published by JPS" },
+  };
+
+  const pending = controller.load(request);
+  expect(Object.isFrozen(request)).toBe(false);
+  expect(Object.isFrozen(request.primary)).toBe(false);
+  const attempt = controller.snapshot.attempt;
+  expect(attempt.state).toBe("loading");
+  if (attempt.state !== "loading") throw new Error("Expected loading attempt.");
+  expect(attempt.request).not.toBe(request);
+  expect(attempt.request.primary).not.toBe(request.primary);
+
+  response.reject(failure);
+  await expect(pending).rejects.toBe(failure);
+  expect(Object.isFrozen(request)).toBe(false);
+  expect(Object.isFrozen(request.primary)).toBe(false);
+});
+
 test("connections accepts documented 200 API errors and rejects invalid 200 shapes", () => {
   const controller = createConnectionsController();
   const request = { tref: "Not a ref" };
@@ -336,6 +365,68 @@ test("connections reprojects one current capture without IO and retains it after
   ).rejects.toBe(failure);
   expect(controller.snapshot.result?.request).toEqual(initial?.request);
   expect(controller.snapshot.result?.viewModel).toBe(projected);
+});
+
+test("uncommitted connections attempts cannot contaminate another attempt projection", async () => {
+  const response = deferred<Response>();
+  const controller = createConnectionsController(
+    createSefariaClient({
+      cache: false,
+      fetch: async () => await response.promise,
+    }),
+  );
+  const pending = controller.load(
+    { tref: "Micah 6:8", withText: true },
+    { projection: { category: "Targum" } },
+  );
+  const aborted = new AbortController();
+  const reason = new Error("Already aborted");
+  aborted.abort(reason);
+
+  await expect(
+    controller.load(
+      { tref: "Genesis 1:2", withText: true },
+      {
+        projection: { category: "Commentary" },
+        signal: aborted.signal,
+      },
+    ),
+  ).rejects.toBe(reason);
+
+  response.resolve(Response.json(linksPayload));
+  await pending;
+  expect(controller.snapshot.result?.projection).toEqual({
+    category: "Targum",
+  });
+});
+
+test("connections preview replacement retains the committed projection after failure", async () => {
+  const failure = new Error("Offline");
+  const fetch = vi
+    .fn()
+    .mockRejectedValueOnce(failure)
+    .mockResolvedValueOnce(Response.json(linksPayload));
+  const controller = createConnectionsController(
+    createSefariaClient({ cache: false, fetch }),
+  );
+  controller.setSuppliedData(
+    { tref: "Micah 6:8", withText: false },
+    linksPayload,
+    { projection: { category: "Targum" } },
+  );
+
+  await expect(
+    controller.load(
+      { tref: "Genesis 1:2", withText: true },
+      { projection: { category: "Commentary" } },
+    ),
+  ).rejects.toBe(failure);
+  await controller.requestPreviews();
+
+  expect(controller.snapshot.result).toMatchObject({
+    request: { tref: "Micah 6:8", withText: true },
+    projection: { category: "Targum" },
+  });
 });
 
 test("invalid supplied data is fully rejected before pending work is superseded", async () => {
@@ -453,10 +544,13 @@ test("disposed connections controllers release committed capture and reject loca
 function deferred<T>(): {
   readonly promise: Promise<T>;
   resolve(value: T): void;
+  reject(reason: unknown): void;
 } {
   let resolve!: (value: T) => void;
-  const promise = new Promise<T>((complete) => {
+  let reject!: (reason: unknown) => void;
+  const promise = new Promise<T>((complete, fail) => {
     resolve = complete;
+    reject = fail;
   });
-  return { promise, resolve };
+  return { promise, resolve, reject };
 }

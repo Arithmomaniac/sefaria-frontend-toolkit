@@ -40,6 +40,7 @@ export interface ComponentControllerAdapter<
 > {
   /** Optional client required only by live loads. */
   readonly client?: SefariaClient;
+  cloneRequest(request: TRequest): TRequest;
   createLoading(request: TRequest): TLoading;
   load(
     request: TRequest,
@@ -147,7 +148,8 @@ export class ComponentControllerEngine<
       throw new Error("This component controller has no supplied client.");
     }
     throwIfAborted(signal);
-    const loading = this.#adapter.createLoading(request);
+    const effectiveRequest = deepFreeze(this.#adapter.cloneRequest(request));
+    const loading = this.#adapter.createLoading(effectiveRequest);
     const id = this.#nextId++;
     const controller = new AbortController();
     const cleanupExternal = linkAbortSignal(signal, controller);
@@ -157,12 +159,16 @@ export class ComponentControllerEngine<
     this.#attempt = deepFreeze({
       state: "loading",
       id,
-      request,
+      request: effectiveRequest,
       viewModel: loading,
     });
     this.#publish();
 
-    const operation = this.#adapter.load(request, client, controller.signal);
+    const operation = this.#adapter.load(
+      effectiveRequest,
+      client,
+      controller.signal,
+    );
     operation.catch(() => undefined);
     try {
       const response = await raceAbort(operation, controller.signal);
@@ -170,7 +176,7 @@ export class ComponentControllerEngine<
         throw controller.signal.reason;
       }
       const projected = this.#adapter.project(
-        request,
+        effectiveRequest,
         response.payload,
         response.status,
       );
@@ -189,7 +195,12 @@ export class ComponentControllerEngine<
         this.#publish();
         throw controller.signal.reason;
       }
-      this.#attempt = deepFreeze({ state: "failed", id, request, error });
+      this.#attempt = deepFreeze({
+        state: "failed",
+        id,
+        request: effectiveRequest,
+        error,
+      });
       this.#publish();
       throw error;
     }

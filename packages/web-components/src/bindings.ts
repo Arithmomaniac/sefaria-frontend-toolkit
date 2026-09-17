@@ -72,19 +72,29 @@ export function bindPopupController(
   controller: PopupController,
 ): () => void {
   const binding = reserveBinding(element);
-  const unsubscribe = controller.subscribe((snapshot) => {
-    element.viewModel = popupViewModel(snapshot);
-  });
   const onClose = (event: Event): void => {
+    const origin = controller.snapshot.attempt;
     queueMicrotask(() => {
-      if (!isActive(element, binding) || event.defaultPrevented) return;
+      if (
+        !isActive(element, binding) ||
+        event.defaultPrevented ||
+        controller.snapshot.attempt !== origin
+      ) {
+        return;
+      }
       controller.cancel();
     });
   };
-  element.addEventListener("sefaria-popup-close", onClose);
-  return cleanupBinding(element, binding, unsubscribe, [
-    ["sefaria-popup-close", onClose],
-  ]);
+  const listeners = [["sefaria-popup-close", onClose]] as const;
+  return activateBinding(
+    element,
+    binding,
+    () =>
+      controller.subscribe((snapshot) => {
+        element.viewModel = popupViewModel(snapshot);
+      }),
+    listeners,
+  );
 }
 
 /** Binds one connections controller and its local data intents to one panel. */
@@ -93,9 +103,6 @@ export function bindConnectionsController(
   controller: ConnectionsController,
 ): () => void {
   const binding = reserveBinding(element);
-  const unsubscribe = controller.subscribe((snapshot) => {
-    element.viewModel = connectionsViewModel(snapshot);
-  });
   const defer = (
     event: Event,
     action: (
@@ -140,10 +147,15 @@ export function bindConnectionsController(
     ["sefaria-connections-page-change", onPage],
     ["sefaria-connections-preview-request", onPreviews],
   ] as const;
-  for (const [name, listener] of listeners) {
-    element.addEventListener(name, listener);
-  }
-  return cleanupBinding(element, binding, unsubscribe, listeners);
+  return activateBinding(
+    element,
+    binding,
+    () =>
+      controller.subscribe((snapshot) => {
+        element.viewModel = connectionsViewModel(snapshot);
+      }),
+    listeners,
+  );
 }
 
 /** Binds one stateful reader controller to one persistent request-free element. */
@@ -242,11 +254,12 @@ export function bindReaderController(
     ["sefaria-reader-connection-select", onConnection],
     ["sefaria-reader-connections-preview-request", onPreviews],
   ] as const;
-  for (const [name, listener] of listeners) {
-    element.addEventListener(name, listener);
-  }
-  const unsubscribe = controller.subscribe(render);
-  return cleanupBinding(element, binding, unsubscribe, listeners);
+  return activateBinding(
+    element,
+    binding,
+    () => controller.subscribe(render),
+    listeners,
+  );
 }
 
 function bindViewModel<
@@ -265,10 +278,15 @@ function bindViewModel<
   const target = element as TElement & {
     viewModel: TViewModel | undefined;
   };
-  const unsubscribe = controller.subscribe((snapshot) => {
-    target.viewModel = select(snapshot);
-  });
-  return cleanupBinding(element, binding, unsubscribe, []);
+  return activateBinding(
+    element,
+    binding,
+    () =>
+      controller.subscribe((snapshot) => {
+        target.viewModel = select(snapshot);
+      }),
+    [],
+  );
 }
 
 function textSegmentViewModel(snapshot: TextSegmentControllerSnapshot) {
@@ -322,6 +340,31 @@ function isActive(element: EventTarget, binding: object): boolean {
   return activeBindings.get(element) === binding;
 }
 
+function activateBinding(
+  element: EventTarget,
+  binding: object,
+  subscribe: () => () => void,
+  listeners: readonly (readonly [string, EventListener])[],
+): () => void {
+  let unsubscribe: (() => void) | undefined;
+  const added: (readonly [string, EventListener])[] = [];
+  try {
+    unsubscribe = subscribe();
+    for (const [name, listener] of listeners) {
+      element.addEventListener(name, listener);
+      added.push([name, listener]);
+    }
+    return cleanupBinding(element, binding, unsubscribe, listeners);
+  } catch (error) {
+    for (const [name, listener] of added) {
+      element.removeEventListener(name, listener);
+    }
+    unsubscribe?.();
+    if (isActive(element, binding)) activeBindings.delete(element);
+    throw error;
+  }
+}
+
 function cleanupBinding(
   element: EventTarget,
   binding: object,
@@ -333,10 +376,10 @@ function cleanupBinding(
     if (!active) return;
     active = false;
     if (isActive(element, binding)) activeBindings.delete(element);
-    unsubscribe();
     for (const [name, listener] of listeners) {
       element.removeEventListener(name, listener);
     }
+    unsubscribe();
   };
 }
 

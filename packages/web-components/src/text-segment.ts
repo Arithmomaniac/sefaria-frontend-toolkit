@@ -275,6 +275,10 @@ export function createTextSegmentController(
 ): TextSegmentController {
   const engine = new ComponentControllerEngine({
     ...(client === undefined ? {} : { client }),
+    cloneRequest: (request: TextSegmentRequest) => ({
+      ...request,
+      version: { ...request.version },
+    }),
     createLoading: (request: TextSegmentRequest) => ({
       state: "loading" as const,
       message: `Loading ${request.tref}.`,
