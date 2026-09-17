@@ -287,7 +287,9 @@ async function editEveryFile(page, project) {
         assertEqual(
           await frame
             .locator(".example")
-            .evaluate((element) => getComputedStyle(element).outlineWidth),
+            .evaluate(
+              (element) => globalThis.getComputedStyle(element).outlineWidth,
+            ),
           "7px",
           `${project} CSS edit`,
         ),
@@ -386,7 +388,7 @@ async function interactWithProject(page, project) {
       assertEqual(
         await close.evaluate(
           (element) =>
-            element === document.activeElement ||
+            element === globalThis.document.activeElement ||
             element.getRootNode().activeElement === element,
         ),
         true,
@@ -395,7 +397,9 @@ async function interactWithProject(page, project) {
       await close.press("Escape");
       await frame.getByText("Popup closed and focus restored.").waitFor();
       assertEqual(
-        await anchor.evaluate((element) => document.activeElement === element),
+        await anchor.evaluate(
+          (element) => globalThis.document.activeElement === element,
+        ),
         true,
         "popup anchor focus restoration",
       );
