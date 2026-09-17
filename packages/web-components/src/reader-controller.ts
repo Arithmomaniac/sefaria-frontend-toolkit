@@ -16,6 +16,7 @@ import {
   createReaderSourceContent,
   type ReaderConnectionsContent,
   type ReaderEntrySeed,
+  type ReaderPresentation,
   type ReaderPresentationPatch,
   type ReaderSession,
   type ReaderSessionOptions,
@@ -98,6 +99,8 @@ export type ReaderControllerTask =
 export interface ReaderControllerSnapshot {
   /** Rendering-only model for `<sefaria-reader>`. */
   readonly reader: ReaderViewModel;
+  /** Current entry-specific presentation supplied separately to the element. */
+  readonly presentation: ReaderPresentation;
   /** Current controller-owned execution state. */
   readonly task: ReaderControllerTask;
 }
@@ -324,6 +327,7 @@ class ReaderControllerImpl implements ReaderController {
   readonly #dataSource: ReaderControllerDataSource;
   #task: ReaderControllerTask = { state: "idle" };
   #snapshot: ReaderControllerSnapshot;
+  #reader: ReaderViewModel;
   #listeners = new Set<Listener>();
   #controller: AbortController | undefined;
   #operationId: string | undefined;
@@ -339,6 +343,7 @@ class ReaderControllerImpl implements ReaderController {
     requireNavigableSeed(seed);
     this.#session = createReaderSession(seed, options);
     this.#dataSource = dataSource;
+    this.#reader = createReaderViewModel(this.#session.view);
     this.#snapshot = this.createSnapshot();
   }
 
@@ -497,6 +502,7 @@ class ReaderControllerImpl implements ReaderController {
     this.requireCurrent(action.originEntryId);
     this.apply(
       this.#session.setPresentation(action.originEntryId, action.patch),
+      false,
     );
   }
 
@@ -675,14 +681,14 @@ class ReaderControllerImpl implements ReaderController {
     return selected.ref;
   }
 
-  private apply(transition: ReaderTransition): boolean {
+  private apply(transition: ReaderTransition, readerChanged = true): boolean {
     this.#session = transition.session;
     if (transition.state === "rejected") {
       this.failTask(transition.reason, transition.message);
       return false;
     }
     this.#task = { state: "idle" };
-    this.publish();
+    this.publish(readerChanged);
     return true;
   }
 
@@ -706,7 +712,10 @@ class ReaderControllerImpl implements ReaderController {
     this.publish();
   }
 
-  private publish(): void {
+  private publish(readerChanged = true): void {
+    if (readerChanged) {
+      this.#reader = createReaderViewModel(this.#session.view);
+    }
     this.#snapshot = this.createSnapshot();
     for (const listener of [...this.#listeners]) {
       this.notify(listener);
@@ -714,8 +723,10 @@ class ReaderControllerImpl implements ReaderController {
   }
 
   private createSnapshot(): ReaderControllerSnapshot {
+    const view = this.#session.view;
     return deepFreeze({
-      reader: createReaderViewModel(this.#session.view),
+      reader: this.#reader,
+      presentation: view.current.presentation,
       task: { ...this.#task },
     });
   }

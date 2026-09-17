@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
 
 # Design: Generated API Contracts and Request-Free Components
 
@@ -142,11 +142,11 @@ The source card owns the bounded text collection. Segment, flat range, chapter, 
 
 Request warnings remain with the selector-owning factory or composite. A resolved-version projection cannot assign a warning for another request selector.
 
-Raw HTML can enter the pure factory only as a field of a validated API payload. The factory uses `@arithmomaniac/sefaria-text-transform` to sanitize, extract structure from, and vocalize that field before constructing the view model. A view model can contain sanitized render-ready HTML fragments and typed text parts. It must not contain raw API HTML for the element to interpret.
+Raw HTML can enter the pure factory only as a field of a validated API payload. The factory uses `@arithmomaniac/sefaria-text-transform` to sanitize and extract structure before constructing the view model. A view model can contain full-mark sanitized render-ready HTML fragments and typed text parts. It must not contain raw API HTML for the element to interpret. An element can use the same pure transform package to derive a supported local vocalization presentation from those immutable safe fields.
 
 An integration can provide a payload-to-component operation. This operation is a facade over the same pure factory and request-free element. It does not create a second projection path or move payload interpretation into the element.
 
-Data state belongs in the view model. The request-free element accepts no reference, raw JSON, client, host, or fetch function. It owns only layout, theme, focus behavior, and other interaction state.
+Data state belongs in the view model. The request-free element accepts no reference, raw JSON, client, host, or fetch function. It owns only layout, theme, vocalization display, focus behavior, and other interaction state.
 
 See the [component specification](specs/components.md) for the three-layer contract and composition rules.
 

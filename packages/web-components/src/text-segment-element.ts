@@ -1,17 +1,24 @@
 import { css, html, nothing } from "lit";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
+import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
 
 import { SefariaElement } from "./sefaria-element.js";
 import type {
   TextSegmentDataViewModel,
   TextSegmentViewModel,
 } from "./text-segment.js";
+import {
+  assertVocalizationMode,
+  deriveTextSegmentDisplay,
+  type TextSegmentDisplay,
+} from "./vocalization-display.js";
 
 /** Request-free custom element that renders one text-segment view model. */
 export class SefariaTextSegment extends SefariaElement {
   /** Lit property metadata for the host-supplied view model. */
   static override properties = {
     viewModel: { attribute: false },
+    vocalizationMode: { type: String, attribute: "vocalization-mode" },
   };
 
   /** Text-segment layout, typography, footnotes, and containment styles. */
@@ -77,8 +84,20 @@ export class SefariaTextSegment extends SefariaElement {
 
   /** Render-ready state supplied by the host. */
   declare viewModel: TextSegmentViewModel;
+  /** Hebrew vocalization preset applied only to the displayed safe text. */
+  declare vocalizationMode: VocalizationMode;
+
+  #displayViewModel: TextSegmentDataViewModel | undefined;
+  #displayMode: VocalizationMode | undefined;
+  #displayValue: TextSegmentDisplay | undefined;
+
+  constructor() {
+    super();
+    this.vocalizationMode = "taamim_and_nikkud";
+  }
 
   protected override render() {
+    assertVocalizationMode(this.vocalizationMode);
     const viewModel = this.viewModel;
     if (!viewModel) {
       return nothing;
@@ -98,14 +117,15 @@ export class SefariaTextSegment extends SefariaElement {
   }
 
   #renderData(viewModel: TextSegmentDataViewModel) {
-    const hasFootnoteBodies = viewModel.notes.some(
+    const display = this.#display(viewModel);
+    const hasFootnoteBodies = display.notes.some(
       (note) => note.content !== null,
     );
 
     return html`
       <article lang=${viewModel.actualLanguage} dir=${viewModel.direction}>
         <div class="body">
-          ${viewModel.body.map((part) =>
+          ${display.body.map((part) =>
             part.kind === "html"
               ? html`<span class="body-part">${unsafeHTML(part.html)}</span>`
               : html`<sup
@@ -118,7 +138,7 @@ export class SefariaTextSegment extends SefariaElement {
         ${
           hasFootnoteBodies
             ? html`<ol class="footnotes">
-                ${viewModel.notes.map((note) =>
+                ${display.notes.map((note) =>
                   note.content === null
                     ? nothing
                     : html`<li data-note-index=${note.index}>
@@ -131,6 +151,22 @@ export class SefariaTextSegment extends SefariaElement {
         }
       </article>
     `;
+  }
+
+  #display(viewModel: TextSegmentDataViewModel): TextSegmentDisplay {
+    if (
+      this.#displayValue === undefined ||
+      this.#displayViewModel !== viewModel ||
+      this.#displayMode !== this.vocalizationMode
+    ) {
+      this.#displayViewModel = viewModel;
+      this.#displayMode = this.vocalizationMode;
+      this.#displayValue = deriveTextSegmentDisplay(
+        viewModel,
+        this.vocalizationMode,
+      );
+    }
+    return this.#displayValue;
   }
 }
 

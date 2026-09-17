@@ -50,6 +50,7 @@ const sessionView: ReaderSessionView = {
         layout: "auto",
         sideOrder: "primary-first",
         showConnectionPreviews: false,
+        vocalizationMode: "taamim_and_nikkud",
       },
       pinCount: 0,
     },
@@ -100,6 +101,7 @@ const sessionView: ReaderSessionView = {
       layout: "auto",
       sideOrder: "primary-first",
       showConnectionPreviews: false,
+      vocalizationMode: "taamim_and_nikkud",
     },
     pinCount: 0,
   },
@@ -123,14 +125,10 @@ describe("createReaderViewModel", () => {
       source: {
         viewModel: sessionView.current.source?.viewModel,
         selectedPosition: [],
-        contentLanguage: "both",
-        layout: "auto",
-        sideOrder: "primary-first",
       },
       connections: {
         state: "component",
         viewModel: { state: "loading", message: "Loading connections." },
-        showPreviews: false,
       },
       selectedTarget: { ref: "Micah 6:8" },
     });

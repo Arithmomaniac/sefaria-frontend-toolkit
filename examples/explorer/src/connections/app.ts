@@ -76,6 +76,10 @@ export function startConnectionsDemo(
   );
   const layout = requireElement<HTMLSelectElement>(root, "#layout");
   const sideOrder = requireElement<HTMLSelectElement>(root, "#side-order");
+  const vocalizationMode = requireElement<HTMLSelectElement>(
+    root,
+    "#vocalization-mode",
+  );
   const status = requireElement<HTMLElement>(root, "#status");
   const hostError = requireElement<HTMLElement>(root, "#host-error");
   const requestCounts = requireElement<HTMLElement>(root, "#request-counts");
@@ -450,6 +454,12 @@ export function startConnectionsDemo(
         : "primary-first";
     reader.showAddressLabels = showAddressLabels.checked;
     connections.showPreviews = showPreviews.checked;
+    const mode =
+      vocalizationMode.value === "nikkud" || vocalizationMode.value === "none"
+        ? vocalizationMode.value
+        : "taamim_and_nikkud";
+    reader.vocalizationMode = mode;
+    connections.vocalizationMode = mode;
   };
 
   form.addEventListener("submit", onSubmit);
@@ -470,6 +480,7 @@ export function startConnectionsDemo(
     showAddressLabels,
     layout,
     sideOrder,
+    vocalizationMode,
   ];
   for (const control of displayControls) {
     control.addEventListener("change", onDisplayChange);

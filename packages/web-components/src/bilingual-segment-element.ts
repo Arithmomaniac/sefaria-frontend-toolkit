@@ -1,4 +1,5 @@
 import { css, html, nothing } from "lit";
+import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
 
 import {
   bilingualPairStyles,
@@ -9,6 +10,7 @@ import {
 } from "./bilingual-pair.js";
 import { SefariaElement } from "./sefaria-element.js";
 import type { BilingualSegmentViewModel } from "./bilingual-segment.js";
+import { assertVocalizationMode } from "./vocalization-display.js";
 
 /** Sides an element renders for one `contentLanguage` value. */
 export type BilingualSegmentContentLanguage = BilingualPairContentLanguage;
@@ -27,6 +29,7 @@ export class SefariaBilingualSegment extends SefariaElement {
     contentLanguage: { type: String, attribute: "content-language" },
     layout: { type: String },
     sideOrder: { type: String, attribute: "side-order" },
+    vocalizationMode: { type: String, attribute: "vocalization-mode" },
   };
 
   /** Bilingual pairing, container-driven layout, and absent-side styles. */
@@ -53,15 +56,19 @@ export class SefariaBilingualSegment extends SefariaElement {
 
   /** Requested role order for a side-by-side arrangement. */
   declare sideOrder: BilingualSegmentSideOrder;
+  /** Hebrew vocalization preset applied to both displayed roles. */
+  declare vocalizationMode: VocalizationMode;
 
   constructor() {
     super();
     this.contentLanguage = "both";
     this.layout = "auto";
     this.sideOrder = "primary-first";
+    this.vocalizationMode = "taamim_and_nikkud";
   }
 
   protected override render() {
+    assertVocalizationMode(this.vocalizationMode);
     const viewModel = this.viewModel;
     if (!viewModel) {
       return nothing;
@@ -79,6 +86,7 @@ export class SefariaBilingualSegment extends SefariaElement {
           contentLanguage: this.contentLanguage,
           layout: this.layout,
           sideOrder: this.sideOrder,
+          vocalizationMode: this.vocalizationMode,
         });
     }
   }

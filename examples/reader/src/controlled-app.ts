@@ -29,6 +29,10 @@ export function startControlledReader(
   const tref = requireInput(form, "tref");
   const status = requireElement<HTMLElement>(root, "#status");
   const hostError = requireElement<HTMLElement>(root, "#host-error");
+  const vocalizationMode = requireElement<HTMLSelectElement>(
+    root,
+    "#vocalization-mode",
+  );
   const workspace = requireElement<HTMLElement>(root, "#workspace");
   const reader = document.createElement("sefaria-reader") as SefariaReader;
   workspace.dataset.surface = "reader";
@@ -92,6 +96,9 @@ export function startControlledReader(
     try {
       const next = await loadReaderController({ tref: normalized }, client, {
         signal: currentInitialization.signal,
+        presentation: {
+          vocalizationMode: readVocalizationMode(vocalizationMode.value),
+        },
       });
       if (
         currentInitialization.signal.aborted ||
@@ -120,6 +127,15 @@ export function startControlledReader(
     void navigate(tref.value);
   };
   form.addEventListener("submit", onSubmit);
+  const onVocalizationChange = (): void => {
+    const current = controller?.snapshot.reader.currentEntryId;
+    if (controller === undefined || current === undefined) return;
+    controller.setPresentation({
+      originEntryId: current,
+      patch: { vocalizationMode: readVocalizationMode(vocalizationMode.value) },
+    });
+  };
+  vocalizationMode.addEventListener("change", onVocalizationChange);
 
   return {
     navigate,
@@ -128,9 +144,16 @@ export function startControlledReader(
       generation += 1;
       releaseController();
       form.removeEventListener("submit", onSubmit);
+      vocalizationMode.removeEventListener("change", onVocalizationChange);
       workspace.replaceChildren();
     },
   };
+}
+
+function readVocalizationMode(
+  value: string,
+): SefariaReader["vocalizationMode"] {
+  return value === "nikkud" || value === "none" ? value : "taamim_and_nikkud";
 }
 
 function requireInput(form: HTMLFormElement, name: string): HTMLInputElement {

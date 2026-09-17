@@ -1,4 +1,5 @@
 import { css, html, nothing, type CSSResult, type TemplateResult } from "lit";
+import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
 
 import "./text-segment-element.js";
 import type { TextSegmentDataViewModel } from "./text-segment.js";
@@ -73,6 +74,8 @@ export interface BilingualPairPresentation {
   readonly layout: BilingualPairLayout;
   /** Requested role order for a side-by-side arrangement. */
   readonly sideOrder: BilingualPairSideOrder;
+  /** Hebrew vocalization preset applied by each text leaf. */
+  readonly vocalizationMode: VocalizationMode;
   /** Whether absent-side messages are announced as live status updates. */
   readonly announceAbsent?: boolean;
 }
@@ -196,6 +199,7 @@ function renderSide(
     <sefaria-text-segment
       data-side=${side}
       .viewModel=${view}
+      .vocalizationMode=${presentation.vocalizationMode}
     ></sefaria-text-segment>
   </div>`;
 }

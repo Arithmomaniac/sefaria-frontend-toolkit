@@ -14,7 +14,7 @@ import { startConnectionsDemo } from "./app.js";
 beforeEach(() => {
   document.body.innerHTML = `<form id="reader-form"><input name="tref" value="Genesis 1:2"><button>Open</button></form>
     <input id="show-previews" type="checkbox" checked><input id="metadata-only" type="checkbox">
-    <select id="content-language"><option>both</option><option>primary</option><option>translation</option></select><input id="show-address-labels" type="checkbox" checked><select id="layout"><option>auto</option></select><select id="side-order"><option>primary-first</option></select>
+    <select id="content-language"><option>both</option><option>primary</option><option>translation</option></select><input id="show-address-labels" type="checkbox" checked><select id="layout"><option>auto</option></select><select id="side-order"><option>primary-first</option></select><select id="vocalization-mode"><option>taamim_and_nikkud</option><option>nikkud</option><option>none</option></select>
     <p id="status"></p><p id="host-error" hidden></p><p id="request-counts"></p>
     <sefaria-source-card id="reader"></sefaria-source-card><sefaria-connections-panel id="connections"></sefaria-connections-panel>`;
 });
@@ -136,6 +136,12 @@ test("local paging/category/preview display use only the current capture", async
   )!;
   showAddressLabels.click();
   expect(reader().showAddressLabels).toBe(false);
+  const vocalizationMode =
+    document.querySelector<HTMLSelectElement>("#vocalization-mode")!;
+  vocalizationMode.value = "none";
+  vocalizationMode.dispatchEvent(new Event("change"));
+  expect(reader().vocalizationMode).toBe("none");
+  expect(panel().vocalizationMode).toBe("none");
   expect(fetch).toHaveBeenCalledTimes(3);
   demo.dispose();
 });

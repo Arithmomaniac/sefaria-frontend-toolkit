@@ -1,4 +1,5 @@
 import { css, html, nothing, type TemplateResult } from "lit";
+import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
 import { repeat } from "lit/directives/repeat.js";
 
 import {
@@ -11,6 +12,7 @@ import {
 } from "./bilingual-pair.js";
 import "./ref-label-element.js";
 import { SefariaElement } from "./sefaria-element.js";
+import { assertVocalizationMode } from "./vocalization-display.js";
 import type { RefLabelViewModel } from "./ref-label.js";
 import type {
   SourceCardAttributionViewModel,
@@ -28,6 +30,7 @@ export class SefariaSourceCard extends SefariaElement {
     contentLanguage: { type: String, attribute: "content-language" },
     layout: { type: String },
     sideOrder: { type: String, attribute: "side-order" },
+    vocalizationMode: { type: String, attribute: "vocalization-mode" },
     hideAttributions: { type: Boolean, attribute: "hide-attributions" },
     showAddressLabels: { attribute: false },
     selectable: { type: Boolean },
@@ -253,6 +256,8 @@ export class SefariaSourceCard extends SefariaElement {
 
   /** Requested role order for every pair. */
   declare sideOrder: BilingualPairSideOrder;
+  /** Hebrew vocalization preset applied to every displayed text leaf. */
+  declare vocalizationMode: VocalizationMode;
   /** Whether compact address labels are visible beside rendered text sides. */
   declare showAddressLabels: boolean;
   /** Enables selection controls for items with proven canonical targets. */
@@ -269,6 +274,7 @@ export class SefariaSourceCard extends SefariaElement {
     this.contentLanguage = "both";
     this.layout = "auto";
     this.sideOrder = "primary-first";
+    this.vocalizationMode = "taamim_and_nikkud";
     this.hideAttributions = false;
     this.showAddressLabels = true;
     this.selectable = false;
@@ -286,6 +292,7 @@ export class SefariaSourceCard extends SefariaElement {
   }
 
   protected override render() {
+    assertVocalizationMode(this.vocalizationMode);
     const viewModel = this.viewModel;
     if (!viewModel) {
       return nothing;
@@ -346,6 +353,7 @@ export class SefariaSourceCard extends SefariaElement {
             contentLanguage: this.contentLanguage,
             layout: this.layout,
             sideOrder: this.sideOrder,
+            vocalizationMode: this.vocalizationMode,
             announceAbsent: false,
           },
           selectable && this.showAddressLabels

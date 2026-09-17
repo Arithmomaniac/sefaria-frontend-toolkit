@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
 
 # Component specification
 
@@ -58,7 +58,7 @@ The listed component names are current.
 
 `@arithmomaniac/sefaria-web-components/reader-session` is a DOM-free immutable navigation session over existing source-card and connections-panel contracts. It is not an element, generalized domain model, request facade, cache, or persistence format. Integrations own clients, requests, external validation, cancellation, and physical operation execution.
 
-The session owns semantic source history, stable entry and operation identities, selected source position, display settings, retained corrected payload captures, completion eligibility, and bounded admission. It exposes render-ready source-card and connections-panel view models but never exposes raw captures through its rendering projection.
+The session owns semantic source history, stable entry and operation identities, selected source position, display settings including vocalization mode, retained corrected payload captures, completion eligibility, and bounded admission. It exposes render-ready source-card and connections-panel view models but never exposes raw captures through its rendering projection.
 
 An initial session accepts exactly one source-only, connections-only, or source-plus-connections seed. A links-only seed does not imply a text request. Repeated equal references create distinct entry identities.
 
@@ -80,9 +80,9 @@ The reader session does not expose a public serialized snapshot schema. Durable 
 
 ## Controlled reader [Current]
 
-`@arithmomaniac/sefaria-web-components/reader` is a DOM-free projection from `ReaderSessionView` to the rendering-only `ReaderViewModel`. The projection includes stable entry identity, breadcrumb labels, history bounds, source-card state, connections-panel state, presentation settings, and an exact selected target when one exists. It excludes requests, captures, operation identities, pin counts, retained-byte diagnostics, clients, and session mutation.
+`@arithmomaniac/sefaria-web-components/reader` is a DOM-free projection from `ReaderSessionView` to the rendering-only `ReaderViewModel`. The projection includes stable entry identity, breadcrumb labels, history bounds, source-card state, connections-panel state, and an exact selected target when one exists. Presentation settings remain a separate `ReaderPresentation` snapshot owned by the session. The rendering model excludes presentation settings, requests, captures, operation identities, pin counts, retained-byte diagnostics, clients, and session mutation.
 
-`<sefaria-reader>` is a controlled request-free element. It renders one current source-and-connections workspace by composing `<sefaria-source-card>` and `<sefaria-connections-panel>`. It never performs a request, calls an async factory, mutates the reader session, or treats a reference string as a history identity.
+`<sefaria-reader>` is a controlled request-free element. It accepts the rendering-only view model plus explicit primitive presentation properties and renders one current source-and-connections workspace by composing `<sefaria-source-card>` and `<sefaria-connections-panel>`. It never performs a request, calls an async factory, mutates the reader session, or treats a reference string as a history identity.
 
 The element emits Back, breadcrumb activation, source selection, connections category/page/preview actions, connection selection, compact-pane selection, and explicit chat-export actions. Every action includes the current entry ID so the host can reject stale work. Child actions are stopped and re-emitted once under reader-specific event names.
 
@@ -104,7 +104,7 @@ Controller actions require the originating entry identity. Source selection reso
 
 The controller normalizes each effective request once and supplies equal request and projection values to both the reader-session operation and data source. A mismatched returned content request is an explicit terminal controller error, not a perpetual loading state. Snapshots contain the projected `ReaderViewModel` plus one task-state discriminator. Connections terminal outcomes remain in the reader view rather than being duplicated as controller task errors.
 
-`bindReaderController(element, controller)` is the DOM adapter. It immediately supplies `controller.snapshot.reader` to one persistent `<sefaria-reader>`, forwards all reader events except chat export to controller actions, and keeps compact pane selection as presentation state. Chat export remains an independent host action. The binding does not move requests, captures, or session mutation into the element. Unbinding removes listeners and subscription; disposing the controller aborts active work.
+`bindReaderController(element, controller)` is the DOM adapter. It immediately supplies `controller.snapshot.reader` and maps `controller.snapshot.presentation` to the public presentation properties of one persistent `<sefaria-reader>`. It forwards all reader events except chat export to controller actions and keeps compact pane selection as binding-local presentation state. Chat export remains an independent host action. The binding does not move requests, captures, or session mutation into the element. Unbinding removes listeners and subscription; disposing the controller aborts active work.
 
 ## View-model states
 
@@ -315,9 +315,9 @@ The pure factory matches `languageFamilyName` case-insensitively and matches `ve
 
 `projectTextSegmentVersion` accepts one already-selected `CoreV3Version`. It does not select by language, title, array position, `isPrimary`, or `isSource`.
 
-`projectTextSegmentValue` accepts one already-selected `CoreV3Version` plus one resolved string or null leaf. It owns the same sanitization, vocalization, footnote extraction, direction, and language projection as `projectTextSegmentVersion`. A composite that flattens recursive text calls this leaf projection rather than constructing text-segment data itself.
+`projectTextSegmentValue` accepts one already-selected `CoreV3Version` plus one resolved string or null leaf. It owns the same sanitization, full-mark footnote extraction, direction, and language projection as `projectTextSegmentVersion`. A composite that flattens recursive text calls this leaf projection rather than constructing text-segment data itself.
 
-`createTextSegmentViewModel` owns language-family selection and delegates the selected version to `projectTextSegmentVersion`. This keeps one owner for sanitization, vocalization, footnote extraction, direction, and language projection.
+`createTextSegmentViewModel` owns language-family selection and delegates the selected version to `projectTextSegmentVersion`. This keeps one owner for sanitization, full-mark footnote extraction, direction, and language projection.
 
 Payload warnings describe missing request selectors. `createTextSegmentViewModel` preserves them because it owns one selector. `projectTextSegmentVersion` does not assign request warnings to an existing selected version.
 
@@ -327,9 +327,9 @@ If a requested role has no selected version, the composite owns that missing-sid
 
 Text segment has no `partial` state. More than one matching version or an array-valued selected text produces a projection `error`; the factory does not choose a version or child segment silently.
 
-String text passes through `sanitize`, full-mark HTML vocalization, and `extractFootnotes` before entering the view model. The data view model preserves the payload-provided `language`, `actualLanguage`, and `direction`.
+String text passes through `sanitize` and `extractFootnotes` before entering the view model. The data view model preserves the full safe marks and the payload-provided `language`, `actualLanguage`, and `direction`.
 
-`<sefaria-text-segment>` renders static footnote markers and available note bodies. Interactive footnote activation and word selection remain outside the current contract because no consumer defines their action or event payload.
+`<sefaria-text-segment>` renders static footnote markers and available note bodies. Its typed `vocalizationMode` property and `vocalization-mode` attribute accept `taamim_and_nikkud`, `nikkud`, or `none` and default to `taamim_and_nikkud`. Unsupported runtime values throw `TypeError`. Full mode renders the original safe body and notes directly with zero display-transform calls. Non-full modes derive only text-node and marker presentation from the immutable original view model, preserving safe markup, note indexes/order, and missing (`null`) versus present-empty (`""`) bodies. Changing back to full restores the exact original display without factory work or requests. Interactive footnote activation and word selection remain outside the current contract because no consumer defines their action or event payload.
 
 The element supports mixed scripts, punctuation, and long unbroken text without inferring direction from language. Poetry- and paragraph-specific presentation remain outside the current contract until an exact behavior is defined.
 
@@ -401,11 +401,12 @@ A `partial` state carries the present side's child view model. The composite mus
 
 Visible sides and layout are separate element properties, because a host chooses them independently.
 
-| Property          | Values                               | Default         |
-| ----------------- | ------------------------------------ | --------------- |
-| `contentLanguage` | `primary`, `translation`, `both`     | `both`          |
-| `layout`          | `auto`, `stacked`, `side-by-side`    | `auto`          |
-| `sideOrder`       | `primary-first`, `translation-first` | `primary-first` |
+| Property | Values | Default |
+| --- | --- | --- |
+| `contentLanguage` | `primary`, `translation`, `both` | `both` |
+| `layout` | `auto`, `stacked`, `side-by-side` | `auto` |
+| `sideOrder` | `primary-first`, `translation-first` | `primary-first` |
+| `vocalizationMode` | `taamim_and_nikkud`, `nikkud`, `none` | `taamim_and_nikkud` |
 
 `auto` selects a stacked or side-by-side layout from container inline size through a CSS container query. The element performs no measurement and holds no resize state.
 
@@ -452,7 +453,7 @@ The card has no card-level `partial` state. A one-sided work is `data` whose ite
 
 ### Element and rendering
 
-`<sefaria-source-card>` accepts only its view model, an optional host-supplied `RefLabelViewModel`, and the `contentLanguage`, `layout`, `sideOrder`, `hideAttributions`, `showAddressLabels`, `selectable`, and `selectedPosition` presentation and interaction properties. `hideAttributions` defaults to false and changes rendering only; it does not remove attribution from the view model. The element performs no request. When `referenceLabel` is absent, it renders the payload-derived header without a link. Supplying `referenceLabel` renders the existing reference-label component and does not change request ownership.
+`<sefaria-source-card>` accepts only its view model, an optional host-supplied `RefLabelViewModel`, and the `contentLanguage`, `layout`, `sideOrder`, `vocalizationMode`, `hideAttributions`, `showAddressLabels`, `selectable`, and `selectedPosition` presentation and interaction properties. `hideAttributions` defaults to false and changes rendering only; it does not remove attribution from the view model. The element performs no request. When `referenceLabel` is absent, it renders the payload-derived header without a link. Supplying `referenceLabel` renders the existing reference-label component and does not change request ownership.
 
 The source card and `<sefaria-bilingual-segment>` use one shared pair renderer for side markup, ordering, absent-side slots, and layout CSS. The bilingual element is a thin public wrapper for one pair. The card renders its keyed item collection inside one shadow root, then renders the visible editions' attribution once outside that repeated collection. Three items from the same two editions therefore render two attribution entries, not six.
 
@@ -480,7 +481,7 @@ The request separates the reference and text-inclusion choice from local categor
 
 Counts use unique link IDs, not expanded anchor count. Identical duplicate records collapse; conflicting duplicates are projection errors. Different IDs remain different connections even when their targets match. Pages contain 20 entries. More and Previous replace the current page rather than accumulating an unbounded list. An out-of-range page is explicit and can return to page one. Only the active page receives preview projection. Category changes reset the page; a new target resets category and page.
 
-Previews default to visible and carry connected text across recursive leaves, not just the first leaf. Each legacy `he`/`text` channel is bounded to 3,500 rendered grapheme clusters through the pure text-preview operation. These channels are not falsely relabeled as v3 primary/translation roles. Available, absent, partially available, and not-requested text remain distinguishable. Preserve reported edition/license metadata without asserting fragment-level attribution that the payload does not establish.
+Previews default to visible and carry connected text across recursive leaves, not just the first leaf. Each legacy `he`/`text` channel is bounded to 3,500 rendered grapheme clusters through the pure text-preview operation. These channels are not falsely relabeled as v3 primary/translation roles. The element applies its local vocalization mode directly to the existing safe preview HTML text nodes and never fabricates v3 payload or text-segment data. Available, absent, partially available, and not-requested text remain distinguishable. Preserve reported edition/license metadata without asserting fragment-level attribution that the payload does not establish.
 
 The element receives only its view model and interaction/presentation properties. It emits `sefaria-connections-category-change`, `sefaria-connections-page-change`, `sefaria-connection-select`, and `sefaria-connections-preview-request` events. Preview visibility is independent of data acquisition. A metadata-only view cannot automatically fetch previews; the preview-request event lets the host explicitly replace the active capture with preview data. See the integration specification for ownership of the active captured payload and zero-request local paging.
 

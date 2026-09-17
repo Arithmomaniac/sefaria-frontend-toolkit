@@ -1,11 +1,16 @@
 import { css, html, nothing } from "lit";
 import { repeat } from "lit/directives/repeat.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
+import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
 import { SefariaElement } from "./sefaria-element.js";
 import type {
   ConnectionEntry,
   ConnectionsViewModel,
 } from "./connections-panel.js";
+import {
+  assertVocalizationMode,
+  deriveSafeHtmlDisplay,
+} from "./vocalization-display.js";
 
 /** Request-free category summaries and bounded connected-text details. */
 export class SefariaConnectionsPanel extends SefariaElement {
@@ -13,6 +18,7 @@ export class SefariaConnectionsPanel extends SefariaElement {
   static override properties = {
     viewModel: { attribute: false },
     showPreviews: { type: Boolean, attribute: "show-previews" },
+    vocalizationMode: { type: String, attribute: "vocalization-mode" },
   };
   /** Responsive styles confined to the panel's shadow root. */
   static override styles = [
@@ -87,13 +93,21 @@ export class SefariaConnectionsPanel extends SefariaElement {
   declare viewModel: ConnectionsViewModel | undefined;
   /** Hides or reveals captured preview data without requesting it. */
   declare showPreviews: boolean;
+  /** Hebrew vocalization preset applied to safe legacy-channel previews. */
+  declare vocalizationMode: VocalizationMode;
+
+  #displayViewModel: ConnectionsViewModel | undefined;
+  #displayMode: VocalizationMode | undefined;
+  #displayHtml = new Map<string, string>();
 
   constructor() {
     super();
     this.showPreviews = true;
+    this.vocalizationMode = "taamim_and_nikkud";
   }
 
   protected override render() {
+    assertVocalizationMode(this.vocalizationMode);
     const vm = this.viewModel;
     if (!vm) return nothing;
     if (vm.state === "error") return html`<p role="alert">${vm.message}</p>`;
@@ -189,8 +203,8 @@ export class SefariaConnectionsPanel extends SefariaElement {
           ? nothing
           : preview.state === "available"
             ? html`
-                ${preview.english ? html`<div class="preview english" lang="en" dir="ltr">${unsafeHTML(preview.english.html)}</div>` : html`<p>No English-channel text.</p>`}
-                ${preview.hebrew ? html`<div class="preview hebrew" lang="he" dir="rtl">${unsafeHTML(preview.hebrew.html)}</div>` : html`<p>No Hebrew-channel text.</p>`}
+                ${preview.english ? html`<div class="preview english" lang="en" dir="ltr">${unsafeHTML(this.#safeHtml(preview.english.html))}</div>` : html`<p>No English-channel text.</p>`}
+                ${preview.hebrew ? html`<div class="preview hebrew" lang="he" dir="rtl">${unsafeHTML(this.#safeHtml(preview.hebrew.html))}</div>` : html`<p>No Hebrew-channel text.</p>`}
                 ${preview.english?.truncated || preview.hebrew?.truncated ? html`<p>Preview shortened. Open the connection to read more.</p>` : nothing}
                 ${entry.editions.length ? html`<p class="metadata">Editions reported for this connection: ${entry.editions.join("; ")}</p>` : nothing}
                 ${entry.licenses.length ? html`<p class="metadata">Licenses reported: ${entry.licenses.join("; ")}</p>` : nothing}
@@ -200,6 +214,22 @@ export class SefariaConnectionsPanel extends SefariaElement {
               </p>`
       }
     </article>`;
+  }
+
+  #safeHtml(html: string): string {
+    if (
+      this.#displayViewModel !== this.viewModel ||
+      this.#displayMode !== this.vocalizationMode
+    ) {
+      this.#displayViewModel = this.viewModel;
+      this.#displayMode = this.vocalizationMode;
+      this.#displayHtml.clear();
+    }
+    const existing = this.#displayHtml.get(html);
+    if (existing !== undefined) return existing;
+    const displayed = deriveSafeHtmlDisplay(html, this.vocalizationMode);
+    this.#displayHtml.set(html, displayed);
+    return displayed;
   }
 
   #emit(name: string, detail: object): void {

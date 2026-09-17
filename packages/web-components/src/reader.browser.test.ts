@@ -67,14 +67,10 @@ const paired: ReaderViewModel = {
   source: {
     viewModel: source,
     selectedPosition: [0],
-    contentLanguage: "both",
-    layout: "auto",
-    sideOrder: "primary-first",
   },
   connections: {
     state: "component",
     viewModel: connections,
-    showPreviews: false,
   },
   selectedTarget: { ref: "Micah 6:8" },
 };
@@ -104,12 +100,22 @@ test("renders paired state and forwards each child action once with origin ident
   const fetch = vi.fn();
   vi.stubGlobal("fetch", fetch);
   const element = await mount();
+  element.contentLanguage = "translation";
+  element.layout = "stacked";
+  element.sideOrder = "translation-first";
+  element.showConnectionPreviews = false;
+  element.vocalizationMode = "none";
+  await element.updateComplete;
   const sourceEvent = vi.fn();
   const connectionEvent = vi.fn();
   element.addEventListener("sefaria-reader-source-select", sourceEvent);
   element.addEventListener("sefaria-reader-connection-select", connectionEvent);
 
   const sourceCard = element.shadowRoot!.querySelector("sefaria-source-card")!;
+  expect(sourceCard.contentLanguage).toBe("translation");
+  expect(sourceCard.layout).toBe("stacked");
+  expect(sourceCard.sideOrder).toBe("translation-first");
+  expect(sourceCard.vocalizationMode).toBe("none");
   sourceCard.dispatchEvent(
     new CustomEvent("sefaria-source-select", {
       detail: { position: [0], ref: "Micah 6:8" },
@@ -118,6 +124,8 @@ test("renders paired state and forwards each child action once with origin ident
     }),
   );
   const panel = element.shadowRoot!.querySelector("sefaria-connections-panel")!;
+  expect(panel.showPreviews).toBe(false);
+  expect(panel.vocalizationMode).toBe("none");
   panel.dispatchEvent(
     new CustomEvent("sefaria-connection-select", {
       detail: { id: "rashi", targetRef: "Rashi on Micah 6:8" },

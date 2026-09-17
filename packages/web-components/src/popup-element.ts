@@ -5,10 +5,12 @@ import {
   type PropertyValues,
   type TemplateResult,
 } from "lit";
+import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
 
 import { SefariaElement } from "./sefaria-element.js";
 import "./source-card-element.js";
 import type { PopupViewModel } from "./popup.js";
+import { assertVocalizationMode } from "./vocalization-display.js";
 
 /** Request-free anchored dialog that renders one popup view model. */
 export class SefariaPopup extends SefariaElement {
@@ -17,6 +19,7 @@ export class SefariaPopup extends SefariaElement {
     viewModel: { attribute: false },
     anchor: { attribute: false },
     open: { type: Boolean, reflect: true },
+    vocalizationMode: { type: String, attribute: "vocalization-mode" },
   };
 
   /** Popup layout, viewport placement, and isolated dialog styles. */
@@ -181,12 +184,15 @@ export class SefariaPopup extends SefariaElement {
 
   /** Whether the dialog is visible. */
   declare open: boolean;
+  /** Hebrew vocalization preset applied to the nested source card. */
+  declare vocalizationMode: VocalizationMode;
 
   constructor() {
     super();
     this.viewModel = undefined;
     this.anchor = null;
     this.open = false;
+    this.vocalizationMode = "taamim_and_nikkud";
   }
 
   override connectedCallback(): void {
@@ -219,6 +225,7 @@ export class SefariaPopup extends SefariaElement {
   }
 
   protected override render(): TemplateResult | typeof nothing {
+    assertVocalizationMode(this.vocalizationMode);
     if (!this.open) {
       return nothing;
     }
@@ -268,7 +275,10 @@ export class SefariaPopup extends SefariaElement {
       return html`<p class="state" role="alert">${viewModel.message}</p>`;
     }
     return html`
-      <sefaria-source-card .viewModel=${viewModel.card}></sefaria-source-card>
+      <sefaria-source-card
+        .viewModel=${viewModel.card}
+        .vocalizationMode=${this.vocalizationMode}
+      ></sefaria-source-card>
       ${
         viewModel.truncated
           ? html`<p class="notice" role="status">

@@ -63,7 +63,29 @@ test("binds one persistent reader, forwards navigation, resets its pane, and cle
   await element.updateComplete;
 
   expect(element.viewModel?.selectedTarget?.ref).toBe("Micah 6:8");
+  expect(element.vocalizationMode).toBe("taamim_and_nikkud");
   expect(document.querySelector("sefaria-reader")).toBe(element);
+
+  const readerViewModel = element.viewModel;
+  controller.setPresentation({
+    originEntryId: "entry-1",
+    patch: {
+      contentLanguage: "translation",
+      layout: "stacked",
+      sideOrder: "translation-first",
+      showConnectionPreviews: false,
+      vocalizationMode: "none",
+    },
+  });
+  await element.updateComplete;
+  expect(element.viewModel).toBe(readerViewModel);
+  expect(element.contentLanguage).toBe("translation");
+  expect(element.layout).toBe("stacked");
+  expect(element.sideOrder).toBe("translation-first");
+  expect(element.showConnectionPreviews).toBe(false);
+  expect(element.vocalizationMode).toBe("none");
+  expect(dataSource.loadSource).not.toHaveBeenCalled();
+  expect(dataSource.loadConnections).not.toHaveBeenCalled();
 
   element.dispatchEvent(
     new CustomEvent("sefaria-reader-pane-change", {

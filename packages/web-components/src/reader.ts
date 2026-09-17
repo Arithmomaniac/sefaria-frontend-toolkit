@@ -1,8 +1,3 @@
-import type {
-  BilingualPairContentLanguage,
-  BilingualPairLayout,
-  BilingualPairSideOrder,
-} from "./bilingual-pair.js";
 import type { ConnectionsViewModel } from "./connections-panel.js";
 import type {
   ReaderBreadcrumb,
@@ -20,12 +15,6 @@ export interface ReaderSourceViewModel {
   readonly viewModel: SourceCardViewModel;
   /** Selected source-card item position. */
   readonly selectedPosition?: readonly number[];
-  /** Source-card content language selection. */
-  readonly contentLanguage: BilingualPairContentLanguage;
-  /** Source-card bilingual arrangement. */
-  readonly layout: BilingualPairLayout;
-  /** First role in a side-by-side source-card layout. */
-  readonly sideOrder: BilingualPairSideOrder;
 }
 
 /** Connections state rendered by the existing connections-panel element. */
@@ -34,8 +23,6 @@ export interface ReaderConnectionsComponentViewModel {
   readonly state: "component";
   /** Render-ready connections-panel state. */
   readonly viewModel: ConnectionsViewModel;
-  /** Whether already captured preview text should be visible. */
-  readonly showPreviews: boolean;
 }
 
 /** Reader-owned terminal state when no connections component data is available. */
@@ -91,14 +78,8 @@ export function createReaderViewModel(
           ...(current.selectedPosition === undefined
             ? {}
             : { selectedPosition: current.selectedPosition }),
-          contentLanguage: current.presentation.contentLanguage,
-          layout: current.presentation.layout,
-          sideOrder: current.presentation.sideOrder,
         };
-  const connections = projectConnections(
-    current.connections,
-    current.presentation.showConnectionPreviews,
-  );
+  const connections = projectConnections(current.connections);
   const selectedTarget = selectedRef(
     current.source?.viewModel,
     current.selectedPosition,
@@ -119,7 +100,6 @@ export function createReaderViewModel(
 
 function projectConnections(
   connections: ReaderConnectionsEntryView | undefined,
-  showPreviews: boolean,
 ): ReaderConnectionsViewModel | undefined {
   if (connections === undefined) return undefined;
   if (connections.state === "unavailable") {
@@ -132,7 +112,6 @@ function projectConnections(
   return {
     state: "component",
     viewModel: connections.viewModel,
-    showPreviews,
   };
 }
 

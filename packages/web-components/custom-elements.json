@@ -52,6 +52,17 @@
               "description": "Requested role order for a side-by-side arrangement.",
               "default": "\"primary-first\"",
               "attribute": "side-order"
+            },
+            {
+              "kind": "field",
+              "name": "vocalizationMode",
+              "privacy": "public",
+              "type": {
+                "text": "VocalizationMode"
+              },
+              "description": "Hebrew vocalization preset applied to both displayed roles.",
+              "default": "\"taamim_and_nikkud\"",
+              "attribute": "vocalization-mode"
             }
           ],
           "attributes": [
@@ -81,6 +92,15 @@
               "description": "Requested role order for a side-by-side arrangement.",
               "default": "\"primary-first\"",
               "fieldName": "sideOrder"
+            },
+            {
+              "name": "vocalization-mode",
+              "type": {
+                "text": "VocalizationMode"
+              },
+              "description": "Hebrew vocalization preset applied to both displayed roles.",
+              "default": "\"taamim_and_nikkud\"",
+              "fieldName": "vocalizationMode"
             }
           ],
           "superclass": {
@@ -235,6 +255,39 @@
               "attribute": "show-previews"
             },
             {
+              "kind": "field",
+              "name": "vocalizationMode",
+              "privacy": "public",
+              "type": {
+                "text": "VocalizationMode"
+              },
+              "description": "Hebrew vocalization preset applied to safe legacy-channel previews.",
+              "default": "\"taamim_and_nikkud\"",
+              "attribute": "vocalization-mode"
+            },
+            {
+              "kind": "field",
+              "name": "#displayViewModel",
+              "privacy": "private",
+              "type": {
+                "text": "ConnectionsViewModel | undefined"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "#displayMode",
+              "privacy": "private",
+              "type": {
+                "text": "VocalizationMode | undefined"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "#displayHtml",
+              "privacy": "private",
+              "default": "new Map<string, string>()"
+            },
+            {
               "kind": "method",
               "name": "#entry",
               "privacy": "private",
@@ -243,6 +296,24 @@
                   "name": "entry",
                   "type": {
                     "text": "ConnectionEntry"
+                  }
+                }
+              ]
+            },
+            {
+              "kind": "method",
+              "name": "#safeHtml",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "string"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "html",
+                  "type": {
+                    "text": "string"
                   }
                 }
               ]
@@ -311,6 +382,15 @@
               "description": "Hides or reveals captured preview data without requesting it.",
               "default": "true",
               "fieldName": "showPreviews"
+            },
+            {
+              "name": "vocalization-mode",
+              "type": {
+                "text": "VocalizationMode"
+              },
+              "description": "Hebrew vocalization preset applied to safe legacy-channel previews.",
+              "default": "\"taamim_and_nikkud\"",
+              "fieldName": "vocalizationMode"
             }
           ],
           "superclass": {
@@ -476,6 +556,17 @@
               "reflects": true
             },
             {
+              "kind": "field",
+              "name": "vocalizationMode",
+              "privacy": "public",
+              "type": {
+                "text": "VocalizationMode"
+              },
+              "description": "Hebrew vocalization preset applied to the nested source card.",
+              "default": "\"taamim_and_nikkud\"",
+              "attribute": "vocalization-mode"
+            },
+            {
               "kind": "method",
               "name": "#renderContent",
               "privacy": "private",
@@ -520,6 +611,15 @@
               "description": "Whether the dialog is visible.",
               "default": "false",
               "fieldName": "open"
+            },
+            {
+              "name": "vocalization-mode",
+              "type": {
+                "text": "VocalizationMode"
+              },
+              "description": "Hebrew vocalization preset applied to the nested source card.",
+              "default": "\"taamim_and_nikkud\"",
+              "fieldName": "vocalizationMode"
             }
           ],
           "superclass": {
@@ -691,6 +791,61 @@
               "description": "Shows an explicit host-mediated chat export action when a target exists.",
               "default": "false",
               "attribute": "chat-export"
+            },
+            {
+              "kind": "field",
+              "name": "contentLanguage",
+              "privacy": "public",
+              "type": {
+                "text": "BilingualPairContentLanguage"
+              },
+              "description": "Source-card roles displayed by the controlled reader.",
+              "default": "\"both\"",
+              "attribute": "content-language"
+            },
+            {
+              "kind": "field",
+              "name": "layout",
+              "privacy": "public",
+              "type": {
+                "text": "BilingualPairLayout"
+              },
+              "description": "Source-card bilingual arrangement.",
+              "default": "\"auto\"",
+              "attribute": "layout"
+            },
+            {
+              "kind": "field",
+              "name": "sideOrder",
+              "privacy": "public",
+              "type": {
+                "text": "BilingualPairSideOrder"
+              },
+              "description": "First source-card role in side-by-side layout.",
+              "default": "\"primary-first\"",
+              "attribute": "side-order"
+            },
+            {
+              "kind": "field",
+              "name": "showConnectionPreviews",
+              "privacy": "public",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether captured connection previews are visible.",
+              "default": "true",
+              "attribute": "show-connection-previews"
+            },
+            {
+              "kind": "field",
+              "name": "vocalizationMode",
+              "privacy": "public",
+              "type": {
+                "text": "VocalizationMode"
+              },
+              "description": "Hebrew vocalization preset applied to source and preview text.",
+              "default": "\"taamim_and_nikkud\"",
+              "attribute": "vocalization-mode"
             },
             {
               "kind": "method",
@@ -1008,6 +1163,51 @@
               "description": "Shows an explicit host-mediated chat export action when a target exists.",
               "default": "false",
               "fieldName": "chatExport"
+            },
+            {
+              "name": "content-language",
+              "type": {
+                "text": "BilingualPairContentLanguage"
+              },
+              "description": "Source-card roles displayed by the controlled reader.",
+              "default": "\"both\"",
+              "fieldName": "contentLanguage"
+            },
+            {
+              "name": "layout",
+              "type": {
+                "text": "BilingualPairLayout"
+              },
+              "description": "Source-card bilingual arrangement.",
+              "default": "\"auto\"",
+              "fieldName": "layout"
+            },
+            {
+              "name": "side-order",
+              "type": {
+                "text": "BilingualPairSideOrder"
+              },
+              "description": "First source-card role in side-by-side layout.",
+              "default": "\"primary-first\"",
+              "fieldName": "sideOrder"
+            },
+            {
+              "name": "show-connection-previews",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether captured connection previews are visible.",
+              "default": "true",
+              "fieldName": "showConnectionPreviews"
+            },
+            {
+              "name": "vocalization-mode",
+              "type": {
+                "text": "VocalizationMode"
+              },
+              "description": "Hebrew vocalization preset applied to source and preview text.",
+              "default": "\"taamim_and_nikkud\"",
+              "fieldName": "vocalizationMode"
             }
           ],
           "superclass": {
@@ -1413,6 +1613,17 @@
             },
             {
               "kind": "field",
+              "name": "vocalizationMode",
+              "privacy": "public",
+              "type": {
+                "text": "VocalizationMode"
+              },
+              "description": "Hebrew vocalization preset applied to every displayed text leaf.",
+              "default": "\"taamim_and_nikkud\"",
+              "attribute": "vocalization-mode"
+            },
+            {
+              "kind": "field",
               "name": "showAddressLabels",
               "privacy": "public",
               "type": {
@@ -1725,6 +1936,15 @@
               "fieldName": "sideOrder"
             },
             {
+              "name": "vocalization-mode",
+              "type": {
+                "text": "VocalizationMode"
+              },
+              "description": "Hebrew vocalization preset applied to every displayed text leaf.",
+              "default": "\"taamim_and_nikkud\"",
+              "fieldName": "vocalizationMode"
+            },
+            {
               "name": "hide-attributions",
               "type": {
                 "text": "boolean"
@@ -1883,6 +2103,41 @@
               "description": "Render-ready state supplied by the host."
             },
             {
+              "kind": "field",
+              "name": "vocalizationMode",
+              "privacy": "public",
+              "type": {
+                "text": "VocalizationMode"
+              },
+              "description": "Hebrew vocalization preset applied only to the displayed safe text.",
+              "default": "\"taamim_and_nikkud\"",
+              "attribute": "vocalization-mode"
+            },
+            {
+              "kind": "field",
+              "name": "#displayViewModel",
+              "privacy": "private",
+              "type": {
+                "text": "TextSegmentDataViewModel | undefined"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "#displayMode",
+              "privacy": "private",
+              "type": {
+                "text": "VocalizationMode | undefined"
+              }
+            },
+            {
+              "kind": "field",
+              "name": "#displayValue",
+              "privacy": "private",
+              "type": {
+                "text": "TextSegmentDisplay | undefined"
+              }
+            },
+            {
               "kind": "method",
               "name": "#renderData",
               "privacy": "private",
@@ -1894,6 +2149,35 @@
                   }
                 }
               ]
+            },
+            {
+              "kind": "method",
+              "name": "#display",
+              "privacy": "private",
+              "return": {
+                "type": {
+                  "text": "TextSegmentDisplay"
+                }
+              },
+              "parameters": [
+                {
+                  "name": "viewModel",
+                  "type": {
+                    "text": "TextSegmentDataViewModel"
+                  }
+                }
+              ]
+            }
+          ],
+          "attributes": [
+            {
+              "name": "vocalization-mode",
+              "type": {
+                "text": "VocalizationMode"
+              },
+              "description": "Hebrew vocalization preset applied only to the displayed safe text.",
+              "default": "\"taamim_and_nikkud\"",
+              "fieldName": "vocalizationMode"
             }
           ],
           "superclass": {

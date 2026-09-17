@@ -187,3 +187,62 @@ test("never calls fetch while rendering", async () => {
 
   expect(fetchMock).not.toHaveBeenCalled();
 });
+
+test("reverses vocalization locally without changing a shared frozen view model", async () => {
+  const viewModel = Object.freeze({
+    ...DATA_VIEW_MODEL,
+    ref: "Micah 6:8",
+    heRef: "מיכה ו׳:ח׳",
+    direction: "rtl" as const,
+    body: Object.freeze([
+      Object.freeze({
+        kind: "html" as const,
+        html: "<b>הִגִּ֥יד׀</b> לְךָ֛ אָדָ֖ם׃",
+      }),
+    ]),
+    notes: Object.freeze([]),
+  });
+  render(html`
+    <sefaria-text-segment
+      data-copy="changing"
+      .viewModel=${viewModel}
+    ></sefaria-text-segment>
+    <sefaria-text-segment
+      data-copy="stable"
+      .viewModel=${viewModel}
+    ></sefaria-text-segment>
+  `);
+  const changing = document.querySelector<SefariaTextSegment>(
+    '[data-copy="changing"]',
+  )!;
+  const stable = document.querySelector<SefariaTextSegment>(
+    '[data-copy="stable"]',
+  )!;
+  await Promise.all([changing.updateComplete, stable.updateComplete]);
+
+  expect(changing.shadowRoot?.textContent).toContain("הִגִּ֥יד׀");
+  changing.vocalizationMode = "nikkud";
+  await changing.updateComplete;
+  expect(changing.shadowRoot?.textContent).toContain("הִגִּיד");
+  expect(changing.shadowRoot?.textContent).toContain("אָדָם׃");
+  changing.vocalizationMode = "none";
+  await changing.updateComplete;
+  expect(changing.shadowRoot?.textContent).toContain("הגיד");
+  expect(changing.shadowRoot?.textContent).toContain("אדם");
+  expect(changing.shadowRoot?.textContent).not.toContain("׃");
+  changing.vocalizationMode = "taamim_and_nikkud";
+  await changing.updateComplete;
+  expect(changing.shadowRoot?.textContent).toContain("הִגִּ֥יד׀");
+  expect(stable.shadowRoot?.textContent).toContain("הִגִּ֥יד׀");
+  expect(changing.viewModel).toBe(viewModel);
+  expect(stable.viewModel).toBe(viewModel);
+});
+
+test("rejects an invalid vocalization attribute value", async () => {
+  const element = new SefariaTextSegment();
+  element.viewModel = DATA_VIEW_MODEL;
+  element.setAttribute("vocalization-mode", "punctuation-free");
+  document.body.append(element);
+
+  await expect(element.updateComplete).rejects.toThrow(TypeError);
+});
