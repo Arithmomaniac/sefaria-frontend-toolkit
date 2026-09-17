@@ -6,11 +6,6 @@ import { EditorState, type Extension } from "@codemirror/state";
 import { EditorView } from "@codemirror/view";
 import { basicSetup } from "codemirror";
 
-import projectManifest from "../projects/source-card/project.json";
-import htmlSource from "../projects/source-card/index.html?raw";
-import javascriptSource from "../projects/source-card/main.js?raw";
-import assetSource from "../projects/source-card/micah-6-8.js?raw";
-import cssSource from "../projects/source-card/styles.css?raw";
 import previewBootstrapSource from "./preview-bootstrap.js?raw";
 import {
   DIAGNOSTIC_COUNT_LIMIT,
@@ -22,12 +17,19 @@ import {
   canAcceptDiagnostic,
   canCreatePreview,
   isBoundedDiagnosticMessage,
+  validateProjectAssets,
   validateProjectSources,
 } from "./policy.js";
 import { rewriteDeclaredAssets } from "./project-imports.js";
+import {
+  selectProject,
+  type FileKind,
+  type PlaygroundProject,
+  type ProjectId,
+} from "./project-catalog.js";
+import { projectCatalog } from "./projects.js";
 import "./style.css";
 
-type FileKind = "html" | "css" | "javascript";
 type DiagnosticCategory = "csp" | "import" | "runtime" | "syntax";
 interface RuntimeGraph {
   readonly version: 1;
@@ -38,13 +40,9 @@ interface PreviewDiagnostic {
   readonly message: string;
 }
 
-const maintained = {
-  html: htmlSource,
-  css: cssSource,
-  javascript: javascriptSource,
-} satisfies Record<FileKind, string>;
 const STYLE_NONCE = "sefaria-playground-editor";
-let drafts = { ...maintained };
+let activeProject: PlaygroundProject | undefined;
+let drafts: Record<FileKind, string> | undefined;
 let activeFile: FileKind = "html";
 let activeFrame: HTMLIFrameElement | undefined;
 let activeChannel = "";
@@ -57,7 +55,13 @@ const previewHost = requireElement<HTMLElement>("#preview");
 const previewStatus = requireElement<HTMLElement>("#preview-status");
 const draftStatus = requireElement<HTMLElement>("#draft-status");
 const diagnosticList = requireElement<HTMLOListElement>("#diagnostic-list");
+const projectSelect = requireElement<HTMLSelectElement>("#project-select");
+const projectTitle = requireElement<HTMLElement>("#project-title");
+const projectSummary = requireElement<HTMLElement>("#project-summary");
+const projectCoverage = requireElement<HTMLElement>("#project-coverage");
+const projectError = requireElement<HTMLElement>("#project-error");
 const sourceLink = requireElement<HTMLAnchorElement>("#source-link");
+const liveLink = requireElement<HTMLAnchorElement>("#live-link");
 const runButton = requireElement<HTMLButtonElement>("#run");
 const resetButton = requireElement<HTMLButtonElement>("#reset");
 const stopButton = requireElement<HTMLButtonElement>("#stop");
@@ -73,10 +77,14 @@ const languages: Record<FileKind, Extension> = {
   javascript: javascript(),
 };
 
-const editor = new EditorView({
-  state: createEditorState(activeFile),
-  parent: editorHost,
-});
+let editor: EditorView | undefined;
+
+for (const project of projectCatalog.projects) {
+  const option = document.createElement("option");
+  option.value = project.manifest.id;
+  option.textContent = project.manifest.title;
+  projectSelect.append(option);
+}
 
 for (const [kind, tab] of Object.entries(tabs) as [
   FileKind,
@@ -98,7 +106,8 @@ for (const [kind, tab] of Object.entries(tabs) as [
 }
 runButton.addEventListener("click", () => void run());
 resetButton.addEventListener("click", () => {
-  drafts = { ...maintained };
+  if (!activeProject || !editor) return;
+  drafts = { ...activeProject.maintained };
   editor.setState(createEditorState(activeFile));
   updateTabs();
   draftStatus.textContent = "Maintained source restored exactly.";
@@ -106,9 +115,19 @@ resetButton.addEventListener("click", () => {
 stopButton.addEventListener("click", () => stopPreview("Preview stopped."));
 copyButton.addEventListener("click", () => void copyActiveFile());
 window.addEventListener("message", receivePreviewMessage);
+window.addEventListener("popstate", () => applyUrlSelection(true));
 window.addEventListener("beforeunload", () => stopPreview(""));
+projectSelect.addEventListener("change", () => {
+  const project = projectCatalog.byId.get(projectSelect.value as ProjectId);
+  if (project === undefined) return;
+  const url = new URL(location.href);
+  url.searchParams.set("project", project.manifest.id);
+  history.pushState(null, "", url);
+  activateProject(project);
+  if (runtimeGraph !== undefined) void run();
+});
 
-updateTabs();
+applyUrlSelection(false);
 void loadGraphAndRun();
 
 async function loadGraphAndRun(): Promise<void> {
@@ -119,7 +138,7 @@ async function loadGraphAndRun(): Promise<void> {
     if (!response.ok)
       throw new Error(`Runtime graph returned HTTP ${response.status}.`);
     runtimeGraph = validateRuntimeGraph(await response.json());
-    await run();
+    if (activeProject !== undefined) await run();
   } catch (error) {
     reportDiagnostic({ category: "import", message: errorMessage(error) });
     previewStatus.textContent = "Preview initialization failed.";
@@ -127,13 +146,14 @@ async function loadGraphAndRun(): Promise<void> {
 }
 
 function createEditorState(kind: FileKind): EditorState {
+  const currentDrafts = requireDrafts();
   return EditorState.create({
-    doc: drafts[kind],
+    doc: currentDrafts[kind],
     extensions: [
       basicSetup,
       EditorView.cspNonce.of(STYLE_NONCE),
       EditorState.lineSeparator.of(
-        drafts[kind].includes("\r\n") ? "\r\n" : "\n",
+        currentDrafts[kind].includes("\r\n") ? "\r\n" : "\n",
       ),
       languages[kind],
       EditorState.transactionFilter.of((transaction) => {
@@ -143,7 +163,7 @@ function createEditorState(kind: FileKind): EditorState {
       }),
       EditorView.updateListener.of((update) => {
         if (!update.docChanged) return;
-        drafts[kind] = update.state.doc.toString();
+        requireDrafts()[kind] = update.state.doc.toString();
         draftStatus.textContent = "Draft changed. Run to update the preview.";
       }),
       EditorView.theme({
@@ -156,13 +176,15 @@ function createEditorState(kind: FileKind): EditorState {
 }
 
 function selectFile(kind: FileKind): void {
-  drafts[activeFile] = editor.state.doc.toString();
+  if (!editor) return;
+  requireDrafts()[activeFile] = editor.state.doc.toString();
   activeFile = kind;
   editor.setState(createEditorState(kind));
   updateTabs();
 }
 
 function updateTabs(): void {
+  const project = activeProject;
   for (const [kind, tab] of Object.entries(tabs) as [
     FileKind,
     HTMLButtonElement,
@@ -170,20 +192,32 @@ function updateTabs(): void {
     const selected = kind === activeFile;
     tab.setAttribute("aria-selected", String(selected));
     tab.tabIndex = selected ? 0 : -1;
+    tab.disabled = project === undefined;
   }
+  if (project === undefined) return;
   editorHost.setAttribute("aria-labelledby", tabs[activeFile].id);
-  sourceLink.href = `${projectManifest.sourceBaseUrl}${projectManifest.files[activeFile]}`;
+  sourceLink.href = `${project.manifest.sourceBaseUrl}${project.manifest.files[activeFile]}`;
 }
 
 async function run(): Promise<void> {
-  drafts[activeFile] = editor.state.doc.toString();
+  const project = activeProject;
+  if (!project || !editor) return;
+  const currentDrafts = requireDrafts();
+  currentDrafts[activeFile] = editor.state.doc.toString();
   clearDiagnostics();
-  const limitFailure = validateProjectSources(drafts);
+  const limitFailure = validateProjectSources(currentDrafts);
   if (limitFailure) {
     reportDiagnostic({ category: "syntax", message: limitFailure });
     return;
   }
-  const syntaxDiagnostics = collectSyntaxDiagnostics(drafts);
+  const assetFailure = validateProjectAssets(project.assets);
+  if (assetFailure) {
+    reportDiagnostic({ category: "import", message: assetFailure });
+    previewStatus.textContent =
+      "Preview not run because project assets are invalid.";
+    return;
+  }
+  const syntaxDiagnostics = collectSyntaxDiagnostics(currentDrafts);
   for (const diagnostic of syntaxDiagnostics) reportDiagnostic(diagnostic);
   if (syntaxDiagnostics.length > 0) {
     previewStatus.textContent =
@@ -198,11 +232,18 @@ async function run(): Promise<void> {
     return;
   }
   try {
-    const javascriptWithAssets = rewriteDeclaredAssets(drafts.javascript, {
-      "./micah-6-8.js": toDataUrl(assetSource),
-    });
+    const declaredAssets = Object.fromEntries(
+      Object.entries(project.assets).map(([specifier, source]) => [
+        specifier,
+        toDataUrl(source),
+      ]),
+    );
+    const javascriptWithAssets = rewriteDeclaredAssets(
+      currentDrafts.javascript,
+      declaredAssets,
+    );
     await createPreview(
-      { ...drafts, javascript: javascriptWithAssets },
+      { ...currentDrafts, javascript: javascriptWithAssets },
       runtimeGraph,
     );
   } catch (error) {
@@ -244,10 +285,12 @@ async function createPreview(
   }
   activeChannel = crypto.randomUUID();
   activeRun = crypto.randomUUID();
+  const channel = activeChannel;
+  const run = activeRun;
   diagnosticCount = 0;
   const config = {
-    channel: activeChannel,
-    run: activeRun,
+    channel,
+    run,
     html: files.html,
     javascriptUrl: toDataUrl(files.javascript),
   };
@@ -255,6 +298,7 @@ async function createPreview(
   const bootstrapUrl = toDataUrl(previewBootstrapSource);
   const emittedImportMap = escapeInline(importMap);
   const importMapHash = await sha256(emittedImportMap);
+  if (activeChannel !== channel || activeRun !== run) return;
   const childPolicy = [
     "default-src 'none'",
     `script-src data: 'sha256-${importMapHash}'`,
@@ -340,11 +384,87 @@ function stopPreview(message: string): void {
 
 async function copyActiveFile(): Promise<void> {
   try {
-    await navigator.clipboard.writeText(drafts[activeFile]);
+    await navigator.clipboard.writeText(requireDrafts()[activeFile]);
     draftStatus.textContent = `${activeFile} copied.`;
   } catch (error) {
     draftStatus.textContent = `Copy failed: ${errorMessage(error)}`;
   }
+}
+
+function applyUrlSelection(runAfterSelection: boolean): void {
+  const selection = selectProject(projectCatalog, location.search);
+  if (selection.state === "invalid") {
+    showInvalidProject(selection.requestedId);
+    return;
+  }
+  activateProject(selection.project);
+  if (runAfterSelection && runtimeGraph !== undefined) void run();
+}
+
+function activateProject(project: PlaygroundProject): void {
+  stopPreview("");
+  editor?.destroy();
+  editorHost.replaceChildren();
+  activeProject = project;
+  drafts = { ...project.maintained };
+  activeFile = "html";
+  projectSelect.value = project.manifest.id;
+  projectTitle.textContent = project.manifest.title;
+  projectSummary.textContent = project.manifest.summary;
+  projectCoverage.textContent = project.manifest.coverage;
+  projectError.hidden = true;
+  sourceLink.hidden = false;
+  if (project.manifest.liveDemoUrl === undefined) {
+    liveLink.hidden = true;
+    liveLink.removeAttribute("href");
+  } else {
+    liveLink.hidden = false;
+    liveLink.href = project.manifest.liveDemoUrl;
+  }
+  for (const button of [runButton, resetButton, stopButton, copyButton]) {
+    button.disabled = false;
+  }
+  editor = new EditorView({
+    state: createEditorState(activeFile),
+    parent: editorHost,
+  });
+  updateTabs();
+  draftStatus.textContent = "Maintained source loaded.";
+  previewStatus.textContent = "Preparing preview.";
+  clearDiagnostics();
+}
+
+function showInvalidProject(requestedId: string): void {
+  stopPreview("");
+  editor?.destroy();
+  editor = undefined;
+  editorHost.replaceChildren();
+  activeProject = undefined;
+  drafts = undefined;
+  projectSelect.value = "";
+  projectTitle.textContent = "Choose a maintained project";
+  projectSummary.textContent =
+    "The requested project is not part of this editor catalog.";
+  projectCoverage.textContent = "No project source has been executed.";
+  projectError.hidden = false;
+  projectError.textContent = `Unknown project "${requestedId}". Choose a maintained project to continue.`;
+  sourceLink.hidden = true;
+  liveLink.hidden = true;
+  liveLink.removeAttribute("href");
+  for (const button of [runButton, resetButton, stopButton, copyButton]) {
+    button.disabled = true;
+  }
+  updateTabs();
+  draftStatus.textContent = "Invalid project. No source loaded.";
+  previewStatus.textContent = "No preview is running.";
+  clearDiagnostics();
+}
+
+function requireDrafts(): Record<FileKind, string> {
+  if (drafts === undefined) {
+    throw new Error("No playground project is selected.");
+  }
+  return drafts;
 }
 
 function validateRuntimeGraph(value: unknown): RuntimeGraph {

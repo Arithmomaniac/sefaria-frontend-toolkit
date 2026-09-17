@@ -1,5 +1,7 @@
 import {
   ACTIVE_PREVIEW_LIMIT,
+  ASSET_FILE_LIMIT,
+  ASSET_TOTAL_LIMIT,
   DIAGNOSTIC_COUNT_LIMIT,
   DIAGNOSTIC_TEXT_LIMIT,
   MESSAGE_SIZE_LIMIT,
@@ -10,6 +12,7 @@ import {
 export type ProjectSources = Readonly<
   Record<"html" | "css" | "javascript", string>
 >;
+export type ProjectAssets = Readonly<Record<string, string>>;
 
 export function validateProjectSources(
   sources: ProjectSources,
@@ -25,6 +28,22 @@ export function validateProjectSources(
   );
   return total > SOURCE_TOTAL_LIMIT
     ? `Project source exceeds the ${SOURCE_TOTAL_LIMIT} character total limit.`
+    : undefined;
+}
+
+export function validateProjectAssets(
+  assets: ProjectAssets,
+): string | undefined {
+  let total = 0;
+  for (const [specifier, source] of Object.entries(assets)) {
+    const size = new TextEncoder().encode(source).byteLength;
+    if (size > ASSET_FILE_LIMIT) {
+      return `${specifier} exceeds the ${ASSET_FILE_LIMIT} byte asset file limit.`;
+    }
+    total += size;
+  }
+  return total > ASSET_TOTAL_LIMIT
+    ? `Project assets exceed the ${ASSET_TOTAL_LIMIT} byte asset total limit.`
     : undefined;
 }
 

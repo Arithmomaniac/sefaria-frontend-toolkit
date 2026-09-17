@@ -1,35 +1,32 @@
 :root {
-  color: #201a17;
+  color: #231b17;
   background: #f7f1e7;
   font-family: ui-sans-serif, system-ui, sans-serif;
 }
-
 body {
   margin: 0;
   padding: 1.5rem;
 }
 .example {
-  max-width: 48rem;
+  max-width: 38rem;
   margin: 0 auto;
 }
 .kicker {
   color: #855c21;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+  font-weight: 800;
   text-transform: uppercase;
 }
-label {
-  display: inline-grid;
-  gap: 0.3rem;
+.actions {
+  display: flex;
+  gap: 0.5rem;
   margin-bottom: 1rem;
-  font-weight: 700;
 }
-select {
-  padding: 0.45rem;
+button {
+  padding: 0.55rem 0.8rem;
 }
-sefaria-source-card {
+sefaria-ref-label {
   --sefaria-accent: #855c21;
-  --sefaria-surface: #fffdf8;
   display: block;
+  padding: 1rem;
+  background: white;
 }

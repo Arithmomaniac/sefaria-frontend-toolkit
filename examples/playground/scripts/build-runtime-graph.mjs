@@ -4,14 +4,9 @@ import path from "node:path";
 
 import { init, parse } from "es-module-lexer";
 import { build } from "vite";
+import { PUBLIC_ENTRIES } from "./runtime-entries.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
-const publicEntries = {
-  "@arithmomaniac/sefaria-client": "client",
-  "@arithmomaniac/sefaria-client/validation": "client-validation",
-  "@arithmomaniac/sefaria-web-components": "web-components",
-  "@arithmomaniac/sefaria-web-components/source-card": "source-card",
-};
 const output = await build({
   configFile: false,
   logLevel: "warn",
@@ -20,7 +15,7 @@ const output = await build({
     minify: false,
     rollupOptions: {
       input: Object.fromEntries(
-        Object.values(publicEntries).map((name) => [
+        Object.values(PUBLIC_ENTRIES).map((name) => [
           name,
           path.join(root, "src", "graph", `${name}.ts`),
         ]),
@@ -79,7 +74,7 @@ for (const chunk of chunks) {
   }
   imports[synthetic(chunk.fileName)] = toDataUrl(code);
 }
-for (const [specifier, entryName] of Object.entries(publicEntries)) {
+for (const [specifier, entryName] of Object.entries(PUBLIC_ENTRIES)) {
   const entry = chunks.find(
     (chunk) => chunk.isEntry && chunk.name === entryName,
   );

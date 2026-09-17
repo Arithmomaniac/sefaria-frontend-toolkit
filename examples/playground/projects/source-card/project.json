@@ -1,11 +1,19 @@
 {
   "id": "source-card",
   "title": "Supplied-data SourceCard",
+  "summary": "Render a selectable bilingual source card and change Hebrew vocalization without another projection.",
+  "coverage": "One locally authored corrected Micah 6:8 payload; selection and display changes make zero requests.",
   "files": {
     "html": "index.html",
     "css": "styles.css",
     "javascript": "main.js"
   },
-  "assets": ["micah-6-8.js"],
-  "sourceBaseUrl": "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/projects/source-card/"
+  "assets": [
+    {
+      "specifier": "./micah-6-8.js",
+      "path": "micah-6-8.js"
+    }
+  ],
+  "sourceBaseUrl": "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/projects/source-card/",
+  "liveDemoUrl": "../explorer/source-card.html"
 }

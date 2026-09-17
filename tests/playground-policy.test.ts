@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   ACTIVE_PREVIEW_LIMIT,
+  ASSET_FILE_LIMIT,
+  ASSET_TOTAL_LIMIT,
   DIAGNOSTIC_COUNT_LIMIT,
   DIAGNOSTIC_TEXT_LIMIT,
   MESSAGE_SIZE_LIMIT,
@@ -12,6 +14,7 @@ import {
   canAcceptDiagnostic,
   canCreatePreview,
   isBoundedDiagnosticMessage,
+  validateProjectAssets,
   validateProjectSources,
 } from "../examples/playground/src/policy.js";
 import { rewriteDeclaredAssets } from "../examples/playground/src/project-imports.js";
@@ -46,6 +49,32 @@ describe("playground policy bounds", () => {
         javascript: "j".repeat(SOURCE_TOTAL_LIMIT - SOURCE_FILE_LIMIT * 2 + 1),
       }),
     ).toContain("total limit");
+  });
+
+  it("bounds declared assets separately from editable source", () => {
+    expect(
+      validateProjectAssets({
+        "./one.js": "a".repeat(ASSET_FILE_LIMIT),
+        "./two.js": "b".repeat(ASSET_TOTAL_LIMIT - ASSET_FILE_LIMIT),
+      }),
+    ).toBeUndefined();
+    expect(
+      validateProjectAssets({
+        "./large.js": "a".repeat(ASSET_FILE_LIMIT + 1),
+      }),
+    ).toContain("./large.js exceeds");
+    expect(
+      validateProjectAssets({
+        "./hebrew.js": "א".repeat(Math.floor(ASSET_FILE_LIMIT / 2) + 1),
+      }),
+    ).toContain("./hebrew.js exceeds");
+    expect(
+      validateProjectAssets({
+        "./one.js": "a".repeat(40_000),
+        "./two.js": "b".repeat(40_000),
+        "./three.js": "c".repeat(20_001),
+      }),
+    ).toContain("asset total limit");
   });
 
   describe("playground project imports", () => {

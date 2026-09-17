@@ -1,0 +1,19 @@
+{
+  "id": "connections-panel",
+  "title": "Connections panel",
+  "summary": "Project categories and pages from one bounded links capture, then hide or reveal captured previews.",
+  "coverage": "Dated Micah 6:8 links capture reduced to 22 real entries, including 21 Quoting Commentary entries for page 2; zero requests.",
+  "files": {
+    "html": "index.html",
+    "css": "styles.css",
+    "javascript": "main.js"
+  },
+  "assets": [
+    {
+      "specifier": "./links.js",
+      "path": "../shared/micah-6-8-links.js"
+    }
+  ],
+  "sourceBaseUrl": "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/projects/connections-panel/",
+  "liveDemoUrl": "../explorer/connections.html"
+}
