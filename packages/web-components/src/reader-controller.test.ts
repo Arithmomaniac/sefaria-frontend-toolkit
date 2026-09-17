@@ -11,9 +11,11 @@ import { describe, expect, it, vi } from "vitest";
 import linksFixture from "../../client/test/fixtures/links-connections-preview-2026-09-06.json";
 import sectionFixture from "../../client/test/fixtures/v3-connections-genesis-section-2026-09-06.json";
 import targetFixture from "../../client/test/fixtures/v3-connections-genesis-target-2026-09-06.json";
+import micahTargetFixture from "../../../examples/react-vite/src/micah-6-8.json";
 import {
   createReaderConnectionsContent,
   createReaderSourceContent,
+  type ReaderConnectionsContent,
   type ReaderSourceContent,
 } from "./reader-session.js";
 import type { SourceCardRequest } from "./source-card.js";
@@ -30,6 +32,10 @@ const contextualTarget = zCoreV3TextsResponse.parse(
 const contextualSection = zCoreV3TextsResponse.parse(
   sectionFixture,
 ) as CoreV3TextsResponse;
+const micahTarget = zCoreV3TextsResponse.parse(
+  micahTargetFixture,
+) as CoreV3TextsResponse;
+const syntheticMicahContext = createSyntheticMicahContext();
 const parsedLinks = zCoreLinkResponse.parse(linksFixture) as CoreLinkResponse;
 if (
   !Array.isArray(parsedLinks) ||
@@ -41,6 +47,65 @@ if (
 const baseLink: CoreLinkObject = parsedLinks[0];
 
 describe("reader controller initialization", () => {
+  it("retains a server-qualified segment target when an alias requires context", async () => {
+    const requests: {
+      readonly path: string;
+      readonly versions: readonly string[];
+      readonly returnFormat: string | null;
+    }[] = [];
+    const client = createSefariaClient({
+      cache: false,
+      fetch: async (input) => {
+        const request = input instanceof Request ? input : new Request(input);
+        const url = new URL(request.url);
+        const path = decodeURIComponent(url.pathname);
+        requests.push({
+          path,
+          versions: url.searchParams.getAll("version"),
+          returnFormat: url.searchParams.get("return_format"),
+        });
+        if (path === "/api/v3/texts/micah 6:8") {
+          return Response.json(micahTarget);
+        }
+        if (path === "/api/v3/texts/Micah 6") {
+          return Response.json(syntheticMicahContext);
+        }
+        if (path === "/api/links/Micah 6:8") {
+          return Response.json([]);
+        }
+        throw new Error(`Unexpected request: ${path}`);
+      },
+    });
+
+    const controller = await loadReaderController(
+      { tref: "micah 6:8" },
+      client,
+    );
+
+    expect(controller.snapshot.reader.selectedTarget?.ref).toBe("Micah 6:8");
+    expect(controller.snapshot.reader.source?.viewModel).toMatchObject({
+      state: "data",
+      header: { ref: "Micah 6" },
+    });
+    expect(requests).toEqual([
+      {
+        path: "/api/v3/texts/micah 6:8",
+        versions: ["primary", "translation"],
+        returnFormat: "default",
+      },
+      {
+        path: "/api/v3/texts/Micah 6",
+        versions: ["primary", "translation"],
+        returnFormat: "default",
+      },
+      {
+        path: "/api/links/Micah 6:8",
+        versions: [],
+        returnFormat: null,
+      },
+    ]);
+  });
+
   it("uses source-card defaults, qualifies context once, and selects the exact returned row", async () => {
     const requests: URL[] = [];
     const client = createSefariaClient({
@@ -219,6 +284,60 @@ describe("reader controller initialization", () => {
 
     expect(fetch).toHaveBeenCalledTimes(2);
   });
+
+  it.each([
+    {
+      request: "Micah 6",
+      target: syntheticMicahContext,
+      expectedSourceRequests: ["Micah 6"],
+      expectedSelectedRef: "Micah 6:1",
+    },
+    {
+      request: "Micah 6:7-8",
+      target: createSyntheticMicahRange(),
+      expectedSourceRequests: ["Micah 6:7-8", "Micah 6"],
+      expectedSelectedRef: "Micah 6:7",
+    },
+  ])(
+    "preserves the canonical $request first-segment contract",
+    async ({
+      request,
+      target,
+      expectedSourceRequests,
+      expectedSelectedRef,
+    }) => {
+      const sourceRequests: string[] = [];
+      const linksRequests: string[] = [];
+      const client = createSefariaClient({
+        cache: false,
+        fetch: async (input) => {
+          const path = decodeURIComponent(
+            new URL(input instanceof Request ? input.url : input).pathname,
+          );
+          if (path.startsWith("/api/v3/texts/")) {
+            const tref = path.slice("/api/v3/texts/".length);
+            sourceRequests.push(tref);
+            return Response.json(
+              tref === request ? target : syntheticMicahContext,
+            );
+          }
+          if (path.startsWith("/api/links/")) {
+            linksRequests.push(path.slice("/api/links/".length));
+            return Response.json([]);
+          }
+          throw new Error(`Unexpected request: ${path}`);
+        },
+      });
+
+      const controller = await loadReaderController({ tref: request }, client);
+
+      expect(controller.snapshot.reader.selectedTarget?.ref).toBe(
+        expectedSelectedRef,
+      );
+      expect(sourceRequests).toEqual(expectedSourceRequests);
+      expect(linksRequests).toEqual([expectedSelectedRef]);
+    },
+  );
 });
 
 describe("reader controller state and operations", () => {
@@ -308,6 +427,116 @@ describe("reader controller state and operations", () => {
     });
     expect(controller.snapshot.reader.connections?.state).toBe("component");
     expect(loadConnections).toHaveBeenCalledTimes(2);
+  });
+
+  it("rejects a mismatched source ref before mutation, cancellation, publication, or I/O", async () => {
+    const pending = deferred<ReaderConnectionsContent>();
+    let activeSignal: AbortSignal | undefined;
+    const loadConnections = vi
+      .fn()
+      .mockImplementationOnce(
+        (
+          _request: { readonly tref: string },
+          _projection: object,
+          signal: AbortSignal,
+        ) => {
+          activeSignal = signal;
+          return pending.promise;
+        },
+      )
+      .mockResolvedValueOnce(connectionsContent("Micah 6:7"));
+    const controller = createReaderController(
+      { source: sourceContent("Micah 6"), selectedPosition: [7] },
+      { loadSource: vi.fn(), loadConnections },
+    );
+    const snapshots: unknown[] = [];
+    controller.subscribe((snapshot) => snapshots.push(snapshot));
+
+    const valid = controller.selectSource({
+      originEntryId: "entry-1",
+      position: [6],
+      ref: "Micah 6:7",
+    });
+    await vi.waitFor(() => expect(activeSignal).toBeDefined());
+    const pendingSnapshot = controller.snapshot;
+    const publicationCount = snapshots.length;
+
+    await expect(
+      controller.selectSource({
+        originEntryId: "entry-1",
+        position: [7],
+        ref: "Micah 6:7",
+      }),
+    ).rejects.toMatchObject({
+      code: "invalid-selection",
+    });
+
+    expect(activeSignal?.aborted).toBe(false);
+    expect(controller.snapshot).toBe(pendingSnapshot);
+    expect(snapshots).toHaveLength(publicationCount);
+    expect(controller.snapshot.reader.selectedTarget?.ref).toBe("Micah 6:7");
+    expect(controller.snapshot.task).toMatchObject({
+      state: "loading-connections",
+      request: { tref: "Micah 6:7", withText: true },
+    });
+    expect(loadConnections).toHaveBeenCalledOnce();
+
+    pending.resolve(connectionsContent("Micah 6:7"));
+    await valid;
+
+    expect(controller.snapshot.reader.selectedTarget?.ref).toBe("Micah 6:7");
+    expect(controller.snapshot.reader.connections).toMatchObject({
+      state: "component",
+    });
+    expect(loadConnections.mock.calls[0]?.[0]).toEqual({
+      tref: "Micah 6:7",
+      withText: true,
+    });
+  });
+
+  it("rejects stale, absent, and non-addressable source selections before I/O", async () => {
+    const dataSource = fixtureDataSource();
+    const controller = createReaderController(
+      { source: sourceContent("Micah 6"), selectedPosition: [7] },
+      dataSource,
+    );
+
+    await expect(
+      controller.selectSource({
+        originEntryId: "entry-0",
+        position: [7],
+        ref: "Micah 6:8",
+      }),
+    ).rejects.toMatchObject({ code: "stale-action" });
+    await expect(
+      controller.selectSource({
+        originEntryId: "entry-1",
+        position: [999],
+        ref: "Micah 6:1000",
+      }),
+    ).rejects.toMatchObject({ code: "invalid-selection" });
+
+    const spanningSource = createReaderSourceContent(
+      createSyntheticSpanningMicah(),
+      { tref: "Micah 6:8-7:1" },
+    );
+    const spanningController = createReaderController(
+      { source: spanningSource },
+      dataSource,
+    );
+    const item = spanningController.snapshot.reader.source?.viewModel;
+    if (item?.state !== "data" || !item.items[0]) {
+      throw new Error("Expected spanning source content.");
+    }
+    await expect(
+      spanningController.selectSource({
+        originEntryId: "entry-1",
+        position: item.items[0].position,
+        ref: "Micah 6:8",
+      }),
+    ).rejects.toMatchObject({ code: "invalid-selection" });
+
+    expect(dataSource.loadConnections).not.toHaveBeenCalled();
   });
 
   it("reports a mismatched source request without committing a new entry", async () => {
@@ -650,6 +879,52 @@ function sectionSourcePayload(
     version.text = version.text.map(() => "X".repeat(textLength));
   }
   return payload;
+}
+
+function createSyntheticMicahContext(): CoreV3TextsResponse {
+  const payload = structuredClone(micahTarget);
+  payload.ref = payload.sectionRef;
+  payload.heRef = payload.heSectionRef;
+  payload.sections = payload.sections.slice(0, -1);
+  payload.toSections = payload.toSections.slice(0, -1);
+  for (const version of payload.versions) {
+    const target = version.text;
+    if (Array.isArray(target)) {
+      throw new TypeError("Expected a scalar Micah target.");
+    }
+    version.text = Array.from({ length: 8 }, (_, index) =>
+      index === 7
+        ? target
+        : `[synthetic Micah 6:${index + 1} context for reader tests]`,
+    );
+  }
+  return zCoreV3TextsResponse.parse(payload) as CoreV3TextsResponse;
+}
+
+function createSyntheticMicahRange(): CoreV3TextsResponse {
+  const payload = structuredClone(syntheticMicahContext);
+  payload.ref = "Micah 6:7-8";
+  payload.heRef = "מיכה ו׳:ז׳-ח׳";
+  payload.sections = ["6", "7"];
+  payload.toSections = ["6", "8"];
+  for (const version of payload.versions) {
+    if (!Array.isArray(version.text)) {
+      throw new TypeError("Expected synthetic Micah context arrays.");
+    }
+    version.text = version.text.slice(6, 8);
+  }
+  return zCoreV3TextsResponse.parse(payload) as CoreV3TextsResponse;
+}
+
+function createSyntheticSpanningMicah(): CoreV3TextsResponse {
+  const payload = structuredClone(syntheticMicahContext);
+  payload.ref = "Micah 6:8-7:1";
+  payload.heRef = "מיכה ו׳:ח׳-ז׳:א׳";
+  payload.sections = ["6", "8"];
+  payload.toSections = ["7", "1"];
+  payload.isSpanning = true;
+  payload.spanningRefs = ["Micah 6:8", "Micah 7:1"];
+  return zCoreV3TextsResponse.parse(payload) as CoreV3TextsResponse;
 }
 
 function sourceContent(sectionRef: string, textLength = 20) {

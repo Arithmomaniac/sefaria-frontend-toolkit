@@ -357,6 +357,7 @@ class ReaderControllerImpl implements ReaderController {
 
   async selectSource(action: ReaderControllerSourceSelection): Promise<void> {
     this.requireCurrent(action.originEntryId);
+    const selectedRef = this.requireSourceSelection(action);
     const active = this.startPhysicalOperation();
     const selected = this.apply(
       this.#session.selectSourcePosition(action.originEntryId, action.position),
@@ -367,7 +368,7 @@ class ReaderControllerImpl implements ReaderController {
     }
     await this.loadConnections(
       action.originEntryId,
-      normalizeConnectionsRequest({ tref: action.ref, withText: true }),
+      normalizeConnectionsRequest({ tref: selectedRef, withText: true }),
       {},
       active,
     );
@@ -651,6 +652,29 @@ class ReaderControllerImpl implements ReaderController {
     );
   }
 
+  private requireSourceSelection(
+    action: ReaderControllerSourceSelection,
+  ): string {
+    const source = this.#session.view.current.source?.viewModel;
+    const selected =
+      source?.state === "data"
+        ? source.items.find((item) => sameJson(item.position, action.position))
+        : undefined;
+    if (selected?.ref === undefined) {
+      throw new ReaderControllerError(
+        "invalid-selection",
+        "Selected position has no addressable source reference.",
+      );
+    }
+    if (selected.ref !== action.ref) {
+      throw new ReaderControllerError(
+        "invalid-selection",
+        `Selected position resolves to ${selected.ref}, not ${action.ref}.`,
+      );
+    }
+    return selected.ref;
+  }
+
   private apply(transition: ReaderTransition): boolean {
     this.#session = transition.session;
     if (transition.state === "rejected") {
@@ -735,6 +759,12 @@ async function resolveDestination(
   let selectedRef = targetData.viewModel.items.find(
     (item) => item.ref === request.tref,
   )?.ref;
+  if (
+    selectedRef === undefined &&
+    targetData.navigation.state === "available"
+  ) {
+    selectedRef = targetData.navigation.firstRef;
+  }
   let content = target;
   let navigation = targetData.navigation;
   if (navigation.state === "context-required") {

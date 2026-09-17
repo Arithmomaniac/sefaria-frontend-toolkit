@@ -159,6 +159,10 @@ Only task-relevant decisions are summarized here. The pointers retain traceabili
 
 **Observed in pinned source, not a new live-UI capture:** the navigation comparison uses Sefaria Web commit `05863b62ce0b7aa176b74df3bc8bfbdeb0bf171f` and Sefaria Mobile commit `77eb30f66ea71a0af6638c3b5c03a4624f68da8f`. These frontend observations do not replace the existing transport/OpenAPI pin.
 
+**Local regression replay on September 17, 2026:** the existing validated [`examples/react-vite/src/micah-6-8.json`](../examples/react-vite/src/micah-6-8.json) payload established the canonical target `Micah 6:8`. A test-only, explicitly synthetic eight-row `Micah 6` context was derived from that payload by retaining its eighth text leaf and labeling the other seven leaves as synthetic. With client caching disabled, the pre-fix controller requested the alias target, canonical section, and then links for `Micah 6:1`; the corrected controller retains the initial response's server-qualified target and requests links for `Micah 6:8`. This is deterministic local regression evidence, not a deployed context capture.
+
+**Local selection-integrity replay on September 17, 2026:** a current `Micah 6` entry paired position `Micah 6:8` with an informational event reference of `Micah 6:7`. Before correction, the session selected `Micah 6:8` while the controller requested links for `Micah 6:7`. The corrected controller resolves the current item by entry identity and position, requires reference agreement, and rejects the mismatch before changing state, cancelling an unrelated valid in-flight operation, notifying subscribers, or performing another request.
+
 | Concern | Source observation |
 | --- | --- |
 | Web reader ownership | [`ReaderApp.jsx`](https://github.com/Sefaria/Sefaria-Project/blob/05863b62ce0b7aa176b74df3bc8bfbdeb0bf171f/static/js/ReaderApp.jsx) owns `panels`, `setPanelState`, `makeHistoryState`, and browser `pushState`/`replaceState`. `openTextListAt` inserts or replaces a connections panel adjacent to its driving panel. `handleCitationClick` can close a following panel and insert a text panel through `openPanelAt`. |
