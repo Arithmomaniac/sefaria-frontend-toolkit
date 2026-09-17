@@ -115,6 +115,8 @@ Review the initial corrections for:
 - [ ] Duplicate binding rejects; unbinding is idempotent and does not dispose the controller.
 - [ ] Deferred defaults honor `preventDefault()` after dispatch and verify that the same binding plus originating committed result or Reader entry remain current.
 - [ ] Reader remains specialized and its presentation snapshot remains separate from its rendering view model.
+- [ ] Optional Reader toolbar content is additive, absent from the no-view-model initial loading state, and uses current public host state rather than private DOM inspection.
+- [ ] Reader parts expose only `toolbar`, `history`, `source-pane`, and `connections-pane`; generated metadata matches template evidence in both directions and forwards no undeclared child part.
 
 ### Text segment
 

@@ -106,11 +106,13 @@ input:focus-visible {
 }
 
 #status,
+#bookmark-status,
 #host-error {
   margin: 0;
 }
 
-#status {
+#status,
+#bookmark-status {
   color: var(--muted);
 }
 
@@ -227,6 +229,35 @@ sefaria-reader {
   display: block;
   width: min(100%, 90rem);
   margin-inline: auto;
+}
+
+#workspace[data-surface="reader"] sefaria-reader::part(toolbar) {
+  gap: 0.75rem;
+}
+
+#workspace[data-surface="reader"] sefaria-reader::part(history) {
+  padding-block-end: 0.15rem;
+}
+
+#workspace[data-surface="reader"] sefaria-reader::part(source-pane) {
+  background: var(--surface);
+}
+
+#workspace[data-surface="reader"] sefaria-reader::part(connections-pane) {
+  background: var(--surface-muted);
+}
+
+.reader-bookmark {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--surface);
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-weight: 600;
+}
+
+.reader-bookmark:hover:not(:disabled) {
+  color: var(--surface);
+  background: var(--accent);
 }
 
 @container (max-width: 40rem) {
