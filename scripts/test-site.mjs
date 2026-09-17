@@ -644,6 +644,55 @@ try {
     );
     await capture(page, "site-mobile.png");
 
+    for (const width of [660, 720, 768, 960, 1024]) {
+      await page.setViewportSize({ width, height: 1024 });
+      await page.goto(siteRouteUrl("/"), {
+        waitUntil: "networkidle",
+      });
+      const compactHeroActions = await page
+        .locator(".VPHomeHero .action")
+        .evaluateAll((actions) =>
+          actions.map((action) => {
+            const actionBounds = action.getBoundingClientRect();
+            const button = action.querySelector("a");
+            const text = button?.firstChild;
+            const buttonBounds = button?.getBoundingClientRect();
+            const textRange = globalThis.document.createRange();
+            if (text) {
+              textRange.selectNodeContents(text);
+            }
+            const textBounds = text ? textRange.getBoundingClientRect() : null;
+            return {
+              action: {
+                y: actionBounds.y,
+                width: actionBounds.width,
+              },
+              button: buttonBounds
+                ? { left: buttonBounds.left, right: buttonBounds.right }
+                : null,
+              text: textBounds
+                ? { left: textBounds.left, right: textBounds.right }
+                : null,
+            };
+          }),
+        );
+      if (
+        compactHeroActions.length !== 3 ||
+        new Set(compactHeroActions.map(({ action }) => Math.round(action.y)))
+          .size !== (width <= 700 ? 3 : 1) ||
+        compactHeroActions.some(
+          ({ button, text }) =>
+            !button ||
+            !text ||
+            text.left < button.left ||
+            text.right > button.right,
+        )
+      ) {
+        throw new Error(
+          `Hero actions overflow or wrap at ${width}px: ${JSON.stringify(compactHeroActions)}`,
+        );
+      }
+    }
     await page.setViewportSize({ width: 768, height: 1024 });
     await page.goto(siteRouteUrl("/components.html"), {
       waitUntil: "networkidle",
