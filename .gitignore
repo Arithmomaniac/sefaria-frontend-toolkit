@@ -13,6 +13,7 @@ demos/mcp/fixture-server/src/sefaria_mcp_fixture/static/
 demos/mcp/fixture-server/uv.lock
 packages/.sefaria-client-refresh-*/
 packages/client/test/.fixture-candidate-stage-*/
+examples/playground/public/runtime-graph.json
 
 # Test and coverage output
 .artifacts/

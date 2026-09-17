@@ -72,6 +72,21 @@ for (const step of createSiteBuildSteps({ skipTypecheck, siteBasePath })) {
     );
     continue;
   }
+  if (step.kind === "playground") {
+    const destination = path.join(stagedPublic, "examples", step.route);
+    runPnpm(["--filter", step.packageName, "build:graph"]);
+    runPnpm([
+      "--filter",
+      step.packageName,
+      "exec",
+      "vite",
+      "build",
+      `--base=${step.base}`,
+      `--outDir=${destination}`,
+      "--emptyOutDir",
+    ]);
+    continue;
+  }
   if (!examplesOnly) {
     runPnpm(["exec", "vitepress", "build", "docs"], {
       ...process.env,
