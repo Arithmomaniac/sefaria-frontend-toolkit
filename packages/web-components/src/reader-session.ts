@@ -20,6 +20,7 @@ import {
   type SourceCardRequest,
   type SourceCardViewModel,
 } from "./source-card.js";
+import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
 
 const DEFAULT_MAX_ENTRIES = 20;
 const DEFAULT_MAX_CAPTURE_BYTES = 20 * 1024 * 1024;
@@ -98,6 +99,8 @@ export interface ReaderPresentation {
   readonly sideOrder: BilingualPairSideOrder;
   /** Whether captured connection previews should be displayed. */
   readonly showConnectionPreviews: boolean;
+  /** Hebrew vocalization preset applied to rendered source and previews. */
+  readonly vocalizationMode: VocalizationMode;
 }
 
 /** Optional reader display values overridden while creating or updating an entry. */
@@ -110,6 +113,8 @@ export interface ReaderPresentationPatch {
   readonly sideOrder?: BilingualPairSideOrder;
   /** Whether captured connection previews should be displayed. */
   readonly showConnectionPreviews?: boolean;
+  /** Hebrew vocalization preset applied to rendered source and previews. */
+  readonly vocalizationMode?: VocalizationMode;
 }
 
 /** Initial content and local state for one reader history entry. */
@@ -1181,6 +1186,7 @@ function presentationFrom(
     layout: "auto",
     sideOrder: "primary-first",
     showConnectionPreviews: true,
+    vocalizationMode: "taamim_and_nikkud",
   },
 ): ReaderPresentation {
   const result = {
@@ -1189,11 +1195,13 @@ function presentationFrom(
     sideOrder: patch.sideOrder ?? base.sideOrder,
     showConnectionPreviews:
       patch.showConnectionPreviews ?? base.showConnectionPreviews,
+    vocalizationMode: patch.vocalizationMode ?? base.vocalizationMode,
   };
   if (
     !["primary", "translation", "both"].includes(result.contentLanguage) ||
     !["auto", "stacked", "side-by-side"].includes(result.layout) ||
-    !["primary-first", "translation-first"].includes(result.sideOrder)
+    !["primary-first", "translation-first"].includes(result.sideOrder) ||
+    !["taamim_and_nikkud", "nikkud", "none"].includes(result.vocalizationMode)
   ) {
     throw new TypeError("Reader presentation contains an unsupported value.");
   }

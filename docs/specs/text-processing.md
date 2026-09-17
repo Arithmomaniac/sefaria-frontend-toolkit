@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
 
 # Text-processing specification
 
@@ -12,7 +12,7 @@ The package remains in the architecture because sanitization, vocalization, and 
 
 `@arithmomaniac/sefaria-text-transform` owns deterministic text changes. It has no network, DOM rendering, API transport, component view-model, or host responsibility.
 
-Component pure factories call these operations before unsafe or presentation-specific text enters a view model. Elements render the resulting view model without reparsing an API payload.
+Component pure factories call the safety and structural operations before text enters a view model. Component view models retain the full safe text. Elements can call the vocalization operations only to derive a reversible local presentation from that immutable safe data; they do not reparse an API payload or repeat sanitization or footnote extraction.
 
 ## Common contract
 
@@ -440,14 +440,14 @@ A component pure factory owns this sequence:
 
 1. Sanitize the API HTML with the selected narrowing options.
 2. Extract structured footnotes from the sanitized HTML.
-3. Apply `applyVocalizationToHtml` to HTML body parts and non-null note content, and apply `applyVocalization` to plain marker text.
+3. Preserve the full-mark safe HTML body parts, plain marker text, and null-or-HTML note content in the component-specific view model.
 4. Assign component-specific rendering fields, including accessible IDs.
 
 `extractFootnotes` is deterministic on any parsed input, but it does not independently claim that unsanitized input is safe.
 
-Raw payload HTML must not be stored in a component view model for later interpretation. A view model can contain sanitized and transformed HTML fragments plus typed marker and note fields.
+Raw payload HTML must not be stored in a component view model for later interpretation. A view model can contain sanitized full-mark HTML fragments plus typed marker and note fields.
 
-The element must not repeat sanitization, vocalization, footnote extraction, or API parsing during rendering.
+The element must not repeat sanitization, footnote extraction, or API parsing during rendering. A Hebrew-capable element can expose the existing three `VocalizationMode` presets as a presentation property. Full `taamim_and_nikkud` mode renders the original safe view-model fields directly and performs zero vocalization calls. A non-full mode derives HTML through `applyVocalizationToHtml` and plain marker text through `applyVocalization`, always from the immutable original fields rather than a previously transformed result. The derivation is refreshed only when the leaf view-model identity or mode changes, so unrelated reactive presentation changes do not repeat Unicode work.
 
 ## Compatibility evidence
 

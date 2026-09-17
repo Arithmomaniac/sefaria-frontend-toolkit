@@ -522,6 +522,7 @@ test("forwards pair presentation properties to every item", async () => {
   host.contentLanguage = "translation";
   host.layout = "side-by-side";
   host.sideOrder = "translation-first";
+  host.vocalizationMode = "none";
   await host.updateComplete;
 
   const pairs = [
@@ -537,6 +538,13 @@ test("forwards pair presentation properties to every item", async () => {
     ["translation", "side-by-side", "translation-first"],
     ["translation", "side-by-side", "translation-first"],
   ]);
+  const segments = [
+    ...(host.shadowRoot?.querySelectorAll("sefaria-text-segment") ?? []),
+  ];
+  expect(segments.length).toBeGreaterThan(0);
+  expect(segments.every((segment) => segment.vocalizationMode === "none")).toBe(
+    true,
+  );
   expect(
     [
       ...(host.shadowRoot?.querySelectorAll<HTMLElement>(".attribution") ?? []),

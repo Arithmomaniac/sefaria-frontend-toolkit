@@ -794,15 +794,22 @@ describe("reader controller state and operations", () => {
     expect(Object.isFrozen(controller.snapshot)).toBe(true);
     expect(Object.isFrozen(controller.snapshot.reader)).toBe(true);
     expect(Object.isFrozen(controller.snapshot.reader.breadcrumbs)).toBe(true);
+    const reader = controller.snapshot.reader;
+    const source = reader.source?.viewModel;
+    const connections = reader.connections;
 
     unsubscribe();
     controller.setPresentation({
       originEntryId: "entry-1",
-      patch: { contentLanguage: "primary" },
+      patch: { contentLanguage: "primary", vocalizationMode: "none" },
     });
     expect(listener).toHaveBeenCalledOnce();
     expect(reportError).toHaveBeenCalledTimes(2);
-    expect(controller.snapshot.reader.source?.contentLanguage).toBe("primary");
+    expect(controller.snapshot.presentation.contentLanguage).toBe("primary");
+    expect(controller.snapshot.presentation.vocalizationMode).toBe("none");
+    expect(controller.snapshot.reader).toBe(reader);
+    expect(controller.snapshot.reader.source?.viewModel).toBe(source);
+    expect(controller.snapshot.reader.connections).toBe(connections);
 
     controller.dispose();
     expect(() => controller.back({ originEntryId: "entry-1" })).toThrowError(

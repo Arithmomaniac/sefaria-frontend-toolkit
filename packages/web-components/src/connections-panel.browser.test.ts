@@ -65,6 +65,9 @@ test("renders safe previews, missing sides and composed navigation without reque
     element.shadowRoot?.querySelector<HTMLElement>(".preview.hebrew");
   expect(hebrewPreview?.lang).toBe("he");
   expect(hebrewPreview?.dir).toBe("rtl");
+  element.vocalizationMode = "none";
+  await element.updateComplete;
+  expect(hebrewPreview?.textContent).toBe("טקסט");
   expect(element.shadowRoot?.textContent).toContain("Preview shortened");
   element.showPreviews = false;
   await element.updateComplete;

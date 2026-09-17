@@ -5,11 +5,18 @@ import {
   type PropertyValues,
   type TemplateResult,
 } from "lit";
+import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
 
+import type {
+  BilingualPairContentLanguage,
+  BilingualPairLayout,
+  BilingualPairSideOrder,
+} from "./bilingual-pair.js";
 import "./connections-panel-element.js";
 import "./source-card-element.js";
 import { SefariaElement } from "./sefaria-element.js";
 import type { ReaderPane, ReaderViewModel } from "./reader.js";
+import { assertVocalizationMode } from "./vocalization-display.js";
 
 interface SourceSelectDetail {
   readonly position: readonly number[];
@@ -36,6 +43,14 @@ export class SefariaReader extends SefariaElement {
     viewModel: { attribute: false },
     activePane: { type: String, attribute: "active-pane" },
     chatExport: { type: Boolean, attribute: "chat-export" },
+    contentLanguage: { type: String, attribute: "content-language" },
+    layout: { type: String },
+    sideOrder: { type: String, attribute: "side-order" },
+    showConnectionPreviews: {
+      type: Boolean,
+      attribute: "show-connection-previews",
+    },
+    vocalizationMode: { type: String, attribute: "vocalization-mode" },
   };
 
   /** Responsive reader composition and accessible navigation styles. */
@@ -274,14 +289,30 @@ export class SefariaReader extends SefariaElement {
   declare activePane: ReaderPane;
   /** Shows an explicit host-mediated chat export action when a target exists. */
   declare chatExport: boolean;
+  /** Source-card roles displayed by the controlled reader. */
+  declare contentLanguage: BilingualPairContentLanguage;
+  /** Source-card bilingual arrangement. */
+  declare layout: BilingualPairLayout;
+  /** First source-card role in side-by-side layout. */
+  declare sideOrder: BilingualPairSideOrder;
+  /** Whether captured connection previews are visible. */
+  declare showConnectionPreviews: boolean;
+  /** Hebrew vocalization preset applied to source and preview text. */
+  declare vocalizationMode: VocalizationMode;
 
   constructor() {
     super();
     this.activePane = "source";
     this.chatExport = false;
+    this.contentLanguage = "both";
+    this.layout = "auto";
+    this.sideOrder = "primary-first";
+    this.showConnectionPreviews = true;
+    this.vocalizationMode = "taamim_and_nikkud";
   }
 
   protected override render(): TemplateResult | typeof nothing {
+    assertVocalizationMode(this.vocalizationMode);
     const viewModel = this.viewModel;
     if (viewModel === undefined) return nothing;
     const activePane = this.#effectivePane(viewModel);
@@ -407,9 +438,10 @@ export class SefariaReader extends SefariaElement {
     return html`<sefaria-source-card
       .viewModel=${source.viewModel}
       .selectedPosition=${source.selectedPosition}
-      .contentLanguage=${source.contentLanguage}
-      .layout=${source.layout}
-      .sideOrder=${source.sideOrder}
+      .contentLanguage=${this.contentLanguage}
+      .layout=${this.layout}
+      .sideOrder=${this.sideOrder}
+      .vocalizationMode=${this.vocalizationMode}
       .showAddressLabels=${true}
       ?selectable=${source.viewModel.state === "data"}
       @sefaria-source-select=${this.#sourceSelect}
@@ -433,7 +465,8 @@ export class SefariaReader extends SefariaElement {
     }
     return html`<sefaria-connections-panel
       .viewModel=${connections.viewModel}
-      .showPreviews=${connections.showPreviews}
+      .showPreviews=${this.showConnectionPreviews}
+      .vocalizationMode=${this.vocalizationMode}
       @sefaria-connections-category-change=${this.#category}
       @sefaria-connections-page-change=${this.#page}
       @sefaria-connection-select=${this.#connection}

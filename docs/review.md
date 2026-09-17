@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot with human review/feedback by avilevin.
+> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
 
 # Review guide
 
@@ -107,7 +107,7 @@ Review the initial corrections for:
 - [ ] `projectTextSegmentVersion` projects an already-selected `CoreV3Version` without language-family reselection.
 - [ ] Request-based text-segment projection delegates post-selection work to `projectTextSegmentVersion`.
 - [ ] Role-based composites resolve sides before they call `projectTextSegmentVersion`.
-- [ ] The resolved-version projection owns sanitization, vocalization, footnotes, direction, and language.
+- [ ] The resolved-version projection owns sanitization, full-mark footnotes, direction, and language; the element derives non-full vocalization only from the immutable safe view model.
 - [ ] Request warnings remain with the selector-owning factory or composite.
 - [ ] The resolved-version projection does not assign payload warnings to an existing selected version.
 - [ ] A composite maps a missing role and its warning without calling the resolved-version projection.

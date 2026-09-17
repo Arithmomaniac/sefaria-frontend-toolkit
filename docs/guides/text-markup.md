@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
 
 # HTML inside Sefaria text
 
@@ -14,7 +14,7 @@ Subsegment tags belong to a Version's text rather than an Index. Different editi
 
 ## Start with the boundary
 
-The client validates the response shape. A non-DOM component factory owns the text boundary: it sanitizes the API HTML, extracts structured footnotes, applies vocalization to text nodes, and creates render-ready view-model fields. The Web Component receives the view model and renders it; it does not parse an API payload or decide which tags are safe.
+The client validates the response shape. A non-DOM component factory owns the text boundary: it sanitizes the API HTML, extracts structured footnotes, preserves the full safe marks, and creates render-ready view-model fields. The Web Component receives the view model and can derive one of the supported vocalization presentations from those immutable safe fields; it does not parse an API payload or decide which tags are safe.
 
 For the path from client to renderer, read [How the pieces fit together](data-flow.md). The [processing boundary](../specs/text-processing.md#processing-boundary) defines the exact responsibilities.
 
@@ -289,10 +289,10 @@ For a validated API string, the owning pure factory follows this order:
 
 1. `sanitize` the API HTML with options that may narrow approved features but cannot widen the allowlist.
 2. `extractFootnotes` from the sanitized fragment.
-3. Apply `applyVocalizationToHtml` to HTML body parts and non-null note content, and `applyVocalization` to plain marker text.
+3. Preserve the full safe HTML body parts, plain marker text, and null-or-HTML note bodies.
 4. Add component-specific rendering fields such as accessible marker and note IDs.
 
-The element receives the resulting view model. It does not receive a reference, raw JSON, client, base URL, `fetch`, or raw API HTML. For ownership and current/planned boundaries, see [Design](../design.md#ownership), [Development](../development.md#implemented-on-this-baseline), and the [component specification](../specs/components.md#element-contract).
+The element receives the resulting view model. Full `taamim_and_nikkud` mode renders those fields directly. `nikkud` and `none` call `applyVocalizationToHtml` for HTML body and note fragments and `applyVocalization` for plain markers, always starting from the original view model. The element does not receive a reference, raw JSON, client, base URL, `fetch`, or raw API HTML. For ownership and current/planned boundaries, see [Design](../design.md#ownership), [Development](../development.md#implemented-on-this-baseline), and the [component specification](../specs/components.md#element-contract).
 
 ## Read the exhaustive sources
 

@@ -74,14 +74,10 @@ const source = {
     ],
   },
   selectedPosition: [0],
-  contentLanguage: "both",
-  layout: "auto",
-  sideOrder: "primary-first",
 } as const;
 
 const connections = {
   state: "component",
-  showPreviews: true,
   viewModel: {
     state: "data",
     reference: "Micah 6:8",
@@ -160,7 +156,6 @@ export const readerConnectionsLoadingScenario = {
         state: "loading",
         message: "Loading connections for Micah 6:8.",
       },
-      showPreviews: false,
     },
   },
 } satisfies ReaderScenario;

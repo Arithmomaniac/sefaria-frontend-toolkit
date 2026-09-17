@@ -14,6 +14,7 @@ Request-free custom element that renders one bilingual-segment view model.
 | `contentLanguage` | `content-language` | `BilingualSegmentContentLanguage` | `"both"` | Sides the host wants displayed. |
 | `layout` | `layout` | `BilingualSegmentLayout` | `"auto"` | Requested arrangement of the two sides. |
 | `sideOrder` | `side-order` | `BilingualSegmentSideOrder` | `"primary-first"` | Requested role order for a side-by-side arrangement. |
+| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | Hebrew vocalization preset applied to both displayed roles. |
 
 ### Events
 
@@ -33,6 +34,7 @@ Request-free category summaries and bounded connected-text details.
 | --- | --- | --- | --- | --- |
 | `viewModel` | Property only | `ConnectionsViewModel | undefined` | - | Host-supplied rendering state. |
 | `showPreviews` | `show-previews` | `boolean` | `true` | Hides or reveals captured preview data without requesting it. |
+| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | Hebrew vocalization preset applied to safe legacy-channel previews. |
 
 ### Events
 
@@ -58,6 +60,7 @@ Request-free anchored dialog that renders one popup view model.
 | `viewModel` | Property only | `PopupViewModel | undefined` | `undefined` | Render-ready popup state supplied by the integration. |
 | `anchor` | Property only | `HTMLElement | null` | `null` | Host element used for placement and focus restoration. |
 | `open` | `open` | `boolean` | `false` | Whether the dialog is visible. |
+| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | Hebrew vocalization preset applied to the nested source card. |
 
 ### Events
 
@@ -80,6 +83,11 @@ Request-free controlled reader surface for one semantic reader entry.
 | `viewModel` | Property only | `ReaderViewModel | undefined` | - | Host-supplied reader rendering state. |
 | `activePane` | `active-pane` | `ReaderPane` | `"source"` | Host-controlled pane selected in compact presentation. |
 | `chatExport` | `chat-export` | `boolean` | `false` | Shows an explicit host-mediated chat export action when a target exists. |
+| `contentLanguage` | `content-language` | `BilingualPairContentLanguage` | `"both"` | Source-card roles displayed by the controlled reader. |
+| `layout` | `layout` | `BilingualPairLayout` | `"auto"` | Source-card bilingual arrangement. |
+| `sideOrder` | `side-order` | `BilingualPairSideOrder` | `"primary-first"` | First source-card role in side-by-side layout. |
+| `showConnectionPreviews` | `show-connection-previews` | `boolean` | `true` | Whether captured connection previews are visible. |
+| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | Hebrew vocalization preset applied to source and preview text. |
 
 ### Events
 
@@ -132,6 +140,7 @@ Request-free custom element that renders one source-card view model.
 | `contentLanguage` | `content-language` | `BilingualPairContentLanguage` | `"both"` | Sides the host wants displayed for every pair. |
 | `layout` | `layout` | `BilingualPairLayout` | `"auto"` | Requested arrangement for every pair. |
 | `sideOrder` | `side-order` | `BilingualPairSideOrder` | `"primary-first"` | Requested role order for every pair. |
+| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | Hebrew vocalization preset applied to every displayed text leaf. |
 | `showAddressLabels` | Property only | `boolean` | `true` | Whether compact address labels are visible beside rendered text sides. |
 | `selectable` | `selectable` | `boolean` | `false` | Enables selection controls for items with proven canonical targets. |
 | `selectedPosition` | Property only | `readonly number[] | undefined` | `undefined` | Host-controlled original position path, never a reference string. |
@@ -156,6 +165,7 @@ Request-free custom element that renders one text-segment view model.
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
 | `viewModel` | Property only | `TextSegmentViewModel` | - | Render-ready state supplied by the host. |
+| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | Hebrew vocalization preset applied only to the displayed safe text. |
 
 ### Events
 

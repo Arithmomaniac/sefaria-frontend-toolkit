@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
 
 # How the client, view models, and Web Components fit together
 
@@ -63,9 +63,9 @@ A **pure factory** has the name `create...ViewModel`: it projects a payload you 
 1. **Your host** creates a client, chooses a reference and any edition selectors, and supplies a loading view model to the element.
 2. **`loadSourceCardViewModel`** calls the generated v3 text operation through that client.
 3. **`@arithmomaniac/sefaria-client`** validates the JSON response against the generated schema for the operation and HTTP status. A successful TypeScript type does not substitute for that runtime boundary.
-4. **`createSourceCardViewModel`** resolves the requested editions, aligns text by its actual array structure, and delegates text preparation to pure child projections. `@arithmomaniac/sefaria-text-transform` sanitizes HTML, extracts footnotes, and applies vocalization.
+4. **`createSourceCardViewModel`** resolves the requested editions, aligns text by its actual array structure, and delegates text preparation to pure child projections. `@arithmomaniac/sefaria-text-transform` sanitizes HTML and extracts footnotes while preserving full safe marks.
 5. **Your host** assigns the returned view model to the element's `viewModel` JavaScript property.
-6. **The element** renders its Shadow DOM. Layout and side-order changes operate on the supplied model; they do not make another API call.
+6. **The element** renders its Shadow DOM. Layout, side-order, and vocalization-mode changes operate on the supplied immutable model; they do not make another API call or factory call.
 
 The [render-text guide](render-text.md#put-a-source-card-in-a-browser-app) implements this sequence with the current public exports.
 
