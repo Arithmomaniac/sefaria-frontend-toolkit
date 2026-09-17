@@ -760,6 +760,30 @@
           "kind": "class",
           "description": "Request-free controlled reader surface for one semantic reader entry.",
           "name": "SefariaReader",
+          "cssParts": [
+            {
+              "description": "Container for compact pane and host action controls.",
+              "name": "toolbar"
+            },
+            {
+              "description": "Back and retained-history controls.",
+              "name": "history"
+            },
+            {
+              "description": "Scrollable source-text pane.",
+              "name": "source-pane"
+            },
+            {
+              "description": "Scrollable connections pane.",
+              "name": "connections-pane"
+            }
+          ],
+          "slots": [
+            {
+              "description": "Host-owned actions placed after the Reader's built-in toolbar controls.",
+              "name": "toolbar-actions"
+            }
+          ],
           "members": [
             {
               "kind": "field",
@@ -1237,8 +1261,6 @@
           },
           "tagName": "sefaria-reader",
           "customElement": true,
-          "slots": [],
-          "cssParts": [],
           "cssProperties": [
             {
               "name": "--sefaria-surface",

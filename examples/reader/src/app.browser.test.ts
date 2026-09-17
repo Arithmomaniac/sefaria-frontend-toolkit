@@ -49,7 +49,7 @@ beforeEach(() => {
     <header id="site-header">
       <form id="reader-form"><input name="tref" value="Micah 6:8"><button>Open</button><select id="vocalization-mode"><option value="taamim_and_nikkud">Full</option><option value="nikkud">Vowels</option><option value="none">None</option></select></form>
       <nav id="pane-path" aria-label="Open reader panes"></nav>
-      <p id="status"></p><p id="host-error" hidden></p>
+      <p id="status"></p><p id="bookmark-status"></p><p id="host-error" hidden></p>
     </header>
     <main id="workspace"></main>
   </div>`;
@@ -402,6 +402,17 @@ test("drives the supported reader component through navigation and Back", async 
   expect(document.querySelectorAll("sefaria-reader")).toHaveLength(1);
   expect(document.querySelectorAll(".reader-pane")).toHaveLength(0);
   expect(reader.viewModel?.breadcrumbs).toHaveLength(1);
+  const bookmark = reader.querySelector<HTMLButtonElement>(
+    '[slot="toolbar-actions"]',
+  )!;
+  expect(bookmark.textContent).toBe("Bookmark Micah 6:8");
+  expect(bookmark.disabled).toBe(false);
+  const requestsBeforeBookmark = requests.length;
+  bookmark.click();
+  expect(document.querySelector("#bookmark-status")?.textContent).toBe(
+    "Bookmarked Micah 6:8 in this page.",
+  );
+  expect(requests).toHaveLength(requestsBeforeBookmark);
   reader.dispatchEvent(
     new CustomEvent("sefaria-reader-connection-select", {
       detail: {
@@ -466,6 +477,11 @@ test("shows full initial loading before one persistent controlled Reader commits
   );
 
   expect(reader.viewModel).toBeUndefined();
+  const bookmark = reader.querySelector<HTMLButtonElement>(
+    '[slot="toolbar-actions"]',
+  )!;
+  expect(bookmark.disabled).toBe(true);
+  expect(bookmark.assignedSlot).toBeNull();
   expect(
     reader.shadowRoot
       ?.querySelector(".initial-loading")
@@ -479,6 +495,8 @@ test("shows full initial loading before one persistent controlled Reader commits
 
   expect(reader.rootLoading).toBe(false);
   expect(reader.viewModel?.selectedTarget?.ref).toBe("Micah 6:8");
+  expect(bookmark.disabled).toBe(false);
+  expect(bookmark.assignedSlot?.name).toBe("toolbar-actions");
   demo.dispose();
 });
 
@@ -582,6 +600,12 @@ test("replaces an external root on one persistent controlled Reader", async () =
   );
   expect(reader.viewModel?.currentEntryId).toBe("entry-1");
   expect(reader.viewModel?.selectedTarget?.ref).toBe("Micah 6:8");
+  const bookmark = reader.querySelector<HTMLButtonElement>(
+    '[slot="toolbar-actions"]',
+  )!;
+  expect(bookmark.disabled).toBe(true);
+  bookmark.click();
+  expect(document.querySelector("#bookmark-status")?.textContent).toBe("");
   expect(reader.shadowRoot?.textContent).toContain(
     "Opening a new Reader location",
   );
@@ -589,6 +613,7 @@ test("replaces an external root on one persistent controlled Reader", async () =
   await failed;
   await reader.updateComplete;
   expect(reader.rootLoading).toBe(false);
+  expect(bookmark.disabled).toBe(false);
   expect(reader.viewModel?.currentEntryId).toBe("entry-1");
   expect(reader.viewModel?.selectedTarget?.ref).toBe("Micah 6:8");
   expect(document.querySelector("#host-error")?.textContent).toBe(
@@ -609,6 +634,11 @@ test("replaces an external root on one persistent controlled Reader", async () =
   expect(reader.viewModel?.currentEntryId).toBe("entry-2");
   expect(reader.viewModel?.breadcrumbs).toHaveLength(1);
   expect(reader.viewModel?.selectedTarget?.ref).toBe("Micah 6:7");
+  expect(bookmark.textContent).toBe("Bookmark Micah 6:7");
+  bookmark.click();
+  expect(document.querySelector("#bookmark-status")?.textContent).toBe(
+    "Bookmarked Micah 6:7 in this page.",
+  );
   expect(reader.vocalizationMode).toBe("nikkud");
   await vi.waitFor(() =>
     expect(reader.shadowRoot?.activeElement).toBe(

@@ -46,8 +46,36 @@ describe("generated public metadata", () => {
       ),
     ).not.toContain("name");
     for (const element of elements) {
-      expect(element.slots).toEqual([]);
-      expect(element.cssParts).toEqual([]);
+      if (element.tagName === "sefaria-reader") {
+        expect(element.slots).toEqual([
+          {
+            name: "toolbar-actions",
+            description:
+              "Host-owned actions placed after the Reader's built-in toolbar controls.",
+          },
+        ]);
+        expect(element.cssParts).toEqual([
+          {
+            name: "toolbar",
+            description: "Container for compact pane and host action controls.",
+          },
+          {
+            name: "history",
+            description: "Back and retained-history controls.",
+          },
+          {
+            name: "source-pane",
+            description: "Scrollable source-text pane.",
+          },
+          {
+            name: "connections-pane",
+            description: "Scrollable connections pane.",
+          },
+        ]);
+      } else {
+        expect(element.slots).toEqual([]);
+        expect(element.cssParts).toEqual([]);
+      }
       expect(element.cssProperties?.length).toBeGreaterThan(10);
     }
   });
