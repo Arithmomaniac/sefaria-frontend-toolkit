@@ -4,7 +4,7 @@
 
 Sefaria is a free digital library and data source for Jewish texts and translations. This project gives developers reusable frontend/UI building blocks for reading and learning experiences: a complete controlled Reader, smaller request-free Web Components, a validated client, component factories, and pure text processing. Start with a useful surface; the architecture and specifications are optional depth, not prerequisites.
 
-This Markdown page is the repository-native documentation home. The [published documentation site](https://arithmomaniac.github.io/sefaria-frontend-toolkit/) presents the same maintained files through VitePress with isolated interactive examples. `pnpm dev:site` serves that content locally; neither the deployed site nor the local presentation is required to use the source.
+Choose a path by the result you want: [get started](get-started.md), compare the [seven current components](components.md), run an [isolated example](examples.md), or use a [task-focused guide](guides/index.md). The [product site](https://arithmomaniac.github.io/sefaria-frontend-toolkit/) presents these maintained files with interactive previews; the Markdown remains useful directly on GitHub.
 
 ## Start from a complete solution
 
@@ -13,6 +13,7 @@ You do not need to finish the tutorial before using the toolkit:
 | Need | Destination |
 | --- | --- |
 | Prebuilt stateful reading surface | [Controlled Reader lesson](learn/04-reader.md) and [`examples/reader/controlled.html`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/reader/controlled.html) |
+| Compare all rendering surfaces | [Component catalog](components.md) |
 | Component states and live diagnostics | [Example catalog](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/README.md) |
 | A passage card in a browser app | [Render text](guides/render-text.md) |
 | Authored citation popups | [Linked article](linked-article.md) |
@@ -22,7 +23,7 @@ The controlled Reader's navigation controller is supplied by the toolkit. The ap
 
 ## Learn step by step
 
-1. [Understand Web Components and toolkit ownership](learn/01-web-components.md): registration, properties versus attributes, events, encapsulation, and the distinct element, library-behavior, and application-host roles.
+1. [Choose a surface and understand ownership](learn/01-web-components.md): begin with a useful component or Reader outcome, then learn registration, properties, events, and the distinct element, library-behavior, and application-host roles.
 2. [Set up and render supplied data](learn/02-supplied-data.md): private workspace and local-tarball setup, validation, pure projection, and a zero-request Micah 6:8 render.
 3. [Load data and handle interaction](learn/03-live-data.md): explicit async factory calls, loading, visible failures, component selection events, cancellation, and stale-result rejection.
 4. [Use the Reader or compose a custom host](learn/04-reader.md): the supplied controlled Reader controller and the extra responsibilities of custom spatial composition.
@@ -54,6 +55,7 @@ React users can branch from steps 2 and 3 into [Use the Web Components from Reac
 | Inspect generated element metadata | [Custom elements](reference/custom-elements.md) |
 | Inspect declaration-derived package exports | [Public package exports](reference/public-exports.md) |
 | Find historical removed material | [Documentation archive](archive/README.md) |
+| Check the audience and owner of every maintained page | [Documentation map](reference/documentation-map.md) |
 
 ## Specifications
 

@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="570" viewBox="0 0 960 570" role="img" aria-labelledby="title desc">
+  <title id="title">Micah 6:8 source card preview</title>
+  <desc id="desc">A bilingual source card showing Hebrew and English text with a Micah 6:8 heading and edition attribution.</desc>
+  <rect width="960" height="570" fill="#f4efe5"/>
+  <rect x="46" y="38" width="868" height="494" rx="22" fill="#fffdf8" stroke="#c8bca9" stroke-width="2"/>
+  <rect x="46" y="38" width="868" height="88" rx="22" fill="#163f3a"/>
+  <rect x="46" y="102" width="868" height="24" fill="#163f3a"/>
+  <text x="82" y="92" fill="#fffdf8" font-family="Georgia, serif" font-size="32" font-weight="700">Micah 6:8</text>
+  <text x="878" y="88" text-anchor="end" fill="#dceae5" font-family="Arial, sans-serif" font-size="18">מיכה ו׳:ח׳</text>
+  <line x1="480" y1="158" x2="480" y2="444" stroke="#ded5c7" stroke-width="2"/>
+  <text x="82" y="184" fill="#75523b" font-family="Arial, sans-serif" font-size="16" font-weight="700">TRANSLATION</text>
+  <text x="878" y="184" text-anchor="end" fill="#75523b" font-family="Arial, sans-serif" font-size="16" font-weight="700">מקור</text>
+  <text x="82" y="232" fill="#292722" font-family="Georgia, serif" font-size="25">
+    <tspan x="82" dy="0">It has been told to you, human,</tspan>
+    <tspan x="82" dy="38">what is good, and what the Eternal</tspan>
+    <tspan x="82" dy="38">requires of you: only to do justice,</tspan>
+    <tspan x="82" dy="38">love goodness, and walk modestly.</tspan>
+  </text>
+  <text x="878" y="232" text-anchor="end" direction="rtl" fill="#292722" font-family="Arial, sans-serif" font-size="29">
+    <tspan x="878" dy="0">הִגִּיד לְךָ אָדָם מַה טּוֹב</tspan>
+    <tspan x="878" dy="42">וּמָה יְהוָה דּוֹרֵשׁ מִמְּךָ</tspan>
+    <tspan x="878" dy="42">כִּי אִם עֲשׂוֹת מִשְׁפָּט</tspan>
+    <tspan x="878" dy="42">וְאַהֲבַת חֶסֶד</tspan>
+  </text>
+  <text x="82" y="478" fill="#6d675e" font-family="Arial, sans-serif" font-size="15">English and Hebrew editions · supplied fixture</text>
+</svg>

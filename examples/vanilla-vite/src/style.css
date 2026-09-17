@@ -37,3 +37,23 @@ button:disabled {
   cursor: wait;
   opacity: 0.65;
 }
+
+:root[data-embedded-preview] main {
+  width: min(52rem, calc(100% - 1.25rem));
+  margin: 0.75rem auto;
+}
+
+:root[data-embedded-preview] h1 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+:root[data-embedded-preview] #status {
+  color: light-dark(#4f4a42, #d8d2c8);
+  font-size: 0.9rem;
+}

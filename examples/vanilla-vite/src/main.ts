@@ -12,6 +12,14 @@ import {
 import payload from "./micah-6-8.json";
 import "./style.css";
 
+const embeddedPreview = new URLSearchParams(globalThis.location.search).has(
+  "embed",
+);
+document.documentElement.toggleAttribute(
+  "data-embedded-preview",
+  embeddedPreview,
+);
+
 const status = requireElement<HTMLElement>("#status");
 const loadButton = requireElement<HTMLButtonElement>("#load-live");
 const card = requireElement<SefariaSourceCard>("sefaria-source-card");
@@ -22,14 +30,6 @@ const validatedPayload = zCoreV3TextsResponse.parse(
 let requestCount = 0;
 let activeController: AbortController | undefined;
 let activeOperation = 0;
-const client = createSefariaClient({
-  cache: false,
-  fetch: async (input, init) => {
-    requestCount += 1;
-    updateStatus(status.textContent ?? "");
-    return fetch(input, init);
-  },
-});
 
 card.viewModel = createSourceCardViewModel(validatedPayload, {
   tref: "Micah 6:8",
@@ -37,9 +37,13 @@ card.viewModel = createSourceCardViewModel(validatedPayload, {
 card.selectable = true;
 updateStatus("Rendered supplied Micah 6:8 data with zero requests.");
 
-loadButton.addEventListener("click", () => {
-  void loadLive();
-});
+if (embeddedPreview) {
+  loadButton.remove();
+} else {
+  loadButton.addEventListener("click", () => {
+    void loadLive();
+  });
+}
 
 async function loadLive(): Promise<void> {
   activeController?.abort();
@@ -56,7 +60,14 @@ async function loadLive(): Promise<void> {
   try {
     const viewModel = await loadSourceCardViewModel(
       { tref: "Micah 6:8" },
-      client,
+      createSefariaClient({
+        cache: false,
+        fetch: async (input, init) => {
+          requestCount += 1;
+          updateStatus(status.textContent ?? "");
+          return fetch(input, init);
+        },
+      }),
       controller.signal,
     );
     if (operation !== activeOperation || controller.signal.aborted) {

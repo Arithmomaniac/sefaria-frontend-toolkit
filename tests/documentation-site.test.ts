@@ -44,7 +44,9 @@ describe("documentation learning journey", () => {
       "utf8",
     );
 
-    expect(index).toContain("Published documentation");
+    expect(index).toContain("<LandingPreview />");
+    expect(index).toContain("Build a useful Jewish text experience");
+    expect(index).not.toContain("Published documentation");
     expect(config).toContain(
       '"https://github.com/Arithmomaniac/sefaria-frontend-toolkit"',
     );
@@ -56,6 +58,79 @@ describe("documentation learning journey", () => {
     expect(config).toContain(
       '"https://arithmomaniac.github.io/sefaria-frontend-toolkit/"',
     );
+    for (const label of [
+      "Get started",
+      "Components",
+      "Examples",
+      "Guides",
+      "Reference",
+    ]) {
+      expect(config).toContain(`text: "${label}"`);
+    }
+    expect(config).toContain('search: { provider: "local" }');
+  });
+
+  it("catalogs all seven current rendering surfaces without inventing APIs", async () => {
+    const catalog = await readFile(
+      path.join(root, "docs", "components.md"),
+      "utf8",
+    );
+
+    for (const [element, subpath] of [
+      ["<sefaria-ref-label>", "ref-label"],
+      ["<sefaria-text-segment>", "text-segment"],
+      ["<sefaria-bilingual-segment>", "bilingual-segment"],
+      ["<sefaria-source-card>", "source-card"],
+      ["<sefaria-connections-panel>", "connections-panel"],
+      ["<sefaria-popup>", "popup"],
+      ["<sefaria-reader>", "reader"],
+    ]) {
+      expect(catalog).toContain(
+        element.replace("<", "&lt;").replace(">", "&gt;"),
+      );
+      expect(catalog).toContain(
+        `@arithmomaniac/sefaria-web-components/${subpath}`,
+      );
+    }
+    expect(catalog).toContain("Open supplied-data preview");
+    expect(catalog).toContain("Start with the complete Reader");
+  });
+
+  it("classifies maintained reader-facing Markdown in the documentation map", async () => {
+    const map = await readFile(
+      path.join(root, "docs", "reference", "documentation-map.md"),
+      "utf8",
+    );
+    const maintainedPaths = [
+      "README.md",
+      "docs/README.md",
+      "docs/index.md",
+      "docs/get-started.md",
+      "docs/components.md",
+      "docs/examples.md",
+      "docs/guides/index.md",
+      ...lessons.map((lesson) => `docs/learn/${lesson}`),
+      "docs/guides/data-flow.md",
+      "docs/guides/differences.md",
+      "docs/guides/reader-navigation.md",
+      "docs/guides/render-text.md",
+      "docs/guides/text-markup.md",
+      "packages/client/README.md",
+      "packages/text-transform/README.md",
+      "packages/web-components/README.md",
+      "examples/README.md",
+      "examples/explorer/README.md",
+      "examples/linked-article/README.md",
+      "examples/react-vite/README.md",
+      "examples/reader/README.md",
+      "examples/vanilla-vite/README.md",
+    ];
+
+    for (const maintainedPath of maintainedPaths) {
+      expect(map).toContain(`\`${maintainedPath}\``);
+    }
+    expect(map).toContain("Contributor");
+    expect(map).toContain("Archive");
   });
 
   it("documents package builds before direct example development servers", async () => {

@@ -1,18 +1,20 @@
 > Created/edited by GitHub Copilot; pending human review.
 
-# 1. Understand Web Components and toolkit ownership
+# 1. Choose a surface and understand ownership
 
 ## Objective
 
-Understand what the browser registers, why complex values use JavaScript properties rather than HTML attributes, how component events return interaction to the host, and where requests and rendering belong.
+Choose a current rendering surface, show a useful request-free state, and understand what the browser element, toolkit factory, and application host each own.
 
-A Web Component is a browser-standard custom HTML element. One JavaScript import registers it, after which vanilla JavaScript, React, or another browser framework can create the same element and assign its typed properties. React is therefore a host option, not a separate toolkit implementation.
+For a complete reading flow, begin with the [controlled Reader](04-reader.md). For one passage or range, begin with a source card. The [component catalog](../components.md) compares all seven current surfaces and links to working previews.
+
+A Web Component is a browser-standard custom HTML element. One JavaScript import registers it, after which vanilla JavaScript, React, or another browser framework can create the same element and assign its typed properties. You do not need to know Lit to consume the toolkit.
 
 ## Prerequisites
 
 - Node.js 22.12 or later and pnpm 11.22.0.
 - A browser with Chromium-compatible Web Components support. Chromium is the browser qualified by this repository.
-- No knowledge of Lit is required to consume the elements.
+- Choose a surface from the [component catalog](../components.md).
 
 ## Try it
 

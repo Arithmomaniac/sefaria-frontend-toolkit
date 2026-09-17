@@ -27,6 +27,15 @@ try {
     });
     const textRequests = [];
     const unexpectedRequests = [];
+    const browserErrors = [];
+    page.on("console", (message) => {
+      if (message.type() === "error") {
+        browserErrors.push(`console: ${message.text()}`);
+      }
+    });
+    page.on("pageerror", (error) => {
+      browserErrors.push(`pageerror: ${error.message}`);
+    });
     const fixture = JSON.parse(
       await readFile(
         path.join(root, "examples", "react-vite", "src", "micah-6-8.json"),
@@ -75,10 +84,101 @@ try {
 
     await page.goto(siteUrl, { waitUntil: "networkidle" });
     await assertText(page.locator("h1"), "Sefaria Frontend Toolkit");
-    await assertText(page.locator("body"), "Published documentation");
+    await assertText(
+      page.locator("body"),
+      "Build a useful Jewish text experience",
+    );
     await assertText(page.locator("body"), "free digital library");
-    await assertText(page.locator("body"), "Bind the supplied controller");
+    await assertText(page.locator("body"), "See the toolkit in action");
+    await assertText(page.locator("body"), "Start with the Reader");
+    await assertText(page.locator("body"), "Use the headless APIs");
+    if (
+      (await page.locator("body").textContent())?.includes(
+        "Created/edited by GitHub Copilot",
+      )
+    ) {
+      throw new Error(
+        "Published pages expose the repository provenance header.",
+      );
+    }
+    const landingPreview = page.frameLocator(
+      'iframe[title="Interactive supplied-data source card"]',
+    );
+    await landingPreview.locator("sefaria-source-card").waitFor();
+    await assertText(
+      landingPreview.locator("#status"),
+      "Rendered supplied Micah 6:8 data with zero requests.",
+    );
+    assertEqual(
+      await landingPreview
+        .getByRole("button", { name: "Start live demo" })
+        .count(),
+      0,
+      "landing live action count",
+    );
     assertEqual(textRequests.length, 0, "landing request count");
+    for (const [name, expectedPath] of [
+      ["Get started", "/get-started.html"],
+      ["Components", "/components.html"],
+      ["Examples", "/examples.html"],
+      ["Guides", "/guides/"],
+      ["Reference", "/reference/custom-elements.html"],
+    ]) {
+      const link = page.getByRole("link", { name, exact: true }).first();
+      assertEqual(
+        new URL(await link.getAttribute("href"), page.url()).pathname,
+        sitePath(expectedPath),
+        `${name} navigation route`,
+      );
+    }
+    for (const [name, expectedPath] of [
+      ["Build the Reader path", "/learn/04-reader.html"],
+      ["Browse the component catalog", "/components.html"],
+      [
+        "Follow the headless path",
+        "/get-started.html#headless-client-transform-and-factory-path",
+      ],
+    ]) {
+      const href = await page
+        .getByRole("link", { name, exact: false })
+        .getAttribute("href");
+      const url = new URL(href, page.url());
+      assertEqual(
+        `${url.pathname}${url.hash}`,
+        `${sitePath(expectedPath.split("#")[0])}${
+          expectedPath.includes("#") ? `#${expectedPath.split("#")[1]}` : ""
+        }`,
+        `${name} landing path`,
+      );
+    }
+    await page
+      .getByRole("button", { name: /Search/u })
+      .first()
+      .waitFor();
+    const primaryContrast = await contrastRatio(
+      page.locator(".VPHomeHero .VPButton.brand"),
+    );
+    if (primaryContrast < 4.5) {
+      throw new Error(
+        `Primary landing action contrast is ${primaryContrast.toFixed(2)}:1.`,
+      );
+    }
+    await page.evaluate(() => {
+      globalThis.document.documentElement.classList.add("dark");
+    });
+    await page.waitForTimeout(300);
+    const darkHeroContrast = await contrastRatio(
+      page.locator(".VPHomeHero .name"),
+    );
+    if (darkHeroContrast < 3) {
+      throw new Error(
+        `Dark landing name contrast is ${darkHeroContrast.toFixed(2)}:1.`,
+      );
+    }
+    await page.evaluate(() => {
+      globalThis.document.documentElement.classList.remove("dark");
+    });
+    await page.waitForTimeout(300);
     await tabTo(
       page,
       page.getByRole("link", { name: "Skip to content" }),
@@ -86,20 +186,63 @@ try {
     );
     await capture(page, "site-landing.png");
 
-    const learnLink = page.getByRole("link", {
-      name: "Learn step by step",
-      exact: true,
-    });
+    const learnLink = page
+      .getByRole("link", {
+        name: "Get started",
+        exact: true,
+      })
+      .first();
     await learnLink.waitFor();
     await Promise.all([
-      page.waitForURL("**/learn/01-web-components.html"),
+      page.waitForURL("**/get-started.html"),
       learnLink.click(),
     ]);
     await page
       .getByRole("heading", {
-        name: "1. Understand Web Components and toolkit ownership",
+        name: "Get started",
       })
       .waitFor();
+    await page.evaluate(() => {
+      globalThis.document.documentElement.classList.add("dark");
+    });
+    await page.waitForTimeout(300);
+    const darkLinkContrast = await contrastRatio(
+      page
+        .getByRole("link", { name: "component catalog", exact: false })
+        .first(),
+    );
+    if (darkLinkContrast < 4.5) {
+      throw new Error(
+        `Dark documentation link contrast is ${darkLinkContrast.toFixed(2)}:1.`,
+      );
+    }
+    await page.evaluate(() => {
+      globalThis.document.documentElement.classList.remove("dark");
+    });
+    await Promise.all([
+      page.waitForURL("**/learn/01-web-components.html"),
+      page
+        .getByRole("link", {
+          name: "Learn step by step",
+          exact: true,
+        })
+        .click(),
+    ]);
+    await page
+      .getByRole("heading", {
+        name: "1. Choose a surface and understand ownership",
+      })
+      .waitFor();
+    assertEqual(
+      new URL(
+        await page
+          .locator(".VPDocFooter .pager-link.next")
+          .getAttribute("href"),
+        page.url(),
+      ).pathname,
+      sitePath("/learn/02-supplied-data.html"),
+      "lesson next-page route",
+    );
     const authored = page.frameLocator(
       'iframe[title="Authored request-free component states"]',
     );
@@ -220,31 +363,26 @@ try {
       waitUntil: "networkidle",
     });
     const catalogLinks = [
-      ["/examples/explorer/authored.html", 0],
-      ["/examples/explorer/index.html", 1],
-      ["/examples/reader/controlled.html", 2],
-      ["/examples/vanilla/index.html", 3],
-      ["/examples/react/index.html", 4],
-      ["/examples/linked-article/index.html", 5],
-      ["/examples/mcp-app/live.html", 6],
+      ["Authored component states", "/examples/explorer/authored.html"],
+      ["Live component explorer", "/examples/explorer/index.html"],
+      ["Controlled and spatial Reader", "/examples/reader/controlled.html"],
+      ["Vanilla supplied-data consumer", "/examples/vanilla/index.html"],
+      ["React consumer", "/examples/react/index.html"],
+      ["Authored linked article", "/examples/linked-article/index.html"],
+      ["Live MCP App host", "/examples/mcp-app/live.html"],
     ];
-    const previewLinks = page.getByRole("link", { name: "Open preview" });
-    assertEqual(
-      await previewLinks.count(),
-      catalogLinks.length,
-      "catalog link count",
-    );
-    for (const [expectedPath, index] of catalogLinks) {
-      const link = previewLinks.nth(index);
+    for (const [exampleName, expectedPath] of catalogLinks) {
+      const row = page.getByRole("row").filter({ hasText: exampleName });
+      const link = row.getByRole("link", { name: "Open preview" });
       assertEqual(
         new URL(await link.getAttribute("href"), page.url()).pathname,
         sitePath(expectedPath),
-        `catalog route ${index}`,
+        `${exampleName} catalog route`,
       );
       assertEqual(
         await link.getAttribute("target"),
         "_self",
-        `catalog target ${index}`,
+        `${exampleName} catalog target`,
       );
     }
     await page.goto(siteRouteUrl("/examples/explorer/index.html"), {
@@ -464,9 +602,13 @@ try {
     await capture(page, "site-linked-popup.png");
 
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto(siteRouteUrl("/learn/05-customization.html"), {
+    await page.goto(siteRouteUrl("/components.html"), {
       waitUntil: "networkidle",
     });
+    await assertText(
+      page.locator("body"),
+      "Start with the smallest surface that completes the user task.",
+    );
     const widths = await page.evaluate(() => ({
       viewport: globalThis.document.documentElement.clientWidth,
       content: globalThis.document.documentElement.scrollWidth,
@@ -476,13 +618,35 @@ try {
         `Mobile documentation overflows horizontally: ${JSON.stringify(widths)}`,
       );
     }
+    await page.locator(".VPNavBarHamburger").click();
+    await page
+      .locator(".VPNavScreen")
+      .getByRole("link", { name: "Components", exact: true })
+      .waitFor();
     await tabTo(
       page,
-      page.getByRole("link", { name: "Use the Reader", exact: true }),
-      "mobile lesson prerequisite link",
+      page.getByRole("link", { name: "Open supplied-data preview" }),
+      "mobile component preview link",
       30,
     );
     await capture(page, "site-mobile.png");
+
+    await page.setViewportSize({ width: 640, height: 900 });
+    await page.goto(siteRouteUrl("/"), { waitUntil: "networkidle" });
+    const zoomWidths = await page.evaluate(() => ({
+      viewport: globalThis.document.documentElement.clientWidth,
+      content: globalThis.document.documentElement.scrollWidth,
+    }));
+    if (zoomWidths.content > zoomWidths.viewport + 1) {
+      throw new Error(
+        `Documentation overflows at the 640px CSS viewport equivalent to 200% zoom on a 1280px display: ${JSON.stringify(zoomWidths)}`,
+      );
+    }
+    await page
+      .frameLocator('iframe[title="Interactive supplied-data source card"]')
+      .locator("sefaria-source-card")
+      .waitFor();
+    await capture(page, "site-200-percent-zoom.png");
 
     textRequests.length = 0;
     await page.goto(siteRouteUrl("/examples/mcp-app/"), {
@@ -516,6 +680,39 @@ try {
       0,
       `unapproved outbound requests: ${unexpectedRequests.join(", ")}`,
     );
+    assertEqual(
+      browserErrors.length,
+      0,
+      `browser runtime errors: ${browserErrors.join(", ")}`,
+    );
+
+    const noScriptContext = await browser.newContext({
+      javaScriptEnabled: false,
+      viewport: { width: 390, height: 844 },
+    });
+    try {
+      const noScriptPage = await noScriptContext.newPage();
+      await noScriptPage.goto(siteUrl, { waitUntil: "load" });
+      await noScriptPage
+        .locator(
+          'img[alt="Preview of a bilingual Micah 6:8 source card with edition attribution"]',
+        )
+        .waitFor();
+      await assertText(
+        noScriptPage.locator(".landing-preview__noscript"),
+        "Enable JavaScript to use the interactive source card.",
+      );
+      assertEqual(
+        await noScriptPage
+          .locator('iframe[title="Interactive supplied-data source card"]')
+          .evaluate((element) => globalThis.getComputedStyle(element).display),
+        "none",
+        "no-script iframe visibility",
+      );
+      await capture(noScriptPage, "site-noscript-mobile.png");
+    } finally {
+      await noScriptContext.close();
+    }
   } finally {
     await browser.close();
   }
@@ -546,6 +743,32 @@ async function capture(page, filename) {
   await page.screenshot({
     path: path.join(screenshotDirectory, filename),
     fullPage: true,
+  });
+}
+
+async function contrastRatio(locator) {
+  return locator.evaluate((element) => {
+    const luminance = (value) => {
+      const channels =
+        value
+          .match(/\d+(?:\.\d+)?/gu)
+          ?.slice(0, 3)
+          .map(Number)
+          .map((channel) => {
+            const normalized = channel / 255;
+            return normalized <= 0.04045
+              ? normalized / 12.92
+              : ((normalized + 0.055) / 1.055) ** 2.4;
+          }) ?? [];
+      return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+    };
+    const style = globalThis.getComputedStyle(element);
+    const foreground = luminance(style.color);
+    const background = luminance(style.backgroundColor);
+    return (
+      (Math.max(foreground, background) + 0.05) /
+      (Math.min(foreground, background) + 0.05)
+    );
   });
 }
 

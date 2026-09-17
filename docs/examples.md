@@ -2,7 +2,7 @@
 
 # Interactive examples
 
-These previews are isolated builds of the maintained private examples. They are not alternate implementations inside VitePress. Landing and supplied-data routes are deterministic; live Sefaria requests occur only after an explicit action on a page that offers them.
+Use the supplied-data previews to inspect real components immediately, then choose an explicit-live page when you want to exercise a client or host integration. Each preview is an isolated build of maintained example source rather than an implementation inside VitePress. Landing and supplied-data routes are deterministic; live Sefaria requests occur only after an explicit action on a page that offers them.
 
 | Example | Local preview | Maintained source |
 | --- | --- | --- |
