@@ -128,6 +128,10 @@ async function qualifyBrowser(browser, name, editorUrl, origin, graph) {
   assertEqual(pageErrors.length, 0, `${name} page errors`);
   await qualifyProjectRenders(page, name);
 
+  const primaryBase = new URL(editorUrl).pathname === "/";
+  if (name === "chromium" && primaryBase) {
+    await qualifyPreviewSupersession(page);
+  }
   await page.getByRole("button", { name: "Stop preview" }).click();
   const graphResult = await runGraphQualification(page, graph);
   assertEqual(graphResult.pureRegistered, false, `${name} pure registration`);
@@ -149,7 +153,6 @@ async function qualifyBrowser(browser, name, editorUrl, origin, graph) {
     `${name} denied child resources and navigation`,
   );
 
-  const primaryBase = new URL(editorUrl).pathname === "/";
   if (name === "chromium" && primaryBase) {
     await qualifyInvalidProject(page, editorUrl);
     await qualifyProjectEditingAndInteraction(page, probeOrigin);
@@ -184,6 +187,57 @@ async function qualifyBrowser(browser, name, editorUrl, origin, graph) {
     await wrapper.close();
   }
   process.stdout.write(`✓ playground ${name} ${new URL(editorUrl).pathname}\n`);
+}
+
+async function qualifyPreviewSupersession(page) {
+  await page.evaluate(() => {
+    const subtle = globalThis.crypto.subtle;
+    const digest = subtle.digest.bind(subtle);
+    Object.defineProperty(subtle, "digest", {
+      configurable: true,
+      value: (...arguments_) =>
+        new Promise((resolve, reject) => {
+          globalThis.setTimeout(() => {
+            digest(...arguments_).then(resolve, reject);
+          }, 250);
+        }),
+    });
+  });
+
+  await page.getByRole("button", { name: "Run" }).click();
+  await page.getByRole("button", { name: "Stop preview" }).click();
+  await page.waitForTimeout(350);
+  assertEqual(
+    await page.locator("#preview iframe").count(),
+    0,
+    "stopped in-flight preview stays stopped",
+  );
+  await page.getByText("Preview stopped.").waitFor();
+
+  await page.getByRole("button", { name: "Run" }).click();
+  await page.evaluate(() => {
+    const url = new URL(globalThis.location.href);
+    url.searchParams.set("project", "unknown");
+    globalThis.history.pushState(null, "", url);
+    globalThis.dispatchEvent(new globalThis.PopStateEvent("popstate"));
+  });
+  await page.waitForTimeout(350);
+  assertEqual(
+    await page.locator("#preview iframe").count(),
+    0,
+    "invalid project supersedes in-flight preview",
+  );
+  await page
+    .getByRole("alert")
+    .filter({ hasText: 'Unknown project "unknown"' })
+    .waitFor();
+  await page.evaluate(() => {
+    delete globalThis.crypto.subtle.digest;
+  });
+  await page.selectOption("#project-select", "source-card");
+  await page
+    .getByText("Preview rendered with supplied data.")
+    .waitFor({ timeout: 30_000 });
 }
 
 async function qualifyProjectRenders(page, name) {

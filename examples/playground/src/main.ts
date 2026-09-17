@@ -285,10 +285,12 @@ async function createPreview(
   }
   activeChannel = crypto.randomUUID();
   activeRun = crypto.randomUUID();
+  const channel = activeChannel;
+  const run = activeRun;
   diagnosticCount = 0;
   const config = {
-    channel: activeChannel,
-    run: activeRun,
+    channel,
+    run,
     html: files.html,
     javascriptUrl: toDataUrl(files.javascript),
   };
@@ -296,6 +298,7 @@ async function createPreview(
   const bootstrapUrl = toDataUrl(previewBootstrapSource);
   const emittedImportMap = escapeInline(importMap);
   const importMapHash = await sha256(emittedImportMap);
+  if (activeChannel !== channel || activeRun !== run) return;
   const childPolicy = [
     "default-src 'none'",
     `script-src data: 'sha256-${importMapHash}'`,
