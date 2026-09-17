@@ -2,7 +2,7 @@
 
 # Interactive examples
 
-Use the supplied-data previews to inspect real components immediately, then choose an explicit-live page when you want to exercise a client or host integration. Each preview is an isolated build of maintained example source rather than an implementation inside VitePress. Landing and supplied-data routes are deterministic; live Sefaria requests occur only after an explicit action on a page that offers them.
+Use a supplied-data preview to inspect a component without a live request. Use a live page when you want to test a client or application integration. Each preview builds the maintained example outside VitePress. A live Sefaria request starts only after you select the page action.
 
 | Example | Local preview | Maintained source |
 | --- | --- | --- |
@@ -15,4 +15,8 @@ Use the supplied-data previews to inspect real components immediately, then choo
 | Authored linked article | <SiteLink to="/examples/linked-article/index.html">Open preview</SiteLink> | [`examples/linked-article`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/linked-article) |
 | Live MCP App host | <SiteLink to="/examples/mcp-app/live.html">Open preview</SiteLink> | [`examples/mcp-app`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/mcp-app) |
 
-The component editor runs only supplied data inside an opaque preview and makes no Sefaria request. The live MCP route makes no Sefaria request until **Start live demo**. It then connects a real in-browser MCP client/server pair, reads the packaged App through `resources/read`, and renders it through AppBridge in an opaque-origin sandbox. Run `pnpm dev:mcp` for the compiled Node server and Streamable HTTP reference host, or use the documented VS Code walkthrough for named-host evidence.
+An opaque preview uses a separate browser origin. The component editor runs supplied data inside one and makes no Sefaria request.
+
+The live MCP route makes no Sefaria request until you select `Start live demo`. It then connects an MCP client and server in the browser. The client reads the packaged App through `resources/read`. AppBridge renders the App inside the opaque preview.
+
+Run `pnpm dev:mcp` for the compiled Node server and Streamable HTTP host. You can also test a named host with the documented VS Code steps.

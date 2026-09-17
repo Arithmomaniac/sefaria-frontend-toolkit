@@ -123,6 +123,44 @@ describe("documentation learning journey", () => {
     expect(map).toContain("supplied-data editor");
   });
 
+  it("uses plain language on the main product paths", async () => {
+    const index = await readFile(path.join(root, "docs", "index.md"), "utf8");
+    const getStarted = await readFile(
+      path.join(root, "docs", "get-started.md"),
+      "utf8",
+    );
+    const components = await readFile(
+      path.join(root, "docs", "components.md"),
+      "utf8",
+    );
+    const examples = await readFile(
+      path.join(root, "docs", "examples.md"),
+      "utf8",
+    );
+    const documentation = await readFile(
+      path.join(root, "docs", "README.md"),
+      "utf8",
+    );
+
+    expect(index).toContain("TypeScript tools that work without UI components");
+    expect(index).not.toContain("headless TypeScript building blocks");
+    for (const definition of [
+      "A host is the application that owns the component.",
+      "A view model is data that a component renders.",
+      "A factory prepares API data for a component.",
+      "Headless means that no browser element is registered.",
+    ]) {
+      expect(getStarted).toContain(definition);
+    }
+    expect(components).toContain("The toolkit provides seven UI components.");
+    expect(components).not.toContain("host-admitted Reader view model");
+    expect(examples).toContain(
+      "An opaque preview uses a separate browser origin.",
+    );
+    expect(documentation).not.toContain("host-mediated tools");
+    expect(documentation).not.toContain("field-level transport definitions");
+  });
+
   it("classifies maintained reader-facing Markdown in the documentation map", async () => {
     const map = await readFile(
       path.join(root, "docs", "reference", "documentation-map.md"),

@@ -660,7 +660,7 @@ try {
     });
     await assertText(
       page.locator("body"),
-      "Start with the smallest surface that completes the user task.",
+      "Choose the smallest component that completes the task.",
     );
     const widths = await page.evaluate(() => ({
       viewport: globalThis.document.documentElement.clientWidth,

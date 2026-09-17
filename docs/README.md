@@ -2,9 +2,9 @@
 
 # Documentation
 
-Sefaria is a free digital library and data source for Jewish texts and translations. This project gives developers reusable frontend/UI building blocks for reading and learning experiences: a complete controlled Reader, smaller request-free Web Components, a supplied-data component editor, a validated client, component factories, and pure text processing. Start with a useful surface; the architecture and specifications are optional depth, not prerequisites.
+Sefaria is a free digital library and data source for Jewish texts and translations. This toolkit helps developers build reading and learning experiences. It includes a Reader, Web Components that do not make requests, a supplied-data editor, an API client, component factories, and text tools. Start with the result that you need. Read the architecture and specifications when you need more detail.
 
-Choose a path by the result you want: [get started](get-started.md), compare the [seven current components](components.md), run an [isolated example](examples.md), or use a [task-focused guide](guides/index.md). The [product site](https://arithmomaniac.github.io/sefaria-frontend-toolkit/) presents these maintained files with interactive previews; the Markdown remains useful directly on GitHub.
+Choose a path by the result that you want. You can [get started](get-started.md), compare the [seven components](components.md), run an [example](examples.md), or use a [guide](guides/index.md). The [product site](https://arithmomaniac.github.io/sefaria-frontend-toolkit/) adds interactive previews. The Markdown also works on GitHub.
 
 ## Start from a complete solution
 
@@ -20,18 +20,18 @@ You do not need to finish the tutorial before using the toolkit:
 | Authored citation popups | [Linked article](linked-article.md) |
 | Reader in an MCP Apps host | [MCP App demonstration](mcp-app-demo.md) |
 
-The controlled Reader's navigation controller is supplied by the toolkit. The application creates a client, loads the controller, binds it to the element, and owns cleanup; it does not reimplement Reader navigation. A website can use direct client access, while an MCP App can use host-mediated tools, without changing the request-free Reader presentation.
+The toolkit supplies the controller for Reader navigation. Your application creates the client and controller. It connects the controller to the element and cleans them up. A website can call the client directly. An MCP App can use tools from its host. Both options keep the Reader element free of requests.
 
 ## Learn step by step
 
-1. [Choose a surface and understand ownership](learn/01-web-components.md): begin with a useful component or Reader outcome, then learn registration, properties, events, and the distinct element, library-behavior, and application-host roles.
-2. [Set up and render supplied data](learn/02-supplied-data.md): private workspace and local-tarball setup, validation, pure projection, and a zero-request Micah 6:8 render.
-3. [Load data and handle interaction](learn/03-live-data.md): explicit async factory calls, loading, visible failures, component selection events, cancellation, and stale-result rejection.
-4. [Use the Reader or compose a custom host](learn/04-reader.md): the supplied controlled Reader controller and the extra responsibilities of custom spatial composition.
-5. [Customize presentation and use headless APIs](learn/05-customization.md): theme, width, side visibility/order, layout, client, factories, and text transforms.
-6. [Integrate an authored article or MCP host](learn/06-host-integration.md): native-link enhancement, server-provided data, host-proxied tools, and the click-to-start static MCP host.
+1. [Choose a component and learn ownership](learn/01-web-components.md). Start with a component or the Reader. Learn who owns registration, properties, events, and requests.
+2. [Set up and render supplied data](learn/02-supplied-data.md). Set up the workspace or local packages. Render Micah 6:8 without a request.
+3. [Load data and handle interaction](learn/03-live-data.md). Add factory calls, loading, visible failures, selection events, cancellation, and protection from old results.
+4. [Use the Reader or build a custom host](learn/04-reader.md). Use the supplied Reader controller. Learn what a custom layout must manage.
+5. [Change presentation or use APIs without UI components](learn/05-customization.md). Change the theme, width, text sides, layout, client, factories, and text tools.
+6. [Add an article or MCP host](learn/06-host-integration.md). Add citation links, supplied server data, host tools, or the static MCP host.
 
-React users can branch from steps 2 and 3 into [Use the Web Components from React](learn/react.md). Web Components are browser-standard custom elements, so React can host them without a toolkit-specific wrapper package.
+React users can continue from steps 2 and 3 to [Use the Web Components from React](learn/react.md). Web Components are standard browser elements. React can use them without a toolkit wrapper package.
 
 ## Understand the design
 
@@ -42,25 +42,25 @@ React users can branch from steps 2 and 3 into [Use the Web Components from Reac
 - [Stable ownership and dependency boundaries](design.md)
 - [Observed source evidence and provenance](evidence.md)
 
-**Current** means delivered on the documented repository baseline. **Planned** means intended but not delivered. **Observed** identifies evidence from a named source or capture, not a universal promise about every Sefaria text.
+`Current` means delivered on the documented repository baseline. `Planned` means intended but not delivered. `Observed` means that a named source or capture provides the evidence. It does not describe every Sefaria text.
 
 ## Reference and contribution
 
 | Goal | Document |
 | --- | --- |
-| Set up the repository and run local/site checks | [Development](development.md) |
+| Set up the repository and run local and site tests | [Development](development.md) |
 | Review a change at the right depth | [Review](review.md) |
-| Use the validated transport package | [`@arithmomaniac/sefaria-client`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/client/README.md) |
+| Use the API client | [`@arithmomaniac/sefaria-client`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/client/README.md) |
 | Use text transforms without components | [`@arithmomaniac/sefaria-text-transform`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/text-transform/README.md) |
 | Choose component and Reader subpaths | [`@arithmomaniac/sefaria-web-components`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/web-components/README.md) |
 | Inspect generated element metadata | [Custom elements](reference/custom-elements.md) |
 | Inspect declaration-derived package exports | [Public package exports](reference/public-exports.md) |
 | Find historical removed material | [Documentation archive](archive/README.md) |
-| Check the audience and owner of every maintained page | [Documentation map](reference/documentation-map.md) |
+| Find the audience and owner of every maintained page | [Documentation map](reference/documentation-map.md) |
 
 ## Specifications
 
-Specifications own intended behavior and acceptance rules. Generated declarations own field-level transport definitions; component subpaths define rendering types.
+Specifications define intended behavior and acceptance rules. Generated declarations define each transport field. Component subpaths define rendering types.
 
 - [Client specification](specs/client.md)
 - [Text-processing specification](specs/text-processing.md)
