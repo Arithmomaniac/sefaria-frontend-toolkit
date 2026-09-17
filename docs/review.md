@@ -289,6 +289,17 @@ Review the initial corrections for:
 - [ ] Each popup activation makes one v3 request; the popup element makes none.
 - [ ] CSP, mixed-content, CORS, and restricted-page limitations are documented.
 
+## Supplied-data editor
+
+- [ ] The dedicated editor host has a leading CSP meta before executable assets and does not impose its `frame-src data:` policy on unrelated VitePress pages.
+- [ ] Edited HTML, CSS, and JavaScript enter only the opaque sandboxed data-document frame.
+- [ ] Trusted setup, source, and live-demo links remain outside the edited frame.
+- [ ] The child policy denies connect, nested frame, worker, object, media, manifest, form, and base capabilities.
+- [ ] The current frame window plus cryptographic channel and run identifiers are required for bounded diagnostics.
+- [ ] Exact source, total, diagnostic, message, and active-preview limits have at-limit and over-limit tests.
+- [ ] Pure subpath import, root registration, shared client identity, both deployment bases, ordinary-page embedding, and Chromium/Firefox/WebKit behavior are qualified without `bypassCSP`.
+- [ ] The review does not claim CPU, heap, process isolation, every Safari device, or tight-loop recovery.
+
 ## Text processing
 
 - [ ] Vocalization runs on text content, not raw markup.

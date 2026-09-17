@@ -180,6 +180,7 @@ export function bindReaderController(
     element.sideOrder = snapshot.presentation.sideOrder;
     element.showConnectionPreviews =
       snapshot.presentation.showConnectionPreviews;
+    element.rootLoading = snapshot.task.state === "loading-source";
     element.vocalizationMode = snapshot.presentation.vocalizationMode;
     element.activePane = activePane;
   };
@@ -259,6 +260,9 @@ export function bindReaderController(
     binding,
     () => controller.subscribe(render),
     listeners,
+    () => {
+      element.rootLoading = false;
+    },
   );
 }
 
@@ -345,6 +349,7 @@ function activateBinding(
   binding: object,
   subscribe: () => () => void,
   listeners: readonly (readonly [string, EventListener])[],
+  deactivate?: () => void,
 ): () => void {
   let unsubscribe: (() => void) | undefined;
   const added: (readonly [string, EventListener])[] = [];
@@ -354,11 +359,12 @@ function activateBinding(
       element.addEventListener(name, listener);
       added.push([name, listener]);
     }
-    return cleanupBinding(element, binding, unsubscribe, listeners);
+    return cleanupBinding(element, binding, unsubscribe, listeners, deactivate);
   } catch (error) {
     for (const [name, listener] of added) {
       element.removeEventListener(name, listener);
     }
+    deactivate?.();
     unsubscribe?.();
     if (isActive(element, binding)) activeBindings.delete(element);
     throw error;
@@ -370,6 +376,7 @@ function cleanupBinding(
   binding: object,
   unsubscribe: () => void,
   listeners: readonly (readonly [string, EventListener])[],
+  deactivate?: () => void,
 ): () => void {
   let active = true;
   return () => {
@@ -379,6 +386,7 @@ function cleanupBinding(
     for (const [name, listener] of listeners) {
       element.removeEventListener(name, listener);
     }
+    deactivate?.();
     unsubscribe();
   };
 }

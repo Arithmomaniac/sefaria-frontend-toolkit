@@ -114,6 +114,7 @@ export function startControlledReader(
     initialization?.abort();
     initialization = new AbortController();
     const currentInitialization = initialization;
+    reader.rootLoading = true;
     status.textContent = `Opening ${normalized}.`;
     try {
       const next = await loadReaderController({ tref: normalized }, client, {
@@ -144,6 +145,7 @@ export function startControlledReader(
     } finally {
       if (initialization === currentInitialization) {
         initialization = undefined;
+        reader.rootLoading = false;
       }
     }
   };

@@ -1,0 +1,24 @@
+{
+  "name": "@sefaria-example/playground",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@arithmomaniac/sefaria-client": "workspace:*",
+    "@arithmomaniac/sefaria-web-components": "workspace:*",
+    "@codemirror/lang-css": "^6.3.1",
+    "@codemirror/lang-html": "^6.4.11",
+    "@codemirror/lang-javascript": "^6.2.4",
+    "@codemirror/language": "^6.12.4",
+    "@codemirror/state": "^6.7.4",
+    "@codemirror/view": "^6.39.17",
+    "codemirror": "^6.0.2",
+    "es-module-lexer": "^2.0.0"
+  },
+  "scripts": {
+    "build": "node scripts/build-runtime-graph.mjs && tsc -p tsconfig.json && vite build",
+    "build:graph": "node scripts/build-runtime-graph.mjs",
+    "dev": "node scripts/build-runtime-graph.mjs && vite",
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}

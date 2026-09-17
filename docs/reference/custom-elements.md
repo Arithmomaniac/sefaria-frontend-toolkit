@@ -87,6 +87,7 @@ Request-free controlled reader surface for one semantic reader entry.
 | `layout` | `layout` | `BilingualPairLayout` | `"auto"` | Source-card bilingual arrangement. |
 | `sideOrder` | `side-order` | `BilingualPairSideOrder` | `"primary-first"` | First source-card role in side-by-side layout. |
 | `showConnectionPreviews` | `show-connection-previews` | `boolean` | `true` | Whether captured connection previews are visible. |
+| `rootLoading` | `root-loading` | `boolean` | `false` | Shows host-controlled root loading without replacing committed content. |
 | `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | Hebrew vocalization preset applied to source and preview text. |
 
 ### Events

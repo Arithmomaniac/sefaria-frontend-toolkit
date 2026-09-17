@@ -1,0 +1,6 @@
+export const SOURCE_FILE_LIMIT = 100_000;
+export const SOURCE_TOTAL_LIMIT = 250_000;
+export const DIAGNOSTIC_COUNT_LIMIT = 20;
+export const DIAGNOSTIC_TEXT_LIMIT = 1_000;
+export const MESSAGE_SIZE_LIMIT = 4_096;
+export const ACTIVE_PREVIEW_LIMIT = 1;

@@ -18,6 +18,9 @@ describe("repository check runner", () => {
     expect(names.indexOf("Workspace builds")).toBeLessThan(
       names.indexOf("MCP Inspector stdio acceptance"),
     );
+    expect(names.indexOf("Documentation site browser acceptance")).toBeLessThan(
+      names.indexOf("Playground browser acceptance"),
+    );
     expect(names.indexOf("MCP Inspector stdio acceptance")).toBeLessThan(
       names.indexOf("MCP protocol and browser acceptance"),
     );
