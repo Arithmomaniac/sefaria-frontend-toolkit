@@ -30,6 +30,10 @@
       "types": "./dist/bilingual-segment.d.ts",
       "import": "./dist/bilingual-segment.js"
     },
+    "./bindings": {
+      "types": "./dist/bindings.d.ts",
+      "import": "./dist/bindings.js"
+    },
     "./connections-panel": {
       "types": "./dist/connections-panel.d.ts",
       "import": "./dist/connections-panel.js"

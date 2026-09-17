@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # Review guide
 
@@ -94,6 +94,27 @@ Review the initial corrections for:
 - [ ] The factory preserves the data owned by its rendering surface; source-card projection preserves edition attribution.
 - [ ] Unsafe HTML passes through `@arithmomaniac/sefaria-text-transform`.
 - [ ] An abort does not become a data state.
+
+## Optional component controllers and bindings
+
+- [ ] Each endpoint-backed controller remains in its owner subpath and uses the owner request, fixed operation path, documented statuses, deterministic options, and pure projection.
+- [ ] The six owner interfaces share only private lifecycle mechanics; there is no public universal loader descriptor or common domain result.
+- [ ] Construction, import, subscription, and binding make zero requests.
+- [ ] A pending or failed named attempt remains separate from the previous committed request and terminal view model.
+- [ ] A valid newer operation aborts older work, and an ignored physical abort cannot publish or resolve stale success.
+- [ ] Invalid request, options, projection, supplied status, or supplied payload rejects before valid pending work is interrupted.
+- [ ] Network, schema, and programmer errors preserve the original cause and structured paths.
+- [ ] A failed initial attempt clears its loading target; a failed replacement retains prior content only as an explicitly prior committed result.
+- [ ] Supplied unknown JSON uses the owner generated operation/status validator and exact same pure projection with zero requests.
+- [ ] Status defaults to 200 and is never inferred from an error-shaped payload.
+- [ ] RefLabel applies the same validated deterministic options to live and supplied projection.
+- [ ] Connections retains only one immutable current corrected payload/request/status/projection capture, reprojects locally with zero I/O, retains the old capture after a failed replacement, and releases it on disposal.
+- [ ] No browser payload cap is borrowed from Reader history, client cache admission, or MCP limits.
+- [ ] Subscriber exceptions are reported without blocking later subscribers, and reentrant operations are rejected.
+- [ ] `./bindings` imports without DOM globals or element registration and exports adapters rather than transport or domain policy.
+- [ ] Duplicate binding rejects; unbinding is idempotent and does not dispose the controller.
+- [ ] Deferred defaults honor `preventDefault()` after dispatch and verify that the same binding plus originating committed result or Reader entry remain current.
+- [ ] Reader remains specialized and its presentation snapshot remains separate from its rendering view model.
 
 ### Text segment
 

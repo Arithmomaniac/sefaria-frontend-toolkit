@@ -74,6 +74,8 @@ _Runtime paths, showing the browser capture-and-project variant. An existing asy
 An ordinary website can initialize and bind the supported controller directly:
 
 ```ts
+import { bindReaderController } from "@arithmomaniac/sefaria-web-components/bindings";
+
 const controller = await loadReaderController(
   { tref: "Micah 6:8" },
   createSefariaClient(),

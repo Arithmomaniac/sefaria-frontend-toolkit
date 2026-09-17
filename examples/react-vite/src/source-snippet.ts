@@ -1,12 +1,9 @@
-export const reactSourceCardSnippet = `const result = await loadSourceCardViewModel(
-  { tref },
-  client,
-  controller.signal,
-);
+export const reactSourceCardSnippet = `const controller = createSourceCardController(client);
+await controller.load({ tref });
 
 const cardRef = useRef<SefariaSourceCard>(null);
+const unbind = useRef<(() => void)>();
 const [selected, setSelected] = useState<SourceSelection>();
-useElementProperty(cardRef, "viewModel", viewModel);
 useElementProperty(cardRef, "selectable", viewModel.state === "data");
 useElementProperty(cardRef, "selectedPosition", selected?.position);
 
@@ -20,9 +17,12 @@ const setCardRef = useCallback((card: SefariaSourceCard | null) => {
     "sefaria-source-select",
     onSourceSelection,
   );
+  unbind.current?.();
   cardRef.current = card;
+  unbind.current =
+    card === null ? undefined : bindSourceCardController(card, controller);
   card?.addEventListener("sefaria-source-select", onSourceSelection);
-}, []);
+}, [controller]);
 
 return (
   <>

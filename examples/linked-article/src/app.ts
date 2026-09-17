@@ -3,8 +3,8 @@ import {
   type SefariaClient,
 } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
-import type { PopupLoadingViewModel } from "@arithmomaniac/sefaria-web-components";
-import { loadPopupViewModel } from "@arithmomaniac/sefaria-web-components/popup";
+import { bindPopupController } from "@arithmomaniac/sefaria-web-components/bindings";
+import { createPopupController } from "@arithmomaniac/sefaria-web-components/popup";
 
 const POPUP_ID = "linked-article-source-popup";
 const LINK_SELECTOR = "a[data-sefaria-ref]";
@@ -19,6 +19,8 @@ export function startLinkedArticle(
   client: SefariaClient = createSefariaClient({ cache: false }),
 ): LinkedArticleApp {
   const popup = root.createElement("sefaria-popup");
+  const controller = createPopupController(client);
+  const unbind = bindPopupController(popup, controller);
   popup.id = POPUP_ID;
   root.body.append(popup);
   const existingStatus = root.querySelector<HTMLElement>(STATUS_SELECTOR);
@@ -31,13 +33,8 @@ export function startLinkedArticle(
 
   const anchors = [...root.querySelectorAll<HTMLAnchorElement>(LINK_SELECTOR)];
   const listeners = new Map<HTMLAnchorElement, (event: MouseEvent) => void>();
-  let request: AbortController | undefined;
-  let operation = 0;
-
   const close = (): void => {
-    request?.abort();
-    request = undefined;
-    operation += 1;
+    controller.cancel();
     popup.open = false;
   };
 
@@ -64,38 +61,18 @@ export function startLinkedArticle(
   }
 
   async function open(anchor: HTMLAnchorElement, tref: string): Promise<void> {
-    request?.abort();
-    const currentRequest = new AbortController();
-    request = currentRequest;
-    const currentOperation = ++operation;
-    const loading: PopupLoadingViewModel = {
-      state: "loading",
-      message: `Loading ${tref}.`,
-    };
     popup.anchor = anchor;
-    popup.viewModel = loading;
     popup.open = true;
     status.textContent = "";
     status.setAttribute("role", "status");
 
     try {
-      const viewModel = await loadPopupViewModel(
-        { tref },
-        client,
-        currentRequest.signal,
-      );
-      if (
-        currentOperation === operation &&
-        !currentRequest.signal.aborted &&
-        popup.isConnected
-      ) {
-        popup.viewModel = viewModel;
-      }
+      await controller.load({ tref });
     } catch (error) {
       if (
-        currentOperation !== operation ||
-        currentRequest.signal.aborted ||
-        !popup.isConnected
+        !popup.isConnected ||
+        controller.snapshot.attempt.state !== "failed" ||
+        controller.snapshot.attempt.error !== error
       ) {
         return;
       }
@@ -109,6 +86,8 @@ export function startLinkedArticle(
   return {
     destroy(): void {
       close();
+      unbind();
+      controller.dispose();
       popup.removeEventListener("sefaria-popup-close", close);
       for (const [anchor, listener] of listeners) {
         anchor.removeEventListener("click", listener);

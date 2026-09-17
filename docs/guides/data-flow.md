@@ -1,10 +1,10 @@
-> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # How the client, view models, and Web Components fit together
 
 [Documentation](../README.md) / How the pieces fit together
 
-**Current:** the text-segment, bilingual-segment, reference-label, source-card, popup, controlled Reader, authored linked-article, and MCP paths described here are implemented. The same pattern is intended for later components, but their names and integration examples are not current APIs.
+**Current:** the text-segment, bilingual-segment, reference-label, source-card, popup, connections-panel, controlled Reader, authored linked-article, and MCP paths described here are implemented. Each endpoint-backed component also has an optional typed headless controller and a registration-free DOM adapter.
 
 The toolkit separates three roles. An **element** displays a view model and emits events. Supplied **factories and controllers** provide reusable projection and supported behavior. The **application host** chooses the data source, creates and disposes the pieces, and owns any integration-specific policy. Elements do not fetch.
 
@@ -39,11 +39,13 @@ The central layers are the same in every case:
 3. A **factory** projects the validated payload into a component-specific **view model**.
 4. A request-free **Web Component** renders that view model.
 
-The difference is where the request happens. A regular site supplies `@arithmomaniac/sefaria-client` to an async factory. The authored linked-article page calls the popup async factory when a reader activates an explicit citation anchor. In the MCP path, the server obtains the payload, the App validates `structuredContent`, and the App calls the same pure factory directly. None of these paths sends raw API JSON to the element.
+The difference is where the request happens. A regular site can supply `@arithmomaniac/sefaria-client` to an async factory or an owner controller. The authored linked-article page calls the popup controller when a reader activates an explicit citation anchor. In the MCP path, the server obtains the payload, the App validates `structuredContent`, and the App calls the same pure projection through its controller seed path. None of these paths sends raw API JSON to the element.
 
 Web Components are composable because the host can arrange several request-free elements and supply each one a view model. Composite data projection happens before rendering: a composite pure factory can call child pure factories using one captured payload. One element does not reach out to fetch data or ask another element to do so; interactive elements emit events and the host decides what data to obtain next.
 
-For the controlled Reader, that host decision does not mean rebuilding the Reader state machine. The toolkit supplies `loadReaderController` and `bindReaderController`; the application supplies the permitted data source and lifecycle. A website can use the public client while an MCP App uses host-proxied tools, and both bind the resulting controller state to the same request-free Reader presentation.
+For one endpoint-backed surface, the host can use the component subpath's `create...Controller` factory and the matching adapter from `@arithmomaniac/sefaria-web-components/bindings` instead of rebuilding cancellation and latest-wins state. These headless controllers are framework-neutral, not Lit `ReactiveController` implementations.
+
+For the controlled Reader, that host decision does not mean rebuilding the specialized Reader state machine. The toolkit supplies `loadReaderController` and `bindReaderController`; the application supplies the permitted data source and lifecycle. A website can use the public client while an MCP App uses host-proxied tools, and both bind the resulting controller state to the same request-free Reader presentation.
 
 The linked-article and MCP lanes are current. The [design diagram](../design.md#package-dependency-diagram) provides the detailed dependency view.
 

@@ -1,28 +1,27 @@
 import { expect, test, vi } from "vitest";
 
-import { createLiveDemoRunner } from "./live-demo-core.js";
+import {
+  createLiveDemoRunner,
+  type LiveDemoController,
+} from "./live-demo-core.js";
 
 interface TestViewModel {
-  readonly state: "loading" | "data";
+  readonly state: "data";
   readonly value: string;
 }
 
-test("owns the shared loading, success, and failure presentation", async () => {
+test("owns shared success and failure presentation around an owner controller", async () => {
   const requestState = document.createElement("p");
   const hostError = document.createElement("p");
   const submitButton = document.createElement("button");
-  const viewModels: TestViewModel[] = [];
+  const failure = new Error("Network unavailable");
   const loader = vi
     .fn<(request: string, signal: AbortSignal) => Promise<TestViewModel>>()
     .mockResolvedValueOnce({ state: "data", value: "loaded" })
-    .mockRejectedValueOnce(new Error("Network unavailable"));
+    .mockRejectedValueOnce(failure);
+  const controller = controllerFromLoader(loader);
   const runner = createLiveDemoRunner<string, TestViewModel>({
-    loader,
-    createLoadingViewModel: (request) => ({
-      state: "loading",
-      value: request,
-    }),
-    setViewModel: (viewModel) => viewModels.push(viewModel),
+    controller,
     formatRequest: (request) => `Request ${request}`,
     requestState,
     hostError,
@@ -31,10 +30,6 @@ test("owns the shared loading, success, and failure presentation", async () => {
 
   await runner.run("first");
 
-  expect(viewModels).toEqual([
-    { state: "loading", value: "first" },
-    { state: "data", value: "loaded" },
-  ]);
   expect(requestState.dataset.state).toBe("data");
   expect(requestState.textContent).toBe("Request first produced data.");
   expect(hostError.hidden).toBe(true);
@@ -42,10 +37,6 @@ test("owns the shared loading, success, and failure presentation", async () => {
 
   await runner.run("second");
 
-  expect(viewModels.at(-1)).toEqual({
-    state: "loading",
-    value: "second",
-  });
   expect(requestState.dataset.state).toBe("error");
   expect(requestState.textContent).toBe("Request second could not complete.");
   expect(hostError.hidden).toBe(false);
@@ -53,7 +44,7 @@ test("owns the shared loading, success, and failure presentation", async () => {
   expect(submitButton.disabled).toBe(false);
 });
 
-test("aborts the old operation and ignores its stale result", async () => {
+test("does not let a superseded operation overwrite current host status", async () => {
   let resolveFirst!: (value: TestViewModel) => void;
   let resolveSecond!: (value: TestViewModel) => void;
   const first = new Promise<TestViewModel>((resolve) => {
@@ -63,19 +54,15 @@ test("aborts the old operation and ignores its stale result", async () => {
     resolveSecond = resolve;
   });
   const signals: AbortSignal[] = [];
-  const viewModels: TestViewModel[] = [];
+  const controller = controllerFromLoader(async (_request, signal) => {
+    signals.push(signal);
+    return signals.length === 1 ? await first : await second;
+  });
+  const requestState = document.createElement("p");
   const runner = createLiveDemoRunner<string, TestViewModel>({
-    loader: async (_request: string, signal: AbortSignal) => {
-      signals.push(signal);
-      return signals.length === 1 ? await first : await second;
-    },
-    createLoadingViewModel: (request) => ({
-      state: "loading",
-      value: request,
-    }),
-    setViewModel: (viewModel) => viewModels.push(viewModel),
+    controller,
     formatRequest: (request) => request,
-    requestState: document.createElement("p"),
+    requestState,
     hostError: document.createElement("p"),
     submitButton: document.createElement("button"),
   });
@@ -89,53 +76,50 @@ test("aborts the old operation and ignores its stale result", async () => {
   resolveFirst({ state: "data", value: "first" });
   await firstRun;
 
-  expect(viewModels).toEqual([
-    { state: "loading", value: "first" },
-    { state: "loading", value: "second" },
-    { state: "data", value: "second" },
-  ]);
+  expect(requestState.textContent).toBe("second produced data.");
 });
 
-test("ignores an abort rejection from a superseded operation", async () => {
-  const requestState = document.createElement("p");
-  const hostError = document.createElement("p");
-  const viewModels: TestViewModel[] = [];
-  let callCount = 0;
-  const runner = createLiveDemoRunner<string, TestViewModel>({
-    loader: async (_request: string, signal: AbortSignal) => {
-      callCount += 1;
-      if (callCount === 2) {
-        return { state: "data", value: "second" };
-      }
-      return await new Promise<TestViewModel>((_resolve, reject) => {
-        signal.addEventListener(
-          "abort",
-          () => reject(new DOMException("Obsolete request", "AbortError")),
-          { once: true },
-        );
-      });
+function controllerFromLoader(
+  loader: (request: string, signal: AbortSignal) => Promise<TestViewModel>,
+): LiveDemoController<string, TestViewModel> {
+  let snapshot: LiveDemoController<string, TestViewModel>["snapshot"] = {
+    attempt: { state: "idle" },
+  };
+  let active: AbortController | undefined;
+  return {
+    get snapshot() {
+      return snapshot;
     },
-    createLoadingViewModel: (request) => ({
-      state: "loading",
-      value: request,
-    }),
-    setViewModel: (viewModel) => viewModels.push(viewModel),
-    formatRequest: (request) => request,
-    requestState,
-    hostError,
-    submitButton: document.createElement("button"),
-  });
-
-  const firstRun = runner.run("first");
-  const secondRun = runner.run("second");
-  await Promise.all([firstRun, secondRun]);
-
-  expect(viewModels).toEqual([
-    { state: "loading", value: "first" },
-    { state: "loading", value: "second" },
-    { state: "data", value: "second" },
-  ]);
-  expect(requestState.dataset.state).toBe("data");
-  expect(hostError.hidden).toBe(true);
-  expect(hostError.textContent).toBe("");
-});
+    load: async (request) => {
+      active?.abort();
+      const current = new AbortController();
+      active = current;
+      snapshot = {
+        ...(snapshot.result === undefined ? {} : { result: snapshot.result }),
+        attempt: { state: "loading" },
+      };
+      try {
+        const viewModel = await loader(request, current.signal);
+        if (active !== current || current.signal.aborted) {
+          throw current.signal.reason;
+        }
+        active = undefined;
+        snapshot = {
+          result: { viewModel },
+          attempt: { state: "idle" },
+        };
+        return viewModel;
+      } catch (error) {
+        if (active !== current || current.signal.aborted) {
+          throw current.signal.reason;
+        }
+        active = undefined;
+        snapshot = {
+          ...(snapshot.result === undefined ? {} : { result: snapshot.result }),
+          attempt: { state: "failed", error },
+        };
+        throw error;
+      }
+    },
+  };
+}
