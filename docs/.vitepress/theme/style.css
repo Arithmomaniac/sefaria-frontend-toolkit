@@ -357,6 +357,32 @@
   color: var(--site-ink);
 }
 
+.documentation-disclosure {
+  border-top: 1px solid var(--vp-c-divider);
+  padding: 1.25rem 1.5rem;
+  color: var(--vp-c-text-2);
+  background: var(--vp-c-bg-soft);
+  text-align: center;
+}
+
+.documentation-disclosure p {
+  margin: 0;
+}
+
+.documentation-disclosure__project {
+  margin-top: 0.35rem !important;
+  font-size: 0.8rem;
+}
+
+.documentation-disclosure a {
+  color: var(--vp-c-brand-1);
+  font-weight: 600;
+}
+
+.documentation-disclosure a:hover {
+  color: var(--vp-c-brand-2);
+}
+
 @media (max-width: 900px) {
   .VPHomeHero .container {
     padding: 1.75rem;

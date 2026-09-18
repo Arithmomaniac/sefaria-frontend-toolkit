@@ -97,8 +97,8 @@ try {
     await assertText(page.locator("body"), "You can stop at any layer");
     await assertText(page.locator("body"), "Microsoft Global Hackathon 2026");
     await assertText(page.locator("body"), "Thank you to Microsoft");
-    await assertText(
-      page.locator(".VPFooter"),
+    await assertVisibleText(
+      page.locator(".documentation-disclosure"),
       "Documentation text was written and edited by GitHub Copilot with human direction and review.",
     );
     assertEqual(
@@ -317,6 +317,10 @@ try {
         name: "1. Choose a surface and understand ownership",
       })
       .waitFor();
+    await assertVisibleText(
+      page.locator(".documentation-disclosure"),
+      "Documentation text was written and edited by GitHub Copilot with human direction and review.",
+    );
     assertEqual(
       new URL(
         await page
@@ -1384,6 +1388,13 @@ async function assertText(locator, expected) {
     throw new Error(
       `Expected ${JSON.stringify(expected)} in ${JSON.stringify(text)}.`,
     );
+  }
+}
+
+async function assertVisibleText(locator, expected) {
+  await assertText(locator, expected);
+  if (!(await locator.isVisible())) {
+    throw new Error(`Expected visible text ${JSON.stringify(expected)}.`);
   }
 }
 

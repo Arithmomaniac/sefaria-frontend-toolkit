@@ -53,6 +53,20 @@ describe("documentation learning journey", () => {
       path.join(root, "docs", ".vitepress", "config.ts"),
       "utf8",
     );
+    const theme = await readFile(
+      path.join(root, "docs", ".vitepress", "theme", "index.ts"),
+      "utf8",
+    );
+    const disclosure = await readFile(
+      path.join(
+        root,
+        "docs",
+        ".vitepress",
+        "theme",
+        "DocumentationDisclosure.vue",
+      ),
+      "utf8",
+    );
 
     expect(index).toContain("<LandingPreview />");
     expect(index).toContain("Bring Sefaria texts into your product");
@@ -67,10 +81,12 @@ describe("documentation learning journey", () => {
       "pattern: `${repository}/edit/${branch}/docs/:path`",
     );
     expect(config).toContain("base: siteBasePath");
-    expect(config).toContain(
+    expect(disclosure).toContain(
       '"https://arithmomaniac.github.io/sefaria-frontend-toolkit/"',
     );
-    expect(config).toContain(
+    expect(theme).toContain('"layout-bottom"');
+    expect(theme).toContain("DocumentationDisclosure");
+    expect(disclosure.replace(/\s+/g, " ")).toContain(
       "Documentation text was written and edited by GitHub Copilot with human direction and review.",
     );
     for (const label of [
