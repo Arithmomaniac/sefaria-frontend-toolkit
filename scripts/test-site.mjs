@@ -947,7 +947,7 @@ try {
     );
     await capture(page, "site-mobile.png");
 
-    for (const width of [660, 720, 768, 960, 1024]) {
+    for (const width of [660, 720, 767, 768, 960, 1024]) {
       await page.setViewportSize({ width, height: 1024 });
       await page.goto(siteRouteUrl("/"), {
         waitUntil: "networkidle",
