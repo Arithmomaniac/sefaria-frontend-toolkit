@@ -344,10 +344,53 @@ try {
         `${framework} next-page route`,
       );
     }
+    for (const [route, project, title] of [
+      [
+        "/learn/01-web-components.html",
+        "ref-label",
+        "Component editor: Edit a request-free reference label",
+      ],
+      [
+        "/learn/02-supplied-data.html",
+        "source-card",
+        "Component editor: Edit the supplied-data source card",
+      ],
+      [
+        "/learn/03-live-data.html",
+        "source-card",
+        "Component editor: Edit before adding live data",
+      ],
+      [
+        "/learn/04-reader.html",
+        "reader",
+        "Component editor: Edit the finite supplied-data Reader",
+      ],
+      [
+        "/learn/05-customization.html",
+        "source-card",
+        "Component editor: Edit source-card presentation",
+      ],
+    ]) {
+      await page.goto(siteRouteUrl(route), { waitUntil: "networkidle" });
+      const embedUrl = new URL(
+        await page.locator(`iframe[title="${title}"]`).getAttribute("src"),
+        page.url(),
+      );
+      assertEqual(
+        embedUrl.pathname,
+        sitePath("/examples/playground/index.html"),
+        `${route} inline editor path`,
+      );
+      assertEqual(
+        embedUrl.searchParams.get("project"),
+        project,
+        `${route} inline editor project`,
+      );
+    }
     await qualifyInlinePlayground(page, {
       route: "/learn/02-supplied-data.html",
       project: "source-card",
-      title: "Edit the supplied-data source card",
+      title: "Component editor: Edit the supplied-data source card",
       sitePath,
       textRequests,
     });
@@ -365,11 +408,22 @@ try {
       waitUntil: "networkidle",
     });
     const refLabelEditor = page.frameLocator(
-      'iframe[title="Edit a request-free reference label"]',
+      'iframe[title="Component editor: Edit a request-free reference label"]',
     );
     await refLabelEditor
       .getByText("Preview rendered with supplied data.")
       .waitFor({ timeout: 30_000 });
+    for (const name of [
+      "Package setup",
+      "View active source",
+      "Open the separate live demo",
+    ]) {
+      assertEqual(
+        await refLabelEditor.getByRole("link", { name }).getAttribute("target"),
+        "_blank",
+        `${name} embedded editor target`,
+      );
+    }
     const refLabelSource = await refLabelEditor
       .getByRole("link", { name: "View active source" })
       .getAttribute("href");
@@ -848,7 +902,7 @@ try {
       );
     }
     const mobileEditor = page.locator(
-      'iframe[title="Editable component catalog"]',
+      'iframe[title="Component editor: Editable component catalog"]',
     );
     const mobileEditorBounds = await mobileEditor.boundingBox();
     if (
@@ -861,7 +915,9 @@ try {
       );
     }
     const mobileEditorWidths = await page
-      .frameLocator('iframe[title="Editable component catalog"]')
+      .frameLocator(
+        'iframe[title="Component editor: Editable component catalog"]',
+      )
       .locator("html")
       .evaluate(() => ({
         viewport: globalThis.document.documentElement.clientWidth,
@@ -1092,6 +1148,14 @@ async function qualifyInlinePlayground(
       marker: globalThis.document.body.dataset.previewMutation ?? null,
     };
   });
+  const editorState = await editor.locator("body").evaluate(() => {
+    globalThis.localStorage.setItem("site-embed-proof", "unchanged");
+    return {
+      url: globalThis.location.href,
+      childCount: globalThis.document.body.childElementCount,
+      marker: globalThis.document.body.dataset.previewMutation ?? null,
+    };
+  });
   const edits = [
     {
       tab: "HTML",
@@ -1118,7 +1182,7 @@ async function qualifyInlinePlayground(
     {
       tab: "JavaScript",
       suffix:
-        '\nconst proof = document.createElement("p"); proof.textContent = "JavaScript changed in the lesson."; document.body.append(proof); try { parent.document.body.dataset.previewMutation = "bad"; } catch {} try { localStorage.setItem("site-embed-proof", "bad"); } catch {} try { parent.history.pushState(null, "", "/bad-preview-route"); } catch {}',
+        '\nconst proof = document.createElement("p"); proof.textContent = "JavaScript changed in the lesson."; document.body.append(proof); try { parent.document.body.dataset.previewMutation = "bad"; } catch {} try { parent.localStorage.setItem("site-embed-proof", "bad"); } catch {} try { parent.history.pushState(null, "", "/bad-editor-route"); } catch {} try { top.document.body.dataset.previewMutation = "bad"; } catch {} try { top.localStorage.setItem("site-embed-proof", "bad"); } catch {} try { top.history.pushState(null, "", "/bad-docs-route"); } catch {}',
       prove: () =>
         editor
           .locator("#preview iframe")
@@ -1149,6 +1213,28 @@ async function qualifyInlinePlayground(
   );
   assertEqual(nextParentState.marker, null, "parent marker isolation");
   assertEqual(nextParentState.storage, "unchanged", "parent storage isolation");
+  const nextEditorState = await editor.locator("body").evaluate(() => ({
+    url: globalThis.location.href,
+    childCount: globalThis.document.body.childElementCount,
+    marker: globalThis.document.body.dataset.previewMutation ?? null,
+    storage: globalThis.localStorage.getItem("site-embed-proof"),
+  }));
+  assertEqual(
+    nextEditorState.url,
+    editorState.url,
+    "trusted editor history isolation",
+  );
+  assertEqual(
+    nextEditorState.childCount,
+    editorState.childCount,
+    "trusted editor DOM isolation",
+  );
+  assertEqual(nextEditorState.marker, null, "trusted editor marker isolation");
+  assertEqual(
+    nextEditorState.storage,
+    "unchanged",
+    "trusted editor storage isolation",
+  );
   await capture(page, "site-inline-editor.png");
   await fullEditor.focus();
   await page.keyboard.press("Tab");
@@ -1171,8 +1257,11 @@ async function qualifyCatalogPlayground(page, sitePath, textRequests) {
     waitUntil: "networkidle",
   });
   const editor = page.frameLocator(
-    'iframe[title="Editable component catalog"]',
+    'iframe[title="Component editor: Editable component catalog"]',
   );
+  await page
+    .getByRole("heading", { name: "Editable component catalog", level: 2 })
+    .waitFor();
   await editor
     .getByText("Preview rendered with supplied data.")
     .waitFor({ timeout: 30_000 });

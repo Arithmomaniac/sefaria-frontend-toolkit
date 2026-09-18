@@ -289,12 +289,14 @@
   gap: 1rem;
 }
 
+.playground-embed__heading h2,
 .playground-embed__heading h3,
 .playground-embed__eyebrow,
 .playground-embed__note {
   margin: 0;
 }
 
+.playground-embed__heading h2,
 .playground-embed__heading h3 {
   padding: 0;
   border: 0;

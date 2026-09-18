@@ -126,7 +126,7 @@ describe("documentation learning journey", () => {
       );
     }
     expect(catalog).toContain(
-      '<PlaygroundEmbed project="source-card" title="Editable component catalog"',
+      '<PlaygroundEmbed project="source-card" title="Editable component catalog" :heading-level="2"',
     );
     expect(catalog).toContain("Open supplied-data preview");
     expect(catalog).toContain("maintained supplied-data projects");
@@ -178,9 +178,22 @@ describe("documentation learning journey", () => {
       "`/examples/playground/index.html?project=${props.project}`",
     );
     expect(embed).toContain('class="playground-embed__frame"');
+    expect(embed).toContain("Component editor:");
+    expect(embed).toContain("props.headingLevel ?? 3");
+    expect(embed).toContain("maintained project on load");
     expect(embed).toContain("Open full editor");
     expect(embed).not.toContain("project-catalog");
     expect(embed).not.toContain("sandbox=");
+  });
+
+  it("keeps embedded editor resource links outside the documentation frame", async () => {
+    const editor = await readFile(
+      path.join(root, "examples", "playground", "index.html"),
+      "utf8",
+    );
+
+    expect(editor.match(/target="_blank"/g)).toHaveLength(3);
+    expect(editor.match(/rel="noreferrer"/g)).toHaveLength(3);
   });
 
   it("describes all seven implemented components as current", async () => {
@@ -460,8 +473,22 @@ describe("documentation learning journey", () => {
       "canonical committed state",
     );
     expect(lessonsByName["04-reader.md"]).toContain("rootLoading");
-    expect(lessonsByName["04-reader.md"]).toContain("reuses that capture");
+    expect(lessonsByName["04-reader.md"]).toContain(
+      "reuses it instead of requesting the source again",
+    );
     expect(lessonsByName["04-reader.md"]).toContain("source-unavailable");
+    expect(lessonsByName["04-reader.md"]).toContain(
+      "**Embedded supplied-data Reader:**",
+    );
+    expect(lessonsByName["04-reader.md"]).toContain(
+      "**Controlled live Reader:**",
+    );
+    expect(lessonsByName["06-host-integration.md"]).toContain(
+      "An MCP App is an interactive web interface",
+    );
+    expect(lessonsByName["06-host-integration.md"]).toContain(
+      "**Browser demonstration:**",
+    );
     expect(lessonsByName["05-customization.md"]).toContain(
       'slot="toolbar-actions"',
     );
@@ -478,6 +505,13 @@ describe("documentation learning journey", () => {
     );
     expect(readerNavigation).toContain("rootLoading");
     expect(readerNavigation).toContain("previous committed root");
+    expect(readerNavigation).toContain(
+      "The supported Reader path combines a DOM-free controller",
+    );
+    expect(readerNavigation).toContain(
+      "## 7. Current boundaries and limitations",
+    );
+    expect(readerNavigation).not.toContain("**Accepted direction:**");
   });
 
   it("builds distinct example files instead of fallback responses", async () => {

@@ -10,7 +10,7 @@ Text components can switch among `taamim_and_nikkud`, `nikkud`, and `none`. The 
 
 Use the editor below to switch among all seven maintained supplied-data projects. It keeps one active editor and one active preview, so the catalog does not load seven workbenches at once. You can also <SiteLink to="/examples/vanilla/index.html">Open supplied-data preview</SiteLink> in the smaller vanilla host.
 
-<PlaygroundEmbed project="source-card" title="Editable component catalog" />
+<PlaygroundEmbed project="source-card" title="Editable component catalog" :heading-level="2" />
 
 ## Start with the complete Reader
 

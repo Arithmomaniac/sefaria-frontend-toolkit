@@ -57,7 +57,9 @@ pnpm dev:reader
 
 ## Expected result
 
-The controlled Reader owns bounded semantic history, transactional external root replacement, source-to-connections transitions, cancellation, and component event handling while the host owns creation and disposal. The host can set `rootLoading` while the first controller is being created; later replacement keeps the previous committed root visible while the new source qualifies. Following a connection pushes history. Calling `replaceRoot` for an exact canonical item already covered by the committed source reuses that capture, then loads its connections. A target outside the finite supplied project reports `source-unavailable` instead of making I/O or inventing empty text. The spatial example can keep several panes visible, but its host also owns pane identity, placement, activation, pruning, compact layout, pins, and operation timing.
+- **Embedded supplied-data Reader:** editing and following a covered Micah connection uses only the project's saved text and links. A target outside that saved data reports `source-unavailable`; it does not make a request or pretend that the target has no text.
+- **Controlled live Reader:** the toolkit controller manages Back, breadcrumbs, cancellation, and source-to-connections navigation. During a new root load, `rootLoading` keeps the last successful Reader visible. If the exact requested text is already in the current validated response, the controller reuses it instead of requesting the source again.
+- **Spatial live example:** the host places and removes multiple panes itself. It also owns which pane is active, the compact layout, pins, limits, and operation timing.
 
 <PlaygroundEmbed project="reader" title="Edit the finite supplied-data Reader" />
 

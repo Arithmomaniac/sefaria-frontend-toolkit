@@ -71,7 +71,7 @@ The complete low-level flow is `client -> pure/async factory -> component-specif
 
 ## Exercise
 
-Change the editor's HTML to move the reference label, change its CSS, then change the JavaScript message shown after selecting **Unresolved**. Choose **Run** after each edit and confirm that the preview changes while the request count stays zero.
+Change the editor's HTML to move the reference label, change its CSS, then change the JavaScript message shown after selecting **Unresolved**. Choose **Run** after each edit and confirm that the preview changes. The project description identifies the saved Micah 6:8 responses and zero-request coverage; use the next lesson's vanilla example when you want a visible request counter.
 
 ## Source and run links
 
