@@ -86,13 +86,15 @@ try {
     await assertText(page.locator("h1"), "Sefaria Frontend Toolkit");
     await assertText(
       page.locator("body"),
-      "Build a useful Jewish text experience",
+      "Bring Sefaria texts into your product",
     );
     await assertText(page.locator("body"), "free digital library");
     await assertText(page.locator("body"), "See the toolkit in action");
-    await assertText(page.locator("body"), "Start with the Reader");
+    await assertText(page.locator("body"), "Fetch and validate data");
+    await assertText(page.locator("body"), "Prepare text you already have");
+    await assertText(page.locator("body"), "Build a complete Reader");
     await assertText(page.locator("body"), "Try the editor");
-    await assertText(page.locator("body"), "Use the headless APIs");
+    await assertText(page.locator("body"), "You can stop at any layer");
     assertEqual(
       await page.locator(".VPFeatures").count(),
       0,
@@ -146,12 +148,16 @@ try {
       );
     }
     for (const [name, expectedPath] of [
-      ["Build the Reader path", "/learn/04-reader.html"],
-      ["Browse the component catalog", "/components.html"],
+      ["Follow the Reader path", "/learn/04-reader.html"],
+      ["Choose a focused component", "/components.html"],
       ["Try the editor", "/examples/playground/index.html"],
       [
-        "Follow the headless path",
-        "/get-started.html#headless-client-transform-and-factory-path",
+        "Use the client without components",
+        "/get-started.html#use-the-client-without-components",
+      ],
+      [
+        "Use the text tools on their own",
+        "/get-started.html#use-text-transforms-without-the-client",
       ],
     ]) {
       const href = await page

@@ -2,9 +2,23 @@
 
 # Documentation
 
-Sefaria is a free digital library and data source for Jewish texts and translations. This toolkit helps developers build reading and learning experiences. It includes a Reader, Web Components that do not make requests, a supplied-data editor, an API client, component factories, and text tools. Start with the result that you need. Read the architecture and specifications when you need more detail.
+Sefaria is a free digital library and data source for Jewish texts and translations. This toolkit helps another product use that library without treating a raw API response or a complete embedded reader as the only choices. Adopt only the layer that the product needs: validated transport data, pure text preparation, render-ready component models, focused request-free components, or a complete controlled Reader.
 
 Choose a path by the result that you want. You can [get started](get-started.md), compare the [seven components](components.md), run an [example](examples.md), or use a [guide](guides/index.md). The [product site](https://arithmomaniac.github.io/sefaria-frontend-toolkit/) adds interactive previews. The Markdown also works on GitHub.
+
+## Use one layer or combine them
+
+The client and text transforms are products in their own right. A server, test, search index, MCP tool, terminal-oriented workflow, or custom renderer can use them without loading the browser package.
+
+| Job | Toolkit layer |
+| --- | --- |
+| Retrieve supported Sefaria operations and validate runtime JSON | [`@arithmomaniac/sefaria-client`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/client/README.md) |
+| Sanitize supported text markup, extract footnotes, create bounded previews, or change vocalization over existing data | [`@arithmomaniac/sefaria-text-transform`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/text-transform/README.md) |
+| Turn validated payloads into component-specific rendering data for an application-owned UI | Non-DOM [`@arithmomaniac/sefaria-web-components`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/web-components/README.md) subpaths |
+| Add one citation, segment, source card, popup, or connections view | A focused request-free Web Component |
+| Add reading, commentary navigation, connections, and semantic history | The controlled Reader and its controller |
+
+Using the toolkit is different from developing its source. Public installation instructions will accompany the release; current private prereleases and local tarballs exist for qualification. Clone this repository and follow [Development](development.md) only when contributing to the toolkit or running its workspace. The browser examples can be evaluated without cloning.
 
 ## Start from a complete solution
 

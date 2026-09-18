@@ -55,7 +55,7 @@ describe("documentation learning journey", () => {
     );
 
     expect(index).toContain("<LandingPreview />");
-    expect(index).toContain("Build a useful Jewish text experience");
+    expect(index).toContain("Bring Sefaria texts into your product");
     expect(index).toContain("Try the editor");
     expect(index).toContain("/examples/playground/index.html");
     expect(index).not.toContain("Published documentation");
@@ -248,7 +248,12 @@ describe("documentation learning journey", () => {
       "utf8",
     );
 
-    expect(index).toContain("TypeScript tools that work without UI components");
+    expect(index).toContain("Bring Sefaria texts into your product");
+    expect(index).toContain("Fetch and validate data");
+    expect(index).toContain("Prepare text you already have");
+    expect(index).toContain("Add a focused reading surface");
+    expect(index).toContain("Build a complete Reader");
+    expect(index).toContain("You can stop at any layer");
     expect(index).not.toContain("headless TypeScript building blocks");
     for (const definition of [
       "A host is the application that owns the component.",
@@ -266,6 +271,57 @@ describe("documentation learning journey", () => {
     expect(examples).toContain("opaque inner preview");
     expect(documentation).not.toContain("host-mediated tools");
     expect(documentation).not.toContain("field-level transport definitions");
+  });
+
+  it("presents the client and text transforms as independently useful products", async () => {
+    const index = await readFile(path.join(root, "docs", "index.md"), "utf8");
+    const getStarted = await readFile(
+      path.join(root, "docs", "get-started.md"),
+      "utf8",
+    );
+    const documentation = await readFile(
+      path.join(root, "docs", "README.md"),
+      "utf8",
+    );
+
+    for (const markdown of [index, getStarted, documentation]) {
+      expect(markdown).toContain("@arithmomaniac/sefaria-client");
+      expect(markdown).toContain("@arithmomaniac/sefaria-text-transform");
+    }
+
+    expect(getStarted).toContain("Use the client without components");
+    expect(getStarted).toContain("getV3Texts");
+    expect(getStarted).toContain("loadValidatedText");
+    expect(getStarted).toContain("Use text transforms without the client");
+    expect(getStarted).toContain("createTextPreview");
+    expect(getStarted).toContain("Use factories with your own renderer");
+    expect(getStarted).toContain("createSourceCardViewModel");
+    expect(documentation).toContain(
+      "The client and text transforms are products in their own right.",
+    );
+  });
+
+  it("separates evaluating and consuming the toolkit from developing its source", async () => {
+    const index = await readFile(path.join(root, "docs", "index.md"), "utf8");
+    const getStarted = await readFile(
+      path.join(root, "docs", "get-started.md"),
+      "utf8",
+    );
+    const documentation = await readFile(
+      path.join(root, "docs", "README.md"),
+      "utf8",
+    );
+
+    expect(index).toContain("Evaluate without cloning");
+    expect(index).toContain("Develop the toolkit itself");
+    expect(getStarted).toContain("Public package installation is planned");
+    expect(getStarted).toContain("Develop or contribute to this repository");
+    expect(documentation).toContain(
+      "Using the toolkit is different from developing its source.",
+    );
+    expect(documentation).toContain(
+      "Public installation instructions will accompany the release",
+    );
   });
 
   it("classifies maintained reader-facing Markdown in the documentation map", async () => {
