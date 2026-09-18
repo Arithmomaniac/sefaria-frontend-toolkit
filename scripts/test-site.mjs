@@ -27,6 +27,15 @@ try {
     });
     const textRequests = [];
     const unexpectedRequests = [];
+    const browserErrors = [];
+    page.on("console", (message) => {
+      if (message.type() === "error") {
+        browserErrors.push(`console: ${message.text()}`);
+      }
+    });
+    page.on("pageerror", (error) => {
+      browserErrors.push(`pageerror: ${error.message}`);
+    });
     const fixture = JSON.parse(
       await readFile(
         path.join(root, "examples", "react-vite", "src", "micah-6-8.json"),
@@ -75,31 +84,253 @@ try {
 
     await page.goto(siteUrl, { waitUntil: "networkidle" });
     await assertText(page.locator("h1"), "Sefaria Frontend Toolkit");
-    await assertText(page.locator("body"), "Published documentation");
+    await assertText(
+      page.locator("body"),
+      "Bring Sefaria texts into your product",
+    );
     await assertText(page.locator("body"), "free digital library");
-    await assertText(page.locator("body"), "Bind the supplied controller");
+    await assertText(page.locator("body"), "See the toolkit in action");
+    await assertText(page.locator("body"), "Fetch and validate data");
+    await assertText(page.locator("body"), "Prepare text you already have");
+    await assertText(page.locator("body"), "Build a complete Reader");
+    await assertText(page.locator("body"), "Try the editor");
+    await assertText(page.locator("body"), "You can stop at any layer");
+    await assertText(page.locator("body"), "Microsoft Global Hackathon 2026");
+    await assertText(page.locator("body"), "Thank you to Microsoft");
+    await assertVisibleText(
+      page.locator(".documentation-disclosure"),
+      "Documentation text was written and edited by GitHub Copilot with human direction and review.",
+    );
+    assertEqual(
+      await page.locator(".VPFeatures").count(),
+      0,
+      "generic landing feature row count",
+    );
+    if (
+      (await page.locator("body").textContent())?.includes(
+        "Created/edited by GitHub Copilot",
+      )
+    ) {
+      throw new Error(
+        "Published pages expose the repository provenance header.",
+      );
+    }
+    const landingPreview = page.frameLocator(
+      'iframe[title="Interactive supplied-data source card"]',
+    );
+    await landingPreview.locator("sefaria-source-card").waitFor();
+    const previewPosition = await page
+      .locator(".landing-preview__stage")
+      .boundingBox();
+    if (!previewPosition || previewPosition.y >= 700) {
+      throw new Error(
+        `Interactive landing preview starts too far below the first viewport: ${JSON.stringify(previewPosition)}.`,
+      );
+    }
+    await assertText(
+      landingPreview.locator("#status"),
+      "Supplied Micah 6:8 data rendered with zero live loads.",
+    );
+    assertEqual(
+      await landingPreview
+        .getByRole("button", { name: "Start live demo" })
+        .count(),
+      0,
+      "landing live action count",
+    );
     assertEqual(textRequests.length, 0, "landing request count");
+    for (const [name, expectedPath] of [
+      ["Get started", "/get-started.html"],
+      ["Components", "/components.html"],
+      ["Examples", "/examples.html"],
+      ["Guides", "/guides/"],
+      ["Reference", "/reference/custom-elements.html"],
+    ]) {
+      const link = page.getByRole("link", { name, exact: true }).first();
+      assertEqual(
+        new URL(await link.getAttribute("href"), page.url()).pathname,
+        sitePath(expectedPath),
+        `${name} navigation route`,
+      );
+    }
+    for (const [name, expectedPath] of [
+      ["Follow the Reader path", "/learn/04-reader.html"],
+      ["Choose a focused component", "/components.html"],
+      ["Try the editor", "/examples/playground/index.html"],
+      [
+        "Use the client without components",
+        "/get-started.html#use-the-client-without-components",
+      ],
+      [
+        "Use the text tools on their own",
+        "/get-started.html#use-text-transforms-without-the-client",
+      ],
+    ]) {
+      const href = await page
+        .getByRole("link", { name, exact: false })
+        .getAttribute("href");
+      const url = new URL(href, page.url());
+      assertEqual(
+        `${url.pathname}${url.hash}`,
+        `${sitePath(expectedPath.split("#")[0])}${
+          expectedPath.includes("#") ? `#${expectedPath.split("#")[1]}` : ""
+        }`,
+        `${name} landing path`,
+      );
+    }
+    await page
+      .getByRole("button", { name: /Search/u })
+      .first()
+      .waitFor();
+    const primaryContrast = await contrastRatio(
+      page.locator(".VPHomeHero .VPButton.brand"),
+    );
+    if (primaryContrast < 4.5) {
+      throw new Error(
+        `Primary landing action contrast is ${primaryContrast.toFixed(2)}:1.`,
+      );
+    }
+    await page.evaluate(() => {
+      globalThis.document.documentElement.classList.add("dark");
+    });
+    await page.waitForTimeout(300);
+    const darkHeroContrast = await contrastRatio(
+      page.locator(".VPHomeHero .name"),
+    );
+    if (darkHeroContrast < 3) {
+      throw new Error(
+        `Dark landing name contrast is ${darkHeroContrast.toFixed(2)}:1.`,
+      );
+    }
+    await page.evaluate(() => {
+      globalThis.document.documentElement.classList.remove("dark");
+    });
+    await page.waitForTimeout(300);
     await tabTo(
       page,
       page.getByRole("link", { name: "Skip to content" }),
       "landing skip link",
     );
     await capture(page, "site-landing.png");
-
-    const learnLink = page.getByRole("link", {
-      name: "Learn step by step",
-      exact: true,
+    const editorPagePromise = page.context().waitForEvent("page", {
+      timeout: 5_000,
     });
+    await page.getByRole("link", { name: "Try the editor" }).click();
+    const editorPage = await editorPagePromise;
+    await editorPage.waitForLoadState("networkidle");
+    assertEqual(
+      new URL(editorPage.url()).pathname,
+      sitePath("/examples/playground/index.html"),
+      "activated editor path",
+    );
+    await assertText(editorPage.locator("h1"), "Component editor");
+    await editorPage.close();
+
+    const learnLink = page
+      .getByRole("link", {
+        name: "Get started",
+        exact: true,
+      })
+      .first();
     await learnLink.waitFor();
     await Promise.all([
-      page.waitForURL("**/learn/01-web-components.html"),
+      page.waitForURL("**/get-started.html"),
       learnLink.click(),
     ]);
     await page
       .getByRole("heading", {
-        name: "1. Understand Web Components and toolkit ownership",
+        name: "Get started",
       })
       .waitFor();
+    const integrationDiagram = page.getByRole("img", {
+      name: "Choose the toolkit layer that matches your product",
+    });
+    await integrationDiagram.waitFor();
+    const diagramState = await integrationDiagram.evaluate((image) => ({
+      complete: image.complete,
+      naturalWidth: image.naturalWidth,
+      pathname: new URL(image.currentSrc, globalThis.location.href).pathname,
+    }));
+    assertEqual(diagramState.complete, true, "integration diagram loaded");
+    if (diagramState.naturalWidth < 1) {
+      throw new Error("Integration diagram has no rendered width.");
+    }
+    if (
+      !diagramState.pathname.startsWith(sitePath("/assets/integration-depths."))
+    ) {
+      throw new Error(
+        `Integration diagram uses an unexpected path: ${diagramState.pathname}.`,
+      );
+    }
+    const originalViewport = page.viewportSize();
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.waitForFunction(() =>
+      globalThis.document
+        .querySelector(
+          'img[alt="Choose the toolkit layer that matches your product"]',
+        )
+        ?.currentSrc.includes("integration-depths-mobile."),
+    );
+    const mobileDiagramPath = await integrationDiagram.evaluate(
+      (image) => new URL(image.currentSrc, globalThis.location.href).pathname,
+    );
+    if (
+      !mobileDiagramPath.startsWith(
+        sitePath("/assets/integration-depths-mobile."),
+      )
+    ) {
+      throw new Error(
+        `Mobile integration diagram uses an unexpected path: ${mobileDiagramPath}.`,
+      );
+    }
+    if (originalViewport) {
+      await page.setViewportSize(originalViewport);
+    }
+    await page.evaluate(() => {
+      globalThis.document.documentElement.classList.add("dark");
+    });
+    await page.waitForTimeout(300);
+    const darkLinkContrast = await contrastRatio(
+      page
+        .getByRole("link", { name: "component catalog", exact: false })
+        .first(),
+    );
+    if (darkLinkContrast < 4.5) {
+      throw new Error(
+        `Dark documentation link contrast is ${darkLinkContrast.toFixed(2)}:1.`,
+      );
+    }
+    await page.evaluate(() => {
+      globalThis.document.documentElement.classList.remove("dark");
+    });
+    await Promise.all([
+      page.waitForURL("**/learn/01-web-components.html"),
+      page
+        .getByRole("link", {
+          name: "Learn step by step",
+          exact: true,
+        })
+        .click(),
+    ]);
+    await page
+      .getByRole("heading", {
+        name: "1. Choose a surface and understand ownership",
+      })
+      .waitFor();
+    await assertVisibleText(
+      page.locator(".documentation-disclosure"),
+      "Documentation text was written and edited by GitHub Copilot with human direction and review.",
+    );
+    assertEqual(
+      new URL(
+        await page
+          .locator(".VPDocFooter .pager-link.next")
+          .getAttribute("href"),
+        page.url(),
+      ).pathname,
+      sitePath("/learn/02-supplied-data.html"),
+      "lesson next-page route",
+    );
     const coreLessonRoutes = [
       "/learn/01-web-components.html",
       "/learn/02-supplied-data.html",
@@ -173,6 +404,57 @@ try {
         `${framework} next-page route`,
       );
     }
+    for (const [route, project, title] of [
+      [
+        "/learn/01-web-components.html",
+        "ref-label",
+        "Component editor: Edit a request-free reference label",
+      ],
+      [
+        "/learn/02-supplied-data.html",
+        "source-card",
+        "Component editor: Edit the supplied-data source card",
+      ],
+      [
+        "/learn/03-live-data.html",
+        "source-card",
+        "Component editor: Edit before adding live data",
+      ],
+      [
+        "/learn/04-reader.html",
+        "reader",
+        "Component editor: Edit the finite supplied-data Reader",
+      ],
+      [
+        "/learn/05-customization.html",
+        "source-card",
+        "Component editor: Edit source-card presentation",
+      ],
+    ]) {
+      await page.goto(siteRouteUrl(route), { waitUntil: "networkidle" });
+      const embedUrl = new URL(
+        await page.locator(`iframe[title="${title}"]`).getAttribute("src"),
+        page.url(),
+      );
+      assertEqual(
+        embedUrl.pathname,
+        sitePath("/examples/playground/index.html"),
+        `${route} inline editor path`,
+      );
+      assertEqual(
+        embedUrl.searchParams.get("project"),
+        project,
+        `${route} inline editor project`,
+      );
+    }
+    await qualifyInlinePlayground(page, {
+      route: "/learn/02-supplied-data.html",
+      project: "source-card",
+      title: "Component editor: Edit the supplied-data source card",
+      sitePath,
+      textRequests,
+    });
+    await qualifyCatalogPlayground(page, sitePath, textRequests);
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(siteRouteUrl("/learn/03-live-data.html"), {
       waitUntil: "networkidle",
@@ -185,27 +467,33 @@ try {
     await page.goto(siteRouteUrl("/learn/01-web-components.html"), {
       waitUntil: "networkidle",
     });
-    const authored = page.frameLocator(
-      'iframe[title="Authored request-free component states"]',
+    const refLabelEditor = page.frameLocator(
+      'iframe[title="Component editor: Edit a request-free reference label"]',
     );
-    await authored
-      .getByRole("heading", { name: "Source card", exact: true })
-      .waitFor();
-    const authoredSource = await authored
-      .locator("[data-repository-source]")
-      .getAttribute("href");
-    if (
-      authoredSource !==
-      "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/source-card.scenarios.ts"
-    ) {
-      const authoredFrame = page
-        .frames()
-        .find((frame) => frame.url().includes("/examples/explorer/authored"));
-      throw new Error(
-        `Unexpected authored source link: ${authoredSource}; frame: ${authoredFrame?.url()}`,
+    await refLabelEditor
+      .getByText("Preview rendered with supplied data.")
+      .waitFor({ timeout: 30_000 });
+    for (const name of [
+      "Package setup",
+      "View active source",
+      "Open the separate live demo",
+    ]) {
+      assertEqual(
+        await refLabelEditor.getByRole("link", { name }).getAttribute("target"),
+        "_blank",
+        `${name} embedded editor target`,
       );
     }
-    assertEqual(textRequests.length, 0, "authored lesson request count");
+    const refLabelSource = await refLabelEditor
+      .getByRole("link", { name: "View active source" })
+      .getAttribute("href");
+    if (
+      refLabelSource !==
+      "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/projects/ref-label/index.html"
+    ) {
+      throw new Error(`Unexpected reference-label source: ${refLabelSource}`);
+    }
+    assertEqual(textRequests.length, 0, "reference-label lesson request count");
 
     for (const [name, route, action] of [
       [
@@ -276,7 +564,7 @@ try {
         );
         assertEqual(
           await link.getAttribute("target"),
-          "_self",
+          expectedPath.includes("/index.html") ? "_blank" : "_self",
           `${name} target`,
         );
       }
@@ -305,32 +593,61 @@ try {
       waitUntil: "networkidle",
     });
     const catalogLinks = [
-      ["/examples/explorer/authored.html", 0],
-      ["/examples/explorer/index.html", 1],
-      ["/examples/reader/controlled.html", 2],
-      ["/examples/vanilla/index.html", 3],
-      ["/examples/react/index.html", 4],
-      ["/examples/alpine/index.html", 5],
-      ["/examples/linked-article/index.html", 6],
-      ["/examples/mcp-app/live.html", 7],
+      [
+        "Supplied-data component editor",
+        "/examples/playground/index.html",
+        "Edit and run any of seven projects",
+        "source-card",
+      ],
+      [
+        "Authored component states",
+        "/examples/explorer/authored.html",
+        "Open preview",
+      ],
+      [
+        "Live component explorer",
+        "/examples/explorer/index.html",
+        "Open preview",
+      ],
+      [
+        "Controlled and spatial Reader",
+        "/examples/reader/controlled.html",
+        "Open preview",
+      ],
+      [
+        "Vanilla supplied-data consumer",
+        "/examples/vanilla/index.html",
+        "Open preview",
+      ],
+      ["React consumer", "/examples/react/index.html", "Open preview"],
+      ["Alpine consumer", "/examples/alpine/index.html", "Open preview"],
+      [
+        "Authored linked article",
+        "/examples/linked-article/index.html",
+        "Open preview",
+      ],
+      ["Live MCP App host", "/examples/mcp-app/live.html", "Open preview"],
     ];
-    const previewLinks = page.getByRole("link", { name: "Open preview" });
-    assertEqual(
-      await previewLinks.count(),
-      catalogLinks.length,
-      "catalog link count",
-    );
-    for (const [expectedPath, index] of catalogLinks) {
-      const link = previewLinks.nth(index);
+    for (const [exampleName, expectedPath, linkName, project] of catalogLinks) {
+      const row = page.getByRole("row").filter({ hasText: exampleName });
+      const link = row.getByRole("link", { name: linkName });
+      const linkUrl = new URL(await link.getAttribute("href"), page.url());
       assertEqual(
-        new URL(await link.getAttribute("href"), page.url()).pathname,
+        linkUrl.pathname,
         sitePath(expectedPath),
-        `catalog route ${index}`,
+        `${exampleName} catalog route`,
       );
+      if (project) {
+        assertEqual(
+          linkUrl.searchParams.get("project"),
+          project,
+          `${exampleName} catalog project`,
+        );
+      }
       assertEqual(
         await link.getAttribute("target"),
-        "_self",
-        `catalog target ${index}`,
+        expectedPath.includes("/index.html") ? "_blank" : "_self",
+        `${exampleName} catalog target`,
       );
     }
     await page.goto(siteRouteUrl("/examples/explorer/index.html"), {
@@ -628,9 +945,13 @@ try {
     await capture(page, "site-linked-popup.png");
 
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto(siteRouteUrl("/learn/05-customization.html"), {
+    await page.goto(siteRouteUrl("/components.html"), {
       waitUntil: "networkidle",
     });
+    await assertText(
+      page.locator("body"),
+      "Choose the smallest component that completes the task.",
+    );
     const widths = await page.evaluate(() => ({
       viewport: globalThis.document.documentElement.clientWidth,
       content: globalThis.document.documentElement.scrollWidth,
@@ -640,13 +961,128 @@ try {
         `Mobile documentation overflows horizontally: ${JSON.stringify(widths)}`,
       );
     }
+    const mobileEditor = page.locator(
+      'iframe[title="Component editor: Editable component catalog"]',
+    );
+    const mobileEditorBounds = await mobileEditor.boundingBox();
+    if (
+      !mobileEditorBounds ||
+      mobileEditorBounds.width > 390 ||
+      mobileEditorBounds.height < 600
+    ) {
+      throw new Error(
+        `Mobile inline editor geometry is invalid: ${JSON.stringify(mobileEditorBounds)}.`,
+      );
+    }
+    const mobileEditorWidths = await page
+      .frameLocator(
+        'iframe[title="Component editor: Editable component catalog"]',
+      )
+      .locator("html")
+      .evaluate(() => ({
+        viewport: globalThis.document.documentElement.clientWidth,
+        content: globalThis.document.documentElement.scrollWidth,
+      }));
+    if (mobileEditorWidths.content > mobileEditorWidths.viewport + 1) {
+      throw new Error(
+        `Mobile inline editor overflows horizontally: ${JSON.stringify(mobileEditorWidths)}.`,
+      );
+    }
+    await page.locator(".VPNavBarHamburger").click();
+    await page
+      .locator(".VPNavScreen")
+      .getByRole("link", { name: "Components", exact: true })
+      .waitFor();
     await tabTo(
       page,
-      page.getByRole("link", { name: "Use the Reader", exact: true }),
-      "mobile lesson prerequisite link",
+      page.getByRole("link", { name: "Open supplied-data preview" }),
+      "mobile component preview link",
       30,
     );
     await capture(page, "site-mobile.png");
+
+    for (const width of [660, 720, 767, 768, 960, 1024]) {
+      await page.setViewportSize({ width, height: 1024 });
+      await page.goto(siteRouteUrl("/"), {
+        waitUntil: "networkidle",
+      });
+      const compactHeroActions = await page
+        .locator(".VPHomeHero .action")
+        .evaluateAll((actions) =>
+          actions.map((action) => {
+            const actionBounds = action.getBoundingClientRect();
+            const button = action.querySelector("a");
+            const text = button?.firstChild;
+            const buttonBounds = button?.getBoundingClientRect();
+            const textRange = globalThis.document.createRange();
+            if (text) {
+              textRange.selectNodeContents(text);
+            }
+
+            const textBounds = text ? textRange.getBoundingClientRect() : null;
+            return {
+              action: {
+                y: actionBounds.y,
+                width: actionBounds.width,
+              },
+              button: buttonBounds
+                ? { left: buttonBounds.left, right: buttonBounds.right }
+                : null,
+              text: textBounds
+                ? { left: textBounds.left, right: textBounds.right }
+                : null,
+            };
+          }),
+        );
+      if (
+        compactHeroActions.length !== 3 ||
+        new Set(compactHeroActions.map(({ action }) => Math.round(action.y)))
+          .size !== (width <= 767 ? 3 : 1) ||
+        compactHeroActions.some(
+          ({ button, text }) =>
+            !button ||
+            !text ||
+            text.left < button.left ||
+            text.right > button.right,
+        )
+      ) {
+        throw new Error(
+          `Hero actions overflow or wrap at ${width}px: ${JSON.stringify(compactHeroActions)}`,
+        );
+      }
+    }
+    await page.setViewportSize({ width: 768, height: 1024 });
+    await page.goto(siteRouteUrl("/components.html"), {
+      waitUntil: "networkidle",
+    });
+    const compactDesktopWidths = await page.evaluate(() => ({
+      viewport: globalThis.document.documentElement.clientWidth,
+      content: globalThis.document.documentElement.scrollWidth,
+    }));
+    if (compactDesktopWidths.content > compactDesktopWidths.viewport + 1) {
+      throw new Error(
+        `Compact desktop navigation overflows horizontally: ${JSON.stringify(compactDesktopWidths)}`,
+      );
+    }
+    await page.getByRole("button", { name: "Search" }).waitFor();
+    await page.getByRole("link", { name: "Reference", exact: true }).waitFor();
+
+    await page.setViewportSize({ width: 640, height: 900 });
+    await page.goto(siteRouteUrl("/"), { waitUntil: "networkidle" });
+    const zoomWidths = await page.evaluate(() => ({
+      viewport: globalThis.document.documentElement.clientWidth,
+      content: globalThis.document.documentElement.scrollWidth,
+    }));
+    if (zoomWidths.content > zoomWidths.viewport + 1) {
+      throw new Error(
+        `Documentation overflows at the 640px CSS viewport equivalent to 200% zoom on a 1280px display: ${JSON.stringify(zoomWidths)}`,
+      );
+    }
+    await page
+      .frameLocator('iframe[title="Interactive supplied-data source card"]')
+      .locator("sefaria-source-card")
+      .waitFor();
+    await capture(page, "site-200-percent-zoom.png");
 
     textRequests.length = 0;
     await page.goto(siteRouteUrl("/examples/mcp-app/"), {
@@ -680,11 +1116,270 @@ try {
       0,
       `unapproved outbound requests: ${unexpectedRequests.join(", ")}`,
     );
+    assertEqual(
+      browserErrors.length,
+      0,
+      `browser runtime errors: ${browserErrors.join(", ")}`,
+    );
+
+    const noScriptContext = await browser.newContext({
+      javaScriptEnabled: false,
+      viewport: { width: 390, height: 844 },
+    });
+    try {
+      const noScriptPage = await noScriptContext.newPage();
+      await noScriptPage.goto(siteUrl, { waitUntil: "load" });
+      await noScriptPage
+        .locator(
+          'img[alt="Preview of a bilingual Micah 6:8 source card with edition attribution"]',
+        )
+        .waitFor();
+      await assertText(
+        noScriptPage.locator(".landing-preview__noscript"),
+        "Enable JavaScript to use the interactive source card.",
+      );
+      assertEqual(
+        await noScriptPage
+          .locator('iframe[title="Interactive supplied-data source card"]')
+          .evaluate((element) => globalThis.getComputedStyle(element).display),
+        "none",
+        "no-script iframe visibility",
+      );
+      await capture(noScriptPage, "site-noscript-mobile.png");
+    } finally {
+      await noScriptContext.close();
+    }
   } finally {
     await browser.close();
   }
 } finally {
   await previewServer.close();
+}
+
+async function qualifyInlinePlayground(
+  page,
+  { route, project, title, sitePath, textRequests },
+) {
+  textRequests.length = 0;
+  await page.goto(siteRouteUrl(route), { waitUntil: "networkidle" });
+  const frameElement = page.locator(`iframe[title="${title}"]`);
+  await frameElement.waitFor();
+  const frameUrl = new URL(await frameElement.getAttribute("src"), page.url());
+  assertEqual(
+    frameUrl.pathname,
+    sitePath("/examples/playground/index.html"),
+    `${project} inline editor path`,
+  );
+  assertEqual(
+    frameUrl.searchParams.get("project"),
+    project,
+    `${project} inline editor selection`,
+  );
+  const fullEditor = page.getByRole("link", { name: "Open full editor" });
+  const fullEditorUrl = new URL(
+    await fullEditor.getAttribute("href"),
+    page.url(),
+  );
+  assertEqual(
+    fullEditorUrl.pathname,
+    sitePath("/examples/playground/index.html"),
+    `${project} full editor path`,
+  );
+  assertEqual(
+    fullEditorUrl.searchParams.get("project"),
+    project,
+    `${project} full editor selection`,
+  );
+  assertEqual(
+    await fullEditor.getAttribute("target"),
+    "_blank",
+    `${project} full editor target`,
+  );
+
+  const editor = page.frameLocator(`iframe[title="${title}"]`);
+  await editor
+    .getByText("Preview rendered with supplied data.")
+    .waitFor({ timeout: 30_000 });
+  const parentState = await page.evaluate(() => {
+    globalThis.localStorage.setItem("site-embed-proof", "unchanged");
+    return {
+      url: globalThis.location.href,
+      childCount: globalThis.document.body.childElementCount,
+      marker: globalThis.document.body.dataset.previewMutation ?? null,
+    };
+  });
+  const editorState = await editor.locator("body").evaluate(() => {
+    globalThis.localStorage.setItem("site-embed-proof", "unchanged");
+    return {
+      url: globalThis.location.href,
+      childCount: globalThis.document.body.childElementCount,
+      marker: globalThis.document.body.dataset.previewMutation ?? null,
+    };
+  });
+  const edits = [
+    {
+      tab: "HTML",
+      suffix: '\n<p id="docs-html-proof">HTML changed in the lesson.</p>',
+      prove: () =>
+        editor
+          .locator("#preview iframe")
+          .contentFrame()
+          .getByText("HTML changed in the lesson.")
+          .waitFor(),
+    },
+    {
+      tab: "CSS",
+      suffix: "\n#docs-html-proof { color: rgb(97, 40, 84); }",
+      prove: async () => {
+        const color = await editor
+          .locator("#preview iframe")
+          .contentFrame()
+          .locator("#docs-html-proof")
+          .evaluate((element) => globalThis.getComputedStyle(element).color);
+        assertEqual(color, "rgb(97, 40, 84)", "inline CSS edit");
+      },
+    },
+    {
+      tab: "JavaScript",
+      suffix:
+        '\nconst proof = document.createElement("p"); proof.textContent = "JavaScript changed in the lesson."; document.body.append(proof); try { parent.document.body.dataset.previewMutation = "bad"; } catch {} try { parent.localStorage.setItem("site-embed-proof", "bad"); } catch {} try { parent.history.pushState(null, "", "/bad-editor-route"); } catch {} try { top.document.body.dataset.previewMutation = "bad"; } catch {} try { top.localStorage.setItem("site-embed-proof", "bad"); } catch {} try { top.history.pushState(null, "", "/bad-docs-route"); } catch {}',
+      prove: () =>
+        editor
+          .locator("#preview iframe")
+          .contentFrame()
+          .getByText("JavaScript changed in the lesson.")
+          .waitFor(),
+    },
+  ];
+  for (const edit of edits) {
+    await editor.getByRole("tab", { name: edit.tab }).click();
+    const code = editor.locator(".cm-content");
+    await code.fill(`${await code.textContent()}${edit.suffix}`);
+    await editor.getByRole("button", { name: "Run" }).click();
+    await edit.prove();
+  }
+  assertEqual(textRequests.length, 0, `${project} inline editor requests`);
+  const nextParentState = await page.evaluate(() => ({
+    url: globalThis.location.href,
+    childCount: globalThis.document.body.childElementCount,
+    marker: globalThis.document.body.dataset.previewMutation ?? null,
+    storage: globalThis.localStorage.getItem("site-embed-proof"),
+  }));
+  assertEqual(nextParentState.url, parentState.url, "parent history isolation");
+  assertEqual(
+    nextParentState.childCount,
+    parentState.childCount,
+    "parent DOM isolation",
+  );
+  assertEqual(nextParentState.marker, null, "parent marker isolation");
+  assertEqual(nextParentState.storage, "unchanged", "parent storage isolation");
+  const nextEditorState = await editor.locator("body").evaluate(() => ({
+    url: globalThis.location.href,
+    childCount: globalThis.document.body.childElementCount,
+    marker: globalThis.document.body.dataset.previewMutation ?? null,
+    storage: globalThis.localStorage.getItem("site-embed-proof"),
+  }));
+  assertEqual(
+    nextEditorState.url,
+    editorState.url,
+    "trusted editor history isolation",
+  );
+  assertEqual(
+    nextEditorState.childCount,
+    editorState.childCount,
+    "trusted editor DOM isolation",
+  );
+  assertEqual(nextEditorState.marker, null, "trusted editor marker isolation");
+  assertEqual(
+    nextEditorState.storage,
+    "unchanged",
+    "trusted editor storage isolation",
+  );
+  await capture(page, "site-inline-editor.png");
+  await fullEditor.focus();
+  await page.keyboard.press("Tab");
+  assertEqual(
+    await page.evaluate(() => globalThis.document.activeElement?.tagName),
+    "IFRAME",
+    "keyboard enters trusted editor",
+  );
+  await page.keyboard.press("Shift+Tab");
+  assertEqual(
+    await fullEditor.evaluate((element) => element.matches(":focus")),
+    true,
+    "keyboard returns to documentation",
+  );
+}
+
+async function qualifyCatalogPlayground(page, sitePath, textRequests) {
+  textRequests.length = 0;
+  await page.goto(siteRouteUrl("/components.html"), {
+    waitUntil: "networkidle",
+  });
+  const editor = page.frameLocator(
+    'iframe[title="Component editor: Editable component catalog"]',
+  );
+  await page
+    .getByRole("heading", { name: "Editable component catalog", level: 2 })
+    .waitFor();
+  await editor
+    .getByText("Preview rendered with supplied data.")
+    .waitFor({ timeout: 30_000 });
+  const projects = [
+    "ref-label",
+    "text-segment",
+    "bilingual-segment",
+    "source-card",
+    "popup",
+    "connections-panel",
+    "reader",
+  ];
+  for (const project of projects) {
+    await editor.locator("#project-select").selectOption(project);
+    await editor
+      .getByText("Preview rendered with supplied data.")
+      .waitFor({ timeout: 30_000 });
+    const fullEditorUrl = new URL(
+      await page
+        .getByRole("link", { name: `Open ${project} in the full editor` })
+        .first()
+        .getAttribute("href"),
+      page.url(),
+    );
+    assertEqual(
+      fullEditorUrl.pathname,
+      sitePath("/examples/playground/index.html"),
+      `${project} catalog full editor route`,
+    );
+    assertEqual(
+      fullEditorUrl.searchParams.get("project"),
+      project,
+      `${project} catalog full editor selection`,
+    );
+  }
+  assertEqual(
+    await editor.locator("#preview iframe").count(),
+    1,
+    "catalog active preview count",
+  );
+  assertEqual(textRequests.length, 0, "catalog inline editor requests");
+  for (const project of ["source-card", "reader"]) {
+    const openedPagePromise = page.context().waitForEvent("page");
+    await page
+      .getByRole("link", { name: `Open ${project} in the full editor` })
+      .first()
+      .click();
+    const openedPage = await openedPagePromise;
+    await openedPage.waitForLoadState("networkidle");
+    assertEqual(
+      new URL(openedPage.url()).searchParams.get("project"),
+      project,
+      `${project} activated full editor selection`,
+    );
+    await assertText(openedPage.locator("h1"), "Component editor");
+    await openedPage.close();
+  }
+  await capture(page, "site-component-catalog.png");
 }
 
 async function assertText(locator, expected) {
@@ -693,6 +1388,13 @@ async function assertText(locator, expected) {
     throw new Error(
       `Expected ${JSON.stringify(expected)} in ${JSON.stringify(text)}.`,
     );
+  }
+}
+
+async function assertVisibleText(locator, expected) {
+  await assertText(locator, expected);
+  if (!(await locator.isVisible())) {
+    throw new Error(`Expected visible text ${JSON.stringify(expected)}.`);
   }
 }
 
@@ -710,6 +1412,32 @@ async function capture(page, filename) {
   await page.screenshot({
     path: path.join(screenshotDirectory, filename),
     fullPage: true,
+  });
+}
+
+async function contrastRatio(locator) {
+  return locator.evaluate((element) => {
+    const luminance = (value) => {
+      const channels =
+        value
+          .match(/\d+(?:\.\d+)?/gu)
+          ?.slice(0, 3)
+          .map(Number)
+          .map((channel) => {
+            const normalized = channel / 255;
+            return normalized <= 0.04045
+              ? normalized / 12.92
+              : ((normalized + 0.055) / 1.055) ** 2.4;
+          }) ?? [];
+      return 0.2126 * channels[0] + 0.7152 * channels[1] + 0.0722 * channels[2];
+    };
+    const style = globalThis.getComputedStyle(element);
+    const foreground = luminance(style.color);
+    const background = luminance(style.backgroundColor);
+    return (
+      (Math.max(foreground, background) + 0.05) /
+      (Math.min(foreground, background) + 0.05)
+    );
   });
 }
 

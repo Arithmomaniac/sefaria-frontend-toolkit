@@ -1,10 +1,10 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by avilevin.
 
-# A reader with history: what to share, what to keep in the host
+# Reader navigation and host ownership
 
-**Accepted direction:** reuse the source card and connections panel, retain immutable history in a headless reader session, coordinate the supported stateful flow through a DOM-free reader controller, and render it in a controlled surface with Back and breadcrumbs. Share the controller and visual contracts between the browser and MCP App while supplying environment-specific data sources.
+The supported Reader path combines a DOM-free controller with the request-free `<sefaria-reader>` element. The controller owns Reader navigation, Back, breadcrumbs, cancellation, and retained validated data. A binding assigns its current view model to the element. The application host supplies the data source, starting reference, placement, and lifecycle.
 
-This is an illustrated explanation, not the normative API reference. **Current** means implemented in this source tree as of September 8, 2026. **Observed** describes pinned upstream source. **Planned** identifies accepted work that has not been implemented. The [component](../specs/components.md) and [integration](../specs/integrations.md) specifications remain authoritative.
+This guide explains current behavior and the choices a host must make. The [component](../specs/components.md) and [integration](../specs/integrations.md) specifications remain the normative API and acceptance references.
 
 ## The questions this answers
 
@@ -38,7 +38,7 @@ _Authenticated named-host capture after two same-App connection hops. The reader
 
 The supported session and controlled surface now provide history across coordinated reader workspaces. The multi-pane website demo additionally proves that a host can preserve spatial context without adding another text renderer or a public arbitrary-panel abstraction.
 
-## 2. What Sefaria owns, and what we are not copying
+## 2. How this navigation differs from Sefaria's applications
 
 ![Source-based schematic of Sefaria web panel ownership, mobile tab history, and the proposed bounded reader trail.](../images/reader-navigation-precedent.png)
 
@@ -50,7 +50,7 @@ On Sefaria Mobile, `ReaderApp` uses `TabHistory`, built from `PageHistory`, and 
 
 The inspected Web `BreadcrumbPath` is a presentation component used for search-result hierarchy: callers supply crumb data and navigation behavior. **It is not evidence of a source-to-commentary reader-history trail.** Connections category/mode navigation is another concern again.
 
-For our bounded product, the accepted supported surface has one active text-and-connections workspace and a retained trail of earlier workspaces. A trail such as `Micah 6:8 > Rashi on Micah 6:8 > another source` is **our navigation-history feature**, not a claim that we copied Sefaria's breadcrumb semantics. A separate website demo owns an ordered spatial pane collection so it can show multiple source and connections panes at once without turning arbitrary panel management into the public package contract.
+The toolkit's supported surface has one active text-and-connections workspace and a retained trail of earlier workspaces. A trail such as `Micah 6:8 > Rashi on Micah 6:8 > another source` is a toolkit navigation feature, not a claim that it copies Sefaria's breadcrumb semantics. A separate website demo owns an ordered spatial pane collection so it can show multiple source and connections panes at once without turning arbitrary panel management into the public package contract.
 
 ## 3. The same component can work in both hosts
 
@@ -90,7 +90,7 @@ unbind();
 controller.dispose();
 ```
 
-The controller uses the client for source and connections requests, retains admitted captures in its private session, and supplies rendering snapshots to the request-free element. Connection selection pushes normal Reader history. An external search calls `replaceRoot`: an exact canonical item covered by the current source capture with the same edition selectors reuses that capture without a source request, but still creates a fresh root and loads its connections. Aliases, references outside the current capture, and edition changes take the normal qualification path. On that path, the old root stays committed until the source qualifies and fits; successful admission removes the old breadcrumbs, and links failure leaves the new source open. A host can keep its own markup or use the lower-level session and `createSefariaReaderDataSource` when it needs spatial pane policy.
+The controller uses the client for source and connections requests, retains admitted captures in its private session, and supplies rendering snapshots to the request-free element. Connection selection pushes normal Reader history. An external search calls `replaceRoot`: an exact canonical item covered by the current source capture with the same edition selectors reuses that capture without a source request, but still creates a fresh root and loads its connections. Aliases, references outside the current capture, and edition changes take the normal qualification path. On that path, the binding sets `rootLoading` while the previous committed root stays visible; successful admission removes the old breadcrumbs, and links failure leaves the new source open. A host can set the same property before the initial controller exists to show the Reader's full loading state. A host can keep its own markup or use the lower-level session and `createSefariaReaderDataSource` when it needs spatial pane policy.
 
 The standalone page can eventually integrate reader navigation with its URL and browser Back, but that should be an explicit host feature. The session should not write global browser history itself.
 
@@ -143,7 +143,7 @@ There is no public snapshot format in this delivery. Retention defaults to 20 en
 
 ![Wide reader with two panes and compact reader with a pane switch, sharing the same source-history trail.](../images/reader-navigation-layouts.png)
 
-_The illustration predates the implementation but shows the current responsive contract. The compact view is mobile web or a narrow MCP App, not a native-mobile screenshot._
+_Illustration of the current responsive contract. The compact view is mobile web or a narrow MCP App, not a native-mobile screenshot._
 
 On a wide surface, show the trail above text and connections side by side with an approximately 68/32 source-to-connections split and a pane separator rather than nested card chrome. A host that assigns a bounded block size keeps the Reader header visible while the source and connections panes scroll independently. At 40rem or less, show one pane with an explicit Text/Connections switch and a compact Back/current-location control. Retained ancestors remain available as breadcrumb buttons without repeating the current heading.
 
@@ -164,9 +164,9 @@ Native mobile could reuse DOM-free navigation semantics, but the current Lit ele
 
 The shared reader surface earns its place by owning navigation presentation and responsive composition, not by being a convenient place to put requests. The existing demo was a useful first host, not a failed component design.
 
-## 7. Accepted boundaries and remaining qualification
+## 7. Current boundaries and limitations
 
-The component specification now settles push/update rules, stable identities, retained-history limits, pending connections, capture accounting, pinning, and explicit rejection. Durable persistence, Forward, browser URL integration, native mobile rendering, and a public arbitrary-panel manager are deferred.
+The current contract includes stable history identities, retained-history limits, pending connections, retained-data accounting, pinning, and explicit rejection. It does not include durable persistence, Forward, browser URL integration, native mobile rendering, or a public arbitrary-panel manager.
 
 For MCP reader work, preserve these seams: explicit component actions; host-mediated data access; corrected payloads with request/status identity; shared pure projection; and operation-scoped completion that cannot overwrite a newer navigation. Do not make the server own visual history or return a reader view model as `structuredContent`.
 

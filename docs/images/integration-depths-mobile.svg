@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 1180" role="img" aria-labelledby="title description">
+  <title id="title">Choose the toolkit layer that matches your product</title>
+  <desc id="description">A mobile view of five independently useful toolkit layers: validated transport, pure text preparation, render-ready models, focused components, and the controlled Reader.</desc>
+  <defs>
+    <style>
+      :root {
+        color-scheme: light dark;
+      }
+      .background { fill: #f8f6ff; }
+      .frame { fill: #ffffff; stroke: #d8d2e8; }
+      .source { fill: #eee8ff; stroke: #7157b7; }
+      .headless { fill: #f4f0ff; stroke: #7157b7; }
+      .browser { fill: #eef7f4; stroke: #287c69; }
+      .title { fill: #241d35; font: 700 26px system-ui, sans-serif; }
+      .subtitle { fill: #5f576f; font: 17px system-ui, sans-serif; }
+      .label { fill: #241d35; font: 700 22px system-ui, sans-serif; }
+      .package { fill: #5f576f; font: 16px ui-monospace, SFMono-Regular, Consolas, monospace; }
+      .detail { fill: #5f576f; font: 17px system-ui, sans-serif; }
+      .stop { fill: #493780; font: 700 17px system-ui, sans-serif; }
+      .arrow { fill: none; stroke: #8d81a8; stroke-width: 4; marker-end: url(#arrowhead); }
+      @media (prefers-color-scheme: dark) {
+        .background { fill: #17131f; }
+        .frame { fill: #211b2c; stroke: #4a405d; }
+        .source { fill: #30234d; stroke: #a98cf0; }
+        .headless { fill: #2a2238; stroke: #a98cf0; }
+        .browser { fill: #1c302c; stroke: #63b9a6; }
+        .title, .label { fill: #f4efff; }
+        .subtitle, .package, .detail { fill: #c6bdd7; }
+        .stop { fill: #c8b5ff; }
+        .arrow { stroke: #a99dbd; }
+      }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 10 4, 0 8" fill="#8d81a8" />
+    </marker>
+  </defs>
+
+  <rect class="background" width="480" height="1180" rx="20" />
+  <rect class="frame" x="18" y="18" width="444" height="1144" rx="16" />
+
+  <text class="title" x="36" y="58">Choose how much toolkit you need</text>
+  <text class="subtitle" x="36" y="88">Use one layer on its own, or combine layers.</text>
+
+  <rect class="source" x="36" y="118" width="408" height="88" rx="12" />
+  <text class="label" x="240" y="153" text-anchor="middle">Sefaria API or data you have</text>
+  <text class="detail" x="240" y="181" text-anchor="middle">Validate external payloads before projection.</text>
+
+  <text class="stop" x="240" y="229" text-anchor="middle">Start with any layer below</text>
+  <rect class="headless" x="36" y="240" width="408" height="142" rx="12" />
+  <text class="label" x="60" y="275">Validated transport</text>
+  <text class="package" x="60" y="303">sefaria-client</text>
+  <text class="detail" x="60" y="335">Typed operations and runtime JSON checks.</text>
+  <text class="stop" x="60" y="363">Stop here: server, test, index, or MCP host</text>
+
+  <path class="arrow" d="M240 382 V414" />
+  <rect class="headless" x="36" y="416" width="408" height="142" rx="12" />
+  <text class="label" x="60" y="451">Pure text preparation</text>
+  <text class="package" x="60" y="479">sefaria-text-transform</text>
+  <text class="detail" x="60" y="511">Safe markup, previews, footnotes, vocalization.</text>
+  <text class="stop" x="60" y="539">Stop here: search, AI, terminal, or offline UI</text>
+
+  <path class="arrow" d="M240 558 V590" />
+  <rect class="headless" x="36" y="592" width="408" height="142" rx="12" />
+  <text class="label" x="60" y="627">Render-ready models</text>
+  <text class="package" x="60" y="655">pure component factories</text>
+  <text class="detail" x="60" y="687">Project validated data for one component.</text>
+  <text class="stop" x="60" y="715">Stop here: render the model in your own UI</text>
+
+  <path class="arrow" d="M240 734 V766" />
+  <rect class="browser" x="36" y="768" width="408" height="142" rx="12" />
+  <text class="label" x="60" y="803">Focused components</text>
+  <text class="package" x="60" y="831">six request-free surfaces</text>
+  <text class="detail" x="60" y="863">Add a citation, text, card, popup, or connections.</text>
+  <text class="stop" x="60" y="891">Stop here: add one reading feature</text>
+
+  <path class="arrow" d="M240 910 V942" />
+  <rect class="browser" x="36" y="944" width="408" height="142" rx="12" />
+  <text class="label" x="60" y="979">Controlled Reader</text>
+  <text class="package" x="60" y="1007">reader + controller</text>
+  <text class="detail" x="60" y="1039">Reading, connections, history, and navigation.</text>
+  <text class="stop" x="60" y="1067">Complete supported reading flow</text>
+
+  <text class="subtitle" x="240" y="1125" text-anchor="middle">Every next layer is optional.</text>
+  <text class="subtitle" x="240" y="1149" text-anchor="middle">Keep the product policy your application already owns.</text>
+</svg>

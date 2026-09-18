@@ -1,18 +1,20 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by avilevin.
 
-# 1. Understand Web Components and toolkit ownership
+# 1. Choose a surface and understand ownership
 
 ## Objective
 
-Understand what the browser registers, why complex values use JavaScript properties rather than HTML attributes, how component events return interaction to the host, and where requests and rendering belong.
+Choose a current rendering surface, show a useful request-free state, and understand what the browser element, toolkit factory, and application host each own.
 
-A Web Component is a browser-standard custom HTML element. One JavaScript import registers it, after which vanilla JavaScript, React, or another browser framework can create the same element and assign its typed properties. React is therefore a host option, not a separate toolkit implementation.
+For a complete reading flow, begin with the [controlled Reader](04-reader.md). For one passage or range, begin with a source card. The [component catalog](../components.md) compares all seven current surfaces and links to working previews.
+
+A Web Component is a browser-standard custom HTML element. One JavaScript import registers it, after which vanilla JavaScript, React, or another browser framework can create the same element and assign its typed properties. You do not need to know Lit to consume the toolkit.
 
 ## Prerequisites
 
 - Node.js 22.12 or later and pnpm 11.22.0.
 - A browser with Chromium-compatible Web Components support. Chromium is the browser qualified by this repository.
-- No knowledge of Lit is required to consume the elements.
+- Choose a surface from the [component catalog](../components.md).
 
 ## Try it
 
@@ -39,7 +41,7 @@ document.body.append(card);
 
 The `import "@arithmomaniac/sefaria-web-components"` statement registers the custom elements in the browser. The non-DOM subpaths, such as `@arithmomaniac/sefaria-web-components/source-card`, export request types, view models, and factories without registering elements.
 
-An HTML attribute contains text. A component view model is a typed object, so the host assigns it as a property:
+An HTML attribute contains text. Properties can carry objects and arrays, so the host assigns a component view model as a JavaScript property:
 
 ```html
 <!-- This creates an element, but it does not load or render a passage. -->
@@ -50,9 +52,9 @@ Do not add a `tref`, client, URL, payload, or `fetch` property to an element. Wh
 
 ## Expected result
 
-The element renders its loading state inside Shadow DOM. No network request occurs. The host can listen for the composed selection event without reaching into the component's internal markup.
+The element renders its loading state inside Shadow DOM. No network request occurs. The host can listen for the composed selection event without reaching into the component's internal markup. In the editor below, the reference-label controller receives validated supplied data and the binding assigns its view model to the element.
 
-<iframe class="example-frame" title="Authored request-free component states" src="../examples/explorer/authored.html?component=source-card&amp;scenario=one-item&amp;diagnostics=1"></iframe>
+<PlaygroundEmbed project="ref-label" title="Edit a request-free reference label" />
 
 ## Who owns what
 
@@ -69,11 +71,13 @@ The complete low-level flow is `client -> pure/async factory -> component-specif
 
 ## Exercise
 
-Open the authored workbench, switch among loading, data, empty, and error source-card scenarios, then change theme and width. Confirm that the diagnostics request count remains zero.
+Change the editor's HTML to move the reference label, change its CSS, then change the JavaScript message shown after selecting **Unresolved**. Choose **Run** after each edit and confirm that the preview changes. The project description identifies the saved Micah 6:8 responses and zero-request coverage; use the next lesson's vanilla example when you want a visible request counter.
 
 ## Source and run links
 
 - Run: `pnpm dev`, then open the authored workbench.
+- Full editor: <SiteLink to="/examples/playground/index.html?project=ref-label">reference-label project</SiteLink>
+- Maintained editor source: [`examples/playground/projects/ref-label/`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground/projects/ref-label)
 - Source: [`development-status.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/development-status.ts)
 - Component contract: [`docs/specs/components.md`](../specs/components.md)
 - Generated element metadata: [Custom elements](../reference/custom-elements.md)

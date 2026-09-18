@@ -1,16 +1,18 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by avilevin.
 
 # 6. Integrate an authored article or MCP host
 
 ## Objective
 
-Apply the same request, validation, pure projection, and request-free rendering boundaries in an ordinary authored page and in an MCP App, while distinguishing the static live host from Node transport proof.
+Apply the same request, validation, pure projection, and request-free rendering boundaries in an ordinary authored page and in an MCP App.
+
+An MCP App is an interactive web interface opened by an MCP host such as an AI client. The host provides data and tool calls; the App validates that data and renders the toolkit Reader without calling Sefaria directly.
 
 ## Prerequisites
 
 - Complete [Customize presentation and use headless APIs](05-customization.md).
-- For the browser-embedded MCP path, use the static live host below.
-- For the Node transport path, use the repository's compiled Node server and local reference host.
+- Use the browser demonstration below when you want to see the complete interaction locally without deploying a server.
+- Use the Node path when you are building or testing an MCP server over stdio or HTTP.
 
 ## Try it
 
@@ -30,11 +32,11 @@ Run it with:
 pnpm dev:linked-article
 ```
 
-The MCP App starts differently. In the static live host, clicking **Start live demo** creates a real MCP client/server pair in the browser. The server obtains a corrected API payload and puts it in `structuredContent`; the App validates that unknown JSON and calls the same pure factory. Opening the page makes zero Sefaria requests. The initial activated flow makes one text request followed by the App-mediated links continuation, without a duplicate source request. Later navigation uses host-proxied server-tool calls rather than direct App requests.
+The MCP App starts differently. In the browser demonstration, clicking **Start live demo** creates a real MCP client/server pair in the page. The server returns API data in the MCP result's `structuredContent` field. The App treats that field as unknown JSON, validates it, and calls the same pure factory. Opening the page makes zero Sefaria requests. The initial activated flow makes one text request followed by a links request, without loading the source twice. Later navigation asks the host to run the server tool; the App still does not request Sefaria directly.
 
 <iframe class="example-frame mcp" title="Static live MCP App host" src="../examples/mcp-app/live.html"></iframe>
 
-The static host uses the packaged App resource, the official AppBridge and postMessage transport, and an opaque-origin sandbox. It does not need a deployed MCP endpoint, proxy, account, or credential. The host owns Sefaria requests; the App remains request-free.
+The browser demonstration uses the packaged App resource and the official browser bridge between host and App. It runs the App in an opaque-origin sandbox and does not need a deployed MCP endpoint, proxy, account, or credential. The host owns Sefaria requests; the App remains request-free.
 
 For the independent Node transport path, run:
 
@@ -46,7 +48,8 @@ pnpm dev:mcp
 
 The linked article still navigates as ordinary HTML when enhancement is unavailable. With JavaScript, explicit activation opens a popup with visible loading, error, cancellation, and cleanup behavior.
 
-The static live host waits for explicit activation, then renders live Sefaria data through real in-memory MCP tools and the packaged App. `pnpm dev:mcp` separately proves compiled stdio and Streamable HTTP transports, registered resources, separate host/sandbox origins, AppBridge calls, cancellation, validation failures, and exact request deltas.
+- **Browser demonstration:** waits for explicit activation, then renders live Sefaria data through in-memory MCP tools and the packaged App.
+- **Node integration path:** `pnpm dev:mcp` runs the compiled stdio and HTTP server with the local reference host. Use the detailed [MCP App guide](../mcp-app-demo.md) for transport, resource, sandbox, cancellation, and validation checks.
 
 ## Who owns what
 
@@ -58,7 +61,7 @@ The static live host waits for explicit activation, then renders live Sefaria da
 | MCP first render | Node server before the tool result reaches the App | Unknown `structuredContent` -> public schema -> pure factory/controller seed -> request-free Reader |
 | MCP continuation | App through the host's supported server-tool bridge | Host-proxied tool result -> validation -> controller/factory -> request-free Reader |
 
-The App does not call Sefaria directly. The static live host qualifies the browser/in-memory topology, while the browser path does not replace Node stdio, HTTP, or named-host qualification.
+The App does not call Sefaria directly. The browser demonstration proves the in-page interaction; it does not replace testing the Node server or a named MCP host.
 
 ## Exercise
 

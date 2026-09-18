@@ -1,12 +1,14 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
 
 # How the client, view models, and Web Components fit together
 
 [Documentation](../README.md) / How the pieces fit together
 
-**Current:** the text-segment, bilingual-segment, reference-label, source-card, popup, connections-panel, controlled Reader, authored linked-article, and MCP paths described here are implemented. Each endpoint-backed component also has an optional typed headless controller and a registration-free DOM adapter.
+**Current:** the reference label, text segment, bilingual segment, source card, connections panel, popup, and controlled Reader are implemented. Each endpoint-backed component also has an optional typed headless controller and a registration-free DOM adapter. The authored linked-article and MCP paths described here are also implemented.
 
 The toolkit separates three roles. An **element** displays a view model and emits events. Supplied **factories and controllers** provide reusable projection and supported behavior. The **application host** chooses the data source, creates and disposes the pieces, and owns any integration-specific policy. Elements do not fetch.
+
+For a controller-backed component, the current path is `application input -> controller or factory -> component view model -> binding -> request-free element`. A semantic component event travels back to the application, which reads the controller's canonical committed state before deciding whether to change data or presentation.
 
 ## The same layers across different hosts
 
@@ -43,7 +45,7 @@ The difference is where the request happens. A regular site can supply `@arithmo
 
 Web Components are composable because the host can arrange several request-free elements and supply each one a view model. Composite data projection happens before rendering: a composite pure factory can call child pure factories using one captured payload. One element does not reach out to fetch data or ask another element to do so; interactive elements emit events and the host decides what data to obtain next.
 
-For one endpoint-backed surface, the host can use the component subpath's `create...Controller` factory and the matching adapter from `@arithmomaniac/sefaria-web-components/bindings` instead of rebuilding cancellation and latest-wins state. These headless controllers are framework-neutral, not Lit `ReactiveController` implementations.
+For one endpoint-backed surface, the host can use the component subpath's `create...Controller` factory and the matching adapter from `@arithmomaniac/sefaria-web-components/bindings` instead of rebuilding cancellation and latest-wins state. A pending or failed attempt stays separate from the previous committed result, so the binding can keep useful content visible while the host reports progress or failure. These headless controllers are framework-neutral, not Lit `ReactiveController` implementations.
 
 For the controlled Reader, that host decision does not mean rebuilding the specialized Reader state machine. The toolkit supplies `loadReaderController` and `bindReaderController`; the application supplies the permitted data source and lifecycle. A website can use the public client while an MCP App uses host-proxied tools, and both bind the resulting controller state to the same request-free Reader presentation.
 

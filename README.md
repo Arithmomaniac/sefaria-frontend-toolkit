@@ -4,7 +4,7 @@
 
 [Sefaria](https://www.sefaria.org/) is a free digital library of Jewish texts and translations. This frontend toolkit helps developers build reading and learning experiences with that data without rebuilding bilingual text, footnotes, attribution, connection navigation, and accessible Reader behavior from scratch.
 
-Start with the complete Reader, use individual browser-standard Web Components from vanilla JavaScript, React, or Alpine, or use the client, factories, and text transforms without rendering components. The current components focus on reading surfaces, but the project boundary is a reusable frontend/UI toolkit rather than a replacement for Sefaria's website.
+Start with the complete Reader, add one of seven focused browser-standard components from vanilla JavaScript, React, or Alpine, or use the validated client, factories, and text transforms without rendering components. The current components focus on reading surfaces, but the project boundary is a reusable frontend/UI toolkit rather than a replacement for Sefaria's website.
 
 > **Experimental.** This public source repository is a development project with no support or stability guarantee. It is not an official Sefaria product. Its synchronized prereleases are private GitHub Packages for authenticated use; there is no public registry, CDN, or stable release.
 
@@ -33,7 +33,9 @@ That example validates a supplied `Micah 6:8` payload, projects it through the p
 
 | Goal | Start here |
 | --- | --- |
-| Learn step by step | [Web Components and ownership](docs/learn/01-web-components.md) |
+| Choose the shortest implementation path | [Get started](docs/get-started.md) |
+| Compare the seven rendering surfaces | [Component catalog](docs/components.md) |
+| Learn step by step | [Choose a surface and understand ownership](docs/learn/01-web-components.md) |
 | Use the prebuilt Reader | [Controlled Reader or custom composition](docs/learn/04-reader.md) |
 | Explore components and states | [Example catalog](examples/README.md) |
 | Customize display or build a host | [Customization and headless APIs](docs/learn/05-customization.md) |
@@ -43,7 +45,7 @@ That example validates a supplied `Micah 6:8` payload, projects it through the p
 | Integrate through MCP | [MCP App guide](docs/mcp-app-demo.md) |
 | Contribute or run all checks | [Development](docs/development.md) |
 
-The [documentation home](docs/README.md) is the repository-native index for guides, specifications, generated reference, evidence, and review guidance. The VitePress site presents the same maintained Markdown and embeds isolated builds of the existing examples; it is not a separate wiki or documentation source.
+The [documentation home](docs/README.md) indexes guides, specifications, generated reference, evidence, and review guidance. The VitePress presentation embeds isolated builds of the maintained examples.
 
 ## Architecture in one minute
 
@@ -67,6 +69,10 @@ Read [How the pieces fit together](docs/guides/data-flow.md) for the complete bo
 - `examples/mcp-app`: compiled Node transports, AppBridge reference host, request-free first render, and a deterministic static fixture preview.
 
 Run `pnpm build:site` and `pnpm preview:site` to inspect the clean production documentation artifact under `dist/site`. The guarded Pages workflow builds and tests the same artifact under the repository project path before deployment.
+
+## Project origin
+
+This project began as a Microsoft Global Hackathon 2026 project. Thank you to Microsoft for sponsoring the hackathon and providing the time and platform that helped turn the initial idea into working software. The toolkit is now an independently maintained open-source project.
 
 ## License and attribution
 

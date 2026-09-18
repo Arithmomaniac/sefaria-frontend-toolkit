@@ -2,11 +2,11 @@
 
 # Render Sefaria text
 
-[Documentation](../README.md) / Render text
+[Documentation](../README.md) / [Guides](index.md) / Render text
 
-Start with a source card if you want a passage, its primary text and translation when available, a heading, and edition attribution. Use the smaller components when your application already supplies the surrounding context.
+Start with a source card to put a useful passage on screen: primary text and translation when available, a reference heading, and edition attribution. Use the smaller text surfaces only when your product already supplies that surrounding context.
 
-These examples target the current private workspace packages. Exact synchronized prereleases are also available through authenticated GitHub Packages; there is no public registry, CDN, or stable-release recipe.
+The fastest supported path runs from this workspace. External consumers can use locally packed tarballs or an exact authenticated private prerelease that their package source actually exposes; there is no documented public npm or CDN installation path.
 
 ## Try the existing demos
 

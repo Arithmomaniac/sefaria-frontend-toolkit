@@ -16,6 +16,14 @@ import {
 import payload from "./micah-6-8.json";
 import "./style.css";
 
+const embeddedPreview = new URLSearchParams(globalThis.location.search).has(
+  "embed",
+);
+document.documentElement.toggleAttribute(
+  "data-embedded-preview",
+  embeddedPreview,
+);
+
 const status = requireElement<HTMLElement>("#status");
 const attempts = requireElement<HTMLElement>("#request-count");
 const committed = requireElement<HTMLElement>("#committed-ref");
@@ -53,7 +61,11 @@ controller.setSuppliedData({ tref: "Micah 6:8" }, validatedPayload);
 card.selectable = true;
 syncPresentation();
 
-form.addEventListener("submit", onSubmit);
+if (embeddedPreview) {
+  form.remove();
+} else {
+  form.addEventListener("submit", onSubmit);
+}
 contentLanguage.addEventListener("change", syncPresentation);
 layout.addEventListener("change", syncPresentation);
 sideOrder.addEventListener("change", syncPresentation);
