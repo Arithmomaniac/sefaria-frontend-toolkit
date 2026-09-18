@@ -70,6 +70,9 @@ describe("documentation learning journey", () => {
     expect(config).toContain(
       '"https://arithmomaniac.github.io/sefaria-frontend-toolkit/"',
     );
+    expect(config).toContain(
+      "Documentation text was written and edited by GitHub Copilot with human direction and review.",
+    );
     for (const label of [
       "Get started",
       "Components",

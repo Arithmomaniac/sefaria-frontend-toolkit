@@ -10,6 +10,8 @@ const site = "https://arithmomaniac.github.io/sefaria-frontend-toolkit/";
 const branch = "main";
 const repositoryRoot = path.resolve(import.meta.dirname, "..", "..");
 const siteBasePath = normalizeSiteBasePath(process.env.SITE_BASE_PATH);
+const copilotDisclosure =
+  "Documentation text was written and edited by GitHub Copilot with human direction and review.";
 const lessonLink = (text: string, link: string) => ({ text, link });
 const learningPagers = {
   "learn/01-web-components.md": {
@@ -200,7 +202,7 @@ export default defineConfig({
     },
     socialLinks: [{ icon: "github", link: repository }],
     footer: {
-      message: `Documentation and isolated examples at ${site}`,
+      message: `${copilotDisclosure} Documentation and isolated examples at ${site}`,
       copyright: "GPL-3.0",
     },
   },

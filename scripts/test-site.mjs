@@ -97,6 +97,10 @@ try {
     await assertText(page.locator("body"), "You can stop at any layer");
     await assertText(page.locator("body"), "Microsoft Global Hackathon 2026");
     await assertText(page.locator("body"), "Thank you to Microsoft");
+    await assertText(
+      page.locator(".VPFooter"),
+      "Documentation text was written and edited by GitHub Copilot with human direction and review.",
+    );
     assertEqual(
       await page.locator(".VPFeatures").count(),
       0,
