@@ -73,3 +73,7 @@ Public package installation is planned for release. Until then, use the browser 
 **Develop the toolkit itself:** clone the repository, use Node.js 22.12 or later and the pinned pnpm version, then follow [Development](development.md). The workspace commands build examples and contributor documentation; they are not a prerequisite for understanding or evaluating the product.
 
 Continue with [Get started](get-started.md) for the current imports and adoption paths.
+
+## Project origin
+
+This project began as a Microsoft Global Hackathon 2026 project. Thank you to Microsoft for sponsoring the hackathon and providing the time and platform that helped turn the initial idea into working software. The toolkit is now an independently maintained open-source project.

@@ -4,6 +4,13 @@
 
 Start with the job that your product needs, not with the largest package. The toolkit has independently useful layers: validated Sefaria transport data, pure text preparation, render-ready view models and controllers, focused request-free components, and a complete controlled Reader. You can stop at any layer.
 
+<picture>
+  <source media="(max-width: 640px)" srcset="./images/integration-depths-mobile.svg">
+  <img src="./images/integration-depths.svg" alt="Choose the toolkit layer that matches your product">
+</picture>
+
+The arrows show ways to combine layers, not mandatory steps. A server can stop after validated transport. A search or AI pipeline can use only text preparation. A custom application can render factory output itself. Browser products can add one focused component or the complete controlled Reader.
+
 | Your product needs | Start here |
 | --- | --- |
 | Validated Sefaria responses for a server, script, browser app, test, or MCP host | `@arithmomaniac/sefaria-client` |

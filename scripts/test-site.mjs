@@ -95,6 +95,8 @@ try {
     await assertText(page.locator("body"), "Build a complete Reader");
     await assertText(page.locator("body"), "Try the editor");
     await assertText(page.locator("body"), "You can stop at any layer");
+    await assertText(page.locator("body"), "Microsoft Global Hackathon 2026");
+    await assertText(page.locator("body"), "Thank you to Microsoft");
     assertEqual(
       await page.locator(".VPFeatures").count(),
       0,
@@ -236,6 +238,50 @@ try {
         name: "Get started",
       })
       .waitFor();
+    const integrationDiagram = page.getByRole("img", {
+      name: "Choose the toolkit layer that matches your product",
+    });
+    await integrationDiagram.waitFor();
+    const diagramState = await integrationDiagram.evaluate((image) => ({
+      complete: image.complete,
+      naturalWidth: image.naturalWidth,
+      pathname: new URL(image.currentSrc, globalThis.location.href).pathname,
+    }));
+    assertEqual(diagramState.complete, true, "integration diagram loaded");
+    if (diagramState.naturalWidth < 1) {
+      throw new Error("Integration diagram has no rendered width.");
+    }
+    if (
+      !diagramState.pathname.startsWith(sitePath("/assets/integration-depths."))
+    ) {
+      throw new Error(
+        `Integration diagram uses an unexpected path: ${diagramState.pathname}.`,
+      );
+    }
+    const originalViewport = page.viewportSize();
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.waitForFunction(() =>
+      globalThis.document
+        .querySelector(
+          'img[alt="Choose the toolkit layer that matches your product"]',
+        )
+        ?.currentSrc.includes("integration-depths-mobile."),
+    );
+    const mobileDiagramPath = await integrationDiagram.evaluate(
+      (image) => new URL(image.currentSrc, globalThis.location.href).pathname,
+    );
+    if (
+      !mobileDiagramPath.startsWith(
+        sitePath("/assets/integration-depths-mobile."),
+      )
+    ) {
+      throw new Error(
+        `Mobile integration diagram uses an unexpected path: ${mobileDiagramPath}.`,
+      );
+    }
+    if (originalViewport) {
+      await page.setViewportSize(originalViewport);
+    }
     await page.evaluate(() => {
       globalThis.document.documentElement.classList.add("dark");
     });

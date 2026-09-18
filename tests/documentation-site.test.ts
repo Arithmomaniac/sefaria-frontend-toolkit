@@ -301,6 +301,63 @@ describe("documentation learning journey", () => {
     );
   });
 
+  it("shows the integration layers visually and preserves the project origin", async () => {
+    const index = await readFile(path.join(root, "docs", "index.md"), "utf8");
+    const getStarted = await readFile(
+      path.join(root, "docs", "get-started.md"),
+      "utf8",
+    );
+    const documentation = await readFile(
+      path.join(root, "docs", "README.md"),
+      "utf8",
+    );
+    const repositoryReadme = await readFile(
+      path.join(root, "README.md"),
+      "utf8",
+    );
+    const diagramPath = path.join(
+      root,
+      "docs",
+      "images",
+      "integration-depths.svg",
+    );
+    const mobileDiagramPath = path.join(
+      root,
+      "docs",
+      "images",
+      "integration-depths-mobile.svg",
+    );
+    await access(diagramPath);
+    await access(mobileDiagramPath);
+    const diagram = await readFile(diagramPath, "utf8");
+
+    expect(getStarted).toContain("<picture>");
+    expect(getStarted).toContain(
+      'srcset="./images/integration-depths-mobile.svg"',
+    );
+    expect(getStarted).toContain('src="./images/integration-depths.svg"');
+    expect(getStarted).toContain(
+      'alt="Choose the toolkit layer that matches your product"',
+    );
+    for (const label of [
+      "Sefaria API or data you already have",
+      "Validated transport",
+      "Pure text preparation",
+      "Render-ready models",
+      "Focused components",
+      "Controlled Reader",
+      "Stop at any layer",
+    ]) {
+      expect(diagram).toContain(label);
+    }
+
+    for (const markdown of [index, documentation, repositoryReadme]) {
+      expect(markdown).toContain("Microsoft Global Hackathon 2026");
+      expect(markdown).toContain("Thank you to Microsoft");
+      expect(markdown).toContain("independently maintained");
+    }
+  });
+
   it("separates evaluating and consuming the toolkit from developing its source", async () => {
     const index = await readFile(path.join(root, "docs", "index.md"), "utf8");
     const getStarted = await readFile(

@@ -72,6 +72,10 @@ React users can branch from steps 2 and 3 into [Use the Web Components from Reac
 | Find historical removed material | [Documentation archive](archive/README.md) |
 | Find the audience and owner of every maintained page | [Documentation map](reference/documentation-map.md) |
 
+## Project origin
+
+This project began as a Microsoft Global Hackathon 2026 project. Thank you to Microsoft for sponsoring the hackathon and providing the time and platform that helped turn the initial idea into working software. The toolkit is now an independently maintained open-source project.
+
 ## Specifications
 
 Specifications define intended behavior and acceptance rules. Generated declarations define each transport field. Component subpaths define rendering types.
