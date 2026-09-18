@@ -983,7 +983,7 @@ try {
       if (
         compactHeroActions.length !== 3 ||
         new Set(compactHeroActions.map(({ action }) => Math.round(action.y)))
-          .size !== (width <= 700 ? 3 : 1) ||
+          .size !== (width <= 767 ? 3 : 1) ||
         compactHeroActions.some(
           ({ button, text }) =>
             !button ||
