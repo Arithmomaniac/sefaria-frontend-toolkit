@@ -4,8 +4,8 @@
     aria-label="Documentation authorship"
   >
     <p>
-      Documentation text was written and edited by GitHub Copilot with human
-      direction and review.
+      Documentation text was written and edited by GitHub Copilot; pending human
+      review.
     </p>
     <p class="documentation-disclosure__project">
       <a href="https://arithmomaniac.github.io/sefaria-frontend-toolkit/">

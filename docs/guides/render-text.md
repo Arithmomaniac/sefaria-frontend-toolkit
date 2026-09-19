@@ -2,32 +2,21 @@
 
 # Render Sefaria text
 
-[Documentation](../README.md) / [Guides](index.md) / Render text
-
 Start with a source card to put a useful passage on screen: primary text and translation when available, a reference heading, and edition attribution. Use the smaller text surfaces only when your product already supplies that surrounding context.
 
-The fastest supported path runs from this workspace. External consumers can use locally packed tarballs or an exact authenticated private prerelease that their package source actually exposes; there is no documented public npm or CDN installation path.
+Public package installation is planned. Use the hosted examples to evaluate the current components without a checkout.
 
-## Try the existing demos
+## Try the hosted examples
 
-Install the workspace's JavaScript dependencies with Node.js 22.12 or later and pnpm 11.22.0:
-
-```powershell
-pnpm install
-pnpm dev:source-card
-```
-
-Open the local Vite URL printed in the terminal and select a preset. The live demos use the deployed Sefaria API; their available text depends on that service. Python and an MCP host are not needed for these browser demos.
-
-| Command | What to explore |
+| Example | What to explore |
 | --- | --- |
-| `pnpm dev:source-card` | A single segment, ranges, nested text, one-sided results, and attribution once per selected edition |
-| `pnpm dev:bilingual-segment` | Primary/translation roles and side visibility, order, and layout for one segment |
-| `pnpm dev:text-segment` | One text version, direction, static footnotes, and empty or wrong-granularity outcomes |
-| `pnpm dev:ref-label` | Canonical labels and links for segments, ranges, commentary, and unresolvable references |
-| `pnpm dev` | Authored view-model states, without API requests |
+| <SiteLink to="/examples/playground/index.html?project=source-card">Source-card editor</SiteLink> | Supplied text, selection, and presentation with zero requests |
+| <SiteLink to="/examples/explorer/source-card.html">Live source card</SiteLink> | A segment, ranges, nested text, one-sided results, and attribution |
+| <SiteLink to="/examples/explorer/bilingual-segment.html">Live bilingual segment</SiteLink> | Primary/translation roles, visibility, order, and layout |
+| <SiteLink to="/examples/explorer/text-segment.html">Live text segment</SiteLink> | One selected edition, direction, markup, footnotes, and empty outcomes |
+| <SiteLink to="/examples/explorer/ref-label.html">Live reference label</SiteLink> | Canonical labels and links for several reference shapes |
 
-[Development](../development.md) covers Corepack, full setup, and contributor commands. MCP and Linker setup and qualification commands are described there separately from these browser components.
+Each live page waits for its explicit action before requesting Sefaria data. Repository contributors can use the repository-only [Development guide](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md) for local commands.
 
 ## Choose a component
 
@@ -42,7 +31,7 @@ There is no separate text-range component: the source card covers that role. A b
 
 ## Put a source card in a browser app
 
-The following is a complete browser TypeScript module for a Vite-style app with access to this workspace's packages. It creates the element, sets a loading model, makes one request, and displays the result.
+The following is a complete browser TypeScript module for a Vite-style app with the toolkit packages installed. It creates the element, sets a loading model, makes one request, and displays the result.
 
 ```ts
 import "@arithmomaniac/sefaria-web-components";
@@ -105,7 +94,7 @@ card.layout = "side-by-side";
 card.sideOrder = "translation-first";
 ```
 
-They reuse the current view model. `sideOrder` controls the side-by-side tracks; stacked layout keeps the primary side first. For responsive placement, the default automatic layout follows the card's available width. See the [bilingual and source-card contracts](../specs/components.md) for the current property values and role-based display controls.
+They reuse the current view model. `sideOrder` controls the side-by-side tracks; stacked layout keeps the primary side first. For responsive placement, the default automatic layout follows the card's available width. See the [bilingual and source-card contracts](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/components.md) for the current property values and role-based display controls.
 
 Changing a reference or edition instead calls the async factory again. In an interactive host, pass an `AbortSignal` as its third argument, cancel obsolete work, and guard against a late result replacing the latest selection. The one-shot example above deliberately has no selection-changing controls.
 
@@ -120,6 +109,6 @@ Changing a reference or edition instead calls the async factory again. In an int
 | Scalar text on one side and an array at the same position on the other | A projection error, not guessed alignment |
 | No renderable text | An empty card model |
 
-The live source-card demo illustrates these cases. Its historical captures are preserved in the [documentation archive](../archive/README.md), but fixed capture counts are not a promise about a changing upstream corpus.
+The live source-card demo illustrates these cases. Its historical captures are preserved in the [documentation archive](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/archive/README.md), but fixed capture counts are not a promise about a changing upstream corpus.
 
 If you already have a payload from a server or fixture, use the [validated pure-factory path](data-flow.md#already-have-the-json) instead of fetching it again. To understand embedded annotations, continue with [Text markup](text-markup.md).

@@ -62,6 +62,18 @@ export default defineConfig({
     ["meta", { name: "sefaria-docs-site", content: "local-docs-site-wave-3" }],
   ],
   cleanUrls: false,
+  srcExclude: [
+    "README.md",
+    "archive/**",
+    "design.md",
+    "development.md",
+    "evidence.md",
+    "handoff.md",
+    "guides/reader-navigation.md",
+    "reference/documentation-map.md",
+    "review.md",
+    "specs/**",
+  ],
   ignoreDeadLinks: [
     /^\/examples\//,
     /^\.\.\/images\/reader-navigation(?:\.html)?$/,
@@ -135,16 +147,18 @@ export default defineConfig({
       ],
       "/guides/": [
         {
-          text: "Guides",
+          text: "Task guides",
           link: "/guides/",
           items: [
             { text: "Render text", link: "/guides/render-text.md" },
-            { text: "How data flows", link: "/guides/data-flow.md" },
             { text: "Text markup", link: "/guides/text-markup.md" },
-            {
-              text: "Reader navigation",
-              link: "/guides/reader-navigation.md",
-            },
+            { text: "Troubleshooting", link: "/guides/troubleshooting.md" },
+          ],
+        },
+        {
+          text: "Advanced explanations",
+          items: [
+            { text: "How data flows", link: "/guides/data-flow.md" },
             {
               text: "Intentional differences",
               link: "/guides/differences.md",
@@ -152,19 +166,36 @@ export default defineConfig({
           ],
         },
       ],
+      "/components": [
+        {
+          text: "Component usage",
+          link: "/components.html",
+          items: [
+            { text: "Reference label", link: "/components/ref-label.md" },
+            { text: "Text segment", link: "/components/text-segment.md" },
+            {
+              text: "Bilingual segment",
+              link: "/components/bilingual-segment.md",
+            },
+            { text: "Source card", link: "/components/source-card.md" },
+            { text: "Popup", link: "/components/popup.md" },
+            {
+              text: "Connections panel",
+              link: "/components/connections-panel.md",
+            },
+            { text: "Reader", link: "/components/reader.md" },
+          ],
+        },
+      ],
       "/reference/": [
         {
-          text: "Reference",
+          text: "API reference",
           items: [
             {
               text: "Custom elements",
               link: "/reference/custom-elements.md",
             },
             { text: "Public exports", link: "/reference/public-exports.md" },
-            {
-              text: "Documentation map",
-              link: "/reference/documentation-map.md",
-            },
           ],
         },
       ],
@@ -176,18 +207,6 @@ export default defineConfig({
             { text: "Components", link: "/components.md" },
             { text: "Examples", link: "/examples.md" },
             { text: "Guides", link: "/guides/" },
-          ],
-        },
-        {
-          text: "Project",
-          items: [
-            {
-              text: "Documentation map",
-              link: "/reference/documentation-map.md",
-            },
-            { text: "Development", link: "/development.md" },
-            { text: "Design", link: "/design.md" },
-            { text: "Review", link: "/review.md" },
           ],
         },
       ],

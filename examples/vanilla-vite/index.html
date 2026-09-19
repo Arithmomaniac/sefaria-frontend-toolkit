@@ -20,6 +20,15 @@
         </label>
         <button id="load-live" type="submit">Load reference</button>
       </form>
+      <p id="status" role="status">Rendering supplied Micah 6:8 data…</p>
+      <p id="request-count">Live load attempts: 0</p>
+      <p id="committed-ref">Current committed reference: Micah 6:8.</p>
+      <p id="failure" role="alert" hidden></p>
+      <sefaria-source-card></sefaria-source-card>
+      <p id="selected-ref" aria-live="polite">
+        Select the rendered segment to send its canonical component event to the
+        host.
+      </p>
       <div class="display-controls">
         <label>
           Text sides
@@ -53,15 +62,6 @@
           </select>
         </label>
       </div>
-      <p id="status" role="status">Rendering supplied Micah 6:8 data…</p>
-      <p id="request-count">Live load attempts: 0</p>
-      <p id="committed-ref">Current committed reference: Micah 6:8.</p>
-      <p id="failure" role="alert" hidden></p>
-      <sefaria-source-card></sefaria-source-card>
-      <p id="selected-ref" aria-live="polite">
-        Select the rendered segment to send its canonical component event to the
-        host.
-      </p>
     </main>
   </body>
 </html>

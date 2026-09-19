@@ -1,4 +1,4 @@
-import { mkdir, readFile } from "node:fs/promises";
+import { access, mkdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { URL } from "node:url";
@@ -95,11 +95,13 @@ try {
     await assertText(page.locator("body"), "Build a complete Reader");
     await assertText(page.locator("body"), "Try the editor");
     await assertText(page.locator("body"), "You can stop at any layer");
-    await assertText(page.locator("body"), "Microsoft Global Hackathon 2026");
-    await assertText(page.locator("body"), "Thank you to Microsoft");
+    await assertNotPresent(
+      page.locator("body"),
+      "Microsoft Global Hackathon 2026",
+    );
     await assertVisibleText(
       page.locator(".documentation-disclosure"),
-      "Documentation text was written and edited by GitHub Copilot with human direction and review.",
+      "Documentation text was written and edited by GitHub Copilot; pending human review.",
     );
     assertEqual(
       await page.locator(".VPFeatures").count(),
@@ -119,6 +121,28 @@ try {
       'iframe[title="Interactive supplied-data source card"]',
     );
     await landingPreview.locator("sefaria-source-card").waitFor();
+    const passageText = landingPreview
+      .locator("sefaria-text-segment .body-part")
+      .first();
+    await passageText.waitFor();
+    const passageTextContent = (await passageText.textContent())?.trim();
+    if (!passageTextContent) {
+      throw new Error("Interactive landing preview has no passage text.");
+    }
+    const passageTextPosition = await passageText.boundingBox();
+    const viewport = page.viewportSize();
+    if (
+      !passageTextPosition ||
+      !viewport ||
+      passageTextPosition.y < 0 ||
+      passageTextPosition.y + passageTextPosition.height > viewport.height
+    ) {
+      throw new Error(
+        `Interactive landing passage text is not fully visible in the first viewport: ${JSON.stringify(
+          passageTextPosition,
+        )}.`,
+      );
+    }
     const previewPosition = await page
       .locator(".landing-preview__stage")
       .boundingBox();
@@ -151,6 +175,22 @@ try {
         new URL(await link.getAttribute("href"), page.url()).pathname,
         sitePath(expectedPath),
         `${name} navigation route`,
+      );
+    }
+    for (const repositoryOnlyFile of [
+      "README.html",
+      "archive/index.html",
+      "design.html",
+      "development.html",
+      "evidence.html",
+      "guides/reader-navigation.html",
+      "reference/documentation-map.html",
+      "review.html",
+      "specs/client.html",
+    ]) {
+      await assertFileMissing(
+        path.join(root, "dist", "site", repositoryOnlyFile),
+        `${repositoryOnlyFile} repository-only artifact`,
       );
     }
     for (const [name, expectedPath] of [
@@ -319,7 +359,7 @@ try {
       .waitFor();
     await assertVisibleText(
       page.locator(".documentation-disclosure"),
-      "Documentation text was written and edited by GitHub Copilot with human direction and review.",
+      "Documentation text was written and edited by GitHub Copilot; pending human review.",
     );
     assertEqual(
       new URL(
@@ -484,6 +524,13 @@ try {
         `${name} embedded editor target`,
       );
     }
+    assertEqual(
+      await refLabelEditor
+        .getByRole("link", { name: "Package setup" })
+        .getAttribute("href"),
+      "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md#build-and-pack-the-private-libraries",
+      "embedded editor package setup",
+    );
     const refLabelSource = await refLabelEditor
       .getByRole("link", { name: "View active source" })
       .getAttribute("href");
@@ -533,14 +580,11 @@ try {
 
     const liveLessons = {
       "03-live-data": [
-        [
-          "open the source-card explorer",
-          "/examples/explorer/source-card.html",
-        ],
+        ["vanilla controller host", "/examples/vanilla/index.html"],
       ],
       "04-reader": [
-        ["open the controlled Reader", "/examples/reader/controlled.html"],
-        ["open the spatial Reader", "/examples/reader/index.html"],
+        ["controlled Reader", "/examples/reader/controlled.html"],
+        ["spatial Reader", "/examples/reader/index.html"],
       ],
     };
     for (const [lesson, links] of Object.entries(liveLessons)) {
@@ -553,7 +597,10 @@ try {
         0,
         `${lesson} unsolicited request count`,
       );
-      await assertText(page.locator("body"), "Explicit live action");
+      await assertText(
+        page.locator("body"),
+        lesson === "03-live-data" ? "Explicit live action" : "Start live demo",
+      );
       for (const [name, expectedPath] of links) {
         const link = page.getByRole("link", { name });
         const href = await link.getAttribute("href");
@@ -569,18 +616,18 @@ try {
         );
       }
       if (lesson === "03-live-data") {
-        await Promise.all([
-          page.waitForURL("**/examples/explorer/source-card.html"),
-          page.getByRole("link", { name: links[0][0] }).click(),
-        ]);
-        await tabTo(
-          page,
-          page.getByRole("button", { name: "Start live demo" }),
-          "source-card load action",
-          30,
+        await page.goto(siteRouteUrl(links[0][1]), {
+          waitUntil: "networkidle",
+        });
+        await page.locator("#load-live").click();
+        await page.waitForFunction(
+          () =>
+            globalThis.document
+              .querySelector("#status")
+              ?.textContent?.includes(
+                "Committed canonical reference Micah 6:8",
+              ) === true,
         );
-        await page.keyboard.press("Enter");
-        await page.locator("#request-state[data-state='data']").waitFor();
         assertEqual(
           textRequests.length,
           1,
@@ -1339,23 +1386,6 @@ async function qualifyCatalogPlayground(page, sitePath, textRequests) {
     await editor
       .getByText("Preview rendered with supplied data.")
       .waitFor({ timeout: 30_000 });
-    const fullEditorUrl = new URL(
-      await page
-        .getByRole("link", { name: `Open ${project} in the full editor` })
-        .first()
-        .getAttribute("href"),
-      page.url(),
-    );
-    assertEqual(
-      fullEditorUrl.pathname,
-      sitePath("/examples/playground/index.html"),
-      `${project} catalog full editor route`,
-    );
-    assertEqual(
-      fullEditorUrl.searchParams.get("project"),
-      project,
-      `${project} catalog full editor selection`,
-    );
   }
   assertEqual(
     await editor.locator("#preview iframe").count(),
@@ -1363,22 +1393,22 @@ async function qualifyCatalogPlayground(page, sitePath, textRequests) {
     "catalog active preview count",
   );
   assertEqual(textRequests.length, 0, "catalog inline editor requests");
-  for (const project of ["source-card", "reader"]) {
-    const openedPagePromise = page.context().waitForEvent("page");
+  const fullEditorUrl = new URL(
     await page
-      .getByRole("link", { name: `Open ${project} in the full editor` })
-      .first()
-      .click();
-    const openedPage = await openedPagePromise;
-    await openedPage.waitForLoadState("networkidle");
-    assertEqual(
-      new URL(openedPage.url()).searchParams.get("project"),
-      project,
-      `${project} activated full editor selection`,
-    );
-    await assertText(openedPage.locator("h1"), "Component editor");
-    await openedPage.close();
-  }
+      .getByRole("link", { name: "Open full editor" })
+      .getAttribute("href"),
+    page.url(),
+  );
+  assertEqual(
+    fullEditorUrl.pathname,
+    sitePath("/examples/playground/index.html"),
+    "catalog full editor route",
+  );
+  assertEqual(
+    fullEditorUrl.searchParams.get("project"),
+    "source-card",
+    "catalog initial editor selection",
+  );
   await capture(page, "site-component-catalog.png");
 }
 
@@ -1389,6 +1419,25 @@ async function assertText(locator, expected) {
       `Expected ${JSON.stringify(expected)} in ${JSON.stringify(text)}.`,
     );
   }
+}
+
+async function assertNotPresent(locator, unexpected) {
+  const text = await locator.textContent();
+  if (text?.includes(unexpected)) {
+    throw new Error(
+      `Did not expect ${JSON.stringify(unexpected)} in ${JSON.stringify(text)}.`,
+    );
+  }
+}
+
+async function assertFileMissing(file, label) {
+  try {
+    await access(file);
+  } catch (error) {
+    if (error?.code === "ENOENT") return;
+    throw error;
+  }
+  throw new Error(`${label}: expected no emitted file.`);
 }
 
 async function assertVisibleText(locator, expected) {

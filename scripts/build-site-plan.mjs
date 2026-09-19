@@ -55,7 +55,6 @@ export const EXAMPLE_BUILDS = [
 
 export const SITE_REQUIRED_FILES = [
   "index.html",
-  "README.html",
   "learn/01-web-components.html",
   "learn/02-supplied-data.html",
   "learn/03-live-data.html",

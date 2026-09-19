@@ -299,6 +299,40 @@ async function qualifyProjectEditingAndInteraction(page, destination) {
   await page
     .getByText("Preview rendered with supplied data.")
     .waitFor({ timeout: 30_000 });
+  await page.getByRole("button", { name: "Jump to preview" }).click();
+  await page.waitForFunction(
+    () => globalThis.document.activeElement?.id === "preview-title",
+  );
+  assertEqual(
+    await page.evaluate(() => globalThis.document.activeElement?.id),
+    "preview-title",
+    "jump-to-preview focus",
+  );
+  const previewTitlePosition = await page
+    .locator("#preview-title")
+    .boundingBox();
+  const viewport = page.viewportSize();
+  if (
+    !previewTitlePosition ||
+    !viewport ||
+    previewTitlePosition.y < 0 ||
+    previewTitlePosition.y + previewTitlePosition.height > viewport.height
+  ) {
+    throw new Error(
+      `Jump-to-preview did not reveal the result heading: ${JSON.stringify(
+        previewTitlePosition,
+      )}.`,
+    );
+  }
+  await page.getByRole("button", { name: "Back to editor" }).click();
+  await page.waitForFunction(
+    () => globalThis.document.activeElement?.id === "project-title",
+  );
+  assertEqual(
+    await page.evaluate(() => globalThis.document.activeElement?.id),
+    "project-title",
+    "back-to-editor focus",
+  );
   await page.getByRole("tab", { name: "HTML" }).focus();
   await page.keyboard.press("ArrowRight");
   assertEqual(

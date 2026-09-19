@@ -61,7 +61,9 @@ export function markdownAnchors(source) {
   const anchors = new Set();
   const counts = new Map();
   for (const match of stripFencedCode(source).matchAll(/^#{1,6}\s+(.+)$/gmu)) {
-    const base = match[1]
+    const heading = match[1].trim();
+    const htmlTagHeading = /^`?<([A-Za-z][\w-]*)>`?$/u.exec(heading);
+    const base = (htmlTagHeading?.[1] ?? heading)
       .replace(/\s+#+\s*$/u, "")
       .trim()
       .toLowerCase()

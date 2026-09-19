@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot with human review/feedback by avilevin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # 4. Use the Reader or compose a custom host
 
@@ -10,13 +10,14 @@ The controlled Reader is the shortest complete path. The toolkit supplies its co
 
 ## Prerequisites
 
-- Node.js 22.12 or later, pnpm 11.22.0, Chromium, and repository access.
-- Complete the one-time checkout, install, and build steps under [the workspace path](02-supplied-data.md#try-it). You do not need to complete the earlier lessons.
+- A modern browser.
 - Decide whether your host needs a complete stateful Reader or custom pane placement.
 
 ## Try it
 
-The supported path creates the browser client, loads a controller once, binds it to one persistent element, and disposes both:
+Open the <SiteLink to="/examples/reader/controlled.html?tref=Micah%206%3A8">controlled Reader</SiteLink> for the supported controller path or the <SiteLink to="/examples/reader/index.html?tref=Micah%206%3A8">spatial Reader</SiteLink> for application-owned pane composition. Both wait for **Start live demo** before requesting Sefaria data.
+
+The supported integration creates the browser client, loads a controller once, binds it to one persistent element, and disposes both:
 
 ```ts
 import { createSefariaClient } from "@arithmomaniac/sefaria-client";
@@ -45,16 +46,6 @@ window.addEventListener(
 );
 ```
 
-Run both maintained website choices:
-
-```powershell
-pnpm build
-pnpm dev:reader
-```
-
-- `controlled.html?tref=Micah%206%3A8` uses the supported controller-backed `<sefaria-reader>`.
-- `index.html?tref=Micah%206%3A8` is a lower-level spatial composition.
-
 ## Expected result
 
 - **Embedded supplied-data Reader:** editing and following a covered Micah connection uses only the project's saved text and links. A target outside that saved data reports `source-unavailable`; it does not make a request or pretend that the target has no text.
@@ -65,7 +56,7 @@ pnpm dev:reader
 
 The same Reader presentation can run with different data paths. A regular website controller can use `@arithmomaniac/sefaria-client`; an MCP App controller uses host-mediated tools because the sandbox cannot make the same direct requests. In both cases the element receives rendering data and emits events rather than fetching.
 
-**Explicit live actions:** after starting `pnpm dev:site`, <SiteLink to="/examples/reader/controlled.html?tref=Micah%206%3A8">open the controlled Reader</SiteLink> or <SiteLink to="/examples/reader/index.html?tref=Micah%206%3A8">open the spatial Reader</SiteLink>, then select **Start live demo**. The route only prefills its `?tref=` value and makes no Sefaria request before activation. The maintained sources are linked below.
+The routes only prefill their `?tref=` values and make no Sefaria request before activation.
 
 ## Who owns what
 
@@ -76,18 +67,21 @@ The same Reader presentation can run with different data paths. A regular websit
 
 The spatial example is a distinct option, not a second supported all-purpose Reader API. Do not copy its private pane coordinator into the component package.
 
+For finite-capture limits, unavailable targets, request failures, and cleanup, use the [troubleshooting guide](../guides/troubleshooting.md).
+
 ## Exercise
 
 In the embedded Reader, change HTML or CSS and choose **Run**. Follow a covered Micah connection, then choose a target outside the supplied capture and confirm that the explicit unavailable message leaves the committed Reader visible. In the controlled live Reader, use Back and submit another reference; confirm that the element stays mounted while its breadcrumb trail starts over.
 
 ## Source and run links
 
-- Run: `pnpm dev:reader`
+- Hosted controlled Reader: <SiteLink to="/examples/reader/controlled.html?tref=Micah%206%3A8">open example</SiteLink>
+- Hosted spatial Reader: <SiteLink to="/examples/reader/index.html?tref=Micah%206%3A8">open example</SiteLink>
 - Full editor: <SiteLink to="/examples/playground/index.html?project=reader">reader project</SiteLink>
 - Maintained editor source: [`examples/playground/projects/reader/`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground/projects/reader)
 - Controlled source: [`examples/reader/src/controlled-app.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/reader/src/controlled-app.ts)
 - Spatial source: [`examples/reader/src/app.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/reader/src/app.ts)
-- Illustrated ownership guide: [Reader navigation](../guides/reader-navigation.md)
+- Repository design notes: [Reader navigation and host ownership](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/guides/reader-navigation.md)
 
 ## Next step
 

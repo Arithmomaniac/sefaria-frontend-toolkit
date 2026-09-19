@@ -20,9 +20,13 @@ hero:
       rel: noreferrer
 ---
 
-> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
+> Created/edited by GitHub Copilot; pending human review.
 
 <LandingPreview />
+
+<div class="status-note">
+  <strong>Experimental and unofficial:</strong> evaluate the browser examples without cloning. Private prereleases and local tarballs support qualification; public npm or CDN installation is not available yet. See the <SiteLink to="/get-started.html#installation-status">current installation status</SiteLink>.
+</div>
 
 ## Why this toolkit exists
 
@@ -64,16 +68,7 @@ The landing preview, seven-project editor, authored component states, and live e
 - Edit HTML, CSS, and JavaScript in the [supplied-data editor](examples/playground/index.html).
 - Compare the [seven components](components.md).
 - Open the [controlled Reader](examples/reader/controlled.html?tref=Micah%206%3A8).
-- Follow the independent [client, transform, factory, component, and Reader paths](get-started.md).
 
-## Evaluate now or develop the source
+**Develop the toolkit itself:** clone the repository and follow the repository-only [Development guide](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md).
 
-Public package installation is planned for release. Until then, use the browser examples to evaluate the product; private prereleases and local tarballs support integration qualification.
-
-**Develop the toolkit itself:** clone the repository, use Node.js 22.12 or later and the pinned pnpm version, then follow [Development](development.md). The workspace commands build examples and contributor documentation; they are not a prerequisite for understanding or evaluating the product.
-
-Continue with [Get started](get-started.md) for the current imports and adoption paths.
-
-## Project origin
-
-This project began as a Microsoft Global Hackathon 2026 project. Thank you to Microsoft for sponsoring the hackathon and providing the time and platform that helped turn the initial idea into working software. The toolkit is now an independently maintained open-source project.
+Follow [Get started](get-started.md) for the client, transform, factory, component, and Reader paths.

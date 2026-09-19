@@ -1,14 +1,12 @@
-> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # HTML inside Sefaria text
 
-[Documentation](../README.md) | [Design](../design.md) | [Development](../development.md)
-
 When a caller requests a Sefaria reference such as `Genesis 1:1`, the reference identifies a passage. It does not contain HTML tags. The returned version `text` value can be a string, `null`, or a recursively nested array of string and `null` leaves; a string leaf can contain HTML markup.
 
-This guide explains the reviewed markup families that may occur in those string leaves and how this project handles them. It is an explanatory guide, not a new allowlist or a promise about every future upstream response. The exhaustive contract is the [text-processing specification](../specs/text-processing.md#markup-contract), and the source observations are in [Text markup evidence](../evidence.md#text-markup-evidence).
+This guide explains the reviewed markup families that may occur in those string leaves and how this project handles them. It is an explanatory guide, not a new allowlist or a promise about every future upstream response. The exhaustive contract is the [text-processing specification](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/text-processing.md#markup-contract), and the source observations are in [Text markup evidence](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/evidence.md#text-markup-evidence).
 
-Sefaria already documents the core tag families, footnotes, commentary placements, overlays, links, and images in [Formatting within Sefaria texts](https://developers.sefaria.org/docs/text-formatting-beyond-the-segment-level). This guide is a companion explaining examples and this project's local handling, not a claim that those concepts are undocumented. See the dated [coverage record](../evidence.md#upstream-documentation-coverage).
+Sefaria already documents the core tag families, footnotes, commentary placements, overlays, links, and images in [Formatting within Sefaria texts](https://developers.sefaria.org/docs/text-formatting-beyond-the-segment-level). This guide is a companion explaining examples and this project's local handling, not a claim that those concepts are undocumented. See the dated [coverage record](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/evidence.md#upstream-documentation-coverage).
 
 Subsegment tags belong to a Version's text rather than an Index. Different editions of the same passage can therefore have different annotations.
 
@@ -16,7 +14,7 @@ Subsegment tags belong to a Version's text rather than an Index. Different editi
 
 The client validates the response shape. A non-DOM component factory owns the text boundary: it sanitizes the API HTML, extracts structured footnotes, preserves the full safe marks, and creates render-ready view-model fields. The Web Component receives the view model and can derive one of the supported vocalization presentations from those immutable safe fields; it does not parse an API payload or decide which tags are safe.
 
-For the path from client to renderer, read [How the pieces fit together](data-flow.md). The [processing boundary](../specs/text-processing.md#processing-boundary) defines the exact responsibilities.
+For the path from client to renderer, read [How the pieces fit together](data-flow.md). The [processing boundary](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/text-processing.md#processing-boundary) defines the exact responsibilities.
 
 Do not copy a raw API string into `unsafeHTML`. A component may render HTML fragments only after the owning factory has applied the documented processing sequence.
 
@@ -35,7 +33,7 @@ The following is an illustrative shape, not a claim that one response contains e
 }
 ```
 
-The deployed API also returns arrays for ranges and nested arrays for some spanning and non-spanning references. Follow the recursive `text` value rather than assuming that `isSpanning` describes its shape. See [Text response shape](../evidence.md#text-response-shape) and [Recursive text shape and side alignment](../evidence.md#recursive-text-shape-and-side-alignment).
+The deployed API also returns arrays for ranges and nested arrays for some spanning and non-spanning references. Follow the recursive `text` value rather than assuming that `isSpanning` describes its shape. See [Text response shape](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/evidence.md#text-response-shape) and [Recursive text shape and side alignment](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/evidence.md#recursive-text-shape-and-side-alignment).
 
 The examples below are short authored illustrations unless they are marked as source-backed. They show the reviewed input shape and local handling; they do not imply that every reference contains every example.
 
@@ -281,7 +279,7 @@ The response format is part of the information available to a component:
 | Mobile `stripItags` | Footnote pairs and several annotation families are removed before rendering. |
 | v3 `strip_only_footnotes` | The name understates the behavior: the broader stripping path also removes commentary and overlay families and rendered markers. |
 
-An empty `notes` array after one of these formats is not proof that the source had no notes. The transform cannot detect or reconstruct content that was removed before it received the string. The host needs request context to explain that loss; use only states supported by the component, not an invented universal “unavailable” state. See [Return-format information loss](../evidence.md#return-format-information-loss).
+An empty `notes` array after one of these formats is not proof that the source had no notes. The transform cannot detect or reconstruct content that was removed before it received the string. The host needs request context to explain that loss; use only states supported by the component, not an invented universal “unavailable” state. See [Return-format information loss](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/evidence.md#return-format-information-loss).
 
 ## The processing path
 
@@ -292,17 +290,17 @@ For a validated API string, the owning pure factory follows this order:
 3. Preserve the full safe HTML body parts, plain marker text, and null-or-HTML note bodies.
 4. Add component-specific rendering fields such as accessible marker and note IDs.
 
-The element receives the resulting view model. Full `taamim_and_nikkud` mode renders those fields directly. `nikkud` and `none` call `applyVocalizationToHtml` for HTML body and note fragments and `applyVocalization` for plain markers, always starting from the original view model. The element does not receive a reference, raw JSON, client, base URL, `fetch`, or raw API HTML. For ownership and current/planned boundaries, see [Design](../design.md#ownership), [Development](../development.md#implemented-on-this-baseline), and the [component specification](../specs/components.md#element-contract).
+The element receives the resulting view model. Full `taamim_and_nikkud` mode renders those fields directly. `nikkud` and `none` call `applyVocalizationToHtml` for HTML body and note fragments and `applyVocalization` for plain markers, always starting from the original view model. The element does not receive a reference, raw JSON, client, base URL, `fetch`, or raw API HTML. For ownership and current/planned boundaries, see [Design](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/design.md#ownership), [Development](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md#implemented-on-this-baseline), and the [component specification](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/components.md#element-contract).
 
 ## Read the exhaustive sources
 
-- [Text-processing specification: markup contract](../specs/text-processing.md#markup-contract)
-- [Text-processing specification: URL policy](../specs/text-processing.md#url-policy)
-- [Text-processing specification: footnotes](../specs/text-processing.md#footnotes)
-- [Text-processing specification: processing boundary](../specs/text-processing.md#processing-boundary)
-- [Evidence: persisted text contract and markup taxonomy](../evidence.md#persisted-text-contract)
-- [Evidence: footnote markup](../evidence.md#footnote-markup)
-- [Evidence: commentary placement iTags](../evidence.md#commentary-placement-itags)
-- [Evidence: structural overlays](../evidence.md#structural-overlays)
-- [Evidence: API-generated links](../evidence.md#api-generated-links)
+- [Text-processing specification: markup contract](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/text-processing.md#markup-contract)
+- [Text-processing specification: URL policy](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/text-processing.md#url-policy)
+- [Text-processing specification: footnotes](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/text-processing.md#footnotes)
+- [Text-processing specification: processing boundary](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/text-processing.md#processing-boundary)
+- [Evidence: persisted text contract and markup taxonomy](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/evidence.md#persisted-text-contract)
+- [Evidence: footnote markup](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/evidence.md#footnote-markup)
+- [Evidence: commentary placement iTags](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/evidence.md#commentary-placement-itags)
+- [Evidence: structural overlays](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/evidence.md#structural-overlays)
+- [Evidence: API-generated links](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/evidence.md#api-generated-links)
 - [Sefaria: formatting within texts](https://developers.sefaria.org/docs/text-formatting-beyond-the-segment-level)

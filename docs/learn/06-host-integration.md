@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot with human review/feedback by avilevin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # 6. Integrate an authored article or MCP host
 
@@ -24,13 +24,7 @@ An authored page keeps a native citation link and enhances it only after JavaScr
 </a>
 ```
 
-The page-owned enhancement handles activation, calls the popup async factory with its client and `AbortSignal`, assigns the resulting view model to the request-free popup, and preserves native navigation for JavaScript-disabled and modifier-key use.
-
-Run it with:
-
-```powershell
-pnpm dev:linked-article
-```
+The page-owned enhancement handles activation, calls the popup async factory with its client and `AbortSignal`, assigns the resulting view model to the request-free popup, and preserves native navigation for JavaScript-disabled and modifier-key use. <SiteLink to="/examples/linked-article/index.html">Open the hosted linked article</SiteLink>.
 
 The MCP App starts differently. In the browser demonstration, clicking **Start live demo** creates a real MCP client/server pair in the page. The server returns API data in the MCP result's `structuredContent` field. The App treats that field as unknown JSON, validates it, and calls the same pure factory. Opening the page makes zero Sefaria requests. The initial activated flow makes one text request followed by a links request, without loading the source twice. Later navigation asks the host to run the server tool; the App still does not request Sefaria directly.
 
@@ -38,18 +32,12 @@ The MCP App starts differently. In the browser demonstration, clicking **Start l
 
 The browser demonstration uses the packaged App resource and the official browser bridge between host and App. It runs the App in an opaque-origin sandbox and does not need a deployed MCP endpoint, proxy, account, or credential. The host owns Sefaria requests; the App remains request-free.
 
-For the independent Node transport path, run:
-
-```powershell
-pnpm dev:mcp
-```
-
 ## Expected result
 
 The linked article still navigates as ordinary HTML when enhancement is unavailable. With JavaScript, explicit activation opens a popup with visible loading, error, cancellation, and cleanup behavior.
 
 - **Browser demonstration:** waits for explicit activation, then renders live Sefaria data through in-memory MCP tools and the packaged App.
-- **Node integration path:** `pnpm dev:mcp` runs the compiled stdio and HTTP server with the local reference host. Use the detailed [MCP App guide](../mcp-app-demo.md) for transport, resource, sandbox, cancellation, and validation checks.
+- **Node integration path:** repository contributors can follow the repository-only [MCP development instructions](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md#run-the-mcp-app-server) for stdio and HTTP transport checks.
 
 ## Who owns what
 
@@ -77,4 +65,4 @@ Disable JavaScript and follow the authored Micah 6:8 link. Re-enable JavaScript,
 
 ## Next step
 
-Return to the [documentation home](../README.md), inspect the [example catalog](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/README.md), or follow [Development](../development.md) to run the complete repository checks.
+Return to the [product home](../index.md) or inspect the [example catalog](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/README.md).

@@ -63,9 +63,13 @@ const projectError = requireElement<HTMLElement>("#project-error");
 const sourceLink = requireElement<HTMLAnchorElement>("#source-link");
 const liveLink = requireElement<HTMLAnchorElement>("#live-link");
 const runButton = requireElement<HTMLButtonElement>("#run");
+const jumpToPreviewButton =
+  requireElement<HTMLButtonElement>("#jump-to-preview");
 const resetButton = requireElement<HTMLButtonElement>("#reset");
 const stopButton = requireElement<HTMLButtonElement>("#stop");
 const copyButton = requireElement<HTMLButtonElement>("#copy");
+const previewTitle = requireElement<HTMLElement>("#preview-title");
+const backToEditorButton = requireElement<HTMLButtonElement>("#back-to-editor");
 const tabs = {
   html: requireElement<HTMLButtonElement>("#tab-html"),
   css: requireElement<HTMLButtonElement>("#tab-css"),
@@ -105,6 +109,10 @@ for (const [kind, tab] of Object.entries(tabs) as [
   });
 }
 runButton.addEventListener("click", () => void run());
+jumpToPreviewButton.addEventListener("click", (event) => {
+  event.preventDefault();
+  globalThis.setTimeout(() => focusAndReveal(previewTitle), 0);
+});
 resetButton.addEventListener("click", () => {
   if (!activeProject || !editor) return;
   drafts = { ...activeProject.maintained };
@@ -114,6 +122,10 @@ resetButton.addEventListener("click", () => {
 });
 stopButton.addEventListener("click", () => stopPreview("Preview stopped."));
 copyButton.addEventListener("click", () => void copyActiveFile());
+backToEditorButton.addEventListener("click", (event) => {
+  event.preventDefault();
+  globalThis.setTimeout(() => focusAndReveal(projectTitle), 0);
+});
 window.addEventListener("message", receivePreviewMessage);
 window.addEventListener("popstate", () => applyUrlSelection(true));
 window.addEventListener("beforeunload", () => stopPreview(""));
@@ -167,7 +179,6 @@ function createEditorState(kind: FileKind): EditorState {
         draftStatus.textContent = "Draft changed. Run to update the preview.";
       }),
       EditorView.theme({
-        "&": { height: "30rem" },
         ".cm-scroller": { overflow: "auto" },
         "&.cm-focused": { outline: "3px solid #9a5d13", outlineOffset: "2px" },
       }),
@@ -322,6 +333,7 @@ async function createPreview(
   frame.src = `data:text/html;base64,${bytesToBase64(new TextEncoder().encode(documentSource))}`;
   activeFrame = frame;
   previewHost.replaceChildren(frame);
+  jumpToPreviewButton.disabled = false;
   previewStatus.textContent = "Running supplied-data preview.";
   draftStatus.textContent = "Current draft is running.";
 }
@@ -379,6 +391,7 @@ function stopPreview(message: string): void {
   activeFrame = undefined;
   activeChannel = "";
   activeRun = "";
+  jumpToPreviewButton.disabled = true;
   if (message) previewStatus.textContent = message;
 }
 
@@ -424,6 +437,7 @@ function activateProject(project: PlaygroundProject): void {
   for (const button of [runButton, resetButton, stopButton, copyButton]) {
     button.disabled = false;
   }
+  backToEditorButton.disabled = false;
   editor = new EditorView({
     state: createEditorState(activeFile),
     parent: editorHost,
@@ -454,6 +468,8 @@ function showInvalidProject(requestedId: string): void {
   for (const button of [runButton, resetButton, stopButton, copyButton]) {
     button.disabled = true;
   }
+  jumpToPreviewButton.disabled = true;
+  backToEditorButton.disabled = true;
   updateTabs();
   draftStatus.textContent = "Invalid project. No source loaded.";
   previewStatus.textContent = "No preview is running.";
@@ -465,6 +481,11 @@ function requireDrafts(): Record<FileKind, string> {
     throw new Error("No playground project is selected.");
   }
   return drafts;
+}
+
+function focusAndReveal(target: HTMLElement): void {
+  target.focus({ preventScroll: true });
+  target.scrollIntoView({ block: "center", inline: "nearest" });
 }
 
 function validateRuntimeGraph(value: unknown): RuntimeGraph {

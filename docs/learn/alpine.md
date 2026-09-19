@@ -9,16 +9,11 @@ Use Alpine 3 as a light declarative host for the same source-card controller, bi
 ## Prerequisites
 
 - Complete [Render supplied data](02-supplied-data.md) and [Load data and handle interaction](03-live-data.md).
-- Build the workspace packages before running the standalone Vite example.
-- Use the workspace-pinned Alpine dependency; the maintained example does not load Alpine or toolkit packages from a CDN.
+- Use the maintained Alpine app, which includes the required framework and toolkit dependencies.
 
 ## Try it
 
-Run the maintained app:
-
-```powershell
-pnpm dev:alpine
-```
+Use the embedded maintained app below or <SiteLink to="/examples/alpine/index.html">open it directly</SiteLink>.
 
 The data provider creates the source-card controller in a closure. Alpine receives only plain host state and methods, so its proxy never wraps the controller's private fields.
 

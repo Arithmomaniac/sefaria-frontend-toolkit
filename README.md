@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot with human review/feedback by avilevin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # Sefaria Frontend Toolkit
 
@@ -27,7 +27,7 @@ pnpm build
 pnpm dev:vanilla
 ```
 
-That example validates a supplied `Micah 6:8` payload, projects it through the public pure factory, and renders it with zero requests. Its explicit button then exercises the public client and async factory with one injected offline response. [Local tarball setup](docs/learn/02-supplied-data.md#try-it) covers an external consumer that cannot resolve workspace source.
+That example validates a supplied `Micah 6:8` payload, projects it through the public pure factory, and renders it with zero requests. Its explicit button then exercises the public client and async factory with one injected offline response. [Private package setup](docs/development.md#build-and-pack-the-private-libraries) covers an external consumer that cannot resolve workspace source.
 
 ## Choose a path
 

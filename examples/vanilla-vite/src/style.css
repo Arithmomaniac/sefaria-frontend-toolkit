@@ -67,6 +67,13 @@ button:disabled {
   white-space: nowrap;
 }
 
+:root[data-embedded-preview] main > p:first-of-type,
+:root[data-embedded-preview] #reference-form,
+:root[data-embedded-preview] #request-count,
+:root[data-embedded-preview] #committed-ref {
+  display: none;
+}
+
 :root[data-embedded-preview] #status {
   color: light-dark(#4f4a42, #d8d2c8);
   font-size: 0.9rem;

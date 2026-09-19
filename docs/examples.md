@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # Interactive examples
 
@@ -16,10 +16,4 @@ Use a supplied-data preview to inspect a component without a live request. Use a
 | Authored linked article | <SiteLink to="/examples/linked-article/index.html">Open preview</SiteLink> | [`examples/linked-article`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/linked-article) |
 | Live MCP App host | <SiteLink to="/examples/mcp-app/live.html">Open preview</SiteLink> | [`examples/mcp-app`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/mcp-app) |
 
-The component editor is a trusted same-site application with a project picker and HTML, CSS, and JavaScript editors. It runs edited code in an opaque inner preview with a restrictive CSP. The preview cannot reach the documentation page's DOM, history, or storage, and the seven maintained projects make no Sefaria request.
-
-The projects are `ref-label`, `text-segment`, `bilingual-segment`, `source-card`, `popup`, `connections-panel`, and `reader`. Each full-editor URL uses `?project=<id>`, and each project keeps its manifest and source under [`examples/playground/projects`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground/projects).
-
-The live MCP route makes no Sefaria request until you select `Start live demo`. It then connects an MCP client and server in the browser. The client reads the packaged App through `resources/read`. AppBridge renders the App inside the opaque preview.
-
-Run `pnpm dev:mcp` for the compiled Node server and Streamable HTTP host. You can also test a named host with the documented VS Code steps.
+The component editor runs edited code in an isolated preview; its seven supplied-data projects make no Sefaria request. The live examples wait for their explicit action before contacting Sefaria.
