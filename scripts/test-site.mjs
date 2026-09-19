@@ -119,6 +119,28 @@ try {
       'iframe[title="Interactive supplied-data source card"]',
     );
     await landingPreview.locator("sefaria-source-card").waitFor();
+    const passageText = landingPreview
+      .locator("sefaria-text-segment .body-part")
+      .first();
+    await passageText.waitFor();
+    const passageTextContent = (await passageText.textContent())?.trim();
+    if (!passageTextContent) {
+      throw new Error("Interactive landing preview has no passage text.");
+    }
+    const passageTextPosition = await passageText.boundingBox();
+    const viewport = page.viewportSize();
+    if (
+      !passageTextPosition ||
+      !viewport ||
+      passageTextPosition.y < 0 ||
+      passageTextPosition.y + passageTextPosition.height > viewport.height
+    ) {
+      throw new Error(
+        `Interactive landing passage text is not fully visible in the first viewport: ${JSON.stringify(
+          passageTextPosition,
+        )}.`,
+      );
+    }
     const previewPosition = await page
       .locator(".landing-preview__stage")
       .boundingBox();
@@ -533,10 +555,7 @@ try {
 
     const liveLessons = {
       "03-live-data": [
-        [
-          "open the source-card explorer",
-          "/examples/explorer/source-card.html",
-        ],
+        ["vanilla controller host", "/examples/vanilla/index.html"],
       ],
       "04-reader": [
         ["open the controlled Reader", "/examples/reader/controlled.html"],
@@ -569,18 +588,18 @@ try {
         );
       }
       if (lesson === "03-live-data") {
-        await Promise.all([
-          page.waitForURL("**/examples/explorer/source-card.html"),
-          page.getByRole("link", { name: links[0][0] }).click(),
-        ]);
-        await tabTo(
-          page,
-          page.getByRole("button", { name: "Start live demo" }),
-          "source-card load action",
-          30,
+        await page.goto(siteRouteUrl(links[0][1]), {
+          waitUntil: "networkidle",
+        });
+        await page.locator("#load-live").click();
+        await page.waitForFunction(
+          () =>
+            globalThis.document
+              .querySelector("#status")
+              ?.textContent?.includes(
+                "Committed canonical reference Micah 6:8",
+              ) === true,
         );
-        await page.keyboard.press("Enter");
-        await page.locator("#request-state[data-state='data']").waitFor();
         assertEqual(
           textRequests.length,
           1,

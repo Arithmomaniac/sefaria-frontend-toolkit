@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # How the client, view models, and Web Components fit together
 
@@ -140,5 +140,40 @@ The component contract includes the concrete ten-child, one-request case. See [c
 | New selection while a request is pending | The host cancels or supersedes the old operation and prevents stale results replacing the new model |
 
 Changing presentation is different from requesting new data. Changing a card's layout is local. Choosing another reference or edition is a new host task. Later interactive components must emit an event when they need different data; the host chooses the permitted data source and calls the factory.
+
+## Advanced: own the request lifecycle
+
+The public controller is the ordinary integration because it already keeps pending and committed state separate, cancels obsolete work, and binds the latest snapshot. A host may own the lifecycle when it coordinates several independent operations or needs a policy that is outside the component controller. That is an advanced alternative, not a prerequisite for using a request-free element.
+
+```ts
+let activeRequest: AbortController | undefined;
+let operation = 0;
+let committed: SourceCardViewModel | undefined;
+
+async function loadSourceCard(tref: string): Promise<void> {
+  activeRequest?.abort();
+  const request = new AbortController();
+  activeRequest = request;
+  const current = ++operation;
+
+  try {
+    const next = await loadSourceCardViewModel(
+      { tref },
+      client,
+      request.signal,
+    );
+    if (!request.signal.aborted && current === operation) {
+      committed = next;
+      card.viewModel = next;
+    }
+  } catch (error) {
+    if (!request.signal.aborted && current === operation) {
+      reportFailure(error, committed);
+    }
+  }
+}
+```
+
+This pattern is only correct when the host keeps the abort signal, operation identity, committed result, and failure reporting together. Do not copy it merely to replace `createSourceCardController`; use the maintained controller unless the host has a concrete multi-operation ownership requirement.
 
 For the full ownership contract, read [Design](../design.md). For exact component types and acceptance rules, read the [component specification](../specs/components.md). For deliberately different behavior from Sefaria's applications, read [Intentional differences](differences.md).

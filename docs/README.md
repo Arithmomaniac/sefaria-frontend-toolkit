@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # Documentation
 
@@ -29,6 +29,7 @@ You do not need to finish the tutorial before using the toolkit:
 | Prebuilt stateful reading surface | [Controlled Reader lesson](learn/04-reader.md) and [`examples/reader/controlled.html`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/reader/controlled.html) |
 | Edit a supplied-data component | [Seven-project editor](examples.md) and [`examples/playground/index.html`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/index.html) |
 | Compare all rendering surfaces | [Component catalog](components.md) |
+| Read a component-specific usage guide | [Component usage directory](components/) |
 | Component states and live diagnostics | [Example catalog](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/README.md) |
 | A passage card in a browser app | [Render text](guides/render-text.md) |
 | Authored citation popups | [Linked article](linked-article.md) |
@@ -58,7 +59,7 @@ React users can branch from steps 2 and 3 into [Use the Web Components from Reac
 
 `Current` means delivered on the documented repository baseline. `Planned` means intended but not delivered. `Observed` means that a named source or capture provides the evidence. It does not describe every Sefaria text.
 
-## Reference and contribution
+## Reference
 
 | Goal | Document |
 | --- | --- |
@@ -69,6 +70,19 @@ React users can branch from steps 2 and 3 into [Use the Web Components from Reac
 | Choose component and Reader subpaths | [`@arithmomaniac/sefaria-web-components`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/web-components/README.md) |
 | Inspect generated element metadata | [Custom elements](reference/custom-elements.md) |
 | Inspect declaration-derived package exports | [Public package exports](reference/public-exports.md) |
+
+## Contributor and internals
+
+These pages describe how the repository is built, specified, evidenced, and reviewed. They are useful when contributing or auditing the toolkit, not prerequisites for evaluating or adopting it.
+
+| Goal | Document |
+| --- | --- |
+| Find the audience and owner of every maintained page | [Documentation map](reference/documentation-map.md) |
+| Set up the repository and run all checks | [Development](development.md) |
+| Inspect stable ownership boundaries | [Design](design.md) |
+| Review a change at the right depth | [Review](review.md) |
+| Read source provenance and compatibility evidence | [Evidence](evidence.md) |
+| Read normative contracts | [Specifications](specs/client.md) |
 | Find historical removed material | [Documentation archive](archive/README.md) |
 | Find the audience and owner of every maintained page | [Documentation map](reference/documentation-map.md) |
 

@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot with human review/feedback by avilevin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # 4. Use the Reader or compose a custom host
 
@@ -11,7 +11,7 @@ The controlled Reader is the shortest complete path. The toolkit supplies its co
 ## Prerequisites
 
 - Node.js 22.12 or later, pnpm 11.22.0, Chromium, and repository access.
-- Complete the one-time checkout, install, and build steps under [the workspace path](02-supplied-data.md#try-it). You do not need to complete the earlier lessons.
+- Complete the one-time checkout, install, and build steps under [the advanced local setup](02-supplied-data.md#advanced-local-setup). You do not need to complete the earlier lessons.
 - Decide whether your host needs a complete stateful Reader or custom pane placement.
 
 ## Try it
@@ -75,6 +75,8 @@ The same Reader presentation can run with different data paths. A regular websit
 | Spatial composition | Reusable reader session, data source, factories, view models, and elements | Ordered panes, parent/child placement, compact active pane, pruning, pins, cancellation, and visible limits |
 
 The spatial example is a distinct option, not a second supported all-purpose Reader API. Do not copy its private pane coordinator into the component package.
+
+For finite-capture limits, unavailable targets, request failures, and cleanup, use the [troubleshooting guide](../guides/troubleshooting.md).
 
 ## Exercise
 

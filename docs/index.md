@@ -24,6 +24,13 @@ hero:
 
 <LandingPreview />
 
+<div class="status-note">
+  <strong>Experimental and unofficial:</strong> evaluate the browser examples
+  without cloning. Private prereleases and local tarballs support qualification;
+  public npm or CDN installation is not available yet. See the
+  <SiteLink to="/get-started.html#installation-status">current installation status</SiteLink>.
+</div>
+
 ## Why this toolkit exists
 
 Sefaria is a free digital library and data source for Jewish texts and translations. A direct API response is only the start of a product: an application still has to validate unknown JSON, prepare markup and footnotes, choose how to display Hebrew vocalization, project nested text into useful rendering data, and own any live request or navigation state.

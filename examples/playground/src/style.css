@@ -146,9 +146,25 @@ main {
   color: #33261d;
   font-weight: 700;
 }
+.preview-navigation {
+  display: flex;
+  justify-content: end;
+  padding: 0.85rem;
+}
+.preview-navigation button {
+  padding: 0.65rem 0.85rem;
+  border: 1px solid #8c7359;
+  border-radius: 0.55rem;
+  background: #fff;
+  color: #33261d;
+  font-weight: 700;
+}
 #run {
   background: #855c21;
   color: #fff;
+}
+#editor .cm-editor {
+  height: 30rem;
 }
 #preview {
   min-height: 32rem;
@@ -192,5 +208,11 @@ main {
   .heading [role="status"] {
     margin-top: 0.5rem;
     text-align: left;
+  }
+  #editor .cm-editor {
+    height: min(22rem, 55vh);
+  }
+  .preview-navigation {
+    justify-content: start;
   }
 }

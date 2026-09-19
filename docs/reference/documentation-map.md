@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # Documentation map
 
@@ -13,6 +13,8 @@ Every maintained Markdown entry point has a primary audience and a navigation ow
 | `docs/README.md` | GitHub reader needing the complete documentation index | Reference |
 | `docs/get-started.md` | New adopter choosing a supported implementation path | Get started |
 | `docs/components.md` | Product developer comparing the seven current rendering surfaces | Components |
+| `docs/components/*.md` | Product developer looking up distinctive usage, interaction, and accessibility guidance for one surface | Components |
+| `docs/components/index.md` | Product developer entering the component usage directory | Components |
 | `docs/examples.md` | Developer choosing an isolated runnable example | Examples |
 | `docs/learn/01-web-components.md` | New component consumer learning registration, properties, events, and ownership | Get started |
 | `docs/learn/02-supplied-data.md` | Developer rendering validated supplied data with zero requests | Get started |
@@ -31,6 +33,7 @@ Every maintained Markdown entry point has a primary audience and a navigation ow
 | `docs/guides/render-text.md` | UI developer choosing and rendering a text surface | Guides |
 | `docs/guides/data-flow.md` | Developer reasoning about validation, factories, view models, and requests | Guides |
 | `docs/guides/text-markup.md` | Developer handling Sefaria text HTML and footnotes | Guides |
+| `docs/guides/troubleshooting.md` | Adopter recovering from common setup and integration symptoms | Guides |
 | `docs/guides/reader-navigation.md` | Developer integrating Reader navigation and lifecycle | Guides |
 | `docs/guides/differences.md` | Developer checking intentional local behavior | Guides |
 | `docs/reference/custom-elements.md` | API consumer looking up generated element declarations | Reference |

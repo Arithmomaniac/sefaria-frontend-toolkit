@@ -27,7 +27,7 @@
         <p id="project-error" class="project-error" role="alert" hidden></p>
         <nav aria-label="Trusted project resources">
           <a
-            href="../../learn/02-supplied-data.html"
+            href="../../learn/02-supplied-data.html#advanced-local-setup"
             target="_blank"
             rel="noreferrer"
             >Package setup</a
@@ -45,7 +45,7 @@
           <div class="heading">
             <div>
               <p class="eyebrow">Project</p>
-              <h2 id="project-title">Loading project</h2>
+              <h2 id="project-title" tabindex="-1">Loading project</h2>
             </div>
             <p id="draft-status" role="status">Maintained source loaded.</p>
           </div>
@@ -82,6 +82,9 @@
           <div id="editor" role="tabpanel" aria-labelledby="tab-html"></div>
           <div class="actions" aria-label="Editor actions">
             <button id="run" type="button">Run</button>
+            <button id="jump-to-preview" type="button" disabled>
+              Jump to preview
+            </button>
             <button id="reset" type="button">Reset</button>
             <button id="stop" type="button">Stop preview</button>
             <button id="copy" type="button">Copy active file</button>
@@ -91,11 +94,16 @@
           <div class="heading">
             <div>
               <p class="eyebrow">Opaque preview</p>
-              <h2>Result</h2>
+              <h2 id="preview-title" tabindex="-1">Result</h2>
             </div>
             <p id="preview-status" role="status">Preparing preview.</p>
           </div>
           <div id="preview"></div>
+          <div class="preview-navigation">
+            <button id="back-to-editor" type="button" disabled>
+              Back to editor
+            </button>
+          </div>
           <section class="diagnostics" aria-labelledby="diagnostics-title">
             <h3 id="diagnostics-title">Diagnostics</h3>
             <ol id="diagnostic-list" aria-live="polite"></ol>

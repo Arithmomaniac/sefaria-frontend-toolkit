@@ -71,6 +71,8 @@ describe("documentation learning journey", () => {
     expect(index).toContain("<LandingPreview />");
     expect(index).toContain("Bring Sefaria texts into your product");
     expect(index).toContain("Try the editor");
+    expect(index).toContain("Experimental and unofficial");
+    expect(index).toContain("installation-status");
     expect(index).toContain("/examples/playground/index.html");
     expect(index).not.toContain("Published documentation");
     expect(config).toContain(
@@ -99,6 +101,54 @@ describe("documentation learning journey", () => {
       expect(config).toContain(`text: "${label}"`);
     }
     expect(config).toContain('search: { provider: "local" }');
+    expect(config).toContain('text: "Task guides"');
+    expect(config).toContain('text: "Advanced explanations"');
+    expect(config).toContain('text: "API reference"');
+    expect(config).toContain('text: "Contributing and internals"');
+  });
+
+  it("provides a component-directory signpost without duplicating the catalog", async () => {
+    const signpost = await readFile(
+      path.join(root, "docs", "components", "index.md"),
+      "utf8",
+    );
+
+    expect(signpost).toContain("[component catalog](../components.md)");
+    expect(signpost).toContain("generated [custom-element");
+    expect(signpost).not.toContain("<PlaygroundEmbed");
+  });
+
+  it("keeps troubleshooting symptom-led and linked from adopter paths", async () => {
+    const troubleshooting = await readFile(
+      path.join(root, "docs", "guides", "troubleshooting.md"),
+      "utf8",
+    );
+    const guides = await readFile(
+      path.join(root, "docs", "guides", "index.md"),
+      "utf8",
+    );
+    const getStarted = await readFile(
+      path.join(root, "docs", "get-started.md"),
+      "utf8",
+    );
+
+    for (const symptom of [
+      "The package cannot be installed",
+      "The custom element is unknown",
+      "A property change has no effect",
+      "The supplied Reader says a target is unavailable",
+      "The editor does not run after an edit",
+      "The browser reports a CSP or blocked-resource error",
+      "A documented HTTP result is confused with a network or schema failure",
+      "A failed or superseded request erased the previous result",
+      "The component remains active after the host removes it",
+    ]) {
+      expect(troubleshooting).toContain(`## ${symptom}`);
+    }
+    expect(troubleshooting).toContain("Do not disable CSP");
+    expect(troubleshooting).toContain("structured issue paths");
+    expect(guides).toContain("[Troubleshooting](troubleshooting.md)");
+    expect(getStarted).toContain("[troubleshooting guide]");
   });
 
   it("keeps the numbered lessons contiguous and React optional", async () => {
@@ -127,6 +177,21 @@ describe("documentation learning journey", () => {
       path.join(root, "docs", "components.md"),
       "utf8",
     );
+    const usageDirectory = await readFile(
+      path.join(root, "docs", "components", "index.md"),
+      "utf8",
+    );
+    const usagePages = Object.fromEntries(
+      await Promise.all(
+        playgroundProjects.map(async (project) => [
+          project,
+          await readFile(
+            path.join(root, "docs", "components", `${project}.md`),
+            "utf8",
+          ),
+        ]),
+      ),
+    );
 
     for (const [element, subpath] of [
       ["<sefaria-ref-label>", "ref-label"],
@@ -142,6 +207,13 @@ describe("documentation learning journey", () => {
       );
       expect(catalog).toContain(
         `@arithmomaniac/sefaria-web-components/${subpath}`,
+      );
+      expect(usageDirectory).toContain(`${subpath}.md`);
+      expect(usagePages[subpath]).toContain(
+        `/reference/custom-elements.md#sefaria-${subpath}`,
+      );
+      expect(usagePages[subpath]).toContain(
+        `<PlaygroundEmbed project="${subpath}"`,
       );
     }
     expect(catalog).toContain(
@@ -593,16 +665,20 @@ describe("documentation learning journey", () => {
       "Properties can carry objects and arrays",
     );
     expect(lessonsByName["02-supplied-data.md"]).toContain(
-      "trusted same-site editor",
+      "trusted same-site application",
     );
     expect(lessonsByName["02-supplied-data.md"]).toContain(
       "opaque inner preview",
     );
+    expect(lessonsByName["03-live-data.md"]).toContain("prior committed card");
     expect(lessonsByName["03-live-data.md"]).toContain(
-      "previous committed content",
+      "current committed result",
     );
     expect(lessonsByName["03-live-data.md"]).toContain(
-      "canonical committed state",
+      "examples/vanilla-vite/src/main.ts",
+    );
+    expect(lessonsByName["03-live-data.md"]).toContain(
+      'to="/examples/vanilla/index.html"',
     );
     expect(lessonsByName["04-reader.md"]).toContain("rootLoading");
     expect(lessonsByName["04-reader.md"]).toContain(

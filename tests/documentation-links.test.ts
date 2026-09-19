@@ -21,6 +21,15 @@ const journey = [
   "docs/learn/04-reader.md",
   "docs/learn/05-customization.md",
   "docs/learn/06-host-integration.md",
+  "docs/components/index.md",
+  "docs/components/ref-label.md",
+  "docs/components/text-segment.md",
+  "docs/components/bilingual-segment.md",
+  "docs/components/source-card.md",
+  "docs/components/popup.md",
+  "docs/components/connections-panel.md",
+  "docs/components/reader.md",
+  "docs/guides/troubleshooting.md",
   "docs/guides/differences.md",
   "docs/archive/README.md",
   "examples/README.md",
@@ -65,6 +74,9 @@ describe("GitHub Markdown file and anchor parity", () => {
   it("matches GitHub-style duplicate heading suffixes", () => {
     expect(markdownAnchors("# Guide\n\n## Try it\n\n## Try it\n")).toEqual(
       new Set(["guide", "try-it", "try-it-1"]),
+    );
+    expect(markdownAnchors("## <sefaria-reader>\n")).toContain(
+      "sefaria-reader",
     );
   });
 });

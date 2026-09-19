@@ -105,7 +105,9 @@ A host is the application that owns the component. The controller manages Reader
 
 ## Installation status
 
-Public package installation is planned for release. The current private prereleases and [local tarballs](learn/02-supplied-data.md#try-it) support qualification before that release; they are not a reason to clone the repository merely to understand the product.
+Public package installation is planned for release. The current private prereleases and [local tarballs](learn/02-supplied-data.md#advanced-local-setup) support qualification before that release; they are not a reason to clone the repository merely to understand the product.
+
+If a component, editor, Reader, or live operation behaves unexpectedly, start with the symptom-led [troubleshooting guide](guides/troubleshooting.md) before changing package, request, or browser policy.
 
 ### Evaluate without installing packages
 
