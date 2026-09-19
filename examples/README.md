@@ -1,8 +1,8 @@
-> Created/edited by GitHub Copilot with human review/feedback by avilevin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # Examples
 
-These private examples form the visitor-facing toolbox for the unpublished Sefaria Frontend Toolkit. They consume public package entry points from the workspace; they are not published packages or evidence of official Sefaria ownership.
+These private examples exercise the toolkit's public package entry points from the workspace. They are not published packages or evidence of official Sefaria ownership.
 
 ## Supplied-data component states
 
@@ -61,18 +61,4 @@ The [React Vite example](react-vite/README.md) demonstrates React 19 custom-elem
 
 The [authored linked article](linked-article/) progressively enhances ordinary Micah 6:8 Sefaria anchors with a request-free popup while preserving JavaScript-disabled and modifier-key navigation. The page owns its cache-disabled client and factory calls, cancellation, stale suppression, visible failures, and cleanup; its [README](linked-article/README.md) identifies the public subpaths and runnable source.
 
-The private [MCP App guide](../docs/mcp-app-demo.md) packages the Reader as a self-contained MCP App. The documentation site includes a click-to-start in-browser MCP client/server and opaque sandbox without an external backend. Run `pnpm dev:mcp` for the compiled Streamable HTTP reference host, or use the stdio and VS Code paths for their distinct transport and named-host evidence. The maintained [App](mcp-app/src/app.ts), [host](mcp-app/src/host/), and [server](mcp-app/src/server/) sources keep tool requests host-mediated and transport logic separate from Reader state.
-
-## Curation disposition
-
-| Previous surface | Disposition |
-| --- | --- |
-| Authored explorer state arrays | Retained unchanged in the deep-linkable authored workbench. |
-| Five live component pages and contextual connections reader | Retained as explicit live actions; no authored scenario silently triggers them. |
-| Controlled and spatial Reader demos | Retained separately with responsibility guidance and `?tref=` deep links. |
-| Linker detection and bookmarklet demos | Replaced by the maintained authored linked article; the historical Pages route remains available for existing links. |
-| Showcase payload → view model → element explanation | Consolidated into maintained source/diagnostic panels and public-package descriptions without copying slide lifecycle code. |
-| Showcase React property/factory bindings | Backfilled into `react-vite` with production-path browser tests, real events, and cleanup; no runtime import from the showcase remains. |
-| Showcase theme and large-slide resize mechanics | The reusable theme/width teaching remains in the authored, Reader, and React examples. Reveal navigation, iframe activation messaging, booth-loop timing, QR generation, video handling, and presentation-only media were retired from active source. |
-
-The removed presentation remains available at the immutable [`d7e2d59645ebf7427dcff2cbdd78073e2e7df58c`](https://github.com/Arithmomaniac/sefaria-web-components/tree/d7e2d59645ebf7427dcff2cbdd78073e2e7df58c/demos/showcase) revision. The current local documentation site assembles these maintained examples without cross-example runtime imports.
+The [MCP App guide](../docs/mcp-app-demo.md) packages the Reader as a self-contained MCP App. The documentation site includes a click-to-start in-browser MCP client/server and opaque sandbox without an external backend. Run `pnpm dev:mcp` for the compiled Streamable HTTP reference host. The maintained [App](mcp-app/src/app.ts), [host](mcp-app/src/host/), and [server](mcp-app/src/server/) sources keep tool requests host-mediated and transport logic separate from Reader state.

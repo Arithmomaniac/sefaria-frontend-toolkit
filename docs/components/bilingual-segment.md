@@ -30,6 +30,5 @@ The element emits no events. Each side retains the direction from its view model
 - [Generated element properties](../reference/custom-elements.md#sefaria-bilingual-segment)
 - [Maintained playground source](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground/projects/bilingual-segment/)
 - [Authored states](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/bilingual-segment.scenarios.ts)
-- [Browser state qualification](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/development-status.browser.test.ts)
 
 For the request-free boundary and pure factory path, see [How the pieces fit together](../guides/data-flow.md).

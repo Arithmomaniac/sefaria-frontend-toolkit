@@ -4,13 +4,15 @@
 
 Every maintained Markdown entry point has a primary audience and a navigation owner. Contributor records and historical material stay available without competing with the product learning path.
 
+The VitePress site excludes this map, `docs/README.md`, development, design, evidence, review, handoff, specifications, and the archive. Those documents remain repository Markdown for contributors and auditors.
+
 ## Product entry and learning pages
 
 | Source | Audience and purpose | Navigation owner |
 | --- | --- | --- |
 | `README.md` | Repository visitor choosing a first run or product path | Repository root |
 | `docs/index.md` | Product-site visitor choosing Reader, components, or headless APIs | Home |
-| `docs/README.md` | GitHub reader needing the complete documentation index | Reference |
+| `docs/README.md` | GitHub reader needing the complete documentation index | Repository Markdown |
 | `docs/get-started.md` | New adopter choosing a supported implementation path | Get started |
 | `docs/components.md` | Product developer comparing the seven current rendering surfaces | Components |
 | `docs/components/*.md` | Product developer looking up distinctive usage, interaction, and accessibility guidance for one surface | Components |
@@ -34,11 +36,11 @@ Every maintained Markdown entry point has a primary audience and a navigation ow
 | `docs/guides/data-flow.md` | Developer reasoning about validation, factories, view models, and requests | Guides |
 | `docs/guides/text-markup.md` | Developer handling Sefaria text HTML and footnotes | Guides |
 | `docs/guides/troubleshooting.md` | Adopter recovering from common setup and integration symptoms | Guides |
-| `docs/guides/reader-navigation.md` | Developer integrating Reader navigation and lifecycle | Guides |
+| `docs/guides/reader-navigation.md` | Contributor inspecting Reader navigation design and qualification | Repository Markdown |
 | `docs/guides/differences.md` | Developer checking intentional local behavior | Guides |
 | `docs/reference/custom-elements.md` | API consumer looking up generated element declarations | Reference |
 | `docs/reference/public-exports.md` | API consumer looking up declaration-derived package exports | Reference |
-| `docs/reference/documentation-map.md` | Maintainer checking audience, purpose, and placement | Reference |
+| `docs/reference/documentation-map.md` | Maintainer checking audience, purpose, and placement | Repository Markdown |
 
 ## Package and example entry points
 
@@ -61,7 +63,7 @@ Every maintained Markdown entry point has a primary audience and a navigation ow
 | Classification | Pages | Purpose |
 | --- | --- | --- |
 | Contributor | `docs/development.md`, `docs/design.md`, `docs/evidence.md`, `docs/review.md`, `docs/handoff.md`, `docs/specs/*.md` | Setup, ownership, evidence, review gates, handoff context, and normative contracts |
-| Integration reference | `docs/linked-article.md`, `docs/mcp-app-demo.md` | Detailed host-specific implementation and qualification |
+| Integration reference | `docs/linked-article.md`, `docs/mcp-app-demo.md` | Host-specific usage and current behavior |
 | Archive | `docs/archive/README.md` and its linked immutable material | Historical presentation and superseded context, excluded from the main learning path |
 
 Generated field-level declarations remain the API authority. This map records discoverability and audience; it does not duplicate those contracts.

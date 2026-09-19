@@ -8,7 +8,7 @@ Start with the symptom, then check the owner of that boundary. The examples and 
 
 **Symptom:** a public registry or CDN lookup cannot find the toolkit package.
 
-**Recovery:** public package installation is planned for release. For browser evaluation, use the [interactive examples](../examples.md), [component catalog](../components.md), or supplied-data editor without installing packages. For local development or authorized prerelease qualification, follow [advanced local setup](../learn/02-supplied-data.md#advanced-local-setup) and use the repository's configured private prerelease or local tarballs.
+**Recovery:** public package installation is planned for release. For browser evaluation, use the [interactive examples](../examples.md), [component catalog](../components.md), or supplied-data editor without installing packages. For local development or authorized prerelease qualification, use the repository-only [private package setup](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md#build-and-pack-the-private-libraries).
 
 Do not describe the current private qualification path as public publication, and do not add a registry fallback to application code.
 
@@ -100,4 +100,4 @@ Remove host-owned listeners at the same boundary. The [Reader lesson](../learn/0
 
 ## More exact detail
 
-Use the [component usage directory](../components/) for surface-specific interaction guidance, the [API reference](../reference/custom-elements.md) for exact properties and events, and [Reader navigation](reader-navigation.md) for controller lifecycle and custom composition.
+Use the [component usage directory](../components/) for surface-specific interaction guidance, the [API reference](../reference/custom-elements.md) for exact properties and events, and the [Reader lesson](../learn/04-reader.md) for controller lifecycle.

@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # Get started
 
@@ -105,17 +105,11 @@ A host is the application that owns the component. The controller manages Reader
 
 ## Installation status
 
-Public package installation is planned for release. The current private prereleases and [local tarballs](learn/02-supplied-data.md#advanced-local-setup) support qualification before that release; they are not a reason to clone the repository merely to understand the product.
+Public package installation is planned for release. Until then, evaluate the [interactive examples](examples.md) without installing packages, or use the repository-only [private package setup](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md#build-and-pack-the-private-libraries) for integration qualification.
 
 If a component, editor, Reader, or live operation behaves unexpectedly, start with the symptom-led [troubleshooting guide](guides/troubleshooting.md) before changing package, request, or browser policy.
 
-### Evaluate without installing packages
-
-Use the [interactive examples](examples.md), [seven-project supplied-data editor](examples/playground/index.html), and [component catalog](components.md). These surfaces demonstrate the current APIs and request boundaries without requiring a clone or local package installation.
-
-### Develop or contribute to this repository
-
-Clone the source only when you want to change the toolkit, run its complete validation, or work on the examples and documentation. Use Node.js 22.12 or later, the pnpm version pinned in `package.json`, and the [Development](development.md) workflow. Public installation instructions will replace the qualification note above when the packages are released.
+Clone the source only to change the toolkit or run its complete validation. Contributor setup and commands remain in the repository [Development guide](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md).
 
 ## Continue
 

@@ -25,6 +25,5 @@ The panel emits events for category changes, page changes, preview requests, and
 - [Generated element properties and events](../reference/custom-elements.md#sefaria-connections-panel)
 - [Maintained playground source](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground/projects/connections-panel/)
 - [Authored states](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/connections-panel.scenarios.ts)
-- [Browser state qualification](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/development-status.browser.test.ts)
 
-For composed navigation and lifecycle, see [Reader navigation and host boundaries](../guides/reader-navigation.md).
+For composed navigation and lifecycle, see [Use the Reader](../learn/04-reader.md).

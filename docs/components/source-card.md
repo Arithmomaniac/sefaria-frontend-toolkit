@@ -34,6 +34,5 @@ Selection is opt-in. Keep `selectedPosition` as the view-model position path rat
 - [Maintained playground source](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground/projects/source-card/)
 - [Maintained vanilla controller host](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/vanilla-vite/)
 - [Authored states](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/source-card.scenarios.ts)
-- [Browser state qualification](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/development-status.browser.test.ts)
 
 For exact controller and factory types, use the [source-card package README](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/web-components/README.md).

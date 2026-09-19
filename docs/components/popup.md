@@ -26,6 +26,5 @@ Assign the actual anchor element to `anchor`, set `open` explicitly, and listen 
 - [Authored citation guide](../linked-article.md)
 - [Maintained playground source](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground/projects/popup/)
 - [Linked-article source](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/linked-article/)
-- [Popup browser tests](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/linked-article/src/)
 
 For request ownership and supplied-data validation, see [How the pieces fit together](../guides/data-flow.md).

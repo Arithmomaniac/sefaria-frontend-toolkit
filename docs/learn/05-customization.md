@@ -100,7 +100,8 @@ Edit the source-card project's CSS and JavaScript to change presentation, choose
 
 ## Source and run links
 
-- Run: `pnpm dev`
+- Hosted source-card editor: <SiteLink to="/examples/playground/index.html?project=source-card">open editor</SiteLink>
+- Hosted controlled Reader: <SiteLink to="/examples/reader/controlled.html?tref=Micah%206%3A8">open example</SiteLink>
 - Full editor: <SiteLink to="/examples/playground/index.html?project=source-card">source-card project</SiteLink>
 - Authored controls: [`examples/explorer/src/authored/development-status.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/development-status.ts)
 - Controlled Reader customization: [`examples/reader/src/controlled-app.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/reader/src/controlled-app.ts)

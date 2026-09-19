@@ -2,8 +2,6 @@
 
 # How the client, view models, and Web Components fit together
 
-[Documentation](../README.md) / How the pieces fit together
-
 **Current:** the reference label, text segment, bilingual segment, source card, connections panel, popup, and controlled Reader are implemented. Each endpoint-backed component also has an optional typed headless controller and a registration-free DOM adapter. The authored linked-article and MCP paths described here are also implemented.
 
 The toolkit separates three roles. An **element** displays a view model and emits events. Supplied **factories and controllers** provide reusable projection and supported behavior. The **application host** chooses the data source, creates and disposes the pieces, and owns any integration-specific policy. Elements do not fetch.
@@ -49,7 +47,7 @@ For one endpoint-backed surface, the host can use the component subpath's `creat
 
 For the controlled Reader, that host decision does not mean rebuilding the specialized Reader state machine. The toolkit supplies `loadReaderController` and `bindReaderController`; the application supplies the permitted data source and lifecycle. A website can use the public client while an MCP App uses host-proxied tools, and both bind the resulting controller state to the same request-free Reader presentation.
 
-The linked-article and MCP lanes are current. The [design diagram](../design.md#package-dependency-diagram) provides the detailed dependency view.
+The linked-article and MCP lanes are current. The [design diagram](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/design.md#package-dependency-diagram) provides the detailed dependency view.
 
 ## Four things that are easy to confuse
 
@@ -84,7 +82,7 @@ The [render-text guide](render-text.md#put-a-source-card-in-a-browser-app) imple
 | Supplied Reader controller | Supported Reader requests, cancellation, semantic history, and navigation state | DOM rendering, host data-source policy, or lifecycle |
 | Your application or integration | Data-source choice, input, lifecycle, custom composition, and assigning or binding rendering state | A second copy of factory projection or supported Reader navigation |
 
-Imports from the non-DOM component subpaths can run without loading custom elements. Import the browser package only in the browser. Generated API types and view-model types describe values; importing a type does not fetch or render anything. The [design diagram](../design.md#package-dependency-diagram) distinguishes runtime, type-only, generation, and external-payload relationships.
+Imports from the non-DOM component subpaths can run without loading custom elements. Import the browser package only in the browser. Generated API types and view-model types describe values; importing a type does not fetch or render anything. The [design diagram](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/design.md#package-dependency-diagram) distinguishes runtime, type-only, generation, and external-payload relationships.
 
 ## Already have the JSON?
 
@@ -126,7 +124,7 @@ A source card is a composite. A scalar segment becomes one item; ranges and nest
 
 The card makes one outer v3 request. Child pure projections make zero requests. It does not load each verse again, synthesize references from array indexes, or depend on a cache to hide duplicate calls. Attribution is shown once per selected edition at card scope, not repeated for every child.
 
-The component contract includes the concrete ten-child, one-request case. See [composite factories](../specs/components.md#composite-factories) for the exact rule.
+The component contract includes the concrete ten-child, one-request case. See [composite factories](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/components.md#composite-factories) for the exact rule.
 
 ## Failures stay at the right boundary
 
@@ -176,4 +174,4 @@ async function loadSourceCard(tref: string): Promise<void> {
 
 This pattern is only correct when the host keeps the abort signal, operation identity, committed result, and failure reporting together. Do not copy it merely to replace `createSourceCardController`; use the maintained controller unless the host has a concrete multi-operation ownership requirement.
 
-For the full ownership contract, read [Design](../design.md). For exact component types and acceptance rules, read the [component specification](../specs/components.md). For deliberately different behavior from Sefaria's applications, read [Intentional differences](differences.md).
+For the full ownership contract, read [Design](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/design.md). For exact component types and acceptance rules, read the [component specification](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/components.md). For deliberately different behavior from Sefaria's applications, read [Intentional differences](differences.md).

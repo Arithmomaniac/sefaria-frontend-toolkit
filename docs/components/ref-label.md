@@ -29,6 +29,5 @@ The element has no custom events. With `linked={false}`, it is display text. Wit
 - [Generated element properties](../reference/custom-elements.md#sefaria-ref-label)
 - [Maintained playground source](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground/projects/ref-label/)
 - [Authored states](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/ref-label.scenarios.ts)
-- [Browser state qualification](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/development-status.browser.test.ts)
 
 For a complete request and validation path, continue to [Render supplied data](../learn/02-supplied-data.md). Use the generated reference for exact property types.

@@ -80,7 +80,7 @@ For the complete maintained source, open [`examples/vanilla-vite/index.html`](ht
 
 The maintained vanilla host opens with supplied data and makes no Sefaria request. Submit a bounded reference to call `controller.load`. The page displays loading or failure visibly, preserves the prior committed card after a rejected request, and rejects late completion when another selection supersedes it. Selecting a rendered source emits `sefaria-source-select`; the host receives the detail and decides what happens next.
 
-**Explicit live action:** after starting `pnpm dev:vanilla`, <SiteLink to="/examples/vanilla/index.html">open the maintained vanilla host</SiteLink>, then submit the form. Opening the lesson or the live route makes no Sefaria request until that activation.
+**Explicit live action:** <SiteLink to="/examples/vanilla/index.html">open the maintained vanilla host</SiteLink>, then submit the form. Opening the lesson or the live route makes no Sefaria request until that activation.
 
 ## Who owns what
 
@@ -98,7 +98,7 @@ Open the vanilla host and submit one reference, then immediately submit another.
 
 ## Source and run links
 
-- Run: `pnpm dev:vanilla`
+- Hosted vanilla example: <SiteLink to="/examples/vanilla/index.html">open example</SiteLink>
 - Maintained host: [`examples/vanilla-vite/index.html`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/vanilla-vite/index.html)
 - Maintained host logic: [`examples/vanilla-vite/src/main.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/vanilla-vite/src/main.ts)
 - Maintained host styles: [`examples/vanilla-vite/src/style.css`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/vanilla-vite/src/style.css)

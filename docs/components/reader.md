@@ -28,10 +28,8 @@ For custom compositions, preserve the Reader's focusable history and pane contro
 
 - [Generated element properties, events, slots, and parts](../reference/custom-elements.md#sefaria-reader)
 - [Use the Reader](../learn/04-reader.md)
-- [Reader navigation and host boundaries](../guides/reader-navigation.md)
 - [Maintained playground source](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground/projects/reader/)
 - [Controlled Reader source](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/reader/)
 - [Authored states](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/reader.scenarios.ts)
-- [Browser state qualification](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/development-status.browser.test.ts)
 
 Start with the [controlled Reader controller](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/packages/web-components/) when the supplied finite project is not enough for the product's navigation policy.

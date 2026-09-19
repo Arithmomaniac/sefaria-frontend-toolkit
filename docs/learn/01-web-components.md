@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot with human review/feedback by avilevin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # 1. Choose a surface and understand ownership
 
@@ -12,8 +12,7 @@ A Web Component is a browser-standard custom HTML element. One JavaScript import
 
 ## Prerequisites
 
-- Node.js 22.12 or later and pnpm 11.22.0.
-- A browser with Chromium-compatible Web Components support. Chromium is the browser qualified by this repository.
+- A modern browser with Web Components support.
 - Choose a surface from the [component catalog](../components.md).
 
 ## Try it
@@ -75,11 +74,10 @@ Change the editor's HTML to move the reference label, change its CSS, then chang
 
 ## Source and run links
 
-- Run: `pnpm dev`, then open the authored workbench.
 - Full editor: <SiteLink to="/examples/playground/index.html?project=ref-label">reference-label project</SiteLink>
 - Maintained editor source: [`examples/playground/projects/ref-label/`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground/projects/ref-label)
 - Source: [`development-status.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/development-status.ts)
-- Component contract: [`docs/specs/components.md`](../specs/components.md)
+- Component contract: [`docs/specs/components.md`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/components.md)
 - Generated element metadata: [Custom elements](../reference/custom-elements.md)
 
 ## Next step

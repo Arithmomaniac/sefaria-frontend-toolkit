@@ -34,11 +34,7 @@ declare module "react" {
 
 ## Try it
 
-Run the maintained app:
-
-```powershell
-pnpm dev:react
-```
+Use the embedded maintained app below or <SiteLink to="/examples/react/index.html">open it directly</SiteLink>.
 
 React 19 assigns a JSX prop as a DOM property when the registered custom element exposes that property. This means arrays and view-model objects do not become string attributes. The exact lowercase event prop is significant: `onsefaria-source-select` listens for the emitted `sefaria-source-select` event.
 

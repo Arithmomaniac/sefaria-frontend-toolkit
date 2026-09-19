@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot with human review/feedback by avilevin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # Development
 
@@ -441,6 +441,8 @@ The development server shows the authored article page. The native citation is p
 
 The [authored linked-article guide](linked-article.md) covers native fallback, page-owned request lifecycle, strict deterministic transport, and the immutable archive for the retired automatic Linker.
 
+The browser tests call the public popup async factory through a strict fixture fetch that accepts only the expected method, origin, decoded `Micah 6:8` path, and ordered query. Separate Playwright coverage starts the actual page on an assigned loopback port with JavaScript disabled and proves that activation follows the authored Sefaria URL.
+
 ## Build artifacts
 
 Build all packages and demonstrations:
@@ -474,6 +476,32 @@ New-Item -ItemType Directory -Force $destination
 pnpm --filter @arithmomaniac/sefaria-client pack --pack-destination $destination
 pnpm --filter @arithmomaniac/sefaria-text-transform pack --pack-destination $destination
 pnpm --filter @arithmomaniac/sefaria-web-components pack --pack-destination $destination
+```
+
+`pnpm --filter ... pack` runs from each package directory, so the absolute destination is intentional. Copy the three emitted tarballs into an external Vite project and use the actual filenames in its `package.json`:
+
+```json
+{
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@arithmomaniac/sefaria-client": "file:./arithmomaniac-sefaria-client-0.0.0.tgz",
+    "@arithmomaniac/sefaria-text-transform": "file:./arithmomaniac-sefaria-text-transform-0.0.0.tgz",
+    "@arithmomaniac/sefaria-web-components": "file:./arithmomaniac-sefaria-web-components-0.0.0.tgz"
+  }
+}
+```
+
+Put matching transitive overrides in the external consumer's `pnpm-workspace.yaml`:
+
+```yaml
+overrides:
+  "@arithmomaniac/sefaria-client": "file:./arithmomaniac-sefaria-client-0.0.0.tgz"
+  "@arithmomaniac/sefaria-text-transform": "file:./arithmomaniac-sefaria-text-transform-0.0.0.tgz"
+  "@arithmomaniac/sefaria-web-components": "file:./arithmomaniac-sefaria-web-components-0.0.0.tgz"
+
+allowBuilds:
+  esbuild: true
 ```
 
 The committed packages remain private. After both hosted validation platforms and the fail-closed `check` succeed on a `main` push, the CI publish job stages copies with version `0.0.0-alpha.<run-id>.<run-attempt>`, rewrites toolkit dependencies to that exact version, and verifies the current package configuration before publishing the client, text transform, then Web Components package under the `alpha` tag. The job has repository-scoped `packages: write`; pull requests, failed validation, skipped aggregation, non-`main` refs, a stale main head, or a failed package preflight cannot publish. Main-push runs are not canceled after publication may have started.

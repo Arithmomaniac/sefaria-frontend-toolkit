@@ -1,10 +1,10 @@
-> Created/edited by GitHub Copilot with human review/feedback by avilevin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # MCP App demonstration
 
-## Status
+## What it demonstrates
 
-The stateful MCP reader is implemented and has completed an automated host walkthrough in authenticated, isolated VS Code `1.137.0` with bundled Copilot Chat `0.65.0`. One initial `get_text` result creates the reader; the same App then loads connections, follows two connection hops, retains a three-level breadcrumb hierarchy, restores middle and root ancestors locally, and exports the deepest selected reference to chat.
+One initial `get_text` result creates the stateful Reader. The same App can load connections, follow connection hops, retain breadcrumb history, restore earlier entries locally, and export the selected reference to chat.
 
 ![Captured source card in isolated VS Code Copilot Chat](images/mcp-app-vscode.png)
 
@@ -14,35 +14,7 @@ Open the <SiteLink to="/examples/mcp-app/live.html">live MCP App host</SiteLink>
 
 After activation, the trusted page creates a real MCP client and server, connects them with the pinned SDK's in-memory transport, reads the packaged App through `resources/read`, and renders it through AppBridge in an opaque-origin sandbox. The MCP server role makes the live Sefaria requests; the packaged App uses host-mediated MCP tools and cannot fetch Sefaria directly.
 
-This route proves the packaged resource, in-browser MCP exchange, AppBridge continuation, request ownership, and static sandbox topology. It does not prove stdio, Streamable HTTP, or compatibility with an external named host. Use the local command and VS Code walkthrough below for those separate paths.
-
-## Try the reader in VS Code
-
-The launch-only command opens the repository minimized in the same isolated VS Code profile used by the accepted walkthrough. It does not enable the smoke-test driver or a debugging port, attach CDP, drive the UI, type or submit a prompt, or call a tool.
-
-Install the workspace:
-
-```powershell
-pnpm install
-```
-
-Prepare the isolated profile the first time:
-
-```powershell
-pnpm setup:mcp:vscode
-```
-
-If prompted, sign in to GitHub Copilot in the window that opens and approve the `sefaria-components-demo` server, then close that window. The isolated profile retains the authentication for later demo sessions.
-
-Open the isolated workspace without automation:
-
-```powershell
-pnpm launch:mcp:vscode
-```
-
-Restore the minimized window from the taskbar, open Copilot Chat, enable the `sefaria-components-demo` tools, and enter your own request or use `/sefaria-mcp-reader` when you want to load and run the Micah 6:8 request from `.github/prompts/sefaria-mcp-reader.prompt.md`. Until then, no chat request or MCP tool call is made. After the reader appears, use its Connections, paging, source navigation, breadcrumbs, and Send to chat controls to explore the integration yourself.
-
-Run the automated assertions without publishing screenshots with `pnpm walkthrough:mcp:vscode`. Run the same complete walkthrough and publish the three maintained captures only after success with `pnpm capture:mcp:vscode`.
+This route demonstrates the packaged resource, in-browser MCP exchange, AppBridge continuation, request ownership, and static sandbox topology. Repository contributors can use the repository-only [MCP development and named-host instructions](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md#run-the-mcp-app-server) for stdio, Streamable HTTP, and VS Code paths.
 
 ## Reader interaction
 
@@ -52,7 +24,7 @@ The initiating host calls `get_text` once. The MCP server role fetches one corre
 
 The controller then calls bare `get_links_between_texts` through the host's `serverTools` capability. Source and connections remain in the same App frame. Category switching and paging reproject retained links locally. Selecting a connection performs bounded source qualification through bare `get_text`, loads that target's connections, and appends one reader history entry.
 
-![Captured three-level reader hierarchy](images/mcp-app-vscode-reader-hierarchy.png)
+![Three-level reader hierarchy](images/mcp-app-vscode-reader-hierarchy.png)
 
 Breadcrumb activation is local retained-history projection. The walkthrough restores the middle entry and then the Micah 6:8 root without creating another chat turn.
 
@@ -61,8 +33,6 @@ Breadcrumb activation is local retained-history projection. The walkthrough rest
 Send to chat is an explicit action separate from reader data transport. It sends one fixed `ui/message` request containing the exact current selected reference. The App rejects stale exports, suppresses concurrent sends, and does not retry unconfirmed delivery.
 
 ![Deep reader reference exported to chat](images/mcp-app-vscode-chat-export.png)
-
-The verified walkthrough result is [machine-readable](images/mcp-app-vscode-walkthrough.json). The maintained captures are the [initial reader](images/mcp-app-vscode.png), [retained hierarchy](images/mcp-app-vscode-reader-hierarchy.png), and [explicit chat export](images/mcp-app-vscode-chat-export.png). Intermediate category, paging, connection, and breadcrumb stages remain asserted in the result without additional maintained screenshots.
 
 ## Invalid payload
 

@@ -62,6 +62,18 @@ export default defineConfig({
     ["meta", { name: "sefaria-docs-site", content: "local-docs-site-wave-3" }],
   ],
   cleanUrls: false,
+  srcExclude: [
+    "README.md",
+    "archive/**",
+    "design.md",
+    "development.md",
+    "evidence.md",
+    "handoff.md",
+    "guides/reader-navigation.md",
+    "reference/documentation-map.md",
+    "review.md",
+    "specs/**",
+  ],
   ignoreDeadLinks: [
     /^\/examples\//,
     /^\.\.\/images\/reader-navigation(?:\.html)?$/,
@@ -148,10 +160,6 @@ export default defineConfig({
           items: [
             { text: "How data flows", link: "/guides/data-flow.md" },
             {
-              text: "Reader navigation",
-              link: "/guides/reader-navigation.md",
-            },
-            {
               text: "Intentional differences",
               link: "/guides/differences.md",
             },
@@ -188,22 +196,6 @@ export default defineConfig({
               link: "/reference/custom-elements.md",
             },
             { text: "Public exports", link: "/reference/public-exports.md" },
-          ],
-        },
-      ],
-      "/reference/documentation-map": [
-        {
-          text: "Contributing and internals",
-          items: [
-            {
-              text: "Documentation map",
-              link: "/reference/documentation-map.md",
-            },
-            { text: "Development", link: "/development.md" },
-            { text: "Design", link: "/design.md" },
-            { text: "Review", link: "/review.md" },
-            { text: "Evidence", link: "/evidence.md" },
-            { text: "Specifications", link: "/specs/client.md" },
           ],
         },
       ],

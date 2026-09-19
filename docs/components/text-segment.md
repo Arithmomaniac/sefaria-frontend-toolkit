@@ -31,6 +31,5 @@ This element emits no events. The view model supplies the text direction, so a h
 - [Text-markup guide](../guides/text-markup.md)
 - [Maintained playground source](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground/projects/text-segment/)
 - [Authored states](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/text-segment.scenarios.ts)
-- [Browser state qualification](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/development-status.browser.test.ts)
 
 For the surrounding validation and factory path, see [Render supplied data](../learn/02-supplied-data.md).

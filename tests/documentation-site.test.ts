@@ -89,7 +89,7 @@ describe("documentation learning journey", () => {
     expect(theme).toContain('"layout-bottom"');
     expect(theme).toContain("DocumentationDisclosure");
     expect(disclosure.replace(/\s+/g, " ")).toContain(
-      "Documentation text was written and edited by GitHub Copilot with human direction and review.",
+      "Documentation text was written and edited by GitHub Copilot; pending human review.",
     );
     for (const label of [
       "Get started",
@@ -104,7 +104,21 @@ describe("documentation learning journey", () => {
     expect(config).toContain('text: "Task guides"');
     expect(config).toContain('text: "Advanced explanations"');
     expect(config).toContain('text: "API reference"');
-    expect(config).toContain('text: "Contributing and internals"');
+    expect(config).not.toContain('text: "Contributing and internals"');
+    for (const repositoryOnlyPath of [
+      '"README.md"',
+      '"archive/**"',
+      '"design.md"',
+      '"development.md"',
+      '"evidence.md"',
+      '"handoff.md"',
+      '"guides/reader-navigation.md"',
+      '"reference/documentation-map.md"',
+      '"review.md"',
+      '"specs/**"',
+    ]) {
+      expect(config).toContain(repositoryOnlyPath);
+    }
   });
 
   it("provides a component-directory signpost without duplicating the catalog", async () => {
@@ -202,9 +216,7 @@ describe("documentation learning journey", () => {
       ["<sefaria-popup>", "popup"],
       ["<sefaria-reader>", "reader"],
     ]) {
-      expect(catalog).toContain(
-        element.replace("<", "&lt;").replace(">", "&gt;"),
-      );
+      expect(catalog).toContain(element);
       expect(catalog).toContain(
         `@arithmomaniac/sefaria-web-components/${subpath}`,
       );
@@ -221,12 +233,7 @@ describe("documentation learning journey", () => {
     );
     expect(catalog).toContain("Open supplied-data preview");
     expect(catalog).toContain("maintained supplied-data projects");
-    for (const project of playgroundProjects) {
-      expect(catalog).toContain(
-        `/examples/playground/index.html?project=${project}`,
-      );
-      expect(catalog).toContain(`examples/playground/projects/${project}/`);
-    }
+    expect(catalog).toContain("/examples/playground/index.html?project=reader");
     expect(catalog).toContain("Start with the complete Reader");
   });
 
@@ -356,10 +363,8 @@ describe("documentation learning journey", () => {
     }
     expect(components).toContain("The toolkit provides seven UI components.");
     expect(components).not.toContain("host-admitted Reader view model");
-    expect(examples).toContain(
-      "The component editor is a trusted same-site application",
-    );
-    expect(examples).toContain("opaque inner preview");
+    expect(examples).toContain("The component editor runs edited code");
+    expect(examples).toContain("isolated preview");
     expect(documentation).not.toContain("host-mediated tools");
     expect(documentation).not.toContain("field-level transport definitions");
   });
@@ -387,12 +392,10 @@ describe("documentation learning journey", () => {
     expect(getStarted).toContain("createTextPreview");
     expect(getStarted).toContain("Use factories with your own renderer");
     expect(getStarted).toContain("createSourceCardViewModel");
-    expect(documentation).toContain(
-      "The client and text transforms are products in their own right.",
-    );
+    expect(documentation).toContain("Package references");
   });
 
-  it("shows the integration layers visually and preserves the project origin", async () => {
+  it("shows the integration layers visually and preserves the project origin in the repository", async () => {
     const index = await readFile(path.join(root, "docs", "index.md"), "utf8");
     const getStarted = await readFile(
       path.join(root, "docs", "get-started.md"),
@@ -442,11 +445,11 @@ describe("documentation learning journey", () => {
       expect(diagram).toContain(label);
     }
 
-    for (const markdown of [index, documentation, repositoryReadme]) {
-      expect(markdown).toContain("Microsoft Global Hackathon 2026");
-      expect(markdown).toContain("Thank you to Microsoft");
-      expect(markdown).toContain("independently maintained");
-    }
+    expect(repositoryReadme).toContain("Microsoft Global Hackathon 2026");
+    expect(repositoryReadme).toContain("Thank you to Microsoft");
+    expect(repositoryReadme).toContain("independently maintained");
+    expect(index).not.toContain("Microsoft Global Hackathon 2026");
+    expect(documentation).not.toContain("Microsoft Global Hackathon 2026");
   });
 
   it("separates evaluating and consuming the toolkit from developing its source", async () => {
@@ -463,12 +466,10 @@ describe("documentation learning journey", () => {
     expect(index).toContain("Evaluate without cloning");
     expect(index).toContain("Develop the toolkit itself");
     expect(getStarted).toContain("Public package installation is planned");
-    expect(getStarted).toContain("Develop or contribute to this repository");
+    expect(getStarted).toContain("Clone the source only to change the toolkit");
+    expect(documentation).toContain("Repository-only documentation");
     expect(documentation).toContain(
-      "Using the toolkit is different from developing its source.",
-    );
-    expect(documentation).toContain(
-      "Public installation instructions will accompany the release",
+      "excluded from the public VitePress routes",
     );
   });
 
@@ -579,6 +580,10 @@ describe("documentation learning journey", () => {
       path.join(root, "examples", "vanilla-vite", "src", "main.ts"),
       "utf8",
     );
+    const development = await readFile(
+      path.join(root, "docs", "development.md"),
+      "utf8",
+    );
     expect(suppliedLesson).toContain("createSourceCardViewModel(validated, {");
     expect(suppliedLesson).toContain("bindSourceCardController");
     expect(suppliedLesson).toContain("controller.setSuppliedData");
@@ -590,7 +595,8 @@ describe("documentation learning journey", () => {
     expect(vanillaSource).toContain(
       "`Supplied ${canonicalRef} data rendered with zero live loads.`",
     );
-    expect(suppliedLesson).toContain("pnpm-workspace.yaml");
+    expect(suppliedLesson).not.toContain("pnpm-workspace.yaml");
+    expect(development).toContain("pnpm-workspace.yaml");
     expect(suppliedLesson).not.toContain('"pnpm": {\n    "overrides"');
 
     const reactLesson = await readFile(
