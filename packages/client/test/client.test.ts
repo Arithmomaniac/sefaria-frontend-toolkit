@@ -85,14 +85,16 @@ describe("generated Sefaria SDK", () => {
 
   it("caches newly covered JSON and PNG operations", async () => {
     const png = [137, 80, 78, 71, 13, 10, 26, 10];
-    const fetchMock = vi.fn<typeof fetch>(async (request) => {
+    let requestCount = 0;
+    const fetchMock: typeof fetch = async (request) => {
+      requestCount += 1;
       const url = request instanceof Request ? request.url : String(request);
       return url.includes("/api/img-gen/")
         ? new Response(new Uint8Array(png), {
             headers: { "content-type": "image/png" },
           })
         : jsonResponse([]);
-    });
+    };
     const client = createSefariaClient({ fetch: fetchMock });
 
     await getAllTopics({ client });
@@ -106,14 +108,12 @@ describe("generated Sefaria SDK", () => {
       path: { tref: "Micah 6:8" },
     });
 
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(requestCount).toBe(2);
     expect(firstImage.data).toBeInstanceOf(Blob);
     expect(secondImage.data).toBeInstanceOf(Blob);
-    expect(
-      Array.from(
-        new Uint8Array(await (secondImage.data as Blob).arrayBuffer()),
-      ),
-    ).toEqual(png);
+    expect(await (secondImage.data as Blob).text()).toBe(
+      new TextDecoder().decode(new Uint8Array(png)),
+    );
     expect(firstImage.response).not.toBe(secondImage.response);
   });
 

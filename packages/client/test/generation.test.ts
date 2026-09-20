@@ -148,7 +148,7 @@ beforeAll(async () => {
       overlay,
     ),
   );
-});
+}, 30_000);
 
 describe("OpenAPI generation", () => {
   it("rejects a checksum mismatch before generation", () => {

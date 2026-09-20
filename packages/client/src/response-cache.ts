@@ -70,7 +70,7 @@ function cacheKey(request: Request): string {
 }
 
 function replayResponse(entry: CachedResponse): Response {
-  const response = new Response(entry.body.slice(), {
+  const response = new Response(new Blob([entry.body.slice()]), {
     headers: entry.headers,
     status: entry.status,
     statusText: entry.statusText,
