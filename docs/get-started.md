@@ -105,9 +105,9 @@ A host is the application that owns the component. The controller manages Reader
 
 ## Installation status
 
-Public GitHub Packages distribution is planned for activation after the public-visibility and installed-consumer release gates pass. Package names are subject to change. These are npm-format packages hosted by GitHub Packages; they are not published on npmjs.com, and GitHub requires authentication even when their visibility is public.
+Public GitHub Packages prereleases are available for installation. Package names are subject to change. These are npm-format packages hosted by GitHub Packages; they are not published on npmjs.com, and GitHub requires authentication even when their visibility is public.
 
-After activation, create a classic GitHub personal access token with `read:packages`. Keep the token in your user environment rather than a repository file:
+Create a classic GitHub personal access token with `read:packages`. Keep the token in your user environment rather than a repository file:
 
 ```powershell
 $env:NODE_AUTH_TOKEN = "<your classic GitHub token>"
@@ -128,7 +128,7 @@ $version = "0.0.0-alpha.<run-id>.<run-attempt>"
 pnpm add "@arithmomaniac/sefaria-client@$version" "@arithmomaniac/sefaria-text-transform@$version" "@arithmomaniac/sefaria-web-components@$version"
 ```
 
-Do not commit a token or an expanded token value in `.npmrc`. GitHub Actions consumers can use an authorized repository `GITHUB_TOKEN` instead of a personal token. Until activation is verified, evaluate the [interactive examples](examples.md) without installing packages, or use the repository-only [local package setup](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md#build-and-pack-the-library-tarballs) for integration qualification.
+Do not commit a token or an expanded token value in `.npmrc`. GitHub Actions consumers can use an authorized repository `GITHUB_TOKEN` instead of a personal token. You can also evaluate the [interactive examples](examples.md) without installing packages, or use the repository-only [local package setup](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md#build-and-pack-the-library-tarballs) for integration qualification.
 
 If a component, editor, Reader, or live operation behaves unexpectedly, start with the symptom-led [troubleshooting guide](guides/troubleshooting.md) before changing package, request, or browser policy.
 

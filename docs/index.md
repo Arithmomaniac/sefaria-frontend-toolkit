@@ -25,7 +25,7 @@ hero:
 <LandingPreview />
 
 <div class="status-note">
-  <strong>Experimental and unofficial:</strong> evaluate the browser examples without cloning. Public GitHub Packages prereleases are planned for authenticated installation; package names are subject to change, and the packages are not published on npmjs.com or a CDN. See the <SiteLink to="/get-started.html#installation-status">current installation status</SiteLink>.
+  <strong>Experimental and unofficial:</strong> evaluate the browser examples without cloning or install the public GitHub Packages prereleases with authentication. Package names are subject to change, and the packages are not published on npmjs.com or a CDN. See the <SiteLink to="/get-started.html#installation-status">installation instructions</SiteLink>.
 </div>
 
 ## Why this toolkit exists

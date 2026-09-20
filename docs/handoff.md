@@ -2,7 +2,7 @@
 
 # Source handoff
 
-This repository delivers reusable building blocks for placing Sefaria reading experiences in browser and MCP hosts. It is intentionally not a replacement for Sefaria.org, a stable package release, or a claim of exhaustive corpus compatibility. Authenticated public GitHub Packages prereleases are planned; package names are subject to change, and the packages are not published on npmjs.com.
+This repository delivers reusable building blocks for placing Sefaria reading experiences in browser and MCP hosts. It is intentionally not a replacement for Sefaria.org, a stable package release, or a claim of exhaustive corpus compatibility. Authenticated public GitHub Packages prereleases are available; package names are subject to change, and the packages are not published on npmjs.com.
 
 ## What is delivered
 

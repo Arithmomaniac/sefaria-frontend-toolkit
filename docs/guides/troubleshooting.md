@@ -8,9 +8,9 @@ Start with the symptom, then check the owner of that boundary. The examples and 
 
 **Symptom:** npmjs.com or a CDN cannot find the toolkit package, or GitHub Packages returns an authentication error.
 
-**Recovery:** the planned public distribution is the npm-format GitHub Packages registry, not npmjs.com or a CDN. Follow the [installation status and authentication steps](../get-started.md#installation-status), confirm that the `@arithmomaniac` scope points to `https://npm.pkg.github.com`, use a classic token with `read:packages`, and request one exact synchronized alpha version. Package names are subject to change.
+**Recovery:** the public distribution is the npm-format GitHub Packages registry, not npmjs.com or a CDN. Follow the [installation and authentication steps](../get-started.md#installation-status), confirm that the `@arithmomaniac` scope points to `https://npm.pkg.github.com`, use a classic token with `read:packages`, and request one exact synchronized alpha version. Package names are subject to change.
 
-Until public activation is qualified, use the [interactive examples](../examples.md), [component catalog](../components.md), supplied-data editor, or repository-only [local package setup](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md#build-and-pack-the-library-tarballs). Do not add a registry fallback to application code or commit credentials.
+For browser evaluation without installation, use the [interactive examples](../examples.md), [component catalog](../components.md), or supplied-data editor. Repository contributors can use the [local package setup](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md#build-and-pack-the-library-tarballs). Do not add a registry fallback to application code or commit credentials.
 
 ## The custom element is unknown
 

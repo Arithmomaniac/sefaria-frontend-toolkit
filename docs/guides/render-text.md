@@ -4,7 +4,7 @@
 
 Start with a source card to put a useful passage on screen: primary text and translation when available, a reference heading, and edition attribution. Use the smaller text surfaces only when your product already supplies that surrounding context.
 
-Public GitHub Packages installation is planned with the authenticated setup in [Get started](../get-started.md#installation-status). Package names are subject to change, and the packages are not published on npmjs.com. Use the hosted examples to evaluate the current components without a checkout.
+Public GitHub Packages prereleases are available with the authenticated setup in [Get started](../get-started.md#installation-status). Package names are subject to change, and the packages are not published on npmjs.com. Use the hosted examples to evaluate the current components without a checkout.
 
 ## Try the hosted examples
 
