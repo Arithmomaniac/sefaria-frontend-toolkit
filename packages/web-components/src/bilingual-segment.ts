@@ -1,5 +1,5 @@
 import {
-  getV3Texts,
+  text,
   type CoreV3TextsResponse,
   type CoreV3Version,
   type GetV3TextsData,
@@ -371,7 +371,7 @@ async function requestBilingualSegmentResponse(
   readonly status: 200 | 400 | 404;
 }> {
   const version = serializeSelectors(request);
-  const result = await getV3Texts({
+  const result = await text.getV3Texts({
     client,
     path: { tref: request.tref },
     query: { version, return_format: "default" },

@@ -1,5 +1,7 @@
 import { LRUCache } from "lru-cache";
 
+import { getResponseContract } from "./validation.js";
+
 /** Default time that an admitted response remains reusable. */
 export const DEFAULT_SEFARIA_CACHE_TTL_MS = 5 * 60 * 1_000;
 /** Default maximum number of admitted responses per client. */
@@ -28,13 +30,11 @@ interface CachedResponse {
   readonly url: string;
 }
 
-const CACHEABLE_OPERATION_PATHS = new Set([
-  "/api/v3/texts/{tref}",
-  "/api/texts/versions/{tref}",
-  "/api/ref/{tref}",
-  "/api/v2/index/{title}",
-  "/api/shape/{title}",
-  "/api/links/{tref}",
+const DYNAMIC_OPERATION_PATHS = new Set([
+  "/api/async/{task_id}",
+  "/api/sheets/modified/{sheet_id}/{timestamp}",
+  "/api/texts/random",
+  "/api/texts/random-by-topic",
 ]);
 
 function positiveFinite(value: number, name: string): number {
@@ -70,7 +70,7 @@ function cacheKey(request: Request): string {
 }
 
 function replayResponse(entry: CachedResponse): Response {
-  const response = new Response(entry.body.slice(), {
+  const response = new Response(new Blob([entry.body.slice()]), {
     headers: entry.headers,
     status: entry.status,
     statusText: entry.statusText,
@@ -227,7 +227,7 @@ export function createSefariaResponseCache(
       if (
         hits.has(response) ||
         requestGenerations.get(request) !== generation ||
-        !CACHEABLE_OPERATION_PATHS.has(operationPath) ||
+        DYNAMIC_OPERATION_PATHS.has(operationPath) ||
         !isEligibleRequest(request) ||
         response.status !== 200 ||
         !response.ok
@@ -247,9 +247,19 @@ export function createSefariaResponseCache(
       if (body.byteLength > maxSize) {
         return;
       }
-      const value = JSON.parse(new TextDecoder().decode(body)) as unknown;
-      if (isNegativePayload(value)) {
+      const contract = getResponseContract({
+        method: request.method,
+        path: operationPath,
+        status: response.status,
+      });
+      if (contract === undefined) {
         return;
+      }
+      if (contract.bodyType === "json") {
+        const value = JSON.parse(new TextDecoder().decode(body)) as unknown;
+        if (isNegativePayload(value)) {
+          return;
+        }
       }
       if (requestGenerations.get(request) !== generation) {
         return;

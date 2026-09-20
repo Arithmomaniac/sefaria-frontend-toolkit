@@ -524,6 +524,16 @@ The reader's `heLeft` and `heRight` layout values are labelled in direction term
 
 This evidence supports a text-segment projection that accepts one already-resolved `CoreV3Version`. The bilingual composite owns role resolution, and text segment remains the single owner of segment transformation.
 
+## Full pinned OpenAPI expansion
+
+**Observed September 20, 2026 from the pinned OpenAPI and local export:** the corrected document contains 60 operations across the `Text`, `Index`, `Related`, `Calendars`, `Lexicon`, `Topic`, `Term`, `Sheets`, `Collections`, `Misc`, and `Ref` tags. Generation retains the complete document and exposes those operations through the corresponding 11 root namespaces. No live Sefaria requests were made during this expansion.
+
+The local export at `C:\_SRC\Sefaria-Export.data\mongo\extracted\dump\sefaria` was inspected with MongoDB Database Tools `bsondump` 100.18.0. The existing bounded sample from `texts.bson` contains recursively nested `chapter` arrays. Direct reads from `manuscripts.bson` confirmed stored manuscript records with `slug`, English and Hebrew titles, source, and descriptions. Direct reads from `term.bson` confirmed term records with Extended JSON numeric values and multilingual title arrays. These records establish stored-data variants and collection availability; they are not treated as HTTP response payloads.
+
+The maintained response-contract test validates every JSON response example for the 52 newly included operations against the generated status-specific Zod schema. Existing source-backed fixtures continue to qualify the eight previously generated operations. The sheet examples exposed numeric and string sheet identifiers, legacy empty-array options, boolean or numeric option flags, and timezone-free ISO-formatted timestamps. The guarded overlay now models those variants. The manuscripts response uses the corrected `application/json` media type, and the image-generation operation remains the document's declared `image/png` response.
+
+The approved reusable transport components are limited to version metadata and sheet topic/tag fields. `CoreVersionMetadata` is shared by `VersionJSON` and `versionData` after preserving the reviewed nullable source and status fields. `CoreSheetTopic` owns `slug`, `asTyped`, `en`, and `he`; `UserSheetTagJSON` adds only `count`. No generalized domain model or shared reference-topic-link component was added.
+
 ### Current front-end cache
 
 The current front-end text cache grows for the lifetime of the page. It has no eviction and no expiry.

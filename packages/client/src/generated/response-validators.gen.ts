@@ -3,10 +3,23 @@
 // Do not edit.
 
 import {
+  zAliyotJson,
+  zAllSheetsJson,
+  zApiIndexResponse,
   zAsyncTaskEnqueued,
   zAsyncTaskFailure,
   zAsyncTaskPending,
   zAsyncTaskSuccess,
+  zAuthorIndexesJson,
+  zBulkSheetEntryJson,
+  zBulktextJson,
+  zCalendarApiResponse,
+  zCalendarHolidayTopicJson,
+  zCalendarNextReadApi,
+  zCalendarParashaTopicJson,
+  zCatJson,
+  zCollectionDetailJson,
+  zCollectionsListJson,
   zCoreErrorResponse,
   zCoreIndexResponse,
   zCoreLinkResponse,
@@ -14,7 +27,41 @@ import {
   zCoreRefResponse,
   zCoreShapeResponse,
   zCoreV3TextsResponse,
+  zCountsJson,
+  zCountsWordsJson,
+  zGetAllTopicsResponse,
+  zGetCountsLinksResponse,
+  zGetLinkSummaryResponse,
+  zGetManuscriptsResponse,
+  zGetRecommendTopicsResponse,
+  zGetRelatedWebsitesResponse,
+  zGetSheetsByRefResponse,
+  zGetSheetsTagListResponse,
+  zGetSheetsTagListSortedResponse,
+  zGetSheetsTrendingTagsResponse,
+  zGetTranslationsLangResponse,
+  zGetTranslationsResponse,
+  zGetUserCollectionsResponse,
+  zGetUserSheetTagsResponse,
   zGetVersionsResponse,
+  zGetWordsCompletionResponse,
+  zGetWordsResponse,
+  zIndexJson,
+  zIndexTitlesJson,
+  zNameApiResponse,
+  zPassagesJson,
+  zProfileJson,
+  zRandomByTopicJson,
+  zRawIndexJson,
+  zRefTopicLinksJson,
+  zRelatedJson,
+  zSearchResponse,
+  zSheetDetailJson,
+  zTermsJson,
+  zTextApiReponse,
+  zTopicGraphJson,
+  zTopicJson,
+  zUserSheetsJson,
 } from "./zod.gen.js";
 
 export function validateGetV3Texts200(value: unknown): boolean {
@@ -29,24 +76,80 @@ export function validateGetV3Texts404(value: unknown): boolean {
   return zCoreErrorResponse.safeParse(value).success;
 }
 
-export function validateGetTextVersions200(value: unknown): boolean {
-  return zGetVersionsResponse.safeParse(value).success;
+export function validateGetV1Texts200(value: unknown): boolean {
+  return zTextApiReponse.safeParse(value).success;
 }
 
-export function validateGetRef200(value: unknown): boolean {
-  return zCoreRefResponse.safeParse(value).success;
+export function validateGetTranslations200(value: unknown): boolean {
+  return zGetTranslationsResponse.safeParse(value).success;
 }
 
-export function validateGetRef404(value: unknown): boolean {
-  return zCoreErrorResponse.safeParse(value).success;
+export function validateGetTranslationsLang200(value: unknown): boolean {
+  return zGetTranslationsLangResponse.safeParse(value).success;
+}
+
+export function validateGetManuscripts200(value: unknown): boolean {
+  return zGetManuscriptsResponse.safeParse(value).success;
+}
+
+export function validateGetTextsRandom200(value: unknown): boolean {
+  return zTextApiReponse.safeParse(value).success;
+}
+
+export function validateGetBulktext200(value: unknown): boolean {
+  return zBulktextJson.safeParse(value).success;
+}
+
+export function validateGetPassages200(value: unknown): boolean {
+  return zPassagesJson.safeParse(value).success;
+}
+
+export function validateGetV2Index200(value: unknown): boolean {
+  return zRawIndexJson.safeParse(value).success;
+}
+
+export function validateGetIndex200(value: unknown): boolean {
+  return zApiIndexResponse.safeParse(value).success;
+}
+
+export function validateGetShape200(value: unknown): boolean {
+  return zCoreShapeResponse.safeParse(value).success;
+}
+
+export function validateGetAuthorIndexes200(value: unknown): boolean {
+  return zAuthorIndexesJson.safeParse(value).success;
+}
+
+export function validateGetIndexTitles200(value: unknown): boolean {
+  return zIndexTitlesJson.safeParse(value).success;
+}
+
+export function validateGetIndexByTitle200(value: unknown): boolean {
+  return zIndexJson.safeParse(value).success;
 }
 
 export function validateGetIndexV2200(value: unknown): boolean {
   return zCoreIndexResponse.safeParse(value).success;
 }
 
-export function validateGetShape200(value: unknown): boolean {
-  return zCoreShapeResponse.safeParse(value).success;
+export function validateGetCounts200(value: unknown): boolean {
+  return zCountsJson.safeParse(value).success;
+}
+
+export function validateGetCountsLinks200(value: unknown): boolean {
+  return zGetCountsLinksResponse.safeParse(value).success;
+}
+
+export function validateGetCountsWords200(value: unknown): boolean {
+  return zCountsWordsJson.safeParse(value).success;
+}
+
+export function validateGetRelated200(value: unknown): boolean {
+  return zRelatedJson.safeParse(value).success;
+}
+
+export function validateGetRelatedWebsites200(value: unknown): boolean {
+  return zGetRelatedWebsitesResponse.safeParse(value).success;
 }
 
 export function validateGetLinks200(value: unknown): boolean {
@@ -57,8 +160,152 @@ export function validateGetLinks400(value: unknown): boolean {
   return zCoreLinksErrorResponse.safeParse(value).success;
 }
 
+export function validateGetRefTopicLinks200(value: unknown): boolean {
+  return zRefTopicLinksJson.safeParse(value).success;
+}
+
+export function validateGetLinkSummary200(value: unknown): boolean {
+  return zGetLinkSummaryResponse.safeParse(value).success;
+}
+
+export function validateGetCalendars200(value: unknown): boolean {
+  return zCalendarApiResponse.safeParse(value).success;
+}
+
+export function validateGetNextRead200(value: unknown): boolean {
+  return zCalendarNextReadApi.safeParse(value).success;
+}
+
+export function validateGetAliyotByParasha200(value: unknown): boolean {
+  return zAliyotJson.safeParse(value).success;
+}
+
+export function validateGetCalendarParashaTopic200(value: unknown): boolean {
+  return zCalendarParashaTopicJson.safeParse(value).success;
+}
+
+export function validateGetCalendarHolidayTopic200(value: unknown): boolean {
+  return zCalendarHolidayTopicJson.safeParse(value).success;
+}
+
+export function validateGetWords200(value: unknown): boolean {
+  return zGetWordsResponse.safeParse(value).success;
+}
+
+export function validateGetWordsCompletion200(value: unknown): boolean {
+  return zGetWordsCompletionResponse.safeParse(value).success;
+}
+
+export function validateGetV2Topics200(value: unknown): boolean {
+  return zTopicJson.safeParse(value).success;
+}
+
+export function validateGetTopicSlug200(value: unknown): boolean {
+  return zTopicJson.safeParse(value).success;
+}
+
+export function validateGetAllTopics200(value: unknown): boolean {
+  return zGetAllTopicsResponse.safeParse(value).success;
+}
+
+export function validateGetTopicsGraph200(value: unknown): boolean {
+  return zTopicGraphJson.safeParse(value).success;
+}
+
+export function validateGetRecommendTopics200(value: unknown): boolean {
+  return zGetRecommendTopicsResponse.safeParse(value).success;
+}
+
+export function validateGetRandomByTopic200(value: unknown): boolean {
+  return zRandomByTopicJson.safeParse(value).success;
+}
+
+export function validateGetTerms200(value: unknown): boolean {
+  return zTermsJson.safeParse(value).success;
+}
+
+export function validateGetName200(value: unknown): boolean {
+  return zNameApiResponse.safeParse(value).success;
+}
+
+export function validateGetSheet200(value: unknown): boolean {
+  return zSheetDetailJson.safeParse(value).success;
+}
+
+export function validateGetSheetsTrendingTags200(value: unknown): boolean {
+  return zGetSheetsTrendingTagsResponse.safeParse(value).success;
+}
+
+export function validateGetSheetModified200(value: unknown): boolean {
+  return zSheetDetailJson.safeParse(value).success;
+}
+
+export function validateGetUserSheets200(value: unknown): boolean {
+  return zUserSheetsJson.safeParse(value).success;
+}
+
+export function validateGetUserSheetsPaginated200(value: unknown): boolean {
+  return zUserSheetsJson.safeParse(value).success;
+}
+
+export function validateGetSheetsBulk200(value: unknown): boolean {
+  return zBulkSheetEntryJson.safeParse(value).success;
+}
+
+export function validateGetSheetsTagList200(value: unknown): boolean {
+  return zGetSheetsTagListResponse.safeParse(value).success;
+}
+
+export function validateGetSheetsTagListSorted200(value: unknown): boolean {
+  return zGetSheetsTagListSortedResponse.safeParse(value).success;
+}
+
+export function validateGetUserSheetTags200(value: unknown): boolean {
+  return zGetUserSheetTagsResponse.safeParse(value).success;
+}
+
+export function validateGetSheetsByRef200(value: unknown): boolean {
+  return zGetSheetsByRefResponse.safeParse(value).success;
+}
+
+export function validateGetAllSheets200(value: unknown): boolean {
+  return zAllSheetsJson.safeParse(value).success;
+}
+
+export function validateGetCollections200(value: unknown): boolean {
+  return zCollectionsListJson.safeParse(value).success;
+}
+
+export function validateGetCollection200(value: unknown): boolean {
+  return zCollectionDetailJson.safeParse(value).success;
+}
+
+export function validateGetUserCollections200(value: unknown): boolean {
+  return zGetUserCollectionsResponse.safeParse(value).success;
+}
+
 export function validatePostFindRefs202(value: unknown): boolean {
   return zAsyncTaskEnqueued.safeParse(value).success;
+}
+
+export function validatePostSearchWrapper200(value: unknown): boolean {
+  return zSearchResponse.safeParse(value).success;
+}
+
+export function validateGetCategory200(value: unknown): boolean {
+  return zCatJson.safeParse(value).success;
+}
+
+export function validateGetRef200(value: unknown): boolean {
+  return zCoreRefResponse.safeParse(value).success;
+}
+
+export function validateGetRef404(value: unknown): boolean {
+  return zCoreErrorResponse.safeParse(value).success;
+}
+
+export function validateGetProfile200(value: unknown): boolean {
+  return zProfileJson.safeParse(value).success;
 }
 
 export function validateGetAsyncTaskStatus200(value: unknown): boolean {
@@ -71,4 +318,8 @@ export function validateGetAsyncTaskStatus202(value: unknown): boolean {
 
 export function validateGetAsyncTaskStatus500(value: unknown): boolean {
   return zAsyncTaskFailure.safeParse(value).success;
+}
+
+export function validateGetTextVersions200(value: unknown): boolean {
+  return zGetVersionsResponse.safeParse(value).success;
 }

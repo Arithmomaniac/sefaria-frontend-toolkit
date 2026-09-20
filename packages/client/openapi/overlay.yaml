@@ -1,10 +1,54 @@
 overlay: 1.1.0
 info:
-  title: Sefaria Core API corrections
+  title: Sefaria API corrections
   version: 1.0.0
-  description: Source-backed corrections for the eight generated Core operations.
+  description: Source-backed corrections for the complete generated pinned API surface.
 extends: ./upstream.json
 x-sefaria-guards:
+  - id: shared-version-metadata
+    preconditions:
+      - target: $.components.schemas.CoreVersionMetadata
+        expected:
+          absent: true
+      - target: $.components.schemas.versionData
+        expected:
+          sha256: 30674c1ce884bdf3345cacb7bdfe8d6e5a1ab2e5c851196ec60d35b61120ca07
+  - id: shared-sheet-topic
+    preconditions:
+      - target: $.components.schemas.CoreSheetTopic
+        expected:
+          absent: true
+      - target: $.components.schemas.SheetTopicJSON
+        expected:
+          sha256: 5db2a7972cc039ebe8fb01eee15eabb212a17af8cc0ae9293f9a5dadba8b4f98
+      - target: $.components.schemas.UserSheetTagJSON
+        expected:
+          sha256: c57345df724703e5a5c75b12a3cf9246825fcbbe7d5c48bb5755fe99d9598647
+  - id: sheet-summary-contract
+    preconditions:
+      - target: $.components.schemas.SheetsJSON.properties.id
+        expected:
+          sha256: b531327ce6cd0c0e99e40708dff9c99385a2d0fb739c64af0c66ab48c375ebb8
+      - target: $.components.schemas.SheetsJSON.properties.via
+        expected:
+          sha256: 1e9bcf42f672afa5c68a80503137a8b71f0b466edd30b5d772b4cbb228a31b84
+      - target: $.components.schemas.SheetsJSON.properties.options
+        expected:
+          sha256: 31b71a178e1e136ca17a9e0271caea3f26e96ffdc4190784ecca450f82bd3cfa
+      - target: $.components.schemas.AllSheetsJSON.properties.sheets.items.properties.created
+        expected:
+          sha256: d39ee056c680d6e9581d537be488c014b831fea35745b8baa4a6dd5b0293839b
+      - target: $.components.schemas.AllSheetsJSON.properties.sheets.items.properties.published
+        expected:
+          sha256: 5d0406f84838048b615f31b06397846a692780b987c84a765dfcb35f10a47ca4
+  - id: manuscripts-content-type
+    preconditions:
+      - target: $.paths['/api/manuscripts/{tref}'].get.responses['200'].content['Manuscript JSON']
+        expected:
+          sha256: 434d5e06ff933ae49485d0bfe8c2513e0bb956ab5effe8b5f4b2664e9f4779f9
+      - target: $.paths['/api/manuscripts/{tref}'].get.responses['200'].content['application/json']
+        expected:
+          absent: true
   - id: versions-contract
     preconditions:
       - target: $.paths['/api/texts/versions/{index}']
@@ -264,6 +308,149 @@ x-sefaria-guards:
         expected:
           absent: true
 actions:
+  - x-action-id: sheet-summary-id-type-remove
+    x-correction-id: sheet-summary-contract
+    target: $.components.schemas.SheetsJSON.properties.id.type
+    remove: true
+  - x-action-id: sheet-summary-id
+    x-correction-id: sheet-summary-contract
+    target: $.components.schemas.SheetsJSON.properties.id
+    update:
+      oneOf:
+        - type: integer
+        - type: string
+  - x-action-id: sheet-summary-via
+    x-correction-id: sheet-summary-contract
+    target: $.components.schemas.SheetsJSON.properties.via
+    update:
+      type: integer
+  - x-action-id: sheet-summary-options-type-remove
+    x-correction-id: sheet-summary-contract
+    target: $.components.schemas.SheetsJSON.properties.options.type
+    remove: true
+  - x-action-id: sheet-summary-options-properties-remove
+    x-correction-id: sheet-summary-contract
+    target: $.components.schemas.SheetsJSON.properties.options.properties
+    remove: true
+  - x-action-id: sheet-summary-options-example-remove
+    x-correction-id: sheet-summary-contract
+    target: $.components.schemas.SheetsJSON.properties.options.example
+    remove: true
+  - x-action-id: sheet-summary-options
+    x-correction-id: sheet-summary-contract
+    target: $.components.schemas.SheetsJSON.properties.options
+    update:
+      type: object
+      oneOf:
+        - type: object
+          properties:
+            numbered:
+              oneOf:
+                - type: boolean
+                - type: integer
+              description: Should the sources be automatically numbered in the Sefaria editor view
+            boxed:
+              description: Should the sources be boxed on the page in the Sefaria editor view
+              oneOf:
+                - type: boolean
+                - type: number
+            assignable:
+              description: Is this source sheet an assignment for students in the Sefaria editor view
+              oneOf:
+                - type: boolean
+                - type: number
+            bsd:
+              description: Should the source sheet include בס"ד at the top of the page in the Sefaria editor view
+              oneOf:
+                - type: boolean
+                - type: number
+            language:
+              description: Default display language of the source sheet in the Sefaria editor view
+              enum:
+                - bilingual
+                - hebrew
+                - english
+              type: string
+            layout:
+              description: Default display layout of the source sheet in the Sefaria editor view
+              type: string
+            langLayout:
+              description: Default display side of the language in a bilingual side-by-side view in the Sefaria editor view
+              type: string
+            divineNames:
+              description: Should divine names be replaced, and if so in what form?
+              type: string
+            highlightMode:
+              oneOf:
+                - type: boolean
+                - type: integer
+            collaboration:
+              type: string
+        - type: array
+          maxItems: 0
+          description: Legacy sheets encode an empty options object as an empty array.
+  - x-action-id: all-sheets-created-format-remove
+    x-correction-id: sheet-summary-contract
+    target: $.components.schemas.AllSheetsJSON.properties.sheets.items.properties.created.format
+    remove: true
+  - x-action-id: all-sheets-published-format-remove
+    x-correction-id: sheet-summary-contract
+    target: $.components.schemas.AllSheetsJSON.properties.sheets.items.properties.published.format
+    remove: true
+  - x-action-id: shared-sheet-topic-seed
+    x-correction-id: shared-sheet-topic
+    target: $.components.schemas
+    update:
+      CoreSheetTopic: {}
+  - x-action-id: shared-sheet-topic-copy
+    x-correction-id: shared-sheet-topic
+    target: $.components.schemas.CoreSheetTopic
+    copy: $.components.schemas.SheetTopicJSON
+  - x-action-id: sheet-topic-properties-remove
+    x-correction-id: shared-sheet-topic
+    target: $.components.schemas.SheetTopicJSON.properties
+    remove: true
+  - x-action-id: sheet-topic-type-remove
+    x-correction-id: shared-sheet-topic
+    target: $.components.schemas.SheetTopicJSON.type
+    remove: true
+  - x-action-id: sheet-topic-base
+    x-correction-id: shared-sheet-topic
+    target: $.components.schemas.SheetTopicJSON
+    update:
+      allOf:
+        - $ref: "#/components/schemas/CoreSheetTopic"
+  - x-action-id: user-sheet-tag-properties-remove
+    x-correction-id: shared-sheet-topic
+    target: $.components.schemas.UserSheetTagJSON.properties
+    remove: true
+  - x-action-id: user-sheet-tag-type-remove
+    x-correction-id: shared-sheet-topic
+    target: $.components.schemas.UserSheetTagJSON.type
+    remove: true
+  - x-action-id: user-sheet-tag-base
+    x-correction-id: shared-sheet-topic
+    target: $.components.schemas.UserSheetTagJSON
+    update:
+      allOf:
+        - $ref: "#/components/schemas/CoreSheetTopic"
+        - type: object
+          properties:
+            count:
+              type: integer
+  - x-action-id: manuscripts-content-seed
+    x-correction-id: manuscripts-content-type
+    target: $.paths['/api/manuscripts/{tref}'].get.responses['200'].content
+    update:
+      application/json: {}
+  - x-action-id: manuscripts-content-copy
+    x-correction-id: manuscripts-content-type
+    target: $.paths['/api/manuscripts/{tref}'].get.responses['200'].content['application/json']
+    copy: $.paths['/api/manuscripts/{tref}'].get.responses['200'].content['Manuscript JSON']
+  - x-action-id: manuscripts-content-remove
+    x-correction-id: manuscripts-content-type
+    target: $.paths['/api/manuscripts/{tref}'].get.responses['200'].content['Manuscript JSON']
+    remove: true
   - x-action-id: linker-detection-schemas
     x-correction-id: linker-detection-contract
     target: "$.components.schemas"
@@ -524,6 +711,43 @@ actions:
     description: Permit stored version metadata whose optional status value is null.
     update:
       nullable: true
+  - x-action-id: shared-version-metadata-seed
+    x-correction-id: shared-version-metadata
+    target: $.components.schemas
+    update:
+      CoreVersionMetadata: {}
+  - x-action-id: shared-version-metadata-copy
+    x-correction-id: shared-version-metadata
+    target: $.components.schemas.CoreVersionMetadata
+    copy: $.components.schemas.VersionJSON
+  - x-action-id: version-json-properties-remove
+    x-correction-id: shared-version-metadata
+    target: $.components.schemas.VersionJSON.properties
+    remove: true
+  - x-action-id: version-json-type-remove
+    x-correction-id: shared-version-metadata
+    target: $.components.schemas.VersionJSON.type
+    remove: true
+  - x-action-id: version-json-base
+    x-correction-id: shared-version-metadata
+    target: $.components.schemas.VersionJSON
+    update:
+      allOf:
+        - $ref: "#/components/schemas/CoreVersionMetadata"
+  - x-action-id: version-data-properties-remove
+    x-correction-id: shared-version-metadata
+    target: $.components.schemas.versionData.properties
+    remove: true
+  - x-action-id: version-data-type-remove
+    x-correction-id: shared-version-metadata
+    target: $.components.schemas.versionData.type
+    remove: true
+  - x-action-id: version-data-base
+    x-correction-id: shared-version-metadata
+    target: $.components.schemas.versionData
+    update:
+      allOf:
+        - $ref: "#/components/schemas/CoreVersionMetadata"
   - x-action-id: v3-version-parameter
     x-correction-id: v3-text-contract
     target: "$.paths['/api/v3/texts/{tref}'].parameters[0]"

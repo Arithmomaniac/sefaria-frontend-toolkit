@@ -1,6 +1,8 @@
 import { expect, test, vi } from "vitest";
 
-import { createSefariaClient, getTextVersions } from "../src/index.js";
+import { createSefariaClient, text } from "../src/index.js";
+
+const { getTextVersions } = text;
 
 test("replays an independent validated Response in Chromium", async () => {
   const responseUrl = "data:application/json,%5B%5D";
