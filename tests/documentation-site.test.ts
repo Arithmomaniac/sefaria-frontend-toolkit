@@ -469,6 +469,10 @@ describe("documentation learning journey", () => {
     expect(getStarted).toContain("read:packages");
     expect(getStarted).toContain("not published on npmjs.com");
     expect(getStarted).toContain("Package names are subject to change");
+    expect(getStarted).toContain(
+      "Public GitHub Packages prereleases are available",
+    );
+    expect(getStarted).not.toContain("planned for activation");
     expect(getStarted).toContain("Clone the source only to change the toolkit");
     expect(documentation).toContain("Repository-only documentation");
     expect(documentation).toContain(

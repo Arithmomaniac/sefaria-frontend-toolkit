@@ -4,7 +4,7 @@
 
 ## Status
 
-This specification defines the intended public prerelease distribution contract. Public availability remains planned until all three existing package records are public and one synchronized release passes hosted publication and installed-consumer qualification.
+This specification defines the current public prerelease distribution contract. The three existing package records are public, and synchronized release `0.0.0-alpha.35489617787.2` passed hosted publication and installed-consumer qualification on September 20, 2026.
 
 ## Package set
 

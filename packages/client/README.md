@@ -4,7 +4,7 @@
 
 `@arithmomaniac/sefaria-client` is the validated transport boundary for the Sefaria operations used by this workspace. It owns the pinned OpenAPI input, guarded corrections, generated contracts and Zod validators, thin fetch client, and bounded default-on per-client response cache.
 
-The committed source manifest remains private to prevent accidental publication. Public GitHub Packages prereleases are planned for authenticated installation; the package name is subject to change, and it is not published on npmjs.com. Follow the repository [installation status](../../docs/get-started.md#installation-status).
+The committed source manifest remains private to prevent accidental publication. Public GitHub Packages prereleases are available for authenticated installation; the package name is subject to change, and it is not published on npmjs.com. Follow the repository [installation instructions](../../docs/get-started.md#installation-status).
 
 ## Ordinary use
 

@@ -151,6 +151,14 @@ Main run `34989378311` passed hosted Ubuntu and Windows validation, the fail-clo
 
 **Locally qualified on September 15, 2026:** the preflight implementation read each package through an authenticated registry request, checked each linked package page without authentication, validated each record's existing `alpha` version and exact repository/dependency metadata, and placed the command after the current-main check but before the first publish. The package records may start with different valid `alpha` versions, allowing a later run to repair a publication that stopped between package publishes without weakening the existence, privacy, or linkage gates. Focused publication and workflow-policy tests passed 13 tests. The complete `pnpm check` passed all 16 stages with 85 test files and 626 tests. This local result does not prove repository-token access or live workflow ordering; a successful hosted `main` publication remains required for that evidence.
 
+## Public GitHub Packages publication qualification
+
+**Observed on September 20, 2026:** PR #18 merged as `e8cebeaa6fc3b6b2e8d5746d92493fd2ecb13093`. The three existing package records were changed from private to public through their owner settings, after which their canonical unauthenticated package pages each returned HTTP 200 and displayed their existing version histories. The repository rollout variable `PUBLIC_PACKAGES_ENABLED` was then set to `true`.
+
+Main workflow run `35489617787`, attempt 2, passed Ubuntu and Windows validation, the fail-closed aggregate, the public-visibility preflight, all three ordered publishes, and complete registry-consumer verification. It published synchronized version `0.0.0-alpha.35489617787.2` for `@arithmomaniac/sefaria-client`, `@arithmomaniac/sefaria-text-transform`, and `@arithmomaniac/sefaria-web-components`. Each public package page exposed that exact version after the run. The verifier authenticated to registry metadata, confirmed repository linkage and exact internal dependencies, installed all three versions into an isolated consumer with no workspace, link, file, or tarball resolution, and imported every Node-safe public subpath.
+
+This qualifies public GitHub Packages distribution and the automatic green-`main` alpha path. GitHub still requires authentication to install public npm-format packages. The package names remain experimental and subject to change, and the packages are not published on npmjs.com or a CDN.
+
 ## Historical decision provenance
 
 This section records the strongest session-history decisions that explain the current contract boundaries. It does not define product behavior; the current specifications and design document do that.
