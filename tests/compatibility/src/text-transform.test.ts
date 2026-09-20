@@ -125,10 +125,10 @@ describe("source-backed structural compatibility", () => {
 
     expect(fixture.capturedAt).toBe("2026-08-30");
     expect(sanitized).toBe(
-      '<span data-sefaria-mam="mam-kq-trivial">שְׁעָרָ֗ו</span>',
+      '<span data-sefaria-mam="trivial-variant">שְׁעָרָ֗ו</span>',
     );
     expect(applyVocalizationToHtml(sanitized, "none")).toBe(
-      '<span data-sefaria-mam="mam-kq-trivial">שערו</span>',
+      '<span data-sefaria-mam="trivial-variant">שערו</span>',
     );
   });
 

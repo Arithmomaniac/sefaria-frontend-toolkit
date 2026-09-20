@@ -151,7 +151,7 @@ function sourceBackedV3Case(): CompatibilityCaseResult {
     "v3-source-backed-pipeline",
     {
       bodyHtml:
-        '<span data-sefaria-mam="mam-kq-trivial">שערו</span> — When God began to create<span data-sefaria-note="0"></span> heaven',
+        '<span data-sefaria-mam="trivial-variant">שערו</span> — When God began to create<span data-sefaria-note="0"></span> heaven',
       notes: [
         {
           key: 0,
@@ -192,15 +192,15 @@ export function evaluateCompatibilityCases(): CompatibilityCaseResult[] {
     textCase(
       "mam-sanitizer-structure",
       "sanitization",
-      '<span data-sefaria-mam="mam-kq-trivial">שְׁעָרָ֗ו</span>',
+      '<span data-sefaria-mam="trivial-variant">שְׁעָרָ֗ו</span>',
       normalizeText('<span class="mam-kq-trivial">שְׁעָרָ֗ו</span>').bodyHtml,
     ),
     textCase(
       "mam-markup-vocalization",
       "vocalization",
-      '<span data-sefaria-mam="mam-kq-trivial">שערו</span>',
+      '<span data-sefaria-mam="trivial-variant">שערו</span>',
       applyVocalizationToHtml(
-        '<span data-sefaria-mam="mam-kq-trivial">שְׁעָרָ֗ו</span>',
+        '<span data-sefaria-mam="trivial-variant">שְׁעָרָ֗ו</span>',
         "none",
       ),
     ),
