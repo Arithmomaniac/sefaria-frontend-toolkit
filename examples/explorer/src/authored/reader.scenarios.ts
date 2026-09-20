@@ -27,12 +27,7 @@ const primary = {
   language: "he",
   actualLanguage: "he",
   direction: "rtl",
-  body: [
-    {
-      kind: "html",
-      html: "הִגִּיד לְךָ אָדָם מַה טּוֹב וּמָה יְהוָה דּוֹרֵשׁ מִמְּךָ",
-    },
-  ],
+  bodyHtml: "הִגִּיד לְךָ אָדָם מַה טּוֹב וּמָה יְהוָה דּוֹרֵשׁ מִמְּךָ",
   notes: [],
 } as const;
 
@@ -43,12 +38,8 @@ const translation = {
   language: "en",
   actualLanguage: "en",
   direction: "ltr",
-  body: [
-    {
-      kind: "html",
-      html: "You have been told what is good and what the Eternal requires of you.",
-    },
-  ],
+  bodyHtml:
+    "You have been told what is good and what the Eternal requires of you.",
   notes: [],
 } as const;
 

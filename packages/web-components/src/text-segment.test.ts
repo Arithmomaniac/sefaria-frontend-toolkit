@@ -1,16 +1,20 @@
 import {
   createSefariaClient,
   SefariaContractError,
+  validateGetLinks200,
   validateGetV3Texts200,
+  type CoreLinkObject,
   type CoreV3TextsResponse,
   type CoreV3Version,
 } from "@arithmomaniac/sefaria-client";
 import { describe, expect, it, vi } from "vitest";
 
 import spanningFixture from "../../client/test/fixtures/v3-text-spanning-2026-08-29.json";
+import linksFixture from "../../client/test/fixtures/links-connections-preview-2026-09-06.json";
 import { v3SourceBackedPayload } from "../../../tests/compatibility/src/v3-source-backed.fixture.js";
 import {
   createTextSegmentViewModel,
+  createTextSegmentCommentaryReferences,
   loadTextSegmentViewModel,
   projectTextSegmentValue,
   projectTextSegmentVersion,
@@ -61,6 +65,75 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
+function sourceLink(): CoreLinkObject {
+  if (!validateGetLinks200(linksFixture) || !Array.isArray(linksFixture)) {
+    throw new TypeError("Expected a valid links fixture.");
+  }
+  const link = linksFixture.find((candidate) => !("isSheet" in candidate));
+  if (!link || "isSheet" in link) {
+    throw new TypeError("Expected one text link.");
+  }
+  return structuredClone(link) as CoreLinkObject;
+}
+
+describe("createTextSegmentCommentaryReferences", () => {
+  it("projects an exact base and edition match into text normalization", () => {
+    const version = englishVersion({
+      versionTitle: "Source edition",
+      text: '<i data-commentator="Magen Avraham" data-order="3"></i>',
+    });
+    const links = [
+      {
+        ...sourceLink(),
+        anchorRef: "Shulchan Arukh, Orach Chayim 1:1",
+        anchorRefExpanded: ["Shulchan Arukh, Orach Chayim 1:1"],
+        anchorVersion: { title: "Source edition", language: "he" },
+        sourceRef: "Magen Avraham 1:3",
+        inline_reference: {
+          "data-commentator": "Magen Avraham",
+          "data-order": 3,
+        },
+      },
+    ];
+    const references = createTextSegmentCommentaryReferences(
+      links,
+      "Shulchan Arukh, Orach Chayim 1:1",
+      version.versionTitle,
+    );
+
+    const result = projectTextSegmentValue(
+      sourcePayload(),
+      version,
+      version.text as string,
+      { commentaryReferences: references },
+    );
+
+    expect(result.state).toBe("data");
+    if (result.state === "data") {
+      expect(result.bodyHtml).toContain('data-sefaria-ref="Magen Avraham 1:3"');
+    }
+  });
+
+  it("rejects malformed unknown inline metadata with its source path", () => {
+    expect(() =>
+      createTextSegmentCommentaryReferences(
+        [
+          {
+            ...sourceLink(),
+            anchorRef: "Micah 6:8",
+            anchorRefExpanded: ["Micah 6:8"],
+            inline_reference: {
+              "data-commentator": "Rashi",
+              "data-order": 1.1,
+            },
+          },
+        ],
+        "Micah 6:8",
+      ),
+    ).toThrow("links[0].inline_reference.data-order");
+  });
+});
+
 describe("projectTextSegmentVersion", () => {
   it("projects the role-selected version without reselecting its language family", () => {
     const payload = sourcePayload();
@@ -81,9 +154,7 @@ describe("projectTextSegmentVersion", () => {
 
     expect(result.state).toBe("data");
     if (result.state === "data") {
-      expect(result.body).toEqual([
-        { kind: "html", html: "Selected translation." },
-      ]);
+      expect(result.bodyHtml).toBe("Selected translation.");
       expect(result.actualLanguage).toBe("en");
     }
   });
@@ -137,7 +208,7 @@ describe("projectTextSegmentVersion", () => {
         language: "en",
         actualLanguage: "en",
         direction: "ltr",
-        body: [{ kind: "html", html: "Second." }],
+        bodyHtml: "Second.",
         notes: [],
       });
     });
@@ -206,7 +277,7 @@ describe("createTextSegmentViewModel", () => {
       language: "en",
       actualLanguage: "en",
       direction: "rtl",
-      body: [{ kind: "html", html: "In the beginning." }],
+      bodyHtml: "In the beginning.",
       notes: [],
     });
   });
@@ -225,7 +296,7 @@ describe("createTextSegmentViewModel", () => {
 
     expect(result.state).toBe("data");
     if (result.state === "data") {
-      expect(result.body).toEqual([{ kind: "html", html: "Exact text." }]);
+      expect(result.bodyHtml).toBe("Exact text.");
     }
   });
 
@@ -238,19 +309,13 @@ describe("createTextSegmentViewModel", () => {
         language: "he",
         actualLanguage: "he",
         direction: "rtl",
-        body: [
-          {
-            kind: "html",
-            html: '<span class="mam-kq-trivial">שְׁעָרָ֗ו</span> — When God began to create',
-          },
-          { kind: "footnote-marker", noteIndex: 0, markerText: "*" },
-          { kind: "html", html: " heaven" },
-        ],
+        bodyHtml:
+          '<span data-sefaria-mam="mam-kq-trivial">שְׁעָרָ֗ו</span> — When God began to create<span data-sefaria-note="0"></span> heaven',
         notes: [
           {
-            index: 0,
-            markerText: "*",
-            content: "<b>When God began to create </b>Others.",
+            key: 0,
+            markerHtml: "*",
+            contentHtml: "<b>When God began to create </b>Others.",
           },
         ],
       },

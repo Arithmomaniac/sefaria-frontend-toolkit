@@ -16,15 +16,13 @@ export const primarySide = {
   language: "he",
   actualLanguage: "he",
   direction: "rtl",
-  body: [
-    { kind: "html", html: "<b>בְּרֵאשִׁית</b> בָּרָא אֱלֹהִים" },
-    { kind: "footnote-marker", noteIndex: 0, markerText: "*" },
-  ],
+  bodyHtml:
+    '<b>בְּרֵאשִׁית</b> בָּרָא אֱלֹהִים<span data-sefaria-note="0"></span>',
   notes: [
     {
-      index: 0,
-      markerText: "*",
-      content: "Static note supplied by the view model.",
+      key: 0,
+      markerHtml: "*",
+      contentHtml: "Static note supplied by the view model.",
     },
   ],
 } satisfies TextSegmentDataViewModel;
@@ -36,12 +34,8 @@ export const translationSide = {
   language: "en",
   actualLanguage: "en",
   direction: "ltr",
-  body: [
-    {
-      kind: "html",
-      html: "When God began to create heaven and earth, the earth being unformed and void.",
-    },
-  ],
+  bodyHtml:
+    "When God began to create heaven and earth, the earth being unformed and void.",
   notes: [],
 } satisfies TextSegmentDataViewModel;
 

@@ -23,6 +23,7 @@ import {
   projectTextSegmentValue,
   type TextSegmentDataViewModel,
 } from "./text-segment.js";
+import type { CommentaryReference } from "@arithmomaniac/sefaria-text-transform";
 import { sourceCardAddresses } from "./source-card-addresses.js";
 import {
   ComponentControllerEngine,
@@ -58,6 +59,14 @@ export interface SourceCardRequest {
   readonly primary?: BilingualSegmentEditionSelection;
   /** Exact edition for the translation side, when required. */
   readonly translation?: BilingualSegmentEditionSelection;
+}
+
+/** Optional request-free annotation evidence keyed by exact item reference and edition title. */
+export interface SourceCardProjectionContext {
+  /** Narrow commentary candidates previously scoped from validated links. */
+  readonly commentaryReferencesByRefAndVersion?: Readonly<
+    Record<string, Readonly<Record<string, readonly CommentaryReference[]>>>
+  >;
 }
 
 /** Payload-derived source-card heading data. */
@@ -226,6 +235,7 @@ const SIDES: readonly BilingualPairSide[] = ["primary", "translation"];
 export function createSourceCardViewModel(
   payload: CoreV3TextsResponse,
   request: SourceCardRequest,
+  context: SourceCardProjectionContext = {},
 ): SourceCardViewModel {
   serializeSourceCardSelectors(request);
   const bilingualRequest: BilingualSegmentRequest = request;
@@ -238,10 +248,16 @@ export function createSourceCardViewModel(
     };
   }
 
+  const addresses = sourceCardAddresses(
+    payload,
+    SIDES.map((side) => resolved.versions[side]?.text),
+  );
   const projected = projectAlignedItems(
     payload,
     bilingualRequest,
     resolved.versions,
+    addresses.refAt,
+    context,
   );
   if ("message" in projected) {
     return {
@@ -253,10 +269,6 @@ export function createSourceCardViewModel(
 
   const header = createHeader(payload);
   const attributions = createAttributions(resolved.versions);
-  const addresses = sourceCardAddresses(
-    payload,
-    SIDES.map((side) => resolved.versions[side]?.text),
-  );
   if (projected.items.length === 0) {
     return {
       state: "empty",
@@ -442,6 +454,8 @@ function projectAlignedItems(
   payload: CoreV3TextsResponse,
   request: BilingualSegmentRequest,
   versions: Partial<Record<BilingualPairSide, CoreV3Version>>,
+  refAt: (position: readonly number[]) => string | undefined,
+  context: SourceCardProjectionContext,
 ):
   | { readonly items: readonly SourceCardItemViewModel[] }
   | { readonly message: string } {
@@ -454,6 +468,8 @@ function projectAlignedItems(
     versions.translation?.text,
     [],
     items,
+    refAt,
+    context,
   );
   return failure === undefined ? { items } : { message: failure };
 }
@@ -466,6 +482,8 @@ function visitAlignedText(
   translation: CoreV3TextValue | undefined,
   position: readonly number[],
   items: SourceCardItemViewModel[],
+  refAt: (position: readonly number[]) => string | undefined,
+  context: SourceCardProjectionContext,
 ): string | undefined {
   const primaryArray = Array.isArray(primary);
   const translationArray = Array.isArray(translation);
@@ -490,6 +508,8 @@ function visitAlignedText(
         translationItems[index],
         [...position, index],
         items,
+        refAt,
+        context,
       );
       if (failure !== undefined) {
         return failure;
@@ -504,6 +524,9 @@ function visitAlignedText(
     "primary",
     versions.primary,
     primary,
+    position,
+    refAt,
+    context,
   );
   const translationResult = projectLeaf(
     payload,
@@ -511,6 +534,9 @@ function visitAlignedText(
     "translation",
     versions.translation,
     translation,
+    position,
+    refAt,
+    context,
   );
   const pair = createPair(primaryResult, translationResult);
   if (pair !== undefined) {
@@ -529,6 +555,9 @@ function projectLeaf(
   side: BilingualPairSide,
   version: CoreV3Version | undefined,
   text: string | null | undefined,
+  position: readonly number[],
+  refAt: (position: readonly number[]) => string | undefined,
+  context: SourceCardProjectionContext,
 ): ProjectedLeaf {
   if (version === undefined) {
     return {
@@ -537,7 +566,19 @@ function projectLeaf(
     };
   }
 
-  const projected = projectTextSegmentValue(payload, version, text ?? null);
+  const ref = refAt(position);
+  const commentaryReferences =
+    ref === undefined
+      ? undefined
+      : context.commentaryReferencesByRefAndVersion?.[ref]?.[
+          version.versionTitle
+        ];
+  const projected = projectTextSegmentValue(
+    payload,
+    version,
+    text ?? null,
+    commentaryReferences === undefined ? {} : { commentaryReferences },
+  );
   return projected.state === "data"
     ? { state: "data", view: projected }
     : { state: "empty", absent: { side, message: projected.message } };

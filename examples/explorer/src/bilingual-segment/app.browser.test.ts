@@ -284,7 +284,7 @@ function createDataViewModel(label: string): BilingualSegmentDataViewModel {
     language,
     actualLanguage: language,
     direction,
-    body: [{ kind: "html", html: `${label} (${language})` }],
+    bodyHtml: `${label} (${language})`,
     notes: [],
   });
 

@@ -11,17 +11,11 @@ const viewModel: TextSegmentDataViewModel = {
   language: "he",
   actualLanguage: "he",
   direction: "rtl",
-  body: [
-    {
-      kind: "html",
-      html: '<span dir="rtl" data-overlay="Vilna Pages">הִגִּ֥יד׀</span><br><a data-ref="Micah 6:8" href="https://www.sefaria.org/Micah.6.8">אָדָ֛ם׃</a>',
-    },
-    { kind: "footnote-marker", noteIndex: 0, markerText: "א֑" },
-    { kind: "footnote-marker", noteIndex: 1, markerText: "ב֑" },
-  ],
+  bodyHtml:
+    '<span data-sefaria-overlay="Vilna Pages">הִגִּ֥יד׀</span><br><span data-sefaria-ref="Micah 6:8">אָדָ֛ם׃</span><span data-sefaria-note="0"></span><span data-sefaria-note="1"></span>',
   notes: [
-    { index: 0, markerText: "א֑", content: null },
-    { index: 1, markerText: "ב֑", content: "" },
+    { key: 0, markerHtml: "א֑", contentHtml: null },
+    { key: 1, markerHtml: "ב֑", contentHtml: "" },
   ],
 };
 
@@ -47,15 +41,13 @@ describe("deriveTextSegmentDisplay", () => {
     const display = deriveTextSegmentDisplay(viewModel, "none");
 
     expect(display).not.toBe(viewModel);
-    expect(display.body).toHaveLength(viewModel.body.length);
     expect(display.notes).toEqual([
-      { index: 0, markerText: "א", content: null },
-      { index: 1, markerText: "ב", content: "" },
+      { key: 0, markerHtml: "א", contentHtml: null },
+      { key: 1, markerHtml: "ב", contentHtml: "" },
     ]);
-    expect(display.body[0]).toEqual({
-      kind: "html",
-      html: '<span data-overlay="Vilna Pages" dir="rtl">הגיד׀</span><br><a data-ref="Micah 6:8" href="https://www.sefaria.org/Micah.6.8">אדם</a>',
-    });
+    expect(display.bodyHtml).toBe(
+      '<span data-sefaria-overlay="Vilna Pages">הגיד׀</span><br><span data-sefaria-ref="Micah 6:8">אדם</span><span data-sefaria-note="0"></span><span data-sefaria-note="1"></span>',
+    );
   });
 
   it("rejects an unsupported runtime preset", () => {

@@ -13,6 +13,8 @@ import {
   type TextSegmentDisplay,
 } from "./vocalization-display.js";
 
+const NOTE_PLACEHOLDER_PATTERN = /<span data-sefaria-note="(\d+)"><\/span>/gu;
+
 /** Request-free custom element that renders one text-segment view model. */
 export class SefariaTextSegment extends SefariaElement {
   /** Lit property metadata for the host-supplied view model. */
@@ -119,31 +121,34 @@ export class SefariaTextSegment extends SefariaElement {
   #renderData(viewModel: TextSegmentDataViewModel) {
     const display = this.#display(viewModel);
     const hasFootnoteBodies = display.notes.some(
-      (note) => note.content !== null,
+      (note) => note.contentHtml !== null,
+    );
+    const bodyHtml = decorateFootnotePlaceholders(
+      display.bodyHtml,
+      display.notes,
     );
 
     return html`
       <article lang=${viewModel.actualLanguage} dir=${viewModel.direction}>
         <div class="body">
-          ${display.body.map((part) =>
-            part.kind === "html"
-              ? html`<span class="body-part">${unsafeHTML(part.html)}</span>`
-              : html`<sup
-                  class="footnote-marker"
-                  data-note-index=${part.noteIndex}
-                  >${part.markerText}</sup
-                >`,
-          )}
+          <span class="body-part">${unsafeHTML(bodyHtml)}</span>
         </div>
         ${
           hasFootnoteBodies
             ? html`<ol class="footnotes">
                 ${display.notes.map((note) =>
-                  note.content === null
+                  note.contentHtml === null
                     ? nothing
-                    : html`<li data-note-index=${note.index}>
-                        <span class="footnote-label">${note.markerText}</span>
-                        ${unsafeHTML(note.content)}
+                    : html`<li data-note-index=${note.key}>
+                        <span class="footnote-label"
+                          >${unsafeHTML(note.markerHtml)}</span
+                        >
+                        ${unsafeHTML(
+                          decorateFootnotePlaceholders(
+                            note.contentHtml,
+                            display.notes,
+                          ),
+                        )}
                       </li>`,
                 )}
               </ol>`
@@ -168,6 +173,22 @@ export class SefariaTextSegment extends SefariaElement {
     }
     return this.#displayValue;
   }
+}
+
+function decorateFootnotePlaceholders(
+  source: string,
+  notes: TextSegmentDisplay["notes"],
+): string {
+  return source.replaceAll(
+    NOTE_PLACEHOLDER_PATTERN,
+    (placeholder, keyText: string) => {
+      const key = Number(keyText);
+      const note = notes[key];
+      return note?.key === key
+        ? `<sup class="footnote-marker" data-note-index="${key}">${note.markerHtml}</sup>`
+        : placeholder;
+    },
+  );
 }
 
 if (!customElements.get("sefaria-text-segment")) {

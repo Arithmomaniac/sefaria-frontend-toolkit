@@ -145,7 +145,7 @@ The source card owns the bounded text collection. Segment, flat range, chapter, 
 
 Request warnings remain with the selector-owning factory or composite. A resolved-version projection cannot assign a warning for another request selector.
 
-Raw HTML can enter the pure factory only as a field of a validated API payload. The factory uses `@arithmomaniac/sefaria-text-transform` to sanitize and extract structure before constructing the view model. A view model can contain full-mark sanitized render-ready HTML fragments and typed text parts. It must not contain raw API HTML for the element to interpret. An element can use the same pure transform package to derive a supported local vocalization presentation from those immutable safe fields.
+Raw HTML can enter the pure factory only as a field of a validated API payload. The factory uses `@arithmomaniac/sefaria-text-transform` to normalize safety and structure once before constructing the view model. A text-segment view model contains safe `bodyHtml` plus source-ordered note records; it must not contain raw API HTML for the element to interpret. An element can use the same pure transform package to derive a supported local vocalization presentation from those immutable safe fields.
 
 An integration can provide a payload-to-component operation. This operation is a facade over the same pure factory and request-free element. It does not create a second projection path or move payload interpretation into the element.
 

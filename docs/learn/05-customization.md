@@ -68,18 +68,14 @@ For a headless path, import only the layers you need:
 
 ```ts
 import { createSefariaClient } from "@arithmomaniac/sefaria-client";
-import {
-  extractFootnotes,
-  sanitize,
-} from "@arithmomaniac/sefaria-text-transform";
+import { normalizeText } from "@arithmomaniac/sefaria-text-transform";
 import { loadSourceCardViewModel } from "@arithmomaniac/sefaria-web-components/source-card";
 
 const client = createSefariaClient({ cache: false });
 const viewModel = await loadSourceCardViewModel({ tref: "Micah 6:8" }, client);
 
-const safeHtml = sanitize("<b>Justice</b>");
-const footnotes = extractFootnotes(safeHtml);
-console.log(viewModel.state, footnotes);
+const normalized = normalizeText("<b>Justice</b>");
+console.log(viewModel.state, normalized);
 ```
 
 The non-DOM component subpaths are safe to use without registering custom elements. They return rendering data, not server-rendered HTML and not a generalized domain model.

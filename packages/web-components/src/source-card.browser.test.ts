@@ -18,7 +18,7 @@ const PRIMARY: TextSegmentDataViewModel = {
   language: "he",
   actualLanguage: "he",
   direction: "rtl",
-  body: [{ kind: "html", html: "בְּרֵאשִׁית" }],
+  bodyHtml: "בְּרֵאשִׁית",
   notes: [],
 };
 
@@ -27,7 +27,7 @@ const TRANSLATION: TextSegmentDataViewModel = {
   language: "en",
   actualLanguage: "en",
   direction: "ltr",
-  body: [{ kind: "html", html: "In the beginning." }],
+  bodyHtml: "In the beginning.",
 };
 
 const DATA: SourceCardDataViewModel = {
@@ -337,15 +337,11 @@ test("unlabeled translation text uses the full pair-side width", async () => {
   );
 });
 
-test("selects from row clicks without intercepting links or text selection", async () => {
+test("selects from row clicks without intercepting text selection", async () => {
   const linkedPrimary: TextSegmentDataViewModel = {
     ...PRIMARY,
-    body: [
-      {
-        kind: "html",
-        html: '<a href="#citation">Citation</a> and selectable text.',
-      },
-    ],
+    bodyHtml:
+      '<span data-sefaria-ref="Genesis 1:1">Citation</span> and selectable text.',
   };
   const selectableData: SourceCardDataViewModel = {
     ...DATA,
@@ -375,13 +371,6 @@ test("selects from row clicks without intercepting links or text selection", asy
     position: [0],
     ref: "Genesis 1:1",
   });
-
-  const segment = rows[0]?.querySelector("sefaria-text-segment");
-  await segment?.updateComplete;
-  const citation = segment?.shadowRoot?.querySelector<HTMLAnchorElement>("a");
-  citation?.addEventListener("click", (event) => event.preventDefault());
-  citation?.click();
-  expect(selection).toHaveBeenCalledTimes(1);
 
   vi.spyOn(document, "getSelection").mockReturnValue({
     isCollapsed: false,

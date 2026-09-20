@@ -6,7 +6,7 @@ import {
   serializeCloseTag,
   serializeOpenTag,
 } from "./html.js";
-import { sanitize } from "./sanitize.js";
+import { normalizeText } from "./normalize.js";
 
 /** Sanitized, bounded text with an explicit truncation indicator. */
 export interface TextPreview {
@@ -35,12 +35,12 @@ export function createTextPreview(
   if (!Number.isSafeInteger(maximumGraphemes) || maximumGraphemes < 1) {
     throw new RangeError("Preview bound must be a positive safe integer.");
   }
-  const safe = sanitize(input, {
+  const safe = normalizeText(input, {
     allowFootnotes: false,
     allowInlineAnnotations: false,
     allowNamedEntities: false,
     allowRefLinks: false,
-  });
+  }).bodyHtml;
   const tokens: Token[] = [];
   const text: string[] = [];
   type Task =

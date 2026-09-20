@@ -26,7 +26,7 @@ flowchart LR
     BINDING --> ELEMENT
 ```
 
-The API payload is authoritative for transport fields, and the view model is authoritative for rendered data. Raw HTML can enter only the pure factory as a validated payload field; the factory applies the required `@arithmomaniac/sefaria-text-transform` operations before placing sanitized HTML fragments or typed text parts in the view model. The element does not read, validate, or project an API payload.
+The API payload is authoritative for transport fields, and the view model is authoritative for rendered data. Raw HTML can enter only the pure factory as a validated payload field; the factory calls `normalizeText` before placing safe `bodyHtml` and note records in the view model. The element does not read, validate, or project an API payload.
 
 A convenience API can accept a payload and return or configure a component, but it must delegate to the same pure factory and then supply its result to the request-free element.
 
@@ -51,7 +51,7 @@ Current public names follow this pattern:
 
 | Component | Request | View model | Pure factory | Async factory | Controller factory |
 | --- | --- | --- | --- | --- | --- |
-| Text segment | `TextSegmentRequest` | `TextSegmentViewModel` | `createTextSegmentViewModel`; `projectTextSegmentVersion` after role resolution; `projectTextSegmentValue` for a resolved leaf | `loadTextSegmentViewModel` | `createTextSegmentController` |
+| Text segment | `TextSegmentRequest` | `TextSegmentViewModel` | `createTextSegmentViewModel`; `projectTextSegmentVersion` after role resolution; `projectTextSegmentValue` for a resolved leaf; `createTextSegmentCommentaryReferences` for supplied validated links | `loadTextSegmentViewModel` | `createTextSegmentController` |
 | Bilingual segment | `BilingualSegmentRequest` | `BilingualSegmentViewModel` | `createBilingualSegmentViewModel` | `loadBilingualSegmentViewModel` | `createBilingualSegmentController` |
 | Reference label | `RefLabelRequest` | `RefLabelViewModel` | `createRefLabelViewModel` | `loadRefLabelViewModel` | `createRefLabelController` |
 | Source card | `SourceCardRequest` | `SourceCardViewModel` | `createSourceCardViewModel` | `loadSourceCardViewModel` | `createSourceCardController` |
@@ -341,9 +341,9 @@ The pure factory matches `languageFamilyName` case-insensitively and matches `ve
 
 `projectTextSegmentVersion` accepts one already-selected `CoreV3Version`. It does not select by language, title, array position, `isPrimary`, or `isSource`.
 
-`projectTextSegmentValue` accepts one already-selected `CoreV3Version` plus one resolved string or null leaf. It owns the same sanitization, full-mark footnote extraction, direction, and language projection as `projectTextSegmentVersion`. A composite that flattens recursive text calls this leaf projection rather than constructing text-segment data itself.
+`projectTextSegmentValue` accepts one already-selected `CoreV3Version` plus one resolved string or null leaf. It owns the same one-pass normalization, direction, and language projection as `projectTextSegmentVersion`. A composite that flattens recursive text calls this leaf projection rather than constructing text-segment data itself.
 
-`createTextSegmentViewModel` owns language-family selection and delegates the selected version to `projectTextSegmentVersion`. This keeps one owner for sanitization, full-mark footnote extraction, direction, and language projection.
+`createTextSegmentViewModel` owns language-family selection and delegates the selected version to `projectTextSegmentVersion`. This keeps one owner for normalization, direction, and language projection.
 
 Payload warnings describe missing request selectors. `createTextSegmentViewModel` preserves them because it owns one selector. `projectTextSegmentVersion` does not assign request warnings to an existing selected version.
 
@@ -353,9 +353,13 @@ If a requested role has no selected version, the composite owns that missing-sid
 
 Text segment has no `partial` state. More than one matching version or an array-valued selected text produces a projection `error`; the factory does not choose a version or child segment silently.
 
-String text passes through `sanitize` and `extractFootnotes` before entering the view model. The data view model preserves the full safe marks and the payload-provided `language`, `actualLanguage`, and `direction`.
+String text passes through `normalizeText` once before entering the view model. The data view model stores `bodyHtml`, source-ordered `{ key, markerHtml, contentHtml }` notes, and the payload-provided `language`, `actualLanguage`, and `direction`.
 
-`<sefaria-text-segment>` renders static footnote markers and available note bodies. Its typed `vocalizationMode` property and `vocalization-mode` attribute accept `taamim_and_nikkud`, `nikkud`, or `none` and default to `taamim_and_nikkud`. Unsupported runtime values throw `TypeError`. Full mode renders the original safe body and notes directly with zero display-transform calls. Non-full modes derive only text-node and marker presentation from the immutable original view model, preserving safe markup, note indexes/order, and missing (`null`) versus present-empty (`""`) bodies. Changing back to full restores the exact original display without factory work or requests. Interactive footnote activation and word selection remain outside the current contract because no consumer defines their action or event payload.
+`createTextSegmentCommentaryReferences` accepts validated `CoreLinkObject` values and scopes them to one exact base reference and selected edition. It guards unknown `inline_reference` fields with source paths and returns only narrow commentary candidates. The pure text projection accepts those candidates explicitly; text-only factories and controllers never make an additional links request.
+
+`<sefaria-text-segment>` decorates canonical key-only note placeholders and renders available note bodies. Its typed `vocalizationMode` property and `vocalization-mode` attribute accept `taamim_and_nikkud`, `nikkud`, or `none` and default to `taamim_and_nikkud`. Unsupported runtime values throw `TypeError`. Full mode renders the original safe body and notes directly with zero display-transform calls. Non-full modes derive every HTML field from the immutable original view model, preserving metadata, local note keys/order, and missing (`null`) versus present-empty (`""`) bodies. Changing back to full restores the exact original display without factory work or requests. Interactive footnote activation and word selection remain outside the current contract because no consumer defines their action or event payload.
+
+`createSourceCardViewModel` can receive an optional `SourceCardProjectionContext` whose commentary candidates are keyed by exact item reference and selected version title. The source card passes only that matching entry to each recursive leaf projection. Its async factory and controller do not fetch links or synthesize candidate scope.
 
 The element supports mixed scripts, punctuation, and long unbroken text without inferring direction from language. Poetry- and paragraph-specific presentation remain outside the current contract until an exact behavior is defined.
 

@@ -1,15 +1,15 @@
 import {
   text,
+  type CoreLinkObject,
   type CoreV3TextsResponse,
   type CoreV3Version,
   type GetV3TextsData,
   type SefariaClient,
 } from "@arithmomaniac/sefaria-client";
 import {
-  extractFootnotes,
-  sanitize,
-  type ExtractedFootnote,
-  type FootnoteBodyPart,
+  normalizeText,
+  type CommentaryReference,
+  type NormalizedFootnote,
 } from "@arithmomaniac/sefaria-text-transform";
 import {
   ComponentControllerEngine,
@@ -34,6 +34,12 @@ export interface TextSegmentRequest {
   readonly version: TextSegmentVersionSelection;
 }
 
+/** Optional request-free evidence used while projecting safe text metadata. */
+export interface TextSegmentProjectionContext {
+  /** Exact commentary candidates already scoped by the host or a projection helper. */
+  readonly commentaryReferences?: readonly CommentaryReference[];
+}
+
 /** Host-supplied state displayed while a text-segment request is pending. */
 export interface TextSegmentLoadingViewModel {
   /** State discriminator. */
@@ -56,10 +62,10 @@ export interface TextSegmentDataViewModel {
   readonly actualLanguage: string;
   /** Payload-provided text direction. */
   readonly direction: "ltr" | "rtl";
-  /** Ordered safe HTML fragments and static footnote marker positions. */
-  readonly body: readonly FootnoteBodyPart[];
-  /** Ordered static footnotes referenced by body markers. */
-  readonly notes: readonly ExtractedFootnote[];
+  /** Complete safe HTML with local key-only footnote placeholders. */
+  readonly bodyHtml: string;
+  /** Ordered static footnotes referenced by body placeholders. */
+  readonly notes: readonly NormalizedFootnote[];
 }
 
 /** Valid response with no renderable text for the requested selection. */
@@ -171,6 +177,7 @@ const RESERVED_VERSION_SELECTORS = new Set([
 export function createTextSegmentViewModel(
   payload: CoreV3TextsResponse,
   request: TextSegmentRequest,
+  context: TextSegmentProjectionContext = {},
 ): TextSegmentViewModel {
   serializeVersionSelection(request.version);
   const language = request.version.language.trim().toLocaleLowerCase("en-US");
@@ -198,7 +205,7 @@ export function createTextSegmentViewModel(
     throw new Error("A single version match was not available.");
   }
 
-  const projected = projectTextSegmentVersion(payload, version);
+  const projected = projectTextSegmentVersion(payload, version, context);
   if (projected.state === "empty") {
     return createEmptyViewModel(payload, createRequestEmptyMessage(request));
   }
@@ -211,6 +218,7 @@ export function createTextSegmentViewModel(
 export function projectTextSegmentVersion(
   payload: CoreV3TextsResponse,
   version: CoreV3Version,
+  context: TextSegmentProjectionContext = {},
 ):
   | TextSegmentDataViewModel
   | TextSegmentEmptyViewModel
@@ -223,7 +231,7 @@ export function projectTextSegmentVersion(
     };
   }
 
-  return projectTextSegmentValue(payload, version, version.text);
+  return projectTextSegmentValue(payload, version, version.text, context);
 }
 
 /**
@@ -233,17 +241,21 @@ export function projectTextSegmentValue(
   payload: CoreV3TextsResponse,
   version: CoreV3Version,
   text: string | null,
+  context: TextSegmentProjectionContext = {},
 ): TextSegmentDataViewModel | TextSegmentEmptyViewModel {
   if (text === null) {
     return createSelectedVersionEmptyViewModel(payload, version);
   }
 
-  const sanitized = sanitize(text);
-  if (sanitized.trim().length === 0) {
+  const normalized = normalizeText(
+    text,
+    context.commentaryReferences === undefined
+      ? {}
+      : { commentaryReferences: context.commentaryReferences },
+  );
+  if (normalized.bodyHtml.trim().length === 0) {
     return createSelectedVersionEmptyViewModel(payload, version);
   }
-
-  const footnotes = extractFootnotes(sanitized);
 
   return {
     state: "data",
@@ -252,9 +264,108 @@ export function projectTextSegmentValue(
     language: version.language,
     actualLanguage: version.actualLanguage,
     direction: version.direction,
-    body: footnotes.body,
-    notes: footnotes.notes,
+    bodyHtml: normalized.bodyHtml,
+    notes: normalized.notes,
   };
+}
+
+/**
+ * Projects validated link objects into exact commentary candidates for one
+ * base reference and selected edition. Unknown inline metadata is rejected
+ * with a structured source path instead of being guessed or silently coerced.
+ */
+export function createTextSegmentCommentaryReferences(
+  links: readonly CoreLinkObject[],
+  baseRef: string,
+  versionTitle?: string,
+): readonly CommentaryReference[] {
+  const references: CommentaryReference[] = [];
+  for (const [index, link] of links.entries()) {
+    if (
+      link.anchorRef !== baseRef &&
+      !link.anchorRefExpanded.includes(baseRef)
+    ) {
+      continue;
+    }
+    if (
+      versionTitle !== undefined &&
+      link.anchorVersion !== undefined &&
+      link.anchorVersion.title !== versionTitle
+    ) {
+      continue;
+    }
+    if (link.inline_reference === undefined) {
+      continue;
+    }
+
+    const commentator = readInlineString(
+      link.inline_reference,
+      "data-commentator",
+      index,
+      true,
+    );
+    const order = readInlineOrder(link.inline_reference, index);
+    const label = readInlineString(
+      link.inline_reference,
+      "data-label",
+      index,
+      false,
+    );
+    if (commentator === undefined) {
+      continue;
+    }
+    references.push({
+      commentator,
+      ...(order === undefined ? {} : { order }),
+      ...(label === undefined ? {} : { label }),
+      ref: link.sourceRef,
+    });
+  }
+  return references;
+}
+
+function readInlineString(
+  inlineReference: Readonly<Record<string, unknown>>,
+  field: string,
+  linkIndex: number,
+  required: boolean,
+): string | undefined {
+  const value = inlineReference[field];
+  if (value === undefined) {
+    if (required) {
+      throw new TypeError(
+        `links[${linkIndex}].inline_reference.${field} is required.`,
+      );
+    }
+    return undefined;
+  }
+  if (typeof value !== "string") {
+    throw new TypeError(
+      `links[${linkIndex}].inline_reference.${field} must be a string.`,
+    );
+  }
+  if (required && value.trim().length === 0) {
+    throw new TypeError(
+      `links[${linkIndex}].inline_reference.${field} must not be blank.`,
+    );
+  }
+  return value;
+}
+
+function readInlineOrder(
+  inlineReference: Readonly<Record<string, unknown>>,
+  linkIndex: number,
+): string | number | undefined {
+  const value = inlineReference["data-order"];
+  if (value === undefined || typeof value === "string") {
+    return value;
+  }
+  if (typeof value === "number" && Number.isSafeInteger(value)) {
+    return value;
+  }
+  throw new TypeError(
+    `links[${linkIndex}].inline_reference.data-order must be a string or safe integer.`,
+  );
 }
 
 /**

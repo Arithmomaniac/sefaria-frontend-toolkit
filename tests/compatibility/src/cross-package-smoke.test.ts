@@ -4,8 +4,7 @@ import {
 } from "@arithmomaniac/sefaria-client";
 import {
   applyVocalizationToHtml,
-  extractFootnotes,
-  sanitize,
+  normalizeText,
 } from "@arithmomaniac/sefaria-text-transform";
 import { expect, it } from "vitest";
 
@@ -31,23 +30,26 @@ it("validates and transforms one complete source-backed v3 payload", () => {
   }
 
   expect(v3SourceBackedFixtureMetadata.textSources).toHaveLength(2);
-  const sanitized = sanitize(html);
-  const vocalized = applyVocalizationToHtml(sanitized, "none");
+  const normalized = normalizeText(html);
 
-  expect(extractFootnotes(vocalized)).toEqual({
-    body: [
-      {
-        kind: "html",
-        html: '<span class="mam-kq-trivial">שערו</span> — When God began to create',
-      },
-      { kind: "footnote-marker", noteIndex: 0, markerText: "*" },
-      { kind: "html", html: " heaven" },
-    ],
+  expect({
+    bodyHtml: applyVocalizationToHtml(normalized.bodyHtml, "none"),
+    notes: normalized.notes.map((note) => ({
+      ...note,
+      markerHtml: applyVocalizationToHtml(note.markerHtml, "none"),
+      contentHtml:
+        note.contentHtml === null
+          ? null
+          : applyVocalizationToHtml(note.contentHtml, "none"),
+    })),
+  }).toEqual({
+    bodyHtml:
+      '<span data-sefaria-mam="mam-kq-trivial">שערו</span> — When God began to create<span data-sefaria-note="0"></span> heaven',
     notes: [
       {
-        index: 0,
-        markerText: "*",
-        content: "<b>When God began to create </b>Others.",
+        key: 0,
+        markerHtml: "*",
+        contentHtml: "<b>When God began to create </b>Others.",
       },
     ],
   });

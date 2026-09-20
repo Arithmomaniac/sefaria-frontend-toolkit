@@ -16,22 +16,13 @@ export const textSegmentDataScenario = {
     language: "he",
     actualLanguage: "he",
     direction: "rtl",
-    body: [
-      {
-        kind: "html",
-        html: "<b>בְּרֵאשִׁית</b> בָּרָא אֱלֹהִים",
-      },
-      { kind: "footnote-marker", noteIndex: 0, markerText: "*" },
-      {
-        kind: "html",
-        html: " — In the beginning.",
-      },
-    ],
+    bodyHtml:
+      '<b>בְּרֵאשִׁית</b> בָּרָא אֱלֹהִים<span data-sefaria-note="0"></span> — In the beginning.',
     notes: [
       {
-        index: 0,
-        markerText: "*",
-        content: "Static note supplied by the view model.",
+        key: 0,
+        markerHtml: "*",
+        contentHtml: "Static note supplied by the view model.",
       },
     ],
   },

@@ -324,7 +324,7 @@ function createDataViewModel(label: string): SourceCardDataViewModel {
               language: "he",
               actualLanguage: "he",
               direction: "rtl",
-              body: [{ kind: "html", html: label }],
+              bodyHtml: label,
               notes: [],
             },
           },
