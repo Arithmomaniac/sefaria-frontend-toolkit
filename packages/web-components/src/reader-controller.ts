@@ -1,6 +1,6 @@
 import {
-  getLinks,
-  getV3Texts,
+  related,
+  text,
   type SefariaClient,
 } from "@arithmomaniac/sefaria-client";
 
@@ -246,7 +246,7 @@ export function createSefariaReaderDataSource(
 ): ReaderControllerDataSource {
   return {
     loadSource: async (request, signal) => {
-      const result = await getV3Texts({
+      const result = await text.getV3Texts({
         client,
         path: { tref: request.tref },
         query: {
@@ -269,7 +269,7 @@ export function createSefariaReaderDataSource(
       throw new Error("The source request returned no documented response.");
     },
     loadConnections: async (request, projection, signal) => {
-      const result = await getLinks({
+      const result = await related.getLinks({
         client,
         path: { tref: request.tref },
         query: createConnectionsQuery(request),

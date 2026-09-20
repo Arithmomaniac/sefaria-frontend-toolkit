@@ -71,7 +71,7 @@ export function getResponseContract(
 /** Returns the Zod schema attached to a generated response contract. */
 export function getResponseValidator(
   contract: GeneratedResponseContract,
-): ZodType {
+): ZodType | undefined {
   return contract.schema;
 }
 
@@ -124,6 +124,18 @@ export function validateExternalResponse(
           `No documented response schema for ${normalizeMethod(
             selector.method,
           )} ${selector.path} status ${selector.status}.`,
+        ),
+      ],
+    };
+  }
+  if (contract.bodyType !== "json") {
+    return {
+      valid: false,
+      issues: [
+        syntheticIssue(
+          "unsupported-body-type",
+          contract.schemaPath,
+          `External JSON validation is not available for ${contract.bodyType} responses.`,
         ),
       ],
     };
@@ -202,17 +214,6 @@ export async function validateResponse(
       ),
     ]);
   }
-  const validator = lookup(contract);
-  if (validator === undefined) {
-    throw contractError(contract, context.response, [
-      syntheticIssue(
-        "missing-validator",
-        contract.schemaPath,
-        `No generated validator named ${contract.validatorName}.`,
-      ),
-    ]);
-  }
-
   const mediaType = normalizedMediaType(
     context.response.headers.get("content-type"),
   );
@@ -229,6 +230,21 @@ export async function validateResponse(
         `Expected ${contract.contentTypes.join(
           " or ",
         )}, received ${mediaType ?? "no content type"}.`,
+      ),
+    ]);
+  }
+
+  if (contract.bodyType === "blob") {
+    return;
+  }
+
+  const validator = lookup(contract);
+  if (validator === undefined) {
+    throw contractError(contract, context.response, [
+      syntheticIssue(
+        "missing-validator",
+        contract.schemaPath,
+        `No generated validator named ${contract.validatorName}.`,
       ),
     ]);
   }

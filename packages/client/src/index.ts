@@ -9,17 +9,20 @@ export {
   type ContractIssue,
   type SefariaContractErrorOptions,
 } from "./contract-error.js";
+export type { Options } from "./generated/sdk.gen.js";
 export {
-  getAsyncTaskStatus,
-  getIndexV2,
-  getLinks,
-  getRef,
-  getShape,
-  getTextVersions,
-  getV3Texts,
-  postFindRefs,
-  type Options,
-} from "./generated/sdk.gen.js";
+  calendars,
+  collections,
+  index,
+  lexicon,
+  misc,
+  ref,
+  related,
+  sheets,
+  term,
+  text,
+  topic,
+} from "./generated/namespaces.gen.js";
 export type * from "./generated/contracts.gen.js";
 export * from "./generated/zod.gen.js";
 export * from "./generated/response-validators.gen.js";

@@ -119,10 +119,28 @@ export interface ResponseContractMetadata {
   readonly contentTypes: readonly string[];
   /** The local schema path in the corrected OpenAPI document. */
   readonly schemaPath: string;
+  /** How the generated client parses this response body. */
+  readonly bodyType: "blob" | "json";
   /** The generated module export used as the validator schema. */
-  readonly validatorExport: string;
+  readonly validatorExport?: string;
   /** The generated response-validator function name. */
-  readonly validatorName: string;
+  readonly validatorName?: string;
+}
+
+/** Metadata for one operation discovered from the corrected OpenAPI document. */
+export interface ApiOperationMetadata {
+  /** HTTP method used by the operation. */
+  readonly method: "get" | "post";
+  /** OpenAPI path template. */
+  readonly path: string;
+  /** Stable OpenAPI operation identifier. */
+  readonly operationId: string;
+  /** Generated SDK function name. */
+  readonly functionName: string;
+  /** OpenAPI tag used for the public namespace. */
+  readonly tag: ApiTag;
+  /** Public generated namespace. */
+  readonly namespace: ApiNamespace;
 }
 
 interface OpenApiFormatResult {
@@ -146,60 +164,25 @@ interface OpenApiFormatModule {
   ) => unknown[];
 }
 
-/** The retained Core endpoints and their stable generated names. */
-export const CORE_OPERATIONS = [
-  {
-    method: "get",
-    path: "/api/v3/texts/{tref}",
-    operationId: "get-v3-texts",
-    functionName: "getV3Texts",
-  },
-  {
-    method: "get",
-    path: "/api/texts/versions/{tref}",
-    operationId: "get-versions",
-    functionName: "getTextVersions",
-  },
-  {
-    method: "get",
-    path: "/api/ref/{tref}",
-    operationId: "get-ref",
-    functionName: "getRef",
-  },
-  {
-    method: "get",
-    path: "/api/v2/index/{title}",
-    operationId: "get-index-v2",
-    functionName: "getIndexV2",
-  },
-  {
-    method: "get",
-    path: "/api/shape/{title}",
-    operationId: "get-shape",
-    functionName: "getShape",
-  },
-  {
-    method: "get",
-    path: "/api/links/{tref}",
-    operationId: "get-links",
-    functionName: "getLinks",
-  },
-  {
-    method: "post",
-    path: "/api/find-refs",
-    operationId: "post-find-refs",
-    functionName: "postFindRefs",
-  },
-  {
-    method: "get",
-    path: "/api/async/{task_id}",
-    operationId: "get-async-task-status",
-    functionName: "getAsyncTaskStatus",
-  },
-] as const;
+const apiNamespaceByTag = {
+  Text: "text",
+  Index: "index",
+  Related: "related",
+  Calendars: "calendars",
+  Lexicon: "lexicon",
+  Topic: "topic",
+  Term: "term",
+  Sheets: "sheets",
+  Collections: "collections",
+  Misc: "misc",
+  Ref: "ref",
+} as const;
 
-/** The OpenAPI paths retained in the corrected Core document. */
-export const CORE_PATHS = [...new Set(CORE_OPERATIONS.map(({ path }) => path))];
+/** OpenAPI tags that define the generated SDK namespaces. */
+export type ApiTag = keyof typeof apiNamespaceByTag;
+
+/** Public generated SDK namespace names. */
+export type ApiNamespace = (typeof apiNamespaceByTag)[ApiTag];
 
 const require = createRequire(import.meta.url);
 const openapiFormat = require("openapi-format") as OpenApiFormatModule;
@@ -269,6 +252,17 @@ function pascalCase(value: string): string {
     .filter(Boolean)
     .map((part) => `${part[0]?.toUpperCase() ?? ""}${part.slice(1)}`)
     .join("");
+}
+
+function camelCase(value: string): string {
+  const pascal = pascalCase(value);
+  return `${pascal[0]?.toLowerCase() ?? ""}${pascal.slice(1)}`;
+}
+
+function operationFunctionName(operationId: string): string {
+  return operationId === "get-versions"
+    ? "getTextVersions"
+    : camelCase(operationId);
 }
 
 function validatorFunctionName(functionName: string, status: number): string {
@@ -572,135 +566,122 @@ function getPointerValue(document: JsonObject, pointer: string): unknown {
   return current;
 }
 
-function retainSelectedMethods(
-  pathItem: JsonValue,
-  methods: ReadonlySet<string>,
-): JsonValue {
-  if (!isRecord(pathItem)) {
-    return cloneJson(pathItem);
-  }
-  const retained: JsonObject = {};
-  for (const [key, value] of Object.entries(pathItem)) {
-    if (!httpMethods.has(key) || methods.has(key)) {
-      retained[key] = cloneJson(value as JsonValue);
+/** Discovers every supported operation from a corrected OpenAPI document. */
+export function collectApiOperations(
+  document: JsonObject,
+): readonly ApiOperationMetadata[] {
+  assertRecord(document.paths, "OpenAPI paths");
+  const operations: ApiOperationMetadata[] = [];
+  const operationIds = new Set<string>();
+  const functionNames = new Set<string>();
+  for (const [path, pathValue] of Object.entries(document.paths)) {
+    assertRecord(pathValue, `OpenAPI path ${path}`);
+    for (const [method, operationValue] of Object.entries(pathValue)) {
+      if (!httpMethods.has(method)) {
+        continue;
+      }
+      if (method !== "get" && method !== "post") {
+        throw new Error(
+          `Unsupported HTTP method ${method.toUpperCase()} ${path}.`,
+        );
+      }
+      assertRecord(operationValue, `${method.toUpperCase()} ${path}`);
+      assertString(
+        operationValue.operationId,
+        `${method.toUpperCase()} ${path} operationId`,
+      );
+      if (operationIds.has(operationValue.operationId)) {
+        throw new Error(
+          `Duplicate operationId: ${operationValue.operationId}.`,
+        );
+      }
+      if (
+        !Array.isArray(operationValue.tags) ||
+        operationValue.tags.length !== 1 ||
+        typeof operationValue.tags[0] !== "string" ||
+        !(operationValue.tags[0] in apiNamespaceByTag)
+      ) {
+        throw new Error(
+          `${method.toUpperCase()} ${path} must have exactly one supported tag.`,
+        );
+      }
+      const tag = operationValue.tags[0] as ApiTag;
+      const functionName = operationFunctionName(operationValue.operationId);
+      if (functionNames.has(functionName)) {
+        throw new Error(`Duplicate generated function name: ${functionName}.`);
+      }
+      operationIds.add(operationValue.operationId);
+      functionNames.add(functionName);
+      operations.push({
+        method,
+        path,
+        operationId: operationValue.operationId,
+        functionName,
+        tag,
+        namespace: apiNamespaceByTag[tag],
+      });
     }
   }
-  return retained;
+  return operations;
 }
 
-/** Retains the selected Core operations and every component they reference. */
-export function extractCoreDocument(
-  document: JsonObject,
-  corePaths: readonly string[] = CORE_PATHS,
-): JsonObject {
-  assertRecord(document.paths, "OpenAPI paths");
-  const sourceComponents = isRecord(document.components)
-    ? document.components
-    : {};
-  const paths: JsonObject = {};
-
-  for (const path of corePaths) {
-    const pathItem = document.paths[path];
-    if (pathItem === undefined) {
-      throw new Error(`Missing Core OpenAPI path: ${path}.`);
-    }
-    const methods = new Set(
-      CORE_OPERATIONS.filter((operation) => operation.path === path).map(
-        ({ method }) => method,
-      ),
-    );
-    paths[path] = retainSelectedMethods(pathItem as JsonValue, methods);
+/** Groups discovered operations in the stable public namespace order. */
+export function collectNamespaceOperations(
+  operations: readonly ApiOperationMetadata[],
+): Readonly<Record<ApiNamespace, readonly ApiOperationMetadata[]>> {
+  const namespaces: Record<ApiNamespace, ApiOperationMetadata[]> = {
+    text: [],
+    index: [],
+    related: [],
+    calendars: [],
+    lexicon: [],
+    topic: [],
+    term: [],
+    sheets: [],
+    collections: [],
+    misc: [],
+    ref: [],
+  };
+  for (const operation of operations) {
+    namespaces[operation.namespace].push(operation);
   }
+  return namespaces;
+}
 
-  const pending = new Set<string>();
-  collectRefs(paths, pending);
-  const visited = new Set<string>();
-  const retainedComponents: Record<string, JsonObject> = {};
-
-  while (pending.size > 0) {
-    const ref = pending.values().next().value as string;
-    pending.delete(ref);
-    if (visited.has(ref)) {
-      continue;
-    }
-    visited.add(ref);
-    if (!ref.startsWith("#/components/")) {
+/** Retains the complete corrected API document and validates its references. */
+export function extractApiDocument(document: JsonObject): JsonObject {
+  const api = cloneJson(document);
+  const unresolved = new Set<string>();
+  collectRefs(api, unresolved);
+  for (const ref of unresolved) {
+    if (!ref.startsWith("#/")) {
       throw new Error(`Unresolved external OpenAPI reference: ${ref}.`);
     }
-    const segments = pointerSegments(ref.slice(1));
-    if (segments.length !== 3 || segments[0] !== "components") {
-      throw new Error(`Unsupported OpenAPI component reference: ${ref}.`);
-    }
-    const section = segments[1];
-    const name = segments[2];
-    if (section === undefined || name === undefined) {
-      throw new Error(`Unsupported OpenAPI component reference: ${ref}.`);
-    }
-    const sourceSection = sourceComponents[section];
-    if (!isRecord(sourceSection) || !Object.hasOwn(sourceSection, name)) {
+    if (getPointerValue(api, ref.slice(1)) === undefined) {
       throw new Error(`Unresolved OpenAPI reference: ${ref}.`);
     }
-    retainedComponents[section] ??= {};
-    retainedComponents[section][name] = cloneJson(
-      sourceSection[name] as JsonValue,
+  }
+  const operations = collectApiOperations(api);
+  if (operations.length !== 60) {
+    throw new Error(
+      `Expected 60 generated OpenAPI operations, received ${operations.length}.`,
     );
-    collectRefs(sourceSection[name], pending);
   }
-
-  const sortedComponents: JsonObject = {};
-  for (const section of Object.keys(retainedComponents).sort()) {
-    const sourceSection = retainedComponents[section];
-    if (sourceSection === undefined) {
-      continue;
-    }
-    sortedComponents[section] = Object.fromEntries(
-      Object.entries(sourceSection).sort(([left], [right]) =>
-        left.localeCompare(right),
-      ),
-    ) as JsonObject;
-  }
-
-  const core: JsonObject = {};
-  for (const [key, value] of Object.entries(document)) {
-    if (key !== "paths" && key !== "components") {
-      core[key] = cloneJson(value as JsonValue);
+  const namespaces = collectNamespaceOperations(operations);
+  for (const [namespace, items] of Object.entries(namespaces)) {
+    if (items.length === 0) {
+      throw new Error(`Generated namespace ${namespace} has no operations.`);
     }
   }
-  core.paths = paths;
-  core.components = sortedComponents;
-
-  const unresolved = new Set<string>();
-  collectRefs(core, unresolved);
-  for (const ref of unresolved) {
-    if (getPointerValue(core, ref.slice(1)) === undefined) {
-      throw new Error(`Unresolved OpenAPI reference after extraction: ${ref}.`);
-    }
-  }
-
-  for (const expected of CORE_OPERATIONS) {
-    const pathItem = paths[expected.path];
-    assertRecord(pathItem, `Core path ${expected.path}`);
-    const operation = pathItem[expected.method];
-    const method = expected.method.toUpperCase();
-    assertRecord(operation, `${method} ${expected.path}`);
-    if (operation.operationId !== expected.operationId) {
-      throw new Error(
-        `Unexpected operationId for ${method} ${expected.path}: ${String(
-          operation.operationId,
-        )}.`,
-      );
-    }
-  }
-
-  return core;
+  return api;
 }
 
 function withGenerationMetadata(
-  core: JsonObject,
+  api: JsonObject,
   source: OpenApiSource,
 ): JsonObject {
   return {
-    ...core,
+    ...api,
     "x-sefaria-generation": {
       command: "pnpm openapi:generate",
       repository: source.repository,
@@ -744,18 +725,23 @@ function componentValidatorExport(schema: unknown): string {
   if (component === undefined) {
     throw new Error(`Unsupported response schema reference: ${reference}.`);
   }
-  return `z${component}`;
+  const normalized = component.replace(
+    /[A-Z]{2,}(?=[A-Z][a-z]|$)/g,
+    (word) => `${word[0]}${word.slice(1).toLowerCase()}`,
+  );
+  return `z${normalized[0]?.toUpperCase() ?? ""}${normalized.slice(1)}`;
 }
 
 function collectResponseContracts(
   document: JsonObject,
+  operations: readonly ApiOperationMetadata[],
 ): readonly ResponseContractMetadata[] {
-  assertRecord(document.paths, "Corrected Core paths");
+  assertRecord(document.paths, "Corrected API paths");
   const metadata: ResponseContractMetadata[] = [];
 
-  for (const expected of CORE_OPERATIONS) {
+  for (const expected of operations) {
     const pathItem = document.paths[expected.path];
-    assertRecord(pathItem, `Core path ${expected.path}`);
+    assertRecord(pathItem, `API path ${expected.path}`);
     const operation = pathItem[expected.method];
     const method = expected.method.toUpperCase() as "GET" | "POST";
     assertRecord(operation, `${method} ${expected.path}`);
@@ -781,9 +767,39 @@ function collectResponseContracts(
         responseValue.content,
         `Response content ${statusText} for ${method} ${expected.path}`,
       );
-      const jsonEntries = Object.entries(responseValue.content).filter(
-        ([mediaType]) => isJsonMediaType(mediaType),
+      const contentEntries = Object.entries(responseValue.content);
+      if (contentEntries.length !== 1) {
+        throw new Error(
+          `${method} ${expected.path} ${statusText} must define exactly one response media type.`,
+        );
+      }
+      const jsonEntries = contentEntries.filter(([mediaType]) =>
+        isJsonMediaType(mediaType),
       );
+      if (jsonEntries.length === 0) {
+        const [mediaType] = contentEntries[0] as [string, unknown];
+        if (mediaType.toLowerCase() !== "image/png") {
+          throw new Error(
+            `${method} ${expected.path} ${statusText} uses unsupported media type ${mediaType}.`,
+          );
+        }
+        metadata.push({
+          operationId: expected.operationId,
+          functionName: expected.functionName,
+          method,
+          path: expected.path,
+          status,
+          contentTypes: [mediaType],
+          schemaPath: responseSchemaPointer(
+            expected.path,
+            expected.method,
+            status,
+            mediaType,
+          ),
+          bodyType: "blob",
+        });
+        continue;
+      }
       if (jsonEntries.length !== 1) {
         throw new Error(
           `${method} ${expected.path} ${statusText} must define exactly one JSON response schema.`,
@@ -824,6 +840,7 @@ function collectResponseContracts(
         status,
         contentTypes: [mediaType],
         schemaPath,
+        bodyType: "json",
         validatorExport,
         validatorName,
       });
@@ -838,7 +855,11 @@ function buildResponseContractsModule(
   source: OpenApiSource,
 ): string {
   const imports = [
-    ...new Set(contracts.map(({ validatorExport }) => validatorExport)),
+    ...new Set(
+      contracts.flatMap(({ validatorExport }) =>
+        validatorExport === undefined ? [] : [validatorExport],
+      ),
+    ),
   ]
     .sort()
     .join(", ");
@@ -852,8 +873,13 @@ function buildResponseContractsModule(
     status: ${entry.status},
     contentTypes: ${JSON.stringify(entry.contentTypes)},
     schemaPath: ${JSON.stringify(entry.schemaPath)},
-    validatorName: ${JSON.stringify(entry.validatorName)},
-    schema: ${entry.validatorExport},
+    bodyType: ${JSON.stringify(entry.bodyType)},
+    ${
+      entry.validatorName === undefined
+        ? ""
+        : `validatorName: ${JSON.stringify(entry.validatorName)},`
+    }
+    ${entry.validatorExport === undefined ? "" : `schema: ${entry.validatorExport},`}
   },`,
     )
     .join("\n");
@@ -871,8 +897,9 @@ export interface GeneratedResponseContract {
   readonly status: number;
   readonly contentTypes: readonly string[];
   readonly schemaPath: string;
-  readonly validatorName: string;
-  readonly schema: ZodType;
+  readonly bodyType: "blob" | "json";
+  readonly validatorName?: string;
+  readonly schema?: ZodType;
 }
 
 export const responseContracts = [
@@ -885,12 +912,22 @@ function buildResponseValidatorsModule(
   contracts: readonly ResponseContractMetadata[],
   source: OpenApiSource,
 ): string {
+  const jsonContracts = contracts.filter(
+    (
+      contract,
+    ): contract is ResponseContractMetadata & {
+      readonly validatorExport: string;
+      readonly validatorName: string;
+    } =>
+      contract.validatorExport !== undefined &&
+      contract.validatorName !== undefined,
+  );
   const imports = [
-    ...new Set(contracts.map(({ validatorExport }) => validatorExport)),
+    ...new Set(jsonContracts.map(({ validatorExport }) => validatorExport)),
   ]
     .sort()
     .join(", ");
-  const validators = contracts
+  const validators = jsonContracts
     .map(
       (
         entry,
@@ -916,6 +953,29 @@ export type {
   GetVersionsResponse as GetTextVersionsResponse,
   GetVersionsResponses as GetTextVersionsResponses,
 } from "./types.gen.js";
+`;
+}
+
+function buildNamespacesModule(
+  operations: readonly ApiOperationMetadata[],
+  source: OpenApiSource,
+): string {
+  const namespaces = collectNamespaceOperations(operations);
+  const functions = operations.map(({ functionName }) => functionName);
+  const namespaceExports = Object.entries(namespaces)
+    .map(
+      ([namespace, items]) => `export const ${namespace} = Object.freeze({
+${items.map(({ functionName }) => `  ${functionName},`).join("\n")}
+});`,
+    )
+    .join("\n\n");
+  return `${generatedHeader(source)}
+
+import {
+${functions.map((functionName) => `  ${functionName},`).join("\n")}
+} from "./sdk.gen.js";
+
+${namespaceExports}
 `;
 }
 
@@ -1003,12 +1063,10 @@ import type {
   const collapsedShape = replaceGeneratedFragment(
     shapeChapter,
     `export const zCoreShapeCollapsedRecord = zCoreShapeMetadata.and(
-  z.lazy(() =>
-    z.object({
-      isComplex: z.literal(true),
-      chapters: z.array(z.lazy((): any => zCoreShapeLeafRecord)),
-    }),
-  ),
+  z.object({
+    isComplex: z.literal(true),
+    chapters: z.array(zCoreShapeLeafRecord),
+  }),
 );`,
     `export const zCoreShapeCollapsedRecord: z.ZodType<CoreShapeCollapsedRecord> =
   z.lazy(() =>
@@ -1096,7 +1154,7 @@ export type Options<
     /options\.client\.(get|post)</g,
     "requireSefariaClient(options.client).$1<",
   );
-  const patched = branded.replace(
+  const jsonPatched = branded.replace(
     /\{\n {4}responseValidator: ([\s\S]*?),\n {4}url: ("[^"]+"),\n {4}\.\.\.options,/g,
     `{
     ...options,
@@ -1106,12 +1164,34 @@ export type Options<
     responseValidator: $1,
     url: $2,`,
   );
+  const patched = replaceGeneratedFragment(
+    jsonPatched,
+    `{
+    url: "/api/img-gen/{tref}",
+    ...options,
+  }`,
+    `{
+    ...options,
+    parseAs: "blob",
+    responseStyle: "fields",
+    responseTransformer: async (data) => data,
+    url: "/api/img-gen/{tref}",
+  }`,
+    "PNG response options",
+  );
+  const clientCallCount = [...patched.matchAll(/requireSefariaClient\(/g)]
+    .length;
+  const securedCallCount = [...patched.matchAll(/responseStyle: "fields"/g)]
+    .length;
   if (
     branded === metadata ||
-    patched === branded ||
-    patched.match(/requireSefariaClient\(/g)?.length !== CORE_OPERATIONS.length
+    jsonPatched === branded ||
+    patched === jsonPatched ||
+    clientCallCount !== securedCallCount
   ) {
-    throw new Error("Could not secure every generated SDK client call.");
+    throw new Error(
+      `Could not secure every generated SDK client call: ${clientCallCount} calls, ${securedCallCount} secured.`,
+    );
   }
   return patched;
 }
@@ -1151,14 +1231,15 @@ async function formatGeneratedFile(
 }
 
 async function generateHeyApiArtifacts(
-  correctedCore: string,
+  correctedApi: string,
   source: OpenApiSource,
+  operations: readonly ApiOperationMetadata[],
 ): Promise<ReadonlyMap<string, string>> {
   const temporaryRoot = await mkdtemp(resolve(tmpdir(), "sefaria-openapi-"));
   const inputPath = resolve(temporaryRoot, "corrected-core.json");
   const outputPath = resolve(temporaryRoot, "generated");
   try {
-    await writeFile(inputPath, correctedCore, "utf8");
+    await writeFile(inputPath, correctedApi, "utf8");
     await generateHeyApiClient({
       input: inputPath,
       output: {
@@ -1264,7 +1345,7 @@ async function generateHeyApiArtifacts(
     const generatedFunctions = [
       ...sdk.matchAll(/export const ([A-Za-z0-9_]+) =/g),
     ].map((match) => match[1]);
-    const expectedFunctions = CORE_OPERATIONS.map(
+    const expectedFunctions = operations.map(
       ({ functionName }) => functionName,
     );
     if (
@@ -1274,6 +1355,9 @@ async function generateHeyApiArtifacts(
       throw new Error(
         `Unexpected generated SDK functions: ${generatedFunctions.join(", ")}.`,
       );
+    }
+    if (sdk.match(/requireSefariaClient\(/g)?.length !== operations.length) {
+      throw new Error("Could not secure every generated SDK client call.");
     }
     return artifacts;
   } finally {
@@ -1296,22 +1380,32 @@ export async function generateArtifacts(
   const upstream = JSON.parse(upstreamText) as JsonObject;
   validatePreconditions(upstream, overlay["x-sefaria-guards"]);
   const corrected = await applyFormalOverlay(upstream, overlay);
-  const core = withGenerationMetadata(extractCoreDocument(corrected), source);
-  validateOpenApi30NullSemantics(core);
-  const correctedCore = await formatGeneratedFile(
-    JSON.stringify(core),
-    "openapi/corrected-core.json",
+  const api = withGenerationMetadata(extractApiDocument(corrected), source);
+  validateOpenApi30NullSemantics(api);
+  const operations = collectApiOperations(api);
+  const correctedApi = await formatGeneratedFile(
+    JSON.stringify(api),
+    "openapi/corrected-api.json",
     "json",
   );
-  const contracts = collectResponseContracts(core);
+  const contracts = collectResponseContracts(api, operations);
   const artifacts = new Map<string, string>();
 
   for (const [path, contents] of await generateHeyApiArtifacts(
-    correctedCore,
+    correctedApi,
     source,
+    operations,
   )) {
     artifacts.set(path, contents);
   }
+  artifacts.set(
+    `${generatedDirectory}/namespaces.gen.ts`,
+    await formatGeneratedFile(
+      buildNamespacesModule(operations, source),
+      `${generatedDirectory}/namespaces.gen.ts`,
+      "typescript",
+    ),
+  );
   artifacts.set(
     `${generatedDirectory}/response-contracts.gen.ts`,
     await formatGeneratedFile(

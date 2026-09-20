@@ -14,11 +14,11 @@ applyTo: "packages/client/**,docs/specs/client.md"
 - Make refresh an explicit network operation with an explicit commit.
 - Make every overlay mutation assert its old value or expected absence at an exact JSON Pointer.
 - Stop at the first stale assertion and report its path, expected state, and actual state.
-- Generate the temporary corrected Core document before TypeScript contracts, Zod schemas, or runtime validators.
+- Generate the temporary corrected complete API document before TypeScript contracts, Zod schemas, or runtime validators.
 - Fail the repository check when any generated output is stale.
 - Publish corrected generated `paths`, `components`, and operation types directly.
 - Publish generated Zod schemas and TypeScript runtime validators for unknown JSON boundaries.
-- Validate every JSON response from the public client.
+- Validate every JSON response from the public client and media-type check each declared binary response.
 - Reject a contract mismatch with the operation, status, and structured JSON paths.
 - Preserve the original `Response` metadata on a contract mismatch.
 - Keep the public client as a thin configured `@hey-api/client-fetch` capability used by the generated SDK, with only the specified bounded per-client response cache.
@@ -27,7 +27,7 @@ applyTo: "packages/client/**,docs/specs/client.md"
 - Add JSDoc to every handwritten exported declaration and every exported interface or class property. Document field meanings, failures, and important behavior at the declaration. Link to the package README for longer explanations.
 - Implement the specified default-on per-client response cache with explicit opt-out, bounded TTL, entry count, and retained-body bytes.
 - Do not add a generalized facade, normalized model, retry, coalescing, stale fallback, persistence, cross-client sharing, or component method.
-- Cover every Core operation from `docs/specs/client.md`.
+- Cover every operation in the pinned OpenAPI scope from `docs/specs/client.md`.
 - Add a correction only after source review or runtime validation identifies a mismatch.
 - Use fixed commit-pinned or dated fixtures for contract tests.
 - Test corrected schemas against the original Sefaria implementation and upstream endpoint tests.

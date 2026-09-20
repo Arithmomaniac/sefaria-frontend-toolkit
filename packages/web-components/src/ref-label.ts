@@ -1,5 +1,5 @@
 import {
-  getRef,
+  ref,
   type CoreRefResponse,
   type GetRefData,
   type SefariaClient,
@@ -233,7 +233,7 @@ async function requestRefLabelResponse(
   readonly status: 200 | 404;
 }> {
   const tref = requireTref(request.tref);
-  const result = await getRef({
+  const result = await ref.getRef({
     client,
     path: { tref },
     ...(signal === undefined ? {} : { signal }),

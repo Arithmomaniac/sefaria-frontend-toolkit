@@ -1,5 +1,5 @@
 import {
-  getV3Texts,
+  text,
   type CoreV3TextsResponse,
   type CoreV3TextValue,
   type CoreV3Version,
@@ -245,7 +245,7 @@ async function requestPopupResponse(
   readonly status: 200 | 400 | 404;
 }> {
   const version = serializePopupSelectors(request);
-  const result = await getV3Texts({
+  const result = await text.getV3Texts({
     client,
     path: { tref: request.tref },
     query: { version, return_format: "default" },

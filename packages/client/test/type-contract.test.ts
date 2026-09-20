@@ -3,15 +3,18 @@ import type { z } from "zod";
 import { describe, expect, expectTypeOf, it } from "vitest";
 
 import {
+  calendars,
+  collections,
   createSefariaClient,
-  getAsyncTaskStatus,
-  getIndexV2,
-  getLinks,
-  getRef,
-  getShape,
-  getTextVersions,
-  getV3Texts,
-  postFindRefs,
+  index,
+  lexicon,
+  misc,
+  ref,
+  related,
+  sheets,
+  term,
+  text,
+  topic,
   type CoreFindRefsResponse,
   type CoreBilingualText,
   type GetAsyncTaskStatusResponses,
@@ -48,33 +51,47 @@ import {
 } from "../src/index.js";
 
 describe("generated request and response contracts", () => {
-  it("exposes the eight named Core SDK functions", () => {
+  it("exposes all generated operations through tag namespaces", () => {
     expect([
-      getV3Texts,
-      getTextVersions,
-      getRef,
-      getIndexV2,
-      getShape,
-      getLinks,
-      postFindRefs,
-      getAsyncTaskStatus,
-    ]).toHaveLength(8);
+      text,
+      index,
+      related,
+      calendars,
+      lexicon,
+      topic,
+      term,
+      sheets,
+      collections,
+      misc,
+      ref,
+    ]).toHaveLength(11);
+    expect(Object.values(text)).toHaveLength(9);
+    expect(Object.values(index)).toHaveLength(10);
+    expect(Object.values(related)).toHaveLength(5);
+    expect(Object.values(calendars)).toHaveLength(5);
+    expect(Object.values(lexicon)).toHaveLength(2);
+    expect(Object.values(topic)).toHaveLength(6);
+    expect(Object.values(term)).toHaveLength(2);
+    expect(Object.values(sheets)).toHaveLength(11);
+    expect(Object.values(collections)).toHaveLength(3);
+    expect(Object.values(misc)).toHaveLength(6);
+    expect(Object.values(ref)).toHaveLength(1);
   });
 
   it("uses tref and typed query arguments", () => {
     const client = createSefariaClient();
     const unsafeClient = createClient();
     const compileRequests = () => {
-      void getTextVersions({
+      void text.getTextVersions({
         client,
         path: { tref: "Genesis 1:1" },
       });
-      void getV3Texts({
+      void text.getV3Texts({
         client,
         path: { tref: "Genesis 1:1" },
         query: { version: ["hebrew", "english|Test Version"] },
       });
-      void getIndexV2({
+      void index.getIndexV2({
         client,
         path: { title: "Genesis" },
         query: {
@@ -82,7 +99,7 @@ describe("generated request and response contracts", () => {
           with_related_topics: "0",
         },
       });
-      void getLinks({
+      void related.getLinks({
         client,
         path: { tref: "Genesis 1:1" },
         query: {
@@ -91,12 +108,12 @@ describe("generated request and response contracts", () => {
           with_text: "0",
         },
       });
-      void getShape({
+      void index.getShape({
         client,
         path: { title: "Tanakh" },
         query: { dependents: "1" },
       });
-      void postFindRefs({
+      void misc.postFindRefs({
         client,
         query: { with_text: "0", debug: "0", max_segments: 20 },
         body: {
@@ -104,11 +121,11 @@ describe("generated request and response contracts", () => {
           lang: "en",
         },
       });
-      void getAsyncTaskStatus({
+      void misc.getAsyncTaskStatus({
         client,
         path: { task_id: "task" },
       });
-      void getShape({
+      void index.getShape({
         client,
         path: { title: "Tanakh" },
         query: {
@@ -117,37 +134,37 @@ describe("generated request and response contracts", () => {
         },
       });
 
-      void getTextVersions({
+      void text.getTextVersions({
         client,
         path: {
           // @ts-expect-error The corrected path parameter is tref, not index.
           index: "Genesis",
         },
       });
-      void getRef({
+      void ref.getRef({
         // @ts-expect-error SDK functions require the validated branded client.
         client: unsafeClient,
         path: { tref: "Genesis 1:1" },
       });
-      void getRef({
+      void ref.getRef({
         client,
         path: { tref: "Genesis 1:1" },
         // @ts-expect-error Generated return types require fields response style.
         responseStyle: "data",
       });
-      void getRef({
+      void ref.getRef({
         client,
         path: { tref: "Genesis 1:1" },
         // @ts-expect-error Callers cannot replace generated response validators.
         responseValidator: (value: unknown) => value,
       });
-      void getRef({
+      void ref.getRef({
         client,
         path: { tref: "Genesis 1:1" },
         // @ts-expect-error SDK functions always parse documented JSON.
         parseAs: "text",
       });
-      void getRef({
+      void ref.getRef({
         client,
         path: { tref: "Genesis 1:1" },
         // @ts-expect-error SDK functions return validated contract values.

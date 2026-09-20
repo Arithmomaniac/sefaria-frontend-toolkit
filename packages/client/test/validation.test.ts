@@ -5,7 +5,8 @@ import { describe, expect, it } from "vitest";
 
 import {
   applyFormalOverlay,
-  extractCoreDocument,
+  collectApiOperations,
+  extractApiDocument,
   loadCommittedInputs,
   type JsonObject,
 } from "../scripts/generate-openapi.js";
@@ -31,10 +32,24 @@ import {
   zCoreV3AvailableVersion,
   zCoreV3TextValue,
   zCoreV3Version,
+  zSheetsJson,
 } from "../src/generated/zod.gen.js";
-import { validateExternalResponse } from "../src/validation.js";
+import {
+  getResponseContract,
+  validateExternalResponse,
+} from "../src/validation.js";
 
 const fixtureRoot = resolve(import.meta.dirname, "fixtures");
+const previouslyQualifiedOperationIds = new Set([
+  "get-v3-texts",
+  "get-versions",
+  "get-ref",
+  "get-index-v2",
+  "get-shape",
+  "get-links",
+  "post-find-refs",
+  "get-async-task-status",
+]);
 
 async function readFixture(name: string): Promise<unknown> {
   return JSON.parse(
@@ -43,9 +58,51 @@ async function readFixture(name: string): Promise<unknown> {
 }
 
 describe("public generated response validators", () => {
+  it("validates every documented JSON response example", async () => {
+    const inputs = await loadCommittedInputs();
+    const api = extractApiDocument(
+      await applyFormalOverlay(
+        JSON.parse(
+          new TextDecoder().decode(inputs.upstreamBytes),
+        ) as JsonObject,
+        inputs.overlay,
+      ),
+    );
+
+    for (const operation of collectApiOperations(api)) {
+      if (previouslyQualifiedOperationIds.has(operation.operationId)) {
+        continue;
+      }
+      const pathItem = (api.paths as JsonObject)[operation.path] as JsonObject;
+      const responses = (pathItem[operation.method] as JsonObject)
+        .responses as JsonObject;
+      for (const [statusText, response] of Object.entries(responses)) {
+        const content = (response as JsonObject).content as JsonObject;
+        const json = content["application/json"] as JsonObject | undefined;
+        if (json === undefined) {
+          continue;
+        }
+        const contract = getResponseContract({
+          method: operation.method,
+          path: operation.path,
+          status: Number(statusText),
+        });
+        expect(contract?.bodyType).toBe("json");
+        expect(contract?.schema).toBeDefined();
+        const examples = json.examples as JsonObject | undefined;
+        for (const [name, example] of Object.entries(examples ?? {})) {
+          expect(
+            contract?.schema?.safeParse((example as JsonObject).value),
+            `${operation.method.toUpperCase()} ${operation.path} ${statusText} example ${name}`,
+          ).toMatchObject({ success: true });
+        }
+      }
+    }
+  });
+
   it("validates every corrected shape response example", async () => {
     const inputs = await loadCommittedInputs();
-    const core = extractCoreDocument(
+    const core = extractApiDocument(
       await applyFormalOverlay(
         JSON.parse(
           new TextDecoder().decode(inputs.upstreamBytes),
@@ -297,6 +354,17 @@ describe("public generated response validators", () => {
         },
       ]),
     ).toBe(true);
+  });
+
+  it("validates only supported sheet options representations", () => {
+    expect(zSheetsJson.safeParse({ options: {} }).success).toBe(true);
+    expect(zSheetsJson.safeParse({ options: [] }).success).toBe(true);
+    expect(zSheetsJson.safeParse({ options: null }).success).toBe(true);
+    expect(zSheetsJson.safeParse({ options: 42 }).success).toBe(false);
+    expect(
+      zSheetsJson.safeParse({ options: { language: "klingon" } }).success,
+    ).toBe(false);
+    expect(zSheetsJson.safeParse({ options: [1] }).success).toBe(false);
   });
 
   it("enforces generated required, strict, and minProperties constraints", async () => {

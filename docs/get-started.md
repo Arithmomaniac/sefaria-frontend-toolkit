@@ -26,12 +26,12 @@ Headless means that no browser element is registered.
 Use `@arithmomaniac/sefaria-client` when your application wants supported Sefaria transport data but owns its own processing and presentation. The client is the runtime-validation boundary; it does not register elements or create component view models.
 
 ```ts
-import { createSefariaClient, getV3Texts } from "@arithmomaniac/sefaria-client";
+import { createSefariaClient, text } from "@arithmomaniac/sefaria-client";
 
 const client = createSefariaClient();
 
 export function loadValidatedText(tref: string) {
-  return getV3Texts({
+  return text.getV3Texts({
     client,
     path: { tref },
   });

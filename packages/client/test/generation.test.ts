@@ -14,10 +14,10 @@ import { resolve } from "node:path";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 
 import {
-  CORE_OPERATIONS,
-  CORE_PATHS,
   applyFormalOverlay,
-  extractCoreDocument,
+  collectApiOperations,
+  collectNamespaceOperations,
+  extractApiDocument,
   findStaleArtifacts,
   generateArtifacts,
   loadCommittedInputs,
@@ -142,7 +142,7 @@ beforeAll(async () => {
   upstream = inputs.upstreamBytes;
   overlay = inputs.overlay;
   artifacts = await generateArtifacts(source, upstream, overlay);
-  core = extractCoreDocument(
+  core = extractApiDocument(
     await applyFormalOverlay(
       JSON.parse(new TextDecoder().decode(upstream)) as JsonObject,
       overlay,
@@ -261,97 +261,52 @@ describe("OpenAPI generation", () => {
     });
   });
 
-  it("extracts only the eight selected Core operations", () => {
-    const paths = Object.fromEntries(
-      CORE_OPERATIONS.map(({ method, path, operationId }) => [
-        path,
-        {
-          [method]: {
-            operationId,
-            responses: {
-              "200": {
-                content: {
-                  "application/json": {
-                    schema: {
-                      $ref:
-                        path === CORE_PATHS[0]
-                          ? "#/components/schemas/Outer"
-                          : "#/components/schemas/Leaf",
+  it("retains all operations and preserves their namespace tags", () => {
+    const operations = collectApiOperations(core);
+    const namespaces = collectNamespaceOperations(operations);
+
+    expect(operations).toHaveLength(60);
+    expect(Object.keys(core.paths as object)).toHaveLength(60);
+    expect(Object.keys(namespaces)).toEqual([
+      "text",
+      "index",
+      "related",
+      "calendars",
+      "lexicon",
+      "topic",
+      "term",
+      "sheets",
+      "collections",
+      "misc",
+      "ref",
+    ]);
+    expect(Object.values(namespaces).map((items) => items.length)).toEqual([
+      9, 10, 5, 5, 2, 6, 2, 11, 3, 6, 1,
+    ]);
+  });
+
+  it("fails when a retained schema has an unresolved reference", () => {
+    expect(() =>
+      extractApiDocument({
+        openapi: "3.0.2",
+        info: { title: "test", version: "1" },
+        paths: {
+          "/test": {
+            get: {
+              operationId: "get-test",
+              tags: ["Misc"],
+              responses: {
+                "200": {
+                  content: {
+                    "application/json": {
+                      schema: { $ref: "#/components/schemas/Missing" },
                     },
                   },
                 },
               },
             },
           },
-          [method === "get" ? "post" : "get"]: {
-            operationId: `${operationId}-post`,
-            responses: {},
-          },
         },
-      ]),
-    );
-    const core = extractCoreDocument({
-      openapi: "3.0.2",
-      info: { title: "test", version: "1" },
-      paths,
-      components: {
-        schemas: {
-          Outer: {
-            type: "object",
-            properties: {
-              inner: { $ref: "#/components/schemas/Inner" },
-            },
-          },
-          Inner: {
-            type: "array",
-            items: { $ref: "#/components/schemas/Leaf" },
-          },
-          Leaf: { type: "string" },
-          Unused: { type: "number" },
-        },
-      },
-    });
-
-    expect(Object.keys(core.paths as object)).toEqual(CORE_PATHS);
-    for (const operation of CORE_OPERATIONS) {
-      const pathItem = (core.paths as JsonObject)[operation.path];
-      expect(pathItem).toHaveProperty(operation.method);
-      expect(pathItem).not.toHaveProperty(
-        operation.method === "get" ? "post" : "get",
-      );
-    }
-    expect(
-      Object.keys(
-        ((core.components as JsonObject).schemas as JsonObject) ?? {},
-      ),
-    ).toEqual(["Inner", "Leaf", "Outer"]);
-  });
-
-  it("fails when a retained schema has an unresolved reference", () => {
-    const paths = Object.fromEntries(
-      CORE_OPERATIONS.map(({ method, path, operationId }) => [
-        path,
-        {
-          [method]: {
-            operationId,
-            responses: {
-              "200": {
-                content: {
-                  "application/json": {
-                    schema: { $ref: "#/components/schemas/Missing" },
-                  },
-                },
-              },
-            },
-          },
-        },
-      ]),
-    );
-    expect(() =>
-      extractCoreDocument({
-        openapi: "3.0.2",
-        info: { title: "test", version: "1" },
-        paths,
         components: { schemas: {} },
       }),
     ).toThrow("Unresolved OpenAPI reference: #/components/schemas/Missing.");
@@ -361,23 +316,30 @@ describe("OpenAPI generation", () => {
     const fetchSpy = vi
       .spyOn(globalThis, "fetch")
       .mockRejectedValue(new Error("network disabled"));
-    const first = await generateArtifacts(source, upstream, overlay);
-    const second = await generateArtifacts(source, upstream, overlay);
 
-    expect([...first]).toEqual([...second]);
-    expect(
-      [...first.keys()].every((path) => path.startsWith("src/generated/")),
-    ).toBe(true);
-    expect(fetchSpy).not.toHaveBeenCalled();
-    expect(first.get("src/generated/sdk.gen.ts")).toContain(
-      "export const getTextVersions",
-    );
-    expect(first.get("src/generated/types.gen.ts")).toContain("tref: string;");
-    expect(first.get("src/generated/types.gen.ts")).not.toContain(
-      '"/api/texts/versions/{index}"',
-    );
-    fetchSpy.mockRestore();
-  });
+    try {
+      const first = await generateArtifacts(source, upstream, overlay);
+      const second = await generateArtifacts(source, upstream, overlay);
+
+      expect([...first]).toEqual([...second]);
+      expect(
+        [...first.keys()].every((path) => path.startsWith("src/generated/")),
+      ).toBe(true);
+      expect(first.has("src/generated/namespaces.gen.ts")).toBe(true);
+      expect(fetchSpy).not.toHaveBeenCalled();
+      expect(first.get("src/generated/sdk.gen.ts")).toContain(
+        "export const getTextVersions",
+      );
+      expect(first.get("src/generated/types.gen.ts")).toContain(
+        "tref: string;",
+      );
+      expect(first.get("src/generated/types.gen.ts")).not.toContain(
+        '"/api/texts/versions/{index}"',
+      );
+    } finally {
+      fetchSpy.mockRestore();
+    }
+  }, 15_000);
 
   it("identifies changed, missing, and unexpected generated output", () => {
     expect(
@@ -578,10 +540,66 @@ describe("reviewed Core corrections", () => {
       ),
     ).toContain("#/components/schemas/CoreErrorResponse");
     const schemas = (core.components as JsonObject).schemas as JsonObject;
-    expect((schemas.VersionJSON as JsonObject).properties).toMatchObject({
+    expect(
+      (schemas.CoreVersionMetadata as JsonObject).properties,
+    ).toMatchObject({
       versionSource: { type: "string", nullable: true },
       status: { type: "string", nullable: true },
     });
+    expect((schemas.VersionJSON as JsonObject).allOf).toEqual([
+      { $ref: "#/components/schemas/CoreVersionMetadata" },
+    ]);
+    expect((schemas.versionData as JsonObject).allOf).toEqual([
+      { $ref: "#/components/schemas/CoreVersionMetadata" },
+    ]);
+  });
+
+  it("reuses sheet topic fields without adding count to every topic", () => {
+    const schemas = (correctedCore().components as JsonObject)
+      .schemas as JsonObject;
+    expect((schemas.SheetTopicJSON as JsonObject).allOf).toEqual([
+      { $ref: "#/components/schemas/CoreSheetTopic" },
+    ]);
+    expect((schemas.UserSheetTagJSON as JsonObject).allOf).toEqual([
+      { $ref: "#/components/schemas/CoreSheetTopic" },
+      {
+        type: "object",
+        properties: { count: { type: "integer" } },
+      },
+    ]);
+  });
+
+  it("models stored sheet summary variants used by documented examples", () => {
+    const schemas = (correctedCore().components as JsonObject)
+      .schemas as JsonObject;
+    const sheet = schemas.SheetsJSON as JsonObject;
+    const properties = sheet.properties as JsonObject;
+    expect((properties.id as JsonObject).oneOf).toEqual([
+      { type: "integer" },
+      { type: "string" },
+    ]);
+    expect(properties.via).toMatchObject({
+      type: "integer",
+      nullable: true,
+    });
+    expect(properties.options).toMatchObject({
+      nullable: true,
+      oneOf: [
+        { type: "object" },
+        {
+          type: "array",
+          maxItems: 0,
+        },
+      ],
+    });
+
+    const allSheets = schemas.AllSheetsJSON as JsonObject;
+    const items = (
+      ((allSheets.properties as JsonObject).sheets as JsonObject)
+        .items as JsonObject
+    ).properties as JsonObject;
+    expect(items.created).not.toHaveProperty("format");
+    expect(items.published).not.toHaveProperty("format");
   });
 
   it("documents v3 repeatable versions, errors, and nullable recursive text values", () => {
@@ -716,7 +734,17 @@ describe("reviewed Core corrections", () => {
     expect(text).toContain('"CoreShapeCollapsedRecord"');
     expect(text).toContain('"CoreShapeRecord"');
     expect(text).toContain('"section"');
-    expect(text).not.toContain('"ShapeJSON"');
+    expect(
+      JSON.stringify(
+        (
+          (
+            ((shape.get as JsonObject).responses as JsonObject)[
+              "200"
+            ] as JsonObject
+          ).content as JsonObject
+        )["application/json"],
+      ),
+    ).not.toContain('"ShapeJSON"');
 
     const correctedExamples = (
       (
