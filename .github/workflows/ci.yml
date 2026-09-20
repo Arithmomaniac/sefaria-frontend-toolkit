@@ -64,8 +64,8 @@ jobs:
           fi
 
   publish:
-    name: publish private prerelease
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    name: publish public prerelease
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.PUBLIC_PACKAGES_ENABLED == 'true' }}
     needs: check
     runs-on: ubuntu-latest
     permissions:
@@ -92,13 +92,13 @@ jobs:
       - run: node scripts/package-publication.mjs preflight
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
-      - run: pnpm publish .artifacts/publish/client --tag alpha --access restricted --no-git-checks
+      - run: pnpm publish .artifacts/publish/client --tag alpha --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
-      - run: pnpm publish .artifacts/publish/text-transform --tag alpha --access restricted --no-git-checks
+      - run: pnpm publish .artifacts/publish/text-transform --tag alpha --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
-      - run: pnpm publish .artifacts/publish/web-components --tag alpha --access restricted --no-git-checks
+      - run: pnpm publish .artifacts/publish/web-components --tag alpha --access public --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
       - run: node scripts/package-publication.mjs verify --version "$PUBLISH_VERSION"

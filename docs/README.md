@@ -4,7 +4,7 @@
 
 Use the [product site](https://arithmomaniac.github.io/sefaria-frontend-toolkit/) for the public learning path and interactive previews. This repository index also links contributor-only specifications, evidence, setup, and review material that is intentionally excluded from VitePress.
 
-Public package installation is planned for release. The browser examples can be evaluated without cloning; repository development and private-package qualification use the contributor documentation below.
+Public GitHub Packages installation is planned for authenticated release. Package names are subject to change, and the packages are not published on npmjs.com. The browser examples can be evaluated without cloning; repository development and local-package qualification use the contributor documentation below.
 
 ## Product documentation
 
@@ -41,5 +41,6 @@ These Markdown files are retained for contributors and auditors but excluded fro
 | Review a change at the right depth | [Review](review.md) |
 | Read source provenance and compatibility evidence | [Evidence](evidence.md) |
 | Read normative contracts | [Specifications](specs/client.md) |
+| Read package distribution rules | [Distribution specification](specs/distribution.md) |
 | Find historical removed material | [Documentation archive](archive/README.md) |
 | Resume repository work | [Handoff](handoff.md) |

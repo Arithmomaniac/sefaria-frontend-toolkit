@@ -91,7 +91,7 @@ TypeScript emits reusable ES modules. Vite builds the browser demonstrations and
 
 ## Local documentation site
 
-After a fresh checkout, run `pnpm install --frozen-lockfile` and `pnpm build` before any direct `pnpm dev:*` example command. Those Vite development scripts resolve the private packages from their built `dist` exports. `pnpm dev:site` is the exception: it builds the maintained example inputs before starting VitePress.
+After a fresh checkout, run `pnpm install --frozen-lockfile` and `pnpm build` before any direct `pnpm dev:*` example command. Those Vite development scripts resolve the workspace packages from their built `dist` exports. `pnpm dev:site` is the exception: it builds the maintained example inputs before starting VitePress.
 
 Run the development site:
 
@@ -140,7 +140,7 @@ The separate Pages workflow runs the complete repository gate on Ubuntu with the
 | `examples/alpine-vite` | Alpine SourceCard controller, property-effect, event, canonical-readout, and destroy integration |
 | `docs/.vitepress` and `scripts/build-site.mjs` | Documentation presentation, project-path navigation, styling, and isolated example assembly |
 
-Workspace dependencies use `workspace:*`, and committed manifests remain private. Successful `main` validation publishes synchronized private prereleases from isolated staged manifests; it does not change workspace dependency resolution.
+Workspace dependencies use `workspace:*`, and committed manifests remain private. After public activation is qualified, successful `main` validation publishes synchronized public GitHub Packages prereleases from isolated staged manifests; it does not change workspace dependency resolution.
 
 ## Required tools
 
@@ -463,7 +463,7 @@ The linked-article build creates `examples/linked-article/dist`.
 
 If a required input file is missing, staging stops.
 
-### Build and pack the private libraries
+### Build and pack the library tarballs
 
 The normal build creates `dist` JavaScript and declarations before workspace consumers typecheck:
 
@@ -504,17 +504,17 @@ allowBuilds:
   esbuild: true
 ```
 
-The committed packages remain private. After both hosted validation platforms and the fail-closed `check` succeed on a `main` push, the CI publish job stages copies with version `0.0.0-alpha.<run-id>.<run-attempt>`, rewrites toolkit dependencies to that exact version, and verifies the current package configuration before publishing the client, text transform, then Web Components package under the `alpha` tag. The job has repository-scoped `packages: write`; pull requests, failed validation, skipped aggregation, non-`main` refs, a stale main head, or a failed package preflight cannot publish. Main-push runs are not canceled after publication may have started.
+The committed source manifests remain private. After this public workflow lands, keep the repository variable `PUBLIC_PACKAGES_ENABLED` unset while the owner changes all three existing package records to public, then set it to `true`. With that one-time rollout gate enabled, both hosted validation platforms and the fail-closed `check` must succeed on a `main` push before the CI publish job stages copies with version `0.0.0-alpha.<run-id>.<run-attempt>`, rewrites toolkit dependencies to that exact version, and verifies the current package configuration before publishing the client, text transform, then Web Components package under the `alpha` tag. The job has repository-scoped `packages: write`; pull requests, failed validation, skipped aggregation, non-`main` refs, a disabled rollout gate, a stale main head, or a failed package preflight cannot publish. Main-push runs are not canceled after publication may have started.
 
-The staged manifests alone set `private: false` and the restricted GitHub npm registry. Committed manifests retain `private: true`, `0.0.0`, and `workspace:*`. Staging copies only built `dist`, package documentation, the root license, and Web Components metadata. Immediately before the first publish, the preflight authenticates to all three existing registry records, validates each record's current `alpha` version with the expected repository metadata and exact internal dependencies, and requires each anonymous repository package page to return `404`. The records need not already share one `alpha` version, so a later main run can repair a prior publication that stopped between package publishes. GitHub package visibility is persistent package configuration rather than a manifest guarantee, so a new package identity must be created and manually confirmed private before it can be added to this publication set; the preflight intentionally fails when a registry record is absent. Post-publication verification repeats the metadata and anonymity checks for the new exact synchronized version, then installs all three versions into a temporary consumer whose lockfile contains no workspace, link, file, or tarball resolution. The verifier removes its token-referencing `.npmrc` and staged package directories before importing every Node-safe public subpath.
+The staged manifests alone set `private: false`, public access intent, and the GitHub npm registry. Committed manifests retain `private: true`, `0.0.0`, and `workspace:*`. Staging copies only built `dist`, package documentation, the root license, and Web Components metadata. Immediately before the first publish, the preflight authenticates to all three existing registry records, validates each record's current `alpha` version with the expected repository metadata and exact internal dependencies, and requires each anonymous repository package page to return HTTP 200 without following redirects. The records need not already share one `alpha` version, so a later main run can repair a prior publication that stopped between package publishes. GitHub package visibility is persistent package configuration rather than a manifest guarantee, so a new package identity must be created and manually confirmed public before it can be added to this publication set; the preflight intentionally fails when a registry record is absent, private, or redirected. Post-publication verification repeats the metadata and visibility checks for the new exact synchronized version, then installs all three versions into a temporary consumer whose lockfile contains no workspace, link, file, or tarball resolution. The verifier removes its token-referencing `.npmrc` and staged package directories before importing every Node-safe public subpath.
 
-Authenticated consumers configure the `@arithmomaniac` scope for `https://npm.pkg.github.com`, supply a token through `NODE_AUTH_TOKEN`, and request one exact synchronized prerelease version for all three packages. A repository `GITHUB_TOKEN` can install packages when that repository has package access; external users need an appropriately scoped classic personal access token. Do not commit either token or an expanded `.npmrc`.
+GitHub Packages requires authentication even for public npm-format packages. Consumers configure the `@arithmomaniac` scope for `https://npm.pkg.github.com`, supply a token through `NODE_AUTH_TOKEN`, and request one exact synchronized prerelease version for all three packages. A repository `GITHUB_TOKEN` can install packages when that repository has package access; external users need a classic personal access token with `read:packages`. Do not commit either token or an expanded `.npmrc`. The package names are subject to change, and the packages are not published on npmjs.com.
 
 Run `pnpm package:smoke` to create an isolated Vite consumer, inspect each unchanged packed manifest and file list, override all three internal toolkit dependencies to their exact `file:` tarballs, inspect the lockfile and installed real paths, remove the producer tarballs, build, import the Node-safe subpaths, and render the source-card path in Chromium. Consumer-side overrides are required for this local private-tarball topology because pnpm otherwise attempts registry resolution for a packed package's internal toolkit dependency.
 
 Run `pnpm metadata:generate` after changing a public export or element contract. `pnpm metadata:check` rejects stale `packages/web-components/custom-elements.json`, `packages/public-exports.json`, and their readable summaries under `docs/reference/`.
 
-Run `pnpm changeset:rehearse` to exercise the pinned private fixed group in a disposable fixture. The current rehearsal proves the observed `0.1.1-alpha.0` to `0.1.1-alpha.1` sequence from a `0.1.0` fixture, synchronized internal dependencies and changelogs, retained private flags, and no automatic commit or tag. It remains a local Changesets qualification and is separate from the run-derived private GitHub Packages prerelease.
+Run `pnpm changeset:rehearse` to exercise the pinned private fixed group in a disposable fixture. The current rehearsal proves the observed `0.1.1-alpha.0` to `0.1.1-alpha.1` sequence from a `0.1.0` fixture, synchronized internal dependencies and changelogs, retained private flags, and no automatic commit or tag. It remains a local Changesets qualification and is separate from the run-derived public GitHub Packages prerelease.
 
 ## Package index configuration
 

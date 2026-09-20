@@ -58,6 +58,7 @@ const NODE_SAFE_IMPORTS = [
   "@arithmomaniac/sefaria-client/validators",
   "@arithmomaniac/sefaria-text-transform",
   "@arithmomaniac/sefaria-web-components/bilingual-segment",
+  "@arithmomaniac/sefaria-web-components/bindings",
   "@arithmomaniac/sefaria-web-components/connections-panel",
   "@arithmomaniac/sefaria-web-components/popup",
   "@arithmomaniac/sefaria-web-components/reader",
@@ -124,7 +125,7 @@ export function createPublishManifest({ definition, sourceManifest, version }) {
     private: false,
     dependencies,
     publishConfig: {
-      access: "restricted",
+      access: "public",
       registry: REGISTRY,
     },
   };
@@ -183,12 +184,12 @@ export function validatePublishedPackage({
   repositoryFullName,
   version,
 }) {
-  if (publicStatus !== 404) {
-    if (publicStatus >= 200 && publicStatus < 300) {
-      throw new Error(`${definition.name} must be private.`);
+  if (publicStatus !== 200) {
+    if (publicStatus === 404) {
+      throw new Error(`${definition.name} must be public.`);
     }
     throw new Error(
-      `${definition.name} private visibility check returned ${publicStatus}.`,
+      `${definition.name} public visibility check returned ${publicStatus}.`,
     );
   }
   if (!isRecord(registryMetadata)) {
@@ -358,6 +359,7 @@ async function fetchPackageRecords({ repositoryFullName, serverUrl, token }) {
             packageName: definition.name,
           }),
           {
+            redirect: "manual",
             headers: {
               Accept: "text/html",
               "User-Agent": "sefaria-frontend-toolkit-publication-verifier",

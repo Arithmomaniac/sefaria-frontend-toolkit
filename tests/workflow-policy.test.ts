@@ -75,7 +75,7 @@ describe("agent-ready workflow policy", () => {
       "cancel-in-progress": "${{ github.event_name == 'pull_request' }}",
     });
     expect(publish.if).toBe(
-      "${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}",
+      "${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.PUBLIC_PACKAGES_ENABLED == 'true' }}",
     );
     expect(publish.needs).toBe("check");
     expect(publish.permissions).toEqual({
@@ -85,6 +85,10 @@ describe("agent-ready workflow policy", () => {
     expect(JSON.stringify(publish)).toContain("github.run_id");
     expect(JSON.stringify(publish)).toContain("github.run_attempt");
     expect(JSON.stringify(publish)).toContain("github.token");
+    expect(JSON.stringify(publish)).toContain("PUBLIC_PACKAGES_ENABLED");
+    expect(publish.name).toBe("publish public prerelease");
+    expect(JSON.stringify(publish)).toContain("--access public");
+    expect(JSON.stringify(publish)).not.toContain("--access restricted");
     expect(JSON.stringify(publish)).not.toContain("secrets.");
     expect(JSON.stringify(publish)).toContain(
       'test \\"$(git rev-parse HEAD)\\" = \\"$(git rev-parse origin/main)\\"',

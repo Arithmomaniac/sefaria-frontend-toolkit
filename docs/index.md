@@ -25,7 +25,7 @@ hero:
 <LandingPreview />
 
 <div class="status-note">
-  <strong>Experimental and unofficial:</strong> evaluate the browser examples without cloning. Private prereleases and local tarballs support qualification; public npm or CDN installation is not available yet. See the <SiteLink to="/get-started.html#installation-status">current installation status</SiteLink>.
+  <strong>Experimental and unofficial:</strong> evaluate the browser examples without cloning. Public GitHub Packages prereleases are planned for authenticated installation; package names are subject to change, and the packages are not published on npmjs.com or a CDN. See the <SiteLink to="/get-started.html#installation-status">current installation status</SiteLink>.
 </div>
 
 ## Why this toolkit exists

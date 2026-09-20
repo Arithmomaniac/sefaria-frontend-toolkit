@@ -465,7 +465,10 @@ describe("documentation learning journey", () => {
 
     expect(index).toContain("Evaluate without cloning");
     expect(index).toContain("Develop the toolkit itself");
-    expect(getStarted).toContain("Public package installation is planned");
+    expect(getStarted).toContain("Public GitHub Packages");
+    expect(getStarted).toContain("read:packages");
+    expect(getStarted).toContain("not published on npmjs.com");
+    expect(getStarted).toContain("Package names are subject to change");
     expect(getStarted).toContain("Clone the source only to change the toolkit");
     expect(documentation).toContain("Repository-only documentation");
     expect(documentation).toContain(
