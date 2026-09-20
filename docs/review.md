@@ -352,9 +352,9 @@ Review the initial corrections for:
 - [ ] Active runtime and build paths contain no Python dependency or retired demo assembly.
 - [ ] Every package, example, and test-workspace manifest remains private.
 - [ ] Library exports and packed files resolve built artifacts rather than producer source.
-- [ ] Workflow YAML permits only the green-`main` private prerelease job to use repository-scoped `packages: write`, `github.token`, the `alpha` tag, and the fixed package order; it contains no deployment, long-lived secret, tag trigger, manual release, or other write capability.
+- [ ] Workflow YAML permits only the rollout-enabled green-`main` public prerelease job to use repository-scoped `packages: write`, `github.token`, the `alpha` tag, and the fixed package order; it contains no deployment, long-lived secret, tag trigger, manual release, or other write capability.
 - [ ] The lockfile contains no mirror-specific remote tarball resolution.
-- [ ] Maintained entry documentation distinguishes workspace/local-tarball use, authenticated private prereleases, and unavailable public/CDN/stable distribution, with no unsupported official or deployed claim.
+- [ ] Maintained entry documentation distinguishes workspace/local-tarball use from planned authenticated public GitHub Packages prereleases, states that names may change and npmjs.com/CDN/stable distribution is unavailable, and makes no unsupported official or deployed claim.
 - [ ] Every retained test from the immutable baseline inventory is present in Vitest discovery; every retirement has a precise presentation-only or supersession reason.
 - [ ] Fresh agent setup uses the frozen lockfile, verifies required immutable Git objects, installs Chromium, and proves a headless launch.
 - [ ] Toolkit setup is selected by checked-out package capability rather than one exact branch name.

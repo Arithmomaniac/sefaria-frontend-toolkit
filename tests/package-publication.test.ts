@@ -27,7 +27,7 @@ import {
 const version = "0.0.0-alpha.123456.2";
 const repositoryFullName = "Arithmomaniac/sefaria-frontend-toolkit";
 
-describe("private package publication", () => {
+describe("public package publication", () => {
   it("derives a unique synchronized version from the run and attempt", () => {
     expect(createPublishVersion("123456", "2")).toBe(version);
 
@@ -65,7 +65,7 @@ describe("private package publication", () => {
       version,
       private: false,
       publishConfig: {
-        access: "restricted",
+        access: "public",
         registry: "https://npm.pkg.github.com",
       },
       dependencies: {
@@ -171,7 +171,7 @@ describe("private package publication", () => {
     }
   });
 
-  it("requires private package metadata, repository linkage, and the exact version", () => {
+  it("requires public package metadata, repository linkage, and the exact version", () => {
     expect(() =>
       validatePublishedPackage({
         definition: PACKAGE_DEFINITIONS[0],
@@ -189,7 +189,7 @@ describe("private package publication", () => {
             },
           },
         },
-        publicStatus: 404,
+        publicStatus: 200,
         repositoryFullName,
         version,
       }),
@@ -212,17 +212,17 @@ describe("private package publication", () => {
             },
           },
         },
-        publicStatus: 200,
+        publicStatus: 404,
         repositoryFullName,
         version,
       }),
-    ).toThrow("must be private");
+    ).toThrow("must be public");
   });
 
-  it("requires every existing package record to have a private linked alpha version", () => {
+  it("requires every existing package record to have a public linked alpha version", () => {
     const packages = PACKAGE_DEFINITIONS.map((definition) => ({
       definition,
-      publicStatus: 404,
+      publicStatus: 200,
       registryMetadata: {
         name: definition.name,
         "dist-tags": { alpha: version },
@@ -271,11 +271,21 @@ describe("private package publication", () => {
     expect(() =>
       validatePublicationPreflight({
         packages: packages.map((entry, index) =>
-          index === 0 ? { ...entry, publicStatus: 200 } : entry,
+          index === 0 ? { ...entry, publicStatus: 404 } : entry,
         ),
         repositoryFullName,
       }),
-    ).toThrow("must be private");
+    ).toThrow("must be public");
+    for (const publicStatus of [302, 401, 403, 429, 500]) {
+      expect(() =>
+        validatePublicationPreflight({
+          packages: packages.map((entry, index) =>
+            index === 0 ? { ...entry, publicStatus } : entry,
+          ),
+          repositoryFullName,
+        }),
+      ).toThrow(`public visibility check returned ${publicStatus}`);
+    }
     expect(() =>
       validatePublicationPreflight({
         packages: packages.map((entry, index) =>
@@ -311,7 +321,8 @@ describe("private package publication", () => {
         throw new Error(`Unexpected preflight URL ${url}`);
       }
       if (!url.startsWith("https://npm.pkg.github.com/")) {
-        return { status: 404 };
+        expect(init?.redirect).toBe("manual");
+        return { status: 200 };
       }
       return {
         ok: true,

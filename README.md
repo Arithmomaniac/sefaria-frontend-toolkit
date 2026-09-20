@@ -6,7 +6,7 @@
 
 Start with the complete Reader, add one of seven focused browser-standard components from vanilla JavaScript, React, or Alpine, or use the validated client, factories, and text transforms without rendering components. The current components focus on reading surfaces, but the project boundary is a reusable frontend/UI toolkit rather than a replacement for Sefaria's website.
 
-> **Experimental.** This public source repository is a development project with no support or stability guarantee. It is not an official Sefaria product. Its synchronized prereleases are private GitHub Packages for authenticated use; there is no public registry, CDN, or stable release.
+> **Experimental.** This public source repository is a development project with no support or stability guarantee. It is not an official Sefaria product. Public GitHub Packages prereleases are planned for authenticated use. Package names are subject to change, and the packages are not published on npmjs.com or a CDN.
 
 ## First run
 
@@ -18,7 +18,7 @@ pnpm install
 pnpm dev:site
 ```
 
-The command builds the maintained private examples and opens the documentation source in development mode. It does not deploy anything or contact Sefaria until you explicitly use a live example action. The current published documentation is available at [arithmomaniac.github.io/sefaria-frontend-toolkit/](https://arithmomaniac.github.io/sefaria-frontend-toolkit/).
+The command builds the maintained examples and opens the documentation source in development mode. It does not deploy anything or contact Sefaria until you explicitly use a live example action. The current published documentation is available at [arithmomaniac.github.io/sefaria-frontend-toolkit/](https://arithmomaniac.github.io/sefaria-frontend-toolkit/).
 
 If you want the shortest component proof instead of the documentation site:
 
@@ -27,7 +27,7 @@ pnpm build
 pnpm dev:vanilla
 ```
 
-That example validates a supplied `Micah 6:8` payload, projects it through the public pure factory, and renders it with zero requests. Its explicit button then exercises the public client and async factory with one injected offline response. [Private package setup](docs/development.md#build-and-pack-the-private-libraries) covers an external consumer that cannot resolve workspace source.
+That example validates a supplied `Micah 6:8` payload, projects it through the public pure factory, and renders it with zero requests. Its explicit button then exercises the public client and async factory with one injected offline response. [Get started](docs/get-started.md#installation-status) describes the planned authenticated GitHub Packages installation, while [local package setup](docs/development.md#build-and-pack-the-library-tarballs) covers contributor qualification.
 
 ## Choose a path
 

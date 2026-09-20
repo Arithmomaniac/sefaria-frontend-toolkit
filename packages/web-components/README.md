@@ -4,7 +4,7 @@
 
 `@arithmomaniac/sefaria-web-components` provides pure view-model factories and request-free Lit elements for Sefaria reading surfaces. Elements receive component-specific rendering data through JavaScript properties; they do not accept references, clients, raw API payloads, or `fetch`.
 
-This is a private built package, not a published npm installation. Its export map resolves to `dist` JavaScript and declarations, while `custom-elements.json` and the generated [custom-element reference](../../docs/reference/custom-elements.md) describe the browser surface.
+The committed source manifest remains private to prevent accidental publication. Public GitHub Packages prereleases are planned for authenticated installation; the package name is subject to change, and it is not published on npmjs.com. Follow the repository [installation status](../../docs/get-started.md#installation-status). Its export map resolves to `dist` JavaScript and declarations, while `custom-elements.json` and the generated [custom-element reference](../../docs/reference/custom-elements.md) describe the browser surface.
 
 ## Choose an entry point
 

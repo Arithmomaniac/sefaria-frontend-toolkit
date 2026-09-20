@@ -339,9 +339,9 @@ function validatePublishJob(publish, issues, filename) {
       'test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"',
     ].join("\n"),
     "node scripts/package-publication.mjs preflight",
-    "pnpm publish .artifacts/publish/client --tag alpha --access restricted --no-git-checks",
-    "pnpm publish .artifacts/publish/text-transform --tag alpha --access restricted --no-git-checks",
-    "pnpm publish .artifacts/publish/web-components --tag alpha --access restricted --no-git-checks",
+    "pnpm publish .artifacts/publish/client --tag alpha --access public --no-git-checks",
+    "pnpm publish .artifacts/publish/text-transform --tag alpha --access public --no-git-checks",
+    "pnpm publish .artifacts/publish/web-components --tag alpha --access public --no-git-checks",
     'node scripts/package-publication.mjs verify --version "$PUBLISH_VERSION"',
   ];
   const steps = Array.isArray(publish.steps) ? publish.steps : [];
@@ -357,9 +357,9 @@ function validatePublishJob(publish, issues, filename) {
   );
 
   if (
-    publish.name !== "publish private prerelease" ||
+    publish.name !== "publish public prerelease" ||
     publish.if !==
-      "${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}" ||
+      "${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.PUBLIC_PACKAGES_ENABLED == 'true' }}" ||
     publish.needs !== "check" ||
     publish["runs-on"] !== "ubuntu-latest" ||
     JSON.stringify(publish.permissions) !==
@@ -463,11 +463,23 @@ export function validateDocumentationClaims(files) {
   const issues = [];
   for (const [filename, source] of Object.entries(files)) {
     const prose = stripFencedCode(source);
-    if (
-      /(?:npm install|pnpm add|yarn add)\s+@arithmomaniac\/sefaria-/iu.test(
-        source,
-      )
-    ) {
+    const toolkitInstallLines = source
+      .split(/\r?\n/u)
+      .filter((line) =>
+        /(?:npm install|pnpm add|yarn add)\s+["']?@arithmomaniac\/sefaria-/iu.test(
+          line,
+        ),
+      );
+    const documentsGitHubPackages =
+      filename === "docs/get-started.md" &&
+      source.includes("https://npm.pkg.github.com") &&
+      /\bread:packages\b/u.test(source) &&
+      /\bnot published on npmjs\.com\b/iu.test(prose) &&
+      toolkitInstallLines.length === 1 &&
+      [...EXPECTED_LIBRARY_NAMES.values()].every((packageName) =>
+        toolkitInstallLines[0].includes(`"${packageName}@$version"`),
+      );
+    if (toolkitInstallLines.length > 0 && !documentsGitHubPackages) {
       issues.push(`unsupported registry installation command: ${filename}`);
     }
     for (const line of prose.split(/\r?\n/u)) {
