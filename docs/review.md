@@ -32,7 +32,7 @@ This guide defines review gates for the delivered architecture and for planned c
 - [ ] Each correction has evidence and a focused test.
 - [ ] Each corrected schema matches the original handler branches and conditional fields.
 
-Review the initial corrections for:
+Review the initial and expanded corrections for:
 
 - [ ] the `/api/texts/versions/{index}` response content key
 - [ ] `v3AvailableVersionsTextJson`
@@ -40,11 +40,13 @@ Review the initial corrections for:
 - [ ] recursive v3 text nesting
 - [ ] documented Core error responses
 - [ ] `ShapeJSON` property and required-name casing
+- [ ] malformed manuscripts response media type
+- [ ] approved shared version-metadata and sheet-topic components
 
 ## Generated contracts
 
-- [ ] Temporary corrected Core generation is deterministic.
-- [ ] TypeScript `paths`, `components`, operation types, Zod schemas, and runtime validators come from the same temporary corrected Core document.
+- [ ] Temporary corrected full-document generation is deterministic.
+- [ ] TypeScript `paths`, `components`, operation types, Zod schemas, and runtime validators come from the same temporary corrected document.
 - [ ] Generated output identifies its source pin.
 - [ ] No handwritten file duplicates a complete generated interface.
 - [ ] No generated file has a manual-only edit.
@@ -54,18 +56,21 @@ Review the initial corrections for:
 ## Thin client
 
 - [ ] The public client uses generated operations directly.
+- [ ] All 60 operations are reachable exactly once through the 11 generated tag namespaces.
+- [ ] Former flat endpoint exports are absent.
 - [ ] The client accepts a configurable base URL.
 - [ ] The client accepts an injectable `fetch`.
 - [ ] The client has no generalized normalized facade.
 - [ ] The client cache is per-client, bounded by TTL, entry count, and retained-body bytes, and can be disabled explicitly.
 - [ ] Cache hits pass through the same generated response validation as network responses.
-- [ ] Documented errors, legitimate negative results, malformed responses, aborts, polling, and submissions are not cached.
+- [ ] Documented errors, legitimate negative results, malformed responses, aborts, dynamic polling or random operations, and submissions are not cached.
 - [ ] The cache has no persistence, cross-client sharing, stale fallback, retry, or request coalescing.
 - [ ] The client has no retry policy.
 - [ ] The client has no request coalescing.
 - [ ] The client has no component-specific method.
 - [ ] Documented HTTP errors remain typed error payloads.
 - [ ] Every JSON success and error response passes its generated validator.
+- [ ] Declared PNG responses preserve bytes and metadata, reject a wrong media type, and are never JSON-parsed.
 - [ ] An undocumented status rejects as a contract mismatch.
 - [ ] A contract mismatch includes the operation, status, structured paths, and original response metadata.
 - [ ] Network failures remain rejected Fetch API operations.

@@ -3,21 +3,27 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   createSefariaClient,
-  getAsyncTaskStatus,
-  getIndexV2,
-  getLinks,
-  getRef,
-  getShape,
-  getTextVersions,
-  getV3Texts,
-  postFindRefs,
+  index,
+  misc,
+  ref,
+  related,
+  text,
+  topic,
   type SefariaClientOptions,
 } from "../src/index.js";
 import { SefariaContractError } from "../src/contract-error.js";
+import { createSefariaResponseCache } from "../src/response-cache.js";
 import {
   validateResponse,
   type ResponseValidatorLookup,
 } from "../src/validation.js";
+
+const { getIndexV2, getShape } = index;
+const { getAsyncTaskStatus, getImgGen, postFindRefs } = misc;
+const { getRef } = ref;
+const { getLinks } = related;
+const { getTextVersions, getV3Texts } = text;
+const { getAllTopics } = topic;
 
 function jsonResponse(
   body: unknown,
@@ -35,6 +41,23 @@ function jsonResponse(
 }
 
 describe("generated Sefaria SDK", () => {
+  it.each([
+    "/api/async/{task_id}",
+    "/api/sheets/modified/{sheet_id}/{timestamp}",
+    "/api/texts/random",
+    "/api/texts/random-by-topic",
+  ])("bypasses the response cache for dynamic GET %s", async (path) => {
+    const fetchMock = vi.fn<typeof fetch>(async () => jsonResponse({}));
+    const cache = createSefariaResponseCache(fetchMock);
+    const firstRequest = new Request("https://example.test/dynamic");
+    const first = await cache.fetch(firstRequest);
+    await cache.admit(first, firstRequest, path);
+
+    await cache.fetch(new Request("https://example.test/dynamic"));
+
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
   it("caches validated public-data GET responses by default", async () => {
     const fetchMock = vi.fn<typeof fetch>(async () =>
       jsonResponse([], 200, { headers: { "x-cache-test": "network" } }),
@@ -58,6 +81,56 @@ describe("generated Sefaria SDK", () => {
     expect(second.data).toEqual([]);
     expect(first.response).not.toBe(second.response);
     expect(second.response?.headers.get("x-cache-test")).toBe("network");
+  });
+
+  it("caches newly covered JSON and PNG operations", async () => {
+    const png = [137, 80, 78, 71, 13, 10, 26, 10];
+    let requestCount = 0;
+    const fetchMock: typeof fetch = async (request) => {
+      requestCount += 1;
+      const url = request instanceof Request ? request.url : String(request);
+      return url.includes("/api/img-gen/")
+        ? new Response(new Uint8Array(png), {
+            headers: { "content-type": "image/png" },
+          })
+        : jsonResponse([]);
+    };
+    const client = createSefariaClient({ fetch: fetchMock });
+
+    await getAllTopics({ client });
+    await getAllTopics({ client });
+    const firstImage = await getImgGen({
+      client,
+      path: { tref: "Micah 6:8" },
+    });
+    const secondImage = await getImgGen({
+      client,
+      path: { tref: "Micah 6:8" },
+    });
+
+    expect(requestCount).toBe(2);
+    expect(firstImage.data).toBeInstanceOf(Blob);
+    expect(secondImage.data).toBeInstanceOf(Blob);
+    expect(await (secondImage.data as Blob).text()).toBe(
+      new TextDecoder().decode(new Uint8Array(png)),
+    );
+    expect(firstImage.response).not.toBe(secondImage.response);
+  });
+
+  it("rejects a non-PNG image response before returning a blob", async () => {
+    const client = createSefariaClient({
+      cache: false,
+      fetch: async () =>
+        new Response("not an image", {
+          headers: { "content-type": "text/plain" },
+        }),
+    });
+
+    await expect(
+      getImgGen({ client, path: { tref: "Micah 6:8" } }),
+    ).rejects.toMatchObject({
+      issues: [expect.objectContaining({ keyword: "content-type" })],
+    });
   });
 
   it("returns independent parsed data for each cache hit", async () => {

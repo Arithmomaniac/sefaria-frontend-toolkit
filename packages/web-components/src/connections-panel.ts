@@ -1,5 +1,5 @@
 import {
-  getLinks,
+  related,
   type CoreLinkObject,
   type CoreLinkResponse,
   type CoreStringArrayOrNull,
@@ -386,7 +386,7 @@ async function requestConnectionsResponse(
   readonly payload: CoreLinkResponse;
   readonly status: 200 | 400;
 }> {
-  const result = await getLinks({
+  const result = await related.getLinks({
     client,
     path: { tref: request.tref },
     query: createConnectionsQuery(request),
