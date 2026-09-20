@@ -43,7 +43,7 @@
       "capturedAt": "2026-08-30",
       "families": ["mam-paragraph", "mam-ketiv-qere", "line-break"],
       "reduction": "Combines reviewed MAM classes found in the Obadiah and Song of Songs probes.",
-      "input": "<span class=\"mam-spi-pe\">פ</span><br><span class=\"mam-kq\"><span class=\"mam-kq-k\">כתיב</span><span class=\"mam-kq-q\">קרי</span></span><span class=\"mam-kq-trivial\">שְׁעָרָ֗ו</span>"
+      "input": "<span class=\"mam-spi-pe\">{פ}</span><br><span class=\"mam-kq\"><span class=\"mam-kq-k\">כתיב</span><span class=\"mam-kq-q\">קרי</span></span><span class=\"mam-kq-trivial\">שְׁעָרָ֗ו</span>"
     },
     {
       "name": "hostile-synthetic",

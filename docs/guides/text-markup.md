@@ -85,15 +85,16 @@ The reviewed span contract is deliberately narrow:
 | `<span dir="rtl">שלום</span>` | Right-to-left text wrapper | Retain `span` and `dir="rtl"`. |
 | `<span dir="ltr">English</span>` | Left-to-right text wrapper | Retain `span` and `dir="ltr"`. |
 | `<span dir="auto">mixed</span>` | Browser-selected direction | Retain `span` and `dir="auto"`. |
-| `<span class="mam-spi-pe">פ</span>` | Masorah paragraph or section marker | Emit `<span data-sefaria-label="פ" data-sefaria-mam="mam-spi-pe"></span>`. |
-| `<span class="mam-spi-samekh">ס</span>` | Masorah paragraph or section marker | Emit an empty span with label and `data-sefaria-mam`. |
-| `<span class="mam-kq">...</span>` | Masorah ketiv/qere family | Emit a content-bearing `span[data-sefaria-mam="mam-kq"]`. |
-| `<span class="mam-kq-k">...</span>` | Masorah ketiv/qere family | Emit a content-bearing `span[data-sefaria-mam="mam-kq-k"]`. |
-| `<span class="mam-kq-q">...</span>` | Masorah ketiv/qere family | Emit a content-bearing `span[data-sefaria-mam="mam-kq-q"]`. |
-| `<span class="mam-kq-trivial">...</span>` | Masorah textual distinction | Emit a content-bearing `span[data-sefaria-mam="mam-kq-trivial"]`. |
-| `<span dir="rtl" class="mam-kq">...</span>` | Direction plus reviewed Masorah metadata | Retain approved direction and emit `data-sefaria-mam`. |
+| `<span class="mam-spi-pe">{פ}</span>` | Open-paragraph Masorah marker | Emit `<span data-sefaria-mam="petuchah">{פ}</span>`, preserving the exact source notation. |
+| `<span class="mam-spi-samekh">{ס}</span>` | Closed-paragraph Masorah marker | Emit `<span data-sefaria-mam="setumah">{ס}</span>`, preserving the exact source notation. |
+| `<span class="mam-spi-invnun">׆</span>` | Inverted-nun Masorah marker | Emit `<span data-sefaria-mam="inverted-nun">׆</span>`. |
+| `<span class="mam-kq">...</span>` | Masorah ketiv/qere family | Emit a content-bearing `span[data-sefaria-mam="ketiv-qere"]`. |
+| `<span class="mam-kq-k">...</span>` | Written ketiv form | Emit a content-bearing `span[data-sefaria-mam="ketiv"]`. |
+| `<span class="mam-kq-q">...</span>` | Read qere form | Emit a content-bearing `span[data-sefaria-mam="qere"]`. |
+| `<span class="mam-kq-trivial">...</span>` | Masorah textual distinction | Emit a content-bearing `span[data-sefaria-mam="trivial-variant"]`. |
+| `<span dir="rtl" class="mam-kq">...</span>` | Direction plus reviewed Masorah metadata | Retain approved direction and emit the semantic `data-sefaria-mam` value. |
 
-An arbitrary `mam-*` prefix is not an allowlist. Only the six listed class tokens are approved; a new class requires source evidence and a specification change.
+An arbitrary `mam-*` prefix is not an allowlist. Only the seven listed class tokens are approved; a new class requires source evidence and a specification change.
 
 An unclassified `span` loses unapproved attributes and is unwrapped when it has no remaining approved semantic meaning or direction. The normalizer does not preserve arbitrary class tokens.
 

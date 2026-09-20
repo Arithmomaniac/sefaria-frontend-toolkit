@@ -201,7 +201,17 @@ describe("normalizeText", () => {
   it("normalizes reviewed MAM families and strips unreviewed classes", () => {
     expect(normalizeText(fixture("mam-structure"))).toEqual({
       bodyHtml:
-        '<span data-sefaria-label="פ" data-sefaria-mam="mam-spi-pe"></span><br><span data-sefaria-mam="mam-kq"><span data-sefaria-mam="mam-kq-k">כתיב</span><span data-sefaria-mam="mam-kq-q">קרי</span></span><span data-sefaria-mam="mam-kq-trivial">שְׁעָרָ֗ו</span>',
+        '<span data-sefaria-mam="petuchah">{פ}</span><br><span data-sefaria-mam="ketiv-qere"><span data-sefaria-mam="ketiv">כתיב</span><span data-sefaria-mam="qere">קרי</span></span><span data-sefaria-mam="trivial-variant">שְׁעָרָ֗ו</span>',
+      notes: [],
+    });
+
+    expect(
+      normalizeText(
+        '<span class="mam-spi-pe">{פ}</span><span class="mam-spi-samekh">{ס}</span><span class="mam-spi-invnun">׆</span>',
+      ),
+    ).toEqual({
+      bodyHtml:
+        '<span data-sefaria-mam="petuchah">{פ}</span><span data-sefaria-mam="setumah">{ס}</span><span data-sefaria-mam="inverted-nun">׆</span>',
       notes: [],
     });
 

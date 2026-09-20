@@ -356,8 +356,8 @@ The persisted contract is evidence of legitimate source forms, not the reusable 
 | Commentary placement | Empty `i[data-commentator]` with `data-order` or `data-label` | Persisted, tested, migrated, and live-confirmed | Web replaces matching placements with `sup.itag`; `data-label` wins | Preserve reviewed attributes inertly |
 | Structural overlay | Empty `i[data-overlay][data-value]` | Persisted and live-confirmed | CSS renders selected overlay names | Preserve safe values inertly without closing the value set |
 | Direction wrapper | `span[dir]` and `i[dir]` | Persisted | Browser direction semantics | Preserve only `ltr`, `rtl`, or `auto` |
-| Masorah paragraph marker | `span.mam-spi-pe`, `span.mam-spi-samekh` | Live-confirmed | Preserves paragraph or section notation | Preserve exact class tokens |
-| Masorah ketiv/qere | `span.mam-kq`, `span.mam-kq-k`, `span.mam-kq-q`, `span.mam-kq-trivial` | Live-confirmed | Preserves textual distinctions | Preserve exact class tokens and nesting |
+| Masorah paragraph marker | `span.mam-spi-pe`, `span.mam-spi-samekh` | Live-confirmed | Preserves paragraph or section notation | Preserve exact visible notation and map source classes to semantic MAM values |
+| Masorah ketiv/qere | `span.mam-kq`, `span.mam-kq-k`, `span.mam-kq-q`, `span.mam-kq-trivial` | Live-confirmed | Preserves textual distinctions | Preserve text and nesting while mapping source classes to semantic MAM values |
 | Reference link | `a[data-ref]` with optional `refLink`, `href`, version, range, and scroll metadata | Persisted attributes and API-generated/live forms | Web routes reference interaction from `data-ref` | Preserve only approved metadata and approved Sefaria URLs |
 | Named-entity link | `a.namedEntityLink[data-slug][data-range]` | API-generated and live-confirmed | Web opens named-entity context | Preserve only when enabled and complete |
 | Category link | `a.categoryLink[data-category-path][data-range]` | API-generated in source | No Core interaction owner | Unwrap to text |
@@ -402,7 +402,7 @@ The representative source URL is `https://www.sefaria.org/api/v3/texts/Jerusalem
 
 ### Masorah markup and line structure
 
-August 30, 2026 deployed Miqra according to the Masorah probes found `mam-spi-pe`, `mam-spi-samekh`, nested `mam-kq`, `mam-kq-k`, and `mam-kq-q` spans, `mam-kq-trivial`, and `br` line structure.
+August 30, 2026 deployed Miqra according to the Masorah probes found `mam-spi-pe`, `mam-spi-samekh`, nested `mam-kq`, `mam-kq-k`, and `mam-kq-q` spans, `mam-kq-trivial`, and `br` line structure. The September 20, 2026 local Mongo inventory additionally found 9 `mam-spi-invnun` starts; this is corpus evidence rather than a deployed-behavior claim.
 
 The Obadiah fixture contains:
 

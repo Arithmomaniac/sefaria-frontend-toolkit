@@ -44,7 +44,7 @@ it("validates and transforms one complete source-backed v3 payload", () => {
     })),
   }).toEqual({
     bodyHtml:
-      '<span data-sefaria-mam="mam-kq-trivial">שערו</span> — When God began to create<span data-sefaria-note="0"></span> heaven',
+      '<span data-sefaria-mam="trivial-variant">שערו</span> — When God began to create<span data-sefaria-note="0"></span> heaven',
     notes: [
       {
         key: 0,

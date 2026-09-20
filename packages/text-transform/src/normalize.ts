@@ -148,13 +148,15 @@ const BLOCK_TAGS = new Set([
   "tr",
   "ul",
 ]);
-const MAM_TEXT_CLASSES = new Set([
-  "mam-kq",
-  "mam-kq-k",
-  "mam-kq-q",
-  "mam-kq-trivial",
+const MAM_VALUES = new Map([
+  ["mam-spi-pe", "petuchah"],
+  ["mam-spi-samekh", "setumah"],
+  ["mam-spi-invnun", "inverted-nun"],
+  ["mam-kq", "ketiv-qere"],
+  ["mam-kq-k", "ketiv"],
+  ["mam-kq-q", "qere"],
+  ["mam-kq-trivial", "trivial-variant"],
 ]);
-const MAM_PARAGRAPH_CLASSES = new Set(["mam-spi-pe", "mam-spi-samekh"]);
 
 /**
  * Converts untrusted Sefaria text markup into safe, directly renderable HTML.
@@ -395,25 +397,11 @@ function classifyElement(
 
 function classifySpan(element: Element): ElementAction {
   const direction = approvedDirection(element.attribs.dir);
-  const mamClasses = classTokens(element).filter(
-    (token) => MAM_TEXT_CLASSES.has(token) || MAM_PARAGRAPH_CLASSES.has(token),
+  const mamClasses = classTokens(element).filter((token) =>
+    MAM_VALUES.has(token),
   );
   if (mamClasses.length === 1) {
-    const mam = mamClasses[0];
-    if (mam && MAM_PARAGRAPH_CLASSES.has(mam)) {
-      const attributes: Record<string, string> = {
-        "data-sefaria-label": textContent(element.children),
-        "data-sefaria-mam": mam,
-      };
-      addDirection(attributes, direction);
-      return {
-        kind: "element",
-        name: "span",
-        attributes,
-        suppressChildren: true,
-        direction,
-      };
-    }
+    const mam = mamClasses[0] ? MAM_VALUES.get(mamClasses[0]) : undefined;
     if (mam) {
       const attributes: Record<string, string> = {
         "data-sefaria-mam": mam,

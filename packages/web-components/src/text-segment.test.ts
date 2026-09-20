@@ -310,7 +310,7 @@ describe("createTextSegmentViewModel", () => {
         actualLanguage: "he",
         direction: "rtl",
         bodyHtml:
-          '<span data-sefaria-mam="mam-kq-trivial">שְׁעָרָ֗ו</span> — When God began to create<span data-sefaria-note="0"></span> heaven',
+          '<span data-sefaria-mam="trivial-variant">שְׁעָרָ֗ו</span> — When God began to create<span data-sefaria-note="0"></span> heaven',
         notes: [
           {
             key: 0,

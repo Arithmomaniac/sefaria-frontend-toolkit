@@ -77,6 +77,7 @@ The normalizer recognizes these exact source class tokens:
 
 - `mam-spi-pe`
 - `mam-spi-samekh`
+- `mam-spi-invnun`
 - `mam-kq`
 - `mam-kq-k`
 - `mam-kq-q`
@@ -84,7 +85,19 @@ The normalizer recognizes these exact source class tokens:
 
 The `mam-spi-*` forms mark paragraph or section structure. The `mam-kq*` forms mark ketiv/qere or related textual distinctions.
 
-`mam-spi-pe` and `mam-spi-samekh` become empty spans with `data-sefaria-mam` and `data-sefaria-label`. The four `mam-kq*` forms become content-bearing spans with `data-sefaria-mam`.
+Every recognized MAM span remains content-bearing and preserves its exact source text. The source class maps to a stable semantic `data-sefaria-mam` value:
+
+| Source class     | Canonical value   |
+| ---------------- | ----------------- |
+| `mam-spi-pe`     | `petuchah`        |
+| `mam-spi-samekh` | `setumah`         |
+| `mam-spi-invnun` | `inverted-nun`    |
+| `mam-kq`         | `ketiv-qere`      |
+| `mam-kq-k`       | `ketiv`           |
+| `mam-kq-q`       | `qere`            |
+| `mam-kq-trivial` | `trivial-variant` |
+
+The canonical value describes the textual phenomenon rather than retaining Sefaria's abbreviated CSS class vocabulary. Paragraph and section markers do not emit a duplicate `data-sefaria-label`; their exact visible notation remains in the span content.
 
 The normalizer does not accept an arbitrary `mam-*` prefix. A new class requires source evidence and a specification change.
 

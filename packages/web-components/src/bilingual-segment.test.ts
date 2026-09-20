@@ -126,7 +126,7 @@ describe("createBilingualSegmentViewModel role resolution", () => {
     expect(result.state).toBe("data");
     if (result.state !== "data") return;
     expect(result.primary.bodyHtml).toBe(
-      '<span data-sefaria-mam="mam-kq-trivial">שְׁעָרָ֗ו</span> — When God began to create<span data-sefaria-note="0"></span> heaven',
+      '<span data-sefaria-mam="trivial-variant">שְׁעָרָ֗ו</span> — When God began to create<span data-sefaria-note="0"></span> heaven',
     );
     expect(result.translation.bodyHtml).toBe("In the beginning.");
   });
