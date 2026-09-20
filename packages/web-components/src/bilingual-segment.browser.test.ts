@@ -17,7 +17,7 @@ const PRIMARY: TextSegmentDataViewModel = {
   language: "he",
   actualLanguage: "he",
   direction: "rtl",
-  body: [{ kind: "html", html: "בְּרֵאשִׁית בָּרָא אֱלֹהִים" }],
+  bodyHtml: "בְּרֵאשִׁית בָּרָא אֱלֹהִים",
   notes: [],
 };
 
@@ -28,7 +28,7 @@ const TRANSLATION: TextSegmentDataViewModel = {
   language: "en",
   actualLanguage: "en",
   direction: "ltr",
-  body: [{ kind: "html", html: "When God began to create heaven and earth." }],
+  bodyHtml: "When God began to create heaven and earth.",
   notes: [],
 };
 
@@ -215,11 +215,11 @@ test("keeps unequal sides aligned and contained side by side", async () => {
     ...DATA,
     primary: {
       ...PRIMARY,
-      body: [{ kind: "html", html: "בְּרֵאשִׁית ".repeat(120) }],
+      bodyHtml: "בְּרֵאשִׁית ".repeat(120),
     },
     translation: {
       ...TRANSLATION,
-      body: [{ kind: "html", html: "Short." }],
+      bodyHtml: "Short.",
     },
   });
   await host.updateComplete;
@@ -241,7 +241,7 @@ test("contains a long unbreakable word within its side", async () => {
     ...DATA,
     translation: {
       ...TRANSLATION,
-      body: [{ kind: "html", html: "A".repeat(400) }],
+      bodyHtml: "A".repeat(400),
     },
   });
   await host.updateComplete;

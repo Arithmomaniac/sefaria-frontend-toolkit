@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # Text-processing specification
 
@@ -12,13 +12,13 @@ The package remains in the architecture because sanitization, vocalization, and 
 
 `@arithmomaniac/sefaria-text-transform` owns deterministic text changes. It has no network, DOM rendering, API transport, component view-model, or host responsibility.
 
-Component pure factories call the safety and structural operations before text enters a view model. Component view models retain the full safe text. Elements can call the vocalization operations only to derive a reversible local presentation from that immutable safe data; they do not reparse an API payload or repeat sanitization or footnote extraction.
+Component pure factories call one normalization operation before text enters a view model. Component view models retain the full safe text and separate footnote records. Elements can call the vocalization operations only to derive a reversible local presentation from that immutable safe data; they do not reparse an API payload or repeat normalization.
 
 ## Common contract
 
 ### Bounded connected-text preview [Current]
 
-`createTextPreview` sanitizes HTML using the existing narrowing options, omitting footnotes, annotations, and link interaction from the compact preview. It returns balanced safe HTML, decoded visible text, and a truncation flag. Its bound counts grapheme clusters of rendered text, not raw HTML bytes or UTF-16 units. Entities count as decoded text, line breaks count as separators, and combining sequences spanning inline nodes remain intact. It does not cut raw markup or introduce browser dependencies.
+`createTextPreview` calls `normalizeText` with footnotes, annotations, named entities, and references disabled. It returns balanced safe HTML, decoded visible text, and a truncation flag. Its bound counts grapheme clusters of rendered text, not raw HTML bytes or UTF-16 units. Entities count as decoded text, line breaks count as separators, and combining sequences spanning inline nodes remain intact. It does not cut raw markup or introduce browser dependencies.
 
 The connections consumer uses a 3,500-grapheme bound per legacy language channel. Recursive API leaves are consumed in source order with separators; output is bounded and traversal is linear, without repeated flattening or growing-prefix concatenation. The implementation uses the package's existing parser dependencies and rejects invalid limits. Truncation is explicit, never an empty-content fallback.
 
@@ -49,9 +49,11 @@ Markup is classified before it is allowed or removed. A tag accepted by one Sefa
 
 ### Ordinary inline text
 
-The sanitizer preserves these attribute-free semantic tags:
+The normalizer preserves these attribute-free semantic tags:
 
-`b`, `strong`, `i`, `em`, `u`, `big`, `small`, `sup`, and `sub`.
+`b`, `strong`, `i`, `em`, `u`, `small`, `sup`, and `sub`.
+
+The obsolete `big` tag becomes `<span style="font-size: larger;">...</span>`. This generated fixed style is the only output style; incoming style attributes are never copied.
 
 A content-bearing ordinary `i` is italic text. It is not an annotation merely because other Sefaria features also use `i`.
 
@@ -59,19 +61,19 @@ An ordinary `sup` remains inert text. The component must not make every superscr
 
 ### Line breaks
 
-The sanitizer preserves `br` and emits one canonical form.
+The normalizer preserves `br` and emits one canonical form.
 
 The text API uses `br` for line structure, including poetry versions. Web-generated poetry layout classes are not API text markup and are not allowed merely because the Web reader creates them later.
 
 ### Direction wrappers
 
-The sanitizer preserves `span[dir]` only when `dir` is `ltr`, `rtl`, or `auto`.
+The normalizer preserves `span[dir]` only when `dir` is `ltr`, `rtl`, or `auto`.
 
 An unclassified `span` loses its attributes but preserves its children. A `span` with no remaining semantic attribute or approved class is unwrapped.
 
 ### Masorah markup
 
-The sanitizer preserves these exact class tokens and their nesting:
+The normalizer recognizes these exact source class tokens:
 
 - `mam-spi-pe`
 - `mam-spi-samekh`
@@ -82,7 +84,9 @@ The sanitizer preserves these exact class tokens and their nesting:
 
 The `mam-spi-*` forms mark paragraph or section structure. The `mam-kq*` forms mark ketiv/qere or related textual distinctions.
 
-The sanitizer does not accept an arbitrary `mam-*` prefix. A new class requires source evidence and a specification change.
+`mam-spi-pe` and `mam-spi-samekh` become empty spans with `data-sefaria-mam` and `data-sefaria-label`. The four `mam-kq*` forms become content-bearing spans with `data-sefaria-mam`.
+
+The normalizer does not accept an arbitrary `mam-*` prefix. A new class requires source evidence and a specification change.
 
 This package preserves the semantic markers but does not style or interpret them. Component work owns presentation.
 
@@ -98,7 +102,7 @@ The class can appear among other source class tokens, but only the reviewed toke
 
 An `i.footnote` can contain ordinary nested markup, including another ordinary `i`.
 
-`sup.endFootnote` is a recognized standalone marker. It remains inert unless a later component defines a presentation.
+`sup.endFootnote` becomes an empty `span[data-sefaria-end-footnote]` when footnotes and inline annotations are enabled.
 
 ### Inline commentary markup
 
@@ -110,14 +114,7 @@ Sefaria stores commentary placement metadata in an empty `i`:
 
 `data-commentator` identifies the commentary. `data-label`, when present, is the displayed label used by Sefaria Web. Otherwise `data-order` supplies the order and possible label.
 
-The sanitizer preserves these attributes:
-
-- `data-commentator`
-- `data-order`
-- `data-label`
-- `dir` when its value is approved
-
-The element remains inert. This package does not select a commentary, convert the element to a marker, encode Hebrew numerals, or expose a commentary-extraction API without a concrete component consumer.
+The normalizer emits an empty `span[data-sefaria-commentator]` with optional `data-sefaria-order` and `data-sefaria-label`. A validated, source-scoped candidate can add `data-sefaria-ref` when commentator, order, and label match exactly and identify one distinct target. Missing, ambiguous, or conflicting evidence emits no reference. The transform does not request links, choose a first match, or encode Hebrew numerals.
 
 Malformed source attributes follow standards-parser recovery. The sanitizer does not guess a value that the parser could not recover.
 
@@ -129,11 +126,7 @@ Sefaria stores page and column transitions in an empty `i`:
 <i data-overlay="Vilna Pages" data-value="2a"></i>
 ```
 
-The sanitizer preserves:
-
-- `data-overlay`
-- `data-value`
-- `dir` when its value is approved
+The normalizer emits an empty span with `data-sefaria-overlay` and `data-sefaria-value`.
 
 Overlay names are data and are not a closed enumeration. Source and deployed examples include `Vilna Pages`, `Venice Columns`, and `Venice Pages`; a safe unknown value remains inert rather than being discarded.
 
@@ -141,25 +134,13 @@ This package does not render transition labels or expose an overlay-extraction A
 
 ### Rendered annotation markers
 
-`sup.itag` is produced by Sefaria Web after it selects and formats a commentary placement. It is tolerated as inert input because Sefaria's stripping behavior recognizes it.
+`sup.itag` is produced by Sefaria Web after it selects and formats a commentary placement. It becomes an empty `span[data-sefaria-commentary-marker]`.
 
 `sup.endFootnote` and `sup.itag` preserve their text only. No source metadata is inferred from them.
 
 ### Reference links
 
-A reference link is an `a` with `data-ref`. It can also contain:
-
-- `class="refLink"`
-- `href`
-- `data-range`
-- `data-ven`
-- `data-vhe`
-- `data-scroll-link`
-- approved `dir`
-
-The semantic discriminator is `data-ref`, not the class alone.
-
-When reference links are enabled, the sanitizer retains only reviewed attributes and an approved URL. A missing `data-ref` or invalid URL unwraps the anchor to its children.
+A reference link is an `a` with a nonblank `data-ref`. When enabled, it becomes an inert content-bearing `span[data-sefaria-ref]`. Optional `data-ven`, `data-vhe`, and approved `dir` become `data-sefaria-ven`, `data-sefaria-vhe`, and `dir`. The normalizer removes `href`, `data-range`, `data-scroll-link`, classes, and every other attribute. It never derives a reference from a URL.
 
 ### Named-entity links
 
@@ -175,21 +156,19 @@ A named-entity link is:
 >
 ```
 
-`data-slug` is required. `data-range` and an approved `href` are optional.
-
-When named entities are disabled, missing their required slug, or carrying an invalid URL, the sanitizer unwraps the anchor to its children.
+`data-slug` is required. When enabled, the anchor becomes a content-bearing `span[data-sefaria-slug]`. URL and source-character range metadata are discarded.
 
 ### Category and generic links
 
 Sefaria can generate `a.categoryLink[data-category-path][data-range]`, but no Core component owns category navigation. Category anchors are always unwrapped to their children.
 
-Every other anchor, including an unrelated safe HTTPS anchor, is also unwrapped. The Core sanitizer does not provide generic outbound navigation on a third-party page.
+Every other anchor, including an unrelated safe HTTPS anchor, is also unwrapped. Normalized text never supplies generic outbound navigation.
 
 ### Images
 
 Sefaria's persisted text contract permits `img[src][alt]`, but the selected Core evidence has no representative live image fixture and no component owns image loading.
 
-The sanitizer removes every image and replaces it with escaped `alt` text. An image without `alt` produces no output.
+The normalizer removes every image and replaces it with escaped `alt` text. An image without `alt` produces no output.
 
 Image rendering and source-origin policy require a later specification change supported by a concrete consumer and fixture.
 
@@ -203,7 +182,7 @@ Attributes on unsupported wrappers are discarded.
 
 ### Active content
 
-The sanitizer removes an active element and all of its descendants. This includes:
+The normalizer removes an active element and all of its descendants. This includes:
 
 - `script`
 - `style`
@@ -214,21 +193,21 @@ The sanitizer removes an active element and all of its descendants. This include
 - SVG or MathML content
 - equivalent embedded or executable surfaces
 
-The sanitizer never unwraps an active subtree because its text can itself contain executable source or misleading fallback content.
+The normalizer never unwraps an active subtree because its text can itself contain executable source or misleading fallback content.
 
 ### Attribute policy
 
-The sanitizer removes:
+The normalizer removes:
 
 - every `on*` event attribute, regardless of case or encoding
-- every inline `style`
+- every incoming inline `style`
 - unknown class tokens
 - unknown `data-*` attributes
 - `data-target-module`
 - Linker debugging classes
 - attributes not assigned to the recognized semantic family
 
-An option can remove an approved feature. No option can preserve an otherwise unapproved attribute, class, tag, origin, or URL scheme.
+Input `data-sefaria-*` fields are untrusted and removed before canonical output metadata is generated. A generic `data-sefaria-kind` discriminator is not part of the output grammar. An option can remove an approved feature; no option can preserve an otherwise unapproved attribute, class, or tag.
 
 ## Vocalization
 
@@ -295,159 +274,83 @@ Compatibility results must identify the selected behavior and show differing Uni
 - Hebrew mixed with English, punctuation, and numbers
 - invalid runtime option values
 
-## Sanitization
+## Normalization
 
 ### Public contract
 
 ```ts
-interface SanitizeOptions {
-  allowFootnotes?: boolean;
-  allowInlineAnnotations?: boolean;
-  allowNamedEntities?: boolean;
-  allowRefLinks?: boolean;
+interface NormalizedFootnote {
+  readonly key: number;
+  readonly markerHtml: string;
+  readonly contentHtml: string | null;
 }
 
-sanitize(html: string, options?: SanitizeOptions): string;
+interface NormalizedText {
+  readonly bodyHtml: string;
+  readonly notes: readonly NormalizedFootnote[];
+}
+
+normalizeText(html: string, options?: NormalizeTextOptions): NormalizedText;
 ```
 
-Every option defaults to `true`.
+`normalizeText` is the only public safety and structure operation. Every option defaults to `true` and can only remove approved features. `allowFootnotes: false` removes recognized marker/body pairs. `allowInlineAnnotations: false` removes commentary, overlay, `sup.itag`, and `sup.endFootnote` metadata. `allowRefLinks: false` and `allowNamedEntities: false` unwrap those anchors to visible children.
 
-`allowFootnotes: false` removes recognized footnote markers and bodies while preserving surrounding text.
+Every `*Html` field is independently balanced and safe for HTML-body insertion. The result contains no URL, event handler, copied style, unknown attribute, unknown class, or caller-supplied `data-sefaria-*` field.
 
-`allowInlineAnnotations: false` removes commentary and structural metadata iTags and tolerated `sup.itag` and `sup.endFootnote` markers.
+### Footnote result
 
-`allowRefLinks: false` and `allowNamedEntities: false` unwrap those anchors to their children.
+A paired marker and body produces one empty body placeholder and one source-ordered note:
 
-### URL policy
-
-The sanitizer permits:
-
-- normal relative and root-relative input paths, serialized as canonical absolute `https://www.sefaria.org/...` URLs
-- HTTPS URLs whose hostname is exactly `sefaria.org`, `www.sefaria.org`, `sefaria.org.il`, or `www.sefaria.org.il`
-
-The sanitizer rejects:
-
-- protocol-relative URLs
-- URLs with credentials
-- active schemes such as `javascript:` or `data:`
-- encoded or mixed-case forms of active schemes
-- malformed URLs
-- unrelated absolute origins
-- suffix-confusion hosts such as `evilsefaria.org`
-
-An invalid URL unwraps the anchor. Link text and approved nested markup remain.
-
-### Required cases
-
-- every tag and semantic subtype in the markup contract
-- every approved class and data attribute
-- unbalanced and malformed tags and attributes
-- nested text and footnote markup
-- entity-encoded text and URLs
-- empty spans
-- line breaks and Masorah paragraph markers
-- dangerous and protocol-relative URLs
-- event handlers and inline styles
-- active subtrees
-- unknown classes and data attributes
-- disabled feature options
-- deeply nested hostile markup
-- deterministic attribute order and serialization
-
-Sanitization must preserve allowed text and structural markup. Dangerous content must not survive.
-
-## Footnotes
-
-### Public contract
+```html
+Text<span data-sefaria-note="0"></span>
+```
 
 ```ts
-interface ExtractedFootnote {
-  readonly index: number;
-  readonly markerText: string;
-  readonly content: string | null;
-}
-
-type FootnoteBodyPart =
-  | {
-      readonly kind: "html";
-      readonly html: string;
-    }
-  | {
-      readonly kind: "footnote-marker";
-      readonly noteIndex: number;
-      readonly markerText: string;
-    };
-
-interface ExtractFootnotesResult {
-  readonly body: readonly FootnoteBodyPart[];
-  readonly notes: readonly ExtractedFootnote[];
-}
-
-extractFootnotes(html: string): ExtractFootnotesResult;
+[{ key: 0, markerHtml: "*", contentHtml: "<b>Explanation</b>" }];
 ```
 
-The extractor uses parsed nodes rather than a footnote regex.
+A marker without a following body has `contentHtml: null`. A present empty body has `contentHtml: ""`. An orphan `i.footnote` remains ordinary italic content. Duplicate labels are valid because the local key, not the label, identifies a note. Nested notes share the same source-ordered key space.
 
-A paired marker and body produces one marker part and one note in source order.
+Keys are zero-based and local to one result. They are not DOM IDs or durable identities. The element decorates placeholders and owns accessibility and interaction.
 
-A marker without a following body produces a note whose `content` is `null`. This is different from a present but empty body, whose content is `""`.
+### Commentary references
 
-An `i.footnote` without a preceding marker is preserved as ordinary italic content with the `footnote` class removed.
+`NormalizeTextOptions.commentaryReferences` accepts narrow `{ commentator, order?, label?, ref }` candidates. Numeric orders must be finite safe integers and are matched as exact strings after conversion; `1.1` is rejected rather than collapsed to `1`.
 
-Nested ordinary markup inside a note remains serialized inside `content`.
+The marker's commentator, order, and label must exactly identify one distinct target. Repeated identical targets deduplicate. Missing, ambiguous, or conflicting targets leave the marker without `data-sefaria-ref`. The transform never selects the first result, parses a reference, or requests link data.
 
-Duplicate marker text is allowed. Logical `index` values are unique and stable within one extraction.
+### Output bound
 
-`markerText` is decoded plain text and must be rendered through a text-node API. `html` body parts and non-null note `content` are escaped HTML strings.
-
-The extractor returns no DOM IDs. A transform has no segment, language-side, range, or render-instance scope. Component view-model factories own accessible marker and note IDs.
-
-`body` is structured so a request-free element can render a real marker button without reparsing an HTML string.
-
-Closing and reopening ordinary ancestor elements around markers can expand output. The extractor throws `RangeError` before projected body HTML plus note HTML exceeds eight times the input length or 64 KiB, whichever is larger.
+Body, marker, and content serialization share one output budget: eight times the input length or 64 KiB, whichever is larger. Exceeding the budget throws `RangeError`.
 
 ### Information loss
 
-`return_format=text_only` removes footnote content, not only tags. The mobile `stripItags` path and the v3 `strip_only_footnotes` return format also remove annotation families before rendering.
-
-An extractor cannot reconstruct removed notes. An empty `notes` array is not proof that the source had no notes.
-
-Request and component context owns the partial or unavailable state caused by an upstream return format.
+`return_format=text_only` removes footnote content, not only tags. The mobile `stripItags` path and the v3 `strip_only_footnotes` return format also remove annotation families before rendering. Normalization cannot reconstruct content removed before it receives the string, so an empty `notes` array does not prove that the source had no notes.
 
 ### Required cases
 
-- nested markup inside a note
-- several notes in one segment
-- letter and non-numeric markers
-- `endFootnote`
-- marker classes with extra source tokens
-- present but empty bodies
-- missing bodies
-- orphan bodies
-- duplicate marker text
-- malformed closing syntax and parser recovery
-- stable source order
-- coalesced HTML body parts
-- plain-text marker handling
-- bounded nested-marker expansion
-- absence of rendering IDs
+- every documented tag and semantic subtype
+- obsolete-tag normalization
+- every canonical output attribute
+- unsupported attributes and preexisting `data-sefaria-*` fields
+- unbalanced and malformed markup
+- nested, missing, empty, orphan, duplicate-label, and direction-inheriting notes
+- exact, missing, duplicate, ambiguous, and invalid commentary candidates
+- entity-encoded text
+- line breaks and Masorah markers
+- event handlers, copied styles, active subtrees, images, unknown classes, and unknown data attributes
+- disabled feature options
+- deeply nested hostile markup
+- deterministic attribute order and serialization
+- aggregate output-budget rejection
 
 ## Processing boundary
 
-API schema validation and HTML sanitization are different controls. `@arithmomaniac/sefaria-client` validates unknown JSON structure. `@arithmomaniac/sefaria-text-transform` makes approved HTML safe for rendering.
+API schema validation and HTML normalization are different controls. `@arithmomaniac/sefaria-client` validates unknown JSON structure. `@arithmomaniac/sefaria-text-transform` makes approved HTML safe for rendering.
 
-A component pure factory owns this sequence:
+A component pure factory calls `normalizeText` once and stores `bodyHtml` plus note records in its component-specific view model. If validated link evidence is supplied, a non-DOM component helper validates unknown `inline_reference` fields, scopes links to the exact base reference and selected edition, and passes only narrow commentary candidates to the transform.
 
-1. Sanitize the API HTML with the selected narrowing options.
-2. Extract structured footnotes from the sanitized HTML.
-3. Preserve the full-mark safe HTML body parts, plain marker text, and null-or-HTML note content in the component-specific view model.
-4. Assign component-specific rendering fields, including accessible IDs.
-
-`extractFootnotes` is deterministic on any parsed input, but it does not independently claim that unsanitized input is safe.
-
-Raw payload HTML must not be stored in a component view model for later interpretation. A view model can contain sanitized full-mark HTML fragments plus typed marker and note fields.
-
-The element must not repeat sanitization, footnote extraction, or API parsing during rendering. A Hebrew-capable element can expose the existing three `VocalizationMode` presets as a presentation property. Full `taamim_and_nikkud` mode renders the original safe view-model fields directly and performs zero vocalization calls. A non-full mode derives HTML through `applyVocalizationToHtml` and plain marker text through `applyVocalization`, always from the immutable original fields rather than a previously transformed result. The derivation is refreshed only when the leaf view-model identity or mode changes, so unrelated reactive presentation changes do not repeat Unicode work.
+Raw payload HTML must not be stored in a component view model for later interpretation. The element does not repeat normalization or API parsing. Full `taamim_and_nikkud` mode renders the original safe fields directly and performs zero vocalization calls. A non-full mode derives every HTML field through `applyVocalizationToHtml`, always from the immutable original view model. The element then replaces canonical note placeholders with presentation markup from matching local note records.
 
 ## Compatibility evidence
 
@@ -471,9 +374,9 @@ Broad corpus comparison and compatibility publication belong to #14. This packag
 
 - the specification classifies every approved, unwrapped, removed, and deferred markup family
 - evidence identifies whether each family is persisted, API-generated, Web-generated, legacy, live-confirmed, source-only, or synthetic
-- the package implements vocalization, sanitization, and structured footnote operations
+- the package implements vocalization and one structured normalization operation
 - every named case has a deterministic test traceable to the markup contract
-- sanitization uses an explicit allowlist and exact URL policy
+- normalization uses an explicit allowlist and emits no URLs
 - unsafe markup does not reach component view models
 - rendering IDs remain outside transform output
 - no operation imports a client, component element, host API, or browser DOM global

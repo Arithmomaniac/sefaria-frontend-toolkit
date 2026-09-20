@@ -5,8 +5,7 @@ import {
 import {
   applyVocalization,
   applyVocalizationToHtml,
-  extractFootnotes,
-  sanitize,
+  normalizeText,
   type PaseqMode,
 } from "@arithmomaniac/sefaria-text-transform";
 
@@ -136,25 +135,28 @@ function sourceBackedV3Case(): CompatibilityCaseResult {
     };
   }
 
-  const actual = extractFootnotes(
-    applyVocalizationToHtml(sanitize(html), "none"),
-  );
+  const normalized = normalizeText(html);
+  const actual = {
+    bodyHtml: applyVocalizationToHtml(normalized.bodyHtml, "none"),
+    notes: normalized.notes.map((note) => ({
+      ...note,
+      markerHtml: applyVocalizationToHtml(note.markerHtml, "none"),
+      contentHtml:
+        note.contentHtml === null
+          ? null
+          : applyVocalizationToHtml(note.contentHtml, "none"),
+    })),
+  };
   return structuredCase(
     "v3-source-backed-pipeline",
     {
-      body: [
-        {
-          kind: "html",
-          html: '<span class="mam-kq-trivial">שערו</span> — When God began to create',
-        },
-        { kind: "footnote-marker", noteIndex: 0, markerText: "*" },
-        { kind: "html", html: " heaven" },
-      ],
+      bodyHtml:
+        '<span data-sefaria-mam="mam-kq-trivial">שערו</span> — When God began to create<span data-sefaria-note="0"></span> heaven',
       notes: [
         {
-          index: 0,
-          markerText: "*",
-          content: "<b>When God began to create </b>Others.",
+          key: 0,
+          markerHtml: "*",
+          contentHtml: "<b>When God began to create </b>Others.",
         },
       ],
     },
@@ -190,38 +192,33 @@ export function evaluateCompatibilityCases(): CompatibilityCaseResult[] {
     textCase(
       "mam-sanitizer-structure",
       "sanitization",
-      '<span class="mam-kq-trivial">שְׁעָרָ֗ו</span>',
-      sanitize('<span class="mam-kq-trivial">שְׁעָרָ֗ו</span>'),
+      '<span data-sefaria-mam="mam-kq-trivial">שְׁעָרָ֗ו</span>',
+      normalizeText('<span class="mam-kq-trivial">שְׁעָרָ֗ו</span>').bodyHtml,
     ),
     textCase(
       "mam-markup-vocalization",
       "vocalization",
-      '<span class="mam-kq-trivial">שערו</span>',
+      '<span data-sefaria-mam="mam-kq-trivial">שערו</span>',
       applyVocalizationToHtml(
-        '<span class="mam-kq-trivial">שְׁעָרָ֗ו</span>',
+        '<span data-sefaria-mam="mam-kq-trivial">שְׁעָרָ֗ו</span>',
         "none",
       ),
     ),
     structuredCase(
       "source-backed-footnote",
       {
-        body: [
-          { kind: "html", html: "When God began to create" },
-          { kind: "footnote-marker", noteIndex: 0, markerText: "*" },
-          { kind: "html", html: " heaven" },
-        ],
+        bodyHtml:
+          'When God began to create<span data-sefaria-note="0"></span> heaven',
         notes: [
           {
-            index: 0,
-            markerText: "*",
-            content: "<b>When God began to create </b>Others.",
+            key: 0,
+            markerHtml: "*",
+            contentHtml: "<b>When God began to create </b>Others.",
           },
         ],
       },
-      extractFootnotes(
-        sanitize(
-          'When God began to create<sup class="footnote-marker">*</sup><i class="footnote"><b>When God began to create </b>Others.</i> heaven',
-        ),
+      normalizeText(
+        'When God began to create<sup class="footnote-marker">*</sup><i class="footnote"><b>When God began to create </b>Others.</i> heaven',
       ),
     ),
     sourceBackedV3Case(),

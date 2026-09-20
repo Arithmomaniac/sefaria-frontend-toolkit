@@ -170,7 +170,7 @@ function createDataViewModel(versionTitle: string): TextSegmentDataViewModel {
     language: "en",
     actualLanguage: "en",
     direction: "ltr",
-    body: [{ kind: "html", html: versionTitle }],
+    bodyHtml: versionTitle,
     notes: [],
   };
 }

@@ -125,17 +125,10 @@ describe("createBilingualSegmentViewModel role resolution", () => {
 
     expect(result.state).toBe("data");
     if (result.state !== "data") return;
-    expect(result.primary.body).toEqual([
-      {
-        kind: "html",
-        html: '<span class="mam-kq-trivial">שְׁעָרָ֗ו</span> — When God began to create',
-      },
-      { kind: "footnote-marker", noteIndex: 0, markerText: "*" },
-      { kind: "html", html: " heaven" },
-    ]);
-    expect(result.translation.body).toEqual([
-      { kind: "html", html: "In the beginning." },
-    ]);
+    expect(result.primary.bodyHtml).toBe(
+      '<span data-sefaria-mam="mam-kq-trivial">שְׁעָרָ֗ו</span> — When God began to create<span data-sefaria-note="0"></span> heaven',
+    );
+    expect(result.translation.bodyHtml).toBe("In the beginning.");
   });
 
   it("drops a version that fills neither role", () => {

@@ -18,7 +18,7 @@ const TEXT: TextSegmentDataViewModel = {
   language: "en",
   actualLanguage: "en",
   direction: "ltr",
-  body: [{ kind: "html", html: "In the beginning." }],
+  bodyHtml: "In the beginning.",
   notes: [],
 };
 

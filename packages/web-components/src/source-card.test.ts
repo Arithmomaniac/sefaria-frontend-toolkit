@@ -75,6 +75,45 @@ function jsonResponse(body: unknown, status = 200): Response {
 }
 
 describe("createSourceCardViewModel", () => {
+  it("applies only reference-and-edition-scoped commentary candidates", () => {
+    const payload = payloadWith(
+      '<i data-commentator="Rashi" data-order="1"></i>',
+      undefined,
+    );
+    payload.ref = "Genesis 1:1";
+    payload.heRef = "בראשית א׳:א׳";
+    payload.sections = ["1", "1"];
+    payload.toSections = ["1", "1"];
+
+    const result = createSourceCardViewModel(
+      payload,
+      { tref: "Genesis 1:1" },
+      {
+        commentaryReferencesByRefAndVersion: {
+          "Genesis 1:1": {
+            "Explicit source-backed compatibility composition": [
+              {
+                commentator: "Rashi",
+                order: 1,
+                ref: "Rashi on Genesis 1:1:1",
+              },
+            ],
+          },
+        },
+      },
+    );
+
+    expect(result.state).toBe("data");
+    if (result.state !== "data") return;
+    const pair = result.items[0]?.pair;
+    expect(pair?.state).toBe("partial");
+    if (pair?.state === "partial") {
+      expect(pair.present.view.bodyHtml).toContain(
+        'data-sefaria-ref="Rashi on Genesis 1:1:1"',
+      );
+    }
+  });
+
   it("treats a scalar segment as one item", () => {
     const result = createSourceCardViewModel(
       payloadWith("Primary.", "Translation."),

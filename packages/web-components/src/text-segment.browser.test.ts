@@ -15,18 +15,13 @@ const DATA_VIEW_MODEL: TextSegmentDataViewModel = {
   language: "he",
   actualLanguage: "he",
   direction: "ltr",
-  body: [
-    {
-      kind: "html",
-      html: "<b>בְּרֵאשִׁית</b> — mixed punctuation, English.",
-    },
-    { kind: "footnote-marker", noteIndex: 0, markerText: "*" },
-  ],
+  bodyHtml:
+    '<b>בְּרֵאשִׁית</b> — mixed punctuation, English.<span data-sefaria-note="0"></span>',
   notes: [
     {
-      index: 0,
-      markerText: "*",
-      content: "<b>Static</b> footnote body.",
+      key: 0,
+      markerHtml: "*",
+      contentHtml: "<b>Static</b> footnote body.",
     },
   ],
 };
@@ -108,7 +103,7 @@ test("renders payload language and direction with static footnotes", async () =>
 test("does not invent a body for a missing static footnote", async () => {
   const viewModel: TextSegmentDataViewModel = {
     ...DATA_VIEW_MODEL,
-    notes: [{ index: 0, markerText: "1", content: null }],
+    notes: [{ key: 0, markerHtml: "1", contentHtml: null }],
   };
   render(
     html`<sefaria-text-segment .viewModel=${viewModel}></sefaria-text-segment>`,
@@ -124,13 +119,11 @@ test("does not invent a body for a missing static footnote", async () => {
 test("labels each rendered footnote body with its source marker", async () => {
   const viewModel: TextSegmentDataViewModel = {
     ...DATA_VIEW_MODEL,
-    body: [
-      { kind: "footnote-marker", noteIndex: 0, markerText: "*" },
-      { kind: "footnote-marker", noteIndex: 1, markerText: "†" },
-    ],
+    bodyHtml:
+      '<span data-sefaria-note="0"></span><span data-sefaria-note="1"></span>',
     notes: [
-      { index: 0, markerText: "*", content: null },
-      { index: 1, markerText: "†", content: "Second note." },
+      { key: 0, markerHtml: "*", contentHtml: null },
+      { key: 1, markerHtml: "†", contentHtml: "Second note." },
     ],
   };
   render(
@@ -153,7 +146,7 @@ test("contains a long unbroken word in a 320 pixel host", async () => {
   const longWord = "word".repeat(200);
   const viewModel: TextSegmentDataViewModel = {
     ...DATA_VIEW_MODEL,
-    body: [{ kind: "html", html: longWord }],
+    bodyHtml: longWord,
     notes: [],
   };
   render(html`
@@ -194,12 +187,7 @@ test("reverses vocalization locally without changing a shared frozen view model"
     ref: "Micah 6:8",
     heRef: "מיכה ו׳:ח׳",
     direction: "rtl" as const,
-    body: Object.freeze([
-      Object.freeze({
-        kind: "html" as const,
-        html: "<b>הִגִּ֥יד׀</b> לְךָ֛ אָדָ֖ם׃",
-      }),
-    ]),
+    bodyHtml: "<b>הִגִּ֥יד׀</b> לְךָ֛ אָדָ֖ם׃",
     notes: Object.freeze([]),
   });
   render(html`

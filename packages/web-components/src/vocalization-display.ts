@@ -1,5 +1,4 @@
 import {
-  applyVocalization,
   applyVocalizationToHtml,
   type VocalizationMode,
 } from "@arithmomaniac/sefaria-text-transform";
@@ -9,7 +8,7 @@ import type { TextSegmentDataViewModel } from "./text-segment.js";
 /** Full safe fields or a non-full display derived from them. */
 export type TextSegmentDisplay = Pick<
   TextSegmentDataViewModel,
-  "body" | "notes"
+  "bodyHtml" | "notes"
 >;
 
 /** Rejects unsupported runtime values assigned through JavaScript or markup. */
@@ -32,22 +31,14 @@ export function deriveTextSegmentDisplay(
   assertVocalizationMode(mode);
   if (mode === "taamim_and_nikkud") return viewModel;
   return {
-    body: viewModel.body.map((part) =>
-      part.kind === "html"
-        ? { kind: "html", html: applyVocalizationToHtml(part.html, mode) }
-        : {
-            kind: "footnote-marker",
-            noteIndex: part.noteIndex,
-            markerText: applyVocalization(part.markerText, mode),
-          },
-    ),
+    bodyHtml: applyVocalizationToHtml(viewModel.bodyHtml, mode),
     notes: viewModel.notes.map((note) => ({
-      index: note.index,
-      markerText: applyVocalization(note.markerText, mode),
-      content:
-        note.content === null
+      key: note.key,
+      markerHtml: applyVocalizationToHtml(note.markerHtml, mode),
+      contentHtml:
+        note.contentHtml === null
           ? null
-          : applyVocalizationToHtml(note.content, mode),
+          : applyVocalizationToHtml(note.contentHtml, mode),
     })),
   };
 }

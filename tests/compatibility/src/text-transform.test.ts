@@ -1,8 +1,7 @@
 import {
   applyVocalization,
   applyVocalizationToHtml,
-  extractFootnotes,
-  sanitize,
+  normalizeText,
   type PaseqMode,
 } from "@arithmomaniac/sefaria-text-transform";
 import { describe, expect, it } from "vitest";
@@ -122,12 +121,14 @@ describe("source-backed structural compatibility", () => {
       html: '<span class="mam-kq-trivial">שְׁעָרָ֗ו</span>',
     };
 
-    const sanitized = sanitize(fixture.html);
+    const sanitized = normalizeText(fixture.html).bodyHtml;
 
     expect(fixture.capturedAt).toBe("2026-08-30");
-    expect(sanitized).toBe('<span class="mam-kq-trivial">שְׁעָרָ֗ו</span>');
+    expect(sanitized).toBe(
+      '<span data-sefaria-mam="mam-kq-trivial">שְׁעָרָ֗ו</span>',
+    );
     expect(applyVocalizationToHtml(sanitized, "none")).toBe(
-      '<span class="mam-kq-trivial">שערו</span>',
+      '<span data-sefaria-mam="mam-kq-trivial">שערו</span>',
     );
   });
 
@@ -139,17 +140,14 @@ describe("source-backed structural compatibility", () => {
       html: 'When God began to create<sup class="footnote-marker">*</sup><i class="footnote"><b>When God began to create </b>Others.</i> heaven',
     };
 
-    expect(extractFootnotes(sanitize(fixture.html))).toEqual({
-      body: [
-        { kind: "html", html: "When God began to create" },
-        { kind: "footnote-marker", noteIndex: 0, markerText: "*" },
-        { kind: "html", html: " heaven" },
-      ],
+    expect(normalizeText(fixture.html)).toEqual({
+      bodyHtml:
+        'When God began to create<span data-sefaria-note="0"></span> heaven',
       notes: [
         {
-          index: 0,
-          markerText: "*",
-          content: "<b>When God began to create </b>Others.",
+          key: 0,
+          markerHtml: "*",
+          contentHtml: "<b>When God began to create </b>Others.",
         },
       ],
     });

@@ -22,7 +22,7 @@ The authored data, empty, loading, and projection-error states are available in 
 
 ## Interaction and accessibility
 
-This element emits no events. The view model supplies the text direction, so a host should not force every segment into one global direction. Footnote markers and notes are prepared data, not arbitrary HTML that the element should sanitize again. Keep the reference and edition context outside the segment when the reader needs that information.
+This element emits no events. The view model supplies the text direction, so a host should not force every segment into one global direction. `bodyHtml`, footnote marker HTML, and note content HTML are already normalized; the element decorates only the canonical local-key placeholders and does not sanitize again. Keep reference and edition context outside the element when the reader needs that information.
 
 ## Exact contract and source
 

@@ -12,10 +12,10 @@ For an illustrated tour of the input, read [Text markup](../../docs/guides/text-
 
 Component pure factories process text in this order:
 
-1. Call `sanitize` on API HTML.
-2. Call `extractFootnotes` on the sanitized result.
-3. Call `applyVocalizationToHtml` on HTML body parts and note content, and `applyVocalization` on plain marker text.
-4. Add component rendering state such as accessible marker and note IDs.
+1. Call `normalizeText` once on API HTML.
+2. Store its safe `bodyHtml` and source-ordered note records in the component view model.
+3. Call `applyVocalizationToHtml` on each safe HTML field when deriving a non-full display mode.
+4. Let the request-free element decorate local `data-sefaria-note` placeholders from the matching note records.
 
 API validation and HTML sanitation are separate controls. `@arithmomaniac/sefaria-client` validates the JSON response shape; this package restricts markup inside valid string fields.
 
@@ -27,17 +27,17 @@ The package parses fragments in HTML mode. This decodes entities and applies bro
 
 The parser, serializers, and traversal helpers are iterative. They can handle realistic deep nesting without exhausting the JavaScript call stack.
 
-### Sanitizer traversal
+### Normalization traversal
 
-The sanitizer assigns one of five actions to each parsed element: retain a reviewed element, unwrap its children, remove its entire subtree, replace it with text, or unwrap it as a block with a deferred separator. Only the retain action can emit a tag or attribute. Parser recovery cannot make unsupported source markup trusted.
+The normalizer assigns one of five actions to each parsed element: retain a reviewed element, unwrap its children, remove its entire subtree, replace it with text, or unwrap it as a block with a deferred separator. Only the retain action can emit a tag or attribute. Parser recovery cannot make unsupported source markup trusted.
 
 Block separators are deferred until visible content appears. This prevents adjacent legacy block wrappers from concatenating words without introducing leading, trailing, or duplicate spaces.
 
-### Footnote extraction
+### Footnote normalization
 
-The extractor recognizes a marker followed by optional whitespace and a footnote body. When a marker appears inside retained markup, the serializer temporarily closes each open ancestor, emits the marker as a typed body part, and reopens the ancestors. This keeps each emitted HTML part balanced and independently renderable.
+The same traversal recognizes a marker followed by optional whitespace and a footnote body. It replaces the pair with an empty key-only placeholder and emits independently balanced marker and content HTML. Missing content is `null`; present-empty content is `""`.
 
-Closing and reopening tags can make the output much larger for hostile deeply nested input. Body and note serialization therefore share one output limit. Exceeding the documented limit throws `RangeError` instead of producing unbounded synchronous output.
+Body and note serialization share one output limit. Exceeding eight times the input length or 64 KiB, whichever is larger, throws `RangeError` instead of producing unbounded synchronous output.
 
 ### Bounded connected-text previews
 
@@ -47,7 +47,7 @@ import { createTextPreview } from "@arithmomaniac/sefaria-text-transform";
 const preview = createTextPreview(apiHtml, 3500);
 ```
 
-The operation sanitizes its input, removes footnotes and interaction metadata, and returns balanced safe `html`, decoded visible `text`, and `truncated`. The limit counts rendered grapheme clusters rather than raw HTML or UTF-16 units, so entities and combining sequences are not cut incorrectly. It remains deterministic and DOM-free.
+The operation runs the normalizer with footnotes and metadata disabled, then returns balanced safe `html`, decoded visible `text`, and `truncated`. The limit counts rendered grapheme clusters rather than raw HTML or UTF-16 units, so entities and combining sequences are not cut incorrectly. It remains deterministic and DOM-free.
 
 ## Vocalization
 
@@ -63,12 +63,12 @@ Do not pass raw HTML to `applyVocalization`. It operates on plain text or parsed
 
 Use `applyVocalizationToHtml` for an already-sanitized HTML fragment. It changes only text nodes and preserves markup and attribute values; it does not sanitize its input.
 
-## Sanitization
+## Text normalization
 
 ```ts
-import { sanitize } from "@arithmomaniac/sefaria-text-transform";
+import { normalizeText } from "@arithmomaniac/sefaria-text-transform";
 
-const html = sanitize(apiText, {
+const result = normalizeText(apiText, {
   allowFootnotes: true,
   allowInlineAnnotations: true,
   allowNamedEntities: false,
@@ -76,30 +76,19 @@ const html = sanitize(apiText, {
 });
 ```
 
-All options default to `true` and can only remove approved features. They cannot expand the fixed tag, attribute, class, or URL allowlist.
+All options default to `true` and can only remove approved features. They cannot expand the fixed tag, attribute, or semantic allowlist.
 
-The sanitizer preserves reviewed Sefaria text structure, including footnotes, commentary placements, structural overlays, Masorah spans, named entities, and reference links. It unwraps generic and category links, replaces images with escaped alt text, and removes active content.
+`result.bodyHtml` is directly renderable safe HTML. Footnote pairs become empty `<span data-sefaria-note="N"></span>` placeholders, while `result.notes` holds `{ key, markerHtml, contentHtml }` records. Every returned HTML field is independently balanced and safe for HTML-body insertion.
 
-Absolute links are limited to HTTPS on `sefaria.org`, `www.sefaria.org`, `sefaria.org.il`, and `www.sefaria.org.il`. Normal relative Sefaria paths are accepted and serialized as canonical absolute `https://www.sefaria.org/...` URLs so embedding-page origins cannot change their destinations.
+The normalizer preserves visual formatting but turns source metadata into inert meaning-specific spans. Reference anchors become `span[data-sefaria-ref]`; named entities become `span[data-sefaria-slug]`; commentary, overlay, Masorah, and note metadata use their corresponding `data-sefaria-*` fields. It removes every unsupported attribute, every URL, active content, and unknown semantic class.
 
-## Footnotes
+Optional `commentaryReferences` can add `data-sefaria-ref` to an exact commentary marker match. The candidates must come from validated, source-scoped Sefaria link evidence. Missing, ambiguous, or conflicting evidence emits no reference; the transform never guesses one.
 
 ```ts
-import {
-  extractFootnotes,
-  sanitize,
-} from "@arithmomaniac/sefaria-text-transform";
-
-const result = extractFootnotes(sanitize(apiText));
+const { bodyHtml, notes } = normalizeText(apiText);
 ```
 
-`result.body` contains ordered HTML and logical marker parts. `result.notes` contains source-ordered marker/content pairs. `markerText` is decoded plain text for text-node rendering; `html` and non-null `content` are escaped HTML. A missing body is `null`; a present empty body is `""`.
-
-The extractor does not return DOM IDs. Component view-model factories own IDs because only they know the segment, language side, composition, and render scope.
-
-`extractFootnotes` does not sanitize its input. Call `sanitize` first when processing untrusted API HTML.
-
-Extraction rejects adversarial inputs with a `RangeError` when closing and reopening nested ancestors around markers would produce more than eight times the input length or 64 KiB, whichever is larger.
+Footnote keys are zero-based and local to one result. They are not DOM IDs or durable identities. The consuming component owns visual marker decoration, accessibility relationships, and interaction.
 
 ## Evidence and compatibility
 
