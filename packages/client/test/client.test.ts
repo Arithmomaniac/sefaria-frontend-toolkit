@@ -84,11 +84,11 @@ describe("generated Sefaria SDK", () => {
   });
 
   it("caches newly covered JSON and PNG operations", async () => {
-    const png = new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10]);
+    const png = [137, 80, 78, 71, 13, 10, 26, 10];
     const fetchMock = vi.fn<typeof fetch>(async (request) => {
       const url = request instanceof Request ? request.url : String(request);
       return url.includes("/api/img-gen/")
-        ? new Response(png, {
+        ? new Response(new Uint8Array(png), {
             headers: { "content-type": "image/png" },
           })
         : jsonResponse([]);
@@ -110,7 +110,9 @@ describe("generated Sefaria SDK", () => {
     expect(firstImage.data).toBeInstanceOf(Blob);
     expect(secondImage.data).toBeInstanceOf(Blob);
     expect(
-      new Uint8Array(await (secondImage.data as Blob).arrayBuffer()),
+      Array.from(
+        new Uint8Array(await (secondImage.data as Blob).arrayBuffer()),
+      ),
     ).toEqual(png);
     expect(firstImage.response).not.toBe(secondImage.response);
   });
