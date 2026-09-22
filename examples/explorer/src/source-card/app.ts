@@ -1,12 +1,10 @@
 import { createSefariaClient } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 import type {
+  SefariaAcquisition,
   SefariaSourceCard,
-  SourceCardController,
   SourceCardRequest,
 } from "@arithmomaniac/sefaria-web-components";
-import { bindSourceCardController } from "@arithmomaniac/sefaria-web-components/bindings";
-import { createSourceCardController } from "@arithmomaniac/sefaria-web-components/source-card";
 
 /** Controls the interactive live source-card demonstration. */
 export interface SourceCardLiveDemo {
@@ -17,9 +15,10 @@ export interface SourceCardLiveDemo {
 /** Connects the request form, presets, and display controls to the source card. */
 export function startSourceCardLiveDemo(
   root: Document,
-  controller: SourceCardController = createSourceCardController(
-    createSefariaClient(),
-  ),
+  acquisition: SefariaAcquisition = {
+    kind: "client",
+    client: createSefariaClient(),
+  },
 ): SourceCardLiveDemo {
   const form = requireElement<HTMLFormElement>(root, "#source-card-form");
   const trefInput = requireNamedInput(form, "tref");
@@ -40,7 +39,12 @@ export function startSourceCardLiveDemo(
     "#source-card-content",
   );
   const result = requireElement<SefariaSourceCard>(root, "#source-card-result");
-  bindSourceCardController(result, controller);
+  let activeLoad = 0;
+  let acquisitionError: unknown;
+  result.addEventListener("sefaria-source-card-error", (event) => {
+    acquisitionError = (event as CustomEvent<{ readonly error: unknown }>)
+      .detail.error;
+  });
 
   const applyDisplaySettings = (): void => {
     const values = new FormData(displayForm);
@@ -58,43 +62,45 @@ export function startSourceCardLiveDemo(
       primaryTitleInput.value,
       translationTitleInput.value,
     );
+    const loadId = ++activeLoad;
+    const hadCommittedContent = result.status === "ready";
     resultContent.hidden = false;
     requestState.dataset.state = "loading";
     requestState.textContent = `Loading ${request.tref} from Sefaria.`;
     hostError.hidden = true;
     hostError.textContent = "";
     submitButton.disabled = true;
+    acquisitionError = undefined;
+    result.acquisition = acquisition;
+    result.primaryVersionTitle = request.primary?.versionTitle;
+    result.translationVersionTitle = request.translation?.versionTitle;
+    result.sref = request.tref;
 
-    try {
-      const viewModel = await controller.load(request);
-      if (controller.snapshot.result?.viewModel !== viewModel) {
-        return;
-      }
-      requestState.dataset.state = viewModel.state;
+    await waitForTerminalStatus(result, loadId, () => activeLoad);
+    if (loadId !== activeLoad) return;
+
+    if (acquisitionError === undefined) {
+      requestState.dataset.state = result.status;
+      const itemCount =
+        result.shadowRoot?.querySelectorAll(".items > [data-position]")
+          .length ?? 0;
       requestState.textContent =
-        viewModel.state === "data"
-          ? `${request.tref} produced ${viewModel.items.length} items from one request.`
-          : `${request.tref} produced ${viewModel.state}.`;
-    } catch (error) {
-      if (
-        controller.snapshot.attempt.state !== "failed" ||
-        controller.snapshot.attempt.error !== error
-      ) {
-        return;
-      }
+        result.status === "ready"
+          ? `${request.tref} produced ${itemCount} items from one request.`
+          : `${request.tref} produced ${result.status}.`;
+    } else if (acquisitionError !== undefined) {
       requestState.dataset.state = "error";
       requestState.textContent = `${request.tref} could not complete.`;
-      if (controller.snapshot.result === undefined) {
+      if (!hadCommittedContent) {
         resultContent.hidden = true;
       }
       hostError.hidden = false;
       hostError.textContent =
-        error instanceof Error ? error.message : String(error);
-    } finally {
-      if (controller.snapshot.attempt.state !== "loading") {
-        submitButton.disabled = false;
-      }
+        acquisitionError instanceof Error
+          ? acquisitionError.message
+          : String(acquisitionError);
     }
+    submitButton.disabled = false;
   };
 
   form.addEventListener("submit", (event) => {
@@ -125,6 +131,18 @@ export function startSourceCardLiveDemo(
         preset.dataset.translationVersionTitle ?? "";
       form.requestSubmit();
     });
+  }
+
+  async function waitForTerminalStatus(
+    result: SefariaSourceCard,
+    loadId: number,
+    activeLoad: () => number,
+  ): Promise<void> {
+    await result.updateComplete;
+    while (loadId === activeLoad() && result.status === "loading") {
+      await new Promise((resolve) => setTimeout(resolve));
+      await result.updateComplete;
+    }
   }
 
   return { loadCurrentRequest };

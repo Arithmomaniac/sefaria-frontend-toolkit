@@ -1,17 +1,14 @@
 import {
   createSefariaClient,
+  text,
   type CoreV3TextsResponse,
   type SefariaClient,
   zCoreV3TextsResponse,
 } from "@arithmomaniac/sefaria-client";
-import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
-import { bindSourceCardController } from "@arithmomaniac/sefaria-web-components/bindings";
-import {
-  createSourceCardController,
-  type SourceCardControllerResult,
-  type SourceCardControllerSnapshot,
-  type SourceCardTerminalViewModel,
-} from "@arithmomaniac/sefaria-web-components/source-card";
+import type {
+  SefariaAcquisition,
+  SefariaSourceCard,
+} from "@arithmomaniac/sefaria-web-components";
 
 import payload from "./micah-6-8.json";
 
@@ -35,15 +32,15 @@ interface AlpineSourceCardState {
   selectable: boolean;
   selectedPosition: readonly number[] | undefined;
   selectedRef: string | undefined;
-  committedRef: string | undefined;
+  committedRef: string;
   loadAttempts: number;
   status: string;
-  failure: string | undefined;
+  inputFailure: string | undefined;
   attach(
     element: SefariaSourceCard,
     reactiveState: AlpineSourceCardState,
   ): void;
-  syncCard(
+  syncPresentation(
     element: SefariaSourceCard,
     contentLanguage: SefariaSourceCard["contentLanguage"],
     layout: SefariaSourceCard["layout"],
@@ -53,7 +50,7 @@ interface AlpineSourceCardState {
     selectedPosition: readonly number[] | undefined,
   ): void;
   selectSource(event: CustomEvent<SourceSelection>): void;
-  loadReference(): Promise<void>;
+  loadReference(): void;
   destroy(): void;
 }
 
@@ -61,13 +58,14 @@ export function createAlpineSourceCardExample(
   suppliedClient?: SefariaClient,
 ): AlpineSourceCardState {
   const client = suppliedClient ?? createSefariaClient({ cache: false });
-  const controller = createSourceCardController(client);
-  controller.setSuppliedData({ tref: "Micah 6:8" }, suppliedPayload);
-  let unbind: (() => void) | undefined;
-  let unsubscribe: (() => void) | undefined;
+  let card: SefariaSourceCard | undefined;
+  let observer: MutationObserver | undefined;
   let host: AlpineSourceCardState | undefined;
-  let previousResult: SourceCardControllerResult | undefined;
+  let selectedMetadataRef: string | undefined;
   let disposed = false;
+  const acquisition = createSourceCardAcquisition(client, (ref) => {
+    selectedMetadataRef = ref;
+  });
 
   const state: AlpineSourceCardState = {
     tref: "Micah 6:8",
@@ -83,20 +81,37 @@ export function createAlpineSourceCardExample(
     committedRef: "Micah 6:8",
     loadAttempts: 0,
     status: "Supplied Micah 6:8 data rendered with zero live loads.",
-    failure: undefined,
+    inputFailure: undefined,
 
     attach(element, reactiveState) {
-      if (disposed || unbind !== undefined) return;
+      if (disposed || card !== undefined) return;
+      card = element;
       host = reactiveState;
-      unbind = bindSourceCardController(element, controller);
-      unsubscribe = controller.subscribe((snapshot) => {
-        if (host === undefined) return;
-        applySnapshot(host, snapshot, previousResult);
-        previousResult = snapshot.result;
+      element.acquisition = acquisition;
+      element.sref = "";
+      element.data = suppliedPayload;
+      const synchronizeCommittedReference = (): void => {
+        if (
+          element.status !== "ready" ||
+          selectedMetadataRef === undefined ||
+          host === undefined ||
+          host.loadAttempts === 0
+        ) {
+          return;
+        }
+        host.committedRef = selectedMetadataRef;
+        host.status = `Committed canonical reference ${selectedMetadataRef}.`;
+      };
+      observer = new MutationObserver(synchronizeCommittedReference);
+      observer.observe(element.shadowRoot!, {
+        childList: true,
+        subtree: true,
+        characterData: true,
       });
+      synchronizeCommittedReference();
     },
 
-    syncCard(
+    syncPresentation(
       element,
       contentLanguage,
       layout,
@@ -119,92 +134,70 @@ export function createAlpineSourceCardExample(
       this.selectedRef = event.detail.ref;
     },
 
-    async loadReference() {
+    loadReference() {
       const normalized = this.tref.trim();
       if (normalized.length === 0) {
-        this.failure = "Enter a non-blank Sefaria reference.";
+        this.inputFailure = "Enter a non-blank Sefaria reference.";
         return;
       }
-      this.failure = undefined;
+      if (card === undefined || disposed) return;
+      this.inputFailure = undefined;
+      this.selectedPosition = undefined;
+      this.selectedRef = undefined;
       this.loadAttempts += 1;
-      try {
-        await controller.load({ tref: normalized });
-      } catch {
-        // The controller snapshot carries the original failure for the UI.
-      }
+      this.status = `Activated ${normalized}. The Source Card reports loading and results inline.`;
+      selectedMetadataRef = undefined;
+      card.data = undefined;
+      card.sref = normalized;
     },
 
     destroy() {
       if (disposed) return;
       disposed = true;
-      unsubscribe?.();
-      unsubscribe = undefined;
-      unbind?.();
-      unbind = undefined;
+      observer?.disconnect();
+      observer = undefined;
+      if (card !== undefined) {
+        card.data = undefined;
+        card.sref = "";
+        card.acquisition = { kind: "disabled" };
+      }
+      card = undefined;
       host = undefined;
-      controller.dispose();
     },
   };
 
   return state;
 }
 
-function applySnapshot(
-  host: AlpineSourceCardState,
-  snapshot: SourceCardControllerSnapshot,
-  previousResult: SourceCardControllerResult | undefined,
-): void {
-  if (
-    previousResult !== undefined &&
-    snapshot.result !== undefined &&
-    snapshot.result !== previousResult
-  ) {
-    host.selectedPosition = undefined;
-    host.selectedRef = undefined;
-  }
-  const canonicalRef = committedCanonicalRef(snapshot.result?.viewModel);
-  host.committedRef = canonicalRef;
-  host.selectable =
-    (snapshot.attempt.state === "loading"
-      ? snapshot.attempt.viewModel
-      : snapshot.result?.viewModel
-    )?.state === "data";
-  if (snapshot.attempt.state === "loading") {
-    host.failure = undefined;
-    host.status = `Loading ${snapshot.attempt.request.tref} through the public controller.`;
-    return;
-  }
-  if (snapshot.attempt.state === "failed") {
-    const message = errorMessage(snapshot.attempt.error);
-    host.failure =
-      canonicalRef === undefined
-        ? message
-        : `${message} The prior committed ${canonicalRef} card remains displayed.`;
-    host.status =
-      canonicalRef === undefined
-        ? "The live load failed. No canonical result is committed."
-        : `The live load failed. Showing the prior committed ${canonicalRef} result.`;
-    return;
-  }
-  host.failure = undefined;
-  host.status =
-    host.loadAttempts === 0
-      ? canonicalRef === undefined
-        ? "Supplied component content rendered with zero live loads."
-        : `Supplied ${canonicalRef} data rendered with zero live loads.`
-      : canonicalRef === undefined
-        ? "The component committed an error result without a canonical reference."
-        : `Committed canonical reference ${canonicalRef}.`;
-}
-
-function committedCanonicalRef(
-  viewModel: SourceCardTerminalViewModel | undefined,
-): string | undefined {
-  return viewModel?.state === "data" || viewModel?.state === "empty"
-    ? viewModel.header.ref
-    : undefined;
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
+function createSourceCardAcquisition(
+  client: SefariaClient,
+  selectMetadata: (ref: string) => void,
+): SefariaAcquisition {
+  return {
+    kind: "capability",
+    capability: {
+      getText: async (request, signal) => {
+        const result = await text.getV3Texts({
+          client,
+          path: { tref: request.sref },
+          query: {
+            version: [...request.versions],
+            return_format: request.returnFormat,
+          },
+          signal,
+        });
+        if (result.data !== undefined) {
+          selectMetadata(result.data.ref);
+          return { payload: result.data, status: 200 };
+        }
+        if (result.error !== undefined && result.response !== undefined) {
+          return {
+            payload: result.error,
+            status: result.response.status,
+          };
+        }
+        throw new Error("The source-card request returned no result.");
+      },
+    },
+  };
 }

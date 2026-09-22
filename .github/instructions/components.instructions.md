@@ -3,30 +3,27 @@ description: "Rules for component factories, Lit elements, and browser demonstra
 applyTo: "packages/web-components/**,examples/explorer/src/authored/**,examples/react-vite/**,examples/reader/**,docs/specs/components.md"
 ---
 
-> Created/edited by GitHub Copilot with human review/feedback by avilevin.
+> Created/edited by GitHub Copilot; pending human review.
 
 # Component Instructions
 
-- Give each endpoint-backed component a non-DOM subpath with its request type, view-model union, pure factory, and async factory.
-- A non-requesting composition or session subpath may instead combine existing component contracts and host-admitted captures; it must not invent an endpoint, client method, or async factory.
-- Keep component view models specific to one rendering surface.
-- Do not create a generalized data facade.
-- Make pure factories deterministic and independent of clients, caches, DOM state, and global state.
-- Make async factories accept a supplied `@arithmomaniac/sefaria-client`.
-- Make a successful async result equal the pure result for its captured payload.
-- Return a component error view model for documented HTTP error payloads.
-- Preserve network and abort rejections from the supplied client.
-- Return component-specific partial or empty states for missing requested content.
-- Keep loading, data, partial, empty, and error details in view models.
-- Keep layout, focus, selection, open state, and placement as element properties.
-- Let elements accept only a component view model and visual or interaction properties.
-- Do not give elements references, raw JSON, API payloads, clients, hosts, base URLs, request parameters, or `fetch`.
-- Do not make requests or call async factories from elements.
-- Make composite async factories issue one outer request and call child pure factories.
-- Prove that ten child views use one outer request and zero child requests.
-- Sanitize unsafe HTML before it enters a view model.
-- Add JSDoc to every handwritten exported declaration and every exported interface or class property. Document rendering state and element behavior at the declaration. Link to package documentation for longer explanations.
+- Give every public element component-specific `sref` and raw `data` inputs; do not expose a public prepared rendering model.
+- Keep raw input, acquisition options, events, and diagnostics specific to one component surface. Do not create a generalized domain or data facade.
+- For the six non-Reader elements, defined `data` is authoritative, including valid empty data and invalid data. Invalid supplied data must supersede pending acquisition, replace prior content with the validation error, and never fall through to `sref`.
+- Keep deterministic validation, selection, normalization, and preparation independent of clients, caches, DOM state, and global state.
+- Use corrected generated contracts directly for complete endpoint payloads. Define narrow validators only for the component-specific selected fragments or response-shaped slices the public contract actually accepts.
+- Preserve network and abort rejections internally as original causes. Current element-owned failures must become accessible state and documented events without unhandled promise rejections; stale completions publish nothing.
+- Keep layout, focus, selection, open state, placement, and other presentation controls as element properties.
+- Permit only the documented tagged acquisition choice. Do not expose a base URL, arbitrary host, request function, or `fetch`.
+- Use one lazy shared acquisition value per loaded module instance. Supplied data, import, and explicit per-element acquisition do not realize it. Configuration after first shared use always fails.
+- An explicit disabled, failed, or unsupported acquisition choice never falls through to browser HTTP.
+- Abort eligible active work on disconnection and resume only still-eligible interrupted work on reconnection. Do not automatically retry ordinary network failures.
+- Keep Popup preparation independent of `open`; visibility alone must not start, restart, or cancel acquisition.
+- Make composites prepare children from captured parent data through private pure helpers or private prepared receivers. Never substitute child `sref` when the parent already owns the data.
+- Prove that ten child renderings use one outer request and zero child requests.
+- Sanitize unsafe HTML before private prepared content reaches rendering.
+- Add JSDoc to every handwritten exported declaration and every exported interface or class property. Link to package documentation for longer explanations.
 - Use direction and attribution from payload data.
 - Use real interactive controls, accessible names, visible focus, and keyboard operation.
-- Use browser tests for structure, direction, focus, layout, event composition, token inheritance, and request absence.
-- Add an authored explorer state for each view-model state and important interaction.
+- Use browser tests for structure, direction, focus, layout, event composition, token inheritance, supplied-data request absence, and standalone loading.
+- Add authored explorer states from raw fixtures or real acquisition/validation paths, not public hand-built view models.

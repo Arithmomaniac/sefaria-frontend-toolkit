@@ -4,500 +4,100 @@
 
 ## Status
 
-The standalone connections reader, multi-pane website reader workspace, stateful MCP reader, adaptive connections tool and rendering, static browser-embedded MCP reference host, supplied-data component editor, authenticated VS Code reader walkthrough, and authored linked-article integration are current. MCP reader data operations use host-proxied server-tool calls. A successful App `ui/message` response applies only to the reader's separate explicit chat-export action and means the host accepted that message for enqueueing or composer placement.
+The documentation site, supplied-data editor, standalone and spatial website Readers, MCP App, and authored linked-article integration are current. Their declarative component-input migration is implemented.
 
-## Shared integration rules
+## Shared rules
 
-Integrations consume built artifacts and public package contracts. They do not copy the Sefaria Web application, mobile application, Linker, or MCP server.
+Integrations consume built artifacts and public package contracts. They own host input, explicit activation policy, external unknown-JSON validation, optional acquisition creation, placement, and application-specific coordination.
 
-An integration can accept a reference or host input. It calls a non-DOM component factory and supplies the resulting view model to an element.
+An integration assigns component-specific raw `data`, a Reader raw seed, or `sref`. It may assign only the documented tagged acquisition choice. It must not give an element arbitrary `fetch`, a base URL, an untyped host, unknown JSON, or public prepared rendering.
 
-An integration must not give a reference, raw payload, client, host, or `fetch` function to an element.
+Unknown server, fixture, stored, user, or MCP JSON passes a public corrected client schema or generated validator before element admission. Validation failures report structured paths.
 
-Unknown JSON must pass a generated `@arithmomaniac/sefaria-client` validator before component projection. Validation failures report structured paths.
+## Activation and traffic policy
 
-## Documentation site [Current]
+Maintained live pages remain explicitly activation-gated. Page arrival, route hydration, deep links, and prefilled query values make no Sefaria request. Only a click, keyboard activation, form submission, example preset, authored citation, or equivalent approved action assigns live `sref` or invokes a host tool.
 
-The VitePress site presents the canonical Markdown learning path and embeds isolated production builds of the maintained browser examples. It does not import DOM-dependent toolkit registration into VitePress server rendering, render toolkit component HTML on the server, or hydrate toolkit elements.
+The supplied-data editor creates no client and makes no live request. Documentation snippets may show immediate `sref` when they are non-executing.
 
-The site build includes the supplied-data editor, explorer, controlled and spatial Reader, vanilla consumer, React consumer, authored linked article, and live browser-embedded MCP host. The live MCP host requires no external server, proxy service, account, or additional hosted origin. Each example keeps its own request ownership, cancellation, stale-result handling, element lifecycle, and tests. No example imports another example at runtime.
+Transport semantics remain unchanged: documented HTTP payloads retain their typed status behavior; network and abort failures remain failures. Integrations add no retry, coalescing, stale fallback, persistence, or response cache beyond the client's bounded per-client cache.
 
-Landing pages, authored-state previews, live demo routes, and reference deep links make no unsolicited Sefaria request. A live route prefills its bounded initial input and presents an explicit start action. Only click, keyboard activation, or an equally explicit example-preset or authored-citation activation starts live data. Live operations preserve network, abort, contract-validation, documented HTTP, projection, partial, and empty distinctions and do not substitute fixture success after a failure.
+## Supplied-data editor
 
-The live MCP route is the static site's in-memory protocol and AppBridge acceptance path. The compiled local Node reference host remains the Streamable HTTP acceptance path.
+The editor exposes seven maintained projects. Each validates fixed corrected payloads and assigns raw component data or Reader seeds. It does not retain public controllers, bindings, prepared models, a fetch broker, runtime package installation, CDN loading, service workers, or a live-data fallback.
 
-### Supplied-data component editor [Current]
+The trusted host owns project selection, editor state, source links, bounded diagnostics, and preview replacement. Edited code runs only in the opaque sandboxed frame under the existing CSP and finite source/asset/message limits.
 
-The component editor exposes maintained HTML, CSS, and plain JavaScript files for seven projects through one shared editor: reference label, text segment, bilingual segment, source card, popup, connections panel, and controlled Reader. Each project validates its fixed corrected payload through the public client schema and calls the same owning pure projection, supplied-data controller, Reader content constructor, or binding used by an application. It creates no client and makes no live Sefaria request.
+The Reader project declares exact finite `Micah 6:8` source and links coverage. Covered actions use saved records; uncovered navigation reports an explicit limitation without fabricating empty data or requesting.
 
-Editing changes only trusted-host draft state. **Run** snapshots the bounded files into one new preview, **Reset** restores the maintained bytes, and **Stop preview** removes the current frame. Switching projects disposes the prior preview and draft/editor state before loading the newly selected maintained source. A missing project query selects the documented default. An unknown project query executes no fallback project: the host shows an explicit invalid-project recovery state until the user chooses a known project.
+## Documentation site
 
-The trusted host owns project selection, URL history, per-file source links, optional separate live-demo links, declared local assets, and preview replacement. Stable embedded routes use the built static `index.html?project=<id>` form. Trusted source and live-demo links remain outside the edited frame and require explicit activation.
+The VitePress site embeds isolated production builds and does not server-render or hydrate toolkit component HTML. Landing pages, authored previews, live routes, and reference deep links produce no unsolicited Sefaria traffic.
 
-The editor host is a dedicated built page whose leading CSP meta applies `frame-src data:` and `child-src data:` only to that page. Its production JavaScript and CSS are self-hosted bundles. CodeMirror's trusted runtime style attributes require the host's narrowly scoped `style-src 'unsafe-inline'`; edited markup and code never enter the host document. Trusted package-setup, source, and live-demo links remain outside the edited frame.
+Request policy and deterministic fixture dispatch classify every permitted declarative request shape. Unexpected origins, methods, paths, references, selectors, and query parameters remain denied.
 
-Each run uses one `sandbox="allow-scripts"` data-document iframe without `allow-same-origin`. The child has a fixed CSP before edited content: scripts are limited to `data:` modules plus the exact import-map hash, styles are inline because Lit and the edited CSS require them, images are data-only, and connect, nested frame, worker, object, media, manifest, form, and base capabilities are denied. The trusted host accepts diagnostics only from the current iframe window with the current cryptographic channel and run identifiers and a bounded schema. Opaque `null` origin is not treated as identity.
+## Website integrations
 
-The package graph is built from the real public ESM entries with Vite/Rollup. Generated chunk edges are parsed with `es-module-lexer`, rejected unless they name a generated chunk, rewritten to synthetic bare specifiers, and mapped to local data modules. Shared chunks preserve module identity. Importing the pure source-card subpath does not register an element; importing the root web-components entry performs its documented registration once.
+### Standalone components
 
-The editor rejects unsupported relative, absolute, URL, escaped, and dynamic project imports rather than adding a browser resolver. Declared local payload modules are parsed and converted to data modules by the trusted host. There is no service worker, runtime package installation, CDN, source alias, fetch broker, retry, cache, fixture transport, compiler, or live-data fallback.
+The vanilla, React, Alpine, and explorer hosts teach supplied `data` first. Their explicit live action clears authoritative data when applicable, assigns `sref`, and optionally supplies an explicit toolkit client acquisition source. The element owns cancellation, stale suppression, private preparation, status, and error events.
 
-Editable source files, total project source, declared asset files, total project assets, diagnostics, message envelopes, and active previews have finite tested limits. Raw declared assets are limited to 50,000 UTF-8 bytes each and 100,000 UTF-8 bytes per project before data-module conversion. Chromium, Firefox, and WebKit acceptance runs at `/` and `/sefaria-frontend-toolkit/` without `bypassCSP`; WebKit evidence does not claim every Safari version or device. The sandbox is a browser capability boundary, not a CPU, heap, or process-isolation guarantee, and Stop/recreate does not promise recovery from every tight loop.
+### Standalone Reader
 
-The endpoint projects use bounded supplied captures with explicit provenance and coverage. Reference-label resolution, edition selection, payload-defined bilingual role and direction, source selection and vocalization, popup focus behavior, and connections category, page, and captured-preview visibility all operate locally. The supplied Reader declares exact Micah 6:8 source and text-inclusive links coverage; covered root operations reuse those validated captures through the Reader content constructors, while uncovered navigation remains an explicit host limitation and does not fabricate empty content, normalize arbitrary references, or request data. Request-bearing behavior remains in separate trusted live demos.
+The ordinary website Reader uses one persistent `<sefaria-reader>`. After **Start live demo**, the host assigns an explicit client acquisition and `sref`. Later external roots assign a new `sref`; the Reader transactionally admits the new root and starts a fresh root history without replacing the element.
 
-### Static browser-embedded MCP host [Current]
+The host may place a page-owned action in `toolbar-actions` and read `reader.selectedRef` when it activates. The action adds no request or persistence contract.
 
-The Pages artifact includes a browser reference host that creates one MCP client and one MCP server in the host page and connects them with the pinned SDK's in-memory transport. The browser server registers the same tools and resource contract as the Node server and calls the deployed Sefaria endpoints only after the user selects **Start live demo**. It does not accept an arbitrary server URL, arbitrary App HTML, credentials, or host policy from query parameters.
+### Spatial Reader
 
-The host obtains the self-contained App only through MCP `resources/read` and sends it through the official AppBridge sandbox-resource handshake. The App continues to make no direct Sefaria request. App-initiated navigation calls the same embedded server through the host's `serverTools` bridge.
+The spatial example uses one `reader-session` for semantic entries, exact capture coverage, pins, and bounded retention. Its host separately owns pane IDs, placement, compact selection, descendant pruning, cancellation timing, and visible limits.
 
-The static host uses an intermediate self-contained `data:` proxy document with an opaque origin and an inner sandboxed App frame. A same-origin HTTP or `srcdoc` outer proxy with both scripts and same-origin permission is not an acceptable substitute. The host and proxy validate expected window sources; an opaque `null` message origin alone is not identity. The fixed browser policy denies App network access, objects, base changes, and nested frames and cannot be widened by the App or URL input.
+The spatial host uses semantic `ReaderEntryInfo` and immutable raw `ReaderSourceRecord`/`ReaderConnectionsRecord`; it does not inspect prepared rendering. One parent capture prepares child surfaces without child acquisition.
 
-The browser-embedded path proves static MCP initialization, tool discovery and calls, resource delivery, AppBridge rendering, sandbox isolation, exact browser request counts, and continuing same-App navigation. It does not prove stdio, Streamable HTTP, or compatibility with an external named host. The existing Node Inspector, local HTTP host, and optional VS Code walkthrough retain those roles.
+## MCP App
 
-Deterministic browser acceptance proves the packaged App through this complete path, including zero pre-activation Sefaria requests, tool and resource discovery, the initial text request, the App-mediated links continuation, opaque isolation, bounded initialization failure, cancellation during startup, and cleanup. A runtime failure must remain visible rather than use unsandboxed rendering, direct App fetches, an external proxy, or fixture success.
+MCP `structuredContent` carries a corrected API payload. Namespaced metadata carries only the operation identity, documented status, and exact request needed to select the validator and construct a raw Reader seed.
 
-The site artifact contains an allowlisted set of real built files. Source links point to actual files on `main` rather than same-origin source-looking paths that can resolve to an HTML fallback. Local builds use `/`; the Pages build uses `/sefaria-frontend-toolkit/` for VitePress, every included example, and browser acceptance. Pull requests build and test without deploying. A separate guarded workflow reruns the complete gate on `main`, uploads only `dist/site`, and deploys through the `github-pages` environment.
+The first App render validates the unknown boundary and supplies the raw seed, making zero duplicate requests. Later Reader work uses a tagged host capability whose only transport is a supported host-proxied tool call. The App and elements never fall back to direct Sefaria HTTP.
 
-## Interaction task flow
+The Node tools remain stateless. Reader semantic history and raw records remain in the App/session. `ui/message` is reserved for the separate explicit chat-export action; it is not Reader data transport.
 
-An integration owns the task lifecycle for user-triggered data changes. It selects authoritative captured data, validated server data, or a supplied client.
+The browser-embedded reference host continues to prove the packaged App, official AppBridge handshake, opaque sandbox, tool/resource discovery, exact request counts, continuing same-App navigation, cancellation, and cleanup. It does not replace stdio, Streamable HTTP, or named-host qualification.
 
-If the required data is already available, the integration calls the owning pure factory. If a client request is required, it calls the async factory with cancellation.
+## Authored linked article
 
-The captured-data owner declares which targets the payload covers. The integration must not infer coverage from an empty pure-factory result.
+The article retains ordinary Sefaria anchors and native navigation. Eligible primary activation assigns Popup `sref`, anchor, and `open`; modifier, alternate-target, download, and non-primary activation remain native.
 
-For a component data path, the integration supplies the target component's loading and terminal view models. It does not give task state, a client, or a raw payload to the element.
+The page uses an explicit cache-disabled client acquisition source. Close, supersession, and destroy clear the owned reference or remove the Popup. Popup owns its acquisition lifecycle and emits `sefaria-popup-error`; the page owns visible integration status and removes only its listeners and accessibility attributes.
 
-If a newer action supersedes an older operation, the integration aborts the old operation when possible. It ignores an obsolete result even when cancellation cannot stop the work.
+The integration does not detect citations, extract article text, submit a Linker task, poll, hover-activate, bulk preload, rewrite prose, or install a global script.
 
-If no permitted data source exists, the integration shows its own unavailable state outside the target element. It does not construct an unsupported component state.
+## Composition and request counts
 
-An integration can use `@lit/task`, a reactive controller, or an equivalent task mechanism. The component package does not require one task framework.
+If an integration already owns corrected data, it supplies raw data or a Reader seed. A parent element or session privately prepares child content from that capture. It must not assign child `sref`.
 
-## Standalone connections reader [Current]
+Ten child renderings from one parent response require one outer request and zero child requests.
 
-The standalone demo has one source-card reader and one connections pane. The host owns the displayed container, active single-segment target, selection, cancellation, stale-result suppression, and English-versus-Hebrew address-label presentation. Selecting a reader row commits the controlled selection immediately, performs one links request and no text request, and renders an integration-owned failure if the request rejects. Opening a connection first obtains its target through the source-card async factory. Once a non-spanning response establishes the first target segment and server-provided section, the host starts the contextual-section request when needed and the first-segment links request concurrently. It commits the contextual reader as soon as the section is available while the connections pane remains loading independently. This is at most two text operations and one links operation; neither component factory performs hidden context loading.
+## Failure rules
 
-A same-section range opens at its first addressed segment, not a multisegment selection. A spanning target follows only the first server-provided `spanningRefs` entry, requests that bounded context, and selects its first qualified segment; it does not render the complete spanning range or parse a reference string. Missing first-target text is unavailable rather than silently replaced with the next nonempty row. Unsupported nested navigation is explicit, while source-card rendering remains supported. Repeated hops are allowed; history, Back, and MCP qualification remain deferred.
-
-For local category/page changes, the host explicitly captures the validated result of the generated `getLinks` operation and calls the connections pure factory. The capture records its exact reference and text-inclusion coverage and is discarded on target replacement. This is an explicit capture-and-project client path, alongside the one-request async view-model factory, not a cache or hidden observer hook. Both paths share the same pure projection. Category changes, paging, and showing/hiding already captured previews make zero requests. Metadata-only captures require an explicit Load previews action to replace them with one text-inclusive links response.
-
-The API has no transport paging parameter: UI paging bounds projection and rendering, not server work or downloaded response bytes. A superseded navigation, links load, or preview load must never overwrite a newer target or page. A failed contextual-section request leaves the previous reader committed and aborts its sibling links operation. A rejected links operation does not roll back an already established reader selection; the integration clears the loading connections surface and reports its own terminal failure outside the request-free element.
-
-## Multi-pane website reader workspace [Current]
-
-The regular-website spatial demonstration uses one `@arithmomaniac/sefaria-web-components/reader-session` for semantic entries, selected positions, admitted source and links captures, operation eligibility, and bounded retention. Its host separately owns ordered stable pane IDs, source-to-connections and ancestor-to-child placement, active compact pane, pane pins, cancellation, and physical operation timing. It uses `createSefariaReaderDataSource` for source and links requests rather than duplicating the component-default selectors. This demo-private spatial state is not a public arbitrary-panel manager and is not part of `<sefaria-reader>`.
-
-The same demo package also serves an interactive supported-reader page. Its host calls `loadReaderController` with the initial reference and client, then calls `bindReaderController` for one persistent `<sefaria-reader>` element. Later form submissions call `replaceRoot` on that same controller: the old committed source remains visible until the new source qualifies and fits, a successful replacement removes old breadcrumbs, and a links failure preserves the new source. The returned controller owns continuing session transitions, cancellation, captures, and event handling. This page proves the public stateful convenience path for a regular website; it does not make the element autonomous, add a general URL router, or add spatial pane policy to the controller.
-
-A wide viewport contains a horizontally scrolling workspace of fixed-width source and connections panes. Each pane scrolls vertically without moving another pane. A compact container shows exactly one active pane and exposes the ordered pane path as controls; switching presentation does not mutate semantic history or request data.
-
-The root opens as source plus connections. Selecting a connection keeps the origin connections pane visible while child source text is pending. After that source commits, the host replaces the origin connections pane with the child source, appends child connections, and pins each visible pane's entry. Closing a non-root pane or activating an ancestor removes its spatial descendants, releases their pins before semantic pruning, cancels obsolete work, and rejects later completions by generation and session operation identity.
-
-Selecting a source segment prunes later panes, updates the retained entry, and issues one links request. Connections category and page changes project the retained successful links capture with zero I/O. A text success followed by links failure keeps the text pane and renders an explicit connections failure. The demo permits at most 20 visible panes and rejects another opening with a visible instruction to close panes; it never silently removes pinned ancestors.
-
-## MCP App purpose
-
-The MCP App renders Sefaria source material inside an MCP Apps-compatible host. The first render uses the tool result and makes no second request.
-
-The current App renders one persistent request-free `<sefaria-reader>`. A corrected `/api/v3/texts/{tref}` tool result seeds its source synchronously, then the reader controller loads that selected row's connections through the originating MCP server. A corrected `/api/links/{tref}` tool result can instead seed a connections-only reader synchronously.
-
-The App is a self-contained HTML resource. The MCP server can package it without the TypeScript checkout at runtime.
-
-### Reader-controller use [Current]
-
-The integrated reader keeps one `@arithmomaniac/sefaria-web-components/reader-controller` instance in the TypeScript App instance. Its first render constructs the controller from already validated source or connections content and performs zero requests. Later controller operations use an MCP-specific reader data source whose only transport is a supported host-proxied tool call. The same public external-root action can therefore operate through this data source without a browser client, direct element request, or wire-format change, although the current App does not add a separate router/search control. The browser-client `loadReaderController` path is not reachable from the MCP App.
-
-The Node tools remain stateless. Each tool result must carry the corrected payload plus effective request metadata sufficient to construct admitted reader content: source reference and edition selectors for text, or reference and resolved `with_text` coverage for links. The App validates both payload and metadata before controller admission. The server does not store reader history, controller snapshots, operation IDs, or expiration state.
-
-The qualified VS Code host advertises `serverTools`, omits `hostContext.toolInfo`, and routes bare `get_text` and `get_links_between_texts` App calls to the originating server. The first integrated reader therefore supports those two bare names only after the host advertises `serverTools`. It does not derive a namespace, list unrelated tools, send a chat message as a transport fallback, or call Sefaria directly. Another host must be qualified separately; unavailable, rejected, malformed, or mismatched tool results remain explicit reader or integration failures.
-
-A source-card tool result seeds the exact returned target row when present, otherwise the first qualified row for a section target. The request-free reader is rendered before any host-proxied continuation. The App then loads that selected row's connections through one `get_links_between_texts` call. A connections tool result seeds a connections-only reader with zero continuation calls. Opening a connection performs the controller's bounded source qualification through `get_text` and then one `get_links_between_texts` call. Back, breadcrumb activation, category changes, paging, and covered preview changes remain local.
-
-If the host destroys the App instance, in-memory reader history is lost. A later App can start from its delivered tool result, but this is not restoration of the prior controller. Durable snapshots, server-side sessions, reference replay, and implicit reconstruction are outside the current contract.
-
-## MCP tool contract
-
-The current MCP server exposes `get_text`, which progressively enhances the official `Sefaria/sefaria-mcp` tool of the same name with an App resource.
-
-| Input | Contract |
+| Failure | Required behavior |
 | --- | --- |
-| `reference` | Required Sefaria reference such as `Micah 6:8` or `Berakhot 2a` |
-| `version_language` | Optional `source`, `english`, or `both`; defaults to `both` |
-
-The tool keeps the official MCP server's `source`, `english`, and `both` input vocabulary, but maps those choices to the source-card rendering roles. `source` sends one `version=primary` query value, `english` sends one `version=translation` query value, and `both` sends repeated `version=primary` and `version=translation` query values. It always sends `return_format=default`. This distinction matters for texts such as Kuzari, where the API's original-language `source` version is not necessarily the database's `isPrimary` version consumed by the source-card factory.
-
-The MCP server role owns the live request to `https://www.sefaria.org/api/v3/texts/{tref}`. The stdio and Streamable HTTP implementations execute that role in Node. The static reference host executes the same registered tool logic in its trusted browser host. The App does not request Sefaria in either topology.
-
-One tool result serves both host capabilities:
-
-- `content` contains a concise plain-text representation for the model and hosts that do not render Apps.
-- `structuredContent` contains the corrected API payload.
-- The tool descriptor's `_meta.ui.resourceUri` points to the App resource.
-- `_meta["sefaria/source-card"]` identifies the request and documented response status for App validation and projection.
-
-The prior private `preview_sefaria_app` tool is not retained as an alias or compatibility path.
-
-### Connections tool [Current]
-
-The server also exposes `get_links_between_texts`, preserving the official tool's `reference` and `with_text` vocabulary while adding the App resource.
-
-| Input | Contract |
-| --- | --- |
-| `reference` | Required Sefaria reference whose text connections are requested |
-| `with_text` | Optional `"0"` or `"1"`; explicit values always win |
-
-When `with_text` is omitted or null, the server resolves it per initialized client session: `"1"` when the client advertises the MCP Apps extension and `"0"` otherwise. It does not infer capability from a client name or persist the decision globally. An explicit `"0"` remains metadata-only even for an Apps client.
-
-The server performs one `GET /api/links/{tref}` operation with the resolved `with_text` and `with_sheet_links=0`. A documented 200 or 400 response is returned through the tool result. Network failures and undocumented statuses remain tool failures.
-
-The server rejects a decoded response body larger than 5 MiB or a successful array containing more than 10,000 links. It asks the caller for a narrower reference and does not silently truncate the corrected payload. This bounds accepted synchronous work; it is not transport pagination.
-
-The text content remains useful without Apps support. It identifies the reference and error or result context, lists at most 20 targets, includes excerpts only when text was requested, is bounded to 8,000 characters, and states when the textual summary is shortened. It is not a second implementation of the component's grouping, sorting, or preview rules.
-
-## MCP payload boundary
-
-`get_text` `structuredContent` carries corrected API-shaped object JSON directly. `get_links_between_texts` preserves the corrected array-shaped links payload inside `{ "payload": ... }` because MCP `structuredContent` requires an object root. The envelope is an integration constraint, not a view model or normalized domain contract.
-
-The tool also returns a short text content item for hosts that do not render Apps.
-
-The tool-result `_meta["sefaria/source-card"]` object carries only integration metadata:
-
-```json
-{
-  "operation": "getV3Texts",
-  "method": "GET",
-  "path": "/api/v3/texts/{tref}",
-  "status": 200,
-  "request": {
-    "tref": "Leviticus 19:18"
-  }
-}
-```
-
-`operation`, `method`, and `path` are fixed constants. `status` is one of the documented `200`, `400`, or `404` statuses. `request.tref` is the exact tool input. This object does not contain a view model, rendered HTML, transport payload fields, or a client configuration.
-
-The App validates the metadata before using it. It then validates `structuredContent` with the generated validator selected by the metadata status. Invalid metadata or payload input stops before projection.
-
-A validation failure contains structured paths that identify each invalid field. The App displays an integration error and does not refetch.
-
-The current tool-result `_meta["sefaria/connections"]` object contains:
-
-```json
-{
-  "operation": "getLinks",
-  "method": "GET",
-  "path": "/api/links/{tref}",
-  "status": 200,
-  "request": {
-    "tref": "Micah 6:8",
-    "withText": true
-  }
-}
-```
-
-The App requires exactly one supported Sefaria result discriminator. It rejects missing or ambiguous metadata rather than guessing from payload shape. For connections, it validates the envelope and then validates `payload` with the generated links response contract selected by the documented 200 or 400 status. Diagnostics prefix generated payload paths with `/structuredContent/payload`.
-
-For a valid success payload, the reader controller retains one capture containing the validated payload and effective request. Connections begin at Overview. Category changes reset to page zero; category, page, and visibility changes project the retained capture and make zero requests. The fixed page size remains 20.
-
-A metadata-only result renders entries without previews. Load previews calls bare `get_links_between_texts` through the qualified host server-tool capability with the same reference and explicit `with_text="1"`. It does not call `fetch`, send a chat message, or create another App result.
-
-## MCP boundary sequence
-
-```mermaid
-sequenceDiagram
-    participant Tool as MCP tool
-    participant Host as MCP host
-    participant App as MCP App
-    participant Validator as @arithmomaniac/sefaria-client validator
-    participant Controller as Reader controller
-    participant Reader as sefaria-reader
-
-    Tool->>Tool: GET /api/v3/texts/{tref}
-    Tool-->>Host: text content + structuredContent + metadata
-    Host-->>App: one tool result
-    App->>App: validate status and request metadata
-    App->>Validator: unknown structuredContent and documented status
-    alt Invalid payload
-        Validator-->>App: structured JSON paths
-        App-->>Host: integration error state
-    else Documented 400 or 404
-        Validator-->>App: typed error payload
-        App-->>Host: request-free documented error surface
-    else Valid 200 payload
-        Validator-->>App: typed corrected payload
-        App->>Controller: createReaderController(validated seed)
-        App->>Reader: bind immutable ReaderViewModel
-        Controller->>Host: callServerTool(get_links_between_texts)
-        Host-->>Controller: validated links result
-        Controller->>Reader: replace immutable ReaderViewModel
-        Reader-->>Host: rendered source and connections
-    end
-```
-
-The first reader render makes zero requests. Its initial connections continuation uses the host-proxied tool boundary after source content is visible.
-
-### Current reader navigation sequence
-
-```mermaid
-sequenceDiagram
-    participant Tool as MCP links tool
-    participant Host as MCP host
-    participant App as MCP App
-    participant Validator as @arithmomaniac/sefaria-client validator
-    participant Controller as Reader controller
-    participant Reader as sefaria-reader
-
-    Reader-->>Controller: open current connection
-    Controller->>Host: callServerTool(get_text target)
-    Host-->>Controller: validated target result
-    Controller->>Host: optional callServerTool(get_text context)
-    Host-->>Controller: validated contextual result
-    Controller->>Host: callServerTool(get_links_between_texts)
-    Host-->>Controller: validated links result
-    Controller->>Reader: append immutable history entry
-    Reader-->>Controller: activate Back or ancestor breadcrumb
-    Controller->>Reader: local retained-history projection
-```
-
-The App resolves a connection activation against the currently rendered entry ID and exact target reference. The controller performs at most two source calls and one links call, requests `version_language="both"`, and excludes preview HTML or arbitrary event text. A forged or stale event performs no tool call.
-
-Back and ancestor breadcrumb activation use retained reader history and make no server-tool call. A source selection issues one links continuation. Category and page changes remain local while capture coverage matches. Preview replacement performs one text-inclusive links call only when the retained capture lacks previews.
-
-The reader's explicit chat-export action is separate from data navigation. After explicit activation, the App attempts `ui/message` even when the initialized host omits the optional text-message capability advertisement. It exposes sending, delivered, rejected, stale, and unconfirmed states outside the request-free reader, suppresses duplicate activation while a send is pending, and does not retry an uncertain send.
-
-A newer tool result, cancellation, or teardown aborts pending controller work, invalidates pending UI continuations, removes result-specific listeners, and disposes the controller. A late server-tool result or message acknowledgement cannot update a newer result.
-
-## Server and client equivalence
-
-The MCP path is server-provided mode. Each tool supplies corrected API-shaped JSON, directly or in the specified links envelope, and the App validates it.
-
-Client mode obtains the same payload type through the thin client. Source-card modes call `createSourceCardViewModel`; connections modes call `createConnectionsViewModel`.
-
-For the same payload and deterministic inputs, each server-provided mode and its corresponding client mode must produce equal view models.
-
-Server-provided mode does not send rendered component HTML. The repository defines no HTML server-rendering or hydration contract.
-
-## Node MCP resource contract
-
-**Source authority:** this specification owns intended integration behavior; the corrected `@arithmomaniac/sefaria-client` schemas own transport payload validation; the MCP Apps 1.7.5 and MCP TypeScript SDK 1.30.0 APIs own protocol and host mechanics.
-
-**Data owner:** the Node MCP server owns Sefaria requests, decoded-response bounds, corrected payload validation, tool metadata, and textual summaries. Each initialized MCP protocol server instance owns its negotiated client capabilities. The App owns boundary validation and Reader admission. The local browser host owns MCP client transport, AppBridge, sandbox isolation, and host-mediated tool calls; it does not own Reader history.
-
-**Exact failure replaced:** the former Python/FastMCP runtime could not provide the approved Node-only stdio and Streamable HTTP package, and a process-global Apps flag could make an omitted `with_text` value depend on another client's initialization.
-
-**Executable red counterexample:** initialize one Apps-capable HTTP session and one plain HTTP session, interleave omitted-`with_text` calls, and require `"1"` and `"0"` respectively while explicit values still win. A shared mutable capability flag fails this sequence. Independently, a browser test must invoke the real HTTP server through the host, load the `ui://` resource through AppBridge in a separately served sandbox origin, admit a text seed without a duplicate source call, and observe exactly one links continuation; a static preview or protocol-only client cannot satisfy that scenario.
-
-| Item          | Value                                          |
-| ------------- | ---------------------------------------------- |
-| Build command | `pnpm --filter @sefaria-example/mcp-app build` |
-| Built file    | `examples/mcp-app/dist/app/mcp-app.html`       |
-| Resource URI  | `ui://sefaria/source-card.html`                |
-| MIME type     | `text/html;profile=mcp-app`                    |
-
-The private example compiles a Node server with stdio and Streamable HTTP entry modes and packages the App as one self-contained HTML file. The same tool implementation is registered into a fresh protocol server for stdio and into one protocol server per initialized HTTP session. Opening or closing a transport does not create shared Reader history.
-
-The HTML file must not contain development-server URLs. It uses the host theme and supported host fonts with Sefaria token defaults. It requests Sefaria data only through host-mediated tools and never calls Sefaria directly.
-
-## Node demonstration server
-
-The demonstration server remains small and additive. It proves the live requests, per-client capability resolution, resource, tool-result, package-data, and unknown-JSON boundaries.
-
-The server contains:
-
-- one current live `get_text` UI tool
-- one current live `get_links_between_texts` UI tool
-- one `ui://` resource
-- the self-contained App
-- validation with the generated TypeScript validator
-- in-memory integration tests with a mocked HTTP transport
-- compiled-package resource tests
-- official MCP Inspector stdio qualification
-- deterministic stdio and Streamable HTTP protocol tests
-
-The server does not contain copied Sefaria API logic, a response cache, retry policy, fallback payload, metrics, OAuth routes, Docker configuration, or unrelated tools.
-
-Repository checks make no live request. TypeScript tests inject deterministic Sefaria transports with representative corrected payloads and documented error payloads.
-
-A `ui://` resource is an MCP resource, not an HTTP route. MCP handles `resources/read`.
-
-The server rejects a successful payload with more than 400 text leaves before it enters `structuredContent`. This bounds synchronous source-card projection and rendering; callers must request a narrower reference. It also rejects a decoded links body larger than 5 MiB or a successful links array larger than 10,000 entries. Textual links summaries may cover at most 20 entries and 8,000 characters, but accepted `structuredContent` is never truncated.
-
-## Reference hosts
-
-The static documentation-site host creates a real MCP client and registered server in the trusted page, connects them with `InMemoryTransport`, reads the packaged App through `resources/read`, and renders it through the official Apps bridge in an opaque-origin sandbox. It starts no MCP lifecycle or Sefaria request before **Start live demo**. Its initial accepted flow performs one text request and one App-mediated links request.
-
-One local command starts the loopback-only Streamable HTTP server, a host origin, and a distinct sandbox origin, then opens a reference browser host that uses the official Apps `AppBridge` and sandbox handshake. The MCP HTTP server validates its loopback Host header and accepts browser requests only from that run's host origin. The sandbox CSP is delivered through an HTTP `Content-Security-Policy` header; malformed optional CSP metadata falls back to the restrictive default instead of terminating the local process. The host reads the registered MCP resource and sends its HTML through the bridge; it does not implement a private replacement protocol.
-
-The deterministic browser acceptance transport rejects every unexpected request and records the exact tool sequence. It proves:
-
-- a text-seeded admission performs zero duplicate source calls and then one links continuation
-- a links-seeded admission performs no continuation
-- opening a connection performs bounded source qualification and one links call
-- Back, retained breadcrumb activation, category changes, paging, and covered-preview changes remain local
-- malformed or partial metadata and payloads report structured paths before projection
-- cancellation, stale completion, and failed or denied tool calls cannot update a newer admitted result
-
-## MCP host acceptance
-
-Optional local qualification uses VS Code Copilot Chat as the named MCP Apps-compatible host for rendering, host-proxied same-App tool calls, retained reader history, local interaction, and explicit chat export. It is not a CI prerequisite. The App attempts `ui/message` only after explicit chat-export activation, even when the host omits the optional text-message capability advertisement, because the qualified VS Code host accepts that request and places its content in the composer.
-
-Record:
-
-- the exact VS Code and GitHub Copilot Chat versions
-- the launch configuration
-- the initial `get_text` invocation, automatic reader connections continuation, same-App hierarchy navigation, breadcrumb activation, and explicit chat export
-- an automated screenshot or a separately recorded automation limitation
-
-Standalone browser rendering does not prove host compatibility. Host limitations remain separate from component failures.
-
-The acceptance harness extends the existing isolated Playwright/CDP flow into one asserted walkthrough:
-
-1. Invoke only `get_text` for Micah 6:8 and verify the reader renders the bilingual source before automatically loading connections through the same App.
-2. Select Commentary, switch to another available category, return, advance one page, and return to page zero without another chat turn.
-3. Activate a displayed connection and verify the same App replaces its current reader entry after host-proxied source qualification and connections loading.
-4. Activate a connection from the child entry and verify the same App retains at least three breadcrumb levels.
-5. Trigger explicit chat export from the deepest entry and verify `ui/message` places that exact selected target in the VS Code composer without performing reader data transport.
-6. Activate the middle breadcrumb and then the root breadcrumb, verifying both retained ancestors restore locally without another chat turn.
-
-The harness tracks one initial App frame and requires all later reader stages to remain in that frame. Micah 6:8 must expose a second category, at least one category with more than 20 links, and two navigable connection hops for the live hierarchy stages; missing prerequisites fail with a concrete diagnostic instead of being skipped. Deterministic fixtures remain the authority for stable multi-category, multi-page, failure, cancellation, and metadata-only preview behavior. Genesis 1:1 is reserved for explicitly identified high-volume tests rather than ordinary examples.
-
-The walkthrough writes a machine-readable result with stages, selected references, host versions, artifacts, and any failure. A partial walkthrough exits nonzero. `walkthrough:mcp:vscode` runs the assertions without publishing screenshots. `capture:mcp:vscode` runs the same complete walkthrough, stages only the initial Reader, retained hierarchy, and explicit chat-export screenshots, and publishes those three files only after every stage succeeds. `launch:mcp:vscode` is a separate minimized launch-only path with no debugging port, smoke-test driver, CDP attachment, UI automation, prompt submission, or tool call.
-
-## MCP acceptance criteria
-
-- The App builds as one HTML file.
-- The demonstration server reads the packaged file through `resources/read`.
-- Tool metadata and the resource use the same URI.
-- One `get_text` call returns useful text content and App content.
-- The server maps `version_language` to the documented repeated `version` query values.
-- `structuredContent` matches a corrected generated API payload.
-- Metadata identifies the fixed operation, documented status, and exact request reference.
-- Unknown payload validation reports structured paths.
-- The App creates one reader controller from validated admitted content.
-- The element receives only immutable `ReaderViewModel` replacements and visual or interaction properties.
-- The first render makes zero requests.
-- A source seed schedules one host-proxied links continuation; a connections-only seed schedules none.
-- A compiled-package resource test reads every packaged runtime artifact.
-- Automated tests make no network request.
-- A successful payload larger than the source-card render limit fails as a tool error.
-- The optional VS Code Copilot Chat qualification renders the packaged reader from one initial `get_text` result.
-- The connections tool resolves omitted `with_text` from the initialized client's Apps capability and preserves explicit `"0"` and `"1"` overrides.
-- One connections invocation performs one links request and returns the unchanged validated response inside the specified object envelope.
-- A successful links response larger than 5 MiB decoded or 10,000 entries fails explicitly without partial projection.
-- The App validates connections metadata, envelope, documented status, and corrected payload before projection.
-- Category changes and paging project retained captures and make zero host calls.
-- Connection activation performs bounded host-proxied source qualification plus one links continuation in the same App.
-- Back and retained breadcrumb activation restore locally without host calls.
-- Metadata-only rendering preserves explicit caller intent; Load previews performs one host-proxied text-inclusive links call.
-- Explicit chat export sends one fixed user-role message for the exact current target. Rejected, stale, concurrent, or unconfirmed messaging leaves the reader usable and is not retried automatically.
-- The named-host walkthrough completes the initial reader, local connections controls, two same-App connection hops, deep chat export, middle breadcrumb activation, and root breadcrumb activation with stage-specific assertions and artifacts.
-
-## Authored linked-article purpose
-
-The current linked-article integration demonstrates progressive enhancement for citations that the page author already marked as ordinary anchors. It is not a citation detector, DOM-rewriting script, bookmarklet, userscript, or migration program for the deployed Sefaria Linker.
-
-The integration specification is the intended-behavior authority. Each authored anchor owns its explicit Sefaria reference and native `https://www.sefaria.org/` destination. The page integration owns enhancement listeners, client creation, popup loading, cancellation, stale-result suppression, visible integration failures, and cleanup. The popup view model owns rendered data, and `<sefaria-popup>` owns request-free dialog rendering and interaction.
-
-The superseded Linker implementation failed this ownership boundary because it extracted host text, submitted detection work, polled, rewrote host DOM, installed a global script API, and prevented all citation navigation. An executable counterexample is an authored `<a href="https://www.sefaria.org/Micah.6.8" data-sefaria-ref="Micah 6:8">Micah 6:8</a>` loaded with JavaScript disabled: the current contract requires ordinary navigation to the authored `href`, while automatic detection cannot supply or preserve that fallback.
-
-| Capability | Required knowledge or state | Exact success result | Invalid input | Missing data or state | Authority | Executable example |
-| --- | --- | --- | --- | --- | --- | --- |
-| Native citation navigation | Authored `href` | Browser follows the authored Sefaria URL without enhancement | Missing or non-Sefaria `href` is not enhanced | JavaScript unavailable | Authored anchor | Disable JavaScript and activate the Micah 6:8 link |
-| Popup enhancement | Authored `data-sefaria-ref`, permitted unmodified activation, supplied client | One popup async-factory operation and one v3 text request with cache disabled | Blank reference is not enhanced | No eligible anchor leaves the page unchanged | Integration specification and popup factory | Click the Micah 6:8 anchor and assert one strict fixture request |
-| Supersession | Current operation identity and abort signal | Only the newest eligible activation can update the popup | N/A | Cancellation may not stop the transport | Page integration | Resolve an older ignored request after a newer request completes |
-| Cleanup | Owned anchors, listener registrations, popup, and active controller | Abort active work, remove owned listeners and popup, and permit native navigation | N/A | Detached host | Page integration | Destroy during a pending load and resolve it late |
-
-## Authored linked-article flow
-
-```mermaid
-sequenceDiagram
-    participant Page as Authored article
-    participant Integration as Page enhancement
-    participant Factory as Popup async factory
-    participant Client as @arithmomaniac/sefaria-client
-    participant Element as sefaria-popup
-
-    Page->>Page: render ordinary Sefaria anchor
-    alt JavaScript absent or native/modifier activation
-        Page->>Page: follow authored href
-    else Enhanced unmodified activation
-        Page->>Integration: activate explicit data-sefaria-ref
-        Integration->>Element: anchor, open, loading view model
-        Integration->>Factory: PopupRequest and supplied client
-        Factory->>Client: one generated text operation
-        Client-->>Factory: corrected validated payload
-        Factory-->>Integration: PopupViewModel
-        Integration->>Element: terminal view model
-    end
-```
-
-The element receives no reference, raw payload, client, host, or fetch function and makes no request.
-
-The enhancement handles only an unmodified primary activation that was not already prevented. Modifier keys, non-primary pointer activation, explicit download behavior, and alternate browsing-context targets retain native anchor behavior. Keyboard Enter follows the browser's ordinary anchor activation path and receives the same enhancement as an unmodified primary click.
-
-If a newer citation replaces an older request, the integration aborts the older operation when possible and rejects its completion by operation identity. An obsolete result or abort must not replace the current view model.
-
-## Popup behavior
-
-The popup element follows the [component contract](components.md).
-
-The integration preserves:
-
-- dialog role
-- focus entry
-- focus restoration
-- Escape closure
-- `aria-controls` on the trigger
-
-The current component also provides:
-
-- `aria-modal`
-- an accessible name
-- a real close button
-- a Tab and Shift+Tab focus cycle
-- viewport-edge placement
-- token-based themes
-- shadow-root style isolation
-
-The popup previews at most 20 aligned source-card positions. It declares when additional content is omitted. Popup dragging is not in Core scope.
-
-The popup keeps source-card edition attribution visible so the embedded preview identifies its source editions. Other source-card hosts also show attribution by default and can opt out with `hide-attributions`.
-
-## Authored linked-article acceptance criteria
-
-- The static article contains authored Sefaria anchors with explicit references and useful prose for bounded `Micah 6:8`.
-- With JavaScript disabled, activating a citation follows its native authored `href`.
-- An unmodified primary click or keyboard Enter opens the popup; modifier and alternate native navigation behavior is not prevented.
-- One eligible citation activation calls the real public popup async factory and performs one strict v3 text request with the client cache disabled.
-- The popup element receives only a view model and interaction properties.
-- Host styles do not enter the popup.
-- Popup styles do not enter the host page.
-- Keyboard users can open, traverse, and close the popup.
-- Closing restores focus.
-- Rapid citation changes do not show obsolete data.
-- Closing or destroying the integration aborts pending work and rejects late completion.
-- Destroy removes only the integration's popup, listeners, and accessibility attributes; authored anchors remain unchanged.
-- API HTML is sanitized before it reaches the element.
-- Fixture transport rejects an unexpected method, origin, path, or query instead of returning default success.
-- The private production build contains no unresolved workspace import.
-
-## Integration failure rules
-
-- Invalid unknown JSON reports structured paths.
-- A documented HTTP error becomes a component-specific error view model.
-- Invalid tool-result metadata stops before payload validation.
-- A network failure or abort rejects the async factory operation.
-- A server-side network failure produces an MCP tool failure rather than a success-shaped result.
-- An obsolete abort does not replace the current view model with an error.
-- A host without a permitted data source shows integration-owned unavailable UI, not empty API content.
-- Missing content becomes the owning component's partial or empty state.
-- Missing build output stops staging.
-- A packaged App must not reference a development server.
-- Host limitations remain separate from component or payload failures.
+| Invalid external JSON | Stop before element admission and report structured paths |
+| Documented HTTP payload | Preserve documented status semantics |
+| Network or abort rejection | Preserve the failure; do not manufacture empty content |
+| Current element failure | Accessible state plus documented error event |
+| Superseded completion | Publish neither success nor failure |
+| Unsupported explicit capability | Fail without browser HTTP fallback |
+| Uncovered supplied Reader target | Report an explicit host limitation |
+| Disconnection | Abort/invalidate eligible work; reconnect only the still-eligible phase |
 
 ## Completion criteria
 
-An integration is complete when its public boundary, artifact packaging, request count, validation, host behavior, and named failure cases pass from a clean checkout.
+- all seven public elements use declarative inputs in maintained integrations
+- no maintained integration constructs public prepared rendering, owner controllers, or bindings
+- supplied paths make zero requests
+- live pages retain explicit activation gates
+- MCP continuation remains host-proxied
+- Popup visibility remains independent of preparation
+- Reader and composite request-count rules are tested
+- deterministic checks remain offline

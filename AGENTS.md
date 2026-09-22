@@ -41,7 +41,7 @@ Use this order:
 3. Use the pinned OpenAPI input as the documented-contract evidence.
 4. Use deployed fixtures when source does not show runtime payload behavior.
 5. Treat the pinned OpenAPI input plus guarded overlay as transport-payload authority.
-6. Treat each component view model as rendering-data authority.
+6. Treat each component's private validated preparation as rendering-data authority; public raw inputs and generated payloads are not render-ready state.
 7. Use downstream consumers as evidence of need, not behavior authority.
 
 If evidence conflicts with a specification, record the observation in `docs/evidence.md`. Then change the owning specification or reviewed overlay before production code.
@@ -65,9 +65,9 @@ High-risk changes include public API contracts, OpenAPI corrections, generated o
 
 - `@arithmomaniac/sefaria-client` owns the pinned OpenAPI input, checksum, guarded overlay, generated contracts, Zod schemas, validators, thin client, and its bounded per-client response cache.
 - `@arithmomaniac/sefaria-text-transform` owns pure sanitization, vocalization, and footnote operations.
-- Non-DOM `@arithmomaniac/sefaria-web-components` subpaths own component request types, view models, pure factories, and async factories.
-- Component elements own layout, interaction, accessibility, theming, and DOM rendering.
-- Integrations own host input, boundary validation, client creation, cancellation, and factory calls.
+- Non-DOM `@arithmomaniac/sefaria-web-components` subpaths own public raw input types, acquisition capabilities, Reader semantic/session contracts, and reusable pure preparation.
+- Component elements own reactive input snapshots, acquisition selection, cancellation and stale-result suppression, private preparation, layout, interaction, accessibility, theming, and DOM rendering.
+- Integrations own host input, activation policy, external unknown-JSON validation, optional client or capability creation, and application-specific coordination.
 - Specifications own intended behavior.
 - `docs/evidence.md` owns observations and source provenance.
 
@@ -93,29 +93,29 @@ Report structured JSON paths before projection.
 
 Do not add an OpenAPI correction before source review or a runtime contract failure identifies a mismatch.
 
-## Keep elements request-free
+## Keep acquisition bounded and declarative
 
-An element can accept one component-specific view model and visual or interaction properties.
+Every public element can accept `sref` and component-specific raw `data`. For the six non-Reader elements, defined `data` is authoritative and must suppress acquisition, including when it is validly empty or invalid.
 
-An element must not accept a reference, raw JSON, generated API payload, client, base URL, host, request parameters, or `fetch`.
+Elements may accept only the documented tagged acquisition choice. Do not expose `fetch`, a base URL, arbitrary request functions, a host object, or a public prepared rendering model.
 
-An element must not make a request or call an async factory.
+The component package owns one lazy default acquisition value per loaded module instance. Import, supplied-data rendering, and explicit per-element acquisition do not realize it. Explicitly disabled or unsupported acquisition must not fall through to browser HTTP.
 
-If an interaction changes requested data, emit an event. The host calls a factory and supplies a new view model.
+Element-owned asynchronous work must preserve original failures, publish no stale completion, avoid unhandled rejections, abort eligible work on disconnection, and resume only the still-eligible interrupted phase on reconnection. Ordinary network failures are not automatically retried.
 
-## Compose through pure factories
+## Compose through captured data and private preparation
 
-A composite async factory owns its outer request. It calls child pure factories with captured payload data.
+A composite that already owns a corrected payload must prepare children from that captured data through private pure helpers or a private prepared receiver.
 
-Do not call child async factories from a composite.
+Do not assign child `sref` or invoke child acquisition when the parent already owns the required data.
 
-Ten child views from one response must use one outer request and zero child requests.
+Ten child renderings from one response must use one outer request and zero child requests.
 
-For a captured successful payload, an async factory result must equal its pure factory result.
+For the same captured successful payload and deterministic options, supplied and acquired paths must produce equal private preparation and visible behavior.
 
 ## Handle server-provided data
 
-Server-provided means corrected API-shaped JSON. Validate it and call the same pure factory as client mode.
+Server-provided means corrected API-shaped JSON. Validate it and use the same private preparation path as client mode.
 
 Do not add component HTML server rendering or hydration.
 
@@ -129,7 +129,7 @@ Write a failing test before you change behavior. Add a deterministic test for ea
 
 Use the intended production path. Do not accept proof from a fallback, cache hit, mock default, or bypass.
 
-Test pure and async factory equivalence with a captured payload.
+Test supplied and acquired preparation equivalence with a captured payload.
 
 Test exact request counts. Include the ten-child, one-request composite case.
 

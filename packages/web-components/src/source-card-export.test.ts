@@ -1,10 +1,6 @@
-import {
-  createSourceCardViewModel,
-  loadSourceCardViewModel,
-} from "@arithmomaniac/sefaria-web-components/source-card";
+import * as sourceCard from "@arithmomaniac/sefaria-web-components/source-card";
 import { expect, test } from "vitest";
 
-test("exports source-card factories from the source-card subpath", () => {
-  expect(createSourceCardViewModel).toBeTypeOf("function");
-  expect(loadSourceCardViewModel).toBeTypeOf("function");
+test("keeps source-card preparation private", () => {
+  expect(Object.keys(sourceCard)).toEqual([]);
 });

@@ -11,7 +11,7 @@ The project addresses four steps between receiving JSON and presenting a reading
 1. `@arithmomaniac/sefaria-client` validates the corrected transport contract and preserves documented HTTP, network, and abort semantics.
 2. `@arithmomaniac/sefaria-text-transform` safely prepares Sefaria's structured text markup and Hebrew vocalization.
 3. Pure `@arithmomaniac/sefaria-web-components` factories project transport payloads into component-specific rendering data.
-4. Request-free Web Components own layout, accessibility, interaction, and theming.
+4. Declarative Web Components own input precedence, optional acquisition, private preparation, layout, accessibility, interaction, and theming.
 
 The same pieces support both packaged and host-specific compositions:
 
@@ -32,7 +32,7 @@ The Reader is one composition of the reusable contracts, not the whole product. 
 | --- | --- |
 | `packages/client` | Pinned upstream OpenAPI input, guarded corrections, generated contracts and validators, thin client, and bounded per-client response cache |
 | `packages/text-transform` | Pure sanitization, vocalization, footnotes, and connected-text previews |
-| `packages/web-components` | Component request types, view models, pure/async factories, reader session/controller, and request-free elements |
+| `packages/web-components` | Declarative elements, component-specific raw input types, tagged acquisition, shared Reader qualification, and the advanced semantic/raw Reader session facade |
 | `examples/explorer` | Authored component states and live developer diagnostics |
 | `examples/reader`, `examples/linked-article`, `examples/mcp-app` | Distinct website, embedding, and host-transport examples |
 | `docs/.vitepress`, `scripts/build-site.mjs` | Local presentation of canonical Markdown and isolated maintained examples |
@@ -48,7 +48,7 @@ Use this order when evidence conflicts:
 1. Repository specifications define intended behavior.
 2. The pinned Sefaria route, handler, response builder, and tests inform OpenAPI corrections.
 3. The pinned OpenAPI input plus guarded overlay defines transport payloads.
-4. Component view models define rendering data.
+4. Each component's private prepared state defines rendering data.
 5. `docs/evidence.md` records observations and provenance.
 
 The implementation deliberately differs from Sefaria in a small number of documented areas, including sanitizer policy and some interaction choices. Review [Intentional differences](guides/differences.md) before treating visual or text-processing differences as regressions.
@@ -67,5 +67,5 @@ The implementation deliberately differs from Sefaria in a small number of docume
 1. Run the browser setup and `pnpm check` from [Development](development.md).
 2. Open `pnpm dev` for authored and live component exploration.
 3. Run `pnpm dev:reader` to compare the supported Reader with the custom spatial composition.
-4. Read [How the pieces fit together](guides/data-flow.md), then inspect one component subpath from request through view model and element.
+4. Read [How the pieces fit together](guides/data-flow.md), then inspect one element from raw input or `sref` through private preparation and rendering.
 5. Use the specifications and evidence record for contract review rather than reconstructing intent from Git history or a historical presentation.

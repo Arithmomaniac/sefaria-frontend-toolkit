@@ -65,12 +65,11 @@ const packageDefinitions = [
     filename: undefined,
     subpaths: [
       ".",
+      "./acquisition",
       "./bilingual-segment",
-      "./bindings",
       "./connections-panel",
       "./popup",
       "./reader",
-      "./reader-controller",
       "./reader-session",
       "./ref-label",
       "./source-card",
@@ -281,11 +280,11 @@ async function inspectConsumerResolution(consumer) {
     "@arithmomaniac/sefaria-client/validation",
     "@arithmomaniac/sefaria-client/validators",
     "@arithmomaniac/sefaria-text-transform",
+    "@arithmomaniac/sefaria-web-components/acquisition",
     "@arithmomaniac/sefaria-web-components/bilingual-segment",
     "@arithmomaniac/sefaria-web-components/connections-panel",
     "@arithmomaniac/sefaria-web-components/popup",
     "@arithmomaniac/sefaria-web-components/reader",
-    "@arithmomaniac/sefaria-web-components/reader-controller",
     "@arithmomaniac/sefaria-web-components/reader-session",
     "@arithmomaniac/sefaria-web-components/ref-label",
     "@arithmomaniac/sefaria-web-components/source-card",
@@ -436,11 +435,11 @@ async function smokeVanillaChromium() {
       const initial = await page.evaluate(() => {
         const card = globalThis.document.querySelector("sefaria-source-card");
         return {
-          state: card?.viewModel?.state,
+          state: card?.status,
           globalFetchCount: globalThis.__exampleGlobalFetchCount,
         };
       });
-      if (initial.state !== "data" || initial.globalFetchCount !== 0) {
+      if (initial.state !== "ready" || initial.globalFetchCount !== 0) {
         throw new Error(
           `Vanilla supplied-data render was not request-free: ${JSON.stringify(initial)}`,
         );
@@ -466,7 +465,7 @@ async function smokeVanillaChromium() {
           ].filter(
             (tagName) => globalThis.customElements.get(tagName) !== undefined,
           ),
-          state: card?.viewModel?.state,
+          state: card?.status,
           text: card?.shadowRoot?.textContent,
           globalFetchCount: globalThis.__exampleGlobalFetchCount,
         };
@@ -474,9 +473,10 @@ async function smokeVanillaChromium() {
       if (
         !result.registered ||
         result.registeredTags.length !== 7 ||
-        result.state !== "data" ||
+        result.state !== "ready" ||
         result.globalFetchCount !== 1 ||
-        !result.text?.includes("Micah 6:8")
+        !result.text?.includes("Deterministic example Hebrew") ||
+        !result.text.includes("Deterministic example translation")
       ) {
         throw new Error(
           `Unexpected Chromium result: ${JSON.stringify(result)}`,
@@ -550,7 +550,7 @@ async function smokeReactChromium() {
         return {
           registered:
             globalThis.customElements.get("sefaria-source-card") !== undefined,
-          state: card?.viewModel?.state,
+          state: card?.status,
           serialized: card?.getAttribute("viewModel"),
           status:
             globalThis.document.querySelector("#request-status")?.textContent,
@@ -558,7 +558,7 @@ async function smokeReactChromium() {
       });
       if (
         !initial.registered ||
-        initial.state !== "data" ||
+        initial.state !== "ready" ||
         initial.serialized !== null ||
         !initial.status?.includes("zero live loads") ||
         requestCount !== 0
@@ -608,7 +608,7 @@ async function smokeReactChromium() {
         const card = globalThis.document.querySelector("sefaria-source-card");
         return {
           stable: card === globalThis.__packedReactCard,
-          state: card?.viewModel?.state,
+          state: card?.status,
           selected: card?.selectedPosition,
           eventText:
             globalThis.document.querySelector("#selected-ref")?.textContent,
@@ -619,7 +619,7 @@ async function smokeReactChromium() {
       if (
         requestCount !== 1 ||
         !loaded.stable ||
-        loaded.state !== "data" ||
+        loaded.state !== "ready" ||
         JSON.stringify(loaded.selected) !== "[]" ||
         !loaded.eventText?.includes("React received selection: Micah 6:8") ||
         !loaded.requestText?.includes("1")
@@ -703,13 +703,13 @@ async function smokeAlpineChromium() {
         return {
           registered:
             globalThis.customElements.get("sefaria-source-card") !== undefined,
-          state: element?.viewModel?.state,
+          state: element?.status,
           serialized: element?.getAttribute("viewModel"),
         };
       });
       if (
         !initial.registered ||
-        initial.state !== "data" ||
+        initial.state !== "ready" ||
         initial.serialized !== null ||
         requestCount !== 0
       ) {
@@ -776,7 +776,7 @@ async function smokeAlpineChromium() {
         );
         return {
           stable: element === globalThis.__packedAlpineCard,
-          state: element?.viewModel?.state,
+          state: element?.status,
           selected: element?.selectedPosition,
           eventText:
             globalThis.document.querySelector("#selected-ref")?.textContent,
@@ -789,7 +789,7 @@ async function smokeAlpineChromium() {
       if (
         requestCount !== 1 ||
         !loaded.stable ||
-        loaded.state !== "data" ||
+        loaded.state !== "ready" ||
         JSON.stringify(loaded.selected) !== "[]" ||
         !loaded.eventText?.includes("Alpine received selection: Micah 6:8") ||
         !loaded.requestText?.includes("1") ||

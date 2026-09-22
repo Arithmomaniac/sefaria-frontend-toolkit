@@ -1,6 +1,9 @@
 import { css, LitElement } from "lit";
 import { sefariaTokenDefaults } from "./tokens.js";
 
+/** Coarse read-only lifecycle diagnostic exposed by every public element. */
+export type SefariaElementStatus = "empty" | "loading" | "ready" | "error";
+
 /** Base class providing shared Sefaria element tokens and host box behavior. */
 export abstract class SefariaElement extends LitElement {
   /** Shared component styles inherited by every Sefaria custom element. */

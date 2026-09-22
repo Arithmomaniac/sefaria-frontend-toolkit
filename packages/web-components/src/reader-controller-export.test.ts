@@ -1,13 +1,6 @@
-import * as readerController from "@arithmomaniac/sefaria-web-components/reader-controller";
 import { expect, test } from "vitest";
+import packageJson from "../package.json";
 
-test("exports the reader controller without a DOM dependency", () => {
-  expect(globalThis.document).toBeUndefined();
-  expect(readerController).toMatchObject({
-    createReaderController: expect.any(Function),
-    createSefariaReaderDataSource: expect.any(Function),
-    loadReaderController: expect.any(Function),
-    ReaderControllerError: expect.any(Function),
-  });
-  expect("bindReaderController" in readerController).toBe(false);
+test("retires the reader-controller package export", () => {
+  expect(packageJson.exports).not.toHaveProperty("./reader-controller");
 });

@@ -1,8 +1,7 @@
 import type { CoreLinkResponse } from "@arithmomaniac/sefaria-client";
 import type {
-  ReaderViewModel,
+  SefariaConnectionsPanel,
   SefariaReader,
-  SefariaSourceCard,
 } from "@arithmomaniac/sefaria-web-components";
 import { beforeEach, expect, test, vi } from "vitest";
 
@@ -34,9 +33,11 @@ test("seeds the stateful reader before loading initial connections through the h
   );
 
   const reader = readerElement();
-  expect(readerViewModel(reader).source).toBeDefined();
-  expect(readerViewModel(reader).connections).toBeUndefined();
-  expect(callServerTool).not.toHaveBeenCalled();
+  await vi.waitFor(() =>
+    expect(
+      reader.shadowRoot?.querySelector("sefaria-source-card"),
+    ).not.toBeNull(),
+  );
 
   await vi.waitFor(() => expect(callServerTool).toHaveBeenCalledOnce());
   expect(callServerTool).toHaveBeenCalledWith(
@@ -49,14 +50,12 @@ test("seeds the stateful reader before loading initial connections through the h
     },
     { signal: expect.any(AbortSignal) },
   );
-  await vi.waitFor(() =>
-    expect(readerViewModel(reader).connections?.state).toBe("component"),
-  );
+  await vi.waitFor(() => expect(connectionsPanel(reader)).toBeDefined());
 
   cleanup();
 });
 
-test("seeds a connections-only reader without a continuation request", () => {
+test("seeds a connections-only reader without a continuation request", async () => {
   const callServerTool = vi.fn();
   const cleanup = renderReaderToolResult(
     root(),
@@ -70,8 +69,8 @@ test("seeds a connections-only reader without a continuation request", () => {
   );
 
   const reader = readerElement();
-  expect(readerViewModel(reader).source).toBeUndefined();
-  expect(readerViewModel(reader).connections?.state).toBe("component");
+  await vi.waitFor(() => expect(connectionsPanel(reader)).toBeDefined());
+  expect(reader.shadowRoot?.querySelector("sefaria-source-card")).toBeNull();
   expect(callServerTool).not.toHaveBeenCalled();
 
   cleanup();
@@ -81,15 +80,22 @@ test("calls the named-host source tool with default selectors and preserves abor
   const callServerTool = vi
     .fn()
     .mockResolvedValue(toolResult(200, structuredClone(v3SourceBackedPayload)));
-  const dataSource = createMcpReaderDataSource({ callServerTool });
+  const acquisition = createMcpReaderDataSource({ callServerTool });
   const controller = new AbortController();
 
-  const content = await dataSource.loadSource(
-    { tref: "Genesis 1:1" },
+  if (acquisition.kind !== "capability" || !acquisition.capability.getText) {
+    throw new Error("MCP text capability is missing.");
+  }
+  const content = await acquisition.capability.getText(
+    {
+      sref: "Genesis 1:1",
+      versions: ["primary", "translation"],
+      returnFormat: "default",
+    },
     controller.signal,
   );
 
-  expect(content.request).toEqual({ tref: "Genesis 1:1" });
+  expect(content.status).toBe(200);
   expect(callServerTool).toHaveBeenCalledWith(
     {
       name: "get_text",
@@ -125,12 +131,14 @@ test("rejects a host result whose effective connections request does not match",
   const callServerTool = vi
     .fn()
     .mockResolvedValue(connectionsToolResult(200, [], true, "Micah 6:8"));
-  const dataSource = createMcpReaderDataSource({ callServerTool });
+  const acquisition = createMcpReaderDataSource({ callServerTool });
 
+  if (acquisition.kind !== "capability" || !acquisition.capability.getLinks) {
+    throw new Error("MCP links capability is missing.");
+  }
   await expect(
-    dataSource.loadConnections(
-      { tref: "Genesis 1:1", withText: true },
-      {},
+    acquisition.capability.getLinks(
+      { sref: "Genesis 1:1", withText: true },
       new AbortController().signal,
     ),
   ).rejects.toThrow("exact requested reference");
@@ -172,7 +180,8 @@ test("builds a reader hierarchy and restores any retained breadcrumb locally", a
     createMcpReaderDataSource({ callServerTool }),
   );
   const reader = readerElement();
-  const rootEntryId = readerViewModel(reader).currentEntryId;
+  await waitForCurrentEntry(reader);
+  const rootEntryId = reader.currentEntryId!;
 
   reader.dispatchEvent(
     new CustomEvent("sefaria-reader-connection-select", {
@@ -184,9 +193,7 @@ test("builds a reader hierarchy and restores any retained breadcrumb locally", a
   );
 
   await vi.waitFor(() => expect(callServerTool).toHaveBeenCalledTimes(3));
-  await vi.waitFor(() =>
-    expect(readerViewModel(reader).currentEntryId).not.toBe(rootEntryId),
-  );
+  await vi.waitFor(() => expect(reader.currentEntryId).not.toBe(rootEntryId));
   expect(
     callServerTool.mock.calls.map(([params]) => [
       params.name,
@@ -198,7 +205,7 @@ test("builds a reader hierarchy and restores any retained breadcrumb locally", a
     ["get_links_between_texts", "Genesis 1:2"],
   ]);
 
-  const childEntryId = readerViewModel(reader).currentEntryId;
+  const childEntryId = reader.currentEntryId!;
   reader.dispatchEvent(
     new CustomEvent("sefaria-reader-connection-select", {
       detail: {
@@ -209,11 +216,8 @@ test("builds a reader hierarchy and restores any retained breadcrumb locally", a
   );
 
   await vi.waitFor(() => expect(callServerTool).toHaveBeenCalledTimes(6));
-  await vi.waitFor(() =>
-    expect(readerViewModel(reader).currentEntryId).not.toBe(childEntryId),
-  );
-  const hierarchy = readerViewModel(reader);
-  expect(hierarchy.breadcrumbs).toHaveLength(3);
+  await vi.waitFor(() => expect(reader.currentEntryId).not.toBe(childEntryId));
+  expect(readerDepth(reader)).toBe(3);
   expect(
     callServerTool.mock.calls.map(([params]) => [
       params.name,
@@ -228,7 +232,7 @@ test("builds a reader hierarchy and restores any retained breadcrumb locally", a
     ["get_links_between_texts", "Genesis 1:2"],
   ]);
 
-  const grandchildEntryId = hierarchy.currentEntryId;
+  const grandchildEntryId = reader.currentEntryId!;
   reader.dispatchEvent(
     new CustomEvent("sefaria-reader-history-activate", {
       detail: {
@@ -238,7 +242,7 @@ test("builds a reader hierarchy and restores any retained breadcrumb locally", a
     }),
   );
   await Promise.resolve();
-  expect(readerViewModel(reader).currentEntryId).toBe(childEntryId);
+  expect(reader.currentEntryId).toBe(childEntryId);
   expect(callServerTool).toHaveBeenCalledTimes(6);
 
   reader.dispatchEvent(
@@ -250,7 +254,7 @@ test("builds a reader hierarchy and restores any retained breadcrumb locally", a
     }),
   );
   await Promise.resolve();
-  expect(readerViewModel(reader).currentEntryId).toBe(rootEntryId);
+  expect(reader.currentEntryId).toBe(rootEntryId);
   expect(callServerTool).toHaveBeenCalledTimes(6);
   cleanup();
 });
@@ -263,7 +267,8 @@ test("reprojects retained connections locally", async () => {
     createMcpReaderDataSource({ callServerTool }),
   );
   const reader = readerElement();
-  const originEntryId = readerViewModel(reader).currentEntryId;
+  await waitForCurrentEntry(reader);
+  const originEntryId = reader.currentEntryId!;
 
   reader.dispatchEvent(
     new CustomEvent("sefaria-reader-connections-category-change", {
@@ -278,13 +283,17 @@ test("reprojects retained connections locally", async () => {
   );
   await Promise.resolve();
 
-  const connections = readerViewModel(reader).connections;
-  expect(connections?.state).toBe("component");
+  await vi.waitFor(() =>
+    expect(
+      connectionsPanel(reader)?.shadowRoot?.querySelector('[role="status"]')
+        ?.textContent,
+    ).toContain("Page 2:"),
+  );
   expect(
-    connections?.state === "component" &&
-      connections.viewModel.state === "data" &&
-      connections.viewModel.page,
-  ).toBe(1);
+    connectionsPanel(reader)?.shadowRoot?.querySelector(
+      'nav[aria-label="Connection categories"] button[aria-pressed="true"]',
+    )?.textContent,
+  ).toContain("Commentary");
   expect(callServerTool).not.toHaveBeenCalled();
   cleanup();
 });
@@ -311,7 +320,8 @@ test("loads missing previews through one same-App tool call", async () => {
     createMcpReaderDataSource({ callServerTool }),
   );
   const reader = readerElement();
-  const originEntryId = readerViewModel(reader).currentEntryId;
+  await waitForCurrentEntry(reader);
+  const originEntryId = reader.currentEntryId!;
 
   reader.dispatchEvent(
     new CustomEvent("sefaria-reader-connections-preview-request", {
@@ -327,13 +337,15 @@ test("loads missing previews through one same-App tool call", async () => {
     },
     { signal: expect.any(AbortSignal) },
   );
+  reader.dispatchEvent(
+    new CustomEvent("sefaria-reader-connections-category-change", {
+      detail: { originEntryId, category: "Commentary" },
+    }),
+  );
   await vi.waitFor(() => {
-    const connections = readerViewModel(reader).connections;
     expect(
-      connections?.state === "component" &&
-        connections.viewModel.state === "data" &&
-        connections.viewModel.previewsIncluded,
-    ).toBe(true);
+      connectionsPanel(reader)?.shadowRoot?.querySelector(".preview"),
+    ).not.toBeNull();
   });
   cleanup();
 });
@@ -351,11 +363,9 @@ test("surfaces a host tool failure as unavailable reader connections", async () 
   const reader = readerElement();
 
   await vi.waitFor(() =>
-    expect(readerViewModel(reader).connections).toEqual({
-      state: "unavailable",
-      reason: "failed",
-      message: "The host denied the links call.",
-    }),
+    expect(
+      reader.shadowRoot?.querySelector('[role="alert"]')?.textContent,
+    ).toContain("The host denied the links call."),
   );
   cleanup();
 });
@@ -396,13 +406,13 @@ test("keeps explicit chat export separate from reader data calls", async () => {
   );
   const reader = readerElement();
   await vi.waitFor(() => expect(callServerTool).toHaveBeenCalledOnce());
-  const viewModel = readerViewModel(reader);
+  await waitForCurrentEntry(reader);
 
   reader.dispatchEvent(
     new CustomEvent("sefaria-reader-chat-export", {
       detail: {
-        originEntryId: viewModel.currentEntryId,
-        targetRef: viewModel.selectedTarget?.ref,
+        originEntryId: reader.currentEntryId,
+        targetRef: reader.selectedRef,
       },
     }),
   );
@@ -434,10 +444,10 @@ test("does not retry rejected, concurrent, or stale chat exports", async () => {
   );
   const reader = readerElement();
   await vi.waitFor(() => expect(callServerTool).toHaveBeenCalledOnce());
-  const viewModel = readerViewModel(reader);
+  await waitForCurrentEntry(reader);
   const detail = {
-    originEntryId: viewModel.currentEntryId,
-    targetRef: viewModel.selectedTarget?.ref,
+    originEntryId: reader.currentEntryId,
+    targetRef: reader.selectedRef,
   };
 
   reader.dispatchEvent(
@@ -515,21 +525,16 @@ test("reports structured paths for invalid corrected payloads", () => {
   expect(root().querySelector("sefaria-reader")).toBeNull();
 });
 
-test("renders a documented source 404 without constructing a reader", async () => {
+test("renders a documented source 404 without constructing a reader", () => {
   renderReaderToolResult(
     root(),
     toolResult(404, { error: "Unknown reference." }),
     createMcpReaderDataSource({ callServerTool: vi.fn() }),
   );
 
-  const card = sourceCard();
-  await card.updateComplete;
-  expect(card.viewModel).toEqual({
-    state: "error",
-    errorKind: "http",
-    status: 404,
-    message: "Unknown reference.",
-  });
+  expect(root().querySelector('[role="alert"]')?.textContent).toBe(
+    "Unknown reference.",
+  );
   expect(root().querySelector("sefaria-reader")).toBeNull();
 });
 
@@ -586,7 +591,7 @@ test("adapts the MCP Apps message wire request without capability gating", async
   });
 });
 
-test("renders documented connections errors and rejects oversized captures", () => {
+test("renders documented connections errors and rejects oversized captures", async () => {
   const dataSource = createMcpReaderDataSource({ callServerTool: vi.fn() });
   const cleanup = renderReaderToolResult(
     root(),
@@ -597,14 +602,11 @@ test("renders documented connections errors and rejects oversized captures", () 
     ),
     dataSource,
   );
-  const connections = readerViewModel(readerElement()).connections;
-  expect(connections?.state).toBe("component");
-  expect(connections?.state === "component" && connections.viewModel).toEqual({
-    state: "error",
-    errorKind: "http",
-    status: 400,
-    message: "Invalid reference.",
-  });
+  const panel = await waitForConnectionsPanel(readerElement());
+  expect(panel.status).toBe("error");
+  expect(
+    panel.shadowRoot?.querySelector('[role="alert"]')?.textContent,
+  ).toContain("Invalid reference.");
   cleanup();
 
   renderReaderToolResult(
@@ -725,19 +727,30 @@ function readerElement(): SefariaReader {
   return element;
 }
 
-function readerViewModel(reader: SefariaReader): ReaderViewModel {
-  if (!reader.viewModel) {
-    throw new Error("Reader view model is missing.");
-  }
-  return reader.viewModel;
+async function waitForCurrentEntry(reader: SefariaReader): Promise<void> {
+  await vi.waitFor(() => expect(reader.currentEntryId).toBeDefined());
 }
 
-function sourceCard(): SefariaSourceCard {
-  const element = root().querySelector<SefariaSourceCard>(
-    "sefaria-source-card",
+function connectionsPanel(
+  reader: SefariaReader,
+): SefariaConnectionsPanel | undefined {
+  return (
+    reader.shadowRoot?.querySelector<SefariaConnectionsPanel>(
+      "sefaria-connections-panel",
+    ) ?? undefined
   );
-  if (!element) {
-    throw new Error("Source card is missing.");
-  }
-  return element;
+}
+
+async function waitForConnectionsPanel(
+  reader: SefariaReader,
+): Promise<SefariaConnectionsPanel> {
+  await vi.waitFor(() => expect(connectionsPanel(reader)).toBeDefined());
+  return connectionsPanel(reader)!;
+}
+
+function readerDepth(reader: SefariaReader): number {
+  return (
+    (reader.shadowRoot?.querySelectorAll('nav[aria-label="Reader history"] li')
+      .length ?? 0) + 1
+  );
 }

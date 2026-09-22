@@ -40,6 +40,42 @@ export interface TextSegmentProjectionContext {
   readonly commentaryReferences?: readonly CommentaryReference[];
 }
 
+/** Reference labels required to prepare one selected text fragment. */
+export interface TextSegmentReferenceData {
+  /** Canonical English reference label. */
+  readonly ref: string;
+  /** Canonical Hebrew reference label. */
+  readonly heRef: string;
+}
+
+/** Selected-version metadata consumed by text-segment preparation. */
+export interface TextSegmentVersionMetadata {
+  /** Sefaria edition title. */
+  readonly versionTitle: string;
+  /** Short language code. */
+  readonly language: string;
+  /** Actual language identifier. */
+  readonly actualLanguage: string;
+  /** English language-family name. */
+  readonly languageFamilyName: string;
+  /** Payload-provided text direction. */
+  readonly direction: "ltr" | "rtl";
+}
+
+/** Raw selected-version fields consumed by text-segment preparation. */
+export interface TextSegmentSelectedVersion extends TextSegmentVersionMetadata {
+  /** Selected scalar text. */
+  readonly text: string | null;
+}
+
+/** Narrow authoritative raw input for one already-selected text fragment. */
+export interface TextSegmentSelectedData extends TextSegmentReferenceData {
+  /** Structural raw-form discriminator. */
+  readonly kind: "selected";
+  /** Already-selected edition and scalar text. */
+  readonly version: TextSegmentSelectedVersion;
+}
+
 /** Host-supplied state displayed while a text-segment request is pending. */
 export interface TextSegmentLoadingViewModel {
   /** State discriminator. */
@@ -68,6 +104,14 @@ export interface TextSegmentDataViewModel {
   readonly notes: readonly NormalizedFootnote[];
 }
 
+/** Read-only metadata for the edition currently displayed by the element. */
+export interface TextSegmentSelectedVersionInfo {
+  /** Selected version's actual language identifier. */
+  readonly actualLanguage: string;
+  /** Payload-provided text direction. */
+  readonly direction: "ltr" | "rtl";
+}
+
 /** Valid response with no renderable text for the requested selection. */
 export interface TextSegmentEmptyViewModel {
   /** State discriminator. */
@@ -92,6 +136,26 @@ export interface TextSegmentProjectionErrorViewModel {
   readonly message: string;
 }
 
+/** Validation failure for authoritative supplied text-segment data. */
+export interface TextSegmentValidationErrorViewModel {
+  /** State discriminator. */
+  readonly state: "error";
+  /** Error classification. */
+  readonly errorKind: "validation";
+  /** Human-readable validation failure with structured paths. */
+  readonly message: string;
+}
+
+/** Standalone acquisition failure for one current text-segment input. */
+export interface TextSegmentAcquisitionErrorViewModel {
+  /** State discriminator. */
+  readonly state: "error";
+  /** Error classification. */
+  readonly errorKind: "acquisition";
+  /** Human-readable acquisition failure. */
+  readonly message: string;
+}
+
 /** Documented v3 texts HTTP failure. */
 export interface TextSegmentHttpErrorViewModel {
   /** State discriminator. */
@@ -110,6 +174,8 @@ export type TextSegmentViewModel =
   | TextSegmentDataViewModel
   | TextSegmentEmptyViewModel
   | TextSegmentProjectionErrorViewModel
+  | TextSegmentValidationErrorViewModel
+  | TextSegmentAcquisitionErrorViewModel
   | TextSegmentHttpErrorViewModel;
 
 /** Terminal text-segment state committed by a headless controller. */
@@ -216,7 +282,7 @@ export function createTextSegmentViewModel(
  * Projects one already-selected version into render-ready segment data.
  */
 export function projectTextSegmentVersion(
-  payload: CoreV3TextsResponse,
+  payload: TextSegmentReferenceData,
   version: CoreV3Version,
   context: TextSegmentProjectionContext = {},
 ):
@@ -238,8 +304,8 @@ export function projectTextSegmentVersion(
  * Projects one resolved recursive-text leaf with its selected version metadata.
  */
 export function projectTextSegmentValue(
-  payload: CoreV3TextsResponse,
-  version: CoreV3Version,
+  payload: TextSegmentReferenceData,
+  version: TextSegmentVersionMetadata,
   text: string | null,
   context: TextSegmentProjectionContext = {},
 ): TextSegmentDataViewModel | TextSegmentEmptyViewModel {
@@ -516,13 +582,15 @@ function createRequestEmptyMessage(request: TextSegmentRequest): string {
   return `No ${requestedVersion} text is available.`;
 }
 
-function createSelectedVersionEmptyMessage(version: CoreV3Version): string {
+function createSelectedVersionEmptyMessage(
+  version: TextSegmentVersionMetadata,
+): string {
   return `No ${version.languageFamilyName} version "${version.versionTitle}" text is available.`;
 }
 
 function createSelectedVersionEmptyViewModel(
-  payload: CoreV3TextsResponse,
-  version: CoreV3Version,
+  payload: TextSegmentReferenceData,
+  version: TextSegmentVersionMetadata,
 ): TextSegmentEmptyViewModel {
   return {
     state: "empty",

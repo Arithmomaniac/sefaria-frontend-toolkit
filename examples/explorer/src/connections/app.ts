@@ -1,20 +1,16 @@
 import {
   createSefariaClient,
+  related,
+  text,
+  type CoreLinkResponse,
+  type CoreV3TextsResponse,
   type SefariaClient,
 } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 import type {
   SefariaConnectionsPanel,
   SefariaSourceCard,
-  SourceCardDataViewModel,
-  SourceCardNavigation,
 } from "@arithmomaniac/sefaria-web-components";
-import { bindConnectionsController } from "@arithmomaniac/sefaria-web-components/bindings";
-import { createConnectionsController } from "@arithmomaniac/sefaria-web-components/connections-panel";
-import {
-  createSourceCardController,
-  type SourceCardViewModel,
-} from "@arithmomaniac/sefaria-web-components/source-card";
 
 /** Host controls exposed for browser qualification and manual use. */
 export interface ConnectionsDemo {
@@ -27,20 +23,10 @@ export interface ConnectionsDemo {
   readonly dispose: () => void;
 }
 
-interface AddressableCard {
-  readonly viewModel: SourceCardDataViewModel;
-  readonly navigation: Extract<
-    SourceCardNavigation,
-    { readonly state: "available" }
-  >;
-}
-
-interface NavigableCard {
-  readonly viewModel: SourceCardDataViewModel;
-  readonly navigation: Exclude<
-    SourceCardNavigation,
-    { readonly state: "unavailable" }
-  >;
+interface RetainedLinks {
+  readonly payload: CoreLinkResponse;
+  readonly sref: string;
+  readonly withText: boolean;
 }
 
 /** Starts the standalone reader/connections host with explicit request ownership. */
@@ -74,19 +60,92 @@ export function startConnectionsDemo(
   const status = requireElement<HTMLElement>(root, "#status");
   const hostError = requireElement<HTMLElement>(root, "#host-error");
   const requestCounts = requireElement<HTMLElement>(root, "#request-counts");
-  const sourceController = createSourceCardController(client);
-  const connectionsController = createConnectionsController(client);
-  const unbindConnections = bindConnectionsController(
-    connections,
-    connectionsController,
-  );
+  const sourceProbe = document.createElement(
+    "sefaria-source-card",
+  ) as SefariaSourceCard;
+  sourceProbe.hidden = true;
+  root.body.append(sourceProbe);
 
   let controller: AbortController | undefined;
   let operation = 0;
   let textRequests = 0;
   let linksRequests = 0;
+  let retainedLinks: RetainedLinks | undefined;
+  let capturedSource:
+    | {
+        readonly sref: string;
+        readonly payload: CoreV3TextsResponse;
+      }
+    | undefined;
 
   reader.selectable = true;
+  const sourceAcquisition = {
+    kind: "capability" as const,
+    capability: {
+      getText: async (
+        request: {
+          readonly sref: string;
+          readonly versions: readonly string[];
+          readonly returnFormat: "default";
+        },
+        signal: AbortSignal,
+      ) => {
+        textRequests += 1;
+        updateCounts();
+        const result = await text.getV3Texts({
+          client,
+          path: { tref: request.sref },
+          query: {
+            version: [...request.versions],
+            return_format: request.returnFormat,
+          },
+          signal,
+        });
+        if (result.data !== undefined) {
+          capturedSource = { sref: request.sref, payload: result.data };
+          return { payload: result.data, status: 200 };
+        }
+        if (result.error !== undefined && result.response !== undefined) {
+          return {
+            payload: result.error,
+            status: result.response.status,
+          };
+        }
+        throw new Error("The v3 texts request returned no result.");
+      },
+    },
+  };
+  sourceProbe.acquisition = sourceAcquisition;
+  connections.acquisition = {
+    kind: "capability",
+    capability: {
+      getLinks: async (request, signal) => {
+        const result = await related.getLinks({
+          client,
+          path: { tref: request.sref },
+          query: {
+            with_text: request.withText ? "1" : "0",
+            with_sheet_links: "0",
+          },
+          signal,
+        });
+        if (result.data !== undefined) {
+          retainedLinks = {
+            payload: result.data,
+            sref: request.sref,
+            withText: request.withText,
+          };
+          return { payload: result.data, status: 200 };
+        }
+        if (result.error !== undefined && result.response.status === 400) {
+          return { payload: result.error, status: 400 };
+        }
+        throw new Error(
+          "The links request returned no data or documented error.",
+        );
+      },
+    },
+  };
   connections.showPreviews = showPreviews.checked;
 
   const updateCounts = (): void => {
@@ -105,12 +164,33 @@ export function startConnectionsDemo(
     hostError.hidden = true;
     hostError.textContent = "";
   };
-  const unsubscribeConnections = connectionsController.subscribe((snapshot) => {
-    if (snapshot.attempt.state === "failed") {
-      showError(snapshot.attempt.error);
+  const onConnectionsError = (event: Event): void => {
+    showError((event as CustomEvent<{ readonly error: unknown }>).detail.error);
+    if (
+      retainedLinks !== undefined &&
+      retainedLinks.sref === connections.sref &&
+      !retainedLinks.withText &&
+      connections.withText
+    ) {
+      const retained = retainedLinks;
+      const category = connections.category;
+      const page = connections.page;
+      queueMicrotask(() => {
+        restoreLinks(retained, category, page);
+      });
     }
-  });
-
+  };
+  const restoreLinks = (
+    retained: RetainedLinks,
+    category: string | undefined,
+    page: number,
+  ): void => {
+    connections.sref = retained.sref;
+    connections.withText = retained.withText;
+    connections.category = category;
+    connections.page = page;
+    connections.data = retained.payload;
+  };
   const loadLinks = async (
     ref: string,
     withText: boolean,
@@ -122,52 +202,57 @@ export function startConnectionsDemo(
     }
     linksRequests += 1;
     updateCounts();
-    await connectionsController.load({ tref: ref, withText }, { signal });
-    if (signal.aborted || expectedOperation !== operation) {
-      return;
+    const previous =
+      retainedLinks === undefined
+        ? undefined
+        : {
+            retained: retainedLinks,
+            category: connections.category,
+            page: connections.page,
+          };
+    connections.data = undefined;
+    connections.category = undefined;
+    connections.page = 0;
+    if (connections.sref === ref && connections.withText === withText) {
+      connections.sref = "";
+      await connections.updateComplete;
+    }
+    connections.withText = withText;
+    connections.sref = ref;
+    try {
+      await waitForConnections(
+        connections,
+        ref,
+        expectedOperation,
+        () => operation,
+        signal,
+      );
+    } catch (error) {
+      if (previous === undefined) {
+        connections.sref = "";
+      } else {
+        restoreLinks(previous.retained, previous.category, previous.page);
+      }
+      await connections.updateComplete;
+      throw error;
     }
   };
 
   const loadSource = async (
     ref: string,
     signal: AbortSignal,
-  ): Promise<SourceCardViewModel> => {
-    textRequests += 1;
-    updateCounts();
-    return await sourceController.load({ tref: ref }, signal);
-  };
-
-  const requireAddressableData = (
-    viewModel: SourceCardViewModel,
-    label: string,
-  ): AddressableCard => {
-    const navigable = requireNavigableData(viewModel, label);
-    if (navigable.navigation.state !== "available") {
-      throw new Error(`${label} requires another contextual text request.`);
+  ): Promise<CoreV3TextsResponse> => {
+    sourceProbe.data = undefined;
+    if (sourceProbe.sref === ref) {
+      sourceProbe.sref = "";
+      await sourceProbe.updateComplete;
     }
-    return {
-      viewModel: navigable.viewModel,
-      navigation: navigable.navigation,
-    };
-  };
-
-  const requireNavigableData = (
-    viewModel: SourceCardViewModel,
-    label: string,
-  ): NavigableCard => {
-    if (viewModel.state !== "data") {
-      throw new Error(`${label} did not produce selectable source-card data.`);
+    sourceProbe.sref = ref;
+    await waitForSource(sourceProbe, ref, signal);
+    if (capturedSource?.sref !== ref) {
+      throw new Error(`Source acquisition did not retain ${ref}.`);
     }
-    if (
-      viewModel.navigation === undefined ||
-      viewModel.navigation.state === "unavailable"
-    ) {
-      throw new Error(
-        viewModel.navigation?.message ??
-          `${label} does not expose supported segment addresses.`,
-      );
-    }
-    return { viewModel, navigation: viewModel.navigation };
+    return capturedSource.payload;
   };
 
   const navigate = async (
@@ -184,14 +269,25 @@ export function startConnectionsDemo(
     clearError();
     status.textContent = `Opening ${normalizedTarget} in context.`;
     try {
-      const target = requireNavigableData(
-        await loadSource(normalizedTarget, currentController.signal),
+      const target = await loadSource(
         normalizedTarget,
+        currentController.signal,
       );
       if (expectedOperation !== operation) {
         return;
       }
-      let contextualPromise: Promise<AddressableCard>;
+      const resolvedFirstRef = firstCanonicalRef(target.ref);
+      firstRef = resolvedFirstRef;
+      const contextRef =
+        target.isSpanning && target.spanningRefs?.[0] !== undefined
+          ? target.spanningRefs[0]
+          : target.sectionRef;
+      if (contextRef === undefined) {
+        throw new Error(
+          `${target.ref} did not provide a contextual reference.`,
+        );
+      }
+      let contextualPromise: Promise<CoreV3TextsResponse>;
       let linksOutcome:
         | Promise<
             | { readonly state: "success" }
@@ -208,34 +304,25 @@ export function startConnectionsDemo(
           () => ({ state: "success" as const }),
           (error: unknown) => ({ state: "error" as const, error }),
         );
-      if (target.navigation.state === "context-required") {
-        const contextRef = target.navigation.contextRef;
-        contextualPromise = loadSource(
-          contextRef,
-          currentController.signal,
-        ).then((viewModel) => requireAddressableData(viewModel, contextRef));
+      if (target.isSpanning) {
+        contextualPromise = loadSource(contextRef, currentController.signal);
       } else {
-        firstRef = target.navigation.firstRef;
-        const sectionRef = target.navigation.sectionRef;
         contextualPromise =
-          target.viewModel.header.ref === sectionRef
-            ? Promise.resolve({
-                viewModel: target.viewModel,
-                navigation: target.navigation,
-              })
-            : loadSource(sectionRef, currentController.signal).then(
-                (viewModel) => requireAddressableData(viewModel, sectionRef),
-              );
-        linksOutcome = startLinks(firstRef);
+          target.ref === contextRef
+            ? Promise.resolve(target)
+            : loadSource(contextRef, currentController.signal);
+        linksOutcome = startLinks(resolvedFirstRef);
       }
-      let contextual: AddressableCard;
+      let contextual: CoreV3TextsResponse;
       try {
         contextual = await contextualPromise;
       } catch (error) {
         currentController.abort();
+        connections.sref = "";
         await linksOutcome;
         if (expectedOperation === operation) {
-          connections.viewModel = undefined;
+          connections.data = undefined;
+          connections.sref = "";
           status.textContent = `${normalizedTarget} could not be opened.`;
           showError(error);
         }
@@ -244,29 +331,30 @@ export function startConnectionsDemo(
       if (expectedOperation !== operation) {
         return;
       }
-      firstRef ??= contextual.navigation.firstRef;
-      linksOutcome ??= startLinks(firstRef);
-      const selected = contextual.viewModel.items.find(
-        (item) => item.ref === firstRef,
-      );
-      if (!selected) {
+      linksOutcome ??= startLinks(resolvedFirstRef);
+      const selectedPosition = selectedPositionFor(resolvedFirstRef);
+      if (!hasTextAt(contextual, selectedPosition)) {
         const error = new Error(
-          `${firstRef} is not a selectable row in ${contextual.viewModel.header.ref}.`,
+          `${resolvedFirstRef} is not a selectable row in ${contextual.ref}.`,
         );
         currentController.abort();
+        connections.sref = "";
         await linksOutcome;
         if (expectedOperation === operation) {
-          connections.viewModel = undefined;
+          connections.data = undefined;
+          connections.sref = "";
           status.textContent = `${normalizedTarget} could not be opened.`;
           showError(error);
         }
         return;
       }
 
-      reader.viewModel = contextual.viewModel;
-      reader.selectedPosition = selected.position;
-      committedSection = contextual.viewModel.header.ref;
-      status.textContent = `Showing ${committedSection}; loading connections for ${firstRef}.`;
+      reader.sref = contextual.ref;
+      reader.data = contextual;
+      reader.selectedPosition = selectedPosition;
+      await reader.updateComplete;
+      committedSection = contextual.ref;
+      status.textContent = `Showing ${committedSection}; loading connections for ${resolvedFirstRef}.`;
       if (revealSelection) {
         await reader.revealSelection();
       }
@@ -276,7 +364,7 @@ export function startConnectionsDemo(
       }
       if (expectedOperation === operation) {
         tref.value = normalizedTarget;
-        status.textContent = `Showing ${committedSection}; selected ${firstRef}.`;
+        status.textContent = `Showing ${committedSection}; selected ${resolvedFirstRef}.`;
       }
     } catch (error) {
       if (currentController.signal.aborted || expectedOperation !== operation) {
@@ -331,7 +419,7 @@ export function startConnectionsDemo(
     );
   };
   const onPreviewRequest = (): void => {
-    if (connectionsController.snapshot.result?.request.withText === false) {
+    if (connections.withText === false) {
       clearError();
       linksRequests += 1;
       updateCounts();
@@ -370,6 +458,10 @@ export function startConnectionsDemo(
   reader.addEventListener("sefaria-source-select", onSourceSelect);
   connections.addEventListener("sefaria-connection-select", onConnectionSelect);
   connections.addEventListener(
+    "sefaria-connections-panel-error",
+    onConnectionsError,
+  );
+  connections.addEventListener(
     "sefaria-connections-preview-request",
     onPreviewRequest,
   );
@@ -391,10 +483,8 @@ export function startConnectionsDemo(
     navigate,
     dispose: () => {
       controller?.abort();
-      unbindConnections();
-      unsubscribeConnections();
-      sourceController.dispose();
-      connectionsController.dispose();
+      connections.sref = "";
+      sourceProbe.remove();
       form.removeEventListener("submit", onSubmit);
       reader.removeEventListener("sefaria-source-select", onSourceSelect);
       connections.removeEventListener(
@@ -405,11 +495,112 @@ export function startConnectionsDemo(
         "sefaria-connection-select",
         onConnectionSelect,
       );
+      connections.removeEventListener(
+        "sefaria-connections-panel-error",
+        onConnectionsError,
+      );
       for (const control of displayControls) {
         control.removeEventListener("change", onDisplayChange);
       }
     },
   };
+}
+
+async function waitForSource(
+  source: SefariaSourceCard,
+  expectedRef: string,
+  signal: AbortSignal,
+): Promise<void> {
+  let acquisitionError: unknown;
+  const onError = (event: Event): void => {
+    const detail = (
+      event as CustomEvent<{
+        readonly error: unknown;
+        readonly sref: string;
+      }>
+    ).detail;
+    if (detail.sref === expectedRef) acquisitionError = detail.error;
+  };
+  const onAbort = (): void => {
+    if (source.sref === expectedRef) source.sref = "";
+  };
+  source.addEventListener("sefaria-source-card-error", onError);
+  signal.addEventListener("abort", onAbort, { once: true });
+  try {
+    while (!signal.aborted) {
+      await source.updateComplete;
+      if (source.status === "loading" || source.status === "empty") {
+        await new Promise((resolve) => setTimeout(resolve));
+        continue;
+      }
+      if (source.status === "error" && acquisitionError !== undefined) {
+        throw acquisitionError;
+      }
+      return;
+    }
+  } finally {
+    source.removeEventListener("sefaria-source-card-error", onError);
+    signal.removeEventListener("abort", onAbort);
+  }
+  throw signal.reason;
+}
+
+async function waitForConnections(
+  connections: SefariaConnectionsPanel,
+  expectedRef: string,
+  expectedOperation: number,
+  currentOperation: () => number,
+  signal: AbortSignal,
+): Promise<void> {
+  let acquisitionError: unknown;
+  const onError = (event: Event): void => {
+    const detail = (
+      event as CustomEvent<{
+        readonly error: unknown;
+        readonly sref: string;
+      }>
+    ).detail;
+    if (detail.sref === expectedRef) acquisitionError = detail.error;
+  };
+  connections.addEventListener("sefaria-connections-panel-error", onError);
+  try {
+    while (!signal.aborted && expectedOperation === currentOperation()) {
+      await connections.updateComplete;
+      if (connections.status === "loading" || connections.status === "empty") {
+        await new Promise((resolve) => setTimeout(resolve));
+        continue;
+      }
+      if (connections.status === "error" && acquisitionError !== undefined) {
+        throw acquisitionError;
+      }
+      return;
+    }
+  } finally {
+    connections.removeEventListener("sefaria-connections-panel-error", onError);
+  }
+}
+
+function firstCanonicalRef(ref: string): string {
+  return ref.replace(/-\d+(?::\d+)*$/u, "");
+}
+
+function selectedPositionFor(ref: string): readonly number[] {
+  const match = /:(\d+)$/u.exec(ref);
+  return match === null ? [] : [Number(match[1]) - 1];
+}
+
+function hasTextAt(
+  payload: CoreV3TextsResponse,
+  position: readonly number[],
+): boolean {
+  return payload.versions.some((version) => {
+    let value: unknown = version.text;
+    for (const index of position) {
+      if (!Array.isArray(value)) return false;
+      value = value[index];
+    }
+    return typeof value === "string" && value.trim().length > 0;
+  });
 }
 
 function requireInput(form: HTMLFormElement, name: string): HTMLInputElement {

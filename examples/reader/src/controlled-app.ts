@@ -3,13 +3,10 @@ import {
   type SefariaClient,
 } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
-import type { SefariaReader } from "@arithmomaniac/sefaria-web-components";
-import { bindReaderController } from "@arithmomaniac/sefaria-web-components/bindings";
-import {
-  loadReaderController,
-  type ReaderController,
-  type ReaderControllerSnapshot,
-} from "@arithmomaniac/sefaria-web-components/reader-controller";
+import type {
+  SefariaAcquisition,
+  SefariaReader,
+} from "@arithmomaniac/sefaria-web-components";
 
 /** Browser controls exposed for qualification of the supported reader path. */
 export interface ControlledReaderDemo {
@@ -45,11 +42,11 @@ export function startControlledReader(
   workspace.dataset.surface = "reader";
   workspace.replaceChildren(reader);
 
-  let controller: ReaderController | undefined;
-  let unbind: (() => void) | undefined;
-  let unsubscribeStatus: (() => void) | undefined;
-  let initialization: AbortController | undefined;
+  const acquisition: SefariaAcquisition = { kind: "client", client };
+  reader.acquisition = acquisition;
   let generation = 0;
+  let disposed = false;
+  let readerFailure: string | undefined;
 
   const clearError = (): void => {
     hostError.hidden = true;
@@ -62,108 +59,107 @@ export function startControlledReader(
       error instanceof Error ? error.message : String(error);
   };
 
-  const renderStatus = (snapshot: ReaderControllerSnapshot): void => {
-    const bookmarkTarget = snapshot.reader.selectedTarget?.ref;
+  const renderStatus = (attemptedRoot?: string): void => {
+    const bookmarkTarget = reader.selectedRef;
     bookmarkAction.disabled =
-      snapshot.task.state === "loading-source" ||
-      snapshot.task.state === "loading-connections" ||
-      bookmarkTarget === undefined;
+      reader.status === "loading" || bookmarkTarget === undefined;
     bookmarkAction.textContent =
       bookmarkTarget === undefined
         ? "Bookmark selected text"
         : `Bookmark ${bookmarkTarget}`;
-    switch (snapshot.task.state) {
-      case "idle":
-        status.textContent = `Showing ${snapshot.reader.label}.`;
-        clearError();
-        break;
-      case "loading-source":
-        status.textContent = `Opening ${snapshot.task.targetRef}.`;
-        break;
-      case "loading-connections":
-        status.textContent = `Loading connections for ${snapshot.task.request.tref}.`;
-        break;
-      case "error":
-        status.textContent = `${snapshot.reader.label} remains open.`;
-        showError(snapshot.task.message);
-        break;
+    if (reader.status === "error") {
+      status.textContent =
+        reader.currentEntryId !== undefined
+          ? `${reader.selectedRef ?? "Reader"} remains open.`
+          : `${attemptedRoot ?? reader.sref} could not be opened.`;
+      showError(
+        readerFailure ?? readerAlert(reader) ?? "Reader acquisition failed.",
+      );
+    } else if (reader.status === "loading") {
+      status.textContent = `Opening ${reader.sref}.`;
+    } else if (reader.status === "ready") {
+      status.textContent = `Showing ${reader.selectedRef ?? "Reader"}.`;
+      readerFailure = undefined;
+      clearError();
     }
   };
-
-  const releaseController = (): void => {
-    unsubscribeStatus?.();
-    unsubscribeStatus = undefined;
-    unbind?.();
-    unbind = undefined;
-    controller?.dispose();
-    controller = undefined;
+  const synchronizeSelection = async (
+    targetRef: string,
+    actionGeneration: number,
+  ): Promise<void> => {
+    await new Promise((resolve) => setTimeout(resolve));
+    while (!disposed && actionGeneration === generation) {
+      await reader.updateComplete;
+      if (
+        reader.status === "error" ||
+        (reader.status === "ready" && reader.selectedRef === targetRef)
+      ) {
+        renderStatus(targetRef);
+        return;
+      }
+      await new Promise((resolve) => setTimeout(resolve));
+    }
   };
+  const onSourceSelect = (event: Event): void => {
+    const targetRef = (event as CustomEvent<{ readonly ref: string }>).detail
+      .ref;
+    status.textContent = `Opening ${targetRef}.`;
+    void synchronizeSelection(targetRef, generation);
+  };
+  const onConnectionSelect = (event: Event): void => {
+    const targetRef = (event as CustomEvent<{ readonly targetRef: string }>)
+      .detail.targetRef;
+    status.textContent = `Opening ${targetRef}.`;
+    void synchronizeSelection(targetRef, generation);
+  };
+  const onHistoryActivate = (event: Event): void => {
+    const label = (event as CustomEvent<{ readonly label?: string }>).detail
+      .label;
+    queueMicrotask(() => {
+      void reader.updateComplete.then(() => {
+        if (!disposed) {
+          status.textContent = `Showing ${label ?? reader.selectedRef ?? "Reader"}.`;
+        }
+      });
+    });
+  };
+  const onReaderError = (event: Event): void => {
+    const detail = (
+      event as CustomEvent<{ readonly error: unknown; readonly sref: string }>
+    ).detail;
+    readerFailure =
+      detail.error instanceof Error
+        ? detail.error.message
+        : "Reader acquisition failed.";
+    renderStatus(detail.sref);
+  };
+  reader.addEventListener("sefaria-reader-source-select", onSourceSelect);
+  reader.addEventListener(
+    "sefaria-reader-connection-select",
+    onConnectionSelect,
+  );
+  reader.addEventListener("sefaria-reader-history-activate", onHistoryActivate);
+  reader.addEventListener("sefaria-reader-error", onReaderError);
 
   const navigate = async (targetRef: string): Promise<void> => {
     const normalized = targetRef.trim();
     const currentGeneration = ++generation;
+    readerFailure = undefined;
     clearError();
-    if (controller !== undefined) {
-      const currentController = controller;
-      try {
-        await currentController.replaceRoot(
-          { tref: normalized },
-          {
-            presentation: {
-              vocalizationMode: readVocalizationMode(vocalizationMode.value),
-            },
-          },
-        );
-        if (
-          controller === currentController &&
-          generation === currentGeneration &&
-          currentController.snapshot.task.state !== "error"
-        ) {
-          tref.value = normalized;
-        }
-      } catch (error) {
-        status.textContent = `${normalized} could not be opened.`;
-        showError(error);
-      }
-      return;
-    }
-
-    initialization?.abort();
-    initialization = new AbortController();
-    const currentInitialization = initialization;
-    reader.rootLoading = true;
+    bookmarkAction.disabled = true;
     status.textContent = `Opening ${normalized}.`;
-    try {
-      const next = await loadReaderController({ tref: normalized }, client, {
-        signal: currentInitialization.signal,
-        presentation: {
-          vocalizationMode: readVocalizationMode(vocalizationMode.value),
-        },
-      });
-      if (
-        currentInitialization.signal.aborted ||
-        currentGeneration !== generation
-      ) {
-        next.dispose();
-        return;
-      }
-      controller = next;
-      unbind = bindReaderController(reader, next);
-      unsubscribeStatus = next.subscribe(renderStatus);
+    reader.vocalizationMode = readVocalizationMode(vocalizationMode.value);
+    reader.sref = normalized;
+    await waitForReader(
+      reader,
+      normalized,
+      currentGeneration,
+      () => generation,
+    );
+    if (currentGeneration !== generation) return;
+    renderStatus(normalized);
+    if (generation === currentGeneration && reader.status === "ready") {
       tref.value = normalized;
-    } catch (error) {
-      if (
-        !currentInitialization.signal.aborted &&
-        currentGeneration === generation
-      ) {
-        status.textContent = `${normalized} could not be opened.`;
-        showError(error);
-      }
-    } finally {
-      if (initialization === currentInitialization) {
-        initialization = undefined;
-        reader.rootLoading = false;
-      }
     }
   };
 
@@ -173,24 +169,12 @@ export function startControlledReader(
   };
   form.addEventListener("submit", onSubmit);
   const onVocalizationChange = (): void => {
-    const current = controller?.snapshot.reader.currentEntryId;
-    if (controller === undefined || current === undefined) return;
-    controller.setPresentation({
-      originEntryId: current,
-      patch: { vocalizationMode: readVocalizationMode(vocalizationMode.value) },
-    });
+    reader.vocalizationMode = readVocalizationMode(vocalizationMode.value);
   };
   vocalizationMode.addEventListener("change", onVocalizationChange);
   const onBookmark = (): void => {
-    const snapshot = controller?.snapshot;
-    if (
-      snapshot === undefined ||
-      snapshot.task.state === "loading-source" ||
-      snapshot.task.state === "loading-connections"
-    ) {
-      return;
-    }
-    const targetRef = snapshot.reader.selectedTarget?.ref;
+    if (reader.status === "loading") return;
+    const targetRef = reader.selectedRef;
     if (targetRef === undefined) return;
     bookmarkStatus.textContent = `Bookmarked ${targetRef} in this page.`;
   };
@@ -199,15 +183,56 @@ export function startControlledReader(
   return {
     navigate,
     dispose: () => {
-      initialization?.abort();
+      disposed = true;
       generation += 1;
-      releaseController();
       form.removeEventListener("submit", onSubmit);
       vocalizationMode.removeEventListener("change", onVocalizationChange);
       bookmarkAction.removeEventListener("click", onBookmark);
+      reader.removeEventListener(
+        "sefaria-reader-source-select",
+        onSourceSelect,
+      );
+      reader.removeEventListener(
+        "sefaria-reader-connection-select",
+        onConnectionSelect,
+      );
+      reader.removeEventListener(
+        "sefaria-reader-history-activate",
+        onHistoryActivate,
+      );
+      reader.removeEventListener("sefaria-reader-error", onReaderError);
       workspace.replaceChildren();
     },
   };
+}
+
+async function waitForReader(
+  reader: SefariaReader,
+  requestedRoot: string,
+  generation: number,
+  currentGeneration: () => number,
+): Promise<void> {
+  while (generation === currentGeneration()) {
+    await reader.updateComplete;
+    if (reader.status === "error") return;
+    if (
+      reader.selectedRef !== undefined &&
+      reader.sref === requestedRoot &&
+      reader.status === "ready"
+    ) {
+      return;
+    }
+
+    await new Promise((resolve) => setTimeout(resolve));
+  }
+}
+
+function readerAlert(reader: SefariaReader): string | undefined {
+  return (
+    reader as SefariaReader & {
+      readonly readerError: string | undefined;
+    }
+  ).readerError;
 }
 
 function readVocalizationMode(

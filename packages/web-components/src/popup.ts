@@ -67,12 +67,23 @@ export interface PopupErrorViewModel {
   readonly message: string;
 }
 
+/** Validation failure for authoritative supplied popup data. */
+export interface PopupValidationErrorViewModel {
+  /** State discriminator. */
+  readonly state: "error";
+  /** Error classification. */
+  readonly errorKind: "validation";
+  /** Human-readable validation failure with structured paths. */
+  readonly message: string;
+}
+
 /** Complete state union accepted by `<sefaria-popup>`. */
 export type PopupViewModel =
   | PopupLoadingViewModel
   | PopupDataViewModel
   | PopupEmptyViewModel
-  | PopupErrorViewModel;
+  | PopupErrorViewModel
+  | PopupValidationErrorViewModel;
 
 /** Terminal popup state committed by a headless controller. */
 export type PopupTerminalViewModel = Exclude<

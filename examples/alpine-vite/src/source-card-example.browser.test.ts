@@ -25,23 +25,18 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-test("assigns typed properties, receives the canonical event, and loads an alias only on submit", async () => {
+test("assigns declarative data and acquisition, receives selection, and loads only on submit", async () => {
   const fetch = vi.fn(createMicahFixtureFetch(fixture));
-  provider = () =>
-    createAlpineSourceCardExample(
-      createSefariaClient({
-        baseUrl: "https://example.invalid",
-        cache: false,
-        fetch,
-      }),
-    );
+  provider = () => createAlpineSourceCardExample(fixtureClient(fetch));
   root = mountExample();
   const card = await requireReadyCard(root);
 
   expect(fetch).not.toHaveBeenCalled();
-  expect(card.viewModel.state).toBe("data");
-  expect(card.getAttribute("viewModel")).toBeNull();
-  expect(card.getAttribute("selectedPosition")).toBeNull();
+  expect(card.data).toEqual(fixture);
+  expect(card.sref).toBe("");
+  expect(card.acquisition).toEqual(
+    expect.objectContaining({ kind: "capability" }),
+  );
 
   setSelect(root, "#layout", "stacked");
   setSelect(root, "#side-order", "translation-first");
@@ -52,7 +47,6 @@ test("assigns typed properties, receives the canonical event, and loads an alias
   expect(card.vocalizationMode).toBe("none");
   expect(fetch).not.toHaveBeenCalled();
 
-  await card.updateComplete;
   card.shadowRoot
     ?.querySelector<HTMLButtonElement>(
       'button[aria-label="Show connections for Micah 6:8"]',
@@ -63,93 +57,76 @@ test("assigns typed properties, receives the canonical event, and loads an alias
     "Alpine received selection: Micah 6:8.",
   );
   expect(card.selectedPosition).toEqual([]);
-  expect(fetch).not.toHaveBeenCalled();
 
   setText(root, 'input[name="tref"]', "micah 6:8");
   click(root, "#load-live");
   await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+  expect(card.data).toBeUndefined();
+  expect(card.sref).toBe("micah 6:8");
+  await waitForCardReady(card);
   await vi.waitFor(() =>
     expect(root?.querySelector("#request-status")?.textContent).toBe(
       "Committed canonical reference Micah 6:8.",
     ),
   );
   expect(root.querySelector("#request-count")?.textContent).toContain("1");
-  expect(root.querySelector("#committed-ref")?.textContent).toContain(
-    "Micah 6:8",
-  );
-  expect(root.querySelector("#committed-ref")?.textContent).not.toContain(
-    "micah 6:8",
-  );
   expect(root.querySelector("#selected-ref")?.textContent).toContain(
     "Select the rendered segment",
   );
 });
 
-test("labels a failed replacement as prior committed data", async () => {
-  let rejectRequest!: (reason: unknown) => void;
-  const fetch = vi.fn(
-    async () =>
-      await new Promise<Response>((_resolve, reject) => {
-        rejectRequest = reject;
-      }),
-  );
-  provider = () =>
-    createAlpineSourceCardExample(
-      createSefariaClient({
-        baseUrl: "https://example.invalid",
-        cache: false,
-        fetch,
-      }),
-    );
+test("lets the element report acquisition errors without a duplicate Alpine alert", async () => {
+  const error = new Error("Network unavailable.");
+  const fetch = vi.fn(async () => {
+    throw error;
+  });
+  provider = () => createAlpineSourceCardExample(fixtureClient(fetch));
   root = mountExample();
   const card = await requireReadyCard(root);
+  const errors: unknown[] = [];
+  card.addEventListener("sefaria-source-card-error", (event) => {
+    errors.push(
+      (event as CustomEvent<{ readonly error: unknown }>).detail.error,
+    );
+  });
 
   click(root, "#load-live");
-  await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
-  rejectRequest(new Error("Network unavailable."));
-  await vi.waitFor(() =>
-    expect(root?.querySelector("#load-error")?.textContent).toContain(
-      "prior committed Micah 6:8",
-    ),
-  );
-
-  expect(card.viewModel.state).toBe("data");
-  expect(root.querySelector("#request-status")?.textContent).toContain(
-    "Showing the prior committed Micah 6:8 result",
-  );
+  await vi.waitFor(() => expect(errors).toEqual([error]));
+  await card.updateComplete;
+  expect(card.status).toBe("error");
+  expect(root.querySelector("#load-error")).toBeNull();
 });
 
-test("destroying the Alpine tree disposes pending controller work once", async () => {
+test("destroying the Alpine tree clears inputs and aborts pending element work", async () => {
   let requestSignal: AbortSignal | undefined;
   const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     requestSignal = new Request(input, init).signal;
     return await new Promise<Response>(() => undefined);
   });
-  provider = () =>
-    createAlpineSourceCardExample(
-      createSefariaClient({
-        baseUrl: "https://example.invalid",
-        cache: false,
-        fetch,
-      }),
-    );
+  provider = () => createAlpineSourceCardExample(fixtureClient(fetch));
   root = mountExample();
-  await requireReadyCard(root);
+  const card = await requireReadyCard(root);
   click(root, "#load-live");
   await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
 
   Alpine.destroyTree(root);
-  Alpine.destroyTree(root);
+  await card.updateComplete;
 
   expect(requestSignal?.aborted).toBe(true);
-  expect(
-    requestSignal?.reason instanceof Error
-      ? requestSignal.reason.message
-      : String(requestSignal?.reason),
-  ).toContain("disposed");
+  expect(card.sref).toBe("");
   root.remove();
   root = undefined;
 });
+
+function fixtureClient(
+  fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>,
+) {
+  return createSefariaClient({
+    baseUrl: "https://example.invalid",
+    cache: false,
+    fetch,
+  });
+}
 
 function mountExample(): HTMLElement {
   const element = document.createElement("div");
@@ -174,13 +151,9 @@ function mountExample(): HTMLElement {
     </select>
     <p id="request-status" x-text="status"></p>
     <p id="request-count">Live load attempts: <span x-text="loadAttempts"></span></p>
-    <p id="committed-ref" x-text="committedRef === undefined
-      ? 'Current result has no committed canonical reference.'
-      : \`Current committed reference: \${committedRef}.\`"></p>
-    <p id="load-error" x-text="failure ?? ''"></p>
     <sefaria-source-card
       x-init="$nextTick(() => attach($el, $data))"
-      x-effect="syncCard($el, contentLanguage, layout, sideOrder, vocalizationMode, selectable, selectedPosition)"
+      x-effect="syncPresentation($el, contentLanguage, layout, sideOrder, vocalizationMode, selectable, selectedPosition)"
       @sefaria-source-select="selectSource($event)"
     ></sefaria-source-card>
     <p id="selected-ref" x-text="selectedRef === undefined
@@ -199,8 +172,15 @@ async function requireReadyCard(
     "sefaria-source-card",
   );
   if (!card) throw new Error("The Alpine source card is missing.");
-  await vi.waitFor(() => expect(card.viewModel?.state).toBe("data"));
+  await waitForCardReady(card);
   return card;
+}
+
+async function waitForCardReady(card: SefariaSourceCard): Promise<void> {
+  await vi.waitFor(async () => {
+    await card.updateComplete;
+    expect(card.status).toBe("ready");
+  });
 }
 
 function click(rootElement: ParentNode, selector: string): void {

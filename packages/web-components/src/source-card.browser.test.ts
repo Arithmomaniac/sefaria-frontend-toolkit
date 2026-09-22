@@ -2,14 +2,14 @@ import { html } from "lit";
 import { render } from "vitest-browser-lit";
 import { afterEach, expect, test, vi } from "vitest";
 
+import { prepared, setPreparedState } from "./prepared-state.js";
 import "./source-card-element.js";
+import type { SefariaSourceCard } from "./index.js";
 import type {
-  RefLabelDataViewModel,
-  SefariaSourceCard,
   SourceCardDataViewModel,
   SourceCardViewModel,
-  TextSegmentDataViewModel,
-} from "./index.js";
+} from "./source-card.js";
+import type { TextSegmentDataViewModel } from "./text-segment.js";
 
 const PRIMARY: TextSegmentDataViewModel = {
   state: "data",
@@ -70,16 +70,6 @@ const DATA: SourceCardDataViewModel = {
   ],
 };
 
-const REFERENCE_LABEL: RefLabelDataViewModel = {
-  state: "data",
-  normalized: "Genesis 1:1-2",
-  hebrew: "בראשית א׳:א׳-ב׳",
-  urlRef: "Genesis.1.1-2",
-  url: "https://www.sefaria.org/Genesis.1.1-2",
-  indexTitle: "Genesis",
-  nodeType: "JaggedArrayNode",
-};
-
 afterEach(() => {
   vi.unstubAllGlobals();
 });
@@ -96,13 +86,9 @@ function element(): SefariaSourceCard {
 
 async function renderCard(
   viewModel: SourceCardViewModel = DATA,
-  referenceLabel?: RefLabelDataViewModel,
 ): Promise<SefariaSourceCard> {
   render(
-    html`<sefaria-source-card
-      .viewModel=${viewModel}
-      .referenceLabel=${referenceLabel}
-    ></sefaria-source-card>`,
+    html`<sefaria-source-card ${prepared(viewModel)}></sefaria-source-card>`,
   );
   const found = element();
   await found.updateComplete;
@@ -391,24 +377,25 @@ test("makes no request while rendering the full card", async () => {
 test("renders the payload-derived bilingual header by default", async () => {
   const host = await renderCard();
   const header = host.shadowRoot?.querySelector("header");
+  const label = header?.querySelector("sefaria-ref-label");
+  await label?.updateComplete;
 
-  expect(header?.textContent).toContain("Genesis 1:1-2");
-  expect(header?.textContent).toContain("בראשית א׳:א׳-ב׳");
-  expect(header?.querySelector("a")).toBeNull();
+  expect(label?.shadowRoot?.textContent).toContain("Genesis 1:1-2");
+  expect(label?.shadowRoot?.textContent).toContain("בראשית א׳:א׳-ב׳");
+  expect(label?.shadowRoot?.querySelector("a")).toBeNull();
   expect(getComputedStyle(header!).borderBottomStyle).toBe("solid");
   expect(getComputedStyle(header!).paddingBottom).toBe("12px");
 });
 
-test("renders a host-supplied linked reference label without requesting", async () => {
+test("composes the private reference label without requesting", async () => {
   const fetchMock = vi.fn();
   vi.stubGlobal("fetch", fetchMock);
-  const host = await renderCard(DATA, REFERENCE_LABEL);
+  const host = await renderCard(DATA);
   const label = host.shadowRoot?.querySelector("sefaria-ref-label");
   await label?.updateComplete;
 
-  expect(label?.shadowRoot?.querySelector("a")?.href).toBe(
-    "https://www.sefaria.org/Genesis.1.1-2",
-  );
+  expect(label?.shadowRoot?.textContent).toContain("Genesis 1:1-2");
+  expect(label?.shadowRoot?.querySelector("a")).toBeNull();
   expect(fetchMock).not.toHaveBeenCalled();
 });
 
@@ -570,7 +557,7 @@ test("preserves keyed item DOM when one pair changes", async () => {
     '[data-position="0"]',
   );
 
-  host.viewModel = {
+  setPreparedState(host, {
     ...DATA,
     items: [
       DATA.items[0]!,
@@ -583,7 +570,7 @@ test("preserves keyed item DOM when one pair changes", async () => {
         },
       },
     ],
-  };
+  });
   await host.updateComplete;
 
   expect(
@@ -623,9 +610,9 @@ test("renders the header and empty message for an empty card", async () => {
     ],
   });
 
-  expect(host.shadowRoot?.querySelector("header")?.textContent).toContain(
-    "Genesis 1:1-2",
-  );
+  const label = host.shadowRoot?.querySelector("sefaria-ref-label");
+  await label?.updateComplete;
+  expect(label?.shadowRoot?.textContent).toContain("Genesis 1:1-2");
   expect(
     host.shadowRoot?.querySelector('[role="status"]')?.textContent?.trim(),
   ).toBe("No primary. No translation.");

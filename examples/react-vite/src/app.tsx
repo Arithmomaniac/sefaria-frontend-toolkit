@@ -1,27 +1,16 @@
 import {
   createSefariaClient,
+  text,
   type CoreV3TextsResponse,
   type SefariaClient,
   zCoreV3TextsResponse,
 } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
-import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
-import { bindSourceCardController } from "@arithmomaniac/sefaria-web-components/bindings";
-import {
-  createSourceCardController,
-  type SourceCardController,
-  type SourceCardControllerSnapshot,
-  type SourceCardTerminalViewModel,
-  type SourceCardViewModel,
-} from "@arithmomaniac/sefaria-web-components/source-card";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-  type FormEvent,
-} from "react";
+import type {
+  SefariaAcquisition,
+  SefariaSourceCard,
+} from "@arithmomaniac/sefaria-web-components";
+import { useCallback, useRef, useState, type FormEvent } from "react";
 
 import payload from "./micah-6-8.json";
 import { reactSourceCardSnippet } from "./source-snippet.js";
@@ -47,43 +36,16 @@ export function ReactSourceCardExample({
   const [client] = useState(
     () => suppliedClient ?? createSefariaClient({ cache: false }),
   );
-  const [controller, setController] = useState<SourceCardController>();
-
-  useEffect(() => {
-    const next = createSourceCardController(client);
-    next.setSuppliedData({ tref: "Micah 6:8" }, suppliedPayload);
-    setController(next);
-    return () => {
-      setController((current) => (current === next ? undefined : current));
-      next.dispose();
-    };
-  }, [client]);
-
-  if (controller === undefined) {
-    return (
-      <main className="react-example">
-        <p role="status">Preparing the validated supplied example.</p>
-      </main>
-    );
-  }
-
-  return (
-    <ActiveReactSourceCardExample
-      controller={controller}
-      initialTref={initialTref}
-    />
+  const [data, setData] = useState<CoreV3TextsResponse | undefined>(
+    suppliedPayload,
   );
-}
-
-function ActiveReactSourceCardExample({
-  controller,
-  initialTref,
-}: {
-  readonly controller: SourceCardController;
-  readonly initialTref: string;
-}) {
-  const snapshot = useSourceCardSnapshot(controller);
-  const [card, setCard] = useState<SefariaSourceCard | null>(null);
+  const [sref, setSref] = useState("");
+  const selectedMetadataRef = useRef<string | undefined>(undefined);
+  const [acquisition] = useState<SefariaAcquisition>(() =>
+    createSourceCardAcquisition(client, (ref) => {
+      selectedMetadataRef.current = ref;
+    }),
+  );
   const [tref, setTref] = useState(initialTref);
   const [selected, setSelected] = useState<SourceSelection>();
   const [theme, setTheme] = useState<"light" | "dark">("light");
@@ -102,24 +64,45 @@ function ActiveReactSourceCardExample({
   >("taamim_and_nikkud");
   const [loadAttempts, setLoadAttempts] = useState(0);
   const [inputFailure, setInputFailure] = useState<string>();
-  const inputFailureAttemptId = useRef<number | undefined>(undefined);
-  const previousResult = useRef(snapshot.result);
+  const [committedRef, setCommittedRef] = useState("Micah 6:8");
+  const [status, setStatus] = useState(
+    "Supplied Micah 6:8 data rendered with zero live loads.",
+  );
+  const cardObserver = useRef<MutationObserver | undefined>(undefined);
+  const liveActivated = useRef(false);
 
-  useEffect(() => {
+  const setCard = useCallback((card: SefariaSourceCard | null) => {
+    cardObserver.current?.disconnect();
+    cardObserver.current = undefined;
     if (card === null) return;
-    return bindSourceCardController(card, controller);
-  }, [card, controller]);
-
-  useEffect(() => {
-    if (
-      previousResult.current !== undefined &&
-      snapshot.result !== undefined &&
-      snapshot.result !== previousResult.current
-    ) {
-      setSelected(undefined);
-    }
-    previousResult.current = snapshot.result;
-  }, [snapshot.result]);
+    const synchronizeCommittedReference = (): void => {
+      if (
+        card.status !== "ready" ||
+        selectedMetadataRef.current === undefined ||
+        !liveActivated.current
+      ) {
+        return;
+      }
+      setCommittedRef(selectedMetadataRef.current);
+      setStatus(
+        `Committed canonical reference ${selectedMetadataRef.current}.`,
+      );
+    };
+    const observer = new MutationObserver(synchronizeCommittedReference);
+    observer.observe(card.shadowRoot!, {
+      childList: true,
+      subtree: true,
+      characterData: true,
+    });
+    cardObserver.current = observer;
+    synchronizeCommittedReference();
+    return () => {
+      observer.disconnect();
+      if (cardObserver.current === observer) {
+        cardObserver.current = undefined;
+      }
+    };
+  }, []);
 
   const onSourceSelection = useCallback(
     (event: CustomEvent<SourceSelection>): void => {
@@ -135,51 +118,31 @@ function ActiveReactSourceCardExample({
     event.preventDefault();
     const normalized = tref.trim();
     if (normalized.length === 0) {
-      inputFailureAttemptId.current =
-        snapshot.attempt.state === "loading" ? snapshot.attempt.id : undefined;
       setInputFailure("Enter a non-blank Sefaria reference.");
       return;
     }
-    inputFailureAttemptId.current = undefined;
     setInputFailure(undefined);
+    setSelected(undefined);
+    liveActivated.current = true;
     setLoadAttempts((count) => count + 1);
-    const load = controller.load({ tref: normalized });
-    const admittedAttempt = controller.snapshot.attempt;
-    const admittedAttemptId =
-      admittedAttempt.state === "loading" ? admittedAttempt.id : undefined;
-    void load.then(
-      () => {
-        if (
-          admittedAttemptId !== undefined &&
-          inputFailureAttemptId.current === admittedAttemptId
-        ) {
-          inputFailureAttemptId.current = undefined;
-          setInputFailure(undefined);
-        }
-      },
-      () => undefined,
+    setStatus(
+      `Activated ${normalized}. The Source Card reports loading and results inline.`,
     );
+    selectedMetadataRef.current = undefined;
+    setData(undefined);
+    setSref(normalized);
   };
-
-  const viewModel = displayedViewModel(snapshot);
-  const canonicalRef = committedCanonicalRef(snapshot);
-  const failure =
-    inputFailure ??
-    (snapshot.attempt.state === "failed"
-      ? errorMessage(snapshot.attempt.error)
-      : undefined);
-  const requestStatus = describeStatus(snapshot, loadAttempts, canonicalRef);
 
   return (
     <main className="react-example">
       <header className="intro">
         <p className="eyebrow">Standalone React consumer</p>
-        <h1>Bind React state to a request-free Sefaria Web Component</h1>
+        <h1>Pass declarative inputs to a Sefaria Web Component</h1>
         <p>
           Validated supplied data renders first. Submitting the form is the only
           live activation. React owns presentation properties and receives the
-          component&apos;s canonical selection event; the shared controller and
-          binder own loading, stale-result rejection, and view-model delivery.
+          component&apos;s canonical selection event; the element owns
+          acquisition, cancellation, loading, and error presentation.
         </p>
       </header>
 
@@ -190,7 +153,10 @@ function ActiveReactSourceCardExample({
             <input
               name="tref"
               value={tref}
-              onChange={(event) => setTref(event.currentTarget.value)}
+              onChange={(event) => {
+                setTref(event.currentTarget.value);
+                setInputFailure(undefined);
+              }}
               required
             />
           </label>
@@ -293,26 +259,18 @@ function ActiveReactSourceCardExample({
         </div>
       </section>
 
-      <p id="request-status" className="status" role="status">
-        {requestStatus}
+      <p id="request-status" className="status">
+        {status}
       </p>
       <p id="request-count" className="status">
         Live load attempts: {loadAttempts}
       </p>
       <p id="committed-ref" className="status">
-        {canonicalRef === undefined
-          ? "Current result has no committed canonical reference."
-          : `Current committed reference: ${canonicalRef}.`}
+        Current committed reference: {committedRef}.
       </p>
-
-      {failure === undefined ? null : (
-        <p id="load-error" className="failure" role="alert">
-          {failure}
-          {inputFailure === undefined &&
-          snapshot.attempt.state === "failed" &&
-          canonicalRef !== undefined
-            ? ` The prior committed ${canonicalRef} card remains displayed.`
-            : ""}
+      {inputFailure === undefined ? null : (
+        <p id="input-error" className="failure" role="alert">
+          {inputFailure}
         </p>
       )}
 
@@ -324,11 +282,14 @@ function ActiveReactSourceCardExample({
       >
         <sefaria-source-card
           ref={setCard}
+          data={data}
+          sref={sref}
+          acquisition={acquisition}
           contentLanguage={contentLanguage}
           layout={layout}
           sideOrder={sideOrder}
           vocalizationMode={vocalizationMode}
-          selectable={viewModel?.state === "data"}
+          selectable
           selectedPosition={selected?.position}
           onsefaria-source-select={onSourceSelection}
         />
@@ -342,15 +303,17 @@ function ActiveReactSourceCardExample({
 
       <section className="diagnostics" aria-label="Optional diagnostics">
         <details>
-          <summary>Actual React binding source</summary>
+          <summary>Actual React element source</summary>
           <pre>
             <code>{reactSourceCardSnippet}</code>
           </pre>
         </details>
         <details>
-          <summary>Current view model</summary>
+          <summary>Current declarative inputs</summary>
           <pre>
-            <code>{JSON.stringify(viewModel, null, 2)}</code>
+            <code>
+              {JSON.stringify({ sref, hasData: data !== undefined }, null, 2)}
+            </code>
           </pre>
         </details>
         <details>
@@ -364,56 +327,35 @@ function ActiveReactSourceCardExample({
   );
 }
 
-function useSourceCardSnapshot(
-  controller: SourceCardController,
-): SourceCardControllerSnapshot {
-  return useSyncExternalStore(
-    (notify) => controller.subscribe(() => notify()),
-    () => controller.snapshot,
-  );
-}
-
-function displayedViewModel(
-  snapshot: SourceCardControllerSnapshot,
-): SourceCardViewModel | undefined {
-  return snapshot.attempt.state === "loading"
-    ? snapshot.attempt.viewModel
-    : snapshot.result?.viewModel;
-}
-
-function committedCanonicalRef(
-  snapshot: SourceCardControllerSnapshot,
-): string | undefined {
-  const viewModel: SourceCardTerminalViewModel | undefined =
-    snapshot.result?.viewModel;
-  return viewModel?.state === "data" || viewModel?.state === "empty"
-    ? viewModel.header.ref
-    : undefined;
-}
-
-function describeStatus(
-  snapshot: SourceCardControllerSnapshot,
-  loadAttempts: number,
-  canonicalRef: string | undefined,
-): string {
-  if (snapshot.attempt.state === "loading") {
-    return `Loading ${snapshot.attempt.request.tref} through the public controller.`;
-  }
-  if (snapshot.attempt.state === "failed") {
-    return canonicalRef === undefined
-      ? "The live load failed. No canonical result is committed."
-      : `The live load failed. Showing the prior committed ${canonicalRef} result.`;
-  }
-  if (loadAttempts === 0) {
-    return canonicalRef === undefined
-      ? "Supplied component content rendered with zero live loads."
-      : `Supplied ${canonicalRef} data rendered with zero live loads.`;
-  }
-  return canonicalRef === undefined
-    ? "The component committed an error result without a canonical reference."
-    : `Committed canonical reference ${canonicalRef}.`;
-}
-
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : String(error);
+function createSourceCardAcquisition(
+  client: SefariaClient,
+  selectMetadata: (ref: string) => void,
+): SefariaAcquisition {
+  return {
+    kind: "capability",
+    capability: {
+      getText: async (request, signal) => {
+        const result = await text.getV3Texts({
+          client,
+          path: { tref: request.sref },
+          query: {
+            version: [...request.versions],
+            return_format: request.returnFormat,
+          },
+          signal,
+        });
+        if (result.data !== undefined) {
+          selectMetadata(result.data.ref);
+          return { payload: result.data, status: 200 };
+        }
+        if (result.error !== undefined && result.response !== undefined) {
+          return {
+            payload: result.error,
+            status: result.response.status,
+          };
+        }
+        throw new Error("The source-card request returned no result.");
+      },
+    },
+  };
 }

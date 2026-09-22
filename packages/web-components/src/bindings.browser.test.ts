@@ -7,6 +7,8 @@ import { html } from "lit";
 import { render } from "vitest-browser-lit";
 import { expect, test, vi } from "vitest";
 
+import { getPreparedState } from "./prepared-state.js";
+import type { SourceCardViewModel } from "./source-card.js";
 import linksFixture from "../../client/test/fixtures/links-targum-2026-08-30.json";
 import textFixture from "../../client/test/fixtures/v3-connections-genesis-target-2026-09-06.json";
 import {
@@ -39,12 +41,12 @@ test("binds supplied terminal state and does no IO itself", () => {
   const controller = createSourceCardController();
   const unbind = bindSourceCardController(element, controller);
 
-  expect(element.viewModel).toBeUndefined();
+  expect(getPreparedState<SourceCardViewModel>(element)).toBeUndefined();
   const terminal = controller.setSuppliedData(
     { tref: "Genesis 1:2" },
     textPayload,
   );
-  expect(element.viewModel).toBe(terminal);
+  expect(getPreparedState<SourceCardViewModel>(element)).toBe(terminal);
   unbind();
   unbind();
   expect(() => controller.dispose()).not.toThrow();
@@ -69,9 +71,11 @@ test("clears an initial loading view model after a failed attempt", async () => 
   const unbind = bindSourceCardController(element, controller);
 
   const pending = controller.load({ tref: "Micah 6:8" });
-  expect(element.viewModel).toMatchObject({ state: "loading" });
+  expect(getPreparedState<SourceCardViewModel>(element)).toMatchObject({
+    state: "loading",
+  });
   await expect(pending).rejects.toBe(failure);
-  expect(element.viewModel).toBeUndefined();
+  expect(getPreparedState<SourceCardViewModel>(element)).toBeUndefined();
 
   unbind();
   controller.dispose();
@@ -109,7 +113,7 @@ test("failed binding setup releases the element for another controller", () => {
 
   const controller = createSourceCardController();
   const unbind = bindSourceCardController(element, controller);
-  expect(element.viewModel).toBeUndefined();
+  expect(getPreparedState<SourceCardViewModel>(element)).toBeUndefined();
   unbind();
 });
 

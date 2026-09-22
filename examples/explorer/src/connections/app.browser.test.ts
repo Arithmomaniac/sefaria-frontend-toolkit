@@ -49,17 +49,13 @@ test("real factories open context, select one first target, and load its links",
   });
   const demo = startConnectionsDemo(document, client);
   await demo.navigate("Genesis 1:2");
-  expect(reader().viewModel).toMatchObject({
-    state: "data",
-    header: { ref: "Genesis 1" },
-  });
+  expect(reader().status).toBe("ready");
+  expect(reader().sref).toBe("Genesis 1");
   expect(reader().selectedPosition).toEqual([1]);
   expect(requests).toHaveLength(3);
   expect(requests[2]).toContain("/api/links/Genesis 1:2");
   await demo.navigate("Rashi on Genesis 1:1:1-2");
-  expect(reader().viewModel).toMatchObject({
-    header: { ref: "Rashi on Genesis 1:1" },
-  });
+  expect(reader().sref).toBe("Rashi on Genesis 1:1");
   expect(reader().selectedPosition).toEqual([0]);
   expect(requests.at(-1)).toContain("/api/links/Rashi on Genesis 1:1:1?");
   expect(requests).toHaveLength(6);
@@ -120,17 +116,11 @@ test("local paging/category/preview display use only the current capture", async
   );
   const demo = startConnectionsDemo(document, createSefariaClient({ fetch }));
   await demo.navigate("Genesis 1:2");
-  panel().dispatchEvent(
-    new CustomEvent("sefaria-connections-category-change", {
-      detail: { category: "Commentary" },
-    }),
-  );
-  await Promise.resolve();
-  panel().dispatchEvent(
-    new CustomEvent("sefaria-connections-page-change", { detail: { page: 1 } }),
-  );
-  await Promise.resolve();
-  expect(panel().viewModel).toMatchObject({ category: "Commentary", page: 1 });
+  panel().category = "Commentary";
+  panel().page = 1;
+  await panel().updateComplete;
+  expect(panel().category).toBe("Commentary");
+  expect(panel().page).toBe(1);
   document.querySelector<HTMLInputElement>("#show-previews")!.click();
   expect(panel().showPreviews).toBe(false);
   const showAddressLabels = document.querySelector<HTMLInputElement>(
@@ -155,25 +145,17 @@ test("loading previews preserves the active category and page", async () => {
   );
   const demo = startConnectionsDemo(document, createSefariaClient({ fetch }));
   await demo.navigate("Genesis 1:2");
-  panel().dispatchEvent(
-    new CustomEvent("sefaria-connections-category-change", {
-      detail: { category: "Commentary" },
-    }),
-  );
-  await Promise.resolve();
-  panel().dispatchEvent(
-    new CustomEvent("sefaria-connections-page-change", { detail: { page: 1 } }),
-  );
-  await Promise.resolve();
-  panel().dispatchEvent(new CustomEvent("sefaria-connections-preview-request"));
-  await vi.waitFor(() =>
-    expect(panel().viewModel).toMatchObject({
-      category: "Commentary",
-      page: 1,
-      previewsIncluded: true,
-    }),
-  );
-  expect(fetch).toHaveBeenCalledTimes(4);
+  panel().category = "Commentary";
+  panel().page = 1;
+  await panel().updateComplete;
+  const previewButton = [
+    ...panel().shadowRoot!.querySelectorAll("button"),
+  ].find((button) => button.textContent?.trim() === "Load previews");
+  previewButton?.click();
+  await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(4));
+  expect(panel().category).toBe("Commentary");
+  expect(panel().page).toBe(1);
+  expect(panel().withText).toBe(true);
   demo.dispose();
 });
 
@@ -188,9 +170,7 @@ test("selecting a reader row issues only a links request", async () => {
       detail: { position: [0], ref: "Genesis 1:1" },
     }),
   );
-  await vi.waitFor(() =>
-    expect(panel().viewModel).toMatchObject({ reference: "Genesis 1:1" }),
-  );
+  await vi.waitFor(() => expect(panel().sref).toBe("Genesis 1:1"));
   expect(fetch).toHaveBeenCalledTimes(4);
   expect(reader().selectedPosition).toEqual([0]);
   demo.dispose();
@@ -224,10 +204,8 @@ test("a failed row links request keeps the new selection and ends loading", asyn
     ).toContain("links unavailable"),
   );
   expect(reader().selectedPosition).toEqual([0]);
-  expect(panel().viewModel).toMatchObject({
-    state: "data",
-    reference: "Genesis 1:2",
-  });
+  expect(panel().status).toBe("ready");
+  expect(panel().sref).toBe("Genesis 1:2");
   demo.dispose();
 });
 
@@ -267,21 +245,15 @@ test("context and links load concurrently and the reader commits first", async (
   ]);
 
   finishContext(Response.json(context));
-  await vi.waitFor(() =>
-    expect(reader().viewModel).toMatchObject({
-      state: "data",
-      header: { ref: "Genesis 1" },
-    }),
-  );
+  await vi.waitFor(() => expect(reader().status).toBe("ready"));
+  expect(reader().sref).toBe("Genesis 1");
   expect(reader().selectedPosition).toEqual([1]);
-  expect(panel().viewModel).toMatchObject({ state: "loading" });
+  expect(panel().status).toBe("loading");
 
   finishLinks(Response.json(capturedLinks));
   await navigation;
-  expect(panel().viewModel).toMatchObject({
-    state: "data",
-    reference: "Genesis 1:2",
-  });
+  expect(panel().status).toBe("ready");
+  expect(panel().sref).toBe("Genesis 1:2");
   demo.dispose();
 });
 
@@ -318,12 +290,10 @@ test("a spanning target opens its first server-provided context", async () => {
     "/api/v3/texts/Genesis 1:1-31",
     "/api/links/Genesis 1:1",
   ]);
-  expect(reader().viewModel).toMatchObject({
-    state: "data",
-    header: { ref: "Genesis 1" },
-  });
+  expect(reader().status).toBe("ready");
+  expect(reader().sref).toBe("Genesis 1");
   expect(reader().selectedPosition).toEqual([0]);
-  expect(panel().viewModel).toMatchObject({ reference: "Genesis 1:1" });
+  expect(panel().sref).toBe("Genesis 1:1");
   demo.dispose();
 });
 
@@ -361,8 +331,8 @@ test("a missing contextual target aborts its sibling links request", async () =>
   const demo = startConnectionsDemo(document, createSefariaClient({ fetch }));
   await demo.navigate("Genesis 1:2");
   expect(linksAborted).toBe(true);
-  expect(reader().viewModel).toBeUndefined();
-  expect(panel().viewModel).toBeUndefined();
+  expect(reader().status).toBe("empty");
+  expect(panel().status).toBe("empty");
   expect(
     document.querySelector<HTMLElement>("#host-error")!.textContent,
   ).toContain("not a selectable row");
@@ -388,12 +358,8 @@ test("an obsolete target response cannot replace newer contextual navigation", a
   await demo.navigate("Rashi on Genesis 1:1:1-2");
   finish(Response.json(target));
   await old;
-  expect(reader().viewModel).toMatchObject({
-    header: { ref: "Rashi on Genesis 1:1" },
-  });
-  expect(panel().viewModel).toMatchObject({
-    reference: "Rashi on Genesis 1:1:1",
-  });
+  expect(reader().sref).toBe("Rashi on Genesis 1:1");
+  expect(panel().sref).toBe("Rashi on Genesis 1:1:1");
   demo.dispose();
 });
 
@@ -417,9 +383,7 @@ test("an obsolete reveal cannot replace newer links with a loading state", async
   await demo.navigate("Rashi on Genesis 1:1:1-2");
   finishReveal();
   await old;
-  expect(panel().viewModel).toMatchObject({
-    state: "data",
-    reference: "Rashi on Genesis 1:1:1",
-  });
+  expect(panel().status).toBe("ready");
+  expect(panel().sref).toBe("Rashi on Genesis 1:1:1");
   demo.dispose();
 });

@@ -1,12 +1,10 @@
-import { createSefariaClient } from "@arithmomaniac/sefaria-client";
+import {
+  createSefariaClient,
+  type SefariaClient,
+} from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
-import type {
-  SefariaTextSegment,
-  TextSegmentController,
-  TextSegmentRequest,
-} from "@arithmomaniac/sefaria-web-components";
-import { bindTextSegmentController } from "@arithmomaniac/sefaria-web-components/bindings";
-import { createTextSegmentController } from "@arithmomaniac/sefaria-web-components/text-segment";
+import type { SefariaTextSegment } from "@arithmomaniac/sefaria-web-components";
+import type { TextSegmentRequest } from "@arithmomaniac/sefaria-web-components/text-segment";
 
 import {
   startLiveDemo,
@@ -22,14 +20,12 @@ export interface TextSegmentLiveDemo {
 /** Connects the demo form and presets to the production text-segment factory. */
 export function startTextSegmentLiveDemo(
   root: Document,
-  controller: TextSegmentController = createTextSegmentController(
-    createSefariaClient(),
-  ),
+  client: SefariaClient = createSefariaClient(),
 ): TextSegmentLiveDemo {
   return startLiveDemo(root, {
     title: "Live text-segment demo",
     description:
-      "This page calls the deployed Sefaria API and supplies each result to the request-free Web Component.",
+      "The activated Web Component loads text from the deployed Sefaria API.",
     requestHeading: "Choose a request",
     presetsLabel: "Example requests",
     controls: [
@@ -92,12 +88,14 @@ export function startTextSegmentLiveDemo(
       },
     ],
     submitLabel: "Load from Sefaria",
-    createResultElement: (document) =>
-      document.createElement("sefaria-text-segment") as SefariaTextSegment,
-    controller,
-    bindController: (result) => {
-      bindTextSegmentController(result, controller);
+    createResultElement: (document) => {
+      const result = document.createElement(
+        "sefaria-text-segment",
+      ) as SefariaTextSegment;
+      result.acquisition = { kind: "client", client };
+      return result;
     },
+    load: loadText,
     createRequest: (form) =>
       createRequest(
         requireNamedInput(form, "tref").value,
@@ -106,6 +104,47 @@ export function startTextSegmentLiveDemo(
       ),
     formatRequest,
   });
+}
+
+async function loadText(
+  result: SefariaTextSegment,
+  request: TextSegmentRequest,
+  signal: AbortSignal,
+): Promise<string> {
+  let acquisitionError: unknown;
+  const onError = (event: Event): void => {
+    acquisitionError = (event as CustomEvent<{ readonly error: unknown }>)
+      .detail.error;
+  };
+  const onAbort = (): void => {
+    if (result.sref === request.tref) result.sref = "";
+  };
+  result.addEventListener("sefaria-text-segment-error", onError);
+  signal.addEventListener("abort", onAbort, { once: true });
+  try {
+    if (
+      result.sref === request.tref &&
+      result.versionLanguage === request.version.language &&
+      result.versionTitle === request.version.versionTitle
+    ) {
+      result.sref = "";
+      await result.updateComplete;
+    }
+    result.versionLanguage = request.version.language;
+    result.versionTitle = request.version.versionTitle;
+    result.sref = request.tref;
+    await result.updateComplete;
+    while (!signal.aborted && result.status === "loading") {
+      await new Promise((resolve) => setTimeout(resolve));
+      await result.updateComplete;
+    }
+    await result.updateComplete;
+    if (acquisitionError !== undefined) throw acquisitionError;
+    return result.status;
+  } finally {
+    result.removeEventListener("sefaria-text-segment-error", onError);
+    signal.removeEventListener("abort", onAbort);
+  }
 }
 
 function createRequest(

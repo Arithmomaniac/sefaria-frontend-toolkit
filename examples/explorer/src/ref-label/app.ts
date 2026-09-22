@@ -1,13 +1,13 @@
-import { createSefariaClient } from "@arithmomaniac/sefaria-client";
+import {
+  createSefariaClient,
+  type SefariaClient,
+} from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 import type {
   RefLabelLanguage,
-  RefLabelController,
   SefariaRefLabel,
 } from "@arithmomaniac/sefaria-web-components";
-import { bindRefLabelController } from "@arithmomaniac/sefaria-web-components/bindings";
-import { createRefLabelController } from "@arithmomaniac/sefaria-web-components/ref-label";
-
+import type { RefLabelRequest } from "@arithmomaniac/sefaria-web-components/ref-label";
 import {
   startLiveDemo,
   requireNamedInput,
@@ -23,14 +23,12 @@ export interface RefLabelLiveDemo {
 /** Connects the demo controls to the production reference-label factory. */
 export function startRefLabelLiveDemo(
   root: Document,
-  controller: RefLabelController = createRefLabelController(
-    createSefariaClient(),
-  ),
+  client: SefariaClient = createSefariaClient(),
 ): RefLabelLiveDemo {
   return startLiveDemo(root, {
     title: "Live reference-label demo",
     description:
-      "The host calls the deployed Sefaria API and supplies the result to a request-free Web Component.",
+      "The activated Web Component loads the reference from the deployed Sefaria API.",
     requestHeading: "Choose a reference",
     presetsLabel: "Example references",
     controls: [
@@ -88,12 +86,14 @@ export function startRefLabelLiveDemo(
       },
     ],
     submitLabel: "Load from Sefaria",
-    createResultElement: (document) =>
-      document.createElement("sefaria-ref-label") as SefariaRefLabel,
-    controller,
-    bindController: (result) => {
-      bindRefLabelController(result, controller);
+    createResultElement: (document) => {
+      const result = document.createElement(
+        "sefaria-ref-label",
+      ) as SefariaRefLabel;
+      result.acquisition = { kind: "client", client };
+      return result;
     },
+    load: loadReference,
     createRequest: (form) => ({
       tref: requireNamedInput(form, "tref").value.trim(),
     }),
@@ -105,6 +105,41 @@ export function startRefLabelLiveDemo(
       result.linked = requireNamedInput(form, "linked").checked;
     },
   });
+}
+
+async function loadReference(
+  result: SefariaRefLabel,
+  request: RefLabelRequest,
+  signal: AbortSignal,
+): Promise<string> {
+  let acquisitionError: unknown;
+  const onError = (event: Event): void => {
+    acquisitionError = (event as CustomEvent<{ readonly error: unknown }>)
+      .detail.error;
+  };
+  const onAbort = (): void => {
+    if (result.sref === request.tref) result.sref = "";
+  };
+  result.addEventListener("sefaria-ref-label-error", onError);
+  signal.addEventListener("abort", onAbort, { once: true });
+  try {
+    if (result.sref === request.tref) {
+      result.sref = "";
+      await result.updateComplete;
+    }
+    result.sref = request.tref;
+    await result.updateComplete;
+    while (!signal.aborted && result.status === "loading") {
+      await new Promise((resolve) => setTimeout(resolve));
+      await result.updateComplete;
+    }
+    await result.updateComplete;
+    if (acquisitionError !== undefined) throw acquisitionError;
+    return result.status;
+  } finally {
+    result.removeEventListener("sefaria-ref-label-error", onError);
+    signal.removeEventListener("abort", onAbort);
+  }
 }
 
 function requireLabelLanguage(value: string): RefLabelLanguage {

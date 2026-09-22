@@ -2,11 +2,9 @@ import { html } from "lit";
 import { render } from "vitest-browser-lit";
 import { afterEach, expect, test, vi } from "vitest";
 
-import {
-  SefariaRefLabel,
-  type RefLabelDataViewModel,
-  type RefLabelViewModel,
-} from "./index.js";
+import { prepared, setPreparedState } from "./prepared-state.js";
+import { SefariaRefLabel } from "./index.js";
+import type { RefLabelDataViewModel, RefLabelViewModel } from "./ref-label.js";
 
 const DATA_VIEW_MODEL: RefLabelDataViewModel = {
   state: "data",
@@ -52,7 +50,7 @@ test.each([
   async ({ viewModel, role, text }) => {
     const screen = render(
       html`<sefaria-ref-label
-        .viewModel=${viewModel satisfies RefLabelViewModel}
+        ${prepared(viewModel satisfies RefLabelViewModel)}
       ></sefaria-ref-label>`,
     );
 
@@ -69,7 +67,7 @@ test.each([
     const screen = render(
       html`<sefaria-ref-label
         label-language=${labelLanguage}
-        .viewModel=${DATA_VIEW_MODEL}
+        ${prepared(DATA_VIEW_MODEL)}
       ></sefaria-ref-label>`,
     );
 
@@ -85,7 +83,7 @@ test("renders both labels in their own language boundaries", async () => {
   render(
     html`<sefaria-ref-label
       label-language="both"
-      .viewModel=${DATA_VIEW_MODEL}
+      ${prepared(DATA_VIEW_MODEL)}
     ></sefaria-ref-label>`,
   );
 
@@ -103,7 +101,7 @@ test("renders a keyboard-operable canonical link with the visible accessible nam
   const screen = render(
     html`<sefaria-ref-label
       linked
-      .viewModel=${DATA_VIEW_MODEL}
+      ${prepared(DATA_VIEW_MODEL)}
     ></sefaria-ref-label>`,
   );
 
@@ -120,7 +118,7 @@ test("renders a keyboard-operable canonical link with the visible accessible nam
 test("inherits link tokens", async () => {
   render(html`
     <div style="--sefaria-link: rgb(1, 2, 3)">
-      <sefaria-ref-label linked .viewModel=${DATA_VIEW_MODEL}>
+      <sefaria-ref-label linked ${prepared(DATA_VIEW_MODEL)}>
       </sefaria-ref-label>
     </div>
   `);
@@ -140,7 +138,7 @@ test("contains a long unbroken label in a 320 pixel host", async () => {
     <div style="width: 320px">
       <sefaria-ref-label
         style="width: 100%"
-        .viewModel=${viewModel}
+        ${prepared(viewModel)}
       ></sefaria-ref-label>
     </div>
   `);
@@ -158,7 +156,7 @@ test("never calls fetch while rendering", async () => {
   });
   vi.stubGlobal("fetch", fetchMock);
   const element = new SefariaRefLabel();
-  element.viewModel = DATA_VIEW_MODEL;
+  setPreparedState(element, DATA_VIEW_MODEL);
   document.body.append(element);
 
   await element.updateComplete;

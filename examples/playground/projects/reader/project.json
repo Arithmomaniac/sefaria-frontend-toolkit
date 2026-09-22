@@ -1,7 +1,7 @@
 {
   "id": "reader",
   "title": "Supplied-data Reader",
-  "summary": "Seed the controlled Reader from exact root captures and keep uncovered navigation explicit.",
+  "summary": "Seed the declarative Reader from exact raw captures and keep uncovered navigation explicit.",
   "coverage": "Exact Micah 6:8 source and text-inclusive links requests only; covered local projection is zero-I/O and other targets are unavailable.",
   "files": {
     "html": "index.html",

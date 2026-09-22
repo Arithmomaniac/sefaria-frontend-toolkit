@@ -514,7 +514,7 @@ async function interactWithProject(page, project) {
         .getByRole("button", { name: /Open .* in context/u })
         .first()
         .click();
-      await frame.getByText(/source-unavailable:/u).waitFor();
+      await frame.getByText(/This supplied project does not cover/u).waitFor();
       await frame
         .getByRole("heading", { name: "Micah 6:8", exact: true })
         .waitFor();
@@ -597,30 +597,31 @@ async function runGraphQualification(page, graph) {
       const pureRegistered = customElements.get("sefaria-source-card") !== undefined;
       const client = await import("@arithmomaniac/sefaria-client");
       const validation = await import("@arithmomaniac/sefaria-client/validation");
+      const acquisition = await import("@arithmomaniac/sefaria-web-components/acquisition");
       const refLabel = await import("@arithmomaniac/sefaria-web-components/ref-label");
       const textSegment = await import("@arithmomaniac/sefaria-web-components/text-segment");
       const bilingualSegment = await import("@arithmomaniac/sefaria-web-components/bilingual-segment");
       const popup = await import("@arithmomaniac/sefaria-web-components/popup");
       const connections = await import("@arithmomaniac/sefaria-web-components/connections-panel");
-      const readerController = await import("@arithmomaniac/sefaria-web-components/reader-controller");
+      const reader = await import("@arithmomaniac/sefaria-web-components/reader");
       const readerSession = await import("@arithmomaniac/sefaria-web-components/reader-session");
-      const bindings = await import("@arithmomaniac/sefaria-web-components/bindings");
       const entriesReady = [
-        refLabel.createRefLabelViewModel,
-        textSegment.createTextSegmentViewModel,
-        bilingualSegment.createBilingualSegmentViewModel,
-        pure.createSourceCardViewModel,
-        popup.createPopupController,
-        connections.createConnectionsController,
-        readerController.createReaderController,
-        readerSession.createReaderSourceContent,
-        readerSession.createReaderConnectionsContent,
-        bindings.bindReaderController,
+        acquisition.configureSefariaAcquisition,
+        reader.resolveReaderSource,
+        readerSession.createReaderSession,
       ].every((value) => typeof value === "function");
+      const pureEntriesReady = [
+        refLabel,
+        textSegment,
+        bilingualSegment,
+        pure,
+        popup,
+        connections,
+      ].every((value) => value !== null && typeof value === "object");
       const root = await import("@arithmomaniac/sefaria-web-components");
       const registered = customElements.get("sefaria-source-card");
       const second = await import("@arithmomaniac/sefaria-web-components");
-      parent.postMessage({type:"graph-result", pureRegistered, clientIdentity:client.getResponseContract === validation.getResponseContract, entriesReady, rootRegistered:registered === root.SefariaSourceCard, rootStable:second.SefariaSourceCard === registered},"*");
+      parent.postMessage({type:"graph-result", pureRegistered, clientIdentity:client.getResponseContract === validation.getResponseContract, entriesReady:entriesReady && pureEntriesReady, rootRegistered:registered === root.SefariaSourceCard, rootStable:second.SefariaSourceCard === registered},"*");
     } catch (error) {
       parent.postMessage({type:"graph-error", message:error instanceof Error ? error.message : String(error)},"*");
     } })();

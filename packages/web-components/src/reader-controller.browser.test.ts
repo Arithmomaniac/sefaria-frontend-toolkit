@@ -9,6 +9,8 @@ import { html } from "lit";
 import { render } from "vitest-browser-lit";
 import { expect, test, vi } from "vitest";
 
+import { getPreparedState } from "./prepared-state.js";
+import type { ReaderViewModel } from "./reader.js";
 import linksFixture from "../../client/test/fixtures/links-connections-preview-2026-09-06.json";
 import sectionFixture from "../../client/test/fixtures/v3-connections-genesis-section-2026-09-06.json";
 import { bindReaderController } from "./bindings.js";
@@ -62,11 +64,13 @@ test("binds one persistent reader, forwards navigation, resets its pane, and cle
   );
   await element.updateComplete;
 
-  expect(element.viewModel?.selectedTarget?.ref).toBe("Micah 6:8");
+  expect(getPreparedState<ReaderViewModel>(element)?.selectedTarget?.ref).toBe(
+    "Micah 6:8",
+  );
   expect(element.vocalizationMode).toBe("taamim_and_nikkud");
   expect(document.querySelector("sefaria-reader")).toBe(element);
 
-  const readerViewModel = element.viewModel;
+  const readerViewModel = getPreparedState<ReaderViewModel>(element);
   controller.setPresentation({
     originEntryId: "entry-1",
     patch: {
@@ -78,7 +82,7 @@ test("binds one persistent reader, forwards navigation, resets its pane, and cle
     },
   });
   await element.updateComplete;
-  expect(element.viewModel).toBe(readerViewModel);
+  expect(getPreparedState<ReaderViewModel>(element)).toBe(readerViewModel);
   expect(element.contentLanguage).toBe("translation");
   expect(element.layout).toBe("stacked");
   expect(element.sideOrder).toBe("translation-first");
@@ -104,7 +108,9 @@ test("binds one persistent reader, forwards navigation, resets its pane, and cle
     }),
   );
   await vi.waitFor(() =>
-    expect(element.viewModel?.currentEntryId).toBe("entry-2"),
+    expect(getPreparedState<ReaderViewModel>(element)?.currentEntryId).toBe(
+      "entry-2",
+    ),
   );
   expect(element.activePane).toBe("source");
   expect(document.querySelector("sefaria-reader")).toBe(element);
@@ -115,7 +121,9 @@ test("binds one persistent reader, forwards navigation, resets its pane, and cle
     }),
   );
   await Promise.resolve();
-  expect(element.viewModel?.currentEntryId).toBe("entry-1");
+  expect(getPreparedState<ReaderViewModel>(element)?.currentEntryId).toBe(
+    "entry-1",
+  );
   const sourceCalls = dataSource.loadSource.mock.calls.length;
   unbind();
   element.dispatchEvent(
@@ -128,7 +136,9 @@ test("binds one persistent reader, forwards navigation, resets its pane, and cle
   );
   await Promise.resolve();
   expect(dataSource.loadSource).toHaveBeenCalledTimes(sourceCalls);
-  expect(element.viewModel?.currentEntryId).toBe("entry-1");
+  expect(getPreparedState<ReaderViewModel>(element)?.currentEntryId).toBe(
+    "entry-1",
+  );
 
   unbind = bindReaderController(element, controller);
   window.dispatchEvent(new Event("pagehide"));
@@ -160,7 +170,7 @@ test("binds pending root qualification without replacing committed Reader conten
     dataSource,
   );
   const unbind = bindReaderController(element, controller);
-  const committed = element.viewModel;
+  const committed = getPreparedState<ReaderViewModel>(element);
   element.dispatchEvent(
     new CustomEvent("sefaria-reader-pane-change", {
       detail: { originEntryId: "entry-1", pane: "connections" },
@@ -178,9 +188,11 @@ test("binds pending root qualification without replacing committed Reader conten
     ),
   );
 
-  expect(element.rootLoading).toBe(true);
-  expect(element.viewModel).toStrictEqual(committed);
-  expect(element.viewModel?.selectedTarget?.ref).toBe("Micah 6:8");
+  expect(element.status).toBe("loading");
+  expect(getPreparedState<ReaderViewModel>(element)).toStrictEqual(committed);
+  expect(getPreparedState<ReaderViewModel>(element)?.selectedTarget?.ref).toBe(
+    "Micah 6:8",
+  );
   expect(element.activePane).toBe("connections");
   expect(element.shadowRoot?.activeElement).toBe(heading);
   expect(
@@ -199,11 +211,13 @@ test("binds pending root qualification without replacing committed Reader conten
   await replacement;
   await element.updateComplete;
 
-  expect(element.rootLoading).toBe(false);
+  expect(element.status).not.toBe("loading");
   expect(
     element.shadowRoot?.querySelector(".panes")?.getAttribute("aria-busy"),
   ).toBe("false");
-  expect(element.viewModel?.selectedTarget?.ref).toBe("Micah 7:1");
+  expect(getPreparedState<ReaderViewModel>(element)?.selectedTarget?.ref).toBe(
+    "Micah 7:1",
+  );
   expect(element.shadowRoot?.textContent).not.toContain(
     "Opening a new Reader location",
   );
@@ -244,19 +258,19 @@ test("rolls back and clears root loading without cancelling caller-owned work", 
   });
 
   expect(() => bindReaderController(element, controller)).toThrow(failure);
-  expect(element.rootLoading).toBe(false);
+  expect(element.status).not.toBe("loading");
 
   add.mockRestore();
   const unbind = bindReaderController(element, controller);
-  expect(element.rootLoading).toBe(true);
-  const committed = element.viewModel;
+  expect(element.status).toBe("loading");
+  const committed = getPreparedState<ReaderViewModel>(element);
   unbind();
-  expect(element.rootLoading).toBe(false);
+  expect(element.status).not.toBe("loading");
 
   resolveSource(sourceContent("Micah 7"));
   await replacement;
-  expect(element.viewModel).toBe(committed);
-  expect(element.rootLoading).toBe(false);
+  expect(getPreparedState<ReaderViewModel>(element)).toBe(committed);
+  expect(element.status).not.toBe("loading");
 });
 
 test("leaves chat export entirely with the host", async () => {
@@ -306,6 +320,7 @@ test("forwards every semantic reader event with its original detail", async () =
     },
     selectSource: vi.fn(async () => undefined),
     replaceRoot: vi.fn(async () => undefined),
+    loadInitialConnections: vi.fn(async () => undefined),
     openConnection: vi.fn(async () => undefined),
     setConnectionsCategory: vi.fn(),
     setConnectionsPage: vi.fn(),
@@ -313,6 +328,8 @@ test("forwards every semantic reader event with its original detail", async () =
     setPresentation: vi.fn(),
     back: vi.fn(),
     activateHistory: vi.fn(),
+    suspend: vi.fn(() => undefined),
+    resume: vi.fn(async () => undefined),
     dispose: vi.fn(),
   };
   const unbind = bindReaderController(element, controller);

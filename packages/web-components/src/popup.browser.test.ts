@@ -2,14 +2,12 @@ import { html } from "lit";
 import { render } from "vitest-browser-lit";
 import { afterEach, expect, test, vi } from "vitest";
 
+import { prepared, setPreparedState } from "./prepared-state.js";
+import type { PopupDataViewModel } from "./popup.js";
 import "./popup-element.js";
-import type {
-  PopupDataViewModel,
-  SefariaPopup,
-  SefariaSourceCard,
-  SourceCardDataViewModel,
-  TextSegmentDataViewModel,
-} from "./index.js";
+import type { SefariaPopup, SefariaSourceCard } from "./index.js";
+import type { SourceCardDataViewModel } from "./source-card.js";
+import type { TextSegmentDataViewModel } from "./text-segment.js";
 
 const TEXT: TextSegmentDataViewModel = {
   state: "data",
@@ -68,7 +66,7 @@ async function renderPopup(): Promise<{
 }> {
   render(html`
     <button id="anchor">Genesis 1:1</button>
-    <sefaria-popup .viewModel=${DATA} open></sefaria-popup>
+    <sefaria-popup ${prepared(DATA)} open></sefaria-popup>
   `);
   const popup = document.querySelector<SefariaPopup>("sefaria-popup");
   const anchor = document.querySelector<HTMLButtonElement>("#anchor");
@@ -103,6 +101,19 @@ test("renders supplied data without requesting", async () => {
   expect(card?.vocalizationMode).toBe("none");
   expect(card?.shadowRoot?.querySelector(".attributions")).not.toBeNull();
   expect(fetchMock).not.toHaveBeenCalled();
+});
+
+test("keeps the popup open when close is prevented", async () => {
+  const { popup } = await renderPopup();
+  popup.addEventListener("sefaria-popup-close", (event) => {
+    event.preventDefault();
+  });
+
+  popup.shadowRoot?.querySelector<HTMLButtonElement>(".close-button")?.click();
+  await popup.updateComplete;
+
+  expect(popup.open).toBe(true);
+  expect(popup.shadowRoot?.querySelector('[role="dialog"]')).not.toBeNull();
 });
 
 test("repositions within the viewport after a resize", async () => {
@@ -160,11 +171,11 @@ test("uses the solid accent for the close-button focus indicator", async () => {
 test("allows the host to theme the error color", async () => {
   const { popup } = await renderPopup();
   popup.style.setProperty("--sefaria-danger", "rgb(1, 2, 3)");
-  popup.viewModel = {
+  setPreparedState(popup, {
     state: "error",
     errorKind: "projection",
     message: "Unable to render source.",
-  };
+  });
   await popup.updateComplete;
 
   const alert = popup.shadowRoot?.querySelector<HTMLElement>('[role="alert"]');

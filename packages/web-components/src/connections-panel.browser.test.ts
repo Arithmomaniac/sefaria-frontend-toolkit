@@ -5,6 +5,11 @@ import "./connections-panel-element.js";
 import type { SefariaConnectionsPanel } from "./connections-panel-element.js";
 import type { ConnectionsViewModel } from "./connections-panel.js";
 
+import {
+  getPreparedState,
+  prepared,
+  setPreparedState,
+} from "./prepared-state.js";
 const data: ConnectionsViewModel = {
   state: "data",
   reference: "Genesis 1:1",
@@ -35,7 +40,7 @@ afterEach(() => vi.unstubAllGlobals());
 async function mount(vm = data): Promise<SefariaConnectionsPanel> {
   render(
     html`<sefaria-connections-panel
-      .viewModel=${vm}
+      ${prepared(vm)}
     ></sefaria-connections-panel>`,
   );
   const element = document.querySelector("sefaria-connections-panel")!;
@@ -86,7 +91,7 @@ test("category and page buttons emit semantic events without mutating the model"
   buttons.find((button) => button.textContent?.trim() === "Overview")!.click();
   expect(page.mock.calls[0]?.[0].detail).toEqual({ page: 1 });
   expect(category.mock.calls[0]?.[0].detail).toEqual({ category: null });
-  expect(element.viewModel).toBe(data);
+  expect(getPreparedState<ConnectionsViewModel>(element)).toBe(data);
 });
 
 test("inherits panel and control shape tokens from the host", async () => {
@@ -109,16 +114,16 @@ test("handles explicit loading/error states and narrow host widths", async () =>
   expect(
     element.shadowRoot?.querySelector('[role="status"]')?.textContent,
   ).toContain("Loading");
-  element.viewModel = {
+  setPreparedState(element, {
     state: "error",
     errorKind: "api",
     message: "Invalid reference.",
-  };
+  });
   await element.updateComplete;
   expect(
     element.shadowRoot?.querySelector('[role="alert"]')?.textContent,
   ).toContain("Invalid reference");
-  element.viewModel = data;
+  setPreparedState(element, data);
   element.style.width = "280px";
   await element.updateComplete;
   expect(element.scrollWidth).toBeLessThanOrEqual(element.clientWidth + 1);

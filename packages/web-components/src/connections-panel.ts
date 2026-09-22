@@ -92,7 +92,8 @@ export type ConnectionsViewModel =
   | ConnectionsEmptyViewModel
   | {
       readonly state: "error";
-      readonly errorKind: "api" | "http" | "projection";
+      readonly errorKind:
+        "api" | "http" | "projection" | "validation" | "acquisition";
       readonly message: string;
       readonly status?: number;
     }

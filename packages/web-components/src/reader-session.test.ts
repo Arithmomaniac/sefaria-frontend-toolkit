@@ -13,6 +13,8 @@ import {
   createReaderConnectionsContent,
   createReaderSession,
   createReaderSourceContent,
+  getReaderConnectionsRecord,
+  getReaderSourceRecord,
   type ReaderPresentationPatch,
   type ReaderSession,
   type ReaderTransition,
@@ -87,10 +89,90 @@ describe("reader session seeds", () => {
       source: { viewModel: { state: "data" } },
       connections: { state: "view", viewModel: { state: "data" } },
     });
+    expect(paired.entryInfo()).toMatchObject({
+      entryId: paired.view.currentEntryId,
+      label: "Micah 6:8",
+      sourceAvailable: true,
+      connections: "available",
+      pinCount: 0,
+    });
   });
 
   it("rejects an empty seed", () => {
     expect(() => createReaderSession({})).toThrow(TypeError);
+  });
+
+  it("exposes stable immutable raw records without cloning caller-owned data", () => {
+    if (!validateGetV3Texts200(v3SourceBackedPayload)) {
+      throw new TypeError("Expected a valid v3 text fixture.");
+    }
+    const callerPayload = structuredClone(
+      v3SourceBackedPayload,
+    ) as CoreV3TextsResponse;
+    const sourceContent = createReaderSourceContent(callerPayload, {
+      tref: "Micah 6:8",
+    });
+    const connectionsContent = links(1);
+
+    const sourceRecord = getReaderSourceRecord(sourceContent);
+    const connectionsRecord = getReaderConnectionsRecord(connectionsContent);
+    callerPayload.ref = "Changed by caller";
+
+    expect(getReaderSourceRecord(sourceContent)).toBe(sourceRecord);
+    expect(getReaderConnectionsRecord(connectionsContent)).toBe(
+      connectionsRecord,
+    );
+    expect(sourceRecord.payload.ref).not.toBe("Changed by caller");
+    expect(sourceRecord.effectiveRequest).toBe(sourceContent.request);
+    expect(connectionsRecord.effectiveRequest).toBe(connectionsContent.request);
+    expect(connectionsRecord.projection).toBe(connectionsContent.projection);
+    expect(Object.isFrozen(sourceRecord.payload)).toBe(true);
+    expect(Object.isFrozen(connectionsRecord.payload)).toBe(true);
+  });
+
+  it("rejects fabricated content when raw records are requested", () => {
+    expect(() =>
+      getReaderSourceRecord({
+        request: { tref: "Micah 6:8" },
+        viewModel: source("Micah 6:8").viewModel,
+        capture: source("Micah 6:8").capture,
+      }),
+    ).toThrow("was not created by this module");
+  });
+
+  it("reports exact selected semantic identity without exposing prepared content", () => {
+    const content = source("Micah 6:8");
+    const selectedPosition =
+      content.viewModel.state === "data"
+        ? content.viewModel.items[0]?.position
+        : undefined;
+    if (selectedPosition === undefined) {
+      throw new TypeError("Expected one addressable source item.");
+    }
+    const session = createReaderSession({
+      source: content,
+      selectedPosition,
+      presentation: { vocalizationMode: "none" },
+    });
+
+    const info = session.entryInfo();
+
+    expect(info.selectedPosition).toEqual(selectedPosition);
+    expect(info.selectedRef).toBe(
+      content.viewModel.state === "data"
+        ? content.viewModel.items[0]?.ref
+        : undefined,
+    );
+    expect(info.presentation.vocalizationMode).toBe("none");
+    expect(info).not.toHaveProperty("viewModel");
+    expect(info).not.toHaveProperty("payload");
+  });
+
+  it("rejects semantic lookup for an entry that is not retained", () => {
+    const session = createReaderSession({ source: source("Micah 6:8") });
+    expect(() => session.entryInfo("entry-999")).toThrow(
+      "Reader entry was not retained",
+    );
   });
 });
 

@@ -77,6 +77,15 @@ async function renderLab(): Promise<LitElement> {
     throw new Error("The component lab was not rendered.");
   }
   await lab.updateComplete;
+  await Promise.all(
+    [
+      ...(lab.shadowRoot?.querySelectorAll<
+        LitElement & { updateComplete: Promise<boolean> }
+      >(
+        "sefaria-ref-label, sefaria-text-segment, sefaria-bilingual-segment, sefaria-source-card, sefaria-connections-panel, sefaria-reader",
+      ) ?? []),
+    ].map((element) => element.updateComplete),
+  );
   return lab;
 }
 
@@ -95,8 +104,8 @@ test("shows the four current text-segment states", async () => {
     ) ?? [],
   );
 
-  expect(segments.map((segment) => segment.viewModel.state)).toEqual(
-    textSegmentScenarios.map((scenario) => scenario.viewModel.state),
+  expect(segments.map((segment) => segment.status)).toEqual(
+    textSegmentScenarios.map((scenario) => scenario.expectedStatus),
   );
   expect(textSegmentScenarios.map((scenario) => scenario.id)).toEqual([
     "data",
@@ -120,8 +129,8 @@ test("shows the four current reference-label states", async () => {
       [],
   );
 
-  expect(labels.map((label) => label.viewModel.state)).toEqual(
-    refLabelScenarios.map((scenario) => scenario.viewModel.state),
+  expect(labels.map((label) => label.status)).toEqual(
+    refLabelScenarios.map((scenario) => scenario.expectedStatus),
   );
   expect(refLabelScenarios.map((scenario) => scenario.id)).toEqual([
     "data",
@@ -147,8 +156,8 @@ test("shows the five current bilingual-segment states", async () => {
     ) ?? [],
   );
 
-  expect(segments.map((segment) => segment.viewModel.state)).toEqual(
-    bilingualSegmentScenarios.map((scenario) => scenario.viewModel.state),
+  expect(segments.map((segment) => segment.status)).toEqual(
+    bilingualSegmentScenarios.map((scenario) => scenario.expectedStatus),
   );
   expect(bilingualSegmentScenarios.map((scenario) => scenario.id)).toEqual([
     "data",
@@ -177,8 +186,8 @@ test("shows the seven current source-card scenarios", async () => {
     ) ?? [],
   );
 
-  expect(cards.map((card) => card.viewModel.state)).toEqual(
-    sourceCardScenarios.map((scenario) => scenario.viewModel.state),
+  expect(cards.map((card) => card.status)).toEqual(
+    sourceCardScenarios.map((scenario) => scenario.expectedStatus),
   );
   expect(sourceCardScenarios.map((scenario) => scenario.id)).toEqual([
     "one-item",
@@ -206,8 +215,8 @@ test("shows the six current connections-panel scenarios", async () => {
       "sefaria-connections-panel",
     ) ?? [],
   );
-  expect(panels.map((panel) => panel.viewModel?.state)).toEqual(
-    connectionsPanelScenarios.map((scenario) => scenario.viewModel.state),
+  expect(panels.map((panel) => panel.status)).toEqual(
+    connectionsPanelScenarios.map((scenario) => scenario.expectedStatus),
   );
   expect(connectionsPanelScenarios.map((scenario) => scenario.id)).toEqual([
     "summary",
@@ -232,9 +241,13 @@ test("shows the six controlled reader scenarios", async () => {
   const readers = Array.from(
     lab.shadowRoot?.querySelectorAll<SefariaReader>("sefaria-reader") ?? [],
   );
-  expect(readers.map((reader) => reader.viewModel?.currentEntryId)).toEqual(
-    readerScenarios.map((scenario) => scenario.viewModel.currentEntryId),
+  await vi.waitFor(() =>
+    expect(readers.every((reader) => reader.status !== "loading")).toBe(true),
   );
+  expect(readers).toHaveLength(3);
+  expect(
+    lab.shadowRoot?.querySelectorAll("[data-authored-unrepresented]"),
+  ).toHaveLength(3);
   expect(readerScenarios.map((scenario) => scenario.id)).toEqual([
     "paired",
     "source-only",

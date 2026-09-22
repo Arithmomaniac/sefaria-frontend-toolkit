@@ -1,20 +1,13 @@
-import { zCoreRefResponse } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
-import { bindRefLabelController } from "@arithmomaniac/sefaria-web-components/bindings";
-import { createRefLabelController } from "@arithmomaniac/sefaria-web-components/ref-label";
 import { resolved, unresolved } from "./reference.js";
 
 const label = requireElement("#label");
 const state = requireElement("#state");
-const controller = createRefLabelController();
-bindRefLabelController(label, controller);
+label.sref = "Micah 6:8";
 label.linked = true;
 
 const show = (payload, message) => {
-  controller.setSuppliedData(
-    { tref: "Micah 6:8" },
-    zCoreRefResponse.parse(payload),
-  );
+  label.data = payload;
   state.textContent = message;
 };
 requireElement("#resolved").addEventListener("click", () =>

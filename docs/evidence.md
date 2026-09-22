@@ -61,6 +61,12 @@ Evidence has these classes:
 - **Inferred:** Public consumer behavior supplied the likely rule.
 - **Proposed:** This project defines the behavior.
 
+## Declarative standalone-loading cutover
+
+**Observed September 22, 2026:** the coordinated cutover removed the supported public prepared-view-model, owner-controller, binding, and Reader-controller surfaces. It did not retire `./reader-session`: that subpath remains the supported advanced DOM-free semantic/raw facade for history, pins, budgets, `entryInfo`, stable source/connections raw records, and raw transitions without prepared content. The `./reader` subpath exposes shared raw source qualification. All seven registered elements now accept standalone `sref`. The six non-Reader elements accept authoritative component-specific raw `data`; Reader accepts raw source/connections seeds transactionally. Generated metadata records public read-only status and Reader diagnostics, component-specific error events, tagged acquisition, and the retained Reader slot/parts.
+
+Focused browser and unit coverage exercises supplied-data precedence, invalid-data supersession, lazy shared versus explicit acquisition, original failure causes, stale-result suppression, disconnection/reconnection, Popup preparation independent of visibility, Reader raw seed admission and semantic records, and parent-owned composition. Source Card and Connections regressions prove one outer request and zero child requests, including ten-child cases. Maintained live pages retain explicit activation gates, and MCP continuation remains host-proxied without direct browser fallback.
+
 ## Repository contract-document corrections
 
 **Observed September 8, 2026:** the component specification's connections row used `ConnectionsPanelRequest`, `ConnectionsPanelViewModel`, `createConnectionsPanelViewModel`, and `loadConnectionsPanelViewModel`, while the implemented and exported declarations in `packages/web-components/src/connections-panel.ts` use `ConnectionsRequest`, `ConnectionsViewModel`, `createConnectionsViewModel`, and `loadConnectionsViewModel`. The specification table was corrected to the existing public declarations; production exports were not renamed to match the stale documentation.
@@ -180,6 +186,16 @@ This qualifies public GitHub Packages distribution and the automatic green-`main
 ## Historical decision provenance
 
 This section records the strongest session-history decisions that explain the current contract boundaries. It does not define product behavior; the current specifications and design document do that.
+
+### Declarative standalone-loading redesign (September 22, 2026)
+
+**Superseded planning record:** this September 20 design approval preceded the implemented cutover recorded above. It remains provenance for the chosen boundary, not current delivery status.
+
+The earlier owner-only/request-free element decision is superseded. Its code and tests are historical baseline evidence. The redesign does not supersede the thin-client transport boundary, generated response validation, bounded per-client cache, text-transform ownership, one-parent-request/zero-child-request composition rule, Reader history/capture constraints, MCP host-proxied transport, or maintained live-page activation gates.
+
+The reviewed Sefaria Web source shows a hybrid rather than universal ownership rule: larger text/Reader owners can load by reference, smaller rendering children receive prepared data, and Linker popups receive text prepared before opening. This supports private captured-data composition and Popup preparation independent of visibility, but it is not authority for exposing public prepared state or restricting standalone loading to only large components.
+
+The executable failure that motivated the redesign was a connected `<sefaria-text-segment sref="Micah 6:8">` that previously rendered nothing without caller orchestration. The September 22 observation records that this counterexample now passes through element-owned acquisition and private preparation.
 
 Session UUIDs with turn numbers and dates are archive trace pointers, not public links. Session archives can omit tool output and can contain assistant proposals or branch reports, so those reports are not implementation proof. The baseline for this audit is `origin/main` commit `7f631685961b3ff6243d812570e1ffbd85aa53c6`; September 6, 2026 active worktrees are excluded.
 

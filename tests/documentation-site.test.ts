@@ -301,7 +301,7 @@ describe("documentation learning journey", () => {
     );
 
     expect(dataFlow).toContain(
-      "the reference label, text segment, bilingual segment, source card, connections panel, popup, and controlled Reader",
+      "all seven public elements support standalone `sref`",
     );
   });
 
@@ -355,13 +355,14 @@ describe("documentation learning journey", () => {
     expect(index).not.toContain("headless TypeScript building blocks");
     for (const definition of [
       "A host is the application that owns the component.",
-      "A view model is data that a component renders.",
-      "A factory prepares API data for a component.",
-      "Headless means that no browser element is registered.",
+      "The element path accepts corrected component-specific raw data",
+      "Advanced spatial hosts use the supported `reader-session` semantic/raw facade",
     ]) {
       expect(getStarted).toContain(definition);
     }
-    expect(components).toContain("The toolkit provides seven UI components.");
+    expect(components).toContain(
+      "The toolkit provides seven declarative UI components.",
+    );
     expect(components).not.toContain("host-admitted Reader view model");
     expect(examples).toContain("The component editor runs edited code");
     expect(examples).toContain("isolated preview");
@@ -390,8 +391,12 @@ describe("documentation learning journey", () => {
     expect(getStarted).toContain("loadValidatedText");
     expect(getStarted).toContain("Use text transforms without the client");
     expect(getStarted).toContain("createTextPreview");
-    expect(getStarted).toContain("Use factories with your own renderer");
-    expect(getStarted).toContain("createSourceCardViewModel");
+    expect(getStarted).toContain(
+      "Use raw component data with your own renderer",
+    );
+    expect(getStarted).toContain(
+      "use the corrected client contracts and text-transform package directly",
+    );
     expect(documentation).toContain("Package references");
   });
 
@@ -591,17 +596,15 @@ describe("documentation learning journey", () => {
       path.join(root, "docs", "development.md"),
       "utf8",
     );
-    expect(suppliedLesson).toContain("createSourceCardViewModel(validated, {");
-    expect(suppliedLesson).toContain("bindSourceCardController");
-    expect(suppliedLesson).toContain("controller.setSuppliedData");
-    expect(suppliedLesson).toContain("controller.load");
-    expect(vanillaSource).toContain("controller.setSuppliedData(");
-    expect(vanillaSource).toContain(
-      "bindSourceCardController(card, controller)",
+    expect(suppliedLesson).toContain(
+      "card.data = zCoreV3TextsResponse.parse(payload)",
     );
-    expect(vanillaSource).toContain(
-      "`Supplied ${canonicalRef} data rendered with zero live loads.`",
+    expect(suppliedLesson).toContain(
+      "No public view model, controller, or binding",
     );
+    expect(vanillaSource).toContain("card.data = validatedPayload");
+    expect(vanillaSource).toContain("card.sref = sref");
+    expect(vanillaSource).toContain('status.dataset.requestCount = "0"');
     expect(suppliedLesson).not.toContain("pnpm-workspace.yaml");
     expect(development).toContain("pnpm-workspace.yaml");
     expect(suppliedLesson).not.toContain('"pnpm": {\n    "overrides"');
@@ -619,18 +622,17 @@ describe("documentation learning journey", () => {
       "utf8",
     );
     for (const sourceFragment of [
-      "useSyncExternalStore(",
-      "bindSourceCardController(card, controller)",
+      "data={data}",
+      "sref={sref}",
+      "acquisition={acquisition}",
       "onsefaria-source-select={onSourceSelection}",
-      "setSelected({",
     ]) {
       expect(reactSource).toContain(sourceFragment);
       expect(reactLesson).toContain(sourceFragment);
     }
-    expect(reactSource).toContain("next.dispose()");
-    expect(reactLesson).toContain("controller.dispose()");
+    expect(reactSource).toContain("setSelected({");
     expect(declarations).toContain('"sefaria-source-card"');
-    expect(reactLesson).toContain('"sefaria-source-card"');
+    expect(reactLesson).toContain("<sefaria-source-card");
 
     const alpineLesson = await readFile(
       path.join(root, "docs", "learn", "alpine.md"),
@@ -646,17 +648,15 @@ describe("documentation learning journey", () => {
       ),
       "utf8",
     );
-    for (const sourceFragment of [
-      "createSourceCardController(client)",
-      "bindSourceCardController(element, controller)",
-      "controller.dispose()",
-    ]) {
-      expect(alpineSource).toContain(sourceFragment);
-      expect(alpineLesson).toContain(sourceFragment);
-    }
+    expect(alpineSource).toContain("element.acquisition = acquisition");
+    expect(alpineSource).toContain("card.data = undefined");
+    expect(alpineSource).toContain("card.sref = normalized");
+    expect(alpineLesson).toContain('acquisition: { kind: "client", client }');
+    expect(alpineLesson).toContain("this.data = undefined");
+    expect(alpineLesson).toContain("this.sref = next");
   });
 
-  it("teaches current controller, Reader, and customization behavior", async () => {
+  it("teaches current declarative, Reader, and customization behavior", async () => {
     const lessonsByName = Object.fromEntries(
       await Promise.all(
         lessons.map(async (lesson) => [
@@ -678,32 +678,24 @@ describe("documentation learning journey", () => {
       "Properties can carry objects and arrays",
     );
     expect(lessonsByName["02-supplied-data.md"]).toContain(
-      "trusted same-site application",
+      "Defined `data` is authoritative",
     );
     expect(lessonsByName["02-supplied-data.md"]).toContain(
-      "opaque inner preview",
-    );
-    expect(lessonsByName["03-live-data.md"]).toContain("prior committed card");
-    expect(lessonsByName["03-live-data.md"]).toContain(
-      "current committed result",
+      "accessible validation failure",
     );
     expect(lessonsByName["03-live-data.md"]).toContain(
-      "examples/vanilla-vite/src/main.ts",
+      "A newer input prevents an older completion from publishing",
     );
+    expect(lessonsByName["03-live-data.md"]).toContain("vanilla host");
     expect(lessonsByName["03-live-data.md"]).toContain(
       'to="/examples/vanilla/index.html"',
     );
     expect(lessonsByName["04-reader.md"]).toContain("rootLoading");
+    expect(lessonsByName["04-reader.md"]).toContain("semantic history");
     expect(lessonsByName["04-reader.md"]).toContain(
-      "reuses it instead of requesting the source again",
+      "Raw seeds initialize or transactionally replace Reader state",
     );
-    expect(lessonsByName["04-reader.md"]).toContain("source-unavailable");
-    expect(lessonsByName["04-reader.md"]).toContain(
-      "**Embedded supplied-data Reader:**",
-    );
-    expect(lessonsByName["04-reader.md"]).toContain(
-      "**Controlled live Reader:**",
-    );
+    expect(lessonsByName["04-reader.md"]).toContain("reader-session");
     expect(lessonsByName["06-host-integration.md"]).toContain(
       "An MCP App is an interactive web interface",
     );
@@ -722,16 +714,12 @@ describe("documentation learning journey", () => {
       expect(lessonsByName["05-customization.md"]).toContain(part);
     }
     expect(dataFlow).toContain(
-      "application input -> controller or factory -> component view model -> binding -> request-free element",
-    );
-    expect(readerNavigation).toContain("rootLoading");
-    expect(readerNavigation).toContain("previous committed root");
-    expect(readerNavigation).toContain(
-      "The supported Reader path combines a DOM-free controller",
+      "all seven public elements support standalone `sref`",
     );
     expect(readerNavigation).toContain(
-      "## 7. Current boundaries and limitations",
+      "supported advanced semantic/raw facade",
     );
+    expect(readerNavigation).toContain("## Current limitations");
     expect(readerNavigation).not.toContain("**Accepted direction:**");
   });
 

@@ -1,19 +1,13 @@
-import { zCoreLinkResponse } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
-import { bindConnectionsController } from "@arithmomaniac/sefaria-web-components/bindings";
-import { createConnectionsController } from "@arithmomaniac/sefaria-web-components/connections-panel";
 import links from "./links.js";
 
 const panel = requireElement("#connections");
 const previews = requireElement("#previews");
 const selection = requireElement("#selection");
-const controller = createConnectionsController();
-bindConnectionsController(panel, controller);
-controller.setSuppliedData(
-  { tref: "Micah 6:8", withText: true },
-  zCoreLinkResponse.parse(links),
-  { projection: { category: "Quoting Commentary" } },
-);
+panel.sref = "Micah 6:8";
+panel.withText = true;
+panel.category = "Quoting Commentary";
+panel.data = links;
 panel.showPreviews = true;
 
 previews.addEventListener("change", () => {

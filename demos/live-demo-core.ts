@@ -1,31 +1,7 @@
-/** Terminal or loading state rendered by a live-demo component. */
-export interface LiveDemoViewModel {
-  /** Component state discriminator. */
-  readonly state: string;
-}
-
-/** Owner controller contract used by a shared live-demo host. */
-export interface LiveDemoController<
-  TRequest,
-  TViewModel extends LiveDemoViewModel,
-> {
-  readonly snapshot: {
-    readonly result?: { readonly viewModel: TViewModel };
-    readonly attempt:
-      | { readonly state: "idle" }
-      | { readonly state: "loading" }
-      | { readonly state: "failed"; readonly error: unknown };
-  };
-  load(request: TRequest): Promise<TViewModel>;
-}
-
 /** Host bindings used by the shared live-demo request lifecycle. */
-export interface LiveDemoRunnerOptions<
-  TRequest,
-  TViewModel extends LiveDemoViewModel,
-> {
-  /** Component-specific owner controller. */
-  readonly controller: LiveDemoController<TRequest, TViewModel>;
+export interface LiveDemoRunnerOptions<TRequest> {
+  /** Executes the component request and returns its coarse terminal status. */
+  readonly load: (request: TRequest, signal: AbortSignal) => Promise<string>;
   /** Formats the request for host-owned status text. */
   readonly formatRequest: (request: TRequest) => string;
   /** Host status element. */
@@ -88,11 +64,7 @@ export interface LiveDemoPreset {
 }
 
 /** Declarative page and component bindings for one live demonstration. */
-export interface LiveDemoOptions<
-  TRequest,
-  TViewModel extends LiveDemoViewModel,
-  TResult extends HTMLElement,
-> {
+export interface LiveDemoOptions<TRequest, TResult extends HTMLElement> {
   readonly title: string;
   readonly description: string;
   readonly requestHeading: string;
@@ -101,8 +73,11 @@ export interface LiveDemoOptions<
   readonly presets: readonly LiveDemoPreset[];
   readonly submitLabel: string;
   readonly createResultElement: (document: Document) => TResult;
-  readonly controller: LiveDemoController<TRequest, TViewModel>;
-  readonly bindController: (result: TResult) => void;
+  readonly load: (
+    result: TResult,
+    request: TRequest,
+    signal: AbortSignal,
+  ) => Promise<string>;
   readonly createRequest: (form: HTMLFormElement) => TRequest;
   readonly formatRequest: (request: TRequest) => string;
   readonly configureResult?: (result: TResult, form: HTMLFormElement) => void;
@@ -114,21 +89,15 @@ export interface LiveDemo {
 }
 
 /** Mounts the shared live-demo page and connects its declarative bindings. */
-export function startLiveDemo<
-  TRequest,
-  TViewModel extends LiveDemoViewModel,
-  TResult extends HTMLElement,
->(
+export function startLiveDemo<TRequest, TResult extends HTMLElement>(
   root: Document,
-  options: LiveDemoOptions<TRequest, TViewModel, TResult>,
+  options: LiveDemoOptions<TRequest, TResult>,
 ): LiveDemo {
   const mount = requireElement<HTMLElement>(root, "#live-demo-root");
   const page = createLiveDemoPage(root, options);
   mount.replaceChildren(page.main);
-  options.bindController(page.result);
-
   const runner = createLiveDemoRunner({
-    controller: options.controller,
+    load: (request, signal) => options.load(page.result, request, signal),
     formatRequest: options.formatRequest,
     requestState: page.requestState,
     hostError: page.hostError,
@@ -174,13 +143,16 @@ export function startLiveDemo<
 }
 
 /** Creates the shared request lifecycle used by live component demonstrations. */
-export function createLiveDemoRunner<
-  TRequest,
-  TViewModel extends LiveDemoViewModel,
->(
-  options: LiveDemoRunnerOptions<TRequest, TViewModel>,
+export function createLiveDemoRunner<TRequest>(
+  options: LiveDemoRunnerOptions<TRequest>,
 ): LiveDemoRunner<TRequest> {
+  let active: AbortController | undefined;
   const run = async (request: TRequest): Promise<void> => {
+    active?.abort(
+      new DOMException("Superseded live demo request.", "AbortError"),
+    );
+    const current = new AbortController();
+    active = current;
     const requestLabel = options.formatRequest(request);
 
     options.requestState.dataset.state = "loading";
@@ -190,26 +162,20 @@ export function createLiveDemoRunner<
     options.submitButton.disabled = true;
 
     try {
-      const viewModel = await options.controller.load(request);
-      if (options.controller.snapshot.result?.viewModel !== viewModel) {
-        return;
-      }
-      options.requestState.dataset.state = viewModel.state;
-      options.requestState.textContent = `${requestLabel} produced ${viewModel.state}.`;
+      const status = await options.load(request, current.signal);
+      if (active !== current || current.signal.aborted) return;
+      options.requestState.dataset.state = status;
+      options.requestState.textContent = `${requestLabel} produced ${status}.`;
     } catch (error) {
-      if (
-        options.controller.snapshot.attempt.state !== "failed" ||
-        options.controller.snapshot.attempt.error !== error
-      ) {
-        return;
-      }
+      if (active !== current || current.signal.aborted) return;
       options.requestState.dataset.state = "error";
       options.requestState.textContent = `${requestLabel} could not complete.`;
       options.hostError.hidden = false;
       options.hostError.textContent =
         error instanceof Error ? error.message : String(error);
     } finally {
-      if (options.controller.snapshot.attempt.state !== "loading") {
+      if (active === current) {
+        active = undefined;
         options.submitButton.disabled = false;
       }
     }
@@ -228,13 +194,9 @@ interface LiveDemoPage<TResult extends HTMLElement> {
   readonly result: TResult;
 }
 
-function createLiveDemoPage<
-  TRequest,
-  TViewModel extends LiveDemoViewModel,
-  TResult extends HTMLElement,
->(
+function createLiveDemoPage<TRequest, TResult extends HTMLElement>(
   document: Document,
-  options: LiveDemoOptions<TRequest, TViewModel, TResult>,
+  options: LiveDemoOptions<TRequest, TResult>,
 ): LiveDemoPage<TResult> {
   document.title = options.title;
 

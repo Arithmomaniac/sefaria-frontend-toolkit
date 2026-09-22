@@ -5,7 +5,7 @@ title: Sefaria Frontend Toolkit
 hero:
   name: Sefaria Frontend Toolkit
   text: Bring Sefaria texts into your product
-  tagline: Fetch and validate Sefaria data, prepare text and footnotes, or add request-free reading surfaces—from one citation to a controlled Reader.
+  tagline: Fetch and validate Sefaria data, prepare text and footnotes, or add declarative reading surfaces—from one citation to a standalone Reader.
   actions:
     - theme: brand
       text: Get started
@@ -32,7 +32,7 @@ hero:
 
 Sefaria is a free digital library and data source for Jewish texts and translations. A direct API response is only the start of a product: an application still has to validate unknown JSON, prepare markup and footnotes, choose how to display Hebrew vocalization, project nested text into useful rendering data, and own any live request or navigation state.
 
-The toolkit separates those jobs so that a third party can adopt only the part it needs. `@arithmomaniac/sefaria-client` validates the supported transport responses. `@arithmomaniac/sefaria-text-transform` provides pure sanitization, vocalization, preview, and footnote operations. Non-DOM `@arithmomaniac/sefaria-web-components` subpaths create render-ready view models and controllers. The browser package adds seven request-free components, including a controlled Reader.
+The toolkit separates those jobs so that a third party can adopt only the part it needs. `@arithmomaniac/sefaria-client` validates the supported transport responses. `@arithmomaniac/sefaria-text-transform` provides pure sanitization, vocalization, preview, and footnote operations. The Web Components package adds seven declarative elements, tagged acquisition, raw Reader seeds, and semantic Reader-session records while keeping prepared rendering private.
 
 You can stop at any layer. A server, test, search index, AI integration, or custom renderer can use the client or text transforms without registering a custom element. A product that wants ready-made presentation can add one focused surface or the complete Reader.
 
@@ -56,7 +56,7 @@ You can stop at any layer. A server, test, search index, AI integration, or cust
   </article>
   <article class="path-card">
     <h3>Build a complete Reader</h3>
-    <p>Use the controlled Reader when people need to read bilingual text, inspect connections, follow commentary, and return through semantic history.</p>
+    <p>Use the standalone Reader when people need to read bilingual text, inspect connections, follow commentary, and return through semantic history.</p>
     <p><SiteLink to="/learn/04-reader.html">Follow the Reader path →</SiteLink></p>
   </article>
 </div>
@@ -67,7 +67,7 @@ The landing preview, seven-project editor, authored component states, and live e
 
 - Edit HTML, CSS, and JavaScript in the [supplied-data editor](examples/playground/index.html).
 - Compare the [seven components](components.md).
-- Open the [controlled Reader](examples/reader/controlled.html?tref=Micah%206%3A8).
+- Open the [standalone Reader](examples/reader/controlled.html?tref=Micah%206%3A8).
 
 **Develop the toolkit itself:** clone the repository and follow the repository-only [Development guide](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md).
 

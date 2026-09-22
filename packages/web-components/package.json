@@ -26,45 +26,41 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./bilingual-segment": {
-      "types": "./dist/bilingual-segment.d.ts",
-      "import": "./dist/bilingual-segment.js"
+    "./acquisition": {
+      "types": "./dist/acquisition.d.ts",
+      "import": "./dist/acquisition.js"
     },
-    "./bindings": {
-      "types": "./dist/bindings.d.ts",
-      "import": "./dist/bindings.js"
+    "./bilingual-segment": {
+      "types": "./dist/bilingual-segment-public.d.ts",
+      "import": "./dist/bilingual-segment-public.js"
     },
     "./connections-panel": {
-      "types": "./dist/connections-panel.d.ts",
-      "import": "./dist/connections-panel.js"
+      "types": "./dist/connections-panel-public.d.ts",
+      "import": "./dist/connections-panel-public.js"
     },
     "./popup": {
-      "types": "./dist/popup.d.ts",
-      "import": "./dist/popup.js"
+      "types": "./dist/popup-public.d.ts",
+      "import": "./dist/popup-public.js"
     },
     "./reader": {
-      "types": "./dist/reader.d.ts",
-      "import": "./dist/reader.js"
-    },
-    "./reader-controller": {
-      "types": "./dist/reader-controller.d.ts",
-      "import": "./dist/reader-controller.js"
+      "types": "./dist/reader-public.d.ts",
+      "import": "./dist/reader-public.js"
     },
     "./reader-session": {
-      "types": "./dist/reader-session.d.ts",
-      "import": "./dist/reader-session.js"
+      "types": "./dist/reader-session-public.d.ts",
+      "import": "./dist/reader-session-public.js"
     },
     "./ref-label": {
-      "types": "./dist/ref-label.d.ts",
-      "import": "./dist/ref-label.js"
+      "types": "./dist/ref-label-public.d.ts",
+      "import": "./dist/ref-label-public.js"
     },
     "./source-card": {
-      "types": "./dist/source-card.d.ts",
-      "import": "./dist/source-card.js"
+      "types": "./dist/source-card-public.d.ts",
+      "import": "./dist/source-card-public.js"
     },
     "./text-segment": {
-      "types": "./dist/text-segment.d.ts",
-      "import": "./dist/text-segment.js"
+      "types": "./dist/text-segment-public.d.ts",
+      "import": "./dist/text-segment-public.js"
     }
   },
   "dependencies": {

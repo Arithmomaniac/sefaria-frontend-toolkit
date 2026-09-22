@@ -1,22 +1,26 @@
-export const reactSourceCardSnippet = `const snapshot = useSyncExternalStore(
-  (notify) => controller.subscribe(() => notify()),
-  () => controller.snapshot,
-);
-const [selected, setSelected] = useState<SourceSelection>();
-const onSelection = useCallback((event: CustomEvent<SourceSelection>) => {
-  setSelected({
-    position: [...event.detail.position],
-    ref: event.detail.ref,
-  });
-}, []);
+export const reactSourceCardSnippet = `const [data, setData] = useState(suppliedPayload);
+const [sref, setSref] = useState("");
+const [acquisition, setAcquisition] = useState({
+  kind: "client",
+  client,
+});
+
+function loadReference(nextSref) {
+  setData(undefined);
+  setSref(nextSref);
+  setAcquisition({ kind: "client", client });
+}
 
 return (
   <sefaria-source-card
+    data={data}
+    sref={sref}
+    acquisition={acquisition}
     contentLanguage={contentLanguage}
     layout={layout}
     sideOrder={sideOrder}
     vocalizationMode={vocalizationMode}
-    selectable={snapshot.result?.viewModel.state === "data"}
+    selectable
     selectedPosition={selected?.position}
     onsefaria-source-select={onSelection}
   />

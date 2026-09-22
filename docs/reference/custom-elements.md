@@ -4,21 +4,28 @@ This file is generated from the Lit element sources and the bounded event and to
 
 ## `<sefaria-bilingual-segment>`
 
-Request-free custom element that renders one bilingual-segment view model.
+Custom element that renders supplied or acquired bilingual-segment data.
 
 ### Properties and attributes
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
-| `viewModel` | Property only | `BilingualSegmentViewModel` | - | Render-ready state supplied by the host. |
+| `sref` | `sref` | `string` | `""` | Reference loaded when authoritative supplied data is absent. |
+| `data` | Property only | `unknown | undefined` | `undefined` | Authoritative corrected response-shaped data. |
+| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
+| `primaryVersionTitle` | `primary-version-title` | `string | undefined` | `undefined` | Optional exact edition title for the primary role. |
+| `translationVersionTitle` | `translation-version-title` | `string | undefined` | `undefined` | Optional exact edition title for the translation role. |
 | `contentLanguage` | `content-language` | `BilingualSegmentContentLanguage` | `"both"` | Sides the host wants displayed. |
 | `layout` | `layout` | `BilingualSegmentLayout` | `"auto"` | Requested arrangement of the two sides. |
 | `sideOrder` | `side-order` | `BilingualSegmentSideOrder` | `"primary-first"` | Requested role order for a side-by-side arrangement. |
 | `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | Hebrew vocalization preset applied to both displayed roles. |
+| `status` | Property only | `SefariaElementStatus` | - | Coarse lifecycle state without exposing prepared rendering data. |
 
 ### Events
 
-None.
+| Event | Description |
+| --- | --- |
+| `sefaria-bilingual-segment-error` | Reports a current standalone loading or validation failure. |
 
 ### Slots
 
@@ -30,15 +37,21 @@ None.
 
 ## `<sefaria-connections-panel>`
 
-Request-free category summaries and bounded connected-text details.
+Category summaries and bounded connected-text details from supplied or acquired data.
 
 ### Properties and attributes
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
-| `viewModel` | Property only | `ConnectionsViewModel | undefined` | - | Host-supplied rendering state. |
+| `sref` | `sref` | `string` | `""` | Reference loaded when authoritative supplied data is absent. |
+| `data` | Property only | `unknown | undefined` | `undefined` | Authoritative corrected links response data. |
+| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
+| `withText` | `with-text` | `boolean` | `true` | Whether acquired or supplied links include connected text. |
+| `category` | `category` | `string | undefined` | `undefined` | Exact category projected from the current captured response. |
+| `page` | `page` | `number` | `0` | Zero-based local page projected from the current captured response. |
 | `showPreviews` | `show-previews` | `boolean` | `true` | Hides or reveals captured preview data without requesting it. |
 | `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | Hebrew vocalization preset applied to safe legacy-channel previews. |
+| `status` | Property only | `SefariaElementStatus` | - | Coarse lifecycle state without exposing prepared rendering data. |
 
 ### Events
 
@@ -48,6 +61,7 @@ Request-free category summaries and bounded connected-text details.
 | `sefaria-connections-preview-request` | Requests captured connection previews from the host. |
 | `sefaria-connections-page-change` | Requests a different page of captured connections. |
 | `sefaria-connection-select` | Reports selection of one connected reference. |
+| `sefaria-connections-panel-error` | Reports a current standalone loading or validation failure. |
 
 ### Slots
 
@@ -59,22 +73,26 @@ None.
 
 ## `<sefaria-popup>`
 
-Request-free anchored dialog that renders one popup view model.
+Anchored dialog that renders supplied or acquired popup data.
 
 ### Properties and attributes
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
-| `viewModel` | Property only | `PopupViewModel | undefined` | `undefined` | Render-ready popup state supplied by the integration. |
+| `sref` | `sref` | `string` | `""` | Reference prepared while the connected popup is open or closed. |
+| `data` | Property only | `unknown | undefined` | `undefined` | Authoritative corrected v3 text response data. |
+| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
 | `anchor` | Property only | `HTMLElement | null` | `null` | Host element used for placement and focus restoration. |
 | `open` | `open` | `boolean` | `false` | Whether the dialog is visible. |
 | `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | Hebrew vocalization preset applied to the nested source card. |
+| `status` | Property only | `SefariaElementStatus` | - | Coarse lifecycle state without exposing prepared rendering data. |
 
 ### Events
 
-| Event                 | Description                          |
-| --------------------- | ------------------------------------ |
+| Event | Description |
+| --- | --- |
 | `sefaria-popup-close` | Reports that the popup should close. |
+| `sefaria-popup-error` | Reports a current standalone loading or validation failure. |
 
 ### Slots
 
@@ -86,21 +104,29 @@ None.
 
 ## `<sefaria-reader>`
 
-Request-free controlled reader surface for one semantic reader entry.
+Controlled or declarative reader surface for one semantic reader entry.
 
 ### Properties and attributes
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
-| `viewModel` | Property only | `ReaderViewModel | undefined` | - | Host-supplied reader rendering state. |
+| `sref` | `sref` | `string` | `""` | Requested external Reader root, separate from current navigation. |
+| `data` | Property only | `ReaderRawSeedData | undefined` | `undefined` | Transactional unknown raw Reader seed. |
+| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
 | `activePane` | `active-pane` | `ReaderPane` | `"source"` | Host-controlled pane selected in compact presentation. |
 | `chatExport` | `chat-export` | `boolean` | `false` | Shows an explicit host-mediated chat export action when a target exists. |
 | `contentLanguage` | `content-language` | `BilingualPairContentLanguage` | `"both"` | Source-card roles displayed by the controlled reader. |
 | `layout` | `layout` | `BilingualPairLayout` | `"auto"` | Source-card bilingual arrangement. |
 | `sideOrder` | `side-order` | `BilingualPairSideOrder` | `"primary-first"` | First source-card role in side-by-side layout. |
 | `showConnectionPreviews` | `show-connection-previews` | `boolean` | `true` | Whether captured connection previews are visible. |
-| `rootLoading` | `root-loading` | `boolean` | `false` | Shows host-controlled root loading without replacing committed content. |
 | `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | Hebrew vocalization preset applied to source and preview text. |
+| `status` | Property only | `SefariaElementStatus` | - | Coarse Reader lifecycle state without exposing prepared rendering data. |
+| `currentEntryId` | Property only | `string | undefined` | - | Stable identity of the current retained semantic Reader entry. |
+| `selectedRef` | Property only | `string | undefined` | - | Exact selected canonical target, when the current entry establishes one. |
+| `rootLoading` | Property only | `boolean` | - | Whether a root source request is currently pending. |
+| `readerError` | Property only | `string | undefined` | - | Current Reader failure message, when the latest eligible operation failed. |
+| `canGoBack` | Property only | `boolean` | - | Whether Reader Back can activate a retained predecessor. |
+| `historyTruncated` | Property only | `boolean` | - | Whether bounded retention removed older semantic history. |
 
 ### Events
 
@@ -115,6 +141,7 @@ Request-free controlled reader surface for one semantic reader entry.
 | `sefaria-reader-connections-page-change` | Requests a different connection page. |
 | `sefaria-reader-connection-select` | Reports selection of one connected reference. |
 | `sefaria-reader-connections-preview-request` | Requests connection previews from the host. |
+| `sefaria-reader-error` | Reports a current standalone loading or seed-admission failure. |
 
 ### Slots
 
@@ -133,19 +160,24 @@ Request-free controlled reader surface for one semantic reader entry.
 
 ## `<sefaria-ref-label>`
 
-Request-free custom element that renders one reference-label view model.
+Custom element that renders supplied or acquired reference-label data.
 
 ### Properties and attributes
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
-| `viewModel` | Property only | `RefLabelViewModel` | - | Render-ready state supplied by the host. |
+| `sref` | `sref` | `string` | `""` | Reference loaded when authoritative supplied data is absent. |
+| `data` | Property only | `unknown | undefined` | `undefined` | Authoritative corrected reference response data. |
+| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
 | `labelLanguage` | `label-language` | `RefLabelLanguage` | `"english"` | Label language selected by the host. |
 | `linked` | `linked` | `boolean` | `false` | Whether data-state labels render as canonical links. |
+| `status` | Property only | `SefariaElementStatus` | - | Coarse lifecycle state without exposing prepared rendering data. |
 
 ### Events
 
-None.
+| Event | Description |
+| --- | --- |
+| `sefaria-ref-label-error` | Reports a current standalone loading or validation failure. |
 
 ### Slots
 
@@ -157,14 +189,17 @@ None.
 
 ## `<sefaria-source-card>`
 
-Request-free custom element that renders one source-card view model.
+Custom element that renders supplied or acquired source-card data.
 
 ### Properties and attributes
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
-| `viewModel` | Property only | `SourceCardViewModel` | - | Render-ready state supplied by the host. |
-| `referenceLabel` | Property only | `RefLabelViewModel | undefined` | `undefined` | Optional richer label supplied by a host that already owns it. |
+| `sref` | `sref` | `string` | `""` | Reference loaded when authoritative supplied data is absent. |
+| `data` | Property only | `unknown | undefined` | `undefined` | Authoritative corrected response-shaped data. |
+| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
+| `primaryVersionTitle` | `primary-version-title` | `string | undefined` | `undefined` | Optional exact edition title for the primary role. |
+| `translationVersionTitle` | `translation-version-title` | `string | undefined` | `undefined` | Optional exact edition title for the translation role. |
 | `contentLanguage` | `content-language` | `BilingualPairContentLanguage` | `"both"` | Sides the host wants displayed for every pair. |
 | `layout` | `layout` | `BilingualPairLayout` | `"auto"` | Requested arrangement for every pair. |
 | `sideOrder` | `side-order` | `BilingualPairSideOrder` | `"primary-first"` | Requested role order for every pair. |
@@ -173,12 +208,14 @@ Request-free custom element that renders one source-card view model.
 | `selectable` | `selectable` | `boolean` | `false` | Enables selection controls for items with proven canonical targets. |
 | `selectedPosition` | Property only | `readonly number[] | undefined` | `undefined` | Host-controlled original position path, never a reference string. |
 | `hideAttributions` | `hide-attributions` | `boolean` | `false` | Whether resolved edition attribution is intentionally omitted. |
+| `status` | Property only | `SefariaElementStatus` | - | Coarse lifecycle state without exposing prepared rendering data. |
 
 ### Events
 
-| Event                   | Description                                |
-| ----------------------- | ------------------------------------------ |
+| Event | Description |
+| --- | --- |
 | `sefaria-source-select` | Reports selection of one source-card item. |
+| `sefaria-source-card-error` | Reports a current standalone loading or validation failure. |
 
 ### Slots
 
@@ -190,18 +227,26 @@ None.
 
 ## `<sefaria-text-segment>`
 
-Request-free custom element that renders one text-segment view model.
+Custom element that renders supplied or acquired text-segment data.
 
 ### Properties and attributes
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
-| `viewModel` | Property only | `TextSegmentViewModel` | - | Render-ready state supplied by the host. |
+| `sref` | `sref` | `string` | `""` | Reference loaded when authoritative supplied data is absent. |
+| `data` | Property only | `unknown | undefined` | `undefined` | Authoritative corrected response-shaped data. |
+| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
+| `versionLanguage` | `version-language` | `string | undefined` | `undefined` | Optional language-family selector overriding the primary default. |
+| `versionTitle` | `version-title` | `string | undefined` | `undefined` | Optional exact edition title paired with `versionLanguage`. |
 | `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | Hebrew vocalization preset applied only to the displayed safe text. |
+| `selectedVersion` | Property only | `TextSegmentSelectedVersionInfo | undefined` | - | Metadata for the currently displayed selected edition. |
+| `status` | Property only | `SefariaElementStatus` | - | Coarse lifecycle state without exposing prepared rendering data. |
 
 ### Events
 
-None.
+| Event | Description |
+| --- | --- |
+| `sefaria-text-segment-error` | Reports a current standalone loading or validation failure. |
 
 ### Slots
 

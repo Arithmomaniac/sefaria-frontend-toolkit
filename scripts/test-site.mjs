@@ -448,7 +448,7 @@ try {
       [
         "/learn/01-web-components.html",
         "ref-label",
-        "Component editor: Edit a request-free reference label",
+        "Component editor: Edit a supplied-data reference label",
       ],
       [
         "/learn/02-supplied-data.html",
@@ -508,7 +508,7 @@ try {
       waitUntil: "networkidle",
     });
     const refLabelEditor = page.frameLocator(
-      'iframe[title="Component editor: Edit a request-free reference label"]',
+      'iframe[title="Component editor: Edit a supplied-data reference label"]',
     );
     await refLabelEditor
       .getByText("Preview rendered with supplied data.")
@@ -579,11 +579,9 @@ try {
     }
 
     const liveLessons = {
-      "03-live-data": [
-        ["vanilla controller host", "/examples/vanilla/index.html"],
-      ],
+      "03-live-data": [["vanilla host", "/examples/vanilla/index.html"]],
       "04-reader": [
-        ["controlled Reader", "/examples/reader/controlled.html"],
+        ["standalone Reader", "/examples/reader/controlled.html"],
         ["spatial Reader", "/examples/reader/index.html"],
       ],
     };
@@ -599,10 +597,10 @@ try {
       );
       await assertText(
         page.locator("body"),
-        lesson === "03-live-data" ? "Explicit live action" : "Start live demo",
+        lesson === "03-live-data" ? "explicit user action" : "Start live demo",
       );
       for (const [name, expectedPath] of links) {
-        const link = page.getByRole("link", { name });
+        const link = page.getByRole("link", { name, exact: true }).first();
         const href = await link.getAttribute("href");
         assertEqual(
           new URL(href, page.url()).pathname,
@@ -948,16 +946,6 @@ try {
           .querySelector("#status")
           ?.textContent?.startsWith("Showing Rashi") === true,
     );
-    const breadcrumbs = await page
-      .locator("sefaria-reader")
-      .evaluate((reader) =>
-        reader.viewModel?.breadcrumbs?.map((entry) => entry.label),
-      );
-    if (!breadcrumbs?.includes("Micah 6")) {
-      throw new Error(
-        `Reader breadcrumb was not retained: ${JSON.stringify(breadcrumbs)}`,
-      );
-    }
     const rootBreadcrumb = page
       .getByRole("navigation", { name: "Reader history" })
       .getByRole("button", { name: "Micah 6", exact: true });
@@ -1044,7 +1032,7 @@ try {
       page,
       page.getByRole("link", { name: "Open supplied-data preview" }),
       "mobile component preview link",
-      30,
+      60,
     );
     await capture(page, "site-mobile.png");
 

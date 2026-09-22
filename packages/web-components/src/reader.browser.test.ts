@@ -2,6 +2,12 @@ import { html } from "lit";
 import { render } from "vitest-browser-lit";
 import { afterEach, expect, test, vi } from "vitest";
 
+import {
+  getPreparedState,
+  prepared,
+  setPreparedState,
+  setPreparedStatus,
+} from "./prepared-state.js";
 import "./reader-element.js";
 import type { SefariaReader } from "./reader-element.js";
 import type { ReaderViewModel } from "./reader.js";
@@ -88,7 +94,7 @@ async function mount(
 ): Promise<SefariaReader> {
   render(
     html`<sefaria-reader
-      .viewModel=${viewModel}
+      ${prepared(viewModel)}
       active-pane="source"
       chat-export
     ></sefaria-reader>`,
@@ -100,9 +106,10 @@ async function mount(
 }
 
 test("renders full initial loading and non-destructive replacement loading states", async () => {
-  render(html`<sefaria-reader root-loading></sefaria-reader>`);
+  render(html`<sefaria-reader></sefaria-reader>`);
   const initial = document.querySelector<SefariaReader>("sefaria-reader");
   if (!initial) throw new Error("Reader was not rendered.");
+  setPreparedStatus(initial, "loading");
   await initial.updateComplete;
 
   expect(
@@ -124,7 +131,7 @@ test("renders full initial loading and non-destructive replacement loading state
   await initial.updateComplete;
   expect(initialAction.assignedSlot).toBeNull();
 
-  initial.viewModel = paired;
+  setPreparedState(initial, paired);
   await initial.updateComplete;
 
   expect(initial.shadowRoot?.textContent).toContain(
@@ -136,7 +143,7 @@ test("renders full initial loading and non-destructive replacement loading state
   ).not.toBeNull();
   expect(initialAction.assignedSlot?.name).toBe("toolbar-actions");
 
-  initial.rootLoading = false;
+  setPreparedStatus(initial, undefined);
   await initial.updateComplete;
 
   expect(
@@ -157,7 +164,7 @@ test("exposes one optional toolbar slot and only the documented coarse parts", a
   const element = await mount();
   const bookmark = document.createElement("button");
   bookmark.slot = "toolbar-actions";
-  bookmark.textContent = `Bookmark ${element.viewModel?.selectedTarget?.ref}`;
+  bookmark.textContent = `Bookmark ${getPreparedState<ReaderViewModel>(element)?.selectedTarget?.ref}`;
   element.append(bookmark);
   await element.updateComplete;
 
@@ -381,7 +388,11 @@ test("emits Back, breadcrumb, pane, and explicit chat-export actions", async () 
   expect(events.get("sefaria-reader-back")).toHaveBeenCalledOnce();
   expect(
     events.get("sefaria-reader-history-activate")?.mock.calls[0]?.[0].detail,
-  ).toEqual({ originEntryId: "entry-2", entryId: "entry-1" });
+  ).toEqual({
+    originEntryId: "entry-2",
+    entryId: "entry-1",
+    label: "Isaiah 1:17",
+  });
   expect(
     events.get("sefaria-reader-pane-change")?.mock.calls[0]?.[0].detail,
   ).toEqual({ originEntryId: "entry-2", pane: "connections" });
@@ -417,22 +428,22 @@ test("renders source-only, connections-only, and unavailable panes", async () =>
   );
 
   const connectionsOnlyViewModel = omit(paired, "source");
-  sourceOnly.viewModel = {
+  setPreparedState(sourceOnly, {
     ...connectionsOnlyViewModel,
-  };
+  });
   await sourceOnly.updateComplete;
   expect(sourceOnly.shadowRoot?.textContent).toContain(
     "Source text is not available for this entry.",
   );
 
-  sourceOnly.viewModel = {
+  setPreparedState(sourceOnly, {
     ...paired,
     connections: {
       state: "unavailable",
       reason: "failed",
       message: "Connections could not be loaded.",
     },
-  };
+  });
   await sourceOnly.updateComplete;
   expect(
     sourceOnly.shadowRoot?.querySelector('[role="alert"]')?.textContent,
@@ -469,7 +480,7 @@ test("uses compact pane visibility without changing semantic history", async () 
   await element.updateComplete;
   expect(getComputedStyle(sourcePane).display).toBe("none");
   expect(getComputedStyle(connectionsPane).display).not.toBe("none");
-  expect(element.viewModel).toBe(paired);
+  expect(getPreparedState<ReaderViewModel>(element)).toBe(paired);
 });
 
 test("keeps both panes visible at the showcase reader width", async () => {
@@ -526,7 +537,7 @@ test("moves focus only when semantic current entry changes", async () => {
   await element.updateComplete;
   expect(element.shadowRoot?.activeElement).toBe(back);
 
-  element.viewModel = {
+  setPreparedState(element, {
     ...paired,
     currentEntryId: "entry-3",
     label: "Rashi on Micah 6:8",
@@ -538,7 +549,7 @@ test("moves focus only when semantic current entry changes", async () => {
         current: true,
       },
     ],
-  };
+  });
   await element.updateComplete;
   await new Promise((resolve) => requestAnimationFrame(resolve));
   expect(element.shadowRoot?.activeElement).toBe(

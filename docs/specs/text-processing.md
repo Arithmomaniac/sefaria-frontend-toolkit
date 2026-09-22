@@ -12,7 +12,7 @@ The package remains in the architecture because sanitization, vocalization, and 
 
 `@arithmomaniac/sefaria-text-transform` owns deterministic text changes. It has no network, DOM rendering, API transport, component view-model, or host responsibility.
 
-Component pure factories call one normalization operation before text enters a view model. Component view models retain the full safe text and separate footnote records. Elements can call the vocalization operations only to derive a reversible local presentation from that immutable safe data; they do not reparse an API payload or repeat normalization.
+Private component preparation calls one normalization operation before text enters render-ready state. That private state retains the full safe text and separate footnote records. Elements can call the vocalization operations only to derive a reversible local presentation from that immutable safe data; they do not reparse an API payload or repeat normalization.
 
 ## Common contract
 
@@ -361,9 +361,9 @@ Body, marker, and content serialization share one output budget: eight times the
 
 API schema validation and HTML normalization are different controls. `@arithmomaniac/sefaria-client` validates unknown JSON structure. `@arithmomaniac/sefaria-text-transform` makes approved HTML safe for rendering.
 
-A component pure factory calls `normalizeText` once and stores `bodyHtml` plus note records in its component-specific view model. If validated link evidence is supplied, a non-DOM component helper validates unknown `inline_reference` fields, scopes links to the exact base reference and selected edition, and passes only narrow commentary candidates to the transform.
+Private component preparation calls `normalizeText` once and stores `bodyHtml` plus note records in component-specific prepared state. If validated link evidence is supplied, private projection validates unknown `inline_reference` fields, scopes links to the exact base reference and selected edition, and passes only narrow commentary candidates to the transform.
 
-Raw payload HTML must not be stored in a component view model for later interpretation. The element does not repeat normalization or API parsing. Full `taamim_and_nikkud` mode renders the original safe fields directly and performs zero vocalization calls. A non-full mode derives every HTML field through `applyVocalizationToHtml`, always from the immutable original view model. The element then replaces canonical note placeholders with presentation markup from matching local note records.
+Raw payload HTML must not be stored in prepared state for later interpretation. The element does not repeat normalization or API parsing. Full `taamim_and_nikkud` mode renders the original safe fields directly and performs zero vocalization calls. A non-full mode derives every HTML field through `applyVocalizationToHtml`, always from the immutable original prepared state. The element then replaces canonical note placeholders with presentation markup from matching local note records.
 
 ## Compatibility evidence
 
@@ -390,7 +390,7 @@ Broad corpus comparison and compatibility publication belong to #14. This packag
 - the package implements vocalization and one structured normalization operation
 - every named case has a deterministic test traceable to the markup contract
 - normalization uses an explicit allowlist and emits no URLs
-- unsafe markup does not reach component view models
+- unsafe markup does not reach private prepared component state
 - rendering IDs remain outside transform output
 - no operation imports a client, component element, host API, or browser DOM global
 - a clean checkout passes `pnpm check`

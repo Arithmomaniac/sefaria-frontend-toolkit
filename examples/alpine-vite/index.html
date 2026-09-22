@@ -10,11 +10,11 @@
     <main class="alpine-example" x-data="sourceCardExample">
       <header class="intro">
         <p class="eyebrow">Standalone Alpine consumer</p>
-        <h1>Bind Alpine state to a request-free Sefaria Web Component</h1>
+        <h1>Pass declarative inputs to a Sefaria Web Component</h1>
         <p>
-          Validated supplied data renders first. The controller stays outside
-          Alpine's reactive proxy. Alpine owns the form, presentation
-          properties, and canonical component event.
+          Validated supplied data renders first. Alpine owns the form,
+          presentation properties, and canonical component event; the element
+          owns acquisition, cancellation, loading, and error presentation.
         </p>
       </header>
 
@@ -79,23 +79,21 @@
         </div>
       </section>
 
-      <p id="request-status" class="status" role="status" x-text="status"></p>
+      <p id="request-status" class="status" x-text="status"></p>
       <p id="request-count" class="status">
         Live load attempts: <span x-text="loadAttempts"></span>
       </p>
       <p
         id="committed-ref"
         class="status"
-        x-text="committedRef === undefined
-          ? 'Current result has no committed canonical reference.'
-          : `Current committed reference: ${committedRef}.`"
+        x-text="`Current committed reference: ${committedRef}.`"
       ></p>
       <p
-        id="load-error"
+        id="input-error"
         class="failure"
         role="alert"
-        x-show="failure !== undefined"
-        x-text="failure ?? ''"
+        x-show="inputFailure !== undefined"
+        x-text="inputFailure ?? ''"
       ></p>
 
       <section
@@ -107,7 +105,7 @@
         <sefaria-source-card
           x-ref="card"
           x-init="$nextTick(() => attach($el, $data))"
-          x-effect="syncCard($el, contentLanguage, layout, sideOrder, vocalizationMode, selectable, selectedPosition)"
+          x-effect="syncPresentation($el, contentLanguage, layout, sideOrder, vocalizationMode, selectable, selectedPosition)"
           @sefaria-source-select="selectSource($event)"
         ></sefaria-source-card>
       </section>
