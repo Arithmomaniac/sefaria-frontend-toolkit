@@ -131,6 +131,31 @@ test("loads through an explicit host capability without browser fallback", async
   expect(fetchMock).not.toHaveBeenCalled();
 });
 
+test("invalid acquired data leaves an error state and publishes its cause", async () => {
+  const element = new SefariaTextSegment();
+  const errors = vi.fn();
+  element.addEventListener("sefaria-text-segment-error", errors);
+  element.sref = "Micah 6:8";
+  element.acquisition = {
+    kind: "capability",
+    capability: {
+      getText: async () => ({
+        payload: { versions: [{ text: 42 }] },
+        status: 200,
+      }),
+    },
+  };
+  document.body.append(element);
+
+  await vi.waitFor(() => {
+    expect(element.status).toBe("error");
+  });
+  expect(element.shadowRoot?.querySelector('[role="alert"]')).not.toBeNull();
+  expect(element.shadowRoot?.textContent).not.toContain("Loading Micah 6:8");
+  expect(errors).toHaveBeenCalledTimes(1);
+  expect(errors.mock.calls[0]?.[0].detail.error).toBeInstanceOf(Error);
+});
+
 test("reports an unsupported explicit capability without browser fallback", async () => {
   const fetchMock = vi.fn<typeof fetch>();
   vi.stubGlobal("fetch", fetchMock);

@@ -10,12 +10,12 @@ For an illustrated tour of the input, read [Text markup](../../docs/guides/text-
 
 ## Processing order
 
-Component pure factories process text in this order:
+Components prepare transformed text in this order:
 
 1. Call `normalizeText` once on API HTML.
-2. Store its safe `bodyHtml` and source-ordered note records in the component view model.
+2. Keep its safe `bodyHtml` and source-ordered note records together during private component preparation.
 3. Call `applyVocalizationToHtml` on each safe HTML field when deriving a non-full display mode.
-4. Let the request-free element decorate local `data-sefaria-note` placeholders from the matching note records.
+4. Let the component element decorate local `data-sefaria-note` placeholders from the matching note records.
 
 API validation and HTML sanitation are separate controls. `@arithmomaniac/sefaria-client` validates the JSON response shape; this package restricts markup inside valid string fields.
 

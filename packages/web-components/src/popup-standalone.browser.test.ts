@@ -168,6 +168,32 @@ test("loads through an explicit capability without browser fallback", async () =
   expect(getPreparedState<PopupViewModel>(element)?.state).toBe("data");
 });
 
+test("invalid acquired data leaves an error state and publishes its cause", async () => {
+  const element = new SefariaPopup();
+  const errors = vi.fn();
+  element.addEventListener("sefaria-popup-error", errors);
+  element.sref = "Micah 6:8";
+  element.open = true;
+  element.acquisition = {
+    kind: "capability",
+    capability: {
+      getText: async () => ({
+        payload: { versions: [{ text: 42 }] },
+        status: 200,
+      }),
+    },
+  };
+  document.body.append(element);
+
+  await vi.waitFor(() => {
+    expect(element.status).toBe("error");
+  });
+  expect(element.shadowRoot?.querySelector('[role="alert"]')).not.toBeNull();
+  expect(getPreparedState<PopupViewModel>(element)?.state).toBe("error");
+  expect(errors).toHaveBeenCalledTimes(1);
+  expect(errors.mock.calls[0]?.[0].detail.error).toBeInstanceOf(Error);
+});
+
 test("suppresses stale results and resumes an interrupted load on reconnect", async () => {
   const resolvers: Array<(response: Response) => void> = [];
   const fetchMock = vi.fn<typeof fetch>(

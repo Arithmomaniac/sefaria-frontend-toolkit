@@ -71,4 +71,4 @@ The landing preview, seven-project editor, authored component states, and live e
 
 **Develop the toolkit itself:** clone the repository and follow the repository-only [Development guide](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md).
 
-Follow [Get started](get-started.md) for the client, transform, factory, component, and Reader paths.
+Follow [Get started](get-started.md) for the client, text-transform, custom-renderer, component, and Reader paths.

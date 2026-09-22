@@ -198,6 +198,56 @@ test("explicit capabilities receive resolveReference and getLinks operations", a
   );
 });
 
+test("invalid acquired data leaves both components in error states and publishes each cause", async () => {
+  const labelErrors = vi.fn();
+  const label = new SefariaRefLabel();
+  label.addEventListener("sefaria-ref-label-error", labelErrors);
+  label.sref = "Micah 6:8";
+  label.acquisition = {
+    kind: "capability",
+    capability: {
+      resolveReference: async () => ({
+        payload: { normalized: 42 },
+        status: 200,
+      }),
+    },
+  };
+  document.body.append(label);
+
+  const connectionsErrors = vi.fn();
+  const connections = new SefariaConnectionsPanel();
+  connections.addEventListener(
+    "sefaria-connections-panel-error",
+    connectionsErrors,
+  );
+  connections.sref = "Micah 6:8";
+  connections.acquisition = {
+    kind: "capability",
+    capability: {
+      getLinks: async () => ({
+        payload: [{ _id: 42 }],
+        status: 200,
+      }),
+    },
+  };
+  document.body.append(connections);
+
+  await vi.waitFor(() => {
+    expect(label.status).toBe("error");
+    expect(connections.status).toBe("error");
+  });
+  expect(label.shadowRoot?.querySelector('[role="alert"]')).not.toBeNull();
+  expect(
+    connections.shadowRoot?.querySelector('[role="alert"]'),
+  ).not.toBeNull();
+  expect(labelErrors).toHaveBeenCalledTimes(1);
+  expect(connectionsErrors).toHaveBeenCalledTimes(1);
+  expect(labelErrors.mock.calls[0]?.[0].detail.error).toBeInstanceOf(Error);
+  expect(connectionsErrors.mock.calls[0]?.[0].detail.error).toBeInstanceOf(
+    Error,
+  );
+});
+
 test("invalid supplied data immediately supersedes active work without live fallback", async () => {
   let resolveRef!: (response: Response) => void;
   let resolveLinks!: (response: Response) => void;

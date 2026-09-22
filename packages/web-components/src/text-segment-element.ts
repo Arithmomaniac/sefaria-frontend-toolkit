@@ -346,8 +346,10 @@ export class SefariaTextSegment extends SefariaElement {
               active.controller.signal,
             );
       if (this.#active !== active) return;
+      const viewModel = this.#project(response.payload, response.status);
+      if (this.#active !== active) return;
       this.#active = undefined;
-      this.#commit(this.#project(response.payload, response.status));
+      this.#commit(viewModel);
     } catch (error) {
       if (this.#active !== active) return;
       this.#active = undefined;

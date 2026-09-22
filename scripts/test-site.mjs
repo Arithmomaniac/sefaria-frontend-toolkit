@@ -184,6 +184,7 @@ try {
       "development.html",
       "evidence.html",
       "guides/reader-navigation.html",
+      "images/reader-navigation.html",
       "reference/documentation-map.html",
       "review.html",
       "specs/client.html",

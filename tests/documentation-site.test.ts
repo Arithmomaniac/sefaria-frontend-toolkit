@@ -428,7 +428,10 @@ describe("documentation learning journey", () => {
     );
     await access(diagramPath);
     await access(mobileDiagramPath);
-    const diagram = await readFile(diagramPath, "utf8");
+    const diagrams = await Promise.all([
+      readFile(diagramPath, "utf8"),
+      readFile(mobileDiagramPath, "utf8"),
+    ]);
 
     expect(getStarted).toContain("<picture>");
     expect(getStarted).toContain(
@@ -438,17 +441,21 @@ describe("documentation learning journey", () => {
     expect(getStarted).toContain(
       'alt="Choose the toolkit layer that matches your product"',
     );
-    for (const label of [
-      "Sefaria API or data you already have",
-      "Validated transport",
-      "Pure text preparation",
-      "Render-ready models",
-      "Focused components",
-      "Controlled Reader",
-      "Stop at any layer",
-    ]) {
-      expect(diagram).toContain(label);
+    for (const diagram of diagrams) {
+      for (const label of [
+        "Validated transport",
+        "Pure text preparation",
+        "Custom rendering",
+        "Focused components",
+        "Controlled Reader",
+      ]) {
+        expect(diagram).toContain(label);
+      }
     }
+    expect(diagrams[0]).toContain("Sefaria API or data you already have");
+    expect(diagrams[0]).toContain("Stop at any layer");
+    expect(diagrams[1]).toContain("Sefaria API or data you have");
+    expect(diagrams[1]).toContain("Start with any layer below");
 
     expect(repositoryReadme).toContain("Microsoft Global Hackathon 2026");
     expect(repositoryReadme).toContain("Thank you to Microsoft");

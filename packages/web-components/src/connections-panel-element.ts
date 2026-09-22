@@ -434,8 +434,9 @@ export class SefariaConnectionsPanel extends SefariaElement {
               active.controller.signal,
             );
       if (this.#active !== active) return;
-      this.#active = undefined;
       this.#captureAndProject(response.payload, response.status, request);
+      if (this.#active !== active) return;
+      this.#active = undefined;
     } catch (error) {
       if (this.#active !== active) return;
       this.#active = undefined;

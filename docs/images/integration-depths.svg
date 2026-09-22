@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 650" role="img" aria-labelledby="title description">
   <title id="title">Choose the toolkit layer that matches your product</title>
-  <desc id="description">Sefaria API data or data an application already has can be validated, prepared as text, projected into render-ready models, displayed in focused components, or used in the controlled Reader. Each layer is a useful stopping point.</desc>
+  <desc id="description">Sefaria API data or data an application already has can be validated, prepared as safe text for custom rendering, displayed in focused components, or used in the controlled Reader. Each layer is a useful stopping point.</desc>
   <defs>
     <style>
       :root {
@@ -72,10 +72,10 @@
   <text class="detail" x="395" y="393" text-anchor="middle">footnotes, vocalization</text>
 
   <rect class="headless" x="520" y="280" width="210" height="124" rx="12" />
-  <text class="label" x="625" y="315" text-anchor="middle">Render-ready models</text>
-  <text class="package" x="625" y="342" text-anchor="middle">pure factories</text>
-  <text class="detail" x="625" y="372" text-anchor="middle">Component-specific data</text>
-  <text class="detail" x="625" y="393" text-anchor="middle">for your own renderer</text>
+  <text class="label" x="625" y="315" text-anchor="middle">Custom rendering</text>
+  <text class="package" x="625" y="342" text-anchor="middle">client + text transforms</text>
+  <text class="detail" x="625" y="372" text-anchor="middle">Validated payloads and</text>
+  <text class="detail" x="625" y="393" text-anchor="middle">safe prepared text</text>
 
   <rect class="browser" x="750" y="280" width="210" height="124" rx="12" />
   <text class="label" x="855" y="315" text-anchor="middle">Focused components</text>
@@ -85,7 +85,7 @@
 
   <rect class="browser" x="980" y="280" width="160" height="124" rx="12" />
   <text class="label" x="1060" y="315" text-anchor="middle">Controlled Reader</text>
-  <text class="package" x="1060" y="342" text-anchor="middle">reader + controller</text>
+  <text class="package" x="1060" y="342" text-anchor="middle">standalone Reader</text>
   <text class="detail" x="1060" y="372" text-anchor="middle">Reading, connections,</text>
   <text class="detail" x="1060" y="393" text-anchor="middle">history, navigation</text>
 
@@ -106,8 +106,8 @@
   <text class="detail" x="395" y="562" text-anchor="middle">desktop, or offline UI</text>
 
   <rect class="outcome" x="520" y="510" width="210" height="72" rx="10" />
-  <text class="detail" x="625" y="540" text-anchor="middle">Custom renderer with</text>
-  <text class="detail" x="625" y="562" text-anchor="middle">toolkit projections</text>
+  <text class="detail" x="625" y="540" text-anchor="middle">Custom renderer using</text>
+  <text class="detail" x="625" y="562" text-anchor="middle">client + text transforms</text>
 
   <rect class="outcome" x="750" y="510" width="210" height="72" rx="10" />
   <text class="detail" x="855" y="540" text-anchor="middle">One reading feature in</text>

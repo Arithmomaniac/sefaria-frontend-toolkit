@@ -4,7 +4,7 @@
 
 [Sefaria](https://www.sefaria.org/) is a free digital library of Jewish texts and translations. This frontend toolkit helps developers build reading and learning experiences with that data without rebuilding bilingual text, footnotes, attribution, connection navigation, and accessible Reader behavior from scratch.
 
-Start with the complete Reader, add one of seven focused browser-standard components from vanilla JavaScript, React, or Alpine, or use the validated client, factories, and text transforms without rendering components. The current components focus on reading surfaces, but the project boundary is a reusable frontend/UI toolkit rather than a replacement for Sefaria's website.
+Start with the complete Reader, add one of seven focused browser-standard components from vanilla JavaScript, React, or Alpine, or use the validated client and text transforms with your own renderer. The current components focus on reading surfaces, but the project boundary is a reusable frontend/UI toolkit rather than a replacement for Sefaria's website.
 
 > **Experimental.** This public source repository is a development project with no support or stability guarantee. It is not an official Sefaria product. Public GitHub Packages prereleases are available for authenticated use. Package names are subject to change, and the packages are not published on npmjs.com or a CDN.
 
