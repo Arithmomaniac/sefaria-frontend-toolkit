@@ -169,17 +169,94 @@ test("loads Micah 6:8 progressively through an explicit client and preserves a f
   const committedEntry =
     getPreparedState<ReaderViewModel>(element)?.currentEntryId;
 
+  const errors: Array<{ error: unknown; sref: string }> = [];
+  element.addEventListener("sefaria-reader-error", (event) => {
+    errors.push(
+      (event as CustomEvent<{ error: unknown; sref: string }>).detail,
+    );
+  });
   element.sref = "Missing";
   await vi.waitFor(() => {
     expect(element.status).toBe("error");
     expect(element.shadowRoot?.textContent).toContain("Unknown text.");
   });
+  expect(errors).toHaveLength(1);
+  expect(errors[0]?.sref).toBe("Missing");
+  expect(errors[0]?.error).toBeInstanceOf(Error);
   expect(getPreparedState<ReaderViewModel>(element)?.currentEntryId).toBe(
     committedEntry,
   );
   expect(getPreparedState<ReaderViewModel>(element)?.selectedTarget?.ref).toBe(
     "Micah 6:7",
   );
+});
+
+test("reports the original failure when a Reader root replacement fails", async () => {
+  const failure = new Error("Root unavailable.");
+  const getText = vi.fn(async ({ sref }: { readonly sref: string }) => {
+    if (sref === "Micah 7:1") throw failure;
+    return {
+      payload: sref === "Micah 6" ? micahContext() : micahTarget,
+      status: 200,
+    };
+  });
+  const getLinks = vi.fn(async () => ({ payload: [], status: 200 }));
+  const element = new SefariaReader();
+  element.sref = "Micah 6:8";
+  element.acquisition = {
+    kind: "capability",
+    capability: { getText, getLinks },
+  };
+  document.body.append(element);
+  await vi.waitFor(() => expect(element.status).toBe("ready"));
+
+  const errors: unknown[] = [];
+  element.addEventListener("sefaria-reader-error", (event) => {
+    errors.push((event as CustomEvent<{ error: unknown }>).detail.error);
+  });
+  element.sref = "Micah 7:1";
+  await vi.waitFor(() => expect(errors).toHaveLength(1));
+  expect(errors[0]).toBe(failure);
+});
+
+test("reports a root failure after resuming an interrupted replacement", async () => {
+  const failure = new Error("Resumed root unavailable.");
+  let rootAttempts = 0;
+  const getText = vi.fn(async ({ sref }: { readonly sref: string }) => {
+    if (sref === "Micah 7:1") {
+      if (++rootAttempts === 1) {
+        return await new Promise<{ payload: CoreV3TextsResponse; status: 200 }>(
+          () => {},
+        );
+      }
+      throw failure;
+    }
+    return {
+      payload: sref === "Micah 6" ? micahContext() : micahTarget,
+      status: 200,
+    };
+  });
+  const getLinks = vi.fn(async () => ({ payload: [], status: 200 }));
+  const element = new SefariaReader();
+  element.sref = "Micah 6:8";
+  element.acquisition = {
+    kind: "capability",
+    capability: { getText, getLinks },
+  };
+  document.body.append(element);
+  await vi.waitFor(() => expect(element.status).toBe("ready"));
+  const errors: unknown[] = [];
+  element.addEventListener("sefaria-reader-error", (event) => {
+    errors.push((event as CustomEvent<{ error: unknown }>).detail.error);
+  });
+
+  element.sref = "Micah 7:1";
+  await vi.waitFor(() => expect(rootAttempts).toBe(1));
+  element.remove();
+  document.body.append(element);
+  await vi.waitFor(() => expect(element.status).toBe("error"));
+  expect(rootAttempts).toBe(2);
+  expect(errors).toEqual([failure]);
 });
 
 test("resumes only interrupted links after reconnect through a host capability", async () => {
@@ -239,6 +316,105 @@ test("resumes only interrupted links after reconnect through a host capability",
     expect(connectionsState(element)).not.toBe("loading");
   });
   expect(getText).toHaveBeenCalledTimes(2);
+});
+
+test("reconciles a changed root instead of resuming disconnected links", async () => {
+  const getText = vi.fn(async ({ sref }: { readonly sref: string }) => ({
+    payload:
+      sref === "Micah 6"
+        ? micahContext()
+        : sref === "Micah 7"
+          ? micahSevenContext()
+          : sref === "Micah 7:1"
+            ? micahSevenTarget()
+            : micahTarget,
+    status: 200,
+  }));
+  const getLinks = vi.fn(
+    async () =>
+      await new Promise<{ payload: unknown; status: number }>(() => {}),
+  );
+  const element = new SefariaReader();
+  element.sref = "Micah 6:8";
+  element.acquisition = {
+    kind: "capability",
+    capability: { getText, getLinks },
+  };
+  document.body.append(element);
+  await vi.waitFor(() => expect(getLinks).toHaveBeenCalledTimes(1));
+
+  element.remove();
+  element.sref = "Micah 7:1";
+  document.body.append(element);
+  await vi.waitFor(() => {
+    expect(getText.mock.calls.map(([request]) => request.sref)).toContain(
+      "Micah 7:1",
+    );
+    expect(element.selectedRef).toBe("Micah 7:1");
+  });
+});
+
+test("honors an acquisition change made while disconnected after a completed load", async () => {
+  const oldGetText = vi.fn(async ({ sref }: { readonly sref: string }) => ({
+    payload: sref === "Micah 6" ? micahContext() : micahTarget,
+    status: 200,
+  }));
+  const oldGetLinks = vi.fn(async () => ({ payload: [], status: 200 }));
+  const newGetText = vi.fn(async ({ sref }: { readonly sref: string }) => ({
+    payload: sref === "Micah 6" ? micahContext() : micahTarget,
+    status: 200,
+  }));
+  const newGetLinks = vi.fn(async () => ({ payload: [], status: 200 }));
+  const element = new SefariaReader();
+  element.sref = "Micah 6:8";
+  element.acquisition = {
+    kind: "capability",
+    capability: { getText: oldGetText, getLinks: oldGetLinks },
+  };
+  document.body.append(element);
+  await vi.waitFor(() => expect(element.status).toBe("ready"));
+
+  element.remove();
+  element.acquisition = {
+    kind: "capability",
+    capability: { getText: newGetText, getLinks: newGetLinks },
+  };
+  await element.updateComplete;
+  document.body.append(element);
+  await vi.waitFor(() => expect(newGetLinks).toHaveBeenCalledTimes(1));
+  expect(newGetText).toHaveBeenCalledTimes(2);
+  expect(oldGetText).toHaveBeenCalledTimes(2);
+});
+
+test("disabling acquisition stops the previous Reader controller", async () => {
+  const getText = vi.fn(async ({ sref }: { readonly sref: string }) => ({
+    payload: sref === "Micah 6" ? micahContext() : micahTarget,
+    status: 200,
+  }));
+  const getLinks = vi.fn(async () => ({ payload: [], status: 200 }));
+  const element = new SefariaReader();
+  element.sref = "Micah 6:8";
+  element.acquisition = {
+    kind: "capability",
+    capability: { getText, getLinks },
+  };
+  document.body.append(element);
+  await vi.waitFor(() => expect(element.status).toBe("ready"));
+
+  element.acquisition = { kind: "disabled" };
+  await vi.waitFor(() => expect(element.status).toBe("error"));
+  element.dispatchEvent(
+    new CustomEvent("sefaria-reader-connection-select", {
+      detail: {
+        originEntryId: element.currentEntryId,
+        targetRef: "Micah 6:7",
+      },
+    }),
+  );
+  await element.updateComplete;
+  expect(getText).toHaveBeenCalledTimes(2);
+  expect(getLinks).toHaveBeenCalledTimes(1);
+  expect(element.status).toBe("error");
 });
 
 test("navigates and returns Back with zero additional capability calls", async () => {
@@ -565,6 +741,25 @@ test("continues a source-only seed with one links call and never duplicates sour
   });
   expect(getText).not.toHaveBeenCalled();
   expect(getLinks).toHaveBeenCalledTimes(2);
+});
+
+test("keeps an unchanged raw seed when sref changes while connected", async () => {
+  const getLinks = vi.fn(async () => ({ payload: [], status: 200 }));
+  const element = new SefariaReader();
+  element.data = { source: rawSourceSeed(), selectedRef: "Micah 6:8" };
+  element.acquisition = {
+    kind: "capability",
+    capability: { getLinks },
+  };
+  document.body.append(element);
+  await vi.waitFor(() => expect(element.status).toBe("ready"));
+  expect(getLinks).toHaveBeenCalledTimes(1);
+
+  element.sref = "Micah 7:1";
+  await element.updateComplete;
+  expect(element.status).toBe("ready");
+  expect(element.selectedRef).toBe("Micah 6:8");
+  expect(getLinks).toHaveBeenCalledTimes(1);
 });
 
 test("admits a links-only seed without continuation", async () => {

@@ -429,6 +429,15 @@ export class SefariaReader extends SefariaElement {
   #acquisitionOverride: SefariaAcquisition | undefined;
   #suspension: ReaderControllerSuspension | undefined;
   #resumeInitial = false;
+  #disconnectedInputs:
+    | {
+        readonly sref: string;
+        readonly data: ReaderRawSeedData | undefined;
+        readonly acquisition: SefariaAcquisition | undefined;
+      }
+    | undefined;
+  #reconcileOnConnect = false;
+  #srefChangedOnConnect = false;
   #declarativeActive = false;
   #processedData: ReaderRawSeedData | undefined;
   #seedCommitted = false;
@@ -452,8 +461,28 @@ export class SefariaReader extends SefariaElement {
 
   override connectedCallback(): void {
     super.connectedCallback();
+    const disconnectedInputs = this.#disconnectedInputs;
+    this.#disconnectedInputs = undefined;
+    if (disconnectedInputs !== undefined) {
+      this.#srefChangedOnConnect = this.sref !== disconnectedInputs.sref;
+      this.#reconcileOnConnect =
+        this.#srefChangedOnConnect ||
+        this.data !== disconnectedInputs.data ||
+        this.acquisition !== disconnectedInputs.acquisition;
+      if (this.#reconcileOnConnect) {
+        this.#suspension = undefined;
+        this.#resumeInitial = false;
+      }
+    }
     queueMicrotask(() => {
       if (!this.isConnected) return;
+      if (this.#reconcileOnConnect) {
+        const srefChanged = this.#srefChangedOnConnect;
+        this.#reconcileOnConnect = false;
+        this.#srefChangedOnConnect = false;
+        this.#reconcile(true, srefChanged, srefChanged);
+        return;
+      }
       if (this.#suspension !== undefined && this.#controller !== undefined) {
         const suspension = this.#suspension;
         this.#suspension = undefined;
@@ -471,6 +500,11 @@ export class SefariaReader extends SefariaElement {
   }
 
   override disconnectedCallback(): void {
+    this.#disconnectedInputs = {
+      sref: this.sref,
+      data: this.data,
+      acquisition: this.acquisition,
+    };
     if (this.#initial !== undefined) {
       this.#initial.controller.abort(
         new DOMException("Reader disconnected.", "AbortError"),
@@ -529,7 +563,17 @@ export class SefariaReader extends SefariaElement {
       changed.has("data") ||
       changed.has("acquisition")
     ) {
-      this.#reconcile(changed.has("acquisition"), changed.has("sref"));
+      const reconcileOnConnect = this.isConnected && this.#reconcileOnConnect;
+      const srefChangedOnConnect = this.#srefChangedOnConnect;
+      if (reconcileOnConnect) {
+        this.#reconcileOnConnect = false;
+        this.#srefChangedOnConnect = false;
+      }
+      this.#reconcile(
+        changed.has("acquisition") || reconcileOnConnect,
+        changed.has("sref") || (reconcileOnConnect && srefChangedOnConnect),
+        reconcileOnConnect && srefChangedOnConnect,
+      );
       return;
     }
     if (
@@ -707,11 +751,15 @@ export class SefariaReader extends SefariaElement {
     this.#renderedEntryId = currentEntryId;
   }
 
-  #reconcile(force: boolean, srefChanged = false): void {
+  #reconcile(
+    force: boolean,
+    srefChanged = false,
+    revalidateData = false,
+  ): void {
     if (!this.isConnected) return;
     const requestedRoot = this.sref.trim();
     if (this.data !== undefined) {
-      if (this.data !== this.#processedData) {
+      if (this.data !== this.#processedData || revalidateData) {
         this.#processedData = this.data;
         this.#transactData(this.data, requestedRoot, srefChanged);
       }
@@ -737,6 +785,9 @@ export class SefariaReader extends SefariaElement {
     this.#requestedRoot = requestedRoot;
     const acquisition = resolveSefariaAcquisition(this.acquisition);
     if (acquisition.kind === "disabled") {
+      this.#clearDeclarativeState();
+      this.#declarativeActive = true;
+      this.#requestedRoot = requestedRoot;
       this.#publishError(
         new Error("Standalone Sefaria acquisition is disabled."),
         requestedRoot,
@@ -881,6 +932,13 @@ export class SefariaReader extends SefariaElement {
     this.#rootPresentation = presentation;
     try {
       await controller.replaceRoot({ tref: sref }, { presentation });
+      if (
+        this.#controller === controller &&
+        this.#requestedRoot === sref &&
+        this.#rootPresentation === presentation
+      ) {
+        this.#publishRootTaskError(controller, sref);
+      }
     } catch (error) {
       this.#publishError(error, sref);
     } finally {
@@ -893,10 +951,25 @@ export class SefariaReader extends SefariaElement {
   async #resume(suspension: ReaderControllerSuspension): Promise<void> {
     const controller = this.#controller;
     if (controller === undefined || !this.isConnected) return;
+    const requestedRoot = this.#requestedRoot;
     try {
       await controller.resume(suspension);
+      if (
+        suspension.kind === "root" &&
+        this.#controller === controller &&
+        this.#requestedRoot === requestedRoot
+      ) {
+        this.#publishRootTaskError(controller, requestedRoot);
+      }
     } catch (error) {
       this.#publishError(error, this.#requestedRoot);
+    }
+  }
+
+  #publishRootTaskError(controller: ReaderController, sref: string): void {
+    const task = controller.snapshot.task;
+    if (task.state === "error") {
+      this.#publishError(task.cause ?? new Error(task.message), sref);
     }
   }
 
