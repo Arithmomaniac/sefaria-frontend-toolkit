@@ -28,7 +28,7 @@ Defined ordinary-element `data` is authoritative, including valid empty and inva
 import "@arithmomaniac/sefaria-web-components";
 
 const card = document.createElement("sefaria-source-card");
-card.sref = "Micah 6:8";
+card.setAttribute("sref", "Micah 6:8");
 document.body.append(card);
 ```
 
@@ -45,7 +45,7 @@ reader.acquisition = {
   kind: "client",
   client: createSefariaClient(),
 };
-reader.sref = "Micah 6:8";
+reader.setAttribute("sref", "Micah 6:8");
 document.body.append(reader);
 ```
 

@@ -42,9 +42,10 @@ test("assigns declarative data and acquisition, receives selection, and loads on
   setSelect(root, "#side-order", "translation-first");
   setSelect(root, "#vocalization-mode", "none");
   await waitForAlpine();
-  expect(card.layout).toBe("stacked");
-  expect(card.sideOrder).toBe("translation-first");
-  expect(card.vocalizationMode).toBe("none");
+  expect(card.getAttribute("layout")).toBe("stacked");
+  expect(card.getAttribute("side-order")).toBe("translation-first");
+  expect(card.getAttribute("vocalization-mode")).toBe("none");
+  expect(card.hasAttribute("selectable")).toBe(true);
   expect(fetch).not.toHaveBeenCalled();
 
   card.shadowRoot
@@ -62,7 +63,7 @@ test("assigns declarative data and acquisition, receives selection, and loads on
   click(root, "#load-live");
   await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
   expect(card.data).toBeUndefined();
-  expect(card.sref).toBe("micah 6:8");
+  expect(card.getAttribute("sref")).toBe("micah 6:8");
   await waitForCardReady(card);
   await vi.waitFor(() =>
     expect(root?.querySelector("#request-status")?.textContent).toBe(
@@ -113,7 +114,7 @@ test("destroying the Alpine tree clears inputs and aborts pending element work",
   await card.updateComplete;
 
   expect(requestSignal?.aborted).toBe(true);
-  expect(card.sref).toBe("");
+  expect(card.getAttribute("sref")).toBe("");
   root.remove();
   root = undefined;
 });
@@ -153,7 +154,13 @@ function mountExample(): HTMLElement {
     <p id="request-count">Live load attempts: <span x-text="loadAttempts"></span></p>
     <sefaria-source-card
       x-init="$nextTick(() => attach($el, $data))"
-      x-effect="syncPresentation($el, contentLanguage, layout, sideOrder, vocalizationMode, selectable, selectedPosition)"
+      :sref="sref"
+      :content-language="contentLanguage"
+      :layout="layout"
+      :side-order="sideOrder"
+      :vocalization-mode="vocalizationMode"
+      :selectable="selectable"
+      x-effect="syncPresentation($el, selectedPosition)"
       @sefaria-source-select="selectSource($event)"
     ></sefaria-source-card>
     <p id="selected-ref" x-text="selectedRef === undefined

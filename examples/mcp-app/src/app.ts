@@ -220,7 +220,7 @@ export function renderReaderToolResult(
   const reader = new SefariaReader();
   reader.acquisition = acquisition;
   reader.data = seed;
-  reader.chatExport = interaction !== undefined;
+  reader.toggleAttribute("chat-export", interaction !== undefined);
   const status = document.createElement("p");
   status.hidden = true;
   section.append(reader, status);

@@ -62,7 +62,7 @@ reader.addEventListener("sefaria-reader-error", () => {
   }
 });
 vocalization.addEventListener("change", () => {
-  reader.vocalizationMode = vocalization.value;
+  reader.setAttribute("vocalization-mode", vocalization.value);
 });
 
 function requireElement(selector) {

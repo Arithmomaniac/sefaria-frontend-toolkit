@@ -36,8 +36,8 @@ export function startLinkedArticle(
   const anchors = [...root.querySelectorAll<HTMLAnchorElement>(LINK_SELECTOR)];
   const listeners = new Map<HTMLAnchorElement, (event: MouseEvent) => void>();
   const close = (): void => {
-    popup.sref = "";
-    popup.open = false;
+    popup.setAttribute("sref", "");
+    popup.removeAttribute("open");
   };
   const showError = (event: Event): void => {
     const detail = (
@@ -46,7 +46,7 @@ export function startLinkedArticle(
     if (popup.sref !== detail.sref) {
       return;
     }
-    popup.open = false;
+    close();
     status.textContent =
       detail.error instanceof Error
         ? detail.error.message
@@ -81,8 +81,8 @@ export function startLinkedArticle(
     popup.anchor = anchor;
     status.textContent = "";
     status.setAttribute("role", "status");
-    popup.sref = tref;
-    popup.open = true;
+    popup.setAttribute("sref", tref);
+    popup.setAttribute("open", "");
   }
 
   return {

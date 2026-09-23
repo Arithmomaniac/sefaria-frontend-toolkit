@@ -19,17 +19,17 @@ Presentation properties operate on the element's current private prepared conten
 import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
 
 export function customizeCard(card: SefariaSourceCard): void {
-  card.contentLanguage = "both";
-  card.layout = "side-by-side";
-  card.sideOrder = "translation-first";
-  card.vocalizationMode = "nikkud";
+  card.setAttribute("content-language", "both");
+  card.setAttribute("layout", "side-by-side");
+  card.setAttribute("side-order", "translation-first");
+  card.setAttribute("vocalization-mode", "nikkud");
   card.style.setProperty("--sefaria-surface", "#fffaf2");
   card.style.setProperty("--sefaria-accent", "#6f3f20");
   card.style.maxWidth = "48rem";
 }
 ```
 
-Changing these values must not call a factory or client. `vocalizationMode` accepts `taamim_and_nikkud`, `nikkud`, or `none`; the full-mark default renders the original safe prepared content directly, while the other presets derive display text from that same immutable content. The equivalent HTML attribute is `vocalization-mode`. Changing the reference or exact edition selector is a data operation and belongs in the host's async lifecycle.
+Changing these values must not call a factory or client. `vocalization-mode` accepts `taamim_and_nikkud`, `nikkud`, or `none`; the full-mark default renders the original safe prepared content directly, while the other presets derive display text from that same immutable content. The scalar HTML attributes are `content-language`, `layout`, `side-order`, and `vocalization-mode`. Changing the reference or exact edition selector is a data operation and belongs in the host's async lifecycle.
 
 The standalone Reader adds one optional host-action placement and four coarse styling regions:
 

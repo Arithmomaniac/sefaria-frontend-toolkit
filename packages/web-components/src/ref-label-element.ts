@@ -28,10 +28,10 @@ export type RefLabelLanguage = "english" | "hebrew" | "both";
 export class SefariaRefLabel extends SefariaElement {
   /** Lit property metadata for declarative data and presentation. */
   static override properties = {
-    sref: { type: String },
+    sref: { type: String, useDefault: true },
     data: { attribute: false },
     acquisition: { attribute: false },
-    labelLanguage: { attribute: "label-language" },
+    labelLanguage: { attribute: "label-language", useDefault: true },
     linked: { type: Boolean },
   };
 

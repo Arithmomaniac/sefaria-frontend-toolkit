@@ -104,6 +104,100 @@ test("standalone bilingual loading makes one request with both exact role select
   expect(url.searchParams.get("return_format")).toBe("default");
 });
 
+test("removing optional selector attributes restores undefined selectors", async () => {
+  const requests: SefariaTextAcquisitionRequest[] = [];
+  const element = new SefariaBilingualSegment();
+  element.acquisition = {
+    kind: "capability",
+    capability: {
+      getText: async (request) => {
+        requests.push(request);
+        return { payload: textPayload(), status: 200 };
+      },
+    },
+  };
+  element.setAttribute("primary-version-title", "Deterministic example Hebrew");
+  element.setAttribute(
+    "translation-version-title",
+    "Deterministic example translation",
+  );
+  element.setAttribute("sref", "Micah 6:8");
+  document.body.append(element);
+  await settle(element);
+
+  element.removeAttribute("primary-version-title");
+  element.removeAttribute("translation-version-title");
+  element.setAttribute("sref", "");
+  await settle(element);
+  element.setAttribute("sref", "Micah 6:8");
+  await settle(element);
+
+  expect(element.primaryVersionTitle).toBeUndefined();
+  expect(element.translationVersionTitle).toBeUndefined();
+  expect(requests).toHaveLength(2);
+  expect(requests[0]?.versions).toEqual([
+    "primary|Deterministic example Hebrew",
+    "translation|Deterministic example translation",
+  ]);
+  expect(requests[1]?.versions).toEqual(["primary", "translation"]);
+});
+
+test("removing sref restores the empty default and aborts active work", async () => {
+  let requestSignal: AbortSignal | undefined;
+  let resolveRequest:
+    | ((value: { readonly payload: unknown; readonly status: number }) => void)
+    | undefined;
+  const response = new Promise<{
+    readonly payload: unknown;
+    readonly status: number;
+  }>((resolve) => {
+    resolveRequest = resolve;
+  });
+  const element = new SefariaBilingualSegment();
+  element.acquisition = {
+    kind: "capability",
+    capability: {
+      getText: async (_request, signal) => {
+        requestSignal = signal;
+        return await response;
+      },
+    },
+  };
+  element.setAttribute("sref", "Micah 6:8");
+  document.body.append(element);
+  await vi.waitFor(() => expect(requestSignal).toBeDefined());
+
+  element.removeAttribute("sref");
+  await element.updateComplete;
+
+  expect(element.sref).toBe("");
+  expect(requestSignal?.aborted).toBe(true);
+  resolveRequest?.({ payload: textPayload(), status: 200 });
+  await settle(element);
+  expect(element.status).toBe("empty");
+});
+
+test("removing scalar presentation attributes restores their defaults", async () => {
+  const element = new SefariaBilingualSegment();
+  element.setAttribute("content-language", "primary");
+  element.setAttribute("layout", "stacked");
+  element.setAttribute("side-order", "translation-first");
+  element.setAttribute("vocalization-mode", "none");
+  document.body.append(element);
+  await element.updateComplete;
+
+  element.removeAttribute("content-language");
+  element.removeAttribute("layout");
+  element.removeAttribute("side-order");
+  element.removeAttribute("vocalization-mode");
+  await element.updateComplete;
+
+  expect(element.contentLanguage).toBe("both");
+  expect(element.layout).toBe("auto");
+  expect(element.sideOrder).toBe("primary-first");
+  expect(element.vocalizationMode).toBe("taamim_and_nikkud");
+});
+
 test("standalone source card uses one v3 request and gives captured children no sref", async () => {
   const fetchMock = vi.fn<typeof fetch>(async () =>
     jsonResponse(textPayload()),

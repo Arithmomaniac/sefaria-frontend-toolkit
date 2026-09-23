@@ -19,11 +19,11 @@ The maintained controlled page waits for **Start live demo**, then assigns its r
 import "@arithmomaniac/sefaria-web-components";
 
 const reader = document.createElement("sefaria-reader");
-reader.sref = "Micah 6:8";
+reader.setAttribute("sref", "Micah 6:8");
 document.body.append(reader);
 ```
 
-Use `reader.acquisition = { kind: "client", client }` when the host needs an explicit client. Later root changes assign a new `sref`; successful admission begins a fresh root history transaction without replacing the element.
+Use `reader.acquisition = { kind: "client", client }` when the host needs an explicit client. Later root changes update the `sref` attribute; successful admission begins a fresh root history transaction without replacing the element.
 
 Open the <SiteLink to="/examples/reader/controlled.html?tref=Micah%206%3A8">standalone Reader</SiteLink> or the <SiteLink to="/examples/reader/index.html?tref=Micah%206%3A8">spatial Reader</SiteLink>. Both preserve the no-unsolicited-traffic gate.
 

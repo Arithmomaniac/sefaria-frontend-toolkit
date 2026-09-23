@@ -5,6 +5,7 @@ import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
 
 import type { SefariaAcquisition } from "./acquisition.js";
 import { resolveSefariaAcquisition } from "./acquisition-state.js";
+import { optionalStringConverter } from "./attribute-converters.js";
 import { validateSuppliedComponentData } from "./component-controller.js";
 import { getPreparedState, setPreparedState } from "./prepared-state.js";
 import {
@@ -35,12 +36,24 @@ const NOTE_PLACEHOLDER_PATTERN = /<span data-sefaria-note="(\d+)"><\/span>/gu;
 export class SefariaTextSegment extends SefariaElement {
   /** Lit property metadata for declarative data and presentation state. */
   static override properties = {
-    sref: { type: String },
+    sref: { type: String, useDefault: true },
     data: { attribute: false },
     acquisition: { attribute: false },
-    versionLanguage: { type: String, attribute: "version-language" },
-    versionTitle: { type: String, attribute: "version-title" },
-    vocalizationMode: { type: String, attribute: "vocalization-mode" },
+    versionLanguage: {
+      type: String,
+      attribute: "version-language",
+      converter: optionalStringConverter,
+    },
+    versionTitle: {
+      type: String,
+      attribute: "version-title",
+      converter: optionalStringConverter,
+    },
+    vocalizationMode: {
+      type: String,
+      attribute: "vocalization-mode",
+      useDefault: true,
+    },
   };
 
   /** Text-segment layout, typography, footnotes, and containment styles. */

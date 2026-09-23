@@ -9,7 +9,7 @@ popup.data = zCoreV3TextsResponse.parse(payload);
 popup.anchor = anchor;
 
 anchor.addEventListener("click", () => {
-  popup.open = true;
+  popup.setAttribute("open", "");
   state.textContent = "Popup open. Press Escape to close.";
 });
 popup.addEventListener("sefaria-popup-close", () => {

@@ -11,9 +11,9 @@ if (!selection) throw new Error("The example requires #selection.");
 
 const validatedPayload = zCoreV3TextsResponse.parse(payload);
 card.data = validatedPayload;
-card.selectable = true;
+card.setAttribute("selectable", "");
 vocalization.addEventListener("change", () => {
-  card.vocalizationMode = vocalization.value;
+  card.setAttribute("vocalization-mode", vocalization.value);
 });
 card.addEventListener("sefaria-source-select", (event) => {
   selection.textContent = `Selected ${event.detail.ref} at position ${event.detail.position.join(".")}.`;

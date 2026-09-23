@@ -4,6 +4,7 @@ import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
 
 import type { SefariaAcquisition } from "./acquisition.js";
 import { resolveSefariaAcquisition } from "./acquisition-state.js";
+import { optionalStringConverter } from "./attribute-converters.js";
 import {
   bilingualPairStyles,
   renderBilingualPair,
@@ -40,21 +41,35 @@ export type BilingualSegmentSideOrder = BilingualPairSideOrder;
 export class SefariaBilingualSegment extends SefariaElement {
   /** Lit property metadata for declarative data and presentation state. */
   static override properties = {
-    sref: { type: String },
+    sref: { type: String, useDefault: true },
     data: { attribute: false },
     acquisition: { attribute: false },
     primaryVersionTitle: {
       type: String,
       attribute: "primary-version-title",
+      converter: optionalStringConverter,
     },
     translationVersionTitle: {
       type: String,
       attribute: "translation-version-title",
+      converter: optionalStringConverter,
     },
-    contentLanguage: { type: String, attribute: "content-language" },
-    layout: { type: String },
-    sideOrder: { type: String, attribute: "side-order" },
-    vocalizationMode: { type: String, attribute: "vocalization-mode" },
+    contentLanguage: {
+      type: String,
+      attribute: "content-language",
+      useDefault: true,
+    },
+    layout: { type: String, useDefault: true },
+    sideOrder: {
+      type: String,
+      attribute: "side-order",
+      useDefault: true,
+    },
+    vocalizationMode: {
+      type: String,
+      attribute: "vocalization-mode",
+      useDefault: true,
+    },
   };
 
   /** Bilingual pairing, container-driven layout, and absent-side styles. */

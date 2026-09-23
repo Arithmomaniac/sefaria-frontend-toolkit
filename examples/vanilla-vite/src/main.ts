@@ -55,9 +55,9 @@ const acquisition = createSourceCardAcquisition(client, (ref) => {
 });
 
 card.acquisition = acquisition;
-card.sref = "";
+card.setAttribute("sref", "");
 card.data = validatedPayload;
-card.selectable = true;
+card.setAttribute("selectable", "");
 syncPresentation();
 const cardObserver = new MutationObserver(synchronizeCommittedReference);
 cardObserver.observe(card.shadowRoot!, {
@@ -94,7 +94,7 @@ function onSubmit(event: SubmitEvent): void {
   selectedRef.textContent =
     "Select the rendered segment to send its canonical component event to the host.";
   card.data = undefined;
-  card.sref = sref;
+  card.setAttribute("sref", sref);
   selectedMetadataRef = undefined;
 }
 
@@ -111,10 +111,16 @@ function onSourceSelection(event: Event): void {
 }
 
 function syncPresentation(): void {
-  card.contentLanguage = readContentLanguage(contentLanguage.value);
-  card.layout = readLayout(layout.value);
-  card.sideOrder = readSideOrder(sideOrder.value);
-  card.vocalizationMode = readVocalizationMode(vocalizationMode.value);
+  card.setAttribute(
+    "content-language",
+    readContentLanguage(contentLanguage.value),
+  );
+  card.setAttribute("layout", readLayout(layout.value));
+  card.setAttribute("side-order", readSideOrder(sideOrder.value));
+  card.setAttribute(
+    "vocalization-mode",
+    readVocalizationMode(vocalizationMode.value),
+  );
 }
 
 function synchronizeCommittedReference(): void {
@@ -137,7 +143,7 @@ function dispose(): void {
   card.removeEventListener("sefaria-source-select", onSourceSelection);
   cardObserver.disconnect();
   card.data = undefined;
-  card.sref = "";
+  card.setAttribute("sref", "");
   card.acquisition = { kind: "disabled" };
 }
 

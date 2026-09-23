@@ -4,11 +4,11 @@ import links from "./links.js";
 const panel = requireElement("#connections");
 const previews = requireElement("#previews");
 const selection = requireElement("#selection");
-panel.sref = "Micah 6:8";
-panel.withText = true;
-panel.category = "Quoting Commentary";
+panel.setAttribute("sref", "Micah 6:8");
+panel.setAttribute("with-text", "");
+panel.setAttribute("category", "Quoting Commentary");
 panel.data = links;
-panel.showPreviews = true;
+panel.setAttribute("show-previews", "");
 
 previews.addEventListener("change", () => {
   panel.showPreviews = previews.checked;

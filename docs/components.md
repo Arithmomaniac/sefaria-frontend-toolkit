@@ -24,13 +24,13 @@ The toolkit provides seven declarative UI components. All seven accept `sref` fo
 
 ## Start with supplied data or standalone `sref`
 
-Use raw `data` for fixtures, server output, or MCP tool results that have already crossed the appropriate validation boundary. Use `sref` for ordinary standalone browser loading. Maintained pages assign live references only after their activation gate.
+Use `sref` as an attribute for ordinary standalone browser loading. Use the property-only raw `data` input for fixtures, server output, or MCP tool results that have already crossed the appropriate validation boundary. Default-true booleans remain properties when a host must set them false. Maintained pages assign live references only after their activation gate.
 
 Elements expose public read-only status and component-specific diagnostics/events. Their prepared rendering state is private.
 
 ## Start with the complete Reader
 
-`<sefaria-reader>` combines text, connections, responsive panes, semantic history, and navigation. Assign `sref` for the ordinary path. Advanced spatial or MCP hosts can use raw seeds, tagged acquisition, and `reader-session` semantic records without constructing public prepared models.
+`<sefaria-reader>` combines text, connections, responsive panes, semantic history, and navigation. Assign the `sref` attribute for the ordinary path. Advanced spatial or MCP hosts can use property-only raw seeds, tagged acquisition, and `reader-session` semantic records without constructing public prepared models.
 
 <SiteLink to="/examples/playground/index.html?project=reader">Edit the Reader supplied-data project</SiteLink>.
 

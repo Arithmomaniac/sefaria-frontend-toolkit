@@ -105,7 +105,13 @@
         <sefaria-source-card
           x-ref="card"
           x-init="$nextTick(() => attach($el, $data))"
-          x-effect="syncPresentation($el, contentLanguage, layout, sideOrder, vocalizationMode, selectable, selectedPosition)"
+          :sref="sref"
+          :content-language="contentLanguage"
+          :layout="layout"
+          :side-order="sideOrder"
+          :vocalization-mode="vocalizationMode"
+          :selectable="selectable"
+          x-effect="syncPresentation($el, selectedPosition)"
           @sefaria-source-select="selectSource($event)"
         ></sefaria-source-card>
       </section>

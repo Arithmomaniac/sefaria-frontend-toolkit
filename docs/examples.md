@@ -17,3 +17,5 @@ Use a supplied-data preview to inspect a component without a live request. Use a
 | Live MCP App host | <SiteLink to="/examples/mcp-app/live.html">Open preview</SiteLink> | [`examples/mcp-app`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/mcp-app) |
 
 The component editor runs edited code in an isolated preview; its seven supplied-data projects make no Sefaria request. The live examples wait for their explicit action before contacting Sefaria.
+
+For ordinary browser integration, prefer declarative scalar attributes: activate live loading with `sref` and configure presentation with attributes such as `layout` and `vocalization-mode`. Use JavaScript properties for rich values that attributes cannot carry, including raw `data`, tagged `acquisition`, array selections, and element anchors. Default-true booleans also remain properties when a host must set them false, because HTML boolean attributes cannot represent false by presence. Supplied-data previews intentionally use `data` for zero-request rendering; MCP and parent-owned composites are the explicit raw-data bridge exceptions.

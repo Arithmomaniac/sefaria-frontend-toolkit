@@ -113,6 +113,7 @@ export type ReaderControllerTask =
       readonly state: "error";
       readonly code: ReaderControllerErrorCode;
       readonly message: string;
+      readonly cause?: unknown;
     };
 
 /** Immutable public projection of one stateful reader controller. */
@@ -762,7 +763,7 @@ class ReaderControllerImpl implements ReaderController {
       );
     } catch (error) {
       if (!this.isActive(active)) return;
-      this.failTask(classifySourceError(error), errorMessage(error));
+      this.failTask(classifySourceError(error), errorMessage(error), error);
     } finally {
       this.finishPhysicalOperation(active);
     }
@@ -1160,8 +1161,17 @@ class ReaderControllerImpl implements ReaderController {
     return transition;
   }
 
-  private failTask(code: ReaderControllerErrorCode, message: string): void {
-    this.#task = { state: "error", code, message };
+  private failTask(
+    code: ReaderControllerErrorCode,
+    message: string,
+    cause?: unknown,
+  ): void {
+    this.#task = {
+      state: "error",
+      code,
+      message,
+      ...(cause === undefined ? {} : { cause }),
+    };
     this.publish();
   }
 

@@ -3,8 +3,8 @@ import { resolved, unresolved } from "./reference.js";
 
 const label = requireElement("#label");
 const state = requireElement("#state");
-label.sref = "Micah 6:8";
-label.linked = true;
+label.setAttribute("sref", "Micah 6:8");
+label.setAttribute("linked", "");
 
 const show = (payload, message) => {
   label.data = payload;

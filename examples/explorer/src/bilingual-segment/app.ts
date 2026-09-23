@@ -5,6 +5,7 @@ import type {
   SefariaAcquisition,
   SefariaBilingualSegment,
 } from "@arithmomaniac/sefaria-web-components";
+import { setOptionalElementAttribute } from "../../../../demos/live-demo-core.js";
 
 /** Controls the interactive live bilingual-segment demonstration. */
 export interface BilingualSegmentLiveDemo {
@@ -47,11 +48,15 @@ export function startBilingualSegmentLiveDemo(
 
   const applyDisplaySettings = (): void => {
     const values = new FormData(displayForm);
-    result.contentLanguage = readContentLanguage(values.get("contentLanguage"));
-    result.layout = readLayout(values.get("layout"));
-    result.sideOrder = readSideOrder(values.get("sideOrder"));
-    result.vocalizationMode = readVocalizationMode(
-      values.get("vocalizationMode"),
+    result.setAttribute(
+      "content-language",
+      readContentLanguage(values.get("contentLanguage")),
+    );
+    result.setAttribute("layout", readLayout(values.get("layout")));
+    result.setAttribute("side-order", readSideOrder(values.get("sideOrder")));
+    result.setAttribute(
+      "vocalization-mode",
+      readVocalizationMode(values.get("vocalizationMode")),
     );
   };
 
@@ -70,9 +75,21 @@ export function startBilingualSegmentLiveDemo(
     submitButton.disabled = true;
     acquisitionError = undefined;
     result.acquisition = acquisition;
-    result.primaryVersionTitle = request.primary?.versionTitle;
-    result.translationVersionTitle = request.translation?.versionTitle;
-    result.sref = request.tref;
+    if (result.sref === request.tref) {
+      result.setAttribute("sref", "");
+      await result.updateComplete;
+    }
+    setOptionalElementAttribute(
+      result,
+      "primary-version-title",
+      request.primary?.versionTitle,
+    );
+    setOptionalElementAttribute(
+      result,
+      "translation-version-title",
+      request.translation?.versionTitle,
+    );
+    result.setAttribute("sref", request.tref);
 
     await waitForTerminalStatus(result, loadId, () => activeLoad);
     if (loadId !== activeLoad) return;
@@ -89,6 +106,7 @@ export function startBilingualSegmentLiveDemo(
           ? acquisitionError.message
           : String(acquisitionError);
     }
+
     submitButton.disabled = false;
   };
 

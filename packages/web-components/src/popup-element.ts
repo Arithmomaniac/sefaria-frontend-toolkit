@@ -34,12 +34,16 @@ const POPUP_VERSIONS = ["primary", "translation"] as const;
 export class SefariaPopup extends SefariaElement {
   /** Lit property metadata for declarative data and interaction state. */
   static override properties = {
-    sref: { type: String },
+    sref: { type: String, useDefault: true },
     data: { attribute: false },
     acquisition: { attribute: false },
     anchor: { attribute: false },
     open: { type: Boolean, reflect: true },
-    vocalizationMode: { type: String, attribute: "vocalization-mode" },
+    vocalizationMode: {
+      type: String,
+      attribute: "vocalization-mode",
+      useDefault: true,
+    },
   };
 
   /** Popup layout, viewport placement, and isolated dialog styles. */

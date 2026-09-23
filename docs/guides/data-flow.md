@@ -34,7 +34,7 @@ const card = document.querySelector("sefaria-source-card");
 if (!card) throw new Error("The source card is missing.");
 
 card.data = undefined;
-card.sref = "Micah 6:8";
+card.setAttribute("sref", "Micah 6:8");
 ```
 
 The element selects either its explicit tagged `acquisition` source or the module-local lazy shared default. An explicit source can be an existing toolkit client, a structural host capability, or disabled. Explicit failure, disablement, or an unsupported operation never falls through to browser HTTP.

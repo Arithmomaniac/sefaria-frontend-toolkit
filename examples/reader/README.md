@@ -6,7 +6,7 @@ The example package exposes two explicitly activated website paths.
 
 ## Standalone Reader
 
-Open [`controlled.html`](controlled.html?tref=Micah%206%3A8). The deep link only prefills the input. **Start live demo** assigns an explicit client acquisition source and `sref` to one persistent `<sefaria-reader>`.
+Open [`controlled.html`](controlled.html?tref=Micah%206%3A8). The deep link only prefills the input. **Start live demo** assigns an explicit client acquisition property and `sref` attribute to one persistent `<sefaria-reader>`.
 
 Later form submissions assign a new root to the same element. Reader owns source qualification, links loading, cancellation, semantic history, Back, breadcrumbs, local reprojection, and errors. The page-local bookmark action reads `reader.selectedRef` when activated and adds no request or persistence.
 
