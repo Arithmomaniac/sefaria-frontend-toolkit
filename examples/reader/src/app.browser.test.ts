@@ -950,6 +950,19 @@ test("uses a viewport-bound horizontal workspace with independently scrolling pa
   expect(
     panes.find((pane) => pane.dataset.paneId === activePaneId)?.dataset.active,
   ).toBe("true");
+  expect(getComputedStyle(panes[1]!).flexBasis).toBe("100%");
+  expect(panes[1]!.getBoundingClientRect().width).toBe(
+    workspace.getBoundingClientRect().width,
+  );
+  document.querySelector<HTMLButtonElement>("#pane-path button")!.click();
+  await new Promise(requestAnimationFrame);
+  const activeSource = document.querySelector<HTMLElement>(
+    '.reader-pane[data-pane-kind="source"]',
+  )!;
+  expect(activeSource.dataset.active).toBe("true");
+  expect(activeSource.getBoundingClientRect().width).toBe(
+    workspace.getBoundingClientRect().width,
+  );
   demo.dispose();
 });
 

@@ -46,7 +46,7 @@ export function startLinkedArticle(
     if (popup.sref !== detail.sref) {
       return;
     }
-    popup.removeAttribute("open");
+    close();
     status.textContent =
       detail.error instanceof Error
         ? detail.error.message

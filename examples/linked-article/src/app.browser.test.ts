@@ -99,13 +99,14 @@ test("enhances keyboard activation but preserves modifier navigation", async () 
 
 test("shows failures instead of success-shaped fallback", async () => {
   const [anchor] = renderArticle();
+  const fetch = vi.fn(async () => {
+    throw new TypeError("fixture network unavailable");
+  });
   const app = startLinkedArticle(
     document,
     createSefariaClient({
       cache: false,
-      fetch: vi.fn(async () => {
-        throw new TypeError("fixture network unavailable");
-      }),
+      fetch,
     }),
   );
 
@@ -116,6 +117,10 @@ test("shows failures instead of success-shaped fallback", async () => {
   );
   await vi.waitFor(() => expect(status?.getAttribute("role")).toBe("alert"));
   expect(status?.textContent).toContain("fixture network unavailable");
+  expect(popup?.open).toBe(false);
+  await popup?.updateComplete;
+  anchor!.click();
+  await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
   expect(popup?.open).toBe(false);
   app.destroy();
 });

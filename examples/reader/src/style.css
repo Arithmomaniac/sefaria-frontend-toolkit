@@ -272,8 +272,11 @@ sefaria-reader {
 
   .reader-pane {
     display: none;
-    flex-basis: 100%;
     min-width: 0;
+  }
+
+  #workspace[data-pane-count] .reader-pane[data-pane-kind] {
+    flex-basis: 100%;
   }
 
   .reader-pane[data-active="true"] {
