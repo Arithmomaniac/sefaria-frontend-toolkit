@@ -1,12 +1,10 @@
 import { createSefariaClient } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 import type {
-  BilingualSegmentController,
   BilingualSegmentRequest,
+  SefariaAcquisition,
   SefariaBilingualSegment,
 } from "@arithmomaniac/sefaria-web-components";
-import { bindBilingualSegmentController } from "@arithmomaniac/sefaria-web-components/bindings";
-import { createBilingualSegmentController } from "@arithmomaniac/sefaria-web-components/bilingual-segment";
 
 /** Controls the interactive live bilingual-segment demonstration. */
 export interface BilingualSegmentLiveDemo {
@@ -17,9 +15,10 @@ export interface BilingualSegmentLiveDemo {
 /** Connects the demo form, presets, and display controls to the production factory. */
 export function startBilingualSegmentLiveDemo(
   root: Document,
-  controller: BilingualSegmentController = createBilingualSegmentController(
-    createSefariaClient(),
-  ),
+  acquisition: SefariaAcquisition = {
+    kind: "client",
+    client: createSefariaClient(),
+  },
 ): BilingualSegmentLiveDemo {
   const form = requireElement<HTMLFormElement>(root, "#bilingual-request-form");
   const trefInput = requireNamedInput(form, "tref");
@@ -39,7 +38,12 @@ export function startBilingualSegmentLiveDemo(
     root,
     "#bilingual-result",
   );
-  bindBilingualSegmentController(result, controller);
+  let activeLoad = 0;
+  let acquisitionError: unknown;
+  result.addEventListener("sefaria-bilingual-segment-error", (event) => {
+    acquisitionError = (event as CustomEvent<{ readonly error: unknown }>)
+      .detail.error;
+  });
 
   const applyDisplaySettings = (): void => {
     const values = new FormData(displayForm);
@@ -57,37 +61,35 @@ export function startBilingualSegmentLiveDemo(
       primaryTitleInput.value,
       translationTitleInput.value,
     );
+    const loadId = ++activeLoad;
 
     requestState.dataset.state = "loading";
     requestState.textContent = `Loading ${formatRequest(request)} from Sefaria.`;
     hostError.hidden = true;
     hostError.textContent = "";
     submitButton.disabled = true;
+    acquisitionError = undefined;
+    result.acquisition = acquisition;
+    result.primaryVersionTitle = request.primary?.versionTitle;
+    result.translationVersionTitle = request.translation?.versionTitle;
+    result.sref = request.tref;
 
-    try {
-      const viewModel = await controller.load(request);
-      if (controller.snapshot.result?.viewModel !== viewModel) {
-        return;
-      }
-      requestState.dataset.state = viewModel.state;
-      requestState.textContent = `${formatRequest(request)} produced ${viewModel.state}.`;
-    } catch (error) {
-      if (
-        controller.snapshot.attempt.state !== "failed" ||
-        controller.snapshot.attempt.error !== error
-      ) {
-        return;
-      }
+    await waitForTerminalStatus(result, loadId, () => activeLoad);
+    if (loadId !== activeLoad) return;
+
+    if (acquisitionError === undefined) {
+      requestState.dataset.state = result.status;
+      requestState.textContent = `${formatRequest(request)} produced ${result.status}.`;
+    } else if (acquisitionError !== undefined) {
       requestState.dataset.state = "error";
       requestState.textContent = `${formatRequest(request)} could not complete.`;
       hostError.hidden = false;
       hostError.textContent =
-        error instanceof Error ? error.message : String(error);
-    } finally {
-      if (controller.snapshot.attempt.state !== "loading") {
-        submitButton.disabled = false;
-      }
+        acquisitionError instanceof Error
+          ? acquisitionError.message
+          : String(acquisitionError);
     }
+    submitButton.disabled = false;
   };
 
   form.addEventListener("submit", (event) => {
@@ -108,6 +110,18 @@ export function startBilingualSegmentLiveDemo(
         preset.dataset.translationVersionTitle ?? "";
       form.requestSubmit();
     });
+  }
+
+  async function waitForTerminalStatus(
+    result: SefariaBilingualSegment,
+    loadId: number,
+    activeLoad: () => number,
+  ): Promise<void> {
+    await result.updateComplete;
+    while (loadId === activeLoad() && result.status === "loading") {
+      await new Promise((resolve) => setTimeout(resolve));
+      await result.updateComplete;
+    }
   }
 
   return { loadCurrentRequest };

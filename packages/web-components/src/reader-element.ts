@@ -12,10 +12,37 @@ import type {
   BilingualPairLayout,
   BilingualPairSideOrder,
 } from "./bilingual-pair.js";
+import type { SefariaAcquisition } from "./acquisition.js";
+import { resolveSefariaAcquisition } from "./acquisition-state.js";
+import { bindReaderController } from "./bindings.js";
+import {
+  getPreparedState,
+  getPreparedStatus,
+  prepared,
+  setPreparedState,
+} from "./prepared-state.js";
 import "./connections-panel-element.js";
+import {
+  createCapabilityReaderDataSource,
+  createReaderController,
+  createReaderEntrySeedFromRawData,
+  createSefariaReaderDataSource,
+  loadReaderControllerProgressively,
+  type ReaderController,
+  type ReaderControllerDataSource,
+  type ReaderControllerSuspension,
+} from "./reader-controller.js";
+import type { ReaderPresentationPatch } from "./reader-session.js";
 import "./source-card-element.js";
-import { SefariaElement } from "./sefaria-element.js";
-import type { ReaderPane, ReaderViewModel } from "./reader.js";
+import {
+  SefariaElement,
+  type SefariaElementStatus,
+} from "./sefaria-element.js";
+import type {
+  ReaderPane,
+  ReaderRawSeedData,
+  ReaderViewModel,
+} from "./reader.js";
 import { assertVocalizationMode } from "./vocalization-display.js";
 
 interface SourceSelectDetail {
@@ -37,7 +64,7 @@ interface ConnectionSelectDetail {
 }
 
 /**
- * Request-free controlled reader surface for one semantic reader entry.
+ * Controlled or declarative reader surface for one semantic reader entry.
  *
  * @slot toolbar-actions - Host-owned actions placed after the Reader's built-in toolbar controls.
  * @csspart toolbar - Container for compact pane and host action controls.
@@ -48,7 +75,9 @@ interface ConnectionSelectDetail {
 export class SefariaReader extends SefariaElement {
   /** Lit property metadata for host-supplied rendering and interaction state. */
   static override properties = {
-    viewModel: { attribute: false },
+    sref: { type: String },
+    data: { attribute: false },
+    acquisition: { attribute: false },
     activePane: { type: String, attribute: "active-pane" },
     chatExport: { type: Boolean, attribute: "chat-export" },
     contentLanguage: { type: String, attribute: "content-language" },
@@ -57,11 +86,6 @@ export class SefariaReader extends SefariaElement {
     showConnectionPreviews: {
       type: Boolean,
       attribute: "show-connection-previews",
-    },
-    rootLoading: {
-      type: Boolean,
-      attribute: "root-loading",
-      reflect: true,
     },
     vocalizationMode: { type: String, attribute: "vocalization-mode" },
   };
@@ -352,8 +376,12 @@ export class SefariaReader extends SefariaElement {
     `,
   ];
 
-  /** Host-supplied reader rendering state. */
-  declare viewModel: ReaderViewModel | undefined;
+  /** Requested external Reader root, separate from current navigation. */
+  declare sref: string;
+  /** Transactional unknown raw Reader seed. */
+  declare data: ReaderRawSeedData | undefined;
+  /** Optional element-specific acquisition source. */
+  declare acquisition: SefariaAcquisition | undefined;
   /** Host-controlled pane selected in compact presentation. */
   declare activePane: ReaderPane;
   /** Shows an explicit host-mediated chat export action when a target exists. */
@@ -366,39 +394,162 @@ export class SefariaReader extends SefariaElement {
   declare sideOrder: BilingualPairSideOrder;
   /** Whether captured connection previews are visible. */
   declare showConnectionPreviews: boolean;
-  /** Shows host-controlled root loading without replacing committed content. */
-  declare rootLoading: boolean;
   /** Hebrew vocalization preset applied to source and preview text. */
   declare vocalizationMode: VocalizationMode;
 
+  #controller: ReaderController | undefined;
+  #unbind: (() => void) | undefined;
+  #errorUnsubscribe: (() => void) | undefined;
+  #initial:
+    | {
+        readonly id: number;
+        readonly controller: AbortController;
+        readonly presentation: ReaderPresentationPatch;
+      }
+    | undefined;
+  #rootPresentation: ReaderPresentationPatch | undefined;
+  #nextOperationId = 1;
+  #requestedRoot = "";
+  #acquisitionOverride: SefariaAcquisition | undefined;
+  #suspension: ReaderControllerSuspension | undefined;
+  #resumeInitial = false;
+  #declarativeActive = false;
+  #processedData: ReaderRawSeedData | undefined;
+  #seedCommitted = false;
+  #readerError: string | undefined;
+  #rootLoading = false;
+  #renderedEntryId: string | undefined;
+
   constructor() {
     super();
+    this.sref = "";
+    this.data = undefined;
+    this.acquisition = undefined;
     this.activePane = "source";
     this.chatExport = false;
     this.contentLanguage = "both";
     this.layout = "auto";
     this.sideOrder = "primary-first";
     this.showConnectionPreviews = true;
-    this.rootLoading = false;
     this.vocalizationMode = "taamim_and_nikkud";
+  }
+
+  override connectedCallback(): void {
+    super.connectedCallback();
+    queueMicrotask(() => {
+      if (!this.isConnected) return;
+      if (this.#suspension !== undefined && this.#controller !== undefined) {
+        const suspension = this.#suspension;
+        this.#suspension = undefined;
+        this.#resumeInitial = false;
+        void this.#resume(suspension);
+        return;
+      }
+      if (this.#resumeInitial) {
+        this.#resumeInitial = false;
+        this.#reconcile(true);
+        return;
+      }
+      this.#reconcile(false, false);
+    });
+  }
+
+  override disconnectedCallback(): void {
+    if (this.#initial !== undefined) {
+      this.#initial.controller.abort(
+        new DOMException("Reader disconnected.", "AbortError"),
+      );
+      this.#initial = undefined;
+      this.#resumeInitial = this.#controller === undefined;
+    }
+    if (this.#controller !== undefined) {
+      this.#suspension = this.#controller.suspend();
+    }
+    super.disconnectedCallback();
+  }
+
+  /** Coarse Reader lifecycle state without exposing prepared rendering data. */
+  get status(): SefariaElementStatus {
+    const preparedStatus = getPreparedStatus(this);
+    if (preparedStatus !== undefined) return preparedStatus;
+    if (this.#readerError !== undefined) return "error";
+    if (this.#rootLoading) return "loading";
+    return this.#viewModel === undefined ? "empty" : "ready";
+  }
+
+  /** Stable identity of the current retained semantic Reader entry. */
+  get currentEntryId(): string | undefined {
+    return this.#viewModel?.currentEntryId;
+  }
+
+  /** Exact selected canonical target, when the current entry establishes one. */
+  get selectedRef(): string | undefined {
+    return this.#viewModel?.selectedTarget?.ref;
+  }
+
+  /** Whether a root source request is currently pending. */
+  get rootLoading(): boolean {
+    return this.#rootLoading;
+  }
+
+  /** Current Reader failure message, when the latest eligible operation failed. */
+  get readerError(): string | undefined {
+    return this.#readerError;
+  }
+
+  /** Whether Reader Back can activate a retained predecessor. */
+  get canGoBack(): boolean {
+    return this.#viewModel?.canGoBack ?? false;
+  }
+
+  /** Whether bounded retention removed older semantic history. */
+  get historyTruncated(): boolean {
+    return this.#viewModel?.historyTruncated ?? false;
+  }
+
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    if (
+      changed.has("sref") ||
+      changed.has("data") ||
+      changed.has("acquisition")
+    ) {
+      this.#reconcile(changed.has("acquisition"), changed.has("sref"));
+      return;
+    }
+    if (
+      changed.has("contentLanguage") ||
+      changed.has("layout") ||
+      changed.has("sideOrder") ||
+      changed.has("showConnectionPreviews") ||
+      changed.has("vocalizationMode")
+    ) {
+      this.#synchronizePresentation();
+    }
   }
 
   protected override render(): TemplateResult | typeof nothing {
     assertVocalizationMode(this.vocalizationMode);
-    const viewModel = this.viewModel;
+    const viewModel = this.#viewModel;
+    const rootLoading =
+      this.#rootLoading || getPreparedStatus(this) === "loading";
     if (viewModel === undefined) {
       return html`
+        ${
+          this.#readerError === undefined
+            ? nothing
+            : html`<p class="unavailable" role="alert">${this.#readerError}</p>`
+        }
         <p
           class="root-loading"
           data-initial="true"
           role="status"
           aria-live="polite"
-          ?hidden=${!this.rootLoading}
+          ?hidden=${!rootLoading}
         >
-          ${this.rootLoading ? "Opening Reader..." : nothing}
+          ${rootLoading ? "Opening Reader..." : nothing}
         </p>
         ${
-          this.rootLoading
+          rootLoading
             ? html`<div
                 class="initial-loading"
                 role="region"
@@ -456,10 +607,15 @@ export class SefariaReader extends SefariaElement {
           class="root-loading"
           role="status"
           aria-live="polite"
-          ?hidden=${!this.rootLoading}
+          ?hidden=${!rootLoading}
         >
-          ${this.rootLoading ? "Opening a new Reader location..." : nothing}
+          ${rootLoading ? "Opening a new Reader location..." : nothing}
         </p>
+        ${
+          this.#readerError === undefined
+            ? nothing
+            : html`<p class="unavailable" role="alert">${this.#readerError}</p>`
+        }
         <div class="actions" part="toolbar">
           <div class="pane-switch" role="group" aria-label="Reader panes">
             <button
@@ -493,7 +649,7 @@ export class SefariaReader extends SefariaElement {
           <slot name="toolbar-actions"></slot>
         </div>
       </header>
-      <div class="panes" aria-busy=${String(this.rootLoading)}>
+      <div class="panes" aria-busy=${String(rootLoading)}>
         <section
           class="pane"
           part="source-pane"
@@ -517,11 +673,12 @@ export class SefariaReader extends SefariaElement {
   }
 
   protected override updated(changed: PropertyValues<this>): void {
-    const previous = changed.get("viewModel");
+    super.updated(changed);
+    const currentEntryId = this.#viewModel?.currentEntryId;
     if (
-      previous !== undefined &&
-      this.viewModel !== undefined &&
-      previous.currentEntryId !== this.viewModel.currentEntryId
+      this.#renderedEntryId !== undefined &&
+      currentEntryId !== undefined &&
+      this.#renderedEntryId !== currentEntryId
     ) {
       requestAnimationFrame(() => {
         const heading = this.shadowRoot?.querySelector<HTMLElement>(
@@ -531,6 +688,291 @@ export class SefariaReader extends SefariaElement {
         heading?.scrollIntoView({ block: "nearest" });
       });
     }
+    this.#renderedEntryId = currentEntryId;
+  }
+
+  #reconcile(force: boolean, srefChanged = false): void {
+    if (!this.isConnected) return;
+    const requestedRoot = this.sref.trim();
+    if (this.data !== undefined) {
+      if (this.data !== this.#processedData) {
+        this.#processedData = this.data;
+        this.#transactData(this.data, requestedRoot, srefChanged);
+      }
+      return;
+    }
+    this.#processedData = undefined;
+    if (requestedRoot.length === 0) {
+      if (this.#seedCommitted) return;
+      if (this.#declarativeActive) this.#clearDeclarativeState();
+      return;
+    }
+    if (
+      !force &&
+      requestedRoot === this.#requestedRoot &&
+      (this.#controller !== undefined || this.#initial !== undefined)
+    ) {
+      return;
+    }
+
+    this.#declarativeActive = true;
+    this.#seedCommitted = false;
+    this.#setReaderError(undefined);
+    this.#requestedRoot = requestedRoot;
+    const acquisition = resolveSefariaAcquisition(this.acquisition);
+    if (acquisition.kind === "disabled") {
+      this.#publishError(
+        new Error("Standalone Sefaria acquisition is disabled."),
+        requestedRoot,
+      );
+      return;
+    }
+
+    if (
+      !force &&
+      this.#controller !== undefined &&
+      this.#acquisitionOverride === this.acquisition
+    ) {
+      void this.#replaceRoot(requestedRoot);
+      return;
+    }
+
+    this.#disposeController();
+    this.#acquisitionOverride = this.acquisition;
+    const dataSource =
+      acquisition.kind === "client"
+        ? createSefariaReaderDataSource(acquisition.client)
+        : createCapabilityReaderDataSource(acquisition.capability);
+    const active = {
+      id: this.#nextOperationId++,
+      controller: new AbortController(),
+      presentation: { ...this.#presentation() },
+    };
+    this.#initial = active;
+    this.#setRootLoading(true);
+    void loadReaderControllerProgressively(
+      { tref: requestedRoot },
+      dataSource,
+      (controller) => {
+        if (this.#initial !== active || !this.isConnected) {
+          controller.dispose();
+          return;
+        }
+        this.#attachController(controller);
+      },
+      {
+        signal: active.controller.signal,
+        presentation: active.presentation,
+      },
+      true,
+    )
+      .then(() => {
+        if (this.#initial === active) this.#initial = undefined;
+      })
+      .catch((error: unknown) => {
+        if (this.#initial !== active) return;
+        this.#initial = undefined;
+        if (active.controller.signal.aborted) return;
+        this.#setRootLoading(false);
+        this.#publishError(error, requestedRoot);
+      });
+  }
+
+  #transactData(
+    data: ReaderRawSeedData,
+    requestedRoot: string,
+    srefChanged: boolean,
+  ): void {
+    const initial = this.#initial;
+    this.#initial = undefined;
+    initial?.controller.abort(
+      new DOMException("Superseded by supplied Reader data.", "AbortError"),
+    );
+    this.#setRootLoading(false);
+    try {
+      const admitted = createReaderEntrySeedFromRawData(data);
+      if (
+        srefChanged &&
+        requestedRoot.length > 0 &&
+        admitted.sourceRequest !== undefined &&
+        admitted.sourceRequest.tref !== requestedRoot
+      ) {
+        throw new TypeError(
+          `Reader data source request ${admitted.sourceRequest.tref} conflicts with sref ${requestedRoot}.`,
+        );
+      }
+      const controller = createReaderController(
+        {
+          ...admitted.seed,
+          presentation: {
+            ...this.#presentation(),
+            ...admitted.seed.presentation,
+          },
+        },
+        this.#createLazyDataSource(),
+      );
+      this.#declarativeActive = true;
+      this.#seedCommitted = true;
+      this.#setReaderError(undefined);
+      this.#requestedRoot = requestedRoot || admitted.sourceRequest?.tref || "";
+      this.#acquisitionOverride = this.acquisition;
+      this.#attachController(controller);
+      if (admitted.continueConnections) {
+        const selectedRef = admitted.selectedRef;
+        if (selectedRef === undefined) {
+          throw new Error(
+            "Reader source seed did not establish a selected reference.",
+          );
+        }
+        void controller.loadInitialConnections(
+          { tref: selectedRef, withText: true },
+          {},
+          new AbortController().signal,
+        );
+      }
+    } catch (error) {
+      this.#publishError(error, requestedRoot);
+    }
+  }
+
+  #createLazyDataSource(): ReaderControllerDataSource {
+    return {
+      loadSource: async (request, signal) =>
+        await this.#resolveDataSource().loadSource(request, signal),
+      loadConnections: async (request, projection, signal) =>
+        await this.#resolveDataSource().loadConnections(
+          request,
+          projection,
+          signal,
+        ),
+    };
+  }
+
+  #resolveDataSource(): ReaderControllerDataSource {
+    const acquisition = resolveSefariaAcquisition(this.acquisition);
+    if (acquisition.kind === "disabled") {
+      throw new Error("Standalone Sefaria acquisition is disabled.");
+    }
+    return acquisition.kind === "client"
+      ? createSefariaReaderDataSource(acquisition.client)
+      : createCapabilityReaderDataSource(acquisition.capability);
+  }
+
+  async #replaceRoot(sref: string): Promise<void> {
+    const controller = this.#controller;
+    if (controller === undefined) return;
+    const presentation = { ...this.#presentation() };
+    this.#rootPresentation = presentation;
+    try {
+      await controller.replaceRoot({ tref: sref }, { presentation });
+    } catch (error) {
+      this.#publishError(error, sref);
+    } finally {
+      if (this.#rootPresentation === presentation) {
+        this.#rootPresentation = undefined;
+      }
+    }
+  }
+
+  async #resume(suspension: ReaderControllerSuspension): Promise<void> {
+    const controller = this.#controller;
+    if (controller === undefined || !this.isConnected) return;
+    try {
+      await controller.resume(suspension);
+    } catch (error) {
+      this.#publishError(error, this.#requestedRoot);
+    }
+  }
+
+  #attachController(controller: ReaderController): void {
+    if (this.#controller === controller) return;
+    this.#disposeController();
+    this.#controller = controller;
+    this.#unbind = bindReaderController(this, controller);
+    this.#errorUnsubscribe = controller.subscribe((snapshot) => {
+      this.#setReaderError(
+        snapshot.task.state === "error" ? snapshot.task.message : undefined,
+      );
+      this.#setRootLoading(snapshot.task.state === "loading-source");
+    });
+  }
+
+  #presentation() {
+    return {
+      contentLanguage: this.contentLanguage,
+      layout: this.layout,
+      sideOrder: this.sideOrder,
+      showConnectionPreviews: this.showConnectionPreviews,
+      vocalizationMode: this.vocalizationMode,
+    } as const;
+  }
+
+  #synchronizePresentation(): void {
+    const next = this.#presentation();
+    if (this.#initial !== undefined) {
+      Object.assign(this.#initial.presentation, next);
+    }
+    if (this.#rootPresentation !== undefined) {
+      Object.assign(this.#rootPresentation, next);
+    }
+    const controller = this.#controller;
+    const currentEntryId = controller?.snapshot.reader.currentEntryId;
+    if (controller === undefined || currentEntryId === undefined) return;
+    const current = controller.snapshot.presentation;
+    if (
+      current.contentLanguage === next.contentLanguage &&
+      current.layout === next.layout &&
+      current.sideOrder === next.sideOrder &&
+      current.showConnectionPreviews === next.showConnectionPreviews &&
+      current.vocalizationMode === next.vocalizationMode
+    ) {
+      return;
+    }
+    controller.setPresentation({
+      originEntryId: currentEntryId,
+      patch: next,
+    });
+  }
+
+  #clearDeclarativeState(): void {
+    this.#initial?.controller.abort(
+      new DOMException("Reader inputs were cleared.", "AbortError"),
+    );
+    this.#initial = undefined;
+    this.#disposeController();
+    this.#requestedRoot = "";
+    this.#acquisitionOverride = undefined;
+    this.#suspension = undefined;
+    this.#resumeInitial = false;
+    this.#rootPresentation = undefined;
+    this.#declarativeActive = false;
+    this.#processedData = undefined;
+    this.#seedCommitted = false;
+    this.#setReaderError(undefined);
+    this.#setRootLoading(false);
+    setPreparedState(this, undefined);
+  }
+
+  #disposeController(): void {
+    this.#errorUnsubscribe?.();
+    this.#errorUnsubscribe = undefined;
+    this.#unbind?.();
+    this.#unbind = undefined;
+    this.#controller?.dispose();
+    this.#controller = undefined;
+  }
+
+  #publishError(error: unknown, sref: string): void {
+    this.#setReaderError(
+      error instanceof Error ? error.message : "Reader acquisition failed.",
+    );
+    this.dispatchEvent(
+      new CustomEvent("sefaria-reader-error", {
+        bubbles: true,
+        composed: true,
+        detail: { error, sref },
+      }),
+    );
   }
 
   #source(viewModel: ReaderViewModel): TemplateResult {
@@ -541,7 +983,7 @@ export class SefariaReader extends SefariaElement {
       </p>`;
     }
     return html`<sefaria-source-card
-      .viewModel=${source.viewModel}
+      ${prepared(source.viewModel)}
       .selectedPosition=${source.selectedPosition}
       .contentLanguage=${this.contentLanguage}
       .layout=${this.layout}
@@ -569,7 +1011,7 @@ export class SefariaReader extends SefariaElement {
       </p>`;
     }
     return html`<sefaria-connections-panel
-      .viewModel=${connections.viewModel}
+      ${prepared(connections.viewModel)}
       .showPreviews=${this.showConnectionPreviews}
       .vocalizationMode=${this.vocalizationMode}
       @sefaria-connections-category-change=${this.#category}
@@ -594,7 +1036,10 @@ export class SefariaReader extends SefariaElement {
   }
 
   #activate(entryId: string): void {
-    this.#emit("sefaria-reader-history-activate", { entryId });
+    const label = this.#viewModel?.breadcrumbs.find(
+      (breadcrumb) => breadcrumb.entryId === entryId,
+    )?.label;
+    this.#emit("sefaria-reader-history-activate", { entryId, label });
   }
 
   #pane(pane: ReaderPane): void {
@@ -631,7 +1076,7 @@ export class SefariaReader extends SefariaElement {
   }
 
   #emit(name: string, detail: object): void {
-    const originEntryId = this.viewModel?.currentEntryId;
+    const originEntryId = this.#viewModel?.currentEntryId;
     if (originEntryId === undefined) return;
     this.dispatchEvent(
       new CustomEvent(name, {
@@ -641,6 +1086,23 @@ export class SefariaReader extends SefariaElement {
         cancelable: true,
       }),
     );
+  }
+
+  get #viewModel(): ReaderViewModel | undefined {
+    return getPreparedState<ReaderViewModel>(this);
+  }
+
+  #setReaderError(error: string | undefined): void {
+    if (this.#readerError === error) return;
+    this.#readerError = error;
+    this.requestUpdate();
+  }
+
+  #setRootLoading(loading: boolean): void {
+    if (this.#rootLoading === loading) return;
+    this.#rootLoading = loading;
+    this.toggleAttribute("root-loading", loading);
+    this.requestUpdate();
   }
 }
 

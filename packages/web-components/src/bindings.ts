@@ -31,6 +31,7 @@ import type {
   TextSegmentController,
   TextSegmentControllerSnapshot,
 } from "./text-segment.js";
+import { setPreparedState, setPreparedStatus } from "./prepared-state.js";
 
 const activeBindings = new WeakMap<EventTarget, object>();
 
@@ -91,7 +92,7 @@ export function bindPopupController(
     binding,
     () =>
       controller.subscribe((snapshot) => {
-        element.viewModel = popupViewModel(snapshot);
+        setPreparedState(element, popupViewModel(snapshot));
       }),
     listeners,
   );
@@ -152,7 +153,7 @@ export function bindConnectionsController(
     binding,
     () =>
       controller.subscribe((snapshot) => {
-        element.viewModel = connectionsViewModel(snapshot);
+        setPreparedState(element, connectionsViewModel(snapshot));
       }),
     listeners,
   );
@@ -174,13 +175,16 @@ export function bindReaderController(
       activePane = "source";
     }
     currentEntryId = snapshot.reader.currentEntryId;
-    element.viewModel = snapshot.reader;
+    setPreparedState(element, snapshot.reader);
+    setPreparedStatus(
+      element,
+      snapshot.task.state === "loading-source" ? "loading" : undefined,
+    );
     element.contentLanguage = snapshot.presentation.contentLanguage;
     element.layout = snapshot.presentation.layout;
     element.sideOrder = snapshot.presentation.sideOrder;
     element.showConnectionPreviews =
       snapshot.presentation.showConnectionPreviews;
-    element.rootLoading = snapshot.task.state === "loading-source";
     element.vocalizationMode = snapshot.presentation.vocalizationMode;
     element.activePane = activePane;
   };
@@ -261,7 +265,7 @@ export function bindReaderController(
     () => controller.subscribe(render),
     listeners,
     () => {
-      element.rootLoading = false;
+      setPreparedStatus(element, undefined);
     },
   );
 }
@@ -279,15 +283,17 @@ function bindViewModel<
   select: (snapshot: TSnapshot) => TViewModel | undefined,
 ): () => void {
   const binding = reserveBinding(element);
-  const target = element as TElement & {
-    viewModel: TViewModel | undefined;
-  };
   return activateBinding(
     element,
     binding,
     () =>
       controller.subscribe((snapshot) => {
-        target.viewModel = select(snapshot);
+        setPreparedState(
+          element as TElement & {
+            requestUpdate(): void;
+          },
+          select(snapshot),
+        );
       }),
     [],
   );

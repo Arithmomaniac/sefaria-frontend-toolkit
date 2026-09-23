@@ -18,7 +18,7 @@ applyTo: "**/*.md"
 - Mark behavior as current, planned, observed, or superseded.
 - Treat corrected generated declarations as the field-level API reference.
 - Do not duplicate complete generated interfaces in specifications or READMEs.
-- Make component view models the rendering-data authority.
+- Make each component's private validated preparation the rendering-data authority; do not document public raw inputs as render-ready state.
 - Make diagrams identify external payloads, runtime dependencies, type-only dependencies, factory orchestration, and DOM rendering.
 - Distinguish current implementation paths from planned paths.
 - Do not put a mutable issue or delivery DAG in normative documents.

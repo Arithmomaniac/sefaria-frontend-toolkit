@@ -8,20 +8,16 @@ import type {
   ConnectionsRequest,
   SefariaConnectionsPanel,
   SefariaSourceCard,
-  SourceCardDataViewModel,
-  SourceCardNavigation,
-  SourceCardRequest,
 } from "@arithmomaniac/sefaria-web-components";
 import {
   createSefariaReaderDataSource,
-  type ReaderControllerDataSource,
-} from "@arithmomaniac/sefaria-web-components/reader-controller";
+  resolveReaderSource,
+} from "@arithmomaniac/sefaria-web-components/reader";
 import {
   createReaderSession,
-  type ReaderConnectionsContent,
-  type ReaderEntryView,
+  type ReaderConnectionsRecord,
+  type ReaderEntryInfo,
   type ReaderSession,
-  type ReaderSourceContent,
   type ReaderTransition,
 } from "@arithmomaniac/sefaria-web-components/reader-session";
 
@@ -69,13 +65,7 @@ export interface ReaderWorkspaceOptions {
   readonly maxPanes?: number;
 }
 
-interface SourceDestination {
-  readonly content: ReaderSourceContent;
-  readonly firstRef: string;
-  readonly selectedPosition: readonly number[];
-}
-
-interface PaneBinding {
+interface PanePin {
   readonly pinId: string;
 }
 
@@ -95,22 +85,22 @@ export function startReaderWorkspace(
   const status = requireElement<HTMLElement>(root, "#status");
   const hostError = requireElement<HTMLElement>(root, "#host-error");
   const workspace = requireElement<HTMLElement>(root, "#workspace");
-  const dataSource: ReaderControllerDataSource =
-    createSefariaReaderDataSource(client);
+  const dataSource = createSefariaReaderDataSource(client);
 
   let session: ReaderSession | undefined;
   let spatial: WorkspaceState | undefined;
-  let bindings = new Map<string, PaneBinding>();
-  let controller: AbortController | undefined;
+  let panePins = new Map<string, PanePin>();
+  let activeAbort: AbortController | undefined;
   let generation = 0;
   let pendingOperationId: string | undefined;
+  const connectionsErrors = new Map<string, string>();
   workspace.dataset.surface = "workspace";
 
   const currentView = (): ReaderWorkspaceView => ({
     panes: spatial?.panes ?? [],
     ...(session === undefined
       ? {}
-      : { currentEntryId: session.view.currentEntryId }),
+      : { currentEntryId: session.state.currentEntryId }),
   });
 
   const clearError = (): void => {
@@ -125,8 +115,8 @@ export function startReaderWorkspace(
   };
 
   const cancelActive = (): void => {
-    controller?.abort();
-    controller = undefined;
+    activeAbort?.abort();
+    activeAbort = undefined;
     generation += 1;
     if (session && pendingOperationId) {
       session = session.cancelOperation(pendingOperationId).session;
@@ -139,20 +129,20 @@ export function startReaderWorkspace(
     completedGeneration: number,
   ): void => {
     if (
-      controller === completedController &&
+      activeAbort === completedController &&
       generation === completedGeneration
     ) {
-      controller = undefined;
+      activeAbort = undefined;
     }
   };
 
   const releasePanes = (panes: readonly WorkspacePane[]): void => {
     if (!session) return;
     for (const pane of panes) {
-      const binding = bindings.get(pane.id);
-      if (!binding) continue;
-      session = session.release(binding.pinId).session;
-      bindings.delete(pane.id);
+      const pin = panePins.get(pane.id);
+      if (!pin) continue;
+      session = session.release(pin.pinId).session;
+      panePins.delete(pane.id);
     }
   };
 
@@ -160,7 +150,7 @@ export function startReaderWorkspace(
     if (!session) throw new Error("Reader session is not initialized.");
     const pinned = requireApplied(session.pin(pane.entryId));
     session = pinned.session;
-    bindings.set(pane.id, { pinId: pinned.value.pinId });
+    panePins.set(pane.id, { pinId: pinned.value.pinId });
   };
 
   const pruneAfter = (paneId: string): void => {
@@ -171,7 +161,7 @@ export function startReaderWorkspace(
   };
 
   const activateEntry = (entryId: string): void => {
-    if (!session || session.view.currentEntryId === entryId) return;
+    if (!session || session.state.currentEntryId === entryId) return;
     session = requireApplied(session.activate(entryId)).session;
   };
 
@@ -185,10 +175,12 @@ export function startReaderWorkspace(
     workspace.dataset.paneCount = String(spatial.panes.length);
     workspace.replaceChildren();
     for (const pane of spatial.panes) {
-      const entry = session.view.entries.find(
-        (candidate) => candidate.id === pane.entryId,
-      );
-      if (!entry) continue;
+      let entry: ReaderEntryInfo;
+      try {
+        entry = session.entryInfo(pane.entryId);
+      } catch {
+        continue;
+      }
       panePath.append(createPathButton(pane, entry));
       workspace.append(createPane(pane, entry));
     }
@@ -199,7 +191,7 @@ export function startReaderWorkspace(
 
   const createPathButton = (
     pane: WorkspacePane,
-    entry: ReaderEntryView,
+    entry: ReaderEntryInfo,
   ): HTMLButtonElement => {
     const button = document.createElement("button");
     button.type = "button";
@@ -215,7 +207,7 @@ export function startReaderWorkspace(
 
   const createPane = (
     pane: WorkspacePane,
-    entry: ReaderEntryView,
+    entry: ReaderEntryInfo,
   ): HTMLElement => {
     const section = document.createElement("section");
     section.className = "reader-pane";
@@ -254,9 +246,10 @@ export function startReaderWorkspace(
 
   const createSourceElement = (
     pane: WorkspacePane,
-    entry: ReaderEntryView,
+    entry: ReaderEntryInfo,
   ): HTMLElement => {
-    if (!entry.source) {
+    const record = session?.sourceRecord(entry.entryId);
+    if (!record) {
       const message = document.createElement("p");
       message.className = "pane-message";
       message.setAttribute("role", "status");
@@ -266,13 +259,13 @@ export function startReaderWorkspace(
     const source = document.createElement(
       "sefaria-source-card",
     ) as SefariaSourceCard;
-    source.viewModel = entry.source.viewModel;
+    source.data = record.payload;
     source.selectedPosition = entry.selectedPosition;
     source.contentLanguage = entry.presentation.contentLanguage;
     source.layout = entry.presentation.layout;
     source.sideOrder = entry.presentation.sideOrder;
     source.vocalizationMode = entry.presentation.vocalizationMode;
-    source.selectable = entry.source.viewModel.state === "data";
+    source.selectable = true;
     source.addEventListener("sefaria-source-select", (event) => {
       const detail = (
         event as CustomEvent<{
@@ -287,22 +280,32 @@ export function startReaderWorkspace(
 
   const createConnectionsElement = (
     pane: WorkspacePane,
-    entry: ReaderEntryView,
+    entry: ReaderEntryInfo,
   ): HTMLElement => {
-    if (entry.connections?.state === "unavailable") {
+    if (entry.connections === "failed" || entry.connections === "interrupted") {
       const message = document.createElement("p");
       message.className = "pane-message";
       message.setAttribute(
         "role",
-        entry.connections.reason === "failed" ? "alert" : "status",
+        entry.connections === "failed" ? "alert" : "status",
       );
-      message.textContent = entry.connections.message;
+      message.textContent =
+        entry.connections === "failed"
+          ? (connectionsErrors.get(entry.entryId) ??
+            "Connections could not be loaded.")
+          : "Connections loading was interrupted.";
       return message;
     }
     const connections = document.createElement(
       "sefaria-connections-panel",
     ) as SefariaConnectionsPanel;
-    connections.viewModel = entry.connections?.viewModel;
+    const record = session?.connectionsRecord(entry.entryId);
+    if (record !== undefined) {
+      connections.data = record.payload;
+    }
+    const projection = record?.projection;
+    connections.category = projection?.category;
+    connections.page = projection?.page ?? 0;
     connections.showPreviews = entry.presentation.showConnectionPreviews;
     connections.vocalizationMode = entry.presentation.vocalizationMode;
     connections.addEventListener(
@@ -317,10 +320,8 @@ export function startReaderWorkspace(
     connections.addEventListener("sefaria-connections-page-change", (event) => {
       const page = (event as CustomEvent<{ readonly page: number }>).detail
         .page;
-      const category =
-        entry.connections?.state === "view"
-          ? entry.connections.projection.category
-          : undefined;
+      const category = session?.connectionsRecord(entry.entryId)?.projection
+        .category;
       projectConnections(pane, {
         ...(category === undefined ? {} : { category }),
         page,
@@ -373,12 +374,13 @@ export function startReaderWorkspace(
     pendingOperationId = begun.value.operationId;
     addPinnedConnectionsPane(sourcePaneId, entryId);
     render();
-    let content: ReaderConnectionsContent;
+    let record: ReaderConnectionsRecord;
     try {
-      content = await dataSource.loadConnections(request, {}, signal);
+      record = await dataSource.loadConnections(request, {}, signal);
     } catch (error) {
       if (!signal.aborted && expectedGeneration === generation) {
         const message = error instanceof Error ? error.message : String(error);
+        connectionsErrors.set(entryId, message);
         session = session.failConnections(
           begun.value.operationId,
           message,
@@ -391,89 +393,14 @@ export function startReaderWorkspace(
     if (signal.aborted || expectedGeneration !== generation) return;
     const completed = session.completeConnections(
       begun.value.operationId,
-      content,
+      record,
     );
     session = completed.session;
     pendingOperationId = undefined;
     if (completed.state === "rejected") throw new Error(completed.message);
+    connectionsErrors.delete(entryId);
     status.textContent = `Showing connections for ${ref}.`;
     render();
-  };
-
-  const loadSource = async (
-    request: SourceCardRequest,
-    signal: AbortSignal,
-  ): Promise<ReaderSourceContent> => dataSource.loadSource(request, signal);
-
-  const requireNavigable = (
-    content: ReaderSourceContent,
-    label: string,
-  ): {
-    readonly viewModel: SourceCardDataViewModel;
-    readonly navigation: Exclude<
-      SourceCardNavigation,
-      { readonly state: "unavailable" }
-    >;
-  } => {
-    const viewModel = content.viewModel;
-    if (viewModel.state !== "data" || !viewModel.navigation) {
-      throw new Error(`${label} did not produce selectable source data.`);
-    }
-    if (viewModel.navigation.state === "unavailable") {
-      throw new Error(viewModel.navigation.message);
-    }
-    return { viewModel, navigation: viewModel.navigation };
-  };
-
-  const loadDestination = async (
-    targetRef: string,
-    signal: AbortSignal,
-    onEffectiveRequest?: (request: SourceCardRequest) => void,
-  ): Promise<SourceDestination> => {
-    const target = await loadSource({ tref: targetRef }, signal);
-    const targetData = requireNavigable(target, targetRef);
-    const selectedRef = targetData.viewModel.items.find(
-      (item) => item.ref === targetRef,
-    )?.ref;
-    let content = target;
-    let navigation = targetData.navigation;
-    if (navigation.state === "context-required") {
-      const contextRef = navigation.contextRef;
-      const request = { tref: contextRef };
-      onEffectiveRequest?.(request);
-      content = await loadSource(request, signal);
-      navigation = requireAvailable(
-        requireNavigable(content, contextRef).navigation,
-        contextRef,
-      );
-    } else if (targetData.viewModel.header.ref !== navigation.sectionRef) {
-      const sectionRef = navigation.sectionRef;
-      const request = { tref: sectionRef };
-      onEffectiveRequest?.(request);
-      content = await loadSource(request, signal);
-      navigation = requireAvailable(
-        requireNavigable(content, sectionRef).navigation,
-        sectionRef,
-      );
-    } else {
-      onEffectiveRequest?.(target.request);
-    }
-    const available = requireAvailable(navigation, targetRef);
-    const sourceData = requireNavigable(content, targetRef).viewModel;
-    const exactSelectedRef = selectedRef ?? available.firstRef;
-    const selected = sourceData.items.find(
-      (item) => item.ref === exactSelectedRef,
-    );
-    if (!selected) {
-      throw new Error(
-        `${exactSelectedRef} is not selectable in ${sourceData.header.ref}.`,
-      );
-    }
-    return {
-      content,
-      firstRef: exactSelectedRef,
-      selectedPosition: selected.position,
-    };
   };
 
   const navigate = async (
@@ -483,12 +410,13 @@ export function startReaderWorkspace(
     cancelActive();
     const currentGeneration = generation;
     const currentController = new AbortController();
-    controller = currentController;
+    activeAbort = currentController;
     clearError();
     status.textContent = `Opening ${targetRef}.`;
     try {
-      const destination = await loadDestination(
-        targetRef.trim(),
+      const destination = await resolveReaderSource(
+        { tref: targetRef.trim() },
+        dataSource,
         currentController.signal,
       );
       if (
@@ -499,17 +427,20 @@ export function startReaderWorkspace(
       }
       releasePanes(spatial?.panes ?? []);
       session = createReaderSession({
-        source: destination.content,
-        selectedPosition: destination.selectedPosition,
+        source: {
+          record: destination.record,
+          selectedPosition: destination.selectedPosition,
+        },
         presentation: {
           vocalizationMode: readVocalizationMode(vocalizationMode.value),
         },
       });
+      connectionsErrors.clear();
       spatial = createWorkspaceState(
-        session.view.currentEntryId,
+        session.state.currentEntryId,
         options.maxPanes,
       );
-      bindings = new Map();
+      panePins = new Map();
       pinPane(spatial.panes[0]!);
       tref.value = targetRef.trim();
       render();
@@ -520,8 +451,8 @@ export function startReaderWorkspace(
       }
       await loadConnections(
         spatial.panes[0]!.id,
-        session.view.currentEntryId,
-        destination.firstRef,
+        session.state.currentEntryId,
+        destination.selectedRef,
         currentGeneration,
         currentController.signal,
       );
@@ -546,7 +477,7 @@ export function startReaderWorkspace(
     cancelActive();
     const currentGeneration = generation;
     const currentController = new AbortController();
-    controller = currentController;
+    activeAbort = currentController;
     clearError();
     const sourcePane = [...spatial.panes]
       .reverse()
@@ -556,27 +487,11 @@ export function startReaderWorkspace(
     if (!sourcePane) throw new Error("Connection origin source was removed.");
     requirePaneCapacity(1);
     activateEntry(originPane.entryId);
-    let sourceOperationId: string | undefined;
     try {
-      const destination = await loadDestination(
-        targetRef,
+      const destination = await resolveReaderSource(
+        { tref: targetRef },
+        dataSource,
         currentController.signal,
-        (request) => {
-          if (
-            currentController.signal.aborted ||
-            currentGeneration !== generation
-          ) {
-            return;
-          }
-          if (!session) throw new Error("Reader session was disposed.");
-          const begun = requireApplied(
-            session.beginSourceNavigation(originPane.entryId, request),
-          );
-          session = begun.session;
-          sourceOperationId = begun.value.operationId;
-          pendingOperationId = sourceOperationId;
-          render();
-        },
       );
       if (
         currentController.signal.aborted ||
@@ -584,13 +499,22 @@ export function startReaderWorkspace(
       ) {
         return;
       }
-      if (!sourceOperationId) {
-        throw new Error("Source navigation did not establish an operation.");
-      }
+      if (!session) throw new Error("Reader session was disposed.");
+      const begun = requireApplied(
+        session.beginSourceNavigation(
+          originPane.entryId,
+          destination.effectiveRequest,
+        ),
+      );
+      session = begun.session;
+      pendingOperationId = begun.value.operationId;
+      render();
       session = requireApplied(
-        session.completeSourceNavigation(sourceOperationId, {
-          source: destination.content,
-          selectedPosition: destination.selectedPosition,
+        session.completeSourceNavigation(begun.value.operationId, {
+          source: {
+            record: destination.record,
+            selectedPosition: destination.selectedPosition,
+          },
         }),
       ).session;
       pendingOperationId = undefined;
@@ -599,7 +523,7 @@ export function startReaderWorkspace(
       spatial = addSourcePane(
         spatial,
         sourcePane.id,
-        session.view.currentEntryId,
+        session.state.currentEntryId,
       );
       const childPane = spatial.panes.find(
         (pane) => pane.id === spatial?.activePaneId,
@@ -610,7 +534,7 @@ export function startReaderWorkspace(
       await loadConnections(
         childPane.id,
         childPane.entryId,
-        destination.firstRef,
+        destination.selectedRef,
         currentGeneration,
         currentController.signal,
       );
@@ -646,7 +570,7 @@ export function startReaderWorkspace(
     ).session;
     const currentGeneration = generation;
     const currentController = new AbortController();
-    controller = currentController;
+    activeAbort = currentController;
     render();
     try {
       await loadConnections(
@@ -727,7 +651,7 @@ export function startReaderWorkspace(
   const onVocalizationChange = (): void => {
     if (!session) return;
     session = requireApplied(
-      session.setPresentation(session.view.currentEntryId, {
+      session.setPresentation(session.state.currentEntryId, {
         vocalizationMode: readVocalizationMode(vocalizationMode.value),
       }),
     ).session;
@@ -744,7 +668,7 @@ export function startReaderWorkspace(
     closePane,
     cancelPending: () => {
       const hadPending =
-        controller !== undefined || pendingOperationId !== undefined;
+        activeAbort !== undefined || pendingOperationId !== undefined;
       cancelActive();
       if (!hadPending) return;
       render();
@@ -765,16 +689,6 @@ function readVocalizationMode(
   value: string,
 ): SefariaSourceCard["vocalizationMode"] {
   return value === "nikkud" || value === "none" ? value : "taamim_and_nikkud";
-}
-
-function requireAvailable(
-  navigation: Exclude<SourceCardNavigation, { readonly state: "unavailable" }>,
-  label: string,
-): Extract<SourceCardNavigation, { readonly state: "available" }> {
-  if (navigation.state !== "available") {
-    throw new Error(`${label} requires another contextual text request.`);
-  }
-  return navigation;
 }
 
 function requireApplied<T>(

@@ -401,7 +401,7 @@ test("drives the supported reader component through navigation and Back", async 
 
   expect(document.querySelectorAll("sefaria-reader")).toHaveLength(1);
   expect(document.querySelectorAll(".reader-pane")).toHaveLength(0);
-  expect(reader.viewModel?.breadcrumbs).toHaveLength(1);
+  expect(reader.canGoBack).toBe(false);
   const bookmark = reader.querySelector<HTMLButtonElement>(
     '[slot="toolbar-actions"]',
   )!;
@@ -423,22 +423,19 @@ test("drives the supported reader component through navigation and Back", async 
   );
   await vi.waitFor(() =>
     expect(
-      document.querySelector<SefariaReader>("sefaria-reader")?.viewModel
-        ?.currentEntryId,
+      document.querySelector<SefariaReader>("sefaria-reader")?.currentEntryId,
     ).toBe("entry-2"),
   );
   reader = document.querySelector<SefariaReader>("sefaria-reader")!;
   await reader.updateComplete;
 
-  expect(reader.viewModel?.breadcrumbs).toHaveLength(2);
+  expect(reader.canGoBack).toBe(true);
   reader.shadowRoot
     ?.querySelector<HTMLButtonElement>('[data-action="back"]')
     ?.click();
-  await vi.waitFor(() =>
-    expect(reader.viewModel?.currentEntryId).toBe("entry-1"),
-  );
+  await vi.waitFor(() => expect(reader.currentEntryId).toBe("entry-1"));
 
-  expect(reader.viewModel?.breadcrumbs).toHaveLength(1);
+  expect(reader.canGoBack).toBe(false);
   expect(requests).toEqual([
     "/api/v3/texts/Micah 6:8",
     "/api/links/Micah 6:8",
@@ -476,7 +473,7 @@ test("shows full initial loading before one persistent controlled Reader commits
     expect(reader.shadowRoot?.textContent).toContain("Opening Reader"),
   );
 
-  expect(reader.viewModel).toBeUndefined();
+  expect(reader.currentEntryId).toBeUndefined();
   const bookmark = reader.querySelector<HTMLButtonElement>(
     '[slot="toolbar-actions"]',
   )!;
@@ -493,8 +490,8 @@ test("shows full initial loading before one persistent controlled Reader commits
   await navigation;
   await reader.updateComplete;
 
-  expect(reader.rootLoading).toBe(false);
-  expect(reader.viewModel?.selectedTarget?.ref).toBe("Micah 6:8");
+  expect(reader.status).toBe("ready");
+  expect(reader.selectedRef).toBe("Micah 6:8");
   expect(bookmark.disabled).toBe(false);
   expect(bookmark.assignedSlot?.name).toBe("toolbar-actions");
   demo.dispose();
@@ -533,8 +530,8 @@ test("clears full loading when an initial load is aborted and its replacement fa
   await aborted;
   await reader.updateComplete;
 
-  expect(reader.rootLoading).toBe(false);
-  expect(reader.viewModel).toBeUndefined();
+  expect(reader.status).toBe("error");
+  expect(reader.currentEntryId).toBeUndefined();
   expect(reader.shadowRoot?.textContent).not.toContain("Opening Reader");
   expect(document.querySelector("#status")?.textContent).toBe(
     "Micah 6:8 could not be opened.",
@@ -598,8 +595,8 @@ test("replaces an external root on one persistent controlled Reader", async () =
       "Opening a new Reader location",
     ),
   );
-  expect(reader.viewModel?.currentEntryId).toBe("entry-1");
-  expect(reader.viewModel?.selectedTarget?.ref).toBe("Micah 6:8");
+  expect(reader.currentEntryId).toBe("entry-1");
+  expect(reader.selectedRef).toBe("Micah 6:8");
   const bookmark = reader.querySelector<HTMLButtonElement>(
     '[slot="toolbar-actions"]',
   )!;
@@ -612,10 +609,10 @@ test("replaces an external root on one persistent controlled Reader", async () =
   rejectPending(new TypeError("Source unavailable."));
   await failed;
   await reader.updateComplete;
-  expect(reader.rootLoading).toBe(false);
+  expect(reader.status).toBe("error");
   expect(bookmark.disabled).toBe(false);
-  expect(reader.viewModel?.currentEntryId).toBe("entry-1");
-  expect(reader.viewModel?.selectedTarget?.ref).toBe("Micah 6:8");
+  expect(reader.currentEntryId).toBe("entry-1");
+  expect(reader.selectedRef).toBe("Micah 6:8");
   expect(document.querySelector("#host-error")?.textContent).toBe(
     "Source unavailable.",
   );
@@ -631,9 +628,9 @@ test("replaces an external root on one persistent controlled Reader", async () =
 
   expect(document.querySelectorAll("sefaria-reader")).toHaveLength(1);
   expect(document.querySelector("sefaria-reader")).toBe(reader);
-  expect(reader.viewModel?.currentEntryId).toBe("entry-2");
-  expect(reader.viewModel?.breadcrumbs).toHaveLength(1);
-  expect(reader.viewModel?.selectedTarget?.ref).toBe("Micah 6:7");
+  expect(reader.currentEntryId).toBe("entry-2");
+  expect(reader.canGoBack).toBe(false);
+  expect(reader.selectedRef).toBe("Micah 6:7");
   expect(bookmark.textContent).toBe("Bookmark Micah 6:7");
   bookmark.click();
   expect(document.querySelector("#bookmark-status")?.textContent).toBe(
@@ -652,7 +649,7 @@ test("replaces an external root on one persistent controlled Reader", async () =
       "Opening Micah 6:6",
     ),
   );
-  expect(reader.rootLoading).toBe(true);
+  expect(reader.status).toBe("loading");
   const latest = demo.navigate("Micah 6:8");
   await vi.waitFor(() =>
     expect(document.querySelector("#status")?.textContent).toContain(
@@ -666,8 +663,8 @@ test("replaces an external root on one persistent controlled Reader", async () =
   resolveLate(Response.json(sourcePayload("Micah 6:6", "Micah 6:6")));
   await superseded;
 
-  expect(reader.viewModel?.currentEntryId).toBe("entry-3");
-  expect(reader.viewModel?.selectedTarget?.ref).toBe("Micah 6:8");
+  expect(reader.currentEntryId).toBe("entry-3");
+  expect(reader.selectedRef).toBe("Micah 6:8");
   expect(document.querySelector<HTMLInputElement>('[name="tref"]')?.value).toBe(
     "Micah 6:8",
   );
@@ -729,15 +726,9 @@ test("source reselection prunes descendants and performs one links request", asy
   const rootSource = document.querySelectorAll<SefariaSourceCard>(
     "sefaria-source-card",
   )[0]!;
-  const item =
-    rootSource.viewModel?.state === "data"
-      ? rootSource.viewModel.items[0]
-      : undefined;
-  if (!item) throw new Error("Expected a selectable root source item.");
-
   rootSource.dispatchEvent(
     new CustomEvent("sefaria-source-select", {
-      detail: { position: item.position, ref: item.ref },
+      detail: { position: [], ref: "Micah 6:8" },
     }),
   );
   await vi.waitFor(() => expect(demo.view.panes).toHaveLength(2));
@@ -789,10 +780,12 @@ test("category and page changes reproject a captured response without I/O", asyn
   );
 
   expect(requests).toHaveLength(requestCount);
-  expect(
-    document.querySelector<SefariaConnectionsPanel>("sefaria-connections-panel")
-      ?.viewModel?.state,
-  ).toBe("data");
+  panel = document.querySelector<SefariaConnectionsPanel>(
+    "sefaria-connections-panel",
+  )!;
+  expect(panel.data).toBeDefined();
+  expect(panel.category).toBe("Commentary");
+  expect(panel.page).toBe(2);
   demo.dispose();
 });
 

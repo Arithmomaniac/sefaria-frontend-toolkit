@@ -1,34 +1,13 @@
 import {
   type ContractIssue,
-  type CoreErrorResponse,
-  type CoreLinkResponse,
-  type CoreV3TextsResponse,
   validateExternalResponse,
 } from "@arithmomaniac/sefaria-client";
 import {
+  type SefariaAcquisition,
   SefariaReader,
-  SefariaSourceCard,
-  type SourceCardViewModel,
+  type ReaderRawSeedData,
 } from "@arithmomaniac/sefaria-web-components";
-import { bindReaderController } from "@arithmomaniac/sefaria-web-components/bindings";
-import {
-  type ConnectionsProjection,
-  type ConnectionsRequest,
-} from "@arithmomaniac/sefaria-web-components/connections-panel";
-import {
-  createReaderController,
-  ReaderControllerError,
-  type ReaderController,
-  type ReaderControllerDataSource,
-  type ReaderControllerSnapshot,
-} from "@arithmomaniac/sefaria-web-components/reader-controller";
-import {
-  createReaderConnectionsContent,
-  createReaderSourceContent,
-  type ReaderConnectionsContent,
-  type ReaderEntrySeed,
-  type ReaderSourceContent,
-} from "@arithmomaniac/sefaria-web-components/reader-session";
+import { type ConnectionsRequest } from "@arithmomaniac/sefaria-web-components/connections-panel";
 import type { SourceCardRequest } from "@arithmomaniac/sefaria-web-components/source-card";
 
 const SOURCE_CARD_META_KEY = "sefaria/source-card";
@@ -119,46 +98,77 @@ export async function waitForMcpConnection(
   signal?.throwIfAborted();
 }
 
-/** Creates the controller data source backed only by host-proxied MCP tools. */
-export function createMcpReaderDataSource(
+/** Creates a Reader acquisition capability backed only by host-proxied tools. */
+export function createMcpReaderAcquisition(
   host: McpReaderToolHost,
-): ReaderControllerDataSource {
+): SefariaAcquisition {
   return {
-    loadSource: async (request, signal) => {
-      requireSupportedSourceRequest(request);
-      const result = await host.callServerTool(
-        {
-          name: "get_text",
-          arguments: {
-            reference: request.tref,
-            version_language: "both",
+    kind: "capability",
+    capability: {
+      getText: async (request, signal) => {
+        requireSupportedTextRequest(request);
+        const effectiveRequest = { tref: request.sref };
+        const result = await host.callServerTool(
+          {
+            name: "get_text",
+            arguments: {
+              reference: request.sref,
+              version_language: "both",
+            },
           },
-        },
-        { signal },
-      );
-      return admitSourceContent(result, request);
-    },
-    loadConnections: async (request, projection, signal) => {
-      const result = await host.callServerTool(
-        {
-          name: "get_links_between_texts",
-          arguments: {
-            reference: request.tref,
-            with_text: request.withText === false ? "0" : "1",
+          { signal },
+        );
+        return admitSourceResponse(result, effectiveRequest);
+      },
+      getLinks: async (request, signal) => {
+        const effectiveRequest = {
+          tref: request.sref,
+          withText: request.withText,
+        };
+        const result = await host.callServerTool(
+          {
+            name: "get_links_between_texts",
+            arguments: {
+              reference: request.sref,
+              with_text: request.withText ? "1" : "0",
+            },
           },
-        },
-        { signal },
-      );
-      return admitConnectionsContent(result, request, projection);
+          { signal },
+        );
+        return admitConnectionsResponse(result, effectiveRequest);
+      },
     },
   };
+}
+
+/** @deprecated Use createMcpReaderAcquisition. */
+export function createMcpReaderDataSource(
+  host: McpReaderToolHost,
+): SefariaAcquisition {
+  return createMcpReaderAcquisition(host);
+}
+
+function requireSupportedTextRequest(request: {
+  readonly versions: readonly string[];
+  readonly returnFormat: string;
+}): void {
+  if (
+    request.returnFormat !== "default" ||
+    request.versions.length !== 2 ||
+    request.versions[0] !== "primary" ||
+    request.versions[1] !== "translation"
+  ) {
+    throw new Error(
+      "The MCP reader supports the default primary and translation selectors only.",
+    );
+  }
 }
 
 /** Renders one validated tool result as a continuing stateful MCP reader. */
 export function renderReaderToolResult(
   root: HTMLElement,
   result: ToolResultLike,
-  dataSource: ReaderControllerDataSource,
+  acquisition: SefariaAcquisition,
   interaction?: ConnectionsInteraction,
 ): () => void {
   if (result.isError === true) {
@@ -172,34 +182,27 @@ export function renderReaderToolResult(
     return noCleanup;
   }
 
-  let initialSelection:
-    { readonly position: readonly number[]; readonly ref: string } | undefined;
-  let seed: ReaderEntrySeed;
+  let seed: ReaderRawSeedData;
   try {
     if (metadata.data.kind === "source-card") {
       if (metadata.data.status !== 200) {
         renderSourceCardResult(root, result, metadata.data);
         return noCleanup;
       }
-      const source = admitSourceContent(
+      const source = admitSourceResponse(
         result,
         metadata.data.request,
         metadata.data,
       );
-      initialSelection = selectInitialSource(
-        source,
-        metadata.data.request.tref,
-      );
       seed = {
-        source,
-        selectedPosition: initialSelection.position,
+        source: { ...source, status: 200 },
+        selectedRef: metadata.data.request.tref,
       };
     } else {
       seed = {
-        connections: admitConnectionsContent(
+        connections: admitConnectionsResponse(
           result,
           metadata.data.request,
-          {},
           metadata.data,
         ),
       };
@@ -213,16 +216,10 @@ export function renderReaderToolResult(
     return noCleanup;
   }
 
-  let controller: ReaderController;
-  try {
-    controller = createReaderController(seed, dataSource);
-  } catch (error) {
-    renderToolError(root, [{ type: "text", text: errorMessage(error) }]);
-    return noCleanup;
-  }
-
   const section = document.createElement("section");
   const reader = new SefariaReader();
+  reader.acquisition = acquisition;
+  reader.data = seed;
   reader.chatExport = interaction !== undefined;
   const status = document.createElement("p");
   status.hidden = true;
@@ -231,37 +228,22 @@ export function renderReaderToolResult(
 
   let disposed = false;
   let pendingChatExport = false;
-  const unbind = bindReaderController(reader, controller);
-  const unsubscribe = controller.subscribe((snapshot) => {
-    renderReaderTask(status, snapshot);
-  });
-  if (initialSelection !== undefined) {
-    const selection = initialSelection;
-    queueMicrotask(() => {
-      if (disposed) return;
-      void controller
-        .selectSource({
-          originEntryId: controller.snapshot.reader.currentEntryId,
-          position: selection.position,
-          ref: selection.ref,
-        })
-        .catch((error: unknown) => {
-          if (!disposed) {
-            status.hidden = false;
-            status.setAttribute("role", "alert");
-            status.textContent = errorMessage(error);
-          }
-        });
-    });
-  }
+  const onReaderError = (event: Event): void => {
+    const detail = customDetail(event);
+    const error = detail?.error;
+    status.hidden = false;
+    status.setAttribute("role", "alert");
+    status.textContent = errorMessage(error);
+  };
+  reader.addEventListener("sefaria-reader-error", onReaderError);
   const onChatExport = (event: Event): void => {
     if (disposed || pendingChatExport || interaction === undefined) return;
     const detail = customDetail(event);
-    const snapshot = controller.snapshot.reader;
     if (
-      detail?.originEntryId !== snapshot.currentEntryId ||
+      detail === undefined ||
+      detail.originEntryId !== reader.currentEntryId ||
       typeof detail.targetRef !== "string" ||
-      detail.targetRef !== snapshot.selectedTarget?.ref
+      detail.targetRef !== reader.selectedRef
     ) {
       status.hidden = false;
       status.setAttribute("role", "alert");
@@ -300,9 +282,8 @@ export function renderReaderToolResult(
   return () => {
     disposed = true;
     reader.removeEventListener("sefaria-reader-chat-export", onChatExport);
-    unsubscribe();
-    unbind();
-    controller.dispose();
+    reader.removeEventListener("sefaria-reader-error", onReaderError);
+    reader.remove();
   };
 }
 
@@ -320,11 +301,15 @@ class IntegrationBoundaryError extends Error {
   }
 }
 
-function admitSourceContent(
+function admitSourceResponse(
   result: ToolResultLike,
   request: SourceCardRequest,
   knownMetadata?: SourceCardMetadata,
-): ReaderSourceContent {
+): {
+  readonly payload: unknown;
+  readonly status: 200 | 400 | 404;
+  readonly effectiveRequest: SourceCardRequest;
+} {
   throwToolFailure(result);
   const metadata = knownMetadata ?? requireSourceMetadata(result);
   if (metadata.request.tref !== request.tref) {
@@ -344,26 +329,22 @@ function admitSourceContent(
     result.structuredContent,
   );
   if (!validation.valid) throw new IntegrationBoundaryError(validation.issues);
-  if (metadata.status !== 200) {
-    throw new ReaderControllerError(
-      "source-http",
-      (result.structuredContent as CoreErrorResponse).error,
-      metadata.status,
-    );
-  }
-
-  return createReaderSourceContent(
-    result.structuredContent as CoreV3TextsResponse,
-    request,
-  );
+  return {
+    payload: result.structuredContent,
+    status: metadata.status,
+    effectiveRequest: request,
+  };
 }
 
-function admitConnectionsContent(
+function admitConnectionsResponse(
   result: ToolResultLike,
   request: ConnectionsRequest,
-  projection: ConnectionsProjection,
   knownMetadata?: ConnectionsMetadata,
-): ReaderConnectionsContent {
+): {
+  readonly payload: unknown;
+  readonly status: 200 | 400;
+  readonly effectiveRequest: ConnectionsRequest;
+} {
   throwToolFailure(result);
   const metadata = knownMetadata ?? requireConnectionsMetadata(result);
   if (
@@ -397,12 +378,11 @@ function admitConnectionsContent(
       })),
     );
   }
-  return createReaderConnectionsContent(
-    envelope.payload as CoreLinkResponse,
-    request,
-    projection,
-    metadata.status,
-  );
+  return {
+    payload: envelope.payload,
+    status: metadata.status,
+    effectiveRequest: request,
+  };
 }
 
 function requireSourceMetadata(result: ToolResultLike): SourceCardMetadata {
@@ -456,58 +436,6 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
 
-function requireSupportedSourceRequest(request: SourceCardRequest): void {
-  if (request.primary !== undefined || request.translation !== undefined) {
-    throw new Error(
-      "The MCP reader supports the default primary and translation selectors only.",
-    );
-  }
-}
-
-function selectInitialSource(
-  source: ReaderSourceContent,
-  requestedRef: string,
-): { readonly position: readonly number[]; readonly ref: string } {
-  if (source.viewModel.state !== "data") {
-    throw new Error(`${requestedRef} did not produce selectable source data.`);
-  }
-  const selected =
-    source.viewModel.items.find((item) => item.ref === requestedRef) ??
-    source.viewModel.items.find(
-      (item): item is typeof item & { readonly ref: string } =>
-        typeof item.ref === "string",
-    );
-  if (!selected || typeof selected.ref !== "string") {
-    throw new Error(`${requestedRef} did not produce a selectable source row.`);
-  }
-  return { position: selected.position, ref: selected.ref };
-}
-
-function renderReaderTask(
-  status: HTMLParagraphElement,
-  snapshot: ReaderControllerSnapshot,
-): void {
-  const task = snapshot.task;
-  if (task.state === "idle") {
-    status.hidden = true;
-    status.textContent = "";
-    return;
-  }
-  status.hidden = false;
-  if (task.state === "loading-source") {
-    status.setAttribute("role", "status");
-    status.textContent = `Loading ${task.targetRef}.`;
-    return;
-  }
-  if (task.state === "loading-connections") {
-    status.setAttribute("role", "status");
-    status.textContent = `Loading connections for ${task.request.tref}.`;
-    return;
-  }
-  status.setAttribute("role", "alert");
-  status.textContent = task.message;
-}
-
 /** Renders an integration-owned status message outside component elements. */
 export function renderStatus(root: HTMLElement, message: string): void {
   const status = document.createElement("p");
@@ -537,13 +465,10 @@ function renderSourceCardResult(
     return;
   }
 
-  const viewModel = createSourceCardHttpErrorViewModel(
-    metadata.status,
-    result.structuredContent as CoreErrorResponse,
-  );
-  const card = new SefariaSourceCard();
-  card.viewModel = viewModel;
-  root.replaceChildren(card);
+  const alert = document.createElement("p");
+  alert.setAttribute("role", "alert");
+  alert.textContent = (result.structuredContent as { error: string }).error;
+  root.replaceChildren(alert);
 }
 
 function validateMetadata(
@@ -790,18 +715,6 @@ function isSourceCardStatus(value: unknown): value is 200 | 400 | 404 {
 
 function isConnectionsStatus(value: unknown): value is 200 | 400 {
   return typeof value === "number" && CONNECTIONS_STATUSES.has(value);
-}
-
-function createSourceCardHttpErrorViewModel(
-  status: 400 | 404,
-  payload: CoreErrorResponse,
-): SourceCardViewModel {
-  return {
-    state: "error",
-    errorKind: "http",
-    status,
-    message: payload.error,
-  };
 }
 
 function sourceFollowUp(targetRef: string): string {

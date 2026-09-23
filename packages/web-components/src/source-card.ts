@@ -155,6 +155,16 @@ export interface SourceCardProjectionErrorViewModel {
   readonly message: string;
 }
 
+/** Validation failure for authoritative supplied source-card data. */
+export interface SourceCardValidationErrorViewModel {
+  /** State discriminator. */
+  readonly state: "error";
+  /** Error classification. */
+  readonly errorKind: "validation";
+  /** Human-readable validation failure with structured paths. */
+  readonly message: string;
+}
+
 /** Documented v3 texts HTTP failure. */
 export interface SourceCardHttpErrorViewModel {
   /** State discriminator. */
@@ -173,6 +183,7 @@ export type SourceCardViewModel =
   | SourceCardDataViewModel
   | SourceCardEmptyViewModel
   | SourceCardProjectionErrorViewModel
+  | SourceCardValidationErrorViewModel
   | SourceCardHttpErrorViewModel;
 
 /** Terminal source-card state committed by a headless controller. */

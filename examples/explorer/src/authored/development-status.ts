@@ -1,6 +1,11 @@
 import { SefariaElement } from "@arithmomaniac/sefaria-web-components";
 import { css, html, nothing } from "lit";
 
+import refCommentary from "../../../../packages/client/test/fixtures/ref-rashi-commentary-2026-09-03.json";
+import refUnresolved from "../../../../packages/client/test/fixtures/ref-unresolved-2026-09-03.json";
+import sourceSection from "../../../../packages/client/test/fixtures/v3-connections-genesis-section-2026-09-06.json";
+import sourceTarget from "../../../../packages/client/test/fixtures/v3-connections-genesis-target-2026-09-06.json";
+import linksPayload from "../../../../packages/client/test/fixtures/links-connections-preview-2026-09-06.json";
 import { bilingualSegmentScenarios } from "./bilingual-segment.scenarios.js";
 import { connectionsPanelScenarios } from "./connections-panel.scenarios.js";
 import { refLabelScenarios } from "./ref-label.scenarios.js";
@@ -22,6 +27,50 @@ type Theme = "system" | "light" | "dark";
 
 const repositorySourceBase =
   "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/";
+
+const pendingAcquisition = {
+  kind: "capability" as const,
+  capability: {
+    getText: async () => await new Promise<never>(() => undefined),
+    resolveReference: async () => await new Promise<never>(() => undefined),
+    getLinks: async () => await new Promise<never>(() => undefined),
+  },
+};
+
+const selectedText = {
+  kind: "selected",
+  ref: "Genesis 1:1",
+  heRef: "בראשית א׳:א׳",
+  version: {
+    versionTitle: "Component lab source edition",
+    language: "he",
+    actualLanguage: "he",
+    languageFamilyName: "hebrew",
+    direction: "rtl",
+    text: "<b>בְּרֵאשִׁית</b> בָּרָא אֱלֹהִים",
+  },
+} as const;
+
+const primaryOnlySource = {
+  ...sourceSection,
+  versions: sourceSection.versions.filter((version) => version.isPrimary),
+};
+const emptySource = { ...sourceSection, versions: [] };
+const conflictingLinks = [
+  linksPayload[0],
+  { ...linksPayload[0], category: "Conflicting category" },
+];
+const readerSourceSeed = {
+  payload: sourceSection,
+  status: 200 as const,
+  effectiveRequest: { tref: "Genesis 1" },
+};
+const readerConnectionsSeed = {
+  payload: linksPayload,
+  status: 200 as const,
+  effectiveRequest: { tref: "Genesis 1:2", withText: true },
+  projection: { category: "Commentary" },
+};
 
 const componentDetails = {
   "ref-label": {
@@ -238,7 +287,7 @@ class SefariaDevelopmentStatus extends SefariaElement {
     return html`
       <h1>Sefaria Web Components authored workbench</h1>
       <p>
-        Choose supplied view-model states without making an API request. Live
+        Choose validated raw-data states without making an API request. Live
         requests stay separate in the component and Reader destinations.
       </p>
       <div class="workbench">
@@ -328,7 +377,7 @@ class SefariaDevelopmentStatus extends SefariaElement {
                   <summary>Scenario diagnostics</summary>
                   <dl>
                     <dt>Data mode</dt>
-                    <dd>Authored view model; request count: 0</dd>
+                    <dd>Validated raw component input; request count: 0</dd>
                     <dt>Public package</dt>
                     <dd>
                       <code
@@ -366,15 +415,11 @@ class SefariaDevelopmentStatus extends SefariaElement {
           ? html`
               <div class="states">
                 ${this.#filter("ref-label", refLabelScenarios).map(
-                  ({ id, title, viewModel }) => html`
+                  ({ id, title }) => html`
                     <section data-component="ref-label" data-scenario=${id}>
                       <h2>${title}</h2>
                       ${this.#scenarioLink("ref-label", id)}
-                      <sefaria-ref-label
-                        linked
-                        label-language="both"
-                        .viewModel=${viewModel}
-                      ></sefaria-ref-label>
+                      ${renderRefLabel(id)}
                     </section>
                   `,
                 )}
@@ -387,13 +432,11 @@ class SefariaDevelopmentStatus extends SefariaElement {
           ? html`
               <div class="states">
                 ${this.#filter("text-segment", textSegmentScenarios).map(
-                  ({ id, title, viewModel }) => html`
+                  ({ id, title }) => html`
                     <section data-component="text-segment" data-scenario=${id}>
                       <h2>${title}</h2>
                       ${this.#scenarioLink("text-segment", id)}
-                      <sefaria-text-segment
-                        .viewModel=${viewModel}
-                      ></sefaria-text-segment>
+                      ${renderTextSegment(id)}
                     </section>
                   `,
                 )}
@@ -414,16 +457,14 @@ class SefariaDevelopmentStatus extends SefariaElement {
                   "bilingual-segment",
                   bilingualSegmentScenarios,
                 ).map(
-                  ({ id, title, viewModel }) => html`
+                  ({ id, title }) => html`
                     <section
                       data-component="bilingual-segment"
                       data-scenario=${id}
                     >
                       <h2>${title}</h2>
                       ${this.#scenarioLink("bilingual-segment", id)}
-                      <sefaria-bilingual-segment
-                        .viewModel=${viewModel}
-                      ></sefaria-bilingual-segment>
+                      ${renderBilingualSegment(id)}
                     </section>
                   `,
                 )}
@@ -444,7 +485,6 @@ class SefariaDevelopmentStatus extends SefariaElement {
                   ({
                     id,
                     title,
-                    viewModel,
                     selectable = false,
                     selectedPosition,
                     showAddressLabels = true,
@@ -456,7 +496,11 @@ class SefariaDevelopmentStatus extends SefariaElement {
                         ?selectable=${selectable}
                         .selectedPosition=${selectedPosition}
                         .showAddressLabels=${showAddressLabels}
-                        .viewModel=${viewModel}
+                        .data=${sourceCardData(id)}
+                        .sref=${sourceCardSref(id)}
+                        .acquisition=${
+                          id === "loading" ? pendingAcquisition : undefined
+                        }
                         @sefaria-source-select=${this.#logEvent}
                       ></sefaria-source-card>
                     </section>
@@ -479,7 +523,7 @@ class SefariaDevelopmentStatus extends SefariaElement {
                   "connections-panel",
                   connectionsPanelScenarios,
                 ).map(
-                  ({ id, title, viewModel }) => html`
+                  ({ id, title }) => html`
                     <section
                       data-component="connections-panel"
                       data-scenario=${id}
@@ -487,7 +531,13 @@ class SefariaDevelopmentStatus extends SefariaElement {
                       <h2>${title}</h2>
                       ${this.#scenarioLink("connections-panel", id)}
                       <sefaria-connections-panel
-                        .viewModel=${viewModel}
+                        sref="Genesis 1:2"
+                        .data=${connectionsData(id)}
+                        .category=${connectionsCategory(id)}
+                        .withText=${id !== "metadata-only"}
+                        .acquisition=${
+                          id === "loading" ? pendingAcquisition : undefined
+                        }
                         @sefaria-connection-select=${this.#logEvent}
                         @sefaria-connections-category-change=${this.#logEvent}
                         @sefaria-connections-page-change=${this.#logEvent}
@@ -513,7 +563,6 @@ class SefariaDevelopmentStatus extends SefariaElement {
                   ({
                     id,
                     title,
-                    viewModel,
                     activePane = "source",
                     chatExport = false,
                   }) => html`
@@ -524,13 +573,20 @@ class SefariaDevelopmentStatus extends SefariaElement {
                     >
                       <h2>${title}</h2>
                       ${this.#scenarioLink("reader", id)}
-                      <sefaria-reader
-                        .viewModel=${viewModel}
-                        .activePane=${activePane}
-                        .chatExport=${chatExport}
-                        @sefaria-reader-back=${this.#logEvent}
-                        @sefaria-reader-connections-open=${this.#logEvent}
-                      ></sefaria-reader>
+                      ${
+                        readerData(id) === undefined
+                          ? html`<p data-authored-unrepresented role="status">
+                              ${readerUnavailableMessage(id)}
+                            </p>`
+                          : html`<sefaria-reader
+                              .data=${readerData(id)}
+                              .acquisition=${{ kind: "disabled" }}
+                              .activePane=${activePane}
+                              .chatExport=${chatExport}
+                              @sefaria-reader-back=${this.#logEvent}
+                              @sefaria-reader-connections-open=${this.#logEvent}
+                            ></sefaria-reader>`
+                      }
                     </section>
                   `,
                 )}
@@ -649,6 +705,145 @@ class SefariaDevelopmentStatus extends SefariaElement {
     if (this.#diagnostics) params.set("diagnostics", "1");
     else params.delete("diagnostics");
     history.replaceState(null, "", `?${params.toString()}`);
+  }
+}
+
+function renderRefLabel(id: string) {
+  if (id === "loading") {
+    return html`<sefaria-ref-label
+      linked
+      label-language="both"
+      sref="Genesis 1:1"
+      .acquisition=${pendingAcquisition}
+    ></sefaria-ref-label>`;
+  }
+  return html`<sefaria-ref-label
+    linked
+    label-language="both"
+    sref=${id === "empty" ? "not a reference" : "Rashi on Genesis 1:1:1"}
+    .data=${
+      id === "data"
+        ? refCommentary
+        : id === "empty"
+          ? refUnresolved
+          : { is_ref: true }
+    }
+  ></sefaria-ref-label>`;
+}
+
+function renderTextSegment(id: string) {
+  if (id === "loading") {
+    return html`<sefaria-text-segment
+      sref="Genesis 1:1"
+      .acquisition=${pendingAcquisition}
+    ></sefaria-text-segment>`;
+  }
+  return html`<sefaria-text-segment
+    sref="Genesis 1:1"
+    .data=${
+      id === "data"
+        ? selectedText
+        : id === "empty"
+          ? {
+              ...selectedText,
+              version: { ...selectedText.version, text: null },
+            }
+          : {
+              ...selectedText,
+              version: { ...selectedText.version, text: 42 },
+            }
+    }
+  ></sefaria-text-segment>`;
+}
+
+function renderBilingualSegment(id: string) {
+  if (id === "loading") {
+    return html`<sefaria-bilingual-segment
+      sref="Genesis 1:2"
+      .acquisition=${pendingAcquisition}
+    ></sefaria-bilingual-segment>`;
+  }
+  return html`<sefaria-bilingual-segment
+    sref="Genesis 1:2"
+    .data=${
+      id === "data"
+        ? sourceTarget
+        : id === "partial"
+          ? {
+              ...sourceTarget,
+              versions: sourceTarget.versions.filter(
+                (version) => version.isPrimary,
+              ),
+            }
+          : id === "empty"
+            ? { ...sourceTarget, versions: [] }
+            : { versions: [{ text: 42 }] }
+    }
+  ></sefaria-bilingual-segment>`;
+}
+
+function sourceCardData(id: string): unknown {
+  switch (id) {
+    case "one-item":
+      return sourceTarget;
+    case "many-items":
+    case "hidden-addresses":
+      return sourceSection;
+    case "one-sided":
+      return primaryOnlySource;
+    case "empty":
+      return emptySource;
+    case "error":
+      return { versions: [{ text: 42 }] };
+    default:
+      return undefined;
+  }
+}
+
+function sourceCardSref(id: string): string {
+  return id === "one-item" ? "Genesis 1:2" : "Genesis 1";
+}
+
+function connectionsData(id: string): unknown {
+  if (id === "loading") return undefined;
+  if (id === "empty") return [];
+  if (id === "error") return conflictingLinks;
+  return linksPayload;
+}
+
+function connectionsCategory(id: string): string | undefined {
+  return id === "details" || id === "metadata-only" ? "Commentary" : undefined;
+}
+
+const readerSeeds = {
+  paired: {
+    source: readerSourceSeed,
+    connections: readerConnectionsSeed,
+    selectedRef: "Genesis 1:2",
+  },
+  "source-only": {
+    source: readerSourceSeed,
+    selectedRef: "Genesis 1:2",
+  },
+  "connections-only": {
+    connections: readerConnectionsSeed,
+  },
+} as const;
+
+function readerData(id: string): unknown {
+  return readerSeeds[id as keyof typeof readerSeeds];
+}
+
+function readerUnavailableMessage(id: string): string {
+  switch (id) {
+    case "connections-loading":
+      return "Connections loading is a transient Reader workflow state and cannot be authored from one raw seed.";
+    case "connections-unavailable":
+      return "Interrupted connections require a live Reader transition and cannot be authored from one raw seed.";
+    case "truncated-history":
+      return "Truncated retained history requires multiple admitted Reader entries and cannot be authored from one raw seed.";
+    default:
+      return "This Reader state requires a live transition.";
   }
 }
 

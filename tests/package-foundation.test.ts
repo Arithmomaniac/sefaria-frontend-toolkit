@@ -22,7 +22,7 @@ describe("library package foundations", () => {
     [
       "packages/web-components/package.json",
       "@arithmomaniac/sefaria-web-components",
-      11,
+      10,
       ["dist", "!dist/*.tsbuildinfo", "README.md", "custom-elements.json"],
     ],
   ] as const;

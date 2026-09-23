@@ -2,28 +2,21 @@
 
 # Connections panel
 
-Use `<sefaria-connections-panel>` for grouped connected references, bounded pages, and optional captured previews. The host supplies the current connection view model and decides whether a category, page, preview, or selected reference needs a new operation.
-
-## Use it when
-
-Choose the connections panel when related texts are a supporting surface beside a passage. Use the Reader when connections, source text, history, and navigation belong to one coordinated reading experience.
+Use `<sefaria-connections-panel>` for grouped related references, bounded pages, and optional captured previews. Assign raw links `data` for zero-request rendering or `sref` for standalone loading.
 
 ## Try it
 
 <PlaygroundEmbed project="connections-panel" title="Edit the connections-panel example" />
 
-The maintained project starts with a supplied category summary, enables captured previews, and lets the host hide those previews without changing data. Selecting an entry updates host status; this supplied-data project does not navigate.
+Category, page, and preview-visibility changes reproject captured data with zero I/O. `showPreviews` controls only captured-preview visibility.
 
-Explore the <SiteLink to="/examples/explorer/authored.html?component=connections-panel&amp;scenario=details">detail page with a partial preview</SiteLink> and <SiteLink to="/examples/explorer/authored.html?component=connections-panel&amp;scenario=metadata-only">metadata without previews</SiteLink>.
+## Interaction and composition
 
-## Interaction and accessibility
+The panel emits category, page, preview-request, and connection-selection events. Current failures emit `sefaria-connections-panel-error`.
 
-The panel emits events for category changes, page changes, preview requests, and connection selection. Handle those events in the host and provide a new view model when data changes. `showPreviews` only controls captured preview visibility; it is not an implicit request switch. Keep the current category and page visible so keyboard users understand what changed.
+One links response privately prepares all visible entries. A ten-preview page makes one outer request and zero child requests.
 
 ## Exact contract and source
 
 - [Generated element properties and events](../reference/custom-elements.md#sefaria-connections-panel)
 - [Maintained playground source](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground/projects/connections-panel/)
-- [Authored states](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/connections-panel.scenarios.ts)
-
-For composed navigation and lifecycle, see [Use the Reader](../learn/04-reader.md).

@@ -2,13 +2,14 @@ import { html } from "lit";
 import { render } from "vitest-browser-lit";
 import { afterEach, expect, test, vi } from "vitest";
 
+import { prepared, setPreparedState } from "./prepared-state.js";
 import "./bilingual-segment-element.js";
+import type { SefariaBilingualSegment } from "./index.js";
 import type {
   BilingualSegmentDataViewModel,
   BilingualSegmentViewModel,
-  SefariaBilingualSegment,
-  TextSegmentDataViewModel,
-} from "./index.js";
+} from "./bilingual-segment.js";
+import type { TextSegmentDataViewModel } from "./text-segment.js";
 
 const PRIMARY: TextSegmentDataViewModel = {
   state: "data",
@@ -59,7 +60,7 @@ function mountInWrapper(
   document.body.append(wrapper);
   wrappers.push(wrapper);
   const host = document.createElement("sefaria-bilingual-segment");
-  host.viewModel = viewModel;
+  setPreparedState(host, viewModel);
   wrapper.append(host);
   return { wrapper, host };
 }
@@ -82,7 +83,7 @@ async function renderData(
 ): Promise<SefariaBilingualSegment> {
   render(
     html`<sefaria-bilingual-segment
-      .viewModel=${viewModel}
+      ${prepared(viewModel)}
       .contentLanguage=${properties.contentLanguage ?? "both"}
       .layout=${properties.layout ?? "auto"}
       .sideOrder=${properties.sideOrder ?? "primary-first"}
@@ -357,7 +358,7 @@ test.each([
   async ({ viewModel, role, text }) => {
     const screen = render(
       html`<sefaria-bilingual-segment
-        .viewModel=${viewModel satisfies BilingualSegmentViewModel}
+        ${prepared(viewModel satisfies BilingualSegmentViewModel)}
       ></sefaria-bilingual-segment>`,
     );
 

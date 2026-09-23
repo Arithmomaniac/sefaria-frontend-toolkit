@@ -8,17 +8,61 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Request-free custom element that renders one bilingual-segment view model.",
+          "description": "Custom element that renders supplied or acquired bilingual-segment data.",
           "name": "SefariaBilingualSegment",
           "members": [
             {
               "kind": "field",
-              "name": "viewModel",
+              "name": "sref",
               "privacy": "public",
               "type": {
-                "text": "BilingualSegmentViewModel"
+                "text": "string"
               },
-              "description": "Render-ready state supplied by the host."
+              "description": "Reference loaded when authoritative supplied data is absent.",
+              "default": "\"\"",
+              "attribute": "sref"
+            },
+            {
+              "kind": "field",
+              "name": "data",
+              "privacy": "public",
+              "type": {
+                "text": "unknown | undefined"
+              },
+              "description": "Authoritative corrected response-shaped data.",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "acquisition",
+              "privacy": "public",
+              "type": {
+                "text": "SefariaAcquisition | undefined"
+              },
+              "description": "Optional element-specific acquisition source.",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "primaryVersionTitle",
+              "privacy": "public",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional exact edition title for the primary role.",
+              "default": "undefined",
+              "attribute": "primary-version-title"
+            },
+            {
+              "kind": "field",
+              "name": "translationVersionTitle",
+              "privacy": "public",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional exact edition title for the translation role.",
+              "default": "undefined",
+              "attribute": "translation-version-title"
             },
             {
               "kind": "field",
@@ -63,9 +107,54 @@
               "description": "Hebrew vocalization preset applied to both displayed roles.",
               "default": "\"taamim_and_nikkud\"",
               "attribute": "vocalization-mode"
+            },
+            {
+              "kind": "field",
+              "name": "status",
+              "type": {
+                "text": "SefariaElementStatus"
+              },
+              "description": "Coarse lifecycle state without exposing prepared rendering data.",
+              "readonly": true
+            }
+          ],
+          "events": [
+            {
+              "name": "sefaria-bilingual-segment-error",
+              "description": "Reports a current standalone loading or validation failure.",
+              "type": {
+                "text": "CustomEvent"
+              }
             }
           ],
           "attributes": [
+            {
+              "name": "sref",
+              "type": {
+                "text": "string"
+              },
+              "description": "Reference loaded when authoritative supplied data is absent.",
+              "default": "\"\"",
+              "fieldName": "sref"
+            },
+            {
+              "name": "primary-version-title",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional exact edition title for the primary role.",
+              "default": "undefined",
+              "fieldName": "primaryVersionTitle"
+            },
+            {
+              "name": "translation-version-title",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional exact edition title for the translation role.",
+              "default": "undefined",
+              "fieldName": "translationVersionTitle"
+            },
             {
               "name": "content-language",
               "type": {
@@ -109,7 +198,6 @@
           },
           "tagName": "sefaria-bilingual-segment",
           "customElement": true,
-          "events": [],
           "slots": [],
           "cssParts": [],
           "cssProperties": [
@@ -231,17 +319,72 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Request-free category summaries and bounded connected-text details.",
+          "description": "Category summaries and bounded connected-text details from supplied or acquired data.",
           "name": "SefariaConnectionsPanel",
           "members": [
             {
               "kind": "field",
-              "name": "viewModel",
+              "name": "sref",
               "privacy": "public",
               "type": {
-                "text": "ConnectionsViewModel | undefined"
+                "text": "string"
               },
-              "description": "Host-supplied rendering state."
+              "description": "Reference loaded when authoritative supplied data is absent.",
+              "default": "\"\"",
+              "attribute": "sref"
+            },
+            {
+              "kind": "field",
+              "name": "data",
+              "privacy": "public",
+              "type": {
+                "text": "unknown | undefined"
+              },
+              "description": "Authoritative corrected links response data.",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "acquisition",
+              "privacy": "public",
+              "type": {
+                "text": "SefariaAcquisition | undefined"
+              },
+              "description": "Optional element-specific acquisition source.",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "withText",
+              "privacy": "public",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether acquired or supplied links include connected text.",
+              "default": "true",
+              "attribute": "with-text"
+            },
+            {
+              "kind": "field",
+              "name": "category",
+              "privacy": "public",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Exact category projected from the current captured response.",
+              "default": "undefined",
+              "attribute": "category"
+            },
+            {
+              "kind": "field",
+              "name": "page",
+              "privacy": "public",
+              "type": {
+                "text": "number"
+              },
+              "description": "Zero-based local page projected from the current captured response.",
+              "default": "0",
+              "attribute": "page"
             },
             {
               "kind": "field",
@@ -267,80 +410,12 @@
             },
             {
               "kind": "field",
-              "name": "#displayViewModel",
-              "privacy": "private",
+              "name": "status",
               "type": {
-                "text": "ConnectionsViewModel | undefined"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "#displayMode",
-              "privacy": "private",
-              "type": {
-                "text": "VocalizationMode | undefined"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "#displayHtml",
-              "privacy": "private",
-              "default": "new Map<string, string>()"
-            },
-            {
-              "kind": "method",
-              "name": "#entry",
-              "privacy": "private",
-              "parameters": [
-                {
-                  "name": "entry",
-                  "type": {
-                    "text": "ConnectionEntry"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "#safeHtml",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "string"
-                }
+                "text": "SefariaElementStatus"
               },
-              "parameters": [
-                {
-                  "name": "html",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "#emit",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "name",
-                  "type": {
-                    "text": "string"
-                  }
-                },
-                {
-                  "name": "detail",
-                  "type": {
-                    "text": "object"
-                  }
-                }
-              ]
+              "description": "Coarse lifecycle state without exposing prepared rendering data.",
+              "readonly": true
             }
           ],
           "events": [
@@ -371,9 +446,52 @@
               "type": {
                 "text": "CustomEvent"
               }
+            },
+            {
+              "name": "sefaria-connections-panel-error",
+              "description": "Reports a current standalone loading or validation failure.",
+              "type": {
+                "text": "CustomEvent"
+              }
             }
           ],
           "attributes": [
+            {
+              "name": "sref",
+              "type": {
+                "text": "string"
+              },
+              "description": "Reference loaded when authoritative supplied data is absent.",
+              "default": "\"\"",
+              "fieldName": "sref"
+            },
+            {
+              "name": "with-text",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether acquired or supplied links include connected text.",
+              "default": "true",
+              "fieldName": "withText"
+            },
+            {
+              "name": "category",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Exact category projected from the current captured response.",
+              "default": "undefined",
+              "fieldName": "category"
+            },
+            {
+              "name": "page",
+              "type": {
+                "text": "number"
+              },
+              "description": "Zero-based local page projected from the current captured response.",
+              "default": "0",
+              "fieldName": "page"
+            },
             {
               "name": "show-previews",
               "type": {
@@ -520,17 +638,38 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Request-free anchored dialog that renders one popup view model.",
+          "description": "Anchored dialog that renders supplied or acquired popup data.",
           "name": "SefariaPopup",
           "members": [
             {
               "kind": "field",
-              "name": "viewModel",
+              "name": "sref",
               "privacy": "public",
               "type": {
-                "text": "PopupViewModel | undefined"
+                "text": "string"
               },
-              "description": "Render-ready popup state supplied by the integration.",
+              "description": "Reference prepared while the connected popup is open or closed.",
+              "default": "\"\"",
+              "attribute": "sref"
+            },
+            {
+              "kind": "field",
+              "name": "data",
+              "privacy": "public",
+              "type": {
+                "text": "unknown | undefined"
+              },
+              "description": "Authoritative corrected v3 text response data.",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "acquisition",
+              "privacy": "public",
+              "type": {
+                "text": "SefariaAcquisition | undefined"
+              },
+              "description": "Optional element-specific acquisition source.",
               "default": "undefined"
             },
             {
@@ -567,42 +706,41 @@
               "attribute": "vocalization-mode"
             },
             {
-              "kind": "method",
-              "name": "#renderContent",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult"
-                }
+              "kind": "field",
+              "name": "status",
+              "type": {
+                "text": "SefariaElementStatus"
+              },
+              "description": "Coarse lifecycle state without exposing prepared rendering data.",
+              "readonly": true
+            }
+          ],
+          "events": [
+            {
+              "name": "sefaria-popup-close",
+              "description": "Reports that the popup should close.",
+              "type": {
+                "text": "CustomEvent"
               }
             },
             {
-              "kind": "field",
-              "name": "#close",
-              "privacy": "private"
-            },
-            {
-              "kind": "field",
-              "name": "#handleKeydown",
-              "privacy": "private"
-            },
-            {
-              "kind": "field",
-              "name": "#handleViewportChange",
-              "privacy": "private"
-            },
-            {
-              "kind": "method",
-              "name": "#place",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
+              "name": "sefaria-popup-error",
+              "description": "Reports a current standalone loading or validation failure.",
+              "type": {
+                "text": "CustomEvent"
               }
             }
           ],
           "attributes": [
+            {
+              "name": "sref",
+              "type": {
+                "text": "string"
+              },
+              "description": "Reference prepared while the connected popup is open or closed.",
+              "default": "\"\"",
+              "fieldName": "sref"
+            },
             {
               "name": "open",
               "type": {
@@ -628,15 +766,6 @@
           },
           "tagName": "sefaria-popup",
           "customElement": true,
-          "events": [
-            {
-              "name": "sefaria-popup-close",
-              "description": "Reports that the popup should close.",
-              "type": {
-                "text": "CustomEvent"
-              }
-            }
-          ],
           "slots": [],
           "cssParts": [],
           "cssProperties": [
@@ -758,7 +887,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Request-free controlled reader surface for one semantic reader entry.",
+          "description": "Controlled or declarative reader surface for one semantic reader entry.",
           "name": "SefariaReader",
           "cssParts": [
             {
@@ -787,12 +916,34 @@
           "members": [
             {
               "kind": "field",
-              "name": "viewModel",
+              "name": "sref",
               "privacy": "public",
               "type": {
-                "text": "ReaderViewModel | undefined"
+                "text": "string"
               },
-              "description": "Host-supplied reader rendering state."
+              "description": "Requested external Reader root, separate from current navigation.",
+              "default": "\"\"",
+              "attribute": "sref"
+            },
+            {
+              "kind": "field",
+              "name": "data",
+              "privacy": "public",
+              "type": {
+                "text": "ReaderRawSeedData | undefined"
+              },
+              "description": "Transactional unknown raw Reader seed.",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "acquisition",
+              "privacy": "public",
+              "type": {
+                "text": "SefariaAcquisition | undefined"
+              },
+              "description": "Optional element-specific acquisition source.",
+              "default": "undefined"
             },
             {
               "kind": "field",
@@ -862,18 +1013,6 @@
             },
             {
               "kind": "field",
-              "name": "rootLoading",
-              "privacy": "public",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Shows host-controlled root loading without replacing committed content.",
-              "default": "false",
-              "attribute": "root-loading",
-              "reflects": true
-            },
-            {
-              "kind": "field",
               "name": "vocalizationMode",
               "privacy": "public",
               "type": {
@@ -884,236 +1023,67 @@
               "attribute": "vocalization-mode"
             },
             {
-              "kind": "method",
-              "name": "#source",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult"
-                }
+              "kind": "field",
+              "name": "status",
+              "type": {
+                "text": "SefariaElementStatus"
               },
-              "parameters": [
-                {
-                  "name": "viewModel",
-                  "type": {
-                    "text": "ReaderViewModel"
-                  }
-                }
-              ]
+              "description": "Coarse Reader lifecycle state without exposing prepared rendering data.",
+              "readonly": true
             },
             {
-              "kind": "method",
-              "name": "#connections",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult"
-                }
+              "kind": "field",
+              "name": "currentEntryId",
+              "type": {
+                "text": "string | undefined"
               },
-              "parameters": [
-                {
-                  "name": "viewModel",
-                  "type": {
-                    "text": "ReaderViewModel"
-                  }
-                }
-              ]
+              "description": "Stable identity of the current retained semantic Reader entry.",
+              "readonly": true
             },
             {
-              "kind": "method",
-              "name": "#effectivePane",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "ReaderPane"
-                }
+              "kind": "field",
+              "name": "selectedRef",
+              "type": {
+                "text": "string | undefined"
               },
-              "parameters": [
-                {
-                  "name": "viewModel",
-                  "type": {
-                    "text": "ReaderViewModel"
-                  }
-                }
-              ]
+              "description": "Exact selected canonical target, when the current entry establishes one.",
+              "readonly": true
             },
             {
-              "kind": "method",
-              "name": "#back",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              }
+              "kind": "field",
+              "name": "rootLoading",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Whether a root source request is currently pending.",
+              "readonly": true
             },
             {
-              "kind": "method",
-              "name": "#activate",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
+              "kind": "field",
+              "name": "readerError",
+              "type": {
+                "text": "string | undefined"
               },
-              "parameters": [
-                {
-                  "name": "entryId",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ]
+              "description": "Current Reader failure message, when the latest eligible operation failed.",
+              "readonly": true
             },
             {
-              "kind": "method",
-              "name": "#pane",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
+              "kind": "field",
+              "name": "canGoBack",
+              "type": {
+                "text": "boolean"
               },
-              "parameters": [
-                {
-                  "name": "pane",
-                  "type": {
-                    "text": "ReaderPane"
-                  }
-                }
-              ]
+              "description": "Whether Reader Back can activate a retained predecessor.",
+              "readonly": true
             },
             {
-              "kind": "method",
-              "name": "#chatExport",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
+              "kind": "field",
+              "name": "historyTruncated",
+              "type": {
+                "text": "boolean"
               },
-              "parameters": [
-                {
-                  "name": "targetRef",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "#sourceSelect",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "CustomEvent<SourceSelectDetail>"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "#category",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "CustomEvent<ConnectionsCategoryDetail>"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "#page",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "CustomEvent<ConnectionsPageDetail>"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "#connection",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "CustomEvent<ConnectionSelectDetail>"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "#previews",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "CustomEvent"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "#emit",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "name",
-                  "type": {
-                    "text": "string"
-                  }
-                },
-                {
-                  "name": "detail",
-                  "type": {
-                    "text": "object"
-                  }
-                }
-              ]
+              "description": "Whether bounded retention removed older semantic history.",
+              "readonly": true
             }
           ],
           "events": [
@@ -1179,9 +1149,25 @@
               "type": {
                 "text": "CustomEvent"
               }
+            },
+            {
+              "name": "sefaria-reader-error",
+              "description": "Reports a current standalone loading or seed-admission failure.",
+              "type": {
+                "text": "CustomEvent"
+              }
             }
           ],
           "attributes": [
+            {
+              "name": "sref",
+              "type": {
+                "text": "string"
+              },
+              "description": "Requested external Reader root, separate from current navigation.",
+              "default": "\"\"",
+              "fieldName": "sref"
+            },
             {
               "name": "active-pane",
               "type": {
@@ -1235,15 +1221,6 @@
               "description": "Whether captured connection previews are visible.",
               "default": "true",
               "fieldName": "showConnectionPreviews"
-            },
-            {
-              "name": "root-loading",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Shows host-controlled root loading without replacing committed content.",
-              "default": "false",
-              "fieldName": "rootLoading"
             },
             {
               "name": "vocalization-mode",
@@ -1380,17 +1357,39 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Request-free custom element that renders one reference-label view model.",
+          "description": "Custom element that renders supplied or acquired reference-label data.",
           "name": "SefariaRefLabel",
           "members": [
             {
               "kind": "field",
-              "name": "viewModel",
+              "name": "sref",
               "privacy": "public",
               "type": {
-                "text": "RefLabelViewModel"
+                "text": "string"
               },
-              "description": "Render-ready state supplied by the host."
+              "description": "Reference loaded when authoritative supplied data is absent.",
+              "default": "\"\"",
+              "attribute": "sref"
+            },
+            {
+              "kind": "field",
+              "name": "data",
+              "privacy": "public",
+              "type": {
+                "text": "unknown | undefined"
+              },
+              "description": "Authoritative corrected reference response data.",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "acquisition",
+              "privacy": "public",
+              "type": {
+                "text": "SefariaAcquisition | undefined"
+              },
+              "description": "Optional element-specific acquisition source.",
+              "default": "undefined"
             },
             {
               "kind": "field",
@@ -1415,43 +1414,34 @@
               "attribute": "linked"
             },
             {
-              "kind": "method",
-              "name": "#renderData",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult"
-                }
+              "kind": "field",
+              "name": "status",
+              "type": {
+                "text": "SefariaElementStatus"
               },
-              "parameters": [
-                {
-                  "name": "viewModel",
-                  "type": {
-                    "text": "RefLabelDataViewModel"
-                  }
-                }
-              ]
-            },
+              "description": "Coarse lifecycle state without exposing prepared rendering data.",
+              "readonly": true
+            }
+          ],
+          "events": [
             {
-              "kind": "method",
-              "name": "#renderLabel",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "viewModel",
-                  "type": {
-                    "text": "RefLabelDataViewModel"
-                  }
-                }
-              ]
+              "name": "sefaria-ref-label-error",
+              "description": "Reports a current standalone loading or validation failure.",
+              "type": {
+                "text": "CustomEvent"
+              }
             }
           ],
           "attributes": [
+            {
+              "name": "sref",
+              "type": {
+                "text": "string"
+              },
+              "description": "Reference loaded when authoritative supplied data is absent.",
+              "default": "\"\"",
+              "fieldName": "sref"
+            },
             {
               "name": "label-language",
               "type": {
@@ -1477,7 +1467,6 @@
           },
           "tagName": "sefaria-ref-label",
           "customElement": true,
-          "events": [],
           "slots": [],
           "cssParts": [],
           "cssProperties": [
@@ -1599,27 +1588,61 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Request-free custom element that renders one source-card view model.",
+          "description": "Custom element that renders supplied or acquired source-card data.",
           "name": "SefariaSourceCard",
           "members": [
             {
               "kind": "field",
-              "name": "viewModel",
+              "name": "sref",
               "privacy": "public",
               "type": {
-                "text": "SourceCardViewModel"
+                "text": "string"
               },
-              "description": "Render-ready state supplied by the host."
+              "description": "Reference loaded when authoritative supplied data is absent.",
+              "default": "\"\"",
+              "attribute": "sref"
             },
             {
               "kind": "field",
-              "name": "referenceLabel",
+              "name": "data",
               "privacy": "public",
               "type": {
-                "text": "RefLabelViewModel | undefined"
+                "text": "unknown | undefined"
               },
-              "description": "Optional richer label supplied by a host that already owns it.",
+              "description": "Authoritative corrected response-shaped data.",
               "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "acquisition",
+              "privacy": "public",
+              "type": {
+                "text": "SefariaAcquisition | undefined"
+              },
+              "description": "Optional element-specific acquisition source.",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "primaryVersionTitle",
+              "privacy": "public",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional exact edition title for the primary role.",
+              "default": "undefined",
+              "attribute": "primary-version-title"
+            },
+            {
+              "kind": "field",
+              "name": "translationVersionTitle",
+              "privacy": "public",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional exact edition title for the translation role.",
+              "default": "undefined",
+              "attribute": "translation-version-title"
             },
             {
               "kind": "field",
@@ -1708,6 +1731,15 @@
               "attribute": "hide-attributions"
             },
             {
+              "kind": "field",
+              "name": "status",
+              "type": {
+                "text": "SefariaElementStatus"
+              },
+              "description": "Coarse lifecycle state without exposing prepared rendering data.",
+              "readonly": true
+            },
+            {
               "kind": "method",
               "name": "revealSelection",
               "return": {
@@ -1716,229 +1748,6 @@
                 }
               },
               "description": "Reveals the selected control without requesting or changing data."
-            },
-            {
-              "kind": "method",
-              "name": "#renderItem",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "item",
-                  "type": {
-                    "text": "SourceCardItemViewModel"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "#renderAddressLabel",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "item",
-                  "type": {
-                    "text": "SourceCardItemViewModel"
-                  }
-                },
-                {
-                  "name": "side",
-                  "type": {
-                    "text": "BilingualPairSide"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "#renderSelectionControl",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "position",
-                  "type": {
-                    "text": "readonly number[]"
-                  }
-                },
-                {
-                  "name": "ref",
-                  "type": {
-                    "text": "string"
-                  }
-                },
-                {
-                  "name": "className",
-                  "type": {
-                    "text": "string"
-                  }
-                },
-                {
-                  "name": "content",
-                  "type": {
-                    "text": "string"
-                  }
-                },
-                {
-                  "name": "language",
-                  "optional": true,
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "#isSelectable",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "item is SourceCardItemViewModel & {\n    readonly ref: string;\n    readonly addressLabel: string;\n  }"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "item",
-                  "type": {
-                    "text": "SourceCardItemViewModel"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "#itemClass",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "string"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "item",
-                  "type": {
-                    "text": "SourceCardItemViewModel"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "#handleItemClick",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "event",
-                  "type": {
-                    "text": "MouseEvent"
-                  }
-                },
-                {
-                  "name": "item",
-                  "type": {
-                    "text": "SourceCardItemViewModel"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "#selectItem",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "void"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "position",
-                  "type": {
-                    "text": "readonly number[]"
-                  }
-                },
-                {
-                  "name": "ref",
-                  "type": {
-                    "text": "string"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "#renderHeader",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "header",
-                  "type": {
-                    "text": "SourceCardHeaderViewModel"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "#renderAttributions",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult | typeof nothing"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "attributions",
-                  "type": {
-                    "text": "readonly SourceCardAttributionViewModel[]"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "#renderAttribution",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TemplateResult"
-                }
-              },
-              "parameters": [
-                {
-                  "name": "attribution",
-                  "type": {
-                    "text": "SourceCardAttributionViewModel"
-                  }
-                }
-              ]
             }
           ],
           "events": [
@@ -1948,9 +1757,43 @@
               "type": {
                 "text": "CustomEvent"
               }
+            },
+            {
+              "name": "sefaria-source-card-error",
+              "description": "Reports a current standalone loading or validation failure.",
+              "type": {
+                "text": "CustomEvent"
+              }
             }
           ],
           "attributes": [
+            {
+              "name": "sref",
+              "type": {
+                "text": "string"
+              },
+              "description": "Reference loaded when authoritative supplied data is absent.",
+              "default": "\"\"",
+              "fieldName": "sref"
+            },
+            {
+              "name": "primary-version-title",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional exact edition title for the primary role.",
+              "default": "undefined",
+              "fieldName": "primaryVersionTitle"
+            },
+            {
+              "name": "translation-version-title",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional exact edition title for the translation role.",
+              "default": "undefined",
+              "fieldName": "translationVersionTitle"
+            },
             {
               "name": "content-language",
               "type": {
@@ -2133,17 +1976,61 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Request-free custom element that renders one text-segment view model.",
+          "description": "Custom element that renders supplied or acquired text-segment data.",
           "name": "SefariaTextSegment",
           "members": [
             {
               "kind": "field",
-              "name": "viewModel",
+              "name": "sref",
               "privacy": "public",
               "type": {
-                "text": "TextSegmentViewModel"
+                "text": "string"
               },
-              "description": "Render-ready state supplied by the host."
+              "description": "Reference loaded when authoritative supplied data is absent.",
+              "default": "\"\"",
+              "attribute": "sref"
+            },
+            {
+              "kind": "field",
+              "name": "data",
+              "privacy": "public",
+              "type": {
+                "text": "unknown | undefined"
+              },
+              "description": "Authoritative corrected response-shaped data.",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "acquisition",
+              "privacy": "public",
+              "type": {
+                "text": "SefariaAcquisition | undefined"
+              },
+              "description": "Optional element-specific acquisition source.",
+              "default": "undefined"
+            },
+            {
+              "kind": "field",
+              "name": "versionLanguage",
+              "privacy": "public",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional language-family selector overriding the primary default.",
+              "default": "undefined",
+              "attribute": "version-language"
+            },
+            {
+              "kind": "field",
+              "name": "versionTitle",
+              "privacy": "public",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional exact edition title paired with `versionLanguage`.",
+              "default": "undefined",
+              "attribute": "version-title"
             },
             {
               "kind": "field",
@@ -2158,61 +2045,60 @@
             },
             {
               "kind": "field",
-              "name": "#displayViewModel",
-              "privacy": "private",
+              "name": "selectedVersion",
               "type": {
-                "text": "TextSegmentDataViewModel | undefined"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "#displayMode",
-              "privacy": "private",
-              "type": {
-                "text": "VocalizationMode | undefined"
-              }
-            },
-            {
-              "kind": "field",
-              "name": "#displayValue",
-              "privacy": "private",
-              "type": {
-                "text": "TextSegmentDisplay | undefined"
-              }
-            },
-            {
-              "kind": "method",
-              "name": "#renderData",
-              "privacy": "private",
-              "parameters": [
-                {
-                  "name": "viewModel",
-                  "type": {
-                    "text": "TextSegmentDataViewModel"
-                  }
-                }
-              ]
-            },
-            {
-              "kind": "method",
-              "name": "#display",
-              "privacy": "private",
-              "return": {
-                "type": {
-                  "text": "TextSegmentDisplay"
-                }
+                "text": "TextSegmentSelectedVersionInfo | undefined"
               },
-              "parameters": [
-                {
-                  "name": "viewModel",
-                  "type": {
-                    "text": "TextSegmentDataViewModel"
-                  }
-                }
-              ]
+              "description": "Metadata for the currently displayed selected edition.",
+              "readonly": true
+            },
+            {
+              "kind": "field",
+              "name": "status",
+              "type": {
+                "text": "SefariaElementStatus"
+              },
+              "description": "Coarse lifecycle state without exposing prepared rendering data.",
+              "readonly": true
+            }
+          ],
+          "events": [
+            {
+              "name": "sefaria-text-segment-error",
+              "description": "Reports a current standalone loading or validation failure.",
+              "type": {
+                "text": "CustomEvent"
+              }
             }
           ],
           "attributes": [
+            {
+              "name": "sref",
+              "type": {
+                "text": "string"
+              },
+              "description": "Reference loaded when authoritative supplied data is absent.",
+              "default": "\"\"",
+              "fieldName": "sref"
+            },
+            {
+              "name": "version-language",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional language-family selector overriding the primary default.",
+              "default": "undefined",
+              "fieldName": "versionLanguage"
+            },
+            {
+              "name": "version-title",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Optional exact edition title paired with `versionLanguage`.",
+              "default": "undefined",
+              "fieldName": "versionTitle"
+            },
             {
               "name": "vocalization-mode",
               "type": {
@@ -2229,7 +2115,6 @@
           },
           "tagName": "sefaria-text-segment",
           "customElement": true,
-          "events": [],
           "slots": [],
           "cssParts": [],
           "cssProperties": [

@@ -2,7 +2,7 @@
 
 # Review guide
 
-This guide defines review gates for the delivered architecture and for planned contracts that have not yet been implemented.
+This guide defines review gates for the delivered architecture and separately identified planned work.
 
 ## Authority and status
 
@@ -12,7 +12,7 @@ This guide defines review gates for the delivered architecture and for planned c
 - [ ] Deployed fixtures include a capture date or immutable source.
 - [ ] Record each source conflict in `docs/evidence.md`.
 - [ ] Generated declarations remain the field-level transport reference.
-- [ ] Component view models remain the rendering authority.
+- [ ] Private validated component preparation remains the rendering authority; public raw data is not treated as render-ready state.
 
 ## OpenAPI pin and overlay
 
@@ -86,42 +86,47 @@ Review the initial and expanded corrections for:
 - [ ] Client response validation and external-boundary validation use the same generated schemas.
 - [ ] HTML sanitization remains separate from JSON schema validation.
 
-## Component factories
+## Declarative component inputs and acquisition
 
-- [ ] Each component subpath owns its request type.
-- [ ] Each component subpath owns its view-model union.
-- [ ] Each component subpath owns a pure payload factory.
-- [ ] Each component subpath owns an async request-and-client factory.
-- [ ] The pure factory makes no request and reads no global state.
-- [ ] The async factory uses a supplied client.
-- [ ] For a captured successful payload, the async result equals the pure result.
-- [ ] Missing requested content becomes a component-specific partial or empty state.
-- [ ] The factory preserves the data owned by its rendering surface; source-card projection preserves edition attribution.
-- [ ] Unsafe HTML passes through `@arithmomaniac/sefaria-text-transform`.
-- [ ] An abort does not become a data state.
+- [ ] All seven public elements accept `sref` and support standalone loading.
+- [ ] The six non-Reader elements accept component-specific raw `data`.
+- [ ] Defined supplied data makes zero requests, including valid empty data.
+- [ ] Invalid supplied data supersedes pending acquisition, replaces prior content with its validation error, and never falls through to `sref`.
+- [ ] Clearing `data` resumes retained eligible `sref`; clearing both inputs in one synchronous update yields empty state.
+- [ ] Complete endpoint payloads use generated operation/status validation.
+- [ ] Narrow selected fragments and response-shaped slices validate only their declared consumed fields.
+- [ ] Candidate collections preserve library-owned edition/role selection and reproject with zero I/O.
+- [ ] Missing selection evidence is distinct from a known no-match.
+- [ ] Supplied and acquired paths produce equal private preparation for the same captured payload and options.
+- [ ] Unsafe HTML passes through `@arithmomaniac/sefaria-text-transform` exactly once.
+- [ ] Current failures preserve original causes and structured paths, become accessible state/events, and produce no unhandled rejection.
+- [ ] Superseded work publishes neither success nor failure.
 
-## Optional component controllers and bindings
+## Shared and per-element acquisition
 
-- [ ] Each endpoint-backed controller remains in its owner subpath and uses the owner request, fixed operation path, documented statuses, deterministic options, and pure projection.
-- [ ] The six owner interfaces share only private lifecycle mechanics; there is no public universal loader descriptor or common domain result.
-- [ ] Construction, import, subscription, and binding make zero requests.
-- [ ] A pending or failed named attempt remains separate from the previous committed request and terminal view model.
-- [ ] A valid newer operation aborts older work, and an ignored physical abort cannot publish or resolve stale success.
-- [ ] Invalid request, options, projection, supplied status, or supplied payload rejects before valid pending work is interrupted.
-- [ ] Network, schema, and programmer errors preserve the original cause and structured paths.
-- [ ] A failed initial attempt clears its loading target; a failed replacement retains prior content only as an explicitly prior committed result.
-- [ ] Supplied unknown JSON uses the owner generated operation/status validator and exact same pure projection with zero requests.
-- [ ] Status defaults to 200 and is never inferred from an error-shaped payload.
-- [ ] RefLabel applies the same validated deterministic options to live and supplied projection.
-- [ ] Connections retains only one immutable current corrected payload/request/status/projection capture, reprojects locally with zero I/O, retains the old capture after a failed replacement, and releases it on disposal.
-- [ ] No browser payload cap is borrowed from Reader history, client cache admission, or MCP limits.
-- [ ] Subscriber exceptions are reported without blocking later subscribers, and reentrant operations are rejected.
-- [ ] `./bindings` imports without DOM globals or element registration and exports adapters rather than transport or domain policy.
-- [ ] Duplicate binding rejects; unbinding is idempotent and does not dispose the controller.
-- [ ] Deferred defaults honor `preventDefault()` after dispatch and verify that the same binding plus originating committed result or Reader entry remain current.
-- [ ] Reader remains specialized and its presentation snapshot remains separate from its rendering view model.
-- [ ] Optional Reader toolbar content is additive, absent from the no-view-model initial loading state, and uses current public host state rather than private DOM inspection.
-- [ ] Reader parts expose only `toolbar`, `history`, `source-pane`, and `connections-pane`; generated metadata matches template evidence in both directions and forwards no undeclared child part.
+- [ ] One lazy shared acquisition value exists per loaded module instance.
+- [ ] Import, supplied data, and explicit per-element acquisition do not realize it.
+- [ ] Configuration can replace the pending choice before first shared use.
+- [ ] Every configuration call after first shared use fails, including an identical value.
+- [ ] Explicit client, host capability, and disabled choices are distinguishable without heuristic duck typing.
+- [ ] Explicit failure, disablement, or unsupported operation never falls through to browser HTTP.
+- [ ] The client cache remains the only response cache; component acquisition adds no retry, coalescing, persistence, or stale fallback.
+- [ ] Disconnection invalidates active work while retaining committed content.
+- [ ] Reconnection resumes only still-eligible interrupted work with a new identity.
+- [ ] Reconnecting completed unchanged content makes zero requests.
+- [ ] Ordinary network failure is not automatically retried.
+- [ ] Popup can prepare while closed, and visibility alone does not start, restart, or cancel acquisition.
+
+## Public and private boundaries
+
+- [ ] Prepared rendering types and protocols are absent from supported declarations, metadata, and exports.
+- [ ] `./bindings` and `./reader-controller` remain absent from supported exports and have explicit test dispositions.
+- [ ] `./acquisition` imports without DOM registration.
+- [ ] Component subpaths expose raw input/options/events rather than public prepared-state factories.
+- [ ] Parent composition uses captured data and private preparation rather than child `sref`.
+- [ ] A parent-intercepted child data action runs one parent default and no child default.
+- [ ] Reader remains specialized and exposes semantic entries/raw retained records rather than prepared child rendering.
+- [ ] Optional Reader toolbar content and coarse parts preserve their current rendering/accessibility contracts.
 
 ### Text segment
 
@@ -135,7 +140,7 @@ Review the initial and expanded corrections for:
 - [ ] `projectTextSegmentVersion` projects an already-selected `CoreV3Version` without language-family reselection.
 - [ ] Request-based text-segment projection delegates post-selection work to `projectTextSegmentVersion`.
 - [ ] Role-based composites resolve sides before they call `projectTextSegmentVersion`.
-- [ ] The resolved-version projection owns sanitization, full-mark footnotes, direction, and language; the element derives non-full vocalization only from the immutable safe view model.
+- [ ] The resolved-version projection owns sanitization, full-mark footnotes, direction, and language; the element derives non-full vocalization only from the immutable safe private prepared state.
 - [ ] Request warnings remain with the selector-owning factory or composite.
 - [ ] The resolved-version projection does not assign payload warnings to an existing selected version.
 - [ ] A composite maps a missing role and its warning without calling the resolved-version projection.
@@ -152,7 +157,7 @@ Review the initial and expanded corrections for:
 - [ ] Blank references and blank exact version titles make zero requests.
 - [ ] Exact selectors claim their matching role version before bare selectors fall back to `isPrimary` and `isSource`.
 - [ ] `isPrimary` is not assumed to be unique across versions returned for both selectors.
-- [ ] Reversing the payload `versions` array produces an identical view model.
+- [ ] Reversing the payload `versions` array produces an identical private prepared state.
 - [ ] A version that fills neither role is dropped.
 - [ ] More than one candidate for either role is a projection error.
 - [ ] The resolved-version projection is never called for an absent role.
@@ -177,11 +182,11 @@ Review the initial and expanded corrections for:
 - [ ] Scalar-array disagreement at one path is a projection error.
 - [ ] Card items retain positional identity; refs appear only for the reviewed metadata-backed address capability.
 - [ ] The payload-derived header makes no second request.
-- [ ] An optional host-supplied `RefLabelViewModel` changes only header rendering.
+- [ ] Optional host-supplied raw reference-label data changes only header preparation.
 - [ ] A ten-item card uses one outer request and zero child requests.
-- [ ] Async and pure factories are equal for the captured payload.
+- [ ] Supplied and acquired paths produce equal private preparation for the captured payload.
 - [ ] The shared pair renderer produces the bilingual element's established layout behavior.
-- [ ] Keyed rendering preserves unchanged item DOM across view-model updates.
+- [ ] Keyed rendering preserves unchanged item DOM across prepared-state updates.
 - [ ] A realistic large payload projects every leaf without truncation or quadratic scanning.
 
 ### Source-card selection
@@ -213,7 +218,7 @@ Review the initial and expanded corrections for:
 - [ ] Category/page/preview-display changes over a captured response make zero requests.
 - [ ] Connection, category, page, and preview-request events are composed and keyboard reachable.
 
-### Reader session and controller
+### Reader session and declarative element
 
 - [ ] External root replacement keeps old committed source, selection, history, and presentation until qualified source admission succeeds.
 - [ ] Source, context, addressability, request-mismatch, pin, and budget failures do not partially replace or evict the old root.
@@ -223,47 +228,28 @@ Review the initial and expanded corrections for:
 - [ ] Requested, server-qualified, contextual, and committed selected references remain distinct, and no alias uses arbitrary string parsing or a first-row fallback.
 - [ ] An invalid replacement is rejected before superseding valid work; a newer valid action aborts older physical work and rejects ignored-abort completion.
 - [ ] Fresh-root presentation uses existing defaults unless explicitly supplied, while connection-follow navigation retains normal history behavior.
-- [ ] Browser and MCP data sources use the same controller action without direct element requests or a wire-format change.
+- [ ] Browser and MCP paths use the same Reader admission semantics without a private wire-format change; MCP continuation remains host-proxied.
 
 ## Composite request counts
 
-- [ ] The composite async factory owns the outer request.
-- [ ] The composite pure factory calls child pure factories.
-- [ ] The composite factory does not call child async factories.
-- [ ] Child factories do not read a client.
+- [ ] The composite element owns the outer request.
+- [ ] Child rendering uses captured parent data and private preparation.
+- [ ] The parent does not assign child `sref` or trigger child acquisition.
 - [ ] A request spy proves one outer request.
 - [ ] The same spy proves zero child requests.
-- [ ] A ten-child fixture produces ten child view models from one captured payload.
+- [ ] A ten-child fixture produces ten child renderings from one captured payload.
 
-## Request-free elements
+## Element rendering and interactions
 
-- [ ] The element accepts one component-specific view model.
-- [ ] Other element properties are visual or interactive.
-- [ ] The element accepts no reference.
-- [ ] The element accepts no raw JSON or generated API payload.
-- [ ] The element accepts no client, base URL, host, or `fetch`.
-- [ ] The element imports no client at runtime.
-- [ ] The element calls no async factory.
-- [ ] A browser test fails if any request occurs.
-- [ ] Every state the component supports comes from the view model.
+- [ ] Every public element accepts its documented `sref`, raw `data`, acquisition, visual, and interaction properties.
+- [ ] No element accepts arbitrary `fetch`, a base URL, or an untyped host.
+- [ ] Private prepared rendering is not writable through a supported property.
 - [ ] Layout and interaction remain element properties.
-
-## Interaction-triggered data
-
-- [ ] An element emits a semantic composed event for a user action.
-- [ ] The event contains no client or raw payload.
-- [ ] The host selects the captured-payload, server-provided, client, or unavailable path explicitly.
-- [ ] The captured-data owner declares that the payload covers the requested target.
-- [ ] An empty pure-factory result does not establish captured-payload coverage.
-- [ ] Captured and server-provided data call the pure factory without a request.
-- [ ] Client mode supplies loading state and calls one async factory operation.
-- [ ] The integration shows missing host capability outside the target element.
-- [ ] The integration does not invent an unsupported component state.
-- [ ] A newer action aborts the older operation when possible.
-- [ ] An obsolete result cannot replace the current view model.
-- [ ] The async factory does not own task history, retries, or active selection.
-- [ ] Task state and component view-model state do not render the same surface independently.
-- [ ] For a component data path, the target element receives loading and terminal view models from the host.
+- [ ] User actions emit semantic composed events containing no client or raw payload.
+- [ ] Deferred defaults honor `preventDefault()` and verify that the originating state remains current.
+- [ ] A parent that owns a child data action prevents the child default and emits one parent action.
+- [ ] Application task state does not become a second renderer for the same surface.
+- [ ] Captured-data coverage is explicit; empty rendering does not establish coverage.
 
 ## MCP integration
 
@@ -272,9 +258,10 @@ Review the initial and expanded corrections for:
 - [ ] Invalid metadata stops before payload validation.
 - [ ] The App validates the unknown payload with the generated TypeScript validator.
 - [ ] The App reports structured paths for invalid payloads.
-- [ ] The App calls the same pure factory as client mode.
-- [ ] The App supplies only a view model to the element.
+- [ ] The App supplies a validated raw Reader seed or tagged host capability.
+- [ ] The Reader uses the same private preparation as browser-client mode.
 - [ ] The first render makes zero requests.
+- [ ] Later Reader acquisition uses host-proxied tools only and never falls back to direct HTTP.
 - [ ] One tool result includes useful text content for hosts without App rendering.
 - [ ] The server preserves network and undocumented HTTP failures as tool failures.
 - [ ] Automated repository checks mock the server transport and remain offline.
@@ -328,10 +315,10 @@ Review the initial and expanded corrections for:
 - [ ] Each public element uses an open shadow root.
 - [ ] Components emit no global style.
 - [ ] Custom properties use the `--sefaria-*` prefix.
-- [ ] Direction comes from view-model data.
+- [ ] Direction comes from prepared-state data.
 - [ ] Text segments contain no repeated edition attribution.
 - [ ] A source card renders each visible resolved edition's attribution once outside its item collection.
-- [ ] `hideAttributions` defaults to false, and enabling it changes rendering without discarding view-model attribution.
+- [ ] `hideAttributions` defaults to false, and enabling it changes rendering without discarding prepared-state attribution.
 - [ ] A source card links the edition title for a validated HTTP(S) `versionSourceUrl` and keeps other source text inert.
 - [ ] The Linker popup displays source-card attribution.
 - [ ] Interactive controls use native elements and accessible names.

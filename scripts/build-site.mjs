@@ -20,10 +20,6 @@ const siteBasePath = readSiteBasePath(process.argv.slice(2));
 await rm(stagedPublic, { recursive: true, force: true });
 await mkdir(path.join(stagedPublic, "examples"), { recursive: true });
 await mkdir(path.join(stagedPublic, "images"), { recursive: true });
-await copyFile(
-  path.join(root, "docs", "images", "reader-navigation.html"),
-  path.join(stagedPublic, "images", "reader-navigation.html"),
-);
 if (!examplesOnly) {
   await rm(site, { recursive: true, force: true });
 }

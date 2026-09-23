@@ -2,33 +2,24 @@
 
 # Bilingual segment
 
-Use `<sefaria-bilingual-segment>` for one aligned primary-and-translation pair. The element handles the pair's layout, side visibility, side order, direction, and vocalization over a supplied view model.
+Use `<sefaria-bilingual-segment>` for one aligned primary-and-translation pair. Assign raw `data` for supplied rendering or `sref` for standalone loading.
 
 ## Use it when
 
-Choose this surface when the product needs one short aligned pair inside its own page or card. Use a source card for a passage or range with attribution and optional item selection; use the bilingual segment when the host already owns that surrounding structure.
+Choose this surface when the host already owns heading and attribution. Use a Source Card for a passage or range.
 
 ## Try it
 
 <PlaygroundEmbed project="bilingual-segment" title="Edit the bilingual-segment example" />
 
-The maintained project changes `sideOrder` without replacing data. It demonstrates that presentation controls remain host-owned:
-
-- `contentLanguage` chooses the visible roles.
-- `layout` chooses the requested arrangement.
-- `sideOrder` chooses which role appears first in a side-by-side layout.
-- `vocalizationMode` changes displayed Hebrew presentation.
-
-The <SiteLink to="/examples/explorer/authored.html?component=bilingual-segment&amp;scenario=partial">authored state explorer</SiteLink> includes data, loading, partial, empty, and projection-error states.
+`contentLanguage`, `layout`, `sideOrder`, and `vocalizationMode` are presentation-only. The element resolves payload-owned roles and directions, and partial data remains an explicit one-sided result.
 
 ## Interaction and accessibility
 
-The element emits no events. Each side retains the direction from its view model, so a bilingual layout can contain RTL Hebrew and LTR translation without the host rewriting either side. A partial state is an explicit missing-side result; do not replace it with an empty string or silently shift the remaining side.
+The element emits no data-action events. Current failures emit `sefaria-bilingual-segment-error`. Supplied and acquired paths use the same private preparation.
 
 ## Exact contract and source
 
-- [Generated element properties](../reference/custom-elements.md#sefaria-bilingual-segment)
+- [Generated element properties and events](../reference/custom-elements.md#sefaria-bilingual-segment)
 - [Maintained playground source](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground/projects/bilingual-segment/)
-- [Authored states](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/bilingual-segment.scenarios.ts)
-
-For the request-free boundary and pure factory path, see [How the pieces fit together](../guides/data-flow.md).
+- [Data-flow guide](../guides/data-flow.md)

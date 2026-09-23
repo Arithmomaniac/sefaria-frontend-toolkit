@@ -12,7 +12,7 @@ Subsegment tags belong to a Version's text rather than an Index. Different editi
 
 ## Start with the boundary
 
-The client validates the response shape. A non-DOM component factory owns the text boundary: it calls `normalizeText` once, preserves its safe HTML fields and structured footnotes, and creates render-ready view-model fields. The Web Component receives the view model and can derive one of the supported vocalization presentations from those immutable safe fields; it does not parse an API payload or decide which tags are safe.
+The client validates the response shape. The element's private preparation boundary calls `normalizeText` once, preserves safe HTML fields and structured footnotes, and creates private render-ready state. Rendering can derive one of the supported vocalization presentations from those immutable safe fields without treating raw API HTML as safe.
 
 For the path from client to renderer, read [How the pieces fit together](data-flow.md). The [processing boundary](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/text-processing.md#processing-boundary) defines the exact responsibilities.
 
@@ -132,7 +132,7 @@ first<sup class="footnote-marker">*</sup><i class="footnote">one</i> second<sup
 ><i class="footnote">two</i>
 ```
 
-The normalizer assigns zero-based keys within that result. Keys are not DOM IDs or durable identities; the request-free element uses them only to match placeholders to note records.
+The normalizer assigns zero-based keys within that result. Keys are not DOM IDs or durable identities; the declarative element uses them only to match placeholders to note records.
 
 ### Commentary placements and rendered markers
 
@@ -302,9 +302,9 @@ An empty `notes` array after one of these formats is not proof that the source h
 
 ## The processing path
 
-For a validated API string, the owning pure factory calls `normalizeText` once and stores `bodyHtml` plus `{ key, markerHtml, contentHtml }` note records. When the host has validated, source-scoped link evidence, the non-DOM projection helper can pass narrow commentary candidates into the same operation.
+For a validated API string, private component preparation calls `normalizeText` once and stores `bodyHtml` plus `{ key, markerHtml, contentHtml }` note records. When validated source-scoped link evidence is available, private projection can pass narrow commentary candidates into the same operation.
 
-The element receives the resulting view model. Full `taamim_and_nikkud` mode renders those fields directly. `nikkud` and `none` call `applyVocalizationToHtml` for every safe HTML field, always starting from the original view model. The element replaces canonical key-only note placeholders with marker presentation at render time. It does not receive raw JSON, a client, base URL, `fetch`, or raw API HTML. For ownership and current/planned boundaries, see [Design](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/design.md#ownership), [Development](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md#implemented-on-this-baseline), and the [component specification](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/components.md#element-contract).
+Full `taamim_and_nikkud` mode renders the prepared safe fields directly. `nikkud` and `none` call `applyVocalizationToHtml` for every safe HTML field, always starting from the original private prepared state. The element replaces canonical key-only note placeholders with marker presentation at render time. Raw API HTML is validated and normalized before it reaches rendering. For ownership and current/planned boundaries, see [Design](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/design.md#ownership), [Development](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md#implemented-on-this-baseline), and the [component specification](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/components.md#element-contract).
 
 ## Read the exhaustive sources
 

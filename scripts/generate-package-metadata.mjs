@@ -33,7 +33,12 @@ const generatedFiles = {
 };
 
 const eventCatalog = {
-  "sefaria-bilingual-segment": [],
+  "sefaria-bilingual-segment": [
+    event(
+      "sefaria-bilingual-segment-error",
+      "Reports a current standalone loading or validation failure.",
+    ),
+  ],
   "sefaria-connections-panel": [
     event(
       "sefaria-connections-category-change",
@@ -51,9 +56,17 @@ const eventCatalog = {
       "sefaria-connection-select",
       "Reports selection of one connected reference.",
     ),
+    event(
+      "sefaria-connections-panel-error",
+      "Reports a current standalone loading or validation failure.",
+    ),
   ],
   "sefaria-popup": [
     event("sefaria-popup-close", "Reports that the popup should close."),
+    event(
+      "sefaria-popup-error",
+      "Reports a current standalone loading or validation failure.",
+    ),
   ],
   "sefaria-reader": [
     event("sefaria-reader-back", "Requests navigation to the previous entry."),
@@ -89,15 +102,33 @@ const eventCatalog = {
       "sefaria-reader-connections-preview-request",
       "Requests connection previews from the host.",
     ),
+    event(
+      "sefaria-reader-error",
+      "Reports a current standalone loading or seed-admission failure.",
+    ),
   ],
-  "sefaria-ref-label": [],
+  "sefaria-ref-label": [
+    event(
+      "sefaria-ref-label-error",
+      "Reports a current standalone loading or validation failure.",
+    ),
+  ],
   "sefaria-source-card": [
     event(
       "sefaria-source-select",
       "Reports selection of one source-card item.",
     ),
+    event(
+      "sefaria-source-card-error",
+      "Reports a current standalone loading or validation failure.",
+    ),
   ],
-  "sefaria-text-segment": [],
+  "sefaria-text-segment": [
+    event(
+      "sefaria-text-segment-error",
+      "Reports a current standalone loading or validation failure.",
+    ),
+  ],
 };
 
 const cssPropertyCatalog = [
@@ -289,6 +320,10 @@ async function buildCustomElementsManifest() {
         sourcePath: module.path,
         source,
       });
+      declaration.members = (declaration.members ?? []).filter(
+        (member) =>
+          member.privacy !== "private" && !member.name?.startsWith("#"),
+      );
       declaration.events = eventCatalog[declaration.tagName];
       declaration.slots ??= [];
       declaration.cssParts ??= [];

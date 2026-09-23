@@ -3,8 +3,10 @@ import {
   type SefariaClient,
 } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
-import { bindPopupController } from "@arithmomaniac/sefaria-web-components/bindings";
-import { createPopupController } from "@arithmomaniac/sefaria-web-components/popup";
+import type {
+  SefariaAcquisition,
+  SefariaPopup,
+} from "@arithmomaniac/sefaria-web-components";
 
 const POPUP_ID = "linked-article-source-popup";
 const LINK_SELECTOR = "a[data-sefaria-ref]";
@@ -18,9 +20,9 @@ export function startLinkedArticle(
   root: Document = document,
   client: SefariaClient = createSefariaClient({ cache: false }),
 ): LinkedArticleApp {
-  const popup = root.createElement("sefaria-popup");
-  const controller = createPopupController(client);
-  const unbind = bindPopupController(popup, controller);
+  const popup = root.createElement("sefaria-popup") as SefariaPopup;
+  const acquisition: SefariaAcquisition = { kind: "client", client };
+  popup.acquisition = acquisition;
   popup.id = POPUP_ID;
   root.body.append(popup);
   const existingStatus = root.querySelector<HTMLElement>(STATUS_SELECTOR);
@@ -34,11 +36,26 @@ export function startLinkedArticle(
   const anchors = [...root.querySelectorAll<HTMLAnchorElement>(LINK_SELECTOR)];
   const listeners = new Map<HTMLAnchorElement, (event: MouseEvent) => void>();
   const close = (): void => {
-    controller.cancel();
+    popup.sref = "";
     popup.open = false;
+  };
+  const showError = (event: Event): void => {
+    const detail = (
+      event as CustomEvent<{ readonly error: unknown; readonly sref: string }>
+    ).detail;
+    if (popup.sref !== detail.sref) {
+      return;
+    }
+    popup.open = false;
+    status.textContent =
+      detail.error instanceof Error
+        ? detail.error.message
+        : String(detail.error);
+    status.setAttribute("role", "alert");
   };
 
   popup.addEventListener("sefaria-popup-close", close);
+  popup.addEventListener("sefaria-popup-error", showError);
 
   for (const anchor of anchors) {
     if (!isEligibleAnchor(anchor)) {
@@ -54,41 +71,25 @@ export function startLinkedArticle(
       if (tref === undefined) {
         return;
       }
-      void open(anchor, tref);
+      open(anchor, tref);
     };
     listeners.set(anchor, listener);
     anchor.addEventListener("click", listener);
   }
 
-  async function open(anchor: HTMLAnchorElement, tref: string): Promise<void> {
+  function open(anchor: HTMLAnchorElement, tref: string): void {
     popup.anchor = anchor;
-    popup.open = true;
     status.textContent = "";
     status.setAttribute("role", "status");
-
-    try {
-      await controller.load({ tref });
-    } catch (error) {
-      if (
-        !popup.isConnected ||
-        controller.snapshot.attempt.state !== "failed" ||
-        controller.snapshot.attempt.error !== error
-      ) {
-        return;
-      }
-      popup.open = false;
-      status.textContent =
-        error instanceof Error ? error.message : String(error);
-      status.setAttribute("role", "alert");
-    }
+    popup.sref = tref;
+    popup.open = true;
   }
 
   return {
     destroy(): void {
       close();
-      unbind();
-      controller.dispose();
       popup.removeEventListener("sefaria-popup-close", close);
+      popup.removeEventListener("sefaria-popup-error", showError);
       for (const [anchor, listener] of listeners) {
         anchor.removeEventListener("click", listener);
         anchor.removeAttribute("aria-controls");

@@ -1,177 +1,91 @@
 > Created/edited by GitHub Copilot; pending human review.
 
-# How the client, view models, and Web Components fit together
+# How declarative components obtain and render data
 
-**Current:** the reference label, text segment, bilingual segment, source card, connections panel, popup, and controlled Reader are implemented. Each endpoint-backed component also has an optional typed headless controller and a registration-free DOM adapter. The authored linked-article and MCP paths described here are also implemented.
+**Current:** all seven public elements support standalone `sref`. The six ordinary elements also accept authoritative component-specific raw `data`; Reader accepts transactional raw seeds. Elements own validation, acquisition selection, cancellation, stale-result suppression, private preparation, and rendering.
 
-The toolkit separates three roles. An **element** displays a view model and emits events. Supplied **factories and controllers** provide reusable projection and supported behavior. The **application host** chooses the data source, creates and disposes the pieces, and owns any integration-specific policy. Elements do not fetch.
+## Start with supplied data
 
-For a controller-backed component, the current path is `application input -> controller or factory -> component view model -> binding -> request-free element`. A semantic component event travels back to the application, which reads the controller's canonical committed state before deciding whether to change data or presentation.
-
-## The same layers across different hosts
-
-```mermaid
-flowchart TB
-    API["Sefaria API"]
-    SITE["Regular website<br/>@arithmomaniac/sefaria-client + async factory"]
-    ARTICLE["Authored article<br/>explicit anchor + popup async factory"]
-    MCP["MCP App<br/>structuredContent + validation"]
-    FACTORY["Component factory<br/>API payload → rendering data"]
-    VM["Component view model"]
-    ELEMENT["Request-free Web Component"]
-    UI["Host-composed UI"]
-
-    API --> SITE
-    API --> ARTICLE
-    API --> MCP
-    SITE --> FACTORY
-    ARTICLE --> FACTORY
-    MCP --> FACTORY
-    FACTORY --> VM
-    VM --> ELEMENT
-    ELEMENT --> UI
-```
-
-The central layers are the same in every case:
-
-1. The **API** supplies transport data.
-2. The **client or integration boundary** obtains and validates that data.
-3. A **factory** projects the validated payload into a component-specific **view model**.
-4. A request-free **Web Component** renders that view model.
-
-The difference is where the request happens. A regular site can supply `@arithmomaniac/sefaria-client` to an async factory or an owner controller. The authored linked-article page calls the popup controller when a reader activates an explicit citation anchor. In the MCP path, the server obtains the payload, the App validates `structuredContent`, and the App calls the same pure projection through its controller seed path. None of these paths sends raw API JSON to the element.
-
-Web Components are composable because the host can arrange several request-free elements and supply each one a view model. Composite data projection happens before rendering: a composite pure factory can call child pure factories using one captured payload. One element does not reach out to fetch data or ask another element to do so; interactive elements emit events and the host decides what data to obtain next.
-
-For one endpoint-backed surface, the host can use the component subpath's `create...Controller` factory and the matching adapter from `@arithmomaniac/sefaria-web-components/bindings` instead of rebuilding cancellation and latest-wins state. A pending or failed attempt stays separate from the previous committed result, so the binding can keep useful content visible while the host reports progress or failure. These headless controllers are framework-neutral, not Lit `ReactiveController` implementations.
-
-For the controlled Reader, that host decision does not mean rebuilding the specialized Reader state machine. The toolkit supplies `loadReaderController` and `bindReaderController`; the application supplies the permitted data source and lifecycle. A website can use the public client while an MCP App uses host-proxied tools, and both bind the resulting controller state to the same request-free Reader presentation.
-
-The linked-article and MCP lanes are current. The [design diagram](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/design.md#package-dependency-diagram) provides the detailed dependency view.
-
-## Four things that are easy to confuse
-
-| Thing | Example | What it means |
-| --- | --- | --- |
-| Component request | `{ tref: "Micah 6:8" }` for a source card | What the host wants to obtain and project; it goes to a factory, never to an element |
-| API payload | A validated v3 text response containing versions and recursive text | What Sefaria returned; its shape follows the corrected generated API contract |
-| View model | A `SourceCardViewModel` with a `state`, and a header and items when it has data | Render-ready data for one component, not another transport or generalized Sefaria model |
-| Web Component | `<sefaria-source-card>` | The browser element that displays a view model and manages presentation |
-
-A **pure factory** has the name `create...ViewModel`: it projects a payload you already have, without making requests. An **async factory** has the name `load...ViewModel`: it uses the client you supply and delegates the successful payload to the same pure factory.
-
-## Follow one source-card request
-
-1. **Your host** creates a client, chooses a reference and any edition selectors, and supplies a loading view model to the element.
-2. **`loadSourceCardViewModel`** calls the generated v3 text operation through that client.
-3. **`@arithmomaniac/sefaria-client`** validates the JSON response against the generated schema for the operation and HTTP status. A successful TypeScript type does not substitute for that runtime boundary.
-4. **`createSourceCardViewModel`** resolves the requested editions, aligns text by its actual array structure, and delegates text preparation to pure child projections. `@arithmomaniac/sefaria-text-transform` sanitizes HTML and extracts footnotes while preserving full safe marks.
-5. **Your host** assigns the returned view model to the element's `viewModel` JavaScript property.
-6. **The element** renders its Shadow DOM. Layout, side-order, and vocalization-mode changes operate on the supplied immutable model; they do not make another API call or factory call.
-
-The [render-text guide](render-text.md#put-a-source-card-in-a-browser-app) implements this sequence with the current public exports.
-
-## Who owns what?
-
-| Owner | Responsibility | Not its responsibility |
-| --- | --- | --- |
-| `@arithmomaniac/sefaria-client` | Generated operations, API contracts, response validation, configurable API origin and `fetch`, and the bounded per-client response cache | Component methods, rendering, retries, or request coalescing |
-| `@arithmomaniac/sefaria-text-transform` | Pure processing of HTML and Hebrew text | Fetching, component state, or DOM rendering |
-| `@arithmomaniac/sefaria-web-components/source-card`, `@arithmomaniac/sefaria-web-components/popup`, and other non-DOM subpaths | Component request types, view-model unions, pure and async factories | Browser elements or the host's active selection |
-| `@arithmomaniac/sefaria-web-components` browser exports | Registered Lit elements, layout, theme, accessibility, and rendering | Fetching or interpreting raw API payloads |
-| Supplied Reader controller | Supported Reader requests, cancellation, semantic history, and navigation state | DOM rendering, host data-source policy, or lifecycle |
-| Your application or integration | Data-source choice, input, lifecycle, custom composition, and assigning or binding rendering state | A second copy of factory projection or supported Reader navigation |
-
-Imports from the non-DOM component subpaths can run without loading custom elements. Import the browser package only in the browser. Generated API types and view-model types describe values; importing a type does not fetch or render anything. The [design diagram](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/design.md#package-dependency-diagram) distinguishes runtime, type-only, generation, and external-payload relationships.
-
-## Already have the JSON?
-
-Validate unknown JSON where it enters your application, then call the same pure factory. This applies to stored data, fixtures, server responses, and tool results. A prior validation in another process does not make incoming bytes trusted.
+If corrected API-shaped JSON already crossed a server, MCP, fixture, stored-data, or user-input boundary, validate it and assign it directly:
 
 ```ts
-import { zGetV3TextsResponse } from "@arithmomaniac/sefaria-client/schemas";
 import {
-  createSourceCardViewModel,
-  type SourceCardRequest,
-} from "@arithmomaniac/sefaria-web-components/source-card";
+  type CoreV3TextsResponse,
+  zCoreV3TextsResponse,
+} from "@arithmomaniac/sefaria-client";
+import "@arithmomaniac/sefaria-web-components";
 
-export function projectReceivedText(
-  value: unknown,
-  request: SourceCardRequest,
-) {
-  const payload = zGetV3TextsResponse.parse(value);
-  return createSourceCardViewModel(payload, request);
-}
+const card = document.querySelector("sefaria-source-card");
+if (!card) throw new Error("The source card is missing.");
+
+card.data = zCoreV3TextsResponse.parse(received) as CoreV3TextsResponse;
 ```
 
-This example handles a v3 **success payload**, not an arbitrary HTTP response. The generated Zod schema throws a validation error with structured issue paths before projection. If you receive operation and status metadata too, use the appropriate status-specific boundary rather than assuming every JSON object is a success payload.
+For the six non-Reader elements, defined `data` is authoritative. Valid, validly empty, and invalid supplied data all suppress `sref` acquisition. Invalid input replaces earlier content with a validation failure and does not fall through to the network. Clearing `data` lets a retained eligible `sref` run.
 
-No client is created here and no request occurs. Supply a request whose reference and edition selection match the captured payload; the factory is not an offline reference parser or a service for finding another passage in unrelated data.
+Raw data is not render-ready state. Each element validates, selects, sanitizes, and prepares it into private state before rendering. The same private preparation is used after standalone acquisition.
 
-This path returns a view model, **not server-rendered component HTML**. The current MCP App uses the same validation-and-projection pattern for `structuredContent`; its first render does not repeat the server's source request.
-
-## A view model is not a bag of arbitrary HTML
-
-API text may be valid JSON and still contain unsafe HTML. These are separate checks: the client validates the JSON shape; the pure component factory sanitizes text before constructing rendering data. Do not cast an API response to a view model or assign raw text to a render-ready HTML field.
-
-The [markup guide](text-markup.md) explains what is retained, transformed, or removed. Elements receive the processed result; they are not another sanitizer or payload validator.
-
-State also belongs in the model. A loading state means the host is waiting. An empty state means a valid payload had nothing this component could render. A bilingual `partial` state means one requested side is missing. A source card can contain partial **items** without having a top-level `partial` state. Use each component's actual union rather than inventing a common state interface.
-
-## One response can produce many child views
-
-A source card is a composite. A scalar segment becomes one item; ranges and nested text can become many. The factory follows the payload's structure and aligns both sides by position, retaining one-sided items instead of shifting subsequent text to fill holes.
-
-The card makes one outer v3 request. Child pure projections make zero requests. It does not load each verse again, synthesize references from array indexes, or depend on a cache to hide duplicate calls. Attribution is shown once per selected edition at card scope, not repeated for every child.
-
-The component contract includes the concrete ten-child, one-request case. See [composite factories](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/components.md#composite-factories) for the exact rule.
-
-## Failures stay at the right boundary
-
-| Outcome | What the host receives or does |
-| --- | --- |
-| Documented HTTP error | The async factory returns the component's documented HTTP-error view model |
-| Valid payload but wrong shape for this component | The pure factory returns its projection-error view model |
-| Valid but missing text | The factory returns the component's empty or partial representation |
-| Invalid JSON contract | Validation rejects with structured paths before projection |
-| Network failure or abort | The async operation rejects; the host handles it without disguising it as missing text |
-| New selection while a request is pending | The host cancels or supersedes the old operation and prevents stale results replacing the new model |
-
-Changing presentation is different from requesting new data. Changing a card's layout is local. Choosing another reference or edition is a new host task. Later interactive components must emit an event when they need different data; the host chooses the permitted data source and calls the factory.
-
-## Advanced: own the request lifecycle
-
-The public controller is the ordinary integration because it already keeps pending and committed state separate, cancels obsolete work, and binds the latest snapshot. A host may own the lifecycle when it coordinates several independent operations or needs a policy that is outside the component controller. That is an advanced alternative, not a prerequisite for using a request-free element.
+## Then add standalone `sref`
 
 ```ts
-let activeRequest: AbortController | undefined;
-let operation = 0;
-let committed: SourceCardViewModel | undefined;
+import "@arithmomaniac/sefaria-web-components";
 
-async function loadSourceCard(tref: string): Promise<void> {
-  activeRequest?.abort();
-  const request = new AbortController();
-  activeRequest = request;
-  const current = ++operation;
+const card = document.querySelector("sefaria-source-card");
+if (!card) throw new Error("The source card is missing.");
 
-  try {
-    const next = await loadSourceCardViewModel(
-      { tref },
-      client,
-      request.signal,
-    );
-    if (!request.signal.aborted && current === operation) {
-      committed = next;
-      card.viewModel = next;
-    }
-  } catch (error) {
-    if (!request.signal.aborted && current === operation) {
-      reportFailure(error, committed);
-    }
-  }
-}
+card.data = undefined;
+card.sref = "Micah 6:8";
 ```
 
-This pattern is only correct when the host keeps the abort signal, operation identity, committed result, and failure reporting together. Do not copy it merely to replace `createSourceCardController`; use the maintained controller unless the host has a concrete multi-operation ownership requirement.
+The element selects either its explicit tagged `acquisition` source or the module-local lazy shared default. An explicit source can be an existing toolkit client, a structural host capability, or disabled. Explicit failure, disablement, or an unsupported operation never falls through to browser HTTP.
 
-For the full ownership contract, read [Design](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/design.md). For exact component types and acceptance rules, read the [component specification](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/components.md). For deliberately different behavior from Sefaria's applications, read [Intentional differences](differences.md).
+Maintained documentation and example pages still preserve their activation gates: opening a page or deep link does not assign a live `sref`. A button, form submission, authored citation activation, or other approved action does.
+
+## Ownership
+
+| Owner | Responsibility | Exclusion |
+| --- | --- | --- |
+| `@arithmomaniac/sefaria-client` | Corrected operations, response validation, Fetch semantics, and the bounded per-client response cache | Component methods, retries, coalescing, or rendering |
+| Text transforms | Pure sanitization, vocalization, footnotes, and bounded previews | Requests or component lifecycle |
+| Public element | Input snapshot, acquisition choice, cancellation, stale suppression, private preparation, status, events, accessibility, and rendering | Arbitrary `fetch`, base URL, untyped host, retry, or public prepared state |
+| Host | Activation policy, supplied unknown-JSON validation, optional explicit acquisition, placement, and application-specific coordination | A second renderer or hidden fallback transport |
+| Reader session | Supported advanced semantic/raw facade: history, pins, budgets, `entryInfo`, stable raw records, and raw transitions | Prepared rendering/content, DOM state, browser-default transport, or spatial pane placement |
+
+## Shared and explicit acquisition
+
+```ts
+import { createSefariaClient } from "@arithmomaniac/sefaria-client";
+import {
+  configureSefariaAcquisition,
+  type SefariaAcquisition,
+} from "@arithmomaniac/sefaria-web-components/acquisition";
+
+const acquisition: SefariaAcquisition = {
+  kind: "client",
+  client: createSefariaClient(),
+};
+
+configureSefariaAcquisition(acquisition);
+```
+
+Configuration is allowed only before first shared use. Importing modules, supplied-data rendering, and explicit per-element acquisition do not realize the shared choice. The client cache remains the only response cache.
+
+## One parent request, zero child requests
+
+A composite owns its outer operation and privately prepares children from the captured response. It does not assign child `sref`. A ten-item Source Card or ten-preview Connections Panel therefore makes one outer request and zero child requests.
+
+## Lifecycle and errors
+
+Disconnected elements start no work. Disconnection aborts or invalidates active eligible work while retaining committed content. Reconnection resumes only the still-eligible interrupted source or links phase with a new operation identity. Ordinary network failure is not retried automatically.
+
+Popup preparation does not depend on `open`; the property controls visibility only. An activation-gated host assigns and clears Popup `sref` according to host policy.
+
+Current failures are reflected in the element's read-only `status` and documented error events. Original error causes and structured validation paths remain available where the event contract provides them. Superseded work emits no stale success or failure and produces no unhandled rejection.
+
+## Reader is specialized
+
+Reader `sref` identifies the requested root. Raw source/connections seeds initialize or transactionally replace the Reader instead of remaining an ordinary authoritative `data` override. Public read-only diagnostics expose semantic state such as `selectedRef`, `currentEntryId`, `rootLoading`, and `readerError`.
+
+Advanced spatial hosts can use the supported `reader-session` facade for history, pins, budgets, `entryInfo`, stable `ReaderSourceRecord`/`ReaderConnectionsRecord` values, and raw transitions. The `reader` subpath supplies shared raw source qualification. Neither subpath exposes private prepared rendering or content.
+
+For exact contracts, read [Design](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/design.md), [Component specification](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/components.md), and [Integration specification](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/integrations.md).

@@ -4,11 +4,7 @@
 
 ## Objective
 
-Choose a current rendering surface, show a useful request-free state, and understand what the browser element, toolkit factory, and application host each own.
-
-For a complete reading flow, begin with the [controlled Reader](04-reader.md). For one passage or range, begin with a source card. The [component catalog](../components.md) compares all seven current surfaces and links to working previews.
-
-A Web Component is a browser-standard custom HTML element. One JavaScript import registers it, after which vanilla JavaScript, React, or another browser framework can create the same element and assign its typed properties. You do not need to know Lit to consume the toolkit.
+Choose one of the seven current elements and render either supplied raw data or a standalone reference.
 
 ## Prerequisites
 
@@ -17,67 +13,55 @@ A Web Component is a browser-standard custom HTML element. One JavaScript import
 
 ## Try it
 
-Register the browser elements, create one source card, and assign a render-ready object to its `viewModel` property:
+Register the elements and assign a reference:
 
 ```ts
 import "@arithmomaniac/sefaria-web-components";
-import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
-import type { SourceCardViewModel } from "@arithmomaniac/sefaria-web-components/source-card";
 
-const card = document.createElement("sefaria-source-card") as SefariaSourceCard;
-
-const model: SourceCardViewModel = {
-  state: "loading",
-  message: "Waiting for the host.",
-};
-
-card.viewModel = model;
+const card = document.createElement("sefaria-source-card");
+card.sref = "Micah 6:8";
+card.selectable = true;
 card.addEventListener("sefaria-source-select", (event) => {
   console.log((event as CustomEvent).detail);
 });
 document.body.append(card);
 ```
 
-The `import "@arithmomaniac/sefaria-web-components"` statement registers the custom elements in the browser. The non-DOM subpaths, such as `@arithmomaniac/sefaria-web-components/source-card`, export request types, view models, and factories without registering elements.
+The root import registers all seven elements. The element owns standalone acquisition and private preparation. Do not assign a client, URL, `fetch`, or prepared rendering object.
 
-An HTML attribute contains text. Properties can carry objects and arrays, so the host assigns a component view model as a JavaScript property:
+Properties can carry objects and arrays, so assign raw `data` and tagged `acquisition` through JavaScript properties rather than HTML attributes.
 
-```html
-<!-- This creates an element, but it does not load or render a passage. -->
-<sefaria-source-card></sefaria-source-card>
+Use an explicit acquisition source only when the default browser client is not appropriate:
+
+```ts
+card.acquisition = { kind: "client", client };
 ```
-
-Do not add a `tref`, client, URL, payload, or `fetch` property to an element. When an interaction needs different data, the element emits an event and the host decides whether to load anything.
 
 ## Expected result
 
-The element renders its loading state inside Shadow DOM. No network request occurs. The host can listen for the composed selection event without reaching into the component's internal markup. In the editor below, the reference-label controller receives validated supplied data and the binding assigns its view model to the element.
+After the element is connected, it reports loading through its read-only status and renders the validated result. Current failures appear as accessible state and a component-specific error event.
 
-<PlaygroundEmbed project="ref-label" title="Edit a request-free reference label" />
+The editor below demonstrates the zero-request supplied-data path:
+
+<PlaygroundEmbed project="ref-label" title="Edit a supplied-data reference label" />
 
 ## Who owns what
 
-| Layer | Owns | Does not own |
-| --- | --- | --- |
-| `@arithmomaniac/sefaria-client` | Corrected transport calls, response validation, and the bounded per-client response cache | Component state or rendering |
-| Pure/async component factories | Projection from validated payloads to one component's view model | DOM layout or host interaction state |
-| Web Component | Shadow DOM, accessibility, theme, layout, and event emission | References, requests, clients, or raw payloads |
-| Host application | Inputs, loading, cancellation, stale-result rejection, and assigning view models | Reimplementing factory projection |
+| Layer | Owns |
+| --- | --- |
+| Client | Transport validation and bounded per-client response cache |
+| Element | Input precedence, acquisition, cancellation, private preparation, rendering, and events |
+| Host | Activation policy, optional explicit acquisition, placement, and application behavior |
 
-For supported stateful surfaces, the toolkit can also supply a controller that coordinates existing factories and state. The controlled Reader uses this path: the host binds the provided controller instead of implementing navigation from scratch.
-
-The complete low-level flow is `client -> pure/async factory -> component-specific view model -> request-free element`. Read [How the pieces fit together](../guides/data-flow.md) for the detailed failure and composition rules.
+The complete flow is `sref or raw data -> element validation/acquisition -> private preparation -> Shadow DOM`. Read [How declarative components obtain and render data](../guides/data-flow.md).
 
 ## Exercise
 
-Change the editor's HTML to move the reference label, change its CSS, then change the JavaScript message shown after selecting **Unresolved**. Choose **Run** after each edit and confirm that the preview changes. The project description identifies the saved Micah 6:8 responses and zero-request coverage; use the next lesson's vanilla example when you want a visible request counter.
+Change the editor's HTML, CSS, and JavaScript, then choose **Run**. Confirm that supplied data renders without a request.
 
 ## Source and run links
 
 - Full editor: <SiteLink to="/examples/playground/index.html?project=ref-label">reference-label project</SiteLink>
-- Maintained editor source: [`examples/playground/projects/ref-label/`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground/projects/ref-label)
-- Source: [`development-status.ts`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/src/authored/development-status.ts)
-- Component contract: [`docs/specs/components.md`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/components.md)
 - Generated element metadata: [Custom elements](../reference/custom-elements.md)
 
 ## Next step

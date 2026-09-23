@@ -3,10 +3,15 @@ import { render } from "vitest-browser-lit";
 import { afterEach, expect, test, vi } from "vitest";
 
 import {
-  SefariaTextSegment,
-  type TextSegmentDataViewModel,
-  type TextSegmentViewModel,
-} from "./index.js";
+  getPreparedState,
+  prepared,
+  setPreparedState,
+} from "./prepared-state.js";
+import { SefariaTextSegment } from "./index.js";
+import type {
+  TextSegmentDataViewModel,
+  TextSegmentViewModel,
+} from "./text-segment.js";
 
 const DATA_VIEW_MODEL: TextSegmentDataViewModel = {
   state: "data",
@@ -61,7 +66,7 @@ test.each([
   async ({ viewModel, role, text }) => {
     const screen = render(
       html`<sefaria-text-segment
-        .viewModel=${viewModel satisfies TextSegmentViewModel}
+        ${prepared(viewModel satisfies TextSegmentViewModel)}
       ></sefaria-text-segment>`,
     );
 
@@ -72,7 +77,7 @@ test.each([
 test("renders payload language and direction with static footnotes", async () => {
   const screen = render(
     html`<sefaria-text-segment
-      .viewModel=${DATA_VIEW_MODEL}
+      ${prepared(DATA_VIEW_MODEL)}
     ></sefaria-text-segment>`,
   );
 
@@ -89,6 +94,10 @@ test("renders payload language and direction with static footnotes", async () =>
   const sourceLink = element?.shadowRoot?.querySelector("a");
   expect(article?.lang).toBe("he");
   expect(article?.dir).toBe("ltr");
+  expect(element?.selectedVersion).toEqual({
+    actualLanguage: "he",
+    direction: "ltr",
+  });
   expect(
     Number.parseFloat(
       getComputedStyle(
@@ -106,7 +115,7 @@ test("does not invent a body for a missing static footnote", async () => {
     notes: [{ key: 0, markerHtml: "1", contentHtml: null }],
   };
   render(
-    html`<sefaria-text-segment .viewModel=${viewModel}></sefaria-text-segment>`,
+    html`<sefaria-text-segment ${prepared(viewModel)}></sefaria-text-segment>`,
   );
 
   const element = document.querySelector<SefariaTextSegment>(
@@ -127,7 +136,7 @@ test("labels each rendered footnote body with its source marker", async () => {
     ],
   };
   render(
-    html`<sefaria-text-segment .viewModel=${viewModel}></sefaria-text-segment>`,
+    html`<sefaria-text-segment ${prepared(viewModel)}></sefaria-text-segment>`,
   );
 
   const element = document.querySelector<SefariaTextSegment>(
@@ -153,7 +162,7 @@ test("contains a long unbroken word in a 320 pixel host", async () => {
     <div style="width: 320px">
       <sefaria-text-segment
         style="width: 100%"
-        .viewModel=${viewModel}
+        ${prepared(viewModel)}
       ></sefaria-text-segment>
     </div>
   `);
@@ -173,7 +182,7 @@ test("never calls fetch while rendering", async () => {
   });
   vi.stubGlobal("fetch", fetchMock);
   const element = new SefariaTextSegment();
-  element.viewModel = DATA_VIEW_MODEL;
+  setPreparedState(element, DATA_VIEW_MODEL);
   document.body.append(element);
 
   await element.updateComplete;
@@ -193,11 +202,11 @@ test("reverses vocalization locally without changing a shared frozen view model"
   render(html`
     <sefaria-text-segment
       data-copy="changing"
-      .viewModel=${viewModel}
+      ${prepared(viewModel)}
     ></sefaria-text-segment>
     <sefaria-text-segment
       data-copy="stable"
-      .viewModel=${viewModel}
+      ${prepared(viewModel)}
     ></sefaria-text-segment>
   `);
   const changing = document.querySelector<SefariaTextSegment>(
@@ -222,13 +231,13 @@ test("reverses vocalization locally without changing a shared frozen view model"
   await changing.updateComplete;
   expect(changing.shadowRoot?.textContent).toContain("הִגִּ֥יד׀");
   expect(stable.shadowRoot?.textContent).toContain("הִגִּ֥יד׀");
-  expect(changing.viewModel).toBe(viewModel);
-  expect(stable.viewModel).toBe(viewModel);
+  expect(getPreparedState<TextSegmentViewModel>(changing)).toBe(viewModel);
+  expect(getPreparedState<TextSegmentViewModel>(stable)).toBe(viewModel);
 });
 
 test("rejects an invalid vocalization attribute value", async () => {
   const element = new SefariaTextSegment();
-  element.viewModel = DATA_VIEW_MODEL;
+  setPreparedState(element, DATA_VIEW_MODEL);
   element.setAttribute("vocalization-mode", "punctuation-free");
   document.body.append(element);
 

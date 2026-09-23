@@ -45,7 +45,7 @@ test("uses one real popup factory request and preserves style isolation", async 
 
   anchors[0]!.click();
   const popup = document.querySelector<SefariaPopup>("sefaria-popup");
-  await vi.waitFor(() => expect(popup?.viewModel?.state).toBe("data"));
+  await vi.waitFor(() => expect(popup?.status).toBe("ready"));
   await popup?.updateComplete;
 
   expect(fetch).toHaveBeenCalledTimes(1);
@@ -54,7 +54,7 @@ test("uses one real popup factory request and preserves style isolation", async 
     "sefaria-source-card",
   );
   await card?.updateComplete;
-  expect(card?.shadowRoot?.textContent).toContain("Micah 6:8");
+  expect(card?.status).toBe("ready");
   expect(
     getComputedStyle(popup!.shadowRoot!.querySelector(".dialog")!)
       .backgroundColor,
@@ -120,7 +120,7 @@ test("shows failures instead of success-shaped fallback", async () => {
   app.destroy();
 });
 
-test("suppresses stale completions and aborts close and destroy work", async () => {
+test("reuses an active reference and aborts close and destroy work", async () => {
   const anchors = renderArticle();
   const pending: Array<{
     signal: AbortSignal;
@@ -142,27 +142,23 @@ test("suppresses stale completions and aborts close and destroy work", async () 
   );
 
   anchors[0]!.click();
+  await vi.waitFor(() => expect(pending).toHaveLength(1));
   anchors[1]!.click();
-  expect(pending[0]!.signal.aborted).toBe(true);
-  pending[1]!.resolve(Response.json(micahPayload));
+  expect(pending).toHaveLength(1);
+  expect(pending[0]!.signal.aborted).toBe(false);
   const popup = document.querySelector<SefariaPopup>("sefaria-popup");
-  await vi.waitFor(() => expect(popup?.viewModel?.state).toBe("data"));
-  expect(popup?.anchor).toBe(anchors[1]);
-  pending[0]!.resolve(
-    Response.json({ ...micahPayload, ref: "Obsolete result" }),
-  );
-  await Promise.resolve();
   expect(popup?.anchor).toBe(anchors[1]);
 
-  anchors[0]!.click();
   popup?.dispatchEvent(
     new CustomEvent("sefaria-popup-close", { bubbles: true, composed: true }),
   );
-  expect(pending[2]!.signal.aborted).toBe(true);
+  await popup?.updateComplete;
+  expect(pending[0]!.signal.aborted).toBe(true);
 
   anchors[1]!.click();
+  await vi.waitFor(() => expect(pending).toHaveLength(2));
   app.destroy();
-  expect(pending[3]!.signal.aborted).toBe(true);
+  expect(pending[1]!.signal.aborted).toBe(true);
   expect(document.querySelector("sefaria-popup")).toBeNull();
   expect(anchors[0]!.hasAttribute("aria-controls")).toBe(false);
 });

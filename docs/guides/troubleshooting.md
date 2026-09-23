@@ -2,102 +2,62 @@
 
 # Troubleshooting
 
-Start with the symptom, then check the owner of that boundary. The examples and lessons use supplied data first, keep live actions explicit, and preserve committed content when a later operation fails.
+Start with the symptom, then check the owner of that boundary.
 
 ## The package cannot be installed
 
-**Symptom:** npmjs.com or a CDN cannot find the toolkit package, or GitHub Packages returns an authentication error.
-
-**Recovery:** the public distribution is the npm-format GitHub Packages registry, not npmjs.com or a CDN. Follow the [installation and authentication steps](../get-started.md#installation-status), confirm that the `@arithmomaniac` scope points to `https://npm.pkg.github.com`, use a classic token with `read:packages`, and request one exact synchronized alpha version. Package names are subject to change.
-
-For browser evaluation without installation, use the [interactive examples](../examples.md), [component catalog](../components.md), or supplied-data editor. Repository contributors can use the [local package setup](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md#build-and-pack-the-library-tarballs). Do not add a registry fallback to application code or commit credentials.
+Use the authenticated GitHub Packages setup in [Get started](../get-started.md#installation-status). The packages are not published on npmjs.com or a CDN. Do not add a registry fallback or commit credentials.
 
 ## The custom element is unknown
 
-**Symptom:** the browser reports an unknown element or the element renders no component behavior.
-
-**Recovery:** load the browser package before creating the element:
-
-```ts
-import "@arithmomaniac/sefaria-web-components";
-```
-
-Use the non-DOM component subpaths when you only need factories, controllers, or view models. They do not register custom elements. The [Web Components lesson](../learn/01-web-components.md) explains registration and the [generated element reference](../reference/custom-elements.md) lists the supported properties.
+Import `@arithmomaniac/sefaria-web-components` before creating the element. DOM-free subpaths do not register tags.
 
 ## A property change has no effect
 
-**Symptom:** assigning an object, array, view model, or DOM element through markup does not work.
-
-**Recovery:** assign non-primitive values as JavaScript properties:
+Assign raw objects, arrays, acquisition choices, and anchors as JavaScript properties:
 
 ```ts
-card.viewModel = viewModel;
+card.data = validatedPayload;
+card.acquisition = { kind: "client", client };
 popup.anchor = citationButton;
-reader.viewModel = readerViewModel;
 ```
 
-Use attributes for the documented primitive controls such as `layout`, `side-order`, `linked`, or `vocalization-mode`. Do not serialize a view model into an attribute and do not pass raw API JSON to an element. See the [component usage pages](../components/) and the [custom-element reference](../reference/custom-elements.md).
+Do not serialize raw data into an attribute or assign prepared rendering.
 
 ## The supplied Reader says a target is unavailable
 
-**Symptom:** a Reader action reports `source-unavailable` after navigation.
-
-**Recovery:** treat it as a finite-example boundary, not as an empty passage or a general Reader failure. The supplied project covers Micah 6:8 source and captured connections only. Use the <SiteLink to="/examples/reader/controlled.html?tref=Micah%206%3A8">controlled live Reader</SiteLink> when the host is allowed to activate live data, or provide a data source that covers the target.
-
-Do not add an implicit request to the supplied example merely to make an uncovered target appear to work.
+The supplied project has finite `Micah 6:8` coverage. Use the explicitly activated live Reader or provide a raw seed/host capability that covers the target. Do not fabricate empty content.
 
 ## The editor does not run after an edit
 
-**Symptom:** the playground reports an import, syntax, or runtime failure after **Run**.
-
-**Recovery:** read the error in the preview first. Confirm that imports use the project-supported package entry points, that the edited file still exports or defines the symbols used by the project, and that the error is not from the example's own host markup. Use **Reset** to restore the maintained project, then reproduce the smallest edit.
-
-The editor runs the selected project inside its existing opaque same-site preview. Do not loosen the iframe sandbox, bypass the import policy, or add a network request to hide a preview failure. For a complete maintained example, use the [vanilla host](../learn/03-live-data.md#try-it) or the matching component page.
+Read the preview error, use **Reset**, and reproduce the smallest edit. Do not loosen the sandbox or add network fallback.
 
 ## The browser reports a CSP or blocked-resource error
 
-**Symptom:** a script, module, or resource is blocked by the browser's content-security policy.
-
-**Recovery:** keep the existing policy and inspect the blocked resource. Use the documented same-site example path and supported package imports. Do not disable CSP, add unsafe inline execution, or work around the editor's opaque preview boundary.
-
-If the failure is in an edited project, reset it and add one supported change at a time. If the failure is in a maintained host, report the exact URL, resource type, and browser console message against that host.
+Keep the existing policy and inspect the blocked URL and resource type. Do not disable CSP.
 
 ## A documented HTTP result is confused with a network or schema failure
 
-**Symptom:** an application displays an empty success state for a failed request, or treats every non-success outcome as a missing passage.
-
-**Recovery:** keep the boundaries distinct:
-
-| Symptom or result | Correct handling |
-| --- | --- |
-| Documented HTTP error | Preserve the generated typed error payload or project it into the component's documented error state. |
-| Valid response with no usable text | Render the component's empty or partial state. |
-| Invalid JSON | Reject validation and report structured issue paths before projection. |
-| Network failure or abort | Preserve the rejected operation; do not convert it to empty content. |
-
-The [data-flow guide](data-flow.md#failures-stay-at-the-right-boundary) and [client package reference](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/client/README.md) describe the current ownership.
+Preserve documented statuses, network/abort rejection, empty content, and invalid JSON as distinct outcomes. Invalid JSON reports structured issue paths before admission.
 
 ## A failed or superseded request erased the previous result
 
-**Symptom:** a loading indicator replaces useful committed content permanently, or an older request overwrites the newer selection.
-
-**Recovery:** use the maintained controller and binding for the ordinary path. It keeps pending attempt state separate from the last committed view model and prevents obsolete completion from winning. The [live-data lesson](../learn/03-live-data.md) demonstrates this with the maintained vanilla host.
-
-If a host owns the lifecycle manually, it must keep the abort signal, operation identity, committed result, and failure reporting together. Use the [advanced lifecycle explanation](data-flow.md#advanced-own-the-request-lifecycle) only when the host has a concrete multi-operation requirement.
+The element owns latest-wins identity and committed content. Replace input objects rather than mutating them, and do not create a second renderer or lifecycle for the same surface.
 
 ## The component remains active after the host removes it
 
-**Symptom:** subscriptions, requests, or event handlers continue after the page removes an element.
+Clear owned inputs or remove the element. Explicit host resources and listeners are released at the same boundary.
 
-**Recovery:** dispose the controller and unbind it from the element when the host removes the surface:
+## Standalone loading starts too early
 
-```ts
-unbind();
-controller.dispose();
-```
+Prefill host input, not live `sref`. Assign `sref` only after the maintained page's activation gate.
 
-Remove host-owned listeners at the same boundary. The [Reader lesson](../learn/04-reader.md#try-it) and [live-data lesson](../learn/03-live-data.md#try-it) show the complete cleanup shape. The element itself does not own the client or decide when application resources are no longer needed.
+## Supplied data suppresses standalone loading
 
-## More exact detail
+Defined ordinary-element `data` is authoritative. Clear it before assigning a live reference.
 
-Use the [component usage directory](../components/) for surface-specific interaction guidance, the [API reference](../reference/custom-elements.md) for exact properties and events, and the [Reader lesson](../learn/04-reader.md) for controller lifecycle.
+## Popup visibility changes acquisition
+
+`open` controls visibility only. Assign or clear Popup `sref` according to host policy.
+
+Use the [data-flow guide](data-flow.md), [component catalog](../components.md), and generated [custom-element reference](../reference/custom-elements.md) for exact contracts.

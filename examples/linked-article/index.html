@@ -51,10 +51,10 @@
         </p>
         <h2 id="about">What the page owns</h2>
         <p>
-          The page creates the client, calls the public popup factory, cancels
-          obsolete work, rejects stale results, and removes its listeners on
-          cleanup. The Web Component receives only its view model, anchor, and
-          open state.
+          The page creates the client, assigns it as the Popup's acquisition
+          source, and sets <code>sref</code> only after activation. The Popup
+          owns loading, cancellation, stale-result protection, preparation, and
+          rendering; the page owns the anchor, visibility, and listeners.
         </p>
       </article>
       <aside class="example-note" aria-labelledby="example-note-title">

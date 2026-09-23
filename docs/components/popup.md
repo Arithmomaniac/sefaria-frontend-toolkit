@@ -2,29 +2,22 @@
 
 # Popup
 
-Use `<sefaria-popup>` for a source preview anchored to authored prose or another host element. The host supplies the popup view model and anchor; the element handles placement, open state, close behavior, and focus restoration.
-
-## Use it when
-
-Choose the popup for progressive disclosure beside a citation. Use a source card directly when the passage should remain in the page flow, or the Reader when the user needs a complete navigation surface.
+Use `<sefaria-popup>` for a source preview anchored to authored prose. Assign supplied raw `data` or standalone `sref`, plus `anchor` and `open`.
 
 ## Try it
 
 <PlaygroundEmbed project="popup" title="Edit the popup example" />
 
-The maintained project anchors a supplied Micah 6:8 preview to a citation button. Clicking the anchor opens the popup; Escape closes it and the host status reports that focus was restored. The linked-article example shows the same pattern in authored content:
+The maintained project uses supplied `Micah 6:8` data. The linked-article example assigns `sref` only after eligible citation activation.
 
-<SiteLink to="/examples/linked-article/index.html">Open the linked-article popup example</SiteLink>
+## Interaction and lifecycle
 
-## Interaction and accessibility
+`open` controls visibility, not preparation eligibility. A connected Popup can prepare `sref` while closed; hiding alone does not start, restart, or cancel work. Activation-gated hosts assign and clear `sref` according to host policy.
 
-Assign the actual anchor element to `anchor`, set `open` explicitly, and listen for `sefaria-popup-close`. The popup's close path is keyboard accessible and restores focus to the anchor. Keep the anchor in the document's logical reading order and provide a useful label for the citation action. Do not make the popup request data or discover citations from raw text.
+Listen for `sefaria-popup-close` and `sefaria-popup-error`. Escape closes the popup and restores focus to the anchor.
 
 ## Exact contract and source
 
-- [Generated element properties and close event](../reference/custom-elements.md#sefaria-popup)
+- [Generated element properties and events](../reference/custom-elements.md#sefaria-popup)
 - [Authored citation guide](../linked-article.md)
-- [Maintained playground source](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground/projects/popup/)
 - [Linked-article source](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/linked-article/)
-
-For request ownership and supplied-data validation, see [How the pieces fit together](../guides/data-flow.md).

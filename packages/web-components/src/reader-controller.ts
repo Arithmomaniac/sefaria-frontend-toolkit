@@ -1,9 +1,13 @@
 import {
   related,
   text,
+  type CoreLinkResponse,
+  type CoreV3TextsResponse,
   type SefariaClient,
 } from "@arithmomaniac/sefaria-client";
 
+import type { SefariaAcquisitionCapability } from "./acquisition.js";
+import { validateSuppliedComponentData } from "./component-controller.js";
 import { createConnectionsQuery } from "./connections-request.js";
 import {
   CONNECTIONS_PAGE_SIZE,
@@ -15,12 +19,14 @@ import {
   createReaderConnectionsContent,
   createReaderSession,
   createReaderSourceContent,
+  getReaderSourceRecord,
   type ReaderConnectionsContent,
   type ReaderEntrySeed,
   type ReaderPresentation,
   type ReaderPresentationPatch,
   type ReaderSession,
   type ReaderSessionOptions,
+  type ReaderSourceRecord,
   type ReaderSourceContent,
   type ReaderTransition,
   type ReaderTransitionRejection,
@@ -94,6 +100,7 @@ export type ReaderControllerTask =
   | { readonly state: "idle" }
   | {
       readonly state: "loading-source";
+      readonly mode: "root" | "navigation";
       readonly originEntryId: string;
       readonly targetRef: string;
     }
@@ -135,6 +142,33 @@ export interface ReaderControllerLoadOptions extends ReaderSessionOptions {
   /** Initial connections request and projection options. */
   readonly connections?: ReaderControllerInitialConnections;
 }
+
+/** Suspended element-owned Reader work eligible for lifecycle resumption. */
+export type ReaderControllerSuspension =
+  | {
+      /** Root replacement or initialization source phase. */
+      readonly kind: "root";
+      /** Requested external root. */
+      readonly request: SourceCardRequest;
+    }
+  | {
+      /** Contextual history navigation source phase. */
+      readonly kind: "navigation";
+      /** Entry that originated navigation. */
+      readonly originEntryId: string;
+      /** Requested connected source. */
+      readonly targetRef: string;
+    }
+  | {
+      /** Connections phase for an already committed source entry. */
+      readonly kind: "connections";
+      /** Entry whose connections were interrupted. */
+      readonly entryId: string;
+      /** Exact interrupted links request. */
+      readonly request: ConnectionsRequest;
+      /** Exact interrupted local projection. */
+      readonly projection: ConnectionsProjection;
+    };
 
 /** Options for replacing a controller's committed external root. */
 export interface ReaderControllerRootOptions {
@@ -223,13 +257,41 @@ export interface ReaderController {
   back(action: ReaderControllerEntryAction): void;
   /** Activates a retained breadcrumb and discards later history. */
   activateHistory(action: ReaderControllerHistoryAction): void;
+  /** Continues one admitted source seed with its initial connections request. */
+  loadInitialConnections(
+    request: ConnectionsRequest,
+    projection: ConnectionsProjection,
+    signal: AbortSignal,
+  ): Promise<void>;
+  /** Interrupts active element-owned work while retaining committed state. */
+  suspend(): ReaderControllerSuspension | undefined;
+  /** Resumes one still-eligible lifecycle interruption. */
+  resume(suspension: ReaderControllerSuspension): Promise<void>;
   /** Aborts active work and permanently closes the controller. */
   dispose(): void;
 }
 
-interface SourceDestination {
+/** Validated admitted content derived from one transactional raw Reader seed. */
+export interface ReaderAdmittedRawSeed {
+  /** Branded immutable entry seed accepted by the Reader session. */
+  readonly seed: ReaderEntrySeed;
+  /** Canonical selected reference when source content is present. */
+  readonly selectedRef?: string;
+  /** Exact effective source request when source content is present. */
+  readonly sourceRequest?: SourceCardRequest;
+  /** Whether source admission requires one links continuation. */
+  readonly continueConnections: boolean;
+}
+
+/** Qualified Reader source shared by ordinary and spatial coordination. */
+export interface ReaderResolvedSource {
+  /** Admitted source content used by existing session transitions. */
   readonly content: ReaderSourceContent;
+  /** Stable raw corrected-payload record for advanced consumers. */
+  readonly record: ReaderSourceRecord;
+  /** Exact selected source position. */
   readonly selectedPosition: readonly number[];
+  /** Exact canonical selected reference. */
   readonly selectedRef: string;
 }
 
@@ -291,19 +353,244 @@ export function createSefariaReaderDataSource(
   };
 }
 
-/** Loads an initial reader position and returns its continuing controller. */
-export async function loadReaderController(
+/** Creates a host-capability Reader data source without browser fallback. */
+export function createCapabilityReaderDataSource(
+  capability: SefariaAcquisitionCapability,
+): ReaderControllerDataSource {
+  return {
+    loadSource: async (request, signal) => {
+      if (capability.getText === undefined) {
+        throw new Error(
+          "The selected acquisition source does not support text.",
+        );
+      }
+
+      const response = await capability.getText(
+        {
+          sref: request.tref,
+          versions: serializeSourceCardSelectors(request),
+          returnFormat: "default",
+        },
+        signal,
+      );
+      if (response.status === 200) {
+        const payload = validateSuppliedComponentData<CoreV3TextsResponse>(
+          { method: "GET", path: "/api/v3/texts/{tref}", status: 200 },
+          response.payload,
+        );
+        return createReaderSourceContent(payload, request);
+      }
+      if (response.status === 400 || response.status === 404) {
+        const payload = validateSuppliedComponentData<{
+          readonly error: string;
+        }>(
+          {
+            method: "GET",
+            path: "/api/v3/texts/{tref}",
+            status: response.status,
+          },
+          response.payload,
+        );
+        throw new ReaderControllerError(
+          "source-http",
+          payload.error,
+          response.status,
+        );
+      }
+      throw new Error(`Unsupported Reader source status ${response.status}.`);
+    },
+    loadConnections: async (request, projection, signal) => {
+      if (capability.getLinks === undefined) {
+        throw new Error(
+          "The selected acquisition source does not support links.",
+        );
+      }
+      const response = await capability.getLinks(
+        {
+          sref: request.tref,
+          withText: request.withText !== false,
+        },
+        signal,
+      );
+      if (response.status !== 200 && response.status !== 400) {
+        throw new Error(
+          `Unsupported Reader connections status ${response.status}.`,
+        );
+      }
+      const payload = validateSuppliedComponentData<CoreLinkResponse>(
+        {
+          method: "GET",
+          path: "/api/links/{tref}",
+          status: response.status,
+        },
+        response.payload,
+      );
+      return createReaderConnectionsContent(
+        payload,
+        request,
+        projection,
+        response.status,
+      );
+    },
+  };
+}
+
+/** Validates and admits one unknown transactional raw Reader seed. */
+export function createReaderEntrySeedFromRawData(
+  value: unknown,
+): ReaderAdmittedRawSeed {
+  const input = rawRecord(value, "/");
+  const sourceInput =
+    input.source === undefined ? undefined : rawRecord(input.source, "/source");
+  const connectionsInput =
+    input.connections === undefined
+      ? undefined
+      : rawRecord(input.connections, "/connections");
+  if (sourceInput === undefined && connectionsInput === undefined) {
+    throw new TypeError("Reader data requires source or connections.");
+  }
+
+  const presentation =
+    input.presentation === undefined
+      ? undefined
+      : parsePresentation(input.presentation);
+  const requestedSelectedRef =
+    input.selectedRef === undefined
+      ? undefined
+      : rawNonblankString(input.selectedRef, "/selectedRef");
+
+  let source: ReaderSourceContent | undefined;
+  let selectedRef: string | undefined;
+  let selectedPosition: readonly number[] | undefined;
+  if (sourceInput !== undefined) {
+    const request = parseSourceRequest(
+      sourceInput.effectiveRequest,
+      "/source/effectiveRequest",
+    );
+    const status = rawNumber(sourceInput.status, "/source/status");
+    if (status !== 200) {
+      if (status === 400 || status === 404) {
+        const failure = validateSuppliedComponentData<{
+          readonly error: string;
+        }>(
+          { method: "GET", path: "/api/v3/texts/{tref}", status },
+          sourceInput.payload,
+        );
+        throw new ReaderControllerError("source-http", failure.error, status);
+      }
+      throw new RangeError("/source/status must be 200.");
+    }
+    const payload = validateSuppliedComponentData<CoreV3TextsResponse>(
+      { method: "GET", path: "/api/v3/texts/{tref}", status: 200 },
+      sourceInput.payload,
+    );
+    source = createReaderSourceContent(payload, request);
+    const navigable = requireNavigable(source, request.tref);
+    const available = requireAvailable(navigable.navigation, request.tref);
+    const candidates =
+      requestedSelectedRef === undefined
+        ? navigable.viewModel.items.filter((item) => item.ref === request.tref)
+        : navigable.viewModel.items.filter(
+            (item) => item.ref === requestedSelectedRef,
+          );
+    if (candidates.length > 1) {
+      throw new ReaderControllerError(
+        "invalid-selection",
+        `Reader selected reference matched ${candidates.length} source items.`,
+      );
+    }
+    let selected = candidates[0];
+    if (selected === undefined && requestedSelectedRef === undefined) {
+      const firstCandidates = navigable.viewModel.items.filter(
+        (item) => item.ref === available.firstRef,
+      );
+      if (firstCandidates.length !== 1) {
+        throw new ReaderControllerError(
+          "invalid-selection",
+          `Reader first target ${available.firstRef} must match exactly one source item.`,
+        );
+      }
+      selected = firstCandidates[0];
+    }
+    if (selected?.ref === undefined) {
+      throw new ReaderControllerError(
+        "invalid-selection",
+        `${
+          requestedSelectedRef ?? request.tref
+        } must match exactly one canonical source item.`,
+      );
+    }
+    selectedRef = selected.ref;
+    selectedPosition = selected.position;
+  } else if (requestedSelectedRef !== undefined) {
+    throw new TypeError(
+      "/selectedRef requires source data for exact selection.",
+    );
+  }
+
+  let connections: ReaderConnectionsContent | undefined;
+  if (connectionsInput !== undefined) {
+    const request = parseConnectionsRequest(
+      connectionsInput.effectiveRequest,
+      "/connections/effectiveRequest",
+    );
+    const status = rawNumber(connectionsInput.status, "/connections/status");
+    if (status !== 200 && status !== 400) {
+      throw new RangeError("/connections/status must be 200 or 400.");
+    }
+    const payload = validateSuppliedComponentData<CoreLinkResponse>(
+      { method: "GET", path: "/api/links/{tref}", status },
+      connectionsInput.payload,
+    );
+    const projection =
+      connectionsInput.projection === undefined
+        ? {}
+        : parseProjection(
+            connectionsInput.projection,
+            "/connections/projection",
+          );
+    if (selectedRef !== undefined && request.tref !== selectedRef) {
+      throw new TypeError(
+        "/connections/effectiveRequest/tref must equal the selected source reference.",
+      );
+    }
+    connections = createReaderConnectionsContent(
+      payload,
+      request,
+      projection,
+      status,
+    );
+  }
+
+  return deepFreeze({
+    seed: {
+      ...(source === undefined ? {} : { source }),
+      ...(connections === undefined ? {} : { connections }),
+      ...(selectedPosition === undefined ? {} : { selectedPosition }),
+      ...(presentation === undefined ? {} : { presentation }),
+    },
+    ...(selectedRef === undefined ? {} : { selectedRef }),
+    ...(source === undefined ? {} : { sourceRequest: source.request }),
+    continueConnections: source !== undefined && connections === undefined,
+  });
+}
+
+/**
+ * Loads Reader source, publishes it, and then continues with connections.
+ */
+export async function loadReaderControllerProgressively(
   request: SourceCardRequest,
-  client: SefariaClient,
+  dataSource: ReaderControllerDataSource,
+  onSource: (controller: ReaderController) => void,
   options: ReaderControllerLoadOptions = {},
+  retainPublishedOnFailure = false,
 ): Promise<ReaderController> {
-  const dataSource = createSefariaReaderDataSource(client);
   const normalized = normalizeSourceRequest(request);
   const signal = options.signal ?? new AbortController().signal;
   throwIfAborted(signal);
-  let destination: SourceDestination;
+  let destination: ReaderResolvedSource;
   try {
-    destination = await resolveDestination(normalized, dataSource, signal);
+    destination = await resolveReaderSource(normalized, dataSource, signal);
   } catch (error) {
     throwIfAborted(signal);
     if (error instanceof ReaderControllerError) throw error;
@@ -321,6 +608,7 @@ export async function loadReaderController(
     dataSource,
     options,
   );
+  onSource(controller);
   try {
     await controller.loadInitialConnections(
       {
@@ -333,9 +621,24 @@ export async function loadReaderController(
     throwIfAborted(signal);
     return controller;
   } catch (error) {
-    controller.dispose();
+    if (!retainPublishedOnFailure) controller.dispose();
     throw error;
   }
+}
+
+/** Loads an initial reader position and returns its continuing controller. */
+export async function loadReaderController(
+  request: SourceCardRequest,
+  client: SefariaClient,
+  options: ReaderControllerLoadOptions = {},
+): Promise<ReaderController> {
+  const dataSource = createSefariaReaderDataSource(client);
+  return await loadReaderControllerProgressively(
+    request,
+    dataSource,
+    () => undefined,
+    options,
+  );
 }
 
 /** Creates a zero-request controller from already admitted reader content. */
@@ -423,11 +726,12 @@ class ReaderControllerImpl implements ReaderController {
     const active = this.startPhysicalOperation();
     this.replaceTask({
       state: "loading-source",
+      mode: "root",
       originEntryId: this.#session.view.currentEntryId,
       targetRef: targetRequest.tref,
     });
     try {
-      const destination = await resolveDestination(
+      const destination = await resolveReaderSource(
         targetRequest,
         this.#dataSource,
         active.controller.signal,
@@ -493,12 +797,13 @@ class ReaderControllerImpl implements ReaderController {
     const active = this.startPhysicalOperation();
     this.replaceTask({
       state: "loading-source",
+      mode: "navigation",
       originEntryId: action.originEntryId,
       targetRef: targetRequest.tref,
     });
     let sourceOperationId: string | undefined;
     try {
-      const destination = await resolveDestination(
+      const destination = await resolveReaderSource(
         targetRequest,
         this.#dataSource,
         active.controller.signal,
@@ -528,6 +833,7 @@ class ReaderControllerImpl implements ReaderController {
         {
           source: destination.content,
           selectedPosition: destination.selectedPosition,
+          presentation: this.#session.view.current.presentation,
         },
       );
       this.#session = completed.session;
@@ -622,6 +928,57 @@ class ReaderControllerImpl implements ReaderController {
     this.apply(this.#session.activate(action.entryId));
   }
 
+  suspend(): ReaderControllerSuspension | undefined {
+    this.assertUsable();
+    const task = this.#task;
+    let suspension: ReaderControllerSuspension | undefined;
+    if (task.state === "loading-source") {
+      suspension =
+        task.mode === "root"
+          ? { kind: "root", request: { tref: task.targetRef } }
+          : {
+              kind: "navigation",
+              originEntryId: task.originEntryId,
+              targetRef: task.targetRef,
+            };
+    } else if (task.state === "loading-connections") {
+      const connections = this.#session.view.current.connections;
+      if (connections?.state === "loading") {
+        suspension = {
+          kind: "connections",
+          entryId: task.originEntryId,
+          request: connections.request,
+          projection: connections.projection,
+        };
+      }
+    }
+    this.cancelActive(true);
+    return suspension;
+  }
+
+  async resume(suspension: ReaderControllerSuspension): Promise<void> {
+    this.assertUsable();
+    if (suspension.kind === "root") {
+      await this.replaceRoot(suspension.request);
+      return;
+    }
+    if (suspension.kind === "navigation") {
+      await this.openConnection({
+        originEntryId: suspension.originEntryId,
+        targetRef: suspension.targetRef,
+      });
+      return;
+    }
+    this.requireCurrent(suspension.entryId);
+    const active = this.startPhysicalOperation();
+    await this.loadConnections(
+      suspension.entryId,
+      suspension.request,
+      suspension.projection,
+      active,
+    );
+  }
+
   dispose(): void {
     if (this.#disposed) return;
     this.cancelActive(false);
@@ -634,10 +991,7 @@ class ReaderControllerImpl implements ReaderController {
     projection: ConnectionsProjection,
     signal: AbortSignal,
   ): Promise<void> {
-    const active: ActiveOperation = {
-      generation: this.#generation,
-      controller: new AbortController(),
-    };
+    const active = this.startPhysicalOperation();
     const abort = () => active.controller.abort(signal.reason);
     signal.addEventListener("abort", abort, { once: true });
     try {
@@ -862,12 +1216,13 @@ class ReaderControllerImpl implements ReaderController {
   }
 }
 
-async function resolveDestination(
+/** Resolves and qualifies one source using at most two source operations. */
+export async function resolveReaderSource(
   request: SourceCardRequest,
   dataSource: ReaderControllerDataSource,
   signal: AbortSignal,
   onEffectiveRequest?: (request: SourceCardRequest) => void,
-): Promise<SourceDestination> {
+): Promise<ReaderResolvedSource> {
   const target = await dataSource.loadSource(request, signal);
   requireMatchingRequest(target.request, request);
   const targetData = requireNavigable(target, request.tref);
@@ -915,6 +1270,7 @@ async function resolveDestination(
   }
   return {
     content,
+    record: getReaderSourceRecord(content),
     selectedPosition: selected.position,
     selectedRef,
   };
@@ -1050,6 +1406,151 @@ function normalizeProjection(
   projection: ConnectionsProjection,
 ): ConnectionsProjection {
   return Object.freeze({ ...projection });
+}
+
+function parseSourceRequest(value: unknown, path: string): SourceCardRequest {
+  const input = rawRecord(value, path);
+  const request: SourceCardRequest = {
+    tref: rawNonblankString(input.tref, `${path}/tref`),
+    ...(input.primary === undefined
+      ? {}
+      : {
+          primary: {
+            versionTitle: rawNonblankString(
+              rawRecord(input.primary, `${path}/primary`).versionTitle,
+              `${path}/primary/versionTitle`,
+            ),
+          },
+        }),
+    ...(input.translation === undefined
+      ? {}
+      : {
+          translation: {
+            versionTitle: rawNonblankString(
+              rawRecord(input.translation, `${path}/translation`).versionTitle,
+              `${path}/translation/versionTitle`,
+            ),
+          },
+        }),
+  };
+  return normalizeSourceRequest(request);
+}
+
+function parseConnectionsRequest(
+  value: unknown,
+  path: string,
+): ConnectionsRequest {
+  const input = rawRecord(value, path);
+  if (input.withText !== undefined && typeof input.withText !== "boolean") {
+    throw new TypeError(`${path}/withText must be a boolean.`);
+  }
+  return normalizeConnectionsRequest({
+    tref: rawNonblankString(input.tref, `${path}/tref`),
+    ...(input.withText === undefined ? {} : { withText: input.withText }),
+  });
+}
+
+function parseProjection(value: unknown, path: string): ConnectionsProjection {
+  const input = rawRecord(value, path);
+  const projection: ConnectionsProjection = {
+    ...(input.category === undefined
+      ? {}
+      : {
+          category: rawNonblankString(input.category, `${path}/category`),
+        }),
+    ...(input.page === undefined
+      ? {}
+      : { page: rawNumber(input.page, `${path}/page`) }),
+  };
+  validateRootOptions({ connections: { projection } });
+  return normalizeProjection(projection);
+}
+
+function parsePresentation(value: unknown): ReaderPresentationPatch {
+  const input = rawRecord(value, "/presentation");
+  const presentation: ReaderPresentationPatch = {
+    ...(input.contentLanguage === undefined
+      ? {}
+      : {
+          contentLanguage: rawString(
+            input.contentLanguage,
+            "/presentation/contentLanguage",
+          ) as NonNullable<ReaderPresentationPatch["contentLanguage"]>,
+        }),
+    ...(input.layout === undefined
+      ? {}
+      : {
+          layout: rawString(
+            input.layout,
+            "/presentation/layout",
+          ) as NonNullable<ReaderPresentationPatch["layout"]>,
+        }),
+    ...(input.sideOrder === undefined
+      ? {}
+      : {
+          sideOrder: rawString(
+            input.sideOrder,
+            "/presentation/sideOrder",
+          ) as NonNullable<ReaderPresentationPatch["sideOrder"]>,
+        }),
+    ...(input.showConnectionPreviews === undefined
+      ? {}
+      : {
+          showConnectionPreviews: rawBoolean(
+            input.showConnectionPreviews,
+            "/presentation/showConnectionPreviews",
+          ),
+        }),
+    ...(input.vocalizationMode === undefined
+      ? {}
+      : {
+          vocalizationMode: rawString(
+            input.vocalizationMode,
+            "/presentation/vocalizationMode",
+          ) as NonNullable<ReaderPresentationPatch["vocalizationMode"]>,
+        }),
+  };
+  validateRootOptions({ presentation });
+  return deepFreeze(presentation);
+}
+
+function rawRecord(
+  value: unknown,
+  path: string,
+): Readonly<Record<string, unknown>> {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    throw new TypeError(`${path} must be an object.`);
+  }
+  return value as Readonly<Record<string, unknown>>;
+}
+
+function rawString(value: unknown, path: string): string {
+  if (typeof value !== "string") {
+    throw new TypeError(`${path} must be a string.`);
+  }
+  return value;
+}
+
+function rawNonblankString(value: unknown, path: string): string {
+  const result = rawString(value, path).trim();
+  if (result.length === 0) {
+    throw new TypeError(`${path} must not be blank.`);
+  }
+  return result;
+}
+
+function rawBoolean(value: unknown, path: string): boolean {
+  if (typeof value !== "boolean") {
+    throw new TypeError(`${path} must be a boolean.`);
+  }
+  return value;
+}
+
+function rawNumber(value: unknown, path: string): number {
+  if (typeof value !== "number") {
+    throw new TypeError(`${path} must be a number.`);
+  }
+  return value;
 }
 
 function withTref(request: SourceCardRequest, tref: string): SourceCardRequest {

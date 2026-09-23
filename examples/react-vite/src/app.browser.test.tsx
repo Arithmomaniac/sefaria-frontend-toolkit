@@ -24,28 +24,21 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-test("keeps one request-free element while React assigns reversible display properties and receives a real selection event", async () => {
+test("supplies data declaratively, preserves presentation controls, and receives selection", async () => {
   const fetch = vi.fn(createMicahFixtureFetch(fixture));
-  const container = document.createElement("div");
-  document.body.append(container);
-  root = createRoot(container);
-
-  await act(async () => {
-    root?.render(
-      <ReactSourceCardExample
-        client={createSefariaClient({
-          baseUrl: "https://example.invalid",
-          cache: false,
-          fetch,
-        })}
-      />,
-    );
-  });
-
+  const container = mount(
+    <ReactSourceCardExample client={fixtureClient(fetch)} />,
+  );
   const card = requireCard(container);
+
+  await waitForCardReady(card);
   expect(fetch).not.toHaveBeenCalled();
-  expect(card.viewModel.state).toBe("data");
-  expect(card.getAttribute("viewModel")).toBeNull();
+  expect(card.data).toEqual(fixture);
+  expect(card.sref).toBe("");
+  expect(card.acquisition).toEqual(
+    expect.objectContaining({ kind: "capability" }),
+  );
+  expect(card.getAttribute("data")).toBeNull();
 
   await act(async () => {
     click(container, "#theme-toggle");
@@ -60,7 +53,6 @@ test("keeps one request-free element while React assigns reversible display prop
   expect(card.layout).toBe("stacked");
   expect(card.sideOrder).toBe("translation-first");
   expect(card.vocalizationMode).toBe("none");
-  expect(card.getAttribute("selectedPosition")).toBeNull();
   expect(container.querySelector<HTMLElement>("#preview")?.dataset.theme).toBe(
     "dark",
   );
@@ -69,11 +61,9 @@ test("keeps one request-free element while React assigns reversible display prop
   await act(async () => {
     setSelect(container, "#vocalization-mode", "taamim_and_nikkud");
   });
-  const withMarks = await renderedHebrew(card);
-  expect(withMarks).not.toBe(withoutMarks);
+  expect(await renderedHebrew(card)).not.toBe(withoutMarks);
   expect(fetch).not.toHaveBeenCalled();
 
-  await card.updateComplete;
   await act(async () => {
     card.shadowRoot
       ?.querySelector<HTMLButtonElement>(
@@ -81,22 +71,19 @@ test("keeps one request-free element while React assigns reversible display prop
       )
       ?.click();
   });
-
   expect(container.querySelector("#selected-ref")?.textContent).toContain(
     "Micah 6:8",
   );
   expect(card.selectedPosition).toEqual([]);
-  expect(fetch).not.toHaveBeenCalled();
 });
 
-test("loads only on explicit actions and rejects stale overlapping results", async () => {
+test("activates acquisition only on submit and rejects stale overlapping results", async () => {
   let firstSignal: AbortSignal | undefined;
   let resolveFirst!: (response: Response) => void;
   let requestNumber = 0;
   const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
     const request = new Request(input, init);
-    const sequence = ++requestNumber;
-    if (sequence === 1) {
+    if (++requestNumber === 1) {
       firstSignal = request.signal;
       return await new Promise<Response>((resolve) => {
         resolveFirst = resolve;
@@ -104,75 +91,48 @@ test("loads only on explicit actions and rejects stale overlapping results", asy
     }
     return Response.json(fixture);
   });
-  const container = document.createElement("div");
-  document.body.append(container);
-  root = createRoot(container);
-
-  await act(async () => {
-    root?.render(
-      <ReactSourceCardExample
-        client={createSefariaClient({
-          baseUrl: "https://example.invalid",
-          cache: false,
-          fetch,
-        })}
-      />,
-    );
-  });
+  const container = mount(
+    <ReactSourceCardExample client={fixtureClient(fetch)} />,
+  );
+  const card = requireCard(container);
+  await waitForCardReady(card);
   expect(fetch).not.toHaveBeenCalled();
 
   await act(async () => {
     setTextInput(container, 'input[name="tref"]', "micah 6:8");
+    click(container, "#load-live");
   });
-  const initialCard = requireCard(container);
-  await initialCard.updateComplete;
+  await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
+  expect(card.data).toBeUndefined();
+  expect(card.sref).toBe("micah 6:8");
+
   await act(async () => {
-    initialCard.shadowRoot
-      ?.querySelector<HTMLButtonElement>(
-        'button[aria-label="Show connections for Micah 6:8"]',
-      )
-      ?.click();
+    setTextInput(container, 'input[name="tref"]', "Micah 6:8");
+    click(container, "#load-live");
   });
+  await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
+  await waitForCardReady(card);
+  await vi.waitFor(() =>
+    expect(container.querySelector("#request-status")?.textContent).toBe(
+      "Committed canonical reference Micah 6:8.",
+    ),
+  );
+  expect(firstSignal?.aborted).toBe(true);
+  expect(container.querySelector("#request-count")?.textContent).toContain("2");
   expect(container.querySelector("#selected-ref")?.textContent).toContain(
-    "Micah 6:8",
+    "Select the rendered segment",
   );
 
-  await act(async () => click(container, "#load-live"));
-  await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
-  await act(async () => click(container, "#load-live"));
-  await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
   await act(async () => {
+    resolveFirst(Response.json({ ...fixture, ref: "Obadiah 1:1" }));
     await waitForReact();
   });
   expect(container.querySelector("#request-status")?.textContent).toBe(
     "Committed canonical reference Micah 6:8.",
   );
-  expect(container.querySelector("#committed-ref")?.textContent).toContain(
-    "Micah 6:8",
-  );
-  expect(container.querySelector("#committed-ref")?.textContent).not.toContain(
-    "micah 6:8",
-  );
-  expect(container.querySelector("#selected-ref")?.textContent).toContain(
-    "Select the rendered segment",
-  );
-  expect(fetch).toHaveBeenCalledTimes(2);
-  expect(firstSignal?.aborted).toBe(true);
-  await act(async () => {
-    resolveFirst(Response.json({ ...fixture, ref: "Obadiah 1:1" }));
-  });
-
-  const card = requireCard(container);
-  expect(card.viewModel.state).toBe("data");
-  expect(
-    card.viewModel.state === "data" ? card.viewModel.header.ref : undefined,
-  ).toBe("Micah 6:8");
-  expect(container.querySelector("#request-count")?.textContent).toBe(
-    "Live load attempts: 2",
-  );
 });
 
-test("blank validation does not cancel an admitted request", async () => {
+test("keeps blank validation host-owned without changing an admitted request", async () => {
   let resolveRequest!: (response: Response) => void;
   let requestSignal: AbortSignal | undefined;
   const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
@@ -182,127 +142,63 @@ test("blank validation does not cancel an admitted request", async () => {
       resolveRequest = resolve;
     });
   });
-  const container = document.createElement("div");
-  document.body.append(container);
-  root = createRoot(container);
+  const container = mount(
+    <ReactSourceCardExample client={fixtureClient(fetch)} />,
+  );
 
-  await act(async () => {
-    root?.render(
-      <ReactSourceCardExample
-        client={createSefariaClient({
-          baseUrl: "https://example.invalid",
-          cache: false,
-          fetch,
-        })}
-      />,
-    );
-  });
   await act(async () => click(container, "#load-live"));
   await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
   await act(async () => {
     setTextInput(container, 'input[name="tref"]', "   ");
+    click(container, "#load-live");
   });
-  await act(async () => click(container, "#load-live"));
 
-  expect(container.querySelector("#load-error")?.textContent).toBe(
+  expect(container.querySelector("#input-error")?.textContent).toBe(
     "Enter a non-blank Sefaria reference.",
   );
   expect(fetch).toHaveBeenCalledOnce();
   expect(requestSignal?.aborted).toBe(false);
 
-  resolveRequest(Response.json(fixture));
   await act(async () => {
+    resolveRequest(Response.json(fixture));
     await waitForReact();
   });
-  await vi.waitFor(
-    () => expect(requireCard(container).viewModel.state).toBe("data"),
-    { timeout: 5_000 },
-  );
-  expect(requireCard(container).viewModel.state).toBe("data");
-  expect(container.querySelector("#request-status")?.textContent).toBe(
-    "Committed canonical reference Micah 6:8.",
-  );
-  expect(container.querySelector("#load-error")).toBeNull();
+  await waitForCardReady(requireCard(container));
 });
 
-test("blank validation survives current failure and a superseded completion", async () => {
-  let resolveFirst!: (response: Response) => void;
-  let rejectSecond!: (reason: unknown) => void;
-  const fetch = vi
-    .fn()
-    .mockImplementationOnce(
-      async () =>
-        await new Promise<Response>((resolve) => {
-          resolveFirst = resolve;
-        }),
-    )
-    .mockImplementationOnce(
-      async () =>
-        await new Promise<Response>((_resolve, reject) => {
-          rejectSecond = reject;
-        }),
-    );
-  const container = document.createElement("div");
-  document.body.append(container);
-  root = createRoot(container);
-
-  await act(async () => {
-    root?.render(
-      <ReactSourceCardExample
-        client={createSefariaClient({
-          baseUrl: "https://example.invalid",
-          cache: false,
-          fetch,
-        })}
-      />,
+test("lets the element own acquisition failures without duplicate host announcements", async () => {
+  const error = new Error("Network unavailable.");
+  const fetch = vi.fn(async () => {
+    throw error;
+  });
+  const container = mount(
+    <ReactSourceCardExample client={fixtureClient(fetch)} />,
+  );
+  const card = requireCard(container);
+  const errors: unknown[] = [];
+  card.addEventListener("sefaria-source-card-error", (event) => {
+    errors.push(
+      (event as CustomEvent<{ readonly error: unknown }>).detail.error,
     );
   });
+
   await act(async () => click(container, "#load-live"));
-  await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
-  await act(async () => {
-    setTextInput(container, 'input[name="tref"]', "Micah 6:7");
-    click(container, "#load-live");
-  });
-  await vi.waitFor(() => expect(fetch).toHaveBeenCalledTimes(2));
-  await act(async () => {
-    setTextInput(container, 'input[name="tref"]', "   ");
-    click(container, "#load-live");
-  });
-  expect(container.querySelector("#load-error")?.textContent).toBe(
-    "Enter a non-blank Sefaria reference.",
-  );
+  await vi.waitFor(() => expect(errors).toEqual([error]));
+  await card.updateComplete;
 
-  await act(async () => {
-    resolveFirst(Response.json({ ...fixture, ref: "Obadiah 1:1" }));
-    await waitForReact();
-  });
-  expect(container.querySelector("#load-error")?.textContent).toBe(
-    "Enter a non-blank Sefaria reference.",
-  );
-
-  await act(async () => {
-    rejectSecond(new Error("Current request failed."));
-    await waitForReact();
-  });
-  expect(container.querySelector("#load-error")?.textContent).toBe(
-    "Enter a non-blank Sefaria reference.",
-  );
+  expect(
+    card.shadowRoot?.querySelector('[role="alert"]')?.textContent,
+  ).toContain("Network unavailable.");
+  expect(container.querySelector("#load-error")).toBeNull();
+  expect(container.querySelectorAll('[role="alert"]')).toHaveLength(0);
 });
 
-test("StrictMode recreates disposed controllers, makes no mount request, and disposes pending work", async () => {
-  let resolveRequest!: (response: Response) => void;
+test("StrictMode makes no mount request and disconnection aborts pending work", async () => {
   let requestSignal: AbortSignal | undefined;
-  const strictFetch = createMicahFixtureFetch(fixture);
   const fetch = vi.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-    const request = new Request(input, init);
-    requestSignal = request.signal;
-    await strictFetch(request);
-    return await new Promise<Response>((resolve) => {
-      resolveRequest = resolve;
-    });
+    requestSignal = new Request(input, init).signal;
+    return await new Promise<Response>(() => undefined);
   });
-  const additions = vi.spyOn(HTMLElement.prototype, "addEventListener");
-  const removals = vi.spyOn(HTMLElement.prototype, "removeEventListener");
   const container = document.createElement("div");
   document.body.append(container);
   root = createRoot(container);
@@ -310,13 +206,7 @@ test("StrictMode recreates disposed controllers, makes no mount request, and dis
   await act(async () => {
     root?.render(
       <StrictMode>
-        <ReactSourceCardExample
-          client={createSefariaClient({
-            baseUrl: "https://example.invalid",
-            cache: false,
-            fetch,
-          })}
-        />
+        <ReactSourceCardExample client={fixtureClient(fetch)} />
       </StrictMode>,
     );
   });
@@ -332,95 +222,26 @@ test("StrictMode recreates disposed controllers, makes no mount request, and dis
     requestSignal?.reason instanceof Error
       ? requestSignal.reason.message
       : String(requestSignal?.reason),
-  ).toContain("disposed");
-  expect(
-    additions.mock.calls.filter(([type]) => type === "sefaria-source-select"),
-  ).toHaveLength(
-    removals.mock.calls.filter(([type]) => type === "sefaria-source-select")
-      .length,
-  );
-  await act(async () => resolveRequest(Response.json(fixture)));
+  ).toContain("disconnected");
 });
 
-test("labels failed replacements as prior committed data and keeps local validation distinct", async () => {
-  let rejectRequest!: (reason: unknown) => void;
-  const fetch = vi.fn(
-    async () =>
-      await new Promise<Response>((_resolve, reject) => {
-        rejectRequest = reject;
-      }),
-  );
+function fixtureClient(
+  fetch: (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>,
+) {
+  return createSefariaClient({
+    baseUrl: "https://example.invalid",
+    cache: false,
+    fetch,
+  });
+}
+
+function mount(node: React.ReactNode): HTMLElement {
   const container = document.createElement("div");
   document.body.append(container);
   root = createRoot(container);
-  await act(async () => {
-    root?.render(
-      <ReactSourceCardExample
-        client={createSefariaClient({
-          baseUrl: "https://example.invalid",
-          cache: false,
-          fetch,
-        })}
-      />,
-    );
-  });
-
-  await act(async () => click(container, "#load-live"));
-  await vi.waitFor(() => expect(fetch).toHaveBeenCalledOnce());
-  await act(async () => {
-    rejectRequest(new Error("Network unavailable."));
-    await waitForReact();
-  });
-  expect(container.querySelector("#load-error")?.textContent).toContain(
-    "Network unavailable.",
-  );
-  expect(container.querySelector("#load-error")?.textContent).toContain(
-    "prior committed Micah 6:8",
-  );
-  const failedPreview = container.querySelector<HTMLElement>("#preview");
-  if (!failedPreview) throw new Error("The React preview is missing.");
-  expect(failedPreview.hidden).toBe(false);
-  expect(requireCard(container).viewModel.state).toBe("data");
-  expect(container.querySelector("#request-status")?.textContent).toContain(
-    "Showing the prior committed Micah 6:8 result",
-  );
-  expect(fetch).toHaveBeenCalledOnce();
-  expect(container.querySelector("#request-count")?.textContent).toContain("1");
-
-  await act(async () => {
-    setTextInput(container, 'input[name="tref"]', "   ");
-  });
-  await act(async () => click(container, "#load-live"));
-  expect(container.querySelector("#load-error")?.textContent).toBe(
-    "Enter a non-blank Sefaria reference.",
-  );
-  expect(fetch).toHaveBeenCalledOnce();
-
-  await act(async () => {
-    root?.unmount();
-  });
-  root = createRoot(container);
-  await act(async () => {
-    root?.render(
-      <ReactSourceCardExample
-        client={createSefariaClient({
-          baseUrl: "https://example.invalid",
-          cache: false,
-          fetch,
-        })}
-        initialTref="   "
-      />,
-    );
-  });
-  await act(async () => {
-    click(container, "#load-live");
-  });
-  expect(container.querySelector("#load-error")?.textContent).toBe(
-    "Enter a non-blank Sefaria reference.",
-  );
-  expect(fetch).toHaveBeenCalledOnce();
-  expect(container.querySelector("#request-count")?.textContent).toContain("0");
-});
+  act(() => root?.render(node));
+  return container;
+}
 
 function requireCard(rootElement: ParentNode): SefariaSourceCard {
   const card = rootElement.querySelector<SefariaSourceCard>(
@@ -443,12 +264,7 @@ function setRange(
 ): void {
   const input = rootElement.querySelector<HTMLInputElement>(selector);
   if (!input) throw new Error(`${selector} is missing.`);
-  const setValue = Object.getOwnPropertyDescriptor(
-    HTMLInputElement.prototype,
-    "value",
-  )?.set;
-  if (!setValue) throw new Error("The native input value setter is missing.");
-  setValue.call(input, value);
+  setNativeValue(HTMLInputElement.prototype, input, value);
   input.dispatchEvent(new Event("input", { bubbles: true }));
   input.dispatchEvent(new Event("change", { bubbles: true }));
 }
@@ -460,12 +276,7 @@ function setTextInput(
 ): void {
   const input = rootElement.querySelector<HTMLInputElement>(selector);
   if (!input) throw new Error(`${selector} is missing.`);
-  const setValue = Object.getOwnPropertyDescriptor(
-    HTMLInputElement.prototype,
-    "value",
-  )?.set;
-  if (!setValue) throw new Error("The native input value setter is missing.");
-  setValue.call(input, value);
+  setNativeValue(HTMLInputElement.prototype, input, value);
   input.dispatchEvent(new Event("input", { bubbles: true }));
 }
 
@@ -476,13 +287,18 @@ function setSelect(
 ): void {
   const select = rootElement.querySelector<HTMLSelectElement>(selector);
   if (!select) throw new Error(`${selector} is missing.`);
-  const setValue = Object.getOwnPropertyDescriptor(
-    HTMLSelectElement.prototype,
-    "value",
-  )?.set;
-  if (!setValue) throw new Error("The native select value setter is missing.");
-  setValue.call(select, value);
+  setNativeValue(HTMLSelectElement.prototype, select, value);
   select.dispatchEvent(new Event("change", { bubbles: true }));
+}
+
+function setNativeValue(
+  prototype: object,
+  element: HTMLInputElement | HTMLSelectElement,
+  value: string,
+): void {
+  const setter = Object.getOwnPropertyDescriptor(prototype, "value")?.set;
+  if (!setter) throw new Error("The native value setter is missing.");
+  setter.call(element, value);
 }
 
 async function waitForReact(): Promise<void> {
@@ -491,27 +307,29 @@ async function waitForReact(): Promise<void> {
   }
 }
 
+async function waitForCardReady(card: SefariaSourceCard): Promise<void> {
+  await act(async () => {
+    await vi.waitFor(async () => {
+      await card.updateComplete;
+      expect(card.status).toBe("ready");
+    });
+  });
+}
+
 async function renderedHebrew(card: SefariaSourceCard): Promise<string> {
   await card.updateComplete;
-  await waitForReact();
-  const segment = [
+  const segments = [
     ...(card.shadowRoot?.querySelectorAll("sefaria-text-segment") ?? []),
-  ].find(
-    (candidate) =>
-      (
-        candidate as HTMLElement & {
-          viewModel?: { readonly language?: string };
-        }
-      ).viewModel?.language === "he",
-  ) as
-    | (HTMLElement & {
-        readonly updateComplete: Promise<boolean>;
-        readonly shadowRoot: ShadowRoot | null;
-      })
-    | undefined;
-  if (segment === undefined) {
-    throw new Error("The rendered Hebrew segment is missing.");
+  ] as Array<
+    HTMLElement & {
+      readonly updateComplete: Promise<boolean>;
+      readonly shadowRoot: ShadowRoot | null;
+    }
+  >;
+  for (const segment of segments) {
+    await segment.updateComplete;
   }
-  await segment.updateComplete;
-  return segment.shadowRoot?.textContent ?? "";
+  return segments
+    .map((segment) => segment.shadowRoot?.textContent ?? "")
+    .join();
 }

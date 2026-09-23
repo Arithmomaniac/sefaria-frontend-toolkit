@@ -1,6 +1,7 @@
 import { css, html, nothing, type CSSResult, type TemplateResult } from "lit";
 import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
 
+import { prepared } from "./prepared-state.js";
 import "./text-segment-element.js";
 import type { TextSegmentDataViewModel } from "./text-segment.js";
 
@@ -197,8 +198,8 @@ function renderSide(
   >
     ${renderSideAdornment?.(side) ?? nothing}
     <sefaria-text-segment
+      ${prepared(view)}
       data-side=${side}
-      .viewModel=${view}
       .vocalizationMode=${presentation.vocalizationMode}
     ></sefaria-text-segment>
   </div>`;

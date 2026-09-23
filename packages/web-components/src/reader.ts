@@ -1,10 +1,49 @@
 import type { ConnectionsViewModel } from "./connections-panel.js";
 import type {
+  ConnectionsProjection,
+  ConnectionsRequest,
+} from "./connections-panel.js";
+import type {
   ReaderBreadcrumb,
   ReaderConnectionsEntryView,
+  ReaderPresentationPatch,
   ReaderSessionView,
 } from "./reader-session.js";
-import type { SourceCardViewModel } from "./source-card.js";
+import type { SourceCardRequest, SourceCardViewModel } from "./source-card.js";
+
+/** Unknown corrected source payload and exact metadata for a raw Reader seed. */
+export interface ReaderRawSourceSeed {
+  /** Unknown payload validated as a successful v3 text response. */
+  readonly payload: unknown;
+  /** Required successful source status. */
+  readonly status: 200;
+  /** Exact source-card request covered by the payload. */
+  readonly effectiveRequest: SourceCardRequest;
+}
+
+/** Unknown corrected links payload and exact metadata for a raw Reader seed. */
+export interface ReaderRawConnectionsSeed {
+  /** Unknown payload validated against the documented links status. */
+  readonly payload: unknown;
+  /** Documented links status. */
+  readonly status: 200 | 400;
+  /** Exact connections request covered by the payload. */
+  readonly effectiveRequest: ConnectionsRequest;
+  /** Initial local connections projection. */
+  readonly projection?: ConnectionsProjection;
+}
+
+/** Transactional raw input accepted by declarative `<sefaria-reader>`. */
+export interface ReaderRawSeedData {
+  /** Optional corrected source response and coverage metadata. */
+  readonly source?: ReaderRawSourceSeed;
+  /** Optional corrected links response and coverage metadata. */
+  readonly connections?: ReaderRawConnectionsSeed;
+  /** Exact canonical source-card item selected by the seed. */
+  readonly selectedRef?: string;
+  /** Initial entry-specific presentation. */
+  readonly presentation?: ReaderPresentationPatch;
+}
 
 /** Reader pane selected by a compact host presentation. */
 export type ReaderPane = "source" | "connections";

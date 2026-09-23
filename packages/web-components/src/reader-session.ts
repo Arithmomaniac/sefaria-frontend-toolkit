@@ -44,6 +44,19 @@ interface CaptureRecord {
 const captureRecords = new WeakMap<ReaderCapture, CaptureRecord>();
 const sourceContents = new WeakSet<ReaderSourceContent>();
 const connectionsContents = new WeakSet<ReaderConnectionsContent>();
+const sourceRecords = new WeakMap<ReaderSourceContent, ReaderSourceRecord>();
+const connectionsRecords = new WeakMap<
+  ReaderConnectionsContent,
+  ReaderConnectionsRecord
+>();
+const sourceRecordContents = new WeakMap<
+  ReaderSourceRecord,
+  ReaderSourceContent
+>();
+const connectionsRecordContents = new WeakMap<
+  ReaderConnectionsRecord,
+  ReaderConnectionsContent
+>();
 
 /** Opaque immutable corrected-payload capture retained by a reader session. */
 export interface ReaderCapture {
@@ -73,6 +86,28 @@ export interface ReaderConnectionsContent {
   readonly viewModel: ConnectionsViewModel;
   /** Opaque links capture retained for covered local reprojection. */
   readonly capture: ReaderCapture;
+}
+
+/** Stable immutable raw source record retained by Reader. */
+export interface ReaderSourceRecord {
+  /** Library-owned corrected v3 payload. */
+  readonly payload: CoreV3TextsResponse;
+  /** Documented successful source status. */
+  readonly status: 200;
+  /** Exact effective source request. */
+  readonly effectiveRequest: SourceCardRequest;
+}
+
+/** Stable immutable raw connections record retained by Reader. */
+export interface ReaderConnectionsRecord {
+  /** Library-owned corrected links payload or documented error. */
+  readonly payload: CoreLinkResponse;
+  /** Documented links status. */
+  readonly status: 200 | 400;
+  /** Exact effective connections request. */
+  readonly effectiveRequest: ConnectionsRequest;
+  /** Current local projection over the retained payload. */
+  readonly projection: ConnectionsProjection;
 }
 
 /** Reader-specific connections state when no completed capture is available. */
@@ -225,6 +260,27 @@ export interface ReaderSessionView {
   readonly maxCaptureBytes: number;
 }
 
+/** Semantic retained-entry information without prepared rendering content. */
+export interface ReaderEntryInfo {
+  /** Stable identity scoped to this Reader session. */
+  readonly entryId: string;
+  /** Human-readable retained-entry label. */
+  readonly label: string;
+  /** Canonical selected reference, when exact selection is established. */
+  readonly selectedRef?: string;
+  /** Zero-based selected source position, when present. */
+  readonly selectedPosition?: readonly number[];
+  /** Whether admitted source data is retained for this entry. */
+  readonly sourceAvailable: boolean;
+  /** Current semantic connections availability. */
+  readonly connections:
+    "absent" | "loading" | "available" | "interrupted" | "failed";
+  /** Entry-specific presentation restored by navigation. */
+  readonly presentation: ReaderPresentation;
+  /** Number of live-consumer pins retaining this entry. */
+  readonly pinCount: number;
+}
+
 /** Stable operation identity returned when host-owned work begins. */
 export interface ReaderOperationHandle {
   /** Operation identity scoped to this session. */
@@ -284,6 +340,12 @@ export type ReaderTransition<T = undefined> =
 export interface ReaderSession {
   /** Current render and diagnostic projection. */
   readonly view: ReaderSessionView;
+  /** Returns semantic information for one retained entry or the current entry. */
+  entryInfo(entryId?: string): ReaderEntryInfo;
+  /** Returns the stable raw source record retained by one entry. */
+  sourceRecord(entryId?: string): ReaderSourceRecord | undefined;
+  /** Returns the stable raw connections record retained by one entry. */
+  connectionsRecord(entryId?: string): ReaderConnectionsRecord | undefined;
   /** Begins host-owned contextual source navigation from a retained entry. */
   beginSourceNavigation(
     originEntryId: string,
@@ -338,7 +400,10 @@ export interface ReaderSession {
 }
 
 type InternalConnections =
-  | (ReaderConnectionsView & { readonly capture: ReaderCapture })
+  | (ReaderConnectionsView & {
+      readonly capture: ReaderCapture;
+      readonly record: ReaderConnectionsRecord;
+    })
   | ReaderConnectionsLoading
   | ReaderConnectionsUnavailable;
 
@@ -399,6 +464,15 @@ export function createReaderSourceContent(
     capture,
   });
   sourceContents.add(content);
+  sourceRecords.set(
+    content,
+    deepFreeze({
+      payload: immutablePayload,
+      status: 200,
+      effectiveRequest: immutableRequest,
+    }),
+  );
+  sourceRecordContents.set(getReaderSourceRecord(content), content);
   return content;
 }
 
@@ -424,18 +498,81 @@ export function createReaderConnectionsContent(
       withText: request.withText !== false,
     },
   });
-  const content = deepFreeze({
-    request: immutableRequest,
-    projection: immutableProjection,
-    viewModel: createConnectionsViewModel(
+  return registerConnectionsContent(
+    capture,
+    immutableRequest,
+    immutableProjection,
+    createConnectionsViewModel(
       immutablePayload,
       immutableRequest,
       immutableProjection,
       status,
     ),
+  );
+}
+
+/** Returns the stable library-owned raw record for admitted source content. */
+export function getReaderSourceRecord(
+  content: ReaderSourceContent,
+): ReaderSourceRecord {
+  const record = sourceRecords.get(content);
+  if (record === undefined) {
+    throw new TypeError(
+      "Reader source content was not created by this module.",
+    );
+  }
+  return record;
+}
+
+/** Returns the stable library-owned raw record for admitted connections content. */
+export function getReaderConnectionsRecord(
+  content: ReaderConnectionsContent,
+): ReaderConnectionsRecord {
+  const record = connectionsRecords.get(content);
+  if (record === undefined) {
+    throw new TypeError(
+      "Reader connections content was not created by this module.",
+    );
+  }
+  return record;
+}
+
+/** Returns admitted source content for a library-owned raw record. */
+export function getReaderSourceContent(
+  record: ReaderSourceRecord,
+): ReaderSourceContent | undefined {
+  return sourceRecordContents.get(record);
+}
+
+/** Returns admitted connections content for a library-owned raw record. */
+export function getReaderConnectionsContent(
+  record: ReaderConnectionsRecord,
+): ReaderConnectionsContent | undefined {
+  return connectionsRecordContents.get(record);
+}
+
+function registerConnectionsContent(
+  capture: ReaderCapture,
+  request: ConnectionsRequest,
+  projection: ConnectionsProjection,
+  viewModel: ConnectionsViewModel,
+): ReaderConnectionsContent {
+  const captureRecord = requireCapture(capture, "connections");
+  const content = deepFreeze({
+    request,
+    projection,
+    viewModel,
     capture,
   });
+  const record = deepFreeze({
+    payload: captureRecord.payload as CoreLinkResponse,
+    status: captureRecord.status,
+    effectiveRequest: request,
+    projection,
+  });
   connectionsContents.add(content);
+  connectionsRecords.set(content, record);
+  connectionsRecordContents.set(record, content);
   return content;
 }
 
@@ -499,6 +636,49 @@ class ReaderSessionImpl implements ReaderSession {
       maxEntries: this.#state.maxEntries,
       maxCaptureBytes: this.#state.maxCaptureBytes,
     });
+  }
+
+  entryInfo(entryId = this.#state.entries.at(-1)?.id): ReaderEntryInfo {
+    const entry =
+      entryId === undefined
+        ? undefined
+        : this.#state.entries.find((candidate) => candidate.id === entryId);
+    if (entry === undefined) {
+      throw new RangeError("Reader entry was not retained.");
+    }
+
+    const publicView = publicEntry(entry, this.#state.pins);
+    const selectedRef = selectedEntryRef(publicView);
+    return deepFreeze({
+      entryId: publicView.id,
+      label: publicView.label,
+      ...(selectedRef === undefined ? {} : { selectedRef }),
+      ...(publicView.selectedPosition === undefined
+        ? {}
+        : { selectedPosition: publicView.selectedPosition }),
+      sourceAvailable: publicView.source !== undefined,
+      connections: connectionsAvailability(publicView.connections),
+      presentation: publicView.presentation,
+      pinCount: publicView.pinCount,
+    });
+  }
+
+  sourceRecord(
+    entryId = this.#state.entries.at(-1)?.id,
+  ): ReaderSourceRecord | undefined {
+    const entry = this.findRetainedEntry(entryId);
+    return entry.source === undefined
+      ? undefined
+      : getReaderSourceRecord(entry.source);
+  }
+
+  connectionsRecord(
+    entryId = this.#state.entries.at(-1)?.id,
+  ): ReaderConnectionsRecord | undefined {
+    const entry = this.findRetainedEntry(entryId);
+    return entry.connections?.state === "view"
+      ? entry.connections.record
+      : undefined;
   }
 
   beginSourceNavigation(
@@ -731,6 +911,7 @@ class ReaderSessionImpl implements ReaderSession {
         projection: content.projection,
         viewModel: content.viewModel,
         capture: content.capture,
+        record: getReaderConnectionsRecord(content),
       },
     });
     const protectedPins = new Map(this.#state.pins);
@@ -841,12 +1022,19 @@ class ReaderSessionImpl implements ReaderSession {
         immutableProjection,
         record.status,
       );
+      const content = registerConnectionsContent(
+        connections.capture,
+        connections.request,
+        immutableProjection,
+        viewModel,
+      );
       const entries = replaceEntry(this.#state.entries, current.id, {
         ...current,
         connections: {
           ...connections,
-          projection: immutableProjection,
-          viewModel: deepFreeze(viewModel),
+          projection: content.projection,
+          viewModel: content.viewModel,
+          record: getReaderConnectionsRecord(content),
         },
       });
       return applied(this.with({ entries }), undefined);
@@ -1090,6 +1278,17 @@ class ReaderSessionImpl implements ReaderSession {
     return new ReaderSessionImpl({ ...this.#state, ...changes });
   }
 
+  private findRetainedEntry(entryId: string | undefined): InternalEntry {
+    const entry =
+      entryId === undefined
+        ? undefined
+        : this.#state.entries.find((candidate) => candidate.id === entryId);
+    if (entry === undefined) {
+      throw new RangeError("Reader entry was not retained.");
+    }
+    return entry;
+  }
+
   private withoutOperation(operationId: string): ReaderSessionImpl {
     return this.with({
       operations: removeMapKey(this.#state.operations, operationId),
@@ -1146,6 +1345,7 @@ function createEntry(id: string, seed: ReaderEntrySeed): InternalEntry {
             projection: connections.projection,
             viewModel: connections.viewModel,
             capture: connections.capture,
+            record: getReaderConnectionsRecord(connections),
           },
         }),
     ...(seed.selectedPosition === undefined
@@ -1234,6 +1434,27 @@ function publicEntry(
     pinCount: [...pins.values()].filter((entryId) => entryId === entry.id)
       .length,
   });
+}
+
+function selectedEntryRef(entry: ReaderEntryView): string | undefined {
+  if (
+    entry.source?.viewModel.state !== "data" ||
+    entry.selectedPosition === undefined
+  ) {
+    return undefined;
+  }
+  return entry.source.viewModel.items.find((item) =>
+    samePosition(item.position, entry.selectedPosition!),
+  )?.ref;
+}
+
+function connectionsAvailability(
+  connections: ReaderConnectionsEntryView | undefined,
+): ReaderEntryInfo["connections"] {
+  if (connections === undefined) return "absent";
+  if (connections.state === "loading") return "loading";
+  if (connections.state === "view") return "available";
+  return connections.reason;
 }
 
 function entryLabel(

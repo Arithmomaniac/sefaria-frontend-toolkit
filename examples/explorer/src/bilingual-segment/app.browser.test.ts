@@ -1,23 +1,18 @@
 import type {
-  BilingualSegmentController,
-  BilingualSegmentControllerSnapshot,
-  BilingualSegmentDataViewModel,
-  BilingualSegmentRequest,
-  BilingualSegmentTerminalViewModel,
-  BilingualSegmentViewModel,
+  SefariaAcquisition,
+  SefariaAcquisitionResponse,
   SefariaBilingualSegment,
-  TextSegmentDataViewModel,
+  SefariaTextAcquisitionRequest,
 } from "@arithmomaniac/sefaria-web-components";
 import { beforeEach, expect, test, vi } from "vitest";
 
+import micahFixture from "../../../react-vite/src/micah-6-8.json";
 import { startBilingualSegmentLiveDemo } from "./app.js";
 
-const FIRST_RESULT = createDataViewModel("First result");
-const SECOND_RESULT = createDataViewModel("Second result");
-type BilingualSegmentLoader = (
-  request: BilingualSegmentRequest,
+type BilingualLoader = (
+  request: SefariaTextAcquisitionRequest,
   signal: AbortSignal,
-) => Promise<BilingualSegmentViewModel>;
+) => Promise<SefariaAcquisitionResponse>;
 
 beforeEach(() => {
   document.body.innerHTML = `
@@ -59,27 +54,27 @@ beforeEach(() => {
   `;
 });
 
-test("loads a preset through the host and supplies its view model to the element", async () => {
-  const loader = vi.fn<BilingualSegmentLoader>(async () => FIRST_RESULT);
-  startBilingualSegmentLiveDemo(document, controllerFromLoader(loader));
+test("loads a preset through declarative public inputs", async () => {
+  const loader = vi.fn<BilingualLoader>(async () => response("First result"));
+  startBilingualSegmentLiveDemo(document, acquisitionFromLoader(loader));
 
   document.querySelector<HTMLButtonElement>("[data-demo-request]")?.click();
-  await vi.waitFor(() => expect(requestState().dataset.state).toBe("data"));
+  await vi.waitFor(() => expect(requestState().dataset.state).toBe("ready"));
 
   expect(loader.mock.calls[0]?.[0]).toEqual({
-    tref: "Genesis 1:1",
-    primary: { versionTitle: "Miqra according to the Masorah" },
-    translation: {
-      versionTitle: "The Contemporary Torah, Jewish Publication Society, 2006",
-    },
+    sref: "Genesis 1:1",
+    versions: [
+      "primary|Miqra according to the Masorah",
+      "translation|The Contemporary Torah, Jewish Publication Society, 2006",
+    ],
+    returnFormat: "default",
   });
-  expect(resultElement().viewModel).toEqual(FIRST_RESULT);
-  expect(requestState().dataset.state).toBe("data");
+  expect(renderedText()).toContain("First result");
 });
 
-test("omits an unfilled edition instead of requesting a blank version title", async () => {
-  const loader = vi.fn<BilingualSegmentLoader>(async () => FIRST_RESULT);
-  startBilingualSegmentLiveDemo(document, controllerFromLoader(loader));
+test("omits an unfilled edition instead of requesting a blank title", async () => {
+  const loader = vi.fn<BilingualLoader>(async () => response("Result"));
+  startBilingualSegmentLiveDemo(document, acquisitionFromLoader(loader));
 
   const presets = document.querySelectorAll<HTMLButtonElement>(
     "[data-demo-request]",
@@ -87,16 +82,16 @@ test("omits an unfilled edition instead of requesting a blank version title", as
   presets[1]?.click();
   await vi.waitFor(() => expect(loader).toHaveBeenCalledOnce());
 
-  expect(loader.mock.calls[0]?.[0]).toEqual({ tref: "Genesis 1" });
+  expect(loader.mock.calls[0]?.[0]).toEqual({
+    sref: "Genesis 1",
+    versions: ["primary", "translation"],
+    returnFormat: "default",
+  });
 });
 
-test("applies the display settings to the element without a request", async () => {
-  const loader = vi.fn<BilingualSegmentLoader>(async () => FIRST_RESULT);
-  startBilingualSegmentLiveDemo(document, controllerFromLoader(loader));
-
-  expect(resultElement().contentLanguage).toBe("both");
-  expect(resultElement().layout).toBe("auto");
-  expect(resultElement().sideOrder).toBe("primary-first");
+test("applies display settings without requesting", () => {
+  const loader = vi.fn<BilingualLoader>(async () => response("Result"));
+  startBilingualSegmentLiveDemo(document, acquisitionFromLoader(loader));
 
   const displayForm = document.querySelector<HTMLFormElement>("#display-form");
   selectValue(displayForm, "contentLanguage", "primary");
@@ -111,20 +106,20 @@ test("applies the display settings to the element without a request", async () =
 });
 
 test("aborts the old operation and ignores its stale result", async () => {
-  let resolveFirst!: (value: BilingualSegmentViewModel) => void;
-  let resolveSecond!: (value: BilingualSegmentViewModel) => void;
-  const first = new Promise<BilingualSegmentViewModel>((resolve) => {
+  let resolveFirst!: (value: SefariaAcquisitionResponse) => void;
+  let resolveSecond!: (value: SefariaAcquisitionResponse) => void;
+  const first = new Promise<SefariaAcquisitionResponse>((resolve) => {
     resolveFirst = resolve;
   });
-  const second = new Promise<BilingualSegmentViewModel>((resolve) => {
+  const second = new Promise<SefariaAcquisitionResponse>((resolve) => {
     resolveSecond = resolve;
   });
   const signals: AbortSignal[] = [];
-  const loader = vi.fn<BilingualSegmentLoader>(async (_request, signal) => {
+  const loader = vi.fn<BilingualLoader>(async (_request, signal) => {
     signals.push(signal);
     return signals.length === 1 ? await first : await second;
   });
-  startBilingualSegmentLiveDemo(document, controllerFromLoader(loader));
+  startBilingualSegmentLiveDemo(document, acquisitionFromLoader(loader));
 
   const presets = document.querySelectorAll<HTMLButtonElement>(
     "[data-demo-request]",
@@ -135,20 +130,18 @@ test("aborts the old operation and ignores its stale result", async () => {
   await vi.waitFor(() => expect(loader).toHaveBeenCalledTimes(2));
   expect(signals[0]?.aborted).toBe(true);
 
-  resolveSecond(SECOND_RESULT);
-  await vi.waitFor(() =>
-    expect(resultElement().viewModel).toEqual(SECOND_RESULT),
-  );
-  resolveFirst(FIRST_RESULT);
+  resolveSecond(response("Second result"));
+  await vi.waitFor(() => expect(renderedText()).toContain("Second result"));
+  resolveFirst(response("First result"));
   await Promise.resolve();
-  expect(resultElement().viewModel).toEqual(SECOND_RESULT);
+  expect(renderedText()).not.toContain("First result");
 });
 
-test("shows a network failure outside the component view model", async () => {
-  const loader = vi.fn<BilingualSegmentLoader>(async () => {
+test("shows a network failure outside the cleared component", async () => {
+  const loader = vi.fn<BilingualLoader>(async () => {
     throw new Error("Network unavailable");
   });
-  startBilingualSegmentLiveDemo(document, controllerFromLoader(loader));
+  startBilingualSegmentLiveDemo(document, acquisitionFromLoader(loader));
 
   document.querySelector<HTMLButtonElement>("[data-demo-request]")?.click();
   await vi.waitFor(() => expect(requestState().dataset.state).toBe("error"));
@@ -156,92 +149,23 @@ test("shows a network failure outside the component view model", async () => {
   const hostError = document.querySelector<HTMLElement>("#host-error");
   expect(hostError?.hidden).toBe(false);
   expect(hostError?.textContent).toContain("Network unavailable");
-  expect(resultElement().viewModel).toBeUndefined();
+  expect(resultElement().status).toBe("error");
 });
 
-function controllerFromLoader(
-  loader: BilingualSegmentLoader,
-): BilingualSegmentController {
-  let snapshot: BilingualSegmentControllerSnapshot = {
-    attempt: { state: "idle" },
-  };
-  const listeners = new Set<
-    (value: BilingualSegmentControllerSnapshot) => void
-  >();
-  let active: AbortController | undefined;
-  let nextId = 1;
-  const publish = (next: BilingualSegmentControllerSnapshot): void => {
-    snapshot = next;
-    for (const listener of listeners) listener(snapshot);
-  };
-  return {
-    get snapshot() {
-      return snapshot;
-    },
-    subscribe: (listener) => {
-      listeners.add(listener);
-      listener(snapshot);
-      return () => listeners.delete(listener);
-    },
-    load: async (request) => {
-      active?.abort();
-      const current = new AbortController();
-      active = current;
-      const id = nextId++;
-      publish({
-        ...(snapshot.result === undefined ? {} : { result: snapshot.result }),
-        attempt: {
-          state: "loading",
-          id,
-          request,
-          viewModel: {
-            state: "loading",
-            message: `Loading ${request.tref}.`,
-          },
-        },
-      });
-      try {
-        const viewModel = await loader(request, current.signal);
-        if (active !== current || current.signal.aborted) {
-          throw current.signal.reason;
-        }
-        const terminal = viewModel as BilingualSegmentTerminalViewModel;
-        active = undefined;
-        publish({
-          result: { request, viewModel: terminal },
-          attempt: { state: "idle" },
-        });
-        return terminal;
-      } catch (error) {
-        if (active !== current || current.signal.aborted) {
-          throw current.signal.reason;
-        }
-        active = undefined;
-        publish({
-          ...(snapshot.result === undefined ? {} : { result: snapshot.result }),
-          attempt: { state: "failed", id, request, error },
-        });
-        throw error;
-      }
-    },
-    setSuppliedData: () => {
-      throw new Error("Not used by this test controller.");
-    },
-    cancel: (reason = new DOMException("Cancelled", "AbortError")) => {
-      active?.abort(reason);
-      active = undefined;
-      publish({
-        ...(snapshot.result === undefined ? {} : { result: snapshot.result }),
-        attempt: { state: "idle" },
-      });
-    },
-    dispose: () => {
-      active?.abort();
-      active = undefined;
-      listeners.clear();
-      snapshot = { attempt: { state: "idle" } };
-    },
-  };
+function acquisitionFromLoader(loader: BilingualLoader): SefariaAcquisition {
+  return { kind: "capability", capability: { getText: loader } };
+}
+
+function response(label: string): SefariaAcquisitionResponse {
+  const payload = structuredClone(micahFixture);
+  payload.ref = "Genesis 1:1";
+  payload.heRef = "בראשית א׳:א׳";
+  payload.versions[0]!.versionTitle = "Miqra according to the Masorah";
+  payload.versions[0]!.text = `${label} primary`;
+  payload.versions[1]!.versionTitle =
+    "The Contemporary Torah, Jewish Publication Society, 2006";
+  payload.versions[1]!.text = `${label} translation`;
+  return { payload, status: 200 };
 }
 
 function selectValue(
@@ -273,26 +197,11 @@ function requestState(): HTMLElement {
   return element;
 }
 
-function createDataViewModel(label: string): BilingualSegmentDataViewModel {
-  const side = (
-    language: "he" | "en",
-    direction: "rtl" | "ltr",
-  ): TextSegmentDataViewModel => ({
-    state: "data",
-    ref: "Genesis 1:1",
-    heRef: "בראשית א׳:א׳",
-    language,
-    actualLanguage: language,
-    direction,
-    bodyHtml: `${label} (${language})`,
-    notes: [],
-  });
-
-  return {
-    state: "data",
-    ref: "Genesis 1:1",
-    heRef: "בראשית א׳:א׳",
-    primary: side("he", "rtl"),
-    translation: side("en", "ltr"),
-  };
+function renderedText(): string {
+  return [
+    ...(resultElement().shadowRoot?.querySelectorAll("sefaria-text-segment") ??
+      []),
+  ]
+    .map((segment) => segment.shadowRoot?.textContent ?? "")
+    .join(" ");
 }

@@ -75,12 +75,23 @@ export interface RefLabelHttpErrorViewModel {
   readonly message: string;
 }
 
+/** Validation or acquisition failure owned by a reference-label element. */
+export interface RefLabelElementErrorViewModel {
+  /** State discriminator. */
+  readonly state: "error";
+  /** Error classification. */
+  readonly errorKind: "validation" | "acquisition";
+  /** Human-readable failure message. */
+  readonly message: string;
+}
+
 /** Complete state union accepted by `<sefaria-ref-label>`. */
 export type RefLabelViewModel =
   | RefLabelLoadingViewModel
   | RefLabelDataViewModel
   | RefLabelEmptyViewModel
-  | RefLabelHttpErrorViewModel;
+  | RefLabelHttpErrorViewModel
+  | RefLabelElementErrorViewModel;
 
 /** Terminal reference-label state committed by a headless controller. */
 export type RefLabelTerminalViewModel = Exclude<

@@ -25,7 +25,7 @@ Public GitHub Packages prereleases are available for authenticated installation.
 | --- | --- |
 | Use the API client | [`@arithmomaniac/sefaria-client`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/client/README.md) |
 | Use text transforms without components | [`@arithmomaniac/sefaria-text-transform`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/text-transform/README.md) |
-| Choose component and Reader subpaths | [`@arithmomaniac/sefaria-web-components`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/web-components/README.md) |
+| Choose declarative component, acquisition, and Reader subpaths | [`@arithmomaniac/sefaria-web-components`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/web-components/README.md) |
 | Inspect generated element metadata | [Custom elements](reference/custom-elements.md) |
 | Inspect declaration-derived package exports | [Public package exports](reference/public-exports.md) |
 

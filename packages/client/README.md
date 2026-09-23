@@ -18,17 +18,19 @@ const result = await text.getV3Texts({
 });
 ```
 
-Most component consumers should call an async component factory and supply this client rather than interpret the transport result themselves:
+Component consumers can supply an existing client as the element's explicit acquisition source:
 
 ```ts
 import { createSefariaClient } from "@arithmomaniac/sefaria-client";
-import { loadSourceCardViewModel } from "@arithmomaniac/sefaria-web-components/source-card";
+import "@arithmomaniac/sefaria-web-components";
 
-const viewModel = await loadSourceCardViewModel(
-  { tref: "Micah 6:8" },
-  createSefariaClient(),
-);
+const card = document.createElement("sefaria-source-card");
+card.acquisition = { kind: "client", client: createSefariaClient() };
+card.sref = "Micah 6:8";
+document.body.append(card);
 ```
+
+Applications with custom renderers use the validated client contracts directly and can apply `@arithmomaniac/sefaria-text-transform` to text they already own.
 
 ## Entry points
 

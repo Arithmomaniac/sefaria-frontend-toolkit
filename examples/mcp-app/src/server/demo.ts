@@ -409,12 +409,15 @@ async function dispatchReaderEvent(
   await frame.locator("sefaria-reader").evaluate(
     (reader, event) => {
       const element = reader as HTMLElement & {
-        viewModel: { currentEntryId: string };
+        currentEntryId?: string;
       };
+      if (element.currentEntryId === undefined) {
+        throw new Error("Reader has no current entry.");
+      }
       element.dispatchEvent(
         new CustomEvent(event.name, {
           detail: {
-            originEntryId: element.viewModel.currentEntryId,
+            originEntryId: element.currentEntryId,
             ...event.detail,
           },
         }),
@@ -533,39 +536,49 @@ function assertNoRequestSince(start: number, action: string): void {
 
 async function readReaderState(frame: Frame): Promise<ReaderState> {
   return frame.locator("sefaria-reader").evaluate((reader) => {
-    const model = (
-      reader as HTMLElement & {
-        viewModel: {
-          currentEntryId: string;
-          label: string;
-          connections?: {
-            state: string;
-            viewModel?: {
-              state: string;
-              category: string | null;
-              page: number;
-              total: number;
-              entries?: Array<{ targetRef: string }>;
-            };
-          };
-        };
-      }
-    ).viewModel;
-    if (
-      model.connections?.state !== "component" ||
-      model.connections.viewModel?.state !== "data"
-    ) {
+    const component = reader as HTMLElement & { currentEntryId?: string };
+    const panel = reader.shadowRoot?.querySelector(
+      "sefaria-connections-panel",
+    ) as
+      | (HTMLElement & {
+          status?: string;
+        })
+      | null;
+    if (component.currentEntryId === undefined || panel?.status !== "ready") {
       throw new Error("Reader connections are unavailable.");
     }
+    const selectedCategory = panel.shadowRoot?.querySelector(
+      'nav[aria-label="Connection categories"] button[aria-pressed="true"]',
+    );
+    const selectedLabel = selectedCategory?.textContent?.trim() ?? "Overview";
+    const category =
+      selectedLabel === "Overview"
+        ? null
+        : selectedLabel.replace(/\s+\(\d+\)$/u, "");
+    const pageStatus =
+      panel.shadowRoot?.querySelector('[role="status"]')?.textContent ?? "";
+    const pageMatch = pageStatus.match(/Page (\d+): \d+ of (\d+)/u);
+    const page = pageMatch ? Number.parseInt(pageMatch[1]!, 10) - 1 : 0;
+    const label =
+      reader.shadowRoot
+        ?.querySelector('[data-current-heading="true"]')
+        ?.textContent?.trim() ?? "";
+    const targetRefs = [
+      ...(panel.shadowRoot?.querySelectorAll("button.open") ?? []),
+    ].flatMap((button) => {
+      const accessibleLabel = button.getAttribute("aria-label");
+      return accessibleLabel?.startsWith("Open ") &&
+        accessibleLabel.endsWith(" in context")
+        ? [accessibleLabel.slice(5, -" in context".length)]
+        : [];
+    });
     return {
-      currentEntryId: model.currentEntryId,
-      label: model.label,
-      category: model.connections.viewModel.category,
-      page: model.connections.viewModel.page,
-      total: model.connections.viewModel.total,
-      targetRefs:
-        model.connections.viewModel.entries?.map((entry) => entry.targetRef) ??
-        [],
+      currentEntryId: component.currentEntryId,
+      label,
+      category,
+      page,
+      total: pageMatch ? Number.parseInt(pageMatch[2]!, 10) : 0,
+      targetRefs,
     };
   });
 }

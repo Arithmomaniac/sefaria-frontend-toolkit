@@ -1,18 +1,11 @@
 import { zCoreV3TextsResponse } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
-import { bindPopupController } from "@arithmomaniac/sefaria-web-components/bindings";
-import { createPopupController } from "@arithmomaniac/sefaria-web-components/popup";
 import payload from "./micah-6-8.js";
 
 const anchor = requireElement("#anchor");
 const popup = requireElement("#popup");
 const state = requireElement("#state");
-const controller = createPopupController();
-bindPopupController(popup, controller);
-controller.setSuppliedData(
-  { tref: "Micah 6:8" },
-  zCoreV3TextsResponse.parse(payload),
-);
+popup.data = zCoreV3TextsResponse.parse(payload);
 popup.anchor = anchor;
 
 anchor.addEventListener("click", () => {

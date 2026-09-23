@@ -108,6 +108,16 @@ export interface BilingualSegmentProjectionErrorViewModel {
   readonly message: string;
 }
 
+/** Validation failure for authoritative supplied bilingual-segment data. */
+export interface BilingualSegmentValidationErrorViewModel {
+  /** State discriminator. */
+  readonly state: "error";
+  /** Error classification. */
+  readonly errorKind: "validation";
+  /** Human-readable validation failure with structured paths. */
+  readonly message: string;
+}
+
 /** Documented v3 texts HTTP failure. */
 export interface BilingualSegmentHttpErrorViewModel {
   /** State discriminator. */
@@ -127,6 +137,7 @@ export type BilingualSegmentViewModel =
   | BilingualSegmentPartialViewModel
   | BilingualSegmentEmptyViewModel
   | BilingualSegmentProjectionErrorViewModel
+  | BilingualSegmentValidationErrorViewModel
   | BilingualSegmentHttpErrorViewModel;
 
 /** Terminal bilingual state committed by a headless controller. */
@@ -474,6 +485,16 @@ export function resolveBilingualSides(
   return { versions: resolved };
 }
 
+/** Serializes the primary and translation selectors for a v3 text request. */
+export function serializeBilingualSegmentSelectors(
+  request: BilingualSegmentRequest,
+): string[] {
+  if (request.tref.trim().length === 0) {
+    throw new TypeError("Bilingual segment reference must not be blank.");
+  }
+  return SIDES.map((side) => serializeSideSelector(request, side));
+}
+
 function exactSideMatches(
   versions: readonly CoreV3Version[],
   request: BilingualSegmentRequest,
@@ -524,12 +545,7 @@ function warningKeyForSide(
   return `${side}|${versionTitle.replaceAll("_", " ")}`;
 }
 
-function serializeSelectors(request: BilingualSegmentRequest): string[] {
-  if (request.tref.trim().length === 0) {
-    throw new TypeError("Bilingual segment reference must not be blank.");
-  }
-  return SIDES.map((side) => serializeSideSelector(request, side));
-}
+const serializeSelectors = serializeBilingualSegmentSelectors;
 
 function serializeSideSelector(
   request: BilingualSegmentRequest,

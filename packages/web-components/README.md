@@ -2,95 +2,71 @@
 
 # `@arithmomaniac/sefaria-web-components`
 
-`@arithmomaniac/sefaria-web-components` provides pure view-model factories and request-free Lit elements for Sefaria reading surfaces. Elements receive component-specific rendering data through JavaScript properties; they do not accept references, clients, raw API payloads, or `fetch`.
+The package provides seven declarative Lit elements. Every element accepts standalone `sref`. The six ordinary elements also accept authoritative component-specific raw `data`; Reader accepts transactional raw source/connections seeds. Prepared rendering is private.
 
-The committed source manifest remains private to prevent accidental publication. Public GitHub Packages prereleases are available for authenticated installation; the package name is subject to change, and it is not published on npmjs.com. Follow the repository [installation instructions](../../docs/get-started.md#installation-status). Its export map resolves to `dist` JavaScript and declarations, while `custom-elements.json` and the generated [custom-element reference](../../docs/reference/custom-elements.md) describe the browser surface.
+## Supplied data
 
-## Choose an entry point
+```ts
+import {
+  type CoreV3TextsResponse,
+  zCoreV3TextsResponse,
+} from "@arithmomaniac/sefaria-client";
+import "@arithmomaniac/sefaria-web-components";
 
-| Goal | Recommended entry point |
-| --- | --- |
-| Register all current custom elements | `@arithmomaniac/sefaria-web-components` |
-| Render a passage or range | `@arithmomaniac/sefaria-web-components/source-card` |
-| Render one primary/translation pair | `@arithmomaniac/sefaria-web-components/bilingual-segment` |
-| Render one selected edition | `@arithmomaniac/sefaria-web-components/text-segment` |
-| Render a reference label | `@arithmomaniac/sefaria-web-components/ref-label` |
-| Render and page contextual links | `@arithmomaniac/sefaria-web-components/connections-panel` |
-| Bind headless controllers to registered elements | `@arithmomaniac/sefaria-web-components/bindings` |
-| Use the supported stateful Reader | `@arithmomaniac/sefaria-web-components/reader-controller` and `@arithmomaniac/sefaria-web-components/reader` |
-| Build custom host navigation | `@arithmomaniac/sefaria-web-components/reader-session` |
+import payload from "./micah-6-8.json";
+
+const card = document.createElement("sefaria-source-card");
+card.data = zCoreV3TextsResponse.parse(payload) as CoreV3TextsResponse;
+document.body.append(card);
+```
+
+Defined ordinary-element `data` is authoritative, including valid empty and invalid data, and makes zero requests.
+
+## Standalone `sref`
+
+```ts
+import "@arithmomaniac/sefaria-web-components";
+
+const card = document.createElement("sefaria-source-card");
+card.sref = "Micah 6:8";
+document.body.append(card);
+```
+
+The undefined acquisition value lazily uses one shared toolkit client per loaded module instance. Assign `{ kind: "client", client }`, `{ kind: "capability", capability }`, or `{ kind: "disabled" }` for an explicit source. Explicit failure or unsupported operations never fall through to browser HTTP.
 
 ## Prebuilt Reader
 
 ```ts
-import "@arithmomaniac/sefaria-web-components";
 import { createSefariaClient } from "@arithmomaniac/sefaria-client";
-import { bindReaderController } from "@arithmomaniac/sefaria-web-components/bindings";
-import { loadReaderController } from "@arithmomaniac/sefaria-web-components/reader-controller";
+import "@arithmomaniac/sefaria-web-components";
 
 const reader = document.createElement("sefaria-reader");
+reader.acquisition = {
+  kind: "client",
+  client: createSefariaClient(),
+};
+reader.sref = "Micah 6:8";
 document.body.append(reader);
-
-const controller = await loadReaderController(
-  { tref: "Micah 6:8" },
-  createSefariaClient(),
-);
-const unbind = bindReaderController(reader, controller);
-
-controller.setPresentation({
-  originEntryId: controller.snapshot.reader.currentEntryId,
-  patch: { vocalizationMode: "nikkud" },
-});
-
-await controller.replaceRoot({ tref: "Micah 6:7" });
-
-window.addEventListener(
-  "pagehide",
-  () => {
-    unbind();
-    controller.dispose();
-  },
-  { once: true },
-);
 ```
 
-## Optional component controllers
+Reader owns source and links acquisition, cancellation, semantic history, Back, breadcrumbs, private preparation, and errors. Raw seeds initialize or transactionally replace state. Read-only `status`, `rootLoading`, `selectedRef`, `currentEntryId`, and `readerError` expose semantic diagnostics.
 
-Each endpoint-backed component subpath exports a headless controller factory alongside its pure and async factories. A controller owns one component's pending attempt, cancellation, stale-result suppression, committed terminal view model, supplied-response validation, and subscriptions. It makes no request until `load` is called.
+## Lifecycle and composition
 
-```ts
-import "@arithmomaniac/sefaria-web-components";
-import { createSefariaClient } from "@arithmomaniac/sefaria-client";
-import { bindSourceCardController } from "@arithmomaniac/sefaria-web-components/bindings";
-import { createSourceCardController } from "@arithmomaniac/sefaria-web-components/source-card";
+- Disconnection aborts or invalidates eligible work; reconnect resumes only the still-eligible interrupted phase.
+- Popup preparation is independent of `open`.
+- Composite parents prepare children from captured data. Ten children remain one parent request and zero child requests.
+- Current failures become accessible state and component-specific error events. Stale completions publish nothing.
+- The toolkit client remains the only response-cache owner.
 
-const card = document.createElement("sefaria-source-card");
-const controller = createSourceCardController(createSefariaClient());
-const unbind = bindSourceCardController(card, controller);
-document.body.append(card);
+## Public subpaths
 
-await controller.load({ tref: "Micah 6:8" });
+| Goal | Entry point |
+| --- | --- |
+| Register all elements | `@arithmomaniac/sefaria-web-components` |
+| Acquisition types/configuration | `@arithmomaniac/sefaria-web-components/acquisition` |
+| Component raw request/selection types | Component-specific subpath |
+| Shared raw Reader source qualification and raw seed types | `@arithmomaniac/sefaria-web-components/reader` |
+| Advanced semantic/raw Reader facade: history, pins, budgets, entry info, records, and raw transitions | `@arithmomaniac/sefaria-web-components/reader-session` |
 
-window.addEventListener(
-  "pagehide",
-  () => {
-    unbind();
-    controller.dispose();
-  },
-  { once: true },
-);
-```
-
-The controller's immutable snapshot keeps a pending or failed named attempt separate from its previous committed result. Network, schema, abort, and programmer failures reject with their original cause; a documented HTTP response remains a component-specific terminal view model. `setSuppliedData` validates unknown corrected API-shaped JSON and calls the same pure projection with zero requests. Connections additionally retains one current corrected links payload for zero-I/O category and page projection.
-
-The `bindings` subpath contains DOM adapters only. Importing it does not register elements or access DOM globals; import the package root separately when the host wants package-wide registration. Unbinding removes element listeners and the snapshot subscription without disposing the caller-owned controller.
-
-Hebrew-capable elements expose the typed `vocalizationMode` property and the `vocalization-mode` attribute with `taamim_and_nikkud`, `nikkud`, and `none` presets. The default preserves all marks. Changing the property is local presentation work over the existing safe view model; it does not refetch or rerun a component factory. A controlled Reader retains the setting per semantic history entry and exposes it separately as `controller.snapshot.presentation`. Following a connection pushes history, while `replaceRoot` starts a fresh root on the same controller and element after source qualification succeeds. An exact canonical item already covered by the current source capture and the same edition selectors reuses that capture with zero source requests while still creating a fresh root and loading its connections. Aliases, uncovered references, and edition changes use normal source qualification. During qualification, `bindReaderController` sets the request-free element's `rootLoading` property so the committed root remains visible under an accessible loading treatment. A host can also set `rootLoading` before supplying the first view model to show the full initial Reader loading state.
-
-The Reader's optional `toolbar-actions` slot places additive host-owned controls after the built-in action controls once a view model is committed. Read action targets from the current `controller.snapshot.reader.selectedTarget` or current Reader view model when the action activates; the slot carries no data context and does not replace required Reader content. The built-in `chatExport` property and event remain the supported chat-specific affordance.
-
-Use `::part(toolbar)`, `::part(history)`, `::part(source-pane)`, and `::part(connections-pane)` for coarse Reader-region styling. No child parts are forwarded. Prefer the shared `--sefaria-*` properties for theme-wide color, type, radius, and scale changes. A host that overrides region layout or visibility owns the resulting responsive behavior.
-
-Use a component's pure factory when corrected API-shaped JSON has already crossed a validated server, MCP, fixture, stored-data, or user-input boundary. Use its async factory for browser client mode. A successful async result is the same projection as the pure factory over its captured payload.
-
-See [Render text](../../docs/guides/render-text.md) for smaller components, [Reader navigation](../../docs/guides/reader-navigation.md) for packaged versus custom composition, and the [component specification](../../docs/specs/components.md) for exact contracts.
+`./reader-session` remains supported for advanced spatial hosts, and `./reader` supplies the shared DOM-free source-qualification boundary. Neither exposes prepared rendering content. `./bindings` and `./reader-controller` are retired. See [Render text](../../docs/guides/render-text.md), [Reader navigation](../../docs/guides/reader-navigation.md), and the [component specification](../../docs/specs/components.md).

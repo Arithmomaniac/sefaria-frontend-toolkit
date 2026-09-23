@@ -1,23 +1,19 @@
 import type {
+  SefariaAcquisition,
+  SefariaAcquisitionResponse,
   SefariaSourceCard,
-  SourceCardController,
-  SourceCardControllerSnapshot,
-  SourceCardDataViewModel,
-  SourceCardRequest,
-  SourceCardTerminalViewModel,
-  SourceCardViewModel,
+  SefariaTextAcquisitionRequest,
 } from "@arithmomaniac/sefaria-web-components";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
+import micahFixture from "../../../react-vite/src/micah-6-8.json";
 import { startSourceCardLiveDemo } from "./app.js";
 import v3Fixture from "../../../../packages/client/test/fixtures/v3-text-spanning-2026-08-29.json" with { type: "json" };
 
-const FIRST_RESULT = createDataViewModel("First");
-const SECOND_RESULT = createDataViewModel("Second");
 type SourceCardLoader = (
-  request: SourceCardRequest,
+  request: SefariaTextAcquisitionRequest,
   signal: AbortSignal,
-) => Promise<SourceCardViewModel>;
+) => Promise<SefariaAcquisitionResponse>;
 
 beforeEach(() => {
   document.body.innerHTML = `
@@ -45,7 +41,7 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-test("reuses the default client's cached response when revisiting a request", async () => {
+test("reuses the completed declarative request", async () => {
   const fetchMock = vi.fn<typeof fetch>(
     async () =>
       new Response(JSON.stringify(v3Fixture), {
@@ -60,26 +56,29 @@ test("reuses the default client's cached response when revisiting a request", as
   await demo.loadCurrentRequest();
 
   expect(fetchMock).toHaveBeenCalledOnce();
-  expect(resultElement().viewModel.state).not.toBe("loading");
+  expect(resultElement().status).not.toBe("loading");
 });
 
-test("loads a preset and supplies the result to the request-free element", async () => {
-  const loader = vi.fn<SourceCardLoader>(async () => FIRST_RESULT);
-  startSourceCardLiveDemo(document, controllerFromLoader(loader));
+test("loads a preset through declarative public inputs", async () => {
+  const loader = vi.fn<SourceCardLoader>(async () => response("First"));
+  startSourceCardLiveDemo(document, acquisitionFromLoader(loader));
 
   document.querySelector<HTMLButtonElement>("[data-demo-request]")?.click();
   await vi.waitFor(() =>
     expect(requestState().textContent).toContain("1 items from one request"),
   );
 
-  expect(loader.mock.calls[0]?.[0]).toEqual({ tref: "Likutei Moharan 1" });
-  expect(resultElement().viewModel).toEqual(FIRST_RESULT);
-  expect(requestState().textContent).toContain("1 items from one request");
+  expect(loader.mock.calls[0]?.[0]).toEqual({
+    sref: "Likutei Moharan 1",
+    versions: ["primary", "translation"],
+    returnFormat: "default",
+  });
+  expect(renderedText()).toContain("First");
 });
 
 test("applies display settings without requesting", () => {
-  const loader = vi.fn<SourceCardLoader>(async () => FIRST_RESULT);
-  startSourceCardLiveDemo(document, controllerFromLoader(loader));
+  const loader = vi.fn<SourceCardLoader>(async () => response("First"));
+  startSourceCardLiveDemo(document, acquisitionFromLoader(loader));
   const form = document.querySelector<HTMLFormElement>("#display-form");
 
   selectValue(form, "contentLanguage", "primary");
@@ -94,8 +93,8 @@ test("applies display settings without requesting", () => {
 });
 
 test("enables selection and reports the real component event", () => {
-  const loader = vi.fn<SourceCardLoader>(async () => FIRST_RESULT);
-  startSourceCardLiveDemo(document, controllerFromLoader(loader));
+  const loader = vi.fn<SourceCardLoader>(async () => response("First"));
+  startSourceCardLiveDemo(document, acquisitionFromLoader(loader));
   const result = resultElement();
 
   expect(result.selectable).toBe(true);
@@ -113,21 +112,28 @@ test("enables selection and reports the real component event", () => {
 test("restores committed content after a transport failure", async () => {
   let rejectSecond!: (reason: unknown) => void;
   const loader = vi.fn<SourceCardLoader>(async () => {
-    if (loader.mock.calls.length === 1) return FIRST_RESULT;
-    return await new Promise<SourceCardViewModel>((_resolve, reject) => {
+    if (loader.mock.calls.length === 1) return response("First");
+    return await new Promise<SefariaAcquisitionResponse>((_resolve, reject) => {
       rejectSecond = reject;
     });
   });
-  const demo = startSourceCardLiveDemo(document, controllerFromLoader(loader));
-  const result = resultElement();
+  const demo = startSourceCardLiveDemo(document, acquisitionFromLoader(loader));
 
   await demo.loadCurrentRequest();
+  const committed = resultElement().shadowRoot?.textContent;
+  const form = document.querySelector<HTMLFormElement>("#source-card-form");
+  const tref = form?.elements.namedItem("tref");
+  if (!(tref instanceof HTMLInputElement)) {
+    throw new Error("The tref input is missing.");
+  }
+  tref.value = "Micah 6:8";
   const failedLoad = demo.loadCurrentRequest();
   await vi.waitFor(() => expect(loader).toHaveBeenCalledTimes(2));
   rejectSecond(new Error("Network unavailable."));
   await failedLoad;
 
-  expect(result.viewModel).toBe(FIRST_RESULT);
+  expect(resultElement().shadowRoot?.textContent).toBe(committed);
+  expect(resultElement().status).toBe("error");
   expect(requestState().dataset.state).toBe("error");
   expect(document.querySelector<HTMLElement>("#host-error")?.textContent).toBe(
     "Network unavailable.",
@@ -138,7 +144,7 @@ test("hides an initial loading placeholder after a transport failure", async () 
   const loader = vi.fn<SourceCardLoader>(async () => {
     throw new Error("Network unavailable.");
   });
-  const demo = startSourceCardLiveDemo(document, controllerFromLoader(loader));
+  const demo = startSourceCardLiveDemo(document, acquisitionFromLoader(loader));
 
   await demo.loadCurrentRequest();
 
@@ -152,12 +158,12 @@ test("hides an initial loading placeholder after a transport failure", async () 
 });
 
 test("aborts the old operation and ignores its stale result", async () => {
-  let resolveFirst!: (value: SourceCardViewModel) => void;
-  let resolveSecond!: (value: SourceCardViewModel) => void;
-  const first = new Promise<SourceCardViewModel>((resolve) => {
+  let resolveFirst!: (value: SefariaAcquisitionResponse) => void;
+  let resolveSecond!: (value: SefariaAcquisitionResponse) => void;
+  const first = new Promise<SefariaAcquisitionResponse>((resolve) => {
     resolveFirst = resolve;
   });
-  const second = new Promise<SourceCardViewModel>((resolve) => {
+  const second = new Promise<SefariaAcquisitionResponse>((resolve) => {
     resolveSecond = resolve;
   });
   const signals: AbortSignal[] = [];
@@ -165,100 +171,37 @@ test("aborts the old operation and ignores its stale result", async () => {
     signals.push(signal);
     return signals.length === 1 ? await first : await second;
   });
-  const demo = startSourceCardLiveDemo(document, controllerFromLoader(loader));
+  const demo = startSourceCardLiveDemo(document, acquisitionFromLoader(loader));
+  const form = document.querySelector<HTMLFormElement>("#source-card-form");
+  const tref = form?.elements.namedItem("tref");
+  if (!(tref instanceof HTMLInputElement)) {
+    throw new Error("The tref input is missing.");
+  }
 
   const firstLoad = demo.loadCurrentRequest();
   await vi.waitFor(() => expect(loader).toHaveBeenCalledTimes(1));
+  tref.value = "Micah 6:8";
   const secondLoad = demo.loadCurrentRequest();
   await vi.waitFor(() => expect(loader).toHaveBeenCalledTimes(2));
   expect(signals[0]?.aborted).toBe(true);
 
-  resolveSecond(SECOND_RESULT);
+  resolveSecond(response("Second"));
   await secondLoad;
-  resolveFirst(FIRST_RESULT);
+  resolveFirst(response("First"));
   await firstLoad;
-  expect(resultElement().viewModel).toEqual(SECOND_RESULT);
+  expect(renderedText()).toContain("Second");
+  expect(renderedText()).not.toContain("First");
 });
 
-function controllerFromLoader(loader: SourceCardLoader): SourceCardController {
-  let snapshot: SourceCardControllerSnapshot = {
-    attempt: { state: "idle" },
-  };
-  const listeners = new Set<(value: SourceCardControllerSnapshot) => void>();
-  let active: AbortController | undefined;
-  let nextId = 1;
-  const publish = (next: SourceCardControllerSnapshot): void => {
-    snapshot = next;
-    for (const listener of listeners) listener(snapshot);
-  };
-  return {
-    get snapshot() {
-      return snapshot;
-    },
-    subscribe: (listener) => {
-      listeners.add(listener);
-      listener(snapshot);
-      return () => listeners.delete(listener);
-    },
-    load: async (request) => {
-      active?.abort();
-      const current = new AbortController();
-      active = current;
-      const id = nextId++;
-      publish({
-        ...(snapshot.result === undefined ? {} : { result: snapshot.result }),
-        attempt: {
-          state: "loading",
-          id,
-          request,
-          viewModel: {
-            state: "loading",
-            message: `Loading ${request.tref}.`,
-          },
-        },
-      });
-      try {
-        const viewModel = await loader(request, current.signal);
-        if (active !== current || current.signal.aborted) {
-          throw current.signal.reason;
-        }
-        const terminal = viewModel as SourceCardTerminalViewModel;
-        active = undefined;
-        publish({
-          result: { request, viewModel: terminal },
-          attempt: { state: "idle" },
-        });
-        return terminal;
-      } catch (error) {
-        if (active !== current || current.signal.aborted) {
-          throw current.signal.reason;
-        }
-        active = undefined;
-        publish({
-          ...(snapshot.result === undefined ? {} : { result: snapshot.result }),
-          attempt: { state: "failed", id, request, error },
-        });
-        throw error;
-      }
-    },
-    setSuppliedData: () => {
-      throw new Error("Not used by this test controller.");
-    },
-    cancel: (reason = new DOMException("Cancelled", "AbortError")) => {
-      active?.abort(reason);
-      active = undefined;
-      publish({
-        ...(snapshot.result === undefined ? {} : { result: snapshot.result }),
-        attempt: { state: "idle" },
-      });
-    },
-    dispose: () => {
-      active?.abort();
-      active = undefined;
-      listeners.clear();
-      snapshot = { attempt: { state: "idle" } };
-    },
-  };
+function acquisitionFromLoader(loader: SourceCardLoader): SefariaAcquisition {
+  return { kind: "capability", capability: { getText: loader } };
+}
+
+function response(label: string): SefariaAcquisitionResponse {
+  const payload = structuredClone(micahFixture);
+  payload.versions[0]!.text = `${label} primary`;
+  payload.versions[1]!.text = `${label} translation`;
+  return { payload, status: 200 };
 }
 
 function selectValue(
@@ -291,46 +234,11 @@ function requestState(): HTMLElement {
   return element;
 }
 
-function createDataViewModel(label: string): SourceCardDataViewModel {
-  return {
-    state: "data",
-    header: {
-      ref: "Genesis 1:1",
-      heRef: "בראשית א׳:א׳",
-      indexTitle: "Genesis",
-      heIndexTitle: "בראשית",
-      primaryCategory: "Tanakh",
-      categories: ["Tanakh", "Torah"],
-    },
-    attributions: [
-      {
-        side: "primary",
-        versionTitle: label,
-        versionSource: null,
-        versionSourceUrl: null,
-      },
-    ],
-    items: [
-      {
-        position: [],
-        pair: {
-          state: "partial",
-          present: {
-            side: "primary",
-            view: {
-              state: "data",
-              ref: "Genesis 1:1",
-              heRef: "בראשית א׳:א׳",
-              language: "he",
-              actualLanguage: "he",
-              direction: "rtl",
-              bodyHtml: label,
-              notes: [],
-            },
-          },
-          absent: { side: "translation", message: "No translation." },
-        },
-      },
-    ],
-  };
+function renderedText(): string {
+  return [
+    ...(resultElement().shadowRoot?.querySelectorAll("sefaria-text-segment") ??
+      []),
+  ]
+    .map((segment) => segment.shadowRoot?.textContent ?? "")
+    .join(" ");
 }

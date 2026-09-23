@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 1180" role="img" aria-labelledby="title description">
   <title id="title">Choose the toolkit layer that matches your product</title>
-  <desc id="description">A mobile view of five independently useful toolkit layers: validated transport, pure text preparation, render-ready models, focused components, and the controlled Reader.</desc>
+  <desc id="description">A mobile view of five independently useful toolkit layers: validated transport, pure text preparation, custom rendering with the client and text transforms, focused components, and the controlled Reader.</desc>
   <defs>
     <style>
       :root {
@@ -61,22 +61,22 @@
 
   <path class="arrow" d="M240 558 V590" />
   <rect class="headless" x="36" y="592" width="408" height="142" rx="12" />
-  <text class="label" x="60" y="627">Render-ready models</text>
-  <text class="package" x="60" y="655">pure component factories</text>
-  <text class="detail" x="60" y="687">Project validated data for one component.</text>
-  <text class="stop" x="60" y="715">Stop here: render the model in your own UI</text>
+  <text class="label" x="60" y="627">Custom rendering</text>
+  <text class="package" x="60" y="655">client + text transforms</text>
+  <text class="detail" x="60" y="687">Use validated payloads and safe prepared text.</text>
+  <text class="stop" x="60" y="715">Stop here: render in your own UI</text>
 
   <path class="arrow" d="M240 734 V766" />
   <rect class="browser" x="36" y="768" width="408" height="142" rx="12" />
   <text class="label" x="60" y="803">Focused components</text>
-  <text class="package" x="60" y="831">six request-free surfaces</text>
+  <text class="package" x="60" y="831">six focused surfaces</text>
   <text class="detail" x="60" y="863">Add a citation, text, card, popup, or connections.</text>
   <text class="stop" x="60" y="891">Stop here: add one reading feature</text>
 
   <path class="arrow" d="M240 910 V942" />
   <rect class="browser" x="36" y="944" width="408" height="142" rx="12" />
   <text class="label" x="60" y="979">Controlled Reader</text>
-  <text class="package" x="60" y="1007">reader + controller</text>
+  <text class="package" x="60" y="1007">standalone Reader</text>
   <text class="detail" x="60" y="1039">Reading, connections, history, and navigation.</text>
   <text class="stop" x="60" y="1067">Complete supported reading flow</text>
 

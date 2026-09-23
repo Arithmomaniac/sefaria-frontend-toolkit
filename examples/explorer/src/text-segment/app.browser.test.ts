@@ -1,50 +1,46 @@
-import type {
-  SefariaTextSegment,
-  TextSegmentController,
-  TextSegmentControllerSnapshot,
-  TextSegmentDataViewModel,
-  TextSegmentRequest,
-  TextSegmentTerminalViewModel,
-  TextSegmentViewModel,
-} from "@arithmomaniac/sefaria-web-components";
+import { createSefariaClient } from "@arithmomaniac/sefaria-client";
+import type { SefariaTextSegment } from "@arithmomaniac/sefaria-web-components";
 import { beforeEach, expect, test, vi } from "vitest";
 
+import textFixture from "../../../../packages/client/test/fixtures/v3-connections-genesis-target-2026-09-06.json";
 import { startTextSegmentLiveDemo } from "./app.js";
-
-const FIRST_RESULT = createDataViewModel("First result");
-type TextSegmentLoader = (
-  request: TextSegmentRequest,
-  signal: AbortSignal,
-) => Promise<TextSegmentViewModel>;
 
 beforeEach(() => {
   document.body.innerHTML = '<div id="live-demo-root"></div>';
 });
 
-test("loads a preset through the host and supplies its view model to the element", async () => {
-  const loader = vi.fn<TextSegmentLoader>(async () => FIRST_RESULT);
-  startTextSegmentLiveDemo(document, controllerFromLoader(loader));
-
-  document
-    .querySelector<HTMLButtonElement>('[data-demo-id="english-footnote"]')
-    ?.click();
-  await vi.waitFor(() => expect(requestState().dataset.state).toBe("data"));
-
-  expect(loader.mock.calls[0]?.[0]).toEqual({
-    tref: "Genesis 1:1",
-    version: {
-      language: "english",
-      versionTitle: "The Contemporary Torah, Jewish Publication Society, 2006",
-    },
-  });
-  expect(resultElement().viewModel).toEqual(FIRST_RESULT);
-  expect(requestState().dataset.state).toBe("data");
-});
-
-test("renders the text-segment controls and presets from its configuration", () => {
+test("loads a preset through explicit acquisition with declarative version inputs", async () => {
+  const fetch = vi.fn<typeof globalThis.fetch>(async () =>
+    Response.json(textFixture),
+  );
   startTextSegmentLiveDemo(
     document,
-    controllerFromLoader(async () => FIRST_RESULT),
+    createSefariaClient({ cache: false, fetch }),
+  );
+
+  document
+    .querySelector<HTMLButtonElement>('[data-demo-id="hebrew-markup"]')
+    ?.click();
+  await vi.waitFor(() => expect(requestState().dataset.state).toBe("ready"));
+
+  expect(fetch).toHaveBeenCalledTimes(1);
+  const request = fetch.mock.calls[0]?.[0] as Request;
+  const url = new URL(request.url);
+  expect(decodeURIComponent(url.pathname)).toBe("/api/v3/texts/Obadiah 1:1");
+  expect(url.searchParams.getAll("version")).toEqual([
+    "hebrew|Miqra according to the Masorah",
+  ]);
+  expect(url.searchParams.get("return_format")).toBe("default");
+  expect(resultElement().sref).toBe("Obadiah 1:1");
+  expect(resultElement().versionLanguage).toBe("hebrew");
+  expect(resultElement().versionTitle).toBe("Miqra according to the Masorah");
+});
+
+test("renders controls and waits for activation before requesting", () => {
+  const fetch = vi.fn<typeof globalThis.fetch>();
+  startTextSegmentLiveDemo(
+    document,
+    createSefariaClient({ cache: false, fetch }),
   );
 
   expect(document.querySelector("h1")?.textContent).toBe(
@@ -55,94 +51,35 @@ test("renders the text-segment controls and presets from its configuration", () 
     document.querySelector<HTMLInputElement>('[name="language"]')?.value,
   ).toBe("hebrew");
   expect(resultElement().localName).toBe("sefaria-text-segment");
+  expect(fetch).not.toHaveBeenCalled();
 });
 
-test("binds rejected operations to the host error element", async () => {
-  const loader = vi.fn<TextSegmentLoader>(async () => {
-    throw new Error("Network unavailable");
+test("reports acquisition failure and restores the committed result", async () => {
+  let fail = false;
+  const fetch = vi.fn<typeof globalThis.fetch>(async () => {
+    if (fail) throw new Error("Network unavailable");
+    return Response.json(textFixture);
   });
-  startTextSegmentLiveDemo(document, controllerFromLoader(loader));
+  startTextSegmentLiveDemo(
+    document,
+    createSefariaClient({ cache: false, fetch }),
+  );
 
   document.querySelector<HTMLButtonElement>('[data-demo-id="hebrew"]')?.click();
-  await vi.waitFor(() => expect(requestState().dataset.state).toBe("error"));
+  await vi.waitFor(() => expect(requestState().dataset.state).toBe("ready"));
+  const committed = resultElement().shadowRoot?.textContent;
 
+  fail = true;
+  document
+    .querySelector<HTMLButtonElement>('[data-demo-id="hebrew-markup"]')
+    ?.click();
+  await vi.waitFor(() => expect(requestState().dataset.state).toBe("error"));
   const hostError = document.querySelector<HTMLElement>("#host-error");
   expect(hostError?.hidden).toBe(false);
   expect(hostError?.textContent).toBe("Network unavailable");
+  expect(resultElement().shadowRoot?.textContent).toBe(committed);
+  expect(resultElement().status).toBe("error");
 });
-
-function controllerFromLoader(
-  loader: TextSegmentLoader,
-): TextSegmentController {
-  let snapshot: TextSegmentControllerSnapshot = {
-    attempt: { state: "idle" },
-  };
-  const listeners = new Set<(value: TextSegmentControllerSnapshot) => void>();
-  let active: AbortController | undefined;
-  let nextId = 1;
-  const publish = (next: TextSegmentControllerSnapshot): void => {
-    snapshot = next;
-    for (const listener of listeners) listener(snapshot);
-  };
-  return {
-    get snapshot() {
-      return snapshot;
-    },
-    subscribe: (listener) => {
-      listeners.add(listener);
-      listener(snapshot);
-      return () => listeners.delete(listener);
-    },
-    load: async (request) => {
-      active?.abort();
-      const current = new AbortController();
-      active = current;
-      const id = nextId++;
-      publish({
-        ...(snapshot.result === undefined ? {} : { result: snapshot.result }),
-        attempt: {
-          state: "loading",
-          id,
-          request,
-          viewModel: {
-            state: "loading",
-            message: `Loading ${request.tref}.`,
-          },
-        },
-      });
-      try {
-        const terminal = (await loader(
-          request,
-          current.signal,
-        )) as TextSegmentTerminalViewModel;
-        active = undefined;
-        publish({
-          result: { request, viewModel: terminal },
-          attempt: { state: "idle" },
-        });
-        return terminal;
-      } catch (error) {
-        active = undefined;
-        publish({
-          ...(snapshot.result === undefined ? {} : { result: snapshot.result }),
-          attempt: { state: "failed", id, request, error },
-        });
-        throw error;
-      }
-    },
-    setSuppliedData: () => {
-      throw new Error("Not used by this test controller.");
-    },
-    cancel: (reason = new DOMException("Cancelled", "AbortError")) => {
-      active?.abort(reason);
-    },
-    dispose: () => {
-      active?.abort();
-      listeners.clear();
-      snapshot = { attempt: { state: "idle" } };
-    },
-  };
-}
 
 function resultElement(): SefariaTextSegment {
   const element = document.querySelector<SefariaTextSegment>(
@@ -160,17 +97,4 @@ function requestState(): HTMLElement {
     throw new Error("The request state element is missing.");
   }
   return element;
-}
-
-function createDataViewModel(versionTitle: string): TextSegmentDataViewModel {
-  return {
-    state: "data",
-    ref: "Genesis 1:1",
-    heRef: "בראשית א׳:א׳",
-    language: "en",
-    actualLanguage: "en",
-    direction: "ltr",
-    bodyHtml: versionTitle,
-    notes: [],
-  };
 }

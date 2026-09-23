@@ -40,13 +40,13 @@ For reader-oriented explanations, use the friendly guides rather than the archiv
 | --- | --- |
 | `packages/client` | Delivers all 60 operations in the pinned OpenAPI through 11 tag namespaces, committed corrected TypeScript contracts, reusable transport schemas, Zod validators, JSON and PNG response handling, and a status-aware fetch client with a bounded default-on per-client response cache. The corrected OpenAPI document is temporary generation output. |
 | `packages/text-transform` | Delivers DOM-free sanitization, Hebrew vocalization modes, structured footnote extraction, and bounded connected-text previews. |
-| `packages/web-components` | Delivers the current component-specific view models, pure and async factory subpaths, request-free elements for the current text, bilingual, reference-label, selectable source-card, connections-panel, popup, and controlled reader surfaces, plus the DOM-free bounded reader session and stateful reader controller. |
-| `examples/explorer` | Provides one developer surface for request-free authored states and click-to-start live pages for reference labels, text segments, bilingual segments, source cards, and contextual connections. Opening a live route makes no Sefaria request before activation. |
-| `examples/reader` | Demonstrates a regular website host with viewport-height spatial panes over the lower-level reader session and shared browser data source, plus an interactive host that uses `loadReaderController` and `bindReaderController` with the supported `<sefaria-reader>` component. |
-| `examples/vanilla-vite` | Exercises installed public client, source-card factory, and custom-element registration paths with a validated supplied `Micah 6:8` response followed by an explicit live request. |
-| `examples/react-vite` | Demonstrates React 19 custom-element properties and events over the public source-card controller and binder, including canonical readouts, reversible vocalization, StrictMode disposal, and explicit live activation. |
-| `examples/alpine-vite` | Demonstrates the same source-card host flow with Alpine 3.17.2, a closure-owned non-proxied controller, element-local property effects, declarative events, and destroy cleanup. |
-| `examples/linked-article` | Progressively enhances authored Sefaria anchors with the public popup factory while preserving native navigation, page-owned cancellation, visible failures, and request-free rendering. |
+| `packages/web-components` | Delivers seven declarative elements with standalone `sref`, authoritative raw `data` for six ordinary elements, Reader raw transactional seeds, tagged acquisition, read-only status and diagnostics, lifecycle reconnect, error events, private preparation, shared raw Reader source qualification, and the supported advanced DOM-free Reader semantic/raw facade. |
+| `examples/explorer` | Provides one developer surface for supplied-data authored states and click-to-start live pages for reference labels, text segments, bilingual segments, source cards, and contextual connections. Opening a live route makes no Sefaria request before activation. |
+| `examples/reader` | Demonstrates a regular website host with viewport-height spatial panes over the lower-level reader session and shared browser data source, plus an interactive host that assigns explicit acquisition and `sref` to the supported `<sefaria-reader>` component. |
+| `examples/vanilla-vite` | Exercises installed public client, Source Card raw-data, acquisition, and custom-element registration paths with a validated supplied `Micah 6:8` response followed by an explicit live request. |
+| `examples/react-vite` | Demonstrates React 19 declarative custom-element properties and events, supplied-data precedence, standalone `sref`, reversible vocalization, stable identity, and explicit live activation. |
+| `examples/alpine-vite` | Demonstrates the same Source Card flow with Alpine 3.17.2, declarative raw data and `sref`, element-local property effects, events, and destroy cleanup. |
+| `examples/linked-article` | Progressively enhances authored Sefaria anchors by assigning Popup `sref` after eligible activation while preserving native navigation, visible failures, and cleanup. |
 | `examples/mcp-app` | Exposes shared `get_text` and adaptive `get_links_between_texts` registration through compiled Node stdio and Streamable HTTP transports and a static in-browser MCP host, packages a single-file App, validates corrected payloads and metadata, proves AppBridge request counts and sandbox isolation, and retains the optional authenticated isolated VS Code hierarchy walkthrough with separate explicit chat export. |
 | `examples/playground` | Provides one supplied-data-only HTML/CSS/JavaScript editor for reference label, text segment, bilingual segment, source card, popup, connections panel, and Reader projects, with a real locally built public-module graph, opaque preview boundary, and focused Chromium/Firefox/WebKit qualification. |
 | `docs/` and `dist/site` | Provide one GitHub-readable learning sequence and a VitePress presentation that embeds isolated builds of the maintained examples and is published from validated `main`. |
@@ -56,11 +56,11 @@ For reader-oriented explanations, use the friendly guides rather than the archiv
 
 These are superseded decisions, not an uncompleted backlog:
 
-- The generalized `@sefaria/model` foundation and broad offline reference parser are no longer the delivery architecture. The corrected OpenAPI contract and thin `@arithmomaniac/sefaria-client` own transport data; component factories own projections.
+- The generalized `@sefaria/model` foundation and broad offline reference parser are no longer the delivery architecture. The corrected OpenAPI contract and thin `@arithmomaniac/sefaria-client` own transport data; elements own private component preparation.
 - The earlier unbounded or implicit cache proposal was removed from the baseline. The current client instead implements one bounded, default-on, per-client response cache with explicit opt-out; retries and request coalescing remain excluded.
 - A separate text-range request and view-model stack was replaced by a bounded source-card collection. A single segment is a one-item collection, while a range remains one outer request with card-level reference data.
 - Attribution belongs once at the source-card level for each displayed edition, not inside every repeated text segment.
-- The private `SourceCardData` MCP wire format is superseded. The current integration uses corrected API-shaped JSON, boundary validation, and the same source-card pure factory as client mode.
+- The private `SourceCardData` MCP wire format is superseded. The current integration uses corrected API-shaped JSON, boundary validation, and the same element-owned private preparation as client mode.
 
 The [historical decision record](evidence.md#historical-decision-provenance) explains the sources and supersession behind these changes. Work on other branches is not included in this baseline. Use the [repository issues](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/issues) page for live delivery tracking, not as the definition of a component contract.
 
@@ -72,7 +72,7 @@ These are remaining intended capabilities, not removed plans. A scaffold, comman
 | --- | --- | --- |
 | Broader compatibility coverage | Extend the small current suite with additional source-backed cases, without promising exhaustive corpus equivalence | [Compatibility evidence](evidence.md#current-focused-compatibility-qualification) |
 
-The client, text-transform foundations, current components, controlled reader, contextual and multi-pane website reader demos, same-App MCP reader, named-host hierarchy acceptance, explicit chat export, and authored linked article are already delivered. New component slices still need concrete consumers; they do not justify restoring the superseded generalized model or hidden client policies.
+The client, text-transform foundations, current components, standalone Reader, contextual and multi-pane website Reader demos, same-App MCP Reader, named-host hierarchy acceptance, explicit chat export, and authored linked article are already delivered. New component slices still need concrete consumers; they do not justify restoring the superseded generalized model or hidden client policies.
 
 ## Technology
 
@@ -114,7 +114,7 @@ Run the focused editor qualification:
 pnpm test:playground
 ```
 
-This command builds the real editor graph and production host at both `/` and `/sefaria-frontend-toolkit/`, then checks Chromium, Firefox, and WebKit. It verifies parent and child CSP layers, all seven maintained project renders, required public factory/controller/binding entries, local module identity and root registration, zero delivered probe requests across fetch/socket/beacon/image/frame/navigation attempts, visible edits to every HTML/CSS/JavaScript tab, Run/Reset behavior, supported component interactions, explicit Reader coverage failure, one active preview, keyboard tabs and popup focus restoration, RTL/LTR output, a 390 px layout at 200% equivalent CSS width, and embedding from an ordinary same-origin documentation page. `pnpm setup:agent` installs and launches all three browser engines.
+This command builds the real editor graph and production host at both `/` and `/sefaria-frontend-toolkit/`, then checks Chromium, Firefox, and WebKit. It verifies parent and child CSP layers, all seven maintained project renders, required declarative element and acquisition entries, local module identity and root registration, zero delivered probe requests across fetch/socket/beacon/image/frame/navigation attempts, visible edits to every HTML/CSS/JavaScript tab, Run/Reset behavior, supported component interactions, explicit Reader coverage failure, one active preview, keyboard tabs and popup focus restoration, RTL/LTR output, a 390 px layout at 200% equivalent CSS width, and embedding from an ordinary same-origin documentation page. `pnpm setup:agent` installs and launches all three browser engines.
 
 The generated `dist/site` directory contains the VitePress pages plus allowlisted example routes under `examples/`: playground, explorer, Reader, vanilla, React, linked article, and the live static MCP host. The playground uses only supplied data; the live MCP host proves in-memory protocol, resource, AppBridge, and opaque-sandbox behavior without an external backend; `pnpm dev:mcp` proves the compiled Streamable HTTP topology.
 
@@ -128,16 +128,16 @@ The separate Pages workflow runs the complete repository gate on Ubuntu with the
 | --- | --- |
 | `packages/client` | Pinned OpenAPI input, formal guarded overlay, generated contracts, Zod schemas, validators, and tag-namespaced SDK functions |
 | `packages/text-transform` | Pure sanitization, vocalization, and footnotes |
-| `packages/web-components` | Non-DOM component factories and request-free Lit elements |
+| `packages/web-components` | Declarative Lit elements, raw public input types, acquisition, shared raw Reader source qualification, and the DOM-free Reader semantic/raw facade |
 | `tests/compatibility` | Pinned compatibility evidence for retained pure behavior |
-| `examples/explorer` | Request-free authored states and opt-in live diagnostics for component primitives and contextual connections |
+| `examples/explorer` | Supplied-data authored states and opt-in live diagnostics for component primitives and contextual connections |
 | `examples/playground` | Maintained supplied-data editor projects, trusted CodeMirror host, locally built ESM graph, opaque preview confinement, and focused three-browser acceptance |
 | `examples/mcp-app` | Shared corrected-payload MCP registration, compiled stdio and Streamable HTTP servers, static in-browser MCP host, self-contained App, AppBridge sandbox hosts, and isolated VS Code qualification tooling |
 | `examples/linked-article` | Authored native citation navigation and page-owned popup integration |
 | `examples/reader` | Interactive multi-pane website host and controlled `<sefaria-reader>` host over the DOM-free reader session |
 | `examples/vanilla-vite` | Minimal supplied-data and explicit-live public-package consumption path |
-| `examples/react-vite` | React 19 SourceCard controller, property, event, canonical-readout, and StrictMode integration |
-| `examples/alpine-vite` | Alpine SourceCard controller, property-effect, event, canonical-readout, and destroy integration |
+| `examples/react-vite` | React 19 Source Card data/`sref`, property, event, canonical-readout, and StrictMode integration |
+| `examples/alpine-vite` | Alpine Source Card data/`sref`, property-effect, event, canonical-readout, and destroy integration |
 | `docs/.vitepress` and `scripts/build-site.mjs` | Documentation presentation, project-path navigation, styling, and isolated example assembly |
 
 Workspace dependencies use `workspace:*`, and committed manifests remain private. Successful `main` validation publishes synchronized public GitHub Packages prereleases from isolated staged manifests; it does not change workspace dependency resolution.
@@ -319,7 +319,7 @@ Do not edit generated declarations by hand.
 pnpm dev
 ```
 
-The landing page links to authored states and click-to-start live diagnostics. Authored states exercise production elements without requests; live pages use ordinary HTML controls, the production client, component factories, and request-free elements. Opening the landing page or any live route does not contact Sefaria before **Start live demo**, an example preset, or an authored citation is activated.
+The landing page links to authored states and click-to-start live diagnostics. Authored states exercise production elements without requests; live pages use ordinary HTML controls, the production client, tagged acquisition, and declarative elements. Opening the landing page or any live route does not contact Sefaria before **Start live demo**, an example preset, or an authored citation is activated.
 
 ## Run the interactive text-segment page
 
@@ -353,7 +353,7 @@ pnpm dev:reader
 
 The command serves two linked interactive pages. The root page is a realistic regular-website consumer rather than a component state gallery: its host uses one DOM-free reader session for semantic entries and capture retention, while demo-private state owns ordered pane IDs, parent relationships, compact selection, and the 20-visible-pane limit. Wide containers scroll horizontally across independently scrolling source and connections panes; compact containers show one selected pane and a path switch.
 
-`/controlled.html` demonstrates the public stateful convenience path. The host calls `loadReaderController` with the starting reference and client, then uses `@arithmomaniac/sefaria-web-components/bindings` to bind the returned controller to one persistent `<sefaria-reader>`. Later form submissions call `replaceRoot` on that controller, retaining the old committed source until the replacement qualifies and resetting breadcrumbs only after atomic admission. The controller owns continuing requests, cancellation, session transitions, captures, Back, breadcrumbs, external root replacement, and local connections projection while the element remains request-free.
+`/controlled.html` demonstrates the ordinary standalone Reader path. The host supplies an explicit client acquisition source, assigns `sref` after activation, observes read-only Reader diagnostics, and keeps one persistent element. Reader owns continuing requests, cancellation, semantic history, Back, breadcrumbs, external root replacement, and local connections projection.
 
 ## Run the MCP App server
 
@@ -385,7 +385,7 @@ VS Code reads the checked-in `.vscode/mcp.json`. It starts the compiled Node std
 
 The resource URI is `ui://sefaria/source-card.html`. Its MIME type is `text/html;profile=mcp-app`.
 
-The server request is live. The App's first render is request-free, and repository tests mock the server transport so `pnpm check` remains offline.
+The server request is live. The App's seeded first render makes no duplicate request, and repository tests mock the server transport so `pnpm check` remains offline.
 
 Build and stage the App before opening the workspace in VS Code:
 

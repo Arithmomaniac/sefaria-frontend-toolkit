@@ -537,7 +537,7 @@ async function waitForSourceCard(
     if (snapshot !== undefined) {
       if (
         snapshot.selectedRef === expectedReference &&
-        snapshot.sourceViewState === "data" &&
+        snapshot.sourceStatus === "ready" &&
         (!requireTranslation || snapshot.hasTranslation)
       ) {
         return;
@@ -565,7 +565,7 @@ async function waitForSourceCard(
 
 interface ReaderSnapshot {
   readonly selectedRef: string | undefined;
-  readonly sourceViewState: string | undefined;
+  readonly sourceStatus: string | undefined;
   readonly hasTranslation: boolean;
   readonly breadcrumbs: readonly {
     readonly label: string;
@@ -578,31 +578,33 @@ async function readReader(frame: Frame): Promise<ReaderSnapshot | undefined> {
   if ((await reader.count()) === 0) return undefined;
   return reader.evaluate((element) => {
     const component = element as HTMLElement & {
-      viewModel?: {
-        selectedTarget?: { ref?: string };
-        breadcrumbs?: readonly {
-          label: string;
-          current: boolean;
-        }[];
-        source?: {
-          viewModel?: {
-            state?: string;
-            items?: readonly {
-              translation?: { state?: string };
-            }[];
-          };
-        };
-      };
+      selectedRef?: string;
     };
-    const viewModel = component.viewModel;
+    const source = element.shadowRoot?.querySelector("sefaria-source-card") as
+      (HTMLElement & { status?: string }) | null;
+    const ancestors = [
+      ...(element.shadowRoot?.querySelectorAll(
+        'nav[aria-label="Reader history"] button',
+      ) ?? []),
+    ].map((button) => ({
+      label: button.textContent?.trim() ?? "",
+      current: false,
+    }));
+    const currentLabel =
+      element.shadowRoot
+        ?.querySelector('[data-current-heading="true"]')
+        ?.textContent?.trim() ?? "";
     return {
-      selectedRef: viewModel?.selectedTarget?.ref,
-      sourceViewState: viewModel?.source?.viewModel?.state,
+      selectedRef: component.selectedRef,
+      sourceStatus: source?.status,
       hasTranslation:
-        viewModel?.source?.viewModel?.items?.some(
-          (item) => item.translation?.state === "text",
-        ) ?? false,
-      breadcrumbs: viewModel?.breadcrumbs ?? [],
+        source?.shadowRoot?.textContent?.includes("Translation:") ?? false,
+      breadcrumbs: [
+        ...ancestors,
+        ...(currentLabel === ""
+          ? []
+          : [{ label: currentLabel, current: true }]),
+      ],
     };
   });
 }
@@ -652,34 +654,52 @@ async function readPanel(frame: Frame): Promise<PanelSnapshot> {
   const panel = frame.locator("sefaria-connections-panel").first();
   return panel.evaluate((element) => {
     const component = element as HTMLElement & {
-      viewModel?: {
-        state: string;
-        category?: string | null;
-        categories?: readonly { id: string; count: number }[];
-        page?: number;
-        pageSize?: number;
-        total?: number;
-        previewsIncluded?: boolean;
-        entries?: readonly {
-          targetRef: string;
-          preview: { state: string };
-        }[];
-      };
+      status?: string;
     };
-    const viewModel = component.viewModel;
+    const categoryButtons = [
+      ...(element.shadowRoot?.querySelectorAll(
+        'nav[aria-label="Connection categories"] button',
+      ) ?? []),
+    ];
+    const selectedCategory = categoryButtons.find(
+      (button) => button.getAttribute("aria-pressed") === "true",
+    );
+    const selectedLabel = selectedCategory?.textContent?.trim() ?? "Overview";
+    const category =
+      selectedLabel === "Overview"
+        ? null
+        : selectedLabel.replace(/\s+\(\d+\)$/u, "");
+    const categories = categoryButtons.slice(1).flatMap((button) => {
+      const match = button.textContent?.trim().match(/^(.*) \((\d+)\)$/u);
+      return match
+        ? [{ id: match[1]!, count: Number.parseInt(match[2]!, 10) }]
+        : [];
+    });
+    const pageStatus =
+      element.shadowRoot?.querySelector('[role="status"]')?.textContent ?? "";
+    const pageMatch = pageStatus.match(/Page (\d+): \d+ of (\d+)/u);
+    const page = pageMatch ? Number.parseInt(pageMatch[1]!, 10) - 1 : 0;
+    const pageSize = 20;
+    const previewCount =
+      element.shadowRoot?.querySelectorAll("article:has(.preview)").length ?? 0;
+    const targetRefs = [
+      ...(element.shadowRoot?.querySelectorAll("button.open") ?? []),
+    ].flatMap((button) => {
+      const label = button.getAttribute("aria-label");
+      return label?.startsWith("Open ") && label.endsWith(" in context")
+        ? [label.slice(5, -" in context".length)]
+        : [];
+    });
     return {
-      state: viewModel?.state ?? "missing",
-      category: viewModel?.category ?? null,
-      categories: viewModel?.categories ?? [],
-      page: viewModel?.page ?? -1,
-      pageSize: viewModel?.pageSize ?? 0,
-      total: viewModel?.total ?? 0,
-      previewsIncluded: viewModel?.previewsIncluded ?? false,
-      previewCount:
-        viewModel?.entries?.filter(
-          (entry) => entry.preview.state === "available",
-        ).length ?? 0,
-      targetRefs: viewModel?.entries?.map((entry) => entry.targetRef) ?? [],
+      state: component.status ?? "missing",
+      category,
+      categories,
+      page,
+      pageSize,
+      total: pageMatch ? Number.parseInt(pageMatch[2]!, 10) : 0,
+      previewsIncluded: previewCount > 0,
+      previewCount,
+      targetRefs,
     };
   });
 }

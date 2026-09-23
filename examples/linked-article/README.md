@@ -2,7 +2,7 @@
 
 # Authored linked article
 
-This private, unpublished example progressively enhances ordinary Sefaria citation links with the request-free `<sefaria-popup>` component. The article author supplies both the native `href` and the explicit `data-sefaria-ref`; the page does not detect citations, rewrite prose, install a global script, or use a bookmarklet.
+This private, unpublished example progressively enhances ordinary Sefaria citation links with `<sefaria-popup>`. The article author supplies the native `href` and explicit `data-sefaria-ref`. Eligible activation assigns Popup `sref`, anchor, and visibility; close and destroy clear the owned reference. The page does not detect citations, rewrite prose, poll, or bulk preload.
 
 ## Run locally
 
@@ -18,8 +18,8 @@ Open the loopback URL printed by Vite. No live data loads on page open. Click th
 
 ## Ownership
 
-[`src/app.ts`](src/app.ts) owns client creation, popup loading, cancellation, stale-result suppression, integration failure reporting, and cleanup. It calls the public [`@arithmomaniac/sefaria-web-components/popup`](../../packages/web-components/src/popup.ts) async factory with the client cache disabled. Documented HTTP failures remain popup view models; rejected network, abort, or contract operations remain integration-owned rather than being relabeled as component success. `<sefaria-popup>` receives only a view model, anchor, and open state.
+[`src/app.ts`](src/app.ts) owns activation policy, client creation, explicit tagged acquisition, integration failure reporting, and cleanup. On eligible citation activation it assigns Popup `sref`, anchor, and visibility. The Popup owns loading, cancellation, stale-result suppression, validation, private preparation, status, and error events. Preparation is independent of visibility, and failures are not relabeled as success.
 
-Deterministic tests inject a strict fixture transport that rejects unexpected methods, origins, paths, and query parameters. Unknown response JSON still crosses the real `@arithmomaniac/sefaria-client` validation boundary before the public popup factory projects it.
+Deterministic tests inject a strict fixture transport that rejects unexpected methods, origins, paths, and query parameters. Unknown response JSON still crosses the real `@arithmomaniac/sefaria-client` validation boundary before the Popup privately prepares it.
 
 The retired automatic Linker, bookmarklet, detection, extraction, and polling implementation remains available in the immutable [`7bc2d258fac2959beb5252ebdbcbddbaccd0c7b7` archive](https://github.com/Arithmomaniac/sefaria-web-components/tree/7bc2d258fac2959beb5252ebdbcbddbaccd0c7b7/demos/linker).

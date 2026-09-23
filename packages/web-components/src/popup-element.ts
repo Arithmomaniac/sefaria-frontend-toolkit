@@ -1,3 +1,4 @@
+import { text, type CoreV3TextsResponse } from "@arithmomaniac/sefaria-client";
 import {
   css,
   html,
@@ -7,16 +8,35 @@ import {
 } from "lit";
 import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
 
-import { SefariaElement } from "./sefaria-element.js";
+import type { SefariaAcquisition } from "./acquisition.js";
+import { resolveSefariaAcquisition } from "./acquisition-state.js";
+import { validateSuppliedComponentData } from "./component-controller.js";
+import {
+  getPreparedState,
+  prepared,
+  setPreparedState,
+} from "./prepared-state.js";
+import {
+  SefariaElement,
+  type SefariaElementStatus,
+} from "./sefaria-element.js";
 import "./source-card-element.js";
-import type { PopupViewModel } from "./popup.js";
+import {
+  createPopupViewModel,
+  type PopupRequest,
+  type PopupViewModel,
+} from "./popup.js";
 import { assertVocalizationMode } from "./vocalization-display.js";
 
-/** Request-free anchored dialog that renders one popup view model. */
+const POPUP_VERSIONS = ["primary", "translation"] as const;
+
+/** Anchored dialog that renders supplied or acquired popup data. */
 export class SefariaPopup extends SefariaElement {
-  /** Lit property metadata for host-supplied data and interaction state. */
+  /** Lit property metadata for declarative data and interaction state. */
   static override properties = {
-    viewModel: { attribute: false },
+    sref: { type: String },
+    data: { attribute: false },
+    acquisition: { attribute: false },
     anchor: { attribute: false },
     open: { type: Boolean, reflect: true },
     vocalizationMode: { type: String, attribute: "vocalization-mode" },
@@ -176,8 +196,14 @@ export class SefariaPopup extends SefariaElement {
     `,
   ];
 
-  /** Render-ready popup state supplied by the integration. */
-  declare viewModel: PopupViewModel | undefined;
+  /** Reference prepared while the connected popup is open or closed. */
+  declare sref: string;
+
+  /** Authoritative corrected v3 text response data. */
+  declare data: unknown | undefined;
+
+  /** Optional element-specific acquisition source. */
+  declare acquisition: SefariaAcquisition | undefined;
 
   /** Host element used for placement and focus restoration. */
   declare anchor: HTMLElement | null;
@@ -187,9 +213,24 @@ export class SefariaPopup extends SefariaElement {
   /** Hebrew vocalization preset applied to the nested source card. */
   declare vocalizationMode: VocalizationMode;
 
+  #active:
+    | {
+        readonly id: number;
+        readonly controller: AbortController;
+      }
+    | undefined;
+  #nextOperationId = 1;
+  #declarativeActive = false;
+  #resumeOnConnect = false;
+  #committedViewModel: PopupViewModel | undefined;
+  #ownedViewModel: PopupViewModel | undefined;
+  #statusOverride: SefariaElementStatus | undefined;
+
   constructor() {
     super();
-    this.viewModel = undefined;
+    this.sref = "";
+    this.data = undefined;
+    this.acquisition = undefined;
     this.anchor = null;
     this.open = false;
     this.vocalizationMode = "taamim_and_nikkud";
@@ -199,12 +240,43 @@ export class SefariaPopup extends SefariaElement {
     super.connectedCallback();
     window.addEventListener("resize", this.#handleViewportChange);
     window.addEventListener("scroll", this.#handleViewportChange, true);
+    if (this.#resumeOnConnect) {
+      queueMicrotask(() => {
+        if (this.isConnected && this.#resumeOnConnect) {
+          this.#resumeOnConnect = false;
+          this.#reconcile();
+        }
+      });
+    }
   }
 
   override disconnectedCallback(): void {
     window.removeEventListener("resize", this.#handleViewportChange);
     window.removeEventListener("scroll", this.#handleViewportChange, true);
+    if (this.#active !== undefined) {
+      this.#active.controller.abort(
+        new DOMException("Popup disconnected.", "AbortError"),
+      );
+      this.#active = undefined;
+      this.#resumeOnConnect = true;
+    }
     super.disconnectedCallback();
+  }
+
+  /** Coarse lifecycle state without exposing prepared rendering data. */
+  get status(): SefariaElementStatus {
+    return this.#statusOverride ?? statusOf(this.#viewModel);
+  }
+
+  protected override willUpdate(changed: PropertyValues<this>): void {
+    if (
+      changed.has("sref") ||
+      changed.has("data") ||
+      changed.has("acquisition")
+    ) {
+      this.#resumeOnConnect = false;
+      this.#reconcile();
+    }
   }
 
   protected override updated(changed: PropertyValues<this>): void {
@@ -262,7 +334,7 @@ export class SefariaPopup extends SefariaElement {
   }
 
   #renderContent(): TemplateResult {
-    const viewModel = this.viewModel;
+    const viewModel = this.#viewModel;
     if (viewModel === undefined) {
       return html`<p class="state" role="status">Loading source.</p>`;
     }
@@ -276,7 +348,7 @@ export class SefariaPopup extends SefariaElement {
     }
     return html`
       <sefaria-source-card
-        .viewModel=${viewModel.card}
+        ${prepared(viewModel.card)}
         .vocalizationMode=${this.vocalizationMode}
       ></sefaria-source-card>
       ${
@@ -290,14 +362,14 @@ export class SefariaPopup extends SefariaElement {
   }
 
   #close = (): void => {
-    this.open = false;
-    this.dispatchEvent(
+    const accepted = this.dispatchEvent(
       new CustomEvent("sefaria-popup-close", {
         bubbles: true,
         cancelable: true,
         composed: true,
       }),
     );
+    if (accepted) this.open = false;
   };
 
   #handleKeydown = (event: KeyboardEvent): void => {
@@ -333,6 +405,205 @@ export class SefariaPopup extends SefariaElement {
     }
   };
 
+  #reconcile(): void {
+    if (!this.isConnected) {
+      this.#resumeOnConnect = true;
+      return;
+    }
+    if (this.data !== undefined) {
+      this.#declarativeActive = true;
+      this.#cancelActive("Superseded by supplied popup data.");
+      try {
+        this.#commit(this.#project(this.data, 200));
+      } catch (error) {
+        this.#commit({
+          state: "error",
+          errorKind: "validation",
+          message:
+            error instanceof Error
+              ? error.message
+              : "Supplied popup data is invalid.",
+        });
+      }
+      return;
+    }
+
+    const sref = this.sref.trim();
+    if (sref.length === 0) {
+      this.#cancelActive("Popup inputs were cleared.");
+      if (this.#declarativeActive) this.#clear();
+      this.#declarativeActive = false;
+      return;
+    }
+
+    this.#declarativeActive = true;
+    this.#startLoad(sref);
+  }
+
+  #startLoad(sref: string): void {
+    this.#cancelActive("Superseded popup load.");
+    const active = {
+      id: this.#nextOperationId++,
+      controller: new AbortController(),
+    };
+    this.#active = active;
+    this.#publish({
+      state: "loading",
+      message: `Loading ${sref}.`,
+    });
+    void this.#load(sref, active);
+  }
+
+  async #load(
+    sref: string,
+    active: { readonly id: number; readonly controller: AbortController },
+  ): Promise<void> {
+    try {
+      const acquisition = resolveSefariaAcquisition(this.acquisition);
+      if (acquisition.kind === "disabled") {
+        throw new Error("Standalone Sefaria acquisition is disabled.");
+      }
+
+      const response =
+        acquisition.kind === "client"
+          ? await this.#loadFromClient(
+              sref,
+              acquisition.client,
+              active.controller.signal,
+            )
+          : await this.#loadFromCapability(
+              sref,
+              acquisition.capability,
+              active.controller.signal,
+            );
+      if (this.#active !== active) return;
+      const viewModel = this.#project(response.payload, response.status, sref);
+      if (this.#active !== active) return;
+      this.#active = undefined;
+      this.#commit(viewModel);
+    } catch (error) {
+      if (this.#active !== active) return;
+      this.#active = undefined;
+      if (active.controller.signal.aborted) return;
+      this.#publishAcquisitionFailure(error, "Popup acquisition failed.");
+      this.dispatchEvent(
+        new CustomEvent("sefaria-popup-error", {
+          bubbles: true,
+          composed: true,
+          detail: { error, sref },
+        }),
+      );
+    }
+  }
+
+  async #loadFromClient(
+    sref: string,
+    client: Extract<SefariaAcquisition, { kind: "client" }>["client"],
+    signal: AbortSignal,
+  ): Promise<{ readonly payload: unknown; readonly status: number }> {
+    const result = await text.getV3Texts({
+      client,
+      path: { tref: sref },
+      query: {
+        version: [...POPUP_VERSIONS],
+        return_format: "default",
+      },
+      signal,
+    });
+    if (result.data !== undefined) {
+      return { payload: result.data, status: 200 };
+    }
+    if (result.error !== undefined && result.response !== undefined) {
+      return { payload: result.error, status: result.response.status };
+    }
+    throw new Error("The popup v3 text request returned no result.");
+  }
+
+  async #loadFromCapability(
+    sref: string,
+    capability: Extract<
+      SefariaAcquisition,
+      { kind: "capability" }
+    >["capability"],
+    signal: AbortSignal,
+  ): Promise<{ readonly payload: unknown; readonly status: number }> {
+    if (capability.getText === undefined) {
+      throw new Error("The selected acquisition source does not support text.");
+    }
+    return await capability.getText(
+      {
+        sref,
+        versions: POPUP_VERSIONS,
+        returnFormat: "default",
+      },
+      signal,
+    );
+  }
+
+  #project(payload: unknown, status: number, sref?: string): PopupViewModel {
+    if (status === 400 || status === 404) {
+      const validated = validateSuppliedComponentData<{
+        readonly error: string;
+      }>({ method: "GET", path: "/api/v3/texts/{tref}", status }, payload);
+      return {
+        state: "error",
+        errorKind: "http",
+        status,
+        message: validated.error,
+      };
+    }
+    if (status !== 200) {
+      throw new Error(`Unsupported popup response status ${status}.`);
+    }
+    const validated = validateSuppliedComponentData<CoreV3TextsResponse>(
+      { method: "GET", path: "/api/v3/texts/{tref}", status: 200 },
+      payload,
+    );
+    const request: PopupRequest = {
+      tref: sref?.trim() || validated.ref,
+    };
+    return createPopupViewModel(validated, request);
+  }
+
+  #cancelActive(message: string): void {
+    const active = this.#active;
+    if (active === undefined) return;
+    this.#active = undefined;
+    active.controller.abort(new DOMException(message, "AbortError"));
+  }
+
+  get #viewModel(): PopupViewModel | undefined {
+    return getPreparedState<PopupViewModel>(this);
+  }
+
+  #publish(viewModel: PopupViewModel | undefined): void {
+    this.#statusOverride = undefined;
+    this.#ownedViewModel = viewModel;
+    setPreparedState(this, viewModel);
+  }
+
+  #commit(viewModel: PopupViewModel): void {
+    this.#committedViewModel = viewModel;
+    this.#publish(viewModel);
+  }
+
+  #clear(): void {
+    this.#committedViewModel = undefined;
+    if (this.#viewModel === this.#ownedViewModel) this.#publish(undefined);
+    this.#ownedViewModel = undefined;
+  }
+
+  #publishAcquisitionFailure(error: unknown, fallback: string): void {
+    this.#statusOverride = "error";
+    const viewModel = this.#committedViewModel ?? {
+      state: "error",
+      errorKind: "validation",
+      message: error instanceof Error ? error.message : fallback,
+    };
+    this.#ownedViewModel = viewModel;
+    setPreparedState(this, viewModel);
+  }
+
   #place(): void {
     const anchor = this.anchor;
     if (anchor === null) {
@@ -340,6 +611,7 @@ export class SefariaPopup extends SefariaElement {
       this.style.top = "0.5rem";
       return;
     }
+
     const rect = anchor.getBoundingClientRect();
     const margin = 8;
     const width = Math.min(608, window.innerWidth - margin * 2);
@@ -361,6 +633,12 @@ export class SefariaPopup extends SefariaElement {
     this.style.left = `${left}px`;
     this.style.top = `${top}px`;
   }
+}
+
+function statusOf(viewModel: PopupViewModel | undefined): SefariaElementStatus {
+  if (viewModel === undefined) return "empty";
+  if (viewModel.state === "data") return "ready";
+  return viewModel.state;
 }
 
 const FOCUSABLE_SELECTOR =

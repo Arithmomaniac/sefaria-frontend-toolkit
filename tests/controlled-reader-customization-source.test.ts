@@ -13,5 +13,7 @@ test("uses public Reader state without private DOM event scraping", async () => 
 
   expect(source).not.toContain("shadowRoot");
   expect(source).not.toContain("composedPath");
-  expect(source).toContain("snapshot.reader.selectedTarget?.ref");
+  expect(source).toContain("reader.selectedRef");
+  expect(source).toContain('"sefaria-reader-connection-select"');
+  expect(source).toContain('"sefaria-reader-history-activate"');
 });

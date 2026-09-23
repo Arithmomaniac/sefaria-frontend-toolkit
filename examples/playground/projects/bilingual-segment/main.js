@@ -1,22 +1,13 @@
 import { zCoreV3TextsResponse } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
-import { bindBilingualSegmentController } from "@arithmomaniac/sefaria-web-components/bindings";
-import { createBilingualSegmentController } from "@arithmomaniac/sefaria-web-components/bilingual-segment";
 import payload from "./micah-6-8.js";
 
 const segment = requireElement("#segment");
 const swap = requireElement("#swap");
 const order = requireElement("#order");
-const controller = createBilingualSegmentController();
-bindBilingualSegmentController(segment, controller);
-controller.setSuppliedData(
-  {
-    tref: "Micah 6:8",
-    primary: { versionTitle: "Deterministic example Hebrew" },
-    translation: { versionTitle: "Deterministic example translation" },
-  },
-  zCoreV3TextsResponse.parse(payload),
-);
+segment.data = zCoreV3TextsResponse.parse(payload);
+segment.primaryVersionTitle = "Deterministic example Hebrew";
+segment.translationVersionTitle = "Deterministic example translation";
 segment.layout = "side-by-side";
 
 swap.addEventListener("click", () => {
