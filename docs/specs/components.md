@@ -74,6 +74,8 @@ The root entry registers all seven elements. The DOM-free `./acquisition` entry 
 
 Prepared rendering types and protocols are private. `./bindings` and `./reader-controller` are retired and absent from supported exports. Elements expose no arbitrary `fetch`, base URL, untyped host, public prepared model, or request-capable child protocol.
 
+Ordinary browser hosts use attributes for scalar public inputs, including `sref`, enum presentation choices, numbers, strings, and default-false boolean flags. A default-true boolean that must be set false remains a property exception because HTML boolean attributes cannot represent false by presence. Raw `data`, tagged `acquisition`, arrays, element anchors, and other rich values remain property-only. React 19 JSX may express both groups as props because React assigns registered custom-element properties directly.
+
 Public read-only `status` reports the element's current semantic state. Reader additionally exposes read-only `rootLoading`, `selectedRef`, `currentEntryId`, and `readerError`.
 
 ## Composition and action ownership

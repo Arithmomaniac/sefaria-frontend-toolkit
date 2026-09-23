@@ -5,6 +5,7 @@ import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
 import type { SefariaAcquisition } from "./acquisition.js";
 import { resolveSefariaAcquisition } from "./acquisition-state.js";
+import { optionalStringConverter } from "./attribute-converters.js";
 import { validateSuppliedComponentData } from "./component-controller.js";
 import { createConnectionsQuery } from "./connections-request.js";
 import { getPreparedState, setPreparedState } from "./prepared-state.js";
@@ -27,14 +28,18 @@ import {
 export class SefariaConnectionsPanel extends SefariaElement {
   /** Declarative data, request selection, and presentation properties. */
   static override properties = {
-    sref: { type: String },
+    sref: { type: String, useDefault: true },
     data: { attribute: false },
     acquisition: { attribute: false },
     withText: { type: Boolean, attribute: "with-text" },
-    category: { type: String },
-    page: { type: Number },
+    category: { type: String, converter: optionalStringConverter },
+    page: { type: Number, useDefault: true },
     showPreviews: { type: Boolean, attribute: "show-previews" },
-    vocalizationMode: { type: String, attribute: "vocalization-mode" },
+    vocalizationMode: {
+      type: String,
+      attribute: "vocalization-mode",
+      useDefault: true,
+    },
   };
   /** Responsive styles confined to the panel's shadow root. */
   static override styles = [

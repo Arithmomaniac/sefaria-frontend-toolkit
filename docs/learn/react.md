@@ -43,7 +43,7 @@ return (
 );
 ```
 
-React 19 assigns registered custom-element properties directly, so arrays and raw data remain JavaScript values rather than string attributes. Keep a stable explicit acquisition object and stable element identity.
+Ordinary HTML and Alpine hosts should use attributes for scalar inputs and properties for rich values. React 19 is the framework-specific exception at the syntax boundary: JSX assigns registered custom-element inputs directly as properties, so scalar props, arrays, and raw data remain JavaScript values rather than string attributes. Keep a stable explicit acquisition object and stable element identity.
 
 ## Expected result
 

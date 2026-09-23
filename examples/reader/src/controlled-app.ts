@@ -148,8 +148,11 @@ export function startControlledReader(
     clearError();
     bookmarkAction.disabled = true;
     status.textContent = `Opening ${normalized}.`;
-    reader.vocalizationMode = readVocalizationMode(vocalizationMode.value);
-    reader.sref = normalized;
+    reader.setAttribute(
+      "vocalization-mode",
+      readVocalizationMode(vocalizationMode.value),
+    );
+    reader.setAttribute("sref", normalized);
     await waitForReader(
       reader,
       normalized,
@@ -169,7 +172,10 @@ export function startControlledReader(
   };
   form.addEventListener("submit", onSubmit);
   const onVocalizationChange = (): void => {
-    reader.vocalizationMode = readVocalizationMode(vocalizationMode.value);
+    reader.setAttribute(
+      "vocalization-mode",
+      readVocalizationMode(vocalizationMode.value),
+    );
   };
   vocalizationMode.addEventListener("change", onVocalizationChange);
   const onBookmark = (): void => {

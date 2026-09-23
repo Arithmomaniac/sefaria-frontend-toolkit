@@ -99,10 +99,14 @@ export function startRefLabelLiveDemo(
     }),
     formatRequest: (request) => request.tref,
     configureResult: (result, form) => {
-      result.labelLanguage = requireLabelLanguage(
-        requireNamedSelect(form, "labelLanguage").value,
+      result.setAttribute(
+        "label-language",
+        requireLabelLanguage(requireNamedSelect(form, "labelLanguage").value),
       );
-      result.linked = requireNamedInput(form, "linked").checked;
+      result.toggleAttribute(
+        "linked",
+        requireNamedInput(form, "linked").checked,
+      );
     },
   });
 }
@@ -118,16 +122,16 @@ async function loadReference(
       .detail.error;
   };
   const onAbort = (): void => {
-    if (result.sref === request.tref) result.sref = "";
+    if (result.sref === request.tref) result.setAttribute("sref", "");
   };
   result.addEventListener("sefaria-ref-label-error", onError);
   signal.addEventListener("abort", onAbort, { once: true });
   try {
     if (result.sref === request.tref) {
-      result.sref = "";
+      result.setAttribute("sref", "");
       await result.updateComplete;
     }
-    result.sref = request.tref;
+    result.setAttribute("sref", request.tref);
     await result.updateComplete;
     while (!signal.aborted && result.status === "loading") {
       await new Promise((resolve) => setTimeout(resolve));

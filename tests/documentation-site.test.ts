@@ -610,7 +610,7 @@ describe("documentation learning journey", () => {
       "No public view model, controller, or binding",
     );
     expect(vanillaSource).toContain("card.data = validatedPayload");
-    expect(vanillaSource).toContain("card.sref = sref");
+    expect(vanillaSource).toContain('card.setAttribute("sref", sref)');
     expect(vanillaSource).toContain('status.dataset.requestCount = "0"');
     expect(suppliedLesson).not.toContain("pnpm-workspace.yaml");
     expect(development).toContain("pnpm-workspace.yaml");
@@ -657,9 +657,11 @@ describe("documentation learning journey", () => {
     );
     expect(alpineSource).toContain("element.acquisition = acquisition");
     expect(alpineSource).toContain("card.data = undefined");
-    expect(alpineSource).toContain("card.sref = normalized");
-    expect(alpineLesson).toContain('acquisition: { kind: "client", client }');
-    expect(alpineLesson).toContain("this.data = undefined");
+    expect(alpineSource).toContain("this.sref = normalized");
+    expect(alpineLesson).toContain(
+      'element.acquisition = { kind: "client", client }',
+    );
+    expect(alpineLesson).toContain("element.data = undefined");
     expect(alpineLesson).toContain("this.sref = next");
   });
 
@@ -682,7 +684,7 @@ describe("documentation learning journey", () => {
     );
 
     expect(lessonsByName["01-web-components.md"]).toContain(
-      "Properties can carry objects and arrays",
+      "Properties carry rich objects and arrays",
     );
     expect(lessonsByName["02-supplied-data.md"]).toContain(
       "Defined `data` is authoritative",

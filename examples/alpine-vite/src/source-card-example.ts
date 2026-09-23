@@ -23,6 +23,7 @@ interface SourceSelection {
 
 interface AlpineSourceCardState {
   tref: string;
+  sref: string;
   contentLanguage: SefariaSourceCard["contentLanguage"];
   layout: SefariaSourceCard["layout"];
   sideOrder: SefariaSourceCard["sideOrder"];
@@ -42,11 +43,6 @@ interface AlpineSourceCardState {
   ): void;
   syncPresentation(
     element: SefariaSourceCard,
-    contentLanguage: SefariaSourceCard["contentLanguage"],
-    layout: SefariaSourceCard["layout"],
-    sideOrder: SefariaSourceCard["sideOrder"],
-    vocalizationMode: SefariaSourceCard["vocalizationMode"],
-    selectable: boolean,
     selectedPosition: readonly number[] | undefined,
   ): void;
   selectSource(event: CustomEvent<SourceSelection>): void;
@@ -69,6 +65,7 @@ export function createAlpineSourceCardExample(
 
   const state: AlpineSourceCardState = {
     tref: "Micah 6:8",
+    sref: "",
     contentLanguage: "both",
     layout: "auto",
     sideOrder: "primary-first",
@@ -88,7 +85,7 @@ export function createAlpineSourceCardExample(
       card = element;
       host = reactiveState;
       element.acquisition = acquisition;
-      element.sref = "";
+      element.setAttribute("sref", "");
       element.data = suppliedPayload;
       const synchronizeCommittedReference = (): void => {
         if (
@@ -111,20 +108,7 @@ export function createAlpineSourceCardExample(
       synchronizeCommittedReference();
     },
 
-    syncPresentation(
-      element,
-      contentLanguage,
-      layout,
-      sideOrder,
-      vocalizationMode,
-      selectable,
-      selectedPosition,
-    ) {
-      element.contentLanguage = contentLanguage;
-      element.layout = layout;
-      element.sideOrder = sideOrder;
-      element.vocalizationMode = vocalizationMode;
-      element.selectable = selectable;
+    syncPresentation(element, selectedPosition) {
       element.selectedPosition =
         selectedPosition === undefined ? undefined : [...selectedPosition];
     },
@@ -148,7 +132,8 @@ export function createAlpineSourceCardExample(
       this.status = `Activated ${normalized}. The Source Card reports loading and results inline.`;
       selectedMetadataRef = undefined;
       card.data = undefined;
-      card.sref = normalized;
+      card.setAttribute("sref", normalized);
+      this.sref = normalized;
     },
 
     destroy() {
@@ -158,7 +143,8 @@ export function createAlpineSourceCardExample(
       observer = undefined;
       if (card !== undefined) {
         card.data = undefined;
-        card.sref = "";
+        this.sref = "";
+        card.setAttribute("sref", "");
         card.acquisition = { kind: "disabled" };
       }
       card = undefined;

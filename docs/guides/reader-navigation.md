@@ -15,14 +15,14 @@ reader.acquisition = {
   kind: "client",
   client: createSefariaClient({ cache: false }),
 };
-reader.sref = "Micah 6:8";
+reader.setAttribute("sref", "Micah 6:8");
 document.body.append(reader);
 ```
 
 Assigning another root keeps the element and starts a transactional root replacement:
 
 ```ts
-reader.sref = "Micah 6:7";
+reader.setAttribute("sref", "Micah 6:7");
 ```
 
 Read-only `status`, `rootLoading`, `selectedRef`, `currentEntryId`, and `readerError` provide semantic diagnostics without exposing private prepared state.

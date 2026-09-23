@@ -20,7 +20,7 @@ Start with a Source Card for a passage, range, heading, aligned text, and attrib
 import "@arithmomaniac/sefaria-web-components";
 
 const card = document.createElement("sefaria-source-card");
-card.sref = "Micah 6:8";
+card.setAttribute("sref", "Micah 6:8");
 document.body.append(card);
 ```
 
@@ -34,7 +34,7 @@ Defined `data` is authoritative. To switch to standalone loading, clear it and a
 
 ```ts
 card.data = undefined;
-card.sref = "Micah 6:8";
+card.setAttribute("sref", "Micah 6:8");
 ```
 
 The element validates and privately prepares both paths. Prepared HTML and child rendering state are not public inputs.
@@ -46,10 +46,10 @@ The undefined `acquisition` value uses the lazy shared default. Assign `{ kind: 
 ## Change presentation without refetching
 
 ```ts
-card.contentLanguage = "both";
-card.layout = "side-by-side";
-card.sideOrder = "translation-first";
-card.vocalizationMode = "nikkud";
+card.setAttribute("content-language", "both");
+card.setAttribute("layout", "side-by-side");
+card.setAttribute("side-order", "translation-first");
+card.setAttribute("vocalization-mode", "nikkud");
 ```
 
 These assignments reuse private prepared content. Changing a reference or edition selector is a data operation.

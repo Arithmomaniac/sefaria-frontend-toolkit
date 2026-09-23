@@ -75,19 +75,35 @@ interface ConnectionSelectDetail {
 export class SefariaReader extends SefariaElement {
   /** Lit property metadata for host-supplied rendering and interaction state. */
   static override properties = {
-    sref: { type: String },
+    sref: { type: String, useDefault: true },
     data: { attribute: false },
     acquisition: { attribute: false },
-    activePane: { type: String, attribute: "active-pane" },
+    activePane: {
+      type: String,
+      attribute: "active-pane",
+      useDefault: true,
+    },
     chatExport: { type: Boolean, attribute: "chat-export" },
-    contentLanguage: { type: String, attribute: "content-language" },
-    layout: { type: String },
-    sideOrder: { type: String, attribute: "side-order" },
+    contentLanguage: {
+      type: String,
+      attribute: "content-language",
+      useDefault: true,
+    },
+    layout: { type: String, useDefault: true },
+    sideOrder: {
+      type: String,
+      attribute: "side-order",
+      useDefault: true,
+    },
     showConnectionPreviews: {
       type: Boolean,
       attribute: "show-connection-previews",
     },
-    vocalizationMode: { type: String, attribute: "vocalization-mode" },
+    vocalizationMode: {
+      type: String,
+      attribute: "vocalization-mode",
+      useDefault: true,
+    },
   };
 
   /** Responsive reader composition and accessible navigation styles. */

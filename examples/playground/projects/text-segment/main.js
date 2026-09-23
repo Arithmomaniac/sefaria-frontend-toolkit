@@ -21,8 +21,8 @@ const editions = {
 const render = async () => {
   const version = editions[edition.value];
   if (!version) throw new Error(`Unknown edition ${edition.value}.`);
-  segment.versionLanguage = version.language;
-  segment.versionTitle = version.versionTitle;
+  segment.setAttribute("version-language", version.language);
+  segment.setAttribute("version-title", version.versionTitle);
   await segment.updateComplete;
   selection.textContent = segment.selectedVersion
     ? `${segment.selectedVersion.actualLanguage} · ${segment.selectedVersion.direction}`

@@ -5,6 +5,7 @@ import type {
   SefariaSourceCard,
   SourceCardRequest,
 } from "@arithmomaniac/sefaria-web-components";
+import { setOptionalElementAttribute } from "../../../../demos/live-demo-core.js";
 
 /** Controls the interactive live source-card demonstration. */
 export interface SourceCardLiveDemo {
@@ -48,11 +49,15 @@ export function startSourceCardLiveDemo(
 
   const applyDisplaySettings = (): void => {
     const values = new FormData(displayForm);
-    result.contentLanguage = readContentLanguage(values.get("contentLanguage"));
-    result.layout = readLayout(values.get("layout"));
-    result.sideOrder = readSideOrder(values.get("sideOrder"));
-    result.vocalizationMode = readVocalizationMode(
-      values.get("vocalizationMode"),
+    result.setAttribute(
+      "content-language",
+      readContentLanguage(values.get("contentLanguage")),
+    );
+    result.setAttribute("layout", readLayout(values.get("layout")));
+    result.setAttribute("side-order", readSideOrder(values.get("sideOrder")));
+    result.setAttribute(
+      "vocalization-mode",
+      readVocalizationMode(values.get("vocalizationMode")),
     );
   };
 
@@ -72,9 +77,21 @@ export function startSourceCardLiveDemo(
     submitButton.disabled = true;
     acquisitionError = undefined;
     result.acquisition = acquisition;
-    result.primaryVersionTitle = request.primary?.versionTitle;
-    result.translationVersionTitle = request.translation?.versionTitle;
-    result.sref = request.tref;
+    if (result.sref === request.tref) {
+      result.setAttribute("sref", "");
+      await result.updateComplete;
+    }
+    setOptionalElementAttribute(
+      result,
+      "primary-version-title",
+      request.primary?.versionTitle,
+    );
+    setOptionalElementAttribute(
+      result,
+      "translation-version-title",
+      request.translation?.versionTitle,
+    );
+    result.setAttribute("sref", request.tref);
 
     await waitForTerminalStatus(result, loadId, () => activeLoad);
     if (loadId !== activeLoad) return;
@@ -94,6 +111,7 @@ export function startSourceCardLiveDemo(
       if (!hadCommittedContent) {
         resultContent.hidden = true;
       }
+
       hostError.hidden = false;
       hostError.textContent =
         acquisitionError instanceof Error
@@ -108,7 +126,7 @@ export function startSourceCardLiveDemo(
     void loadCurrentRequest();
   });
   displayForm.addEventListener("change", applyDisplaySettings);
-  result.selectable = true;
+  result.setAttribute("selectable", "");
   result.addEventListener("sefaria-source-select", (event) => {
     const detail = (
       event as CustomEvent<{

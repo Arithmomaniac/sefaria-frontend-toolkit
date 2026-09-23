@@ -76,7 +76,7 @@ Use this path when users need bilingual text, connections, commentary navigation
 
 1. Create and connect `<sefaria-reader>`.
 2. Assign an explicit acquisition source when the lazy browser default is not appropriate.
-3. Assign `sref = "Micah 6:8"` after the host's activation gate.
+3. Assign `sref` as an attribute after the host's activation gate.
 4. Observe read-only Reader status and semantic diagnostics.
 5. Clear inputs or remove the element during host teardown.
 

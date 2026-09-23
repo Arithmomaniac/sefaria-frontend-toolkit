@@ -45,7 +45,7 @@ For reader-oriented explanations, use the friendly guides rather than the archiv
 | `examples/reader` | Demonstrates a regular website host with viewport-height spatial panes over the lower-level reader session and shared browser data source, plus an interactive host that assigns explicit acquisition and `sref` to the supported `<sefaria-reader>` component. |
 | `examples/vanilla-vite` | Exercises installed public client, Source Card raw-data, acquisition, and custom-element registration paths with a validated supplied `Micah 6:8` response followed by an explicit live request. |
 | `examples/react-vite` | Demonstrates React 19 declarative custom-element properties and events, supplied-data precedence, standalone `sref`, reversible vocalization, stable identity, and explicit live activation. |
-| `examples/alpine-vite` | Demonstrates the same Source Card flow with Alpine 3.17.2, declarative raw data and `sref`, element-local property effects, events, and destroy cleanup. |
+| `examples/alpine-vite` | Demonstrates the same Source Card flow with Alpine 3.17.2, scalar attribute bindings, property-only raw data and acquisition, events, and destroy cleanup. |
 | `examples/linked-article` | Progressively enhances authored Sefaria anchors by assigning Popup `sref` after eligible activation while preserving native navigation, visible failures, and cleanup. |
 | `examples/mcp-app` | Exposes shared `get_text` and adaptive `get_links_between_texts` registration through compiled Node stdio and Streamable HTTP transports and a static in-browser MCP host, packages a single-file App, validates corrected payloads and metadata, proves AppBridge request counts and sandbox isolation, and retains the optional authenticated isolated VS Code hierarchy walkthrough with separate explicit chat export. |
 | `examples/playground` | Provides one supplied-data-only HTML/CSS/JavaScript editor for reference label, text segment, bilingual segment, source card, popup, connections panel, and Reader projects, with a real locally built public-module graph, opaque preview boundary, and focused Chromium/Firefox/WebKit qualification. |
@@ -137,7 +137,7 @@ The separate Pages workflow runs the complete repository gate on Ubuntu with the
 | `examples/reader` | Interactive multi-pane website host and controlled `<sefaria-reader>` host over the DOM-free reader session |
 | `examples/vanilla-vite` | Minimal supplied-data and explicit-live public-package consumption path |
 | `examples/react-vite` | React 19 Source Card data/`sref`, property, event, canonical-readout, and StrictMode integration |
-| `examples/alpine-vite` | Alpine Source Card data/`sref`, property-effect, event, canonical-readout, and destroy integration |
+| `examples/alpine-vite` | Alpine Source Card scalar attributes, property-only rich inputs, event, canonical-readout, and destroy integration |
 | `docs/.vitepress` and `scripts/build-site.mjs` | Documentation presentation, project-path navigation, styling, and isolated example assembly |
 
 Workspace dependencies use `workspace:*`, and committed manifests remain private. Successful `main` validation publishes synchronized public GitHub Packages prereleases from isolated staged manifests; it does not change workspace dependency resolution.

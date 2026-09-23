@@ -13,23 +13,27 @@ Choose one of the seven current elements and render either supplied raw data or 
 
 ## Try it
 
-Register the elements and assign a reference:
+Register the elements and declare a reference:
+
+```html
+<sefaria-source-card sref="Micah 6:8" selectable></sefaria-source-card>
+```
+
+Then handle its semantic event:
 
 ```ts
 import "@arithmomaniac/sefaria-web-components";
 
-const card = document.createElement("sefaria-source-card");
-card.sref = "Micah 6:8";
-card.selectable = true;
+const card = document.querySelector("sefaria-source-card");
+if (!card) throw new Error("The source card is missing.");
 card.addEventListener("sefaria-source-select", (event) => {
   console.log((event as CustomEvent).detail);
 });
-document.body.append(card);
 ```
 
 The root import registers all seven elements. The element owns standalone acquisition and private preparation. Do not assign a client, URL, `fetch`, or prepared rendering object.
 
-Properties can carry objects and arrays, so assign raw `data` and tagged `acquisition` through JavaScript properties rather than HTML attributes.
+Use attributes for scalar inputs such as `sref`, `layout`, and `vocalization-mode`. Properties carry rich objects and arrays, so assign raw `data`, tagged `acquisition`, selected positions, and anchors through JavaScript properties instead.
 
 Use an explicit acquisition source only when the default browser client is not appropriate:
 

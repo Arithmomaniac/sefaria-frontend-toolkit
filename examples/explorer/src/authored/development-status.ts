@@ -1,5 +1,6 @@
 import { SefariaElement } from "@arithmomaniac/sefaria-web-components";
 import { css, html, nothing } from "lit";
+import { ifDefined } from "lit/directives/if-defined.js";
 
 import refCommentary from "../../../../packages/client/test/fixtures/ref-rashi-commentary-2026-09-03.json";
 import refUnresolved from "../../../../packages/client/test/fixtures/ref-unresolved-2026-09-03.json";
@@ -497,7 +498,7 @@ class SefariaDevelopmentStatus extends SefariaElement {
                         .selectedPosition=${selectedPosition}
                         .showAddressLabels=${showAddressLabels}
                         .data=${sourceCardData(id)}
-                        .sref=${sourceCardSref(id)}
+                        sref=${sourceCardSref(id)}
                         .acquisition=${
                           id === "loading" ? pendingAcquisition : undefined
                         }
@@ -533,7 +534,7 @@ class SefariaDevelopmentStatus extends SefariaElement {
                       <sefaria-connections-panel
                         sref="Genesis 1:2"
                         .data=${connectionsData(id)}
-                        .category=${connectionsCategory(id)}
+                        category=${ifDefined(connectionsCategory(id))}
                         .withText=${id !== "metadata-only"}
                         .acquisition=${
                           id === "loading" ? pendingAcquisition : undefined
@@ -581,8 +582,8 @@ class SefariaDevelopmentStatus extends SefariaElement {
                           : html`<sefaria-reader
                               .data=${readerData(id)}
                               .acquisition=${{ kind: "disabled" }}
-                              .activePane=${activePane}
-                              .chatExport=${chatExport}
+                              active-pane=${activePane}
+                              ?chat-export=${chatExport}
                               @sefaria-reader-back=${this.#logEvent}
                               @sefaria-reader-connections-open=${this.#logEvent}
                             ></sefaria-reader>`

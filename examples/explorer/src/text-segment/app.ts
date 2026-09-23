@@ -7,6 +7,7 @@ import type { SefariaTextSegment } from "@arithmomaniac/sefaria-web-components";
 import type { TextSegmentRequest } from "@arithmomaniac/sefaria-web-components/text-segment";
 
 import {
+  setOptionalElementAttribute,
   startLiveDemo,
   requireNamedInput,
 } from "../../../../demos/live-demo-core.js";
@@ -117,7 +118,7 @@ async function loadText(
       .detail.error;
   };
   const onAbort = (): void => {
-    if (result.sref === request.tref) result.sref = "";
+    if (result.sref === request.tref) result.setAttribute("sref", "");
   };
   result.addEventListener("sefaria-text-segment-error", onError);
   signal.addEventListener("abort", onAbort, { once: true });
@@ -127,17 +128,26 @@ async function loadText(
       result.versionLanguage === request.version.language &&
       result.versionTitle === request.version.versionTitle
     ) {
-      result.sref = "";
+      result.setAttribute("sref", "");
       await result.updateComplete;
     }
-    result.versionLanguage = request.version.language;
-    result.versionTitle = request.version.versionTitle;
-    result.sref = request.tref;
+    setOptionalElementAttribute(
+      result,
+      "version-language",
+      request.version.language,
+    );
+    setOptionalElementAttribute(
+      result,
+      "version-title",
+      request.version.versionTitle,
+    );
+    result.setAttribute("sref", request.tref);
     await result.updateComplete;
     while (!signal.aborted && result.status === "loading") {
       await new Promise((resolve) => setTimeout(resolve));
       await result.updateComplete;
     }
+
     await result.updateComplete;
     if (acquisitionError !== undefined) throw acquisitionError;
     return result.status;

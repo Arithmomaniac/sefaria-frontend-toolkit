@@ -261,11 +261,14 @@ export function startReaderWorkspace(
     ) as SefariaSourceCard;
     source.data = record.payload;
     source.selectedPosition = entry.selectedPosition;
-    source.contentLanguage = entry.presentation.contentLanguage;
-    source.layout = entry.presentation.layout;
-    source.sideOrder = entry.presentation.sideOrder;
-    source.vocalizationMode = entry.presentation.vocalizationMode;
-    source.selectable = true;
+    source.setAttribute("content-language", entry.presentation.contentLanguage);
+    source.setAttribute("layout", entry.presentation.layout);
+    source.setAttribute("side-order", entry.presentation.sideOrder);
+    source.setAttribute(
+      "vocalization-mode",
+      entry.presentation.vocalizationMode,
+    );
+    source.setAttribute("selectable", "");
     source.addEventListener("sefaria-source-select", (event) => {
       const detail = (
         event as CustomEvent<{
@@ -304,10 +307,17 @@ export function startReaderWorkspace(
       connections.data = record.payload;
     }
     const projection = record?.projection;
-    connections.category = projection?.category;
-    connections.page = projection?.page ?? 0;
+    if (projection?.category === undefined) {
+      connections.removeAttribute("category");
+    } else {
+      connections.setAttribute("category", projection.category);
+    }
+    connections.setAttribute("page", String(projection?.page ?? 0));
     connections.showPreviews = entry.presentation.showConnectionPreviews;
-    connections.vocalizationMode = entry.presentation.vocalizationMode;
+    connections.setAttribute(
+      "vocalization-mode",
+      entry.presentation.vocalizationMode,
+    );
     connections.addEventListener(
       "sefaria-connections-category-change",
       (event) => {

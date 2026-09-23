@@ -2,7 +2,7 @@
 
 # Authored linked article
 
-This private, unpublished example progressively enhances ordinary Sefaria citation links with `<sefaria-popup>`. The article author supplies the native `href` and explicit `data-sefaria-ref`. Eligible activation assigns Popup `sref`, anchor, and visibility; close and destroy clear the owned reference. The page does not detect citations, rewrite prose, poll, or bulk preload.
+This private, unpublished example progressively enhances ordinary Sefaria citation links with `<sefaria-popup>`. The article author supplies the native `href` and explicit `data-sefaria-ref`. Eligible activation assigns Popup `sref` and `open` attributes and sets the property-only anchor; close and destroy clear the owned reference. The page does not detect citations, rewrite prose, poll, or bulk preload.
 
 ## Run locally
 
@@ -18,7 +18,7 @@ Open the loopback URL printed by Vite. No live data loads on page open. Click th
 
 ## Ownership
 
-[`src/app.ts`](src/app.ts) owns activation policy, client creation, explicit tagged acquisition, integration failure reporting, and cleanup. On eligible citation activation it assigns Popup `sref`, anchor, and visibility. The Popup owns loading, cancellation, stale-result suppression, validation, private preparation, status, and error events. Preparation is independent of visibility, and failures are not relabeled as success.
+[`src/app.ts`](src/app.ts) owns activation policy, client creation, explicit tagged acquisition, integration failure reporting, and cleanup. On eligible citation activation it assigns Popup `sref` and `open` attributes and sets the property-only anchor. The Popup owns loading, cancellation, stale-result suppression, validation, private preparation, status, and error events. Preparation is independent of visibility, and failures are not relabeled as success.
 
 Deterministic tests inject a strict fixture transport that rejects unexpected methods, origins, paths, and query parameters. Unknown response JSON still crosses the real `@arithmomaniac/sefaria-client` validation boundary before the Popup privately prepares it.
 

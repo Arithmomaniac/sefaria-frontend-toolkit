@@ -29,7 +29,7 @@ form.addEventListener("submit", (event) => {
   if (next.length === 0) return;
 
   card.data = undefined;
-  card.sref = next;
+  card.setAttribute("sref", next);
 });
 ```
 
@@ -44,7 +44,7 @@ card.acquisition = {
 
 ## Expected result
 
-Opening the route makes no Sefaria request. Submitting the form assigns `sref`; the element owns loading, cancellation, latest-wins behavior, private preparation, and accessible failures. A newer input prevents an older completion from publishing.
+Opening the route makes no Sefaria request. Submitting the form assigns the `sref` attribute; the element owns loading, cancellation, latest-wins behavior, private preparation, and accessible failures. A newer input prevents an older completion from publishing.
 
 The `sefaria-source-select` event carries the selected canonical reference and position. The host decides what that action means; it does not query Shadow DOM.
 

@@ -11,6 +11,7 @@ import type {
   SefariaConnectionsPanel,
   SefariaSourceCard,
 } from "@arithmomaniac/sefaria-web-components";
+import { setOptionalElementAttribute } from "../../../../demos/live-demo-core.js";
 
 /** Host controls exposed for browser qualification and manual use. */
 export interface ConnectionsDemo {
@@ -78,7 +79,7 @@ export function startConnectionsDemo(
       }
     | undefined;
 
-  reader.selectable = true;
+  reader.setAttribute("selectable", "");
   const sourceAcquisition = {
     kind: "capability" as const,
     capability: {
@@ -185,10 +186,10 @@ export function startConnectionsDemo(
     category: string | undefined,
     page: number,
   ): void => {
-    connections.sref = retained.sref;
+    connections.setAttribute("sref", retained.sref);
     connections.withText = retained.withText;
-    connections.category = category;
-    connections.page = page;
+    setOptionalElementAttribute(connections, "category", category);
+    connections.setAttribute("page", String(page));
     connections.data = retained.payload;
   };
   const loadLinks = async (
@@ -211,14 +212,14 @@ export function startConnectionsDemo(
             page: connections.page,
           };
     connections.data = undefined;
-    connections.category = undefined;
-    connections.page = 0;
+    connections.removeAttribute("category");
+    connections.setAttribute("page", "0");
     if (connections.sref === ref && connections.withText === withText) {
-      connections.sref = "";
+      connections.setAttribute("sref", "");
       await connections.updateComplete;
     }
     connections.withText = withText;
-    connections.sref = ref;
+    connections.setAttribute("sref", ref);
     try {
       await waitForConnections(
         connections,
@@ -229,7 +230,7 @@ export function startConnectionsDemo(
       );
     } catch (error) {
       if (previous === undefined) {
-        connections.sref = "";
+        connections.setAttribute("sref", "");
       } else {
         restoreLinks(previous.retained, previous.category, previous.page);
       }
@@ -244,10 +245,10 @@ export function startConnectionsDemo(
   ): Promise<CoreV3TextsResponse> => {
     sourceProbe.data = undefined;
     if (sourceProbe.sref === ref) {
-      sourceProbe.sref = "";
+      sourceProbe.setAttribute("sref", "");
       await sourceProbe.updateComplete;
     }
-    sourceProbe.sref = ref;
+    sourceProbe.setAttribute("sref", ref);
     await waitForSource(sourceProbe, ref, signal);
     if (capturedSource?.sref !== ref) {
       throw new Error(`Source acquisition did not retain ${ref}.`);
@@ -318,11 +319,11 @@ export function startConnectionsDemo(
         contextual = await contextualPromise;
       } catch (error) {
         currentController.abort();
-        connections.sref = "";
+        connections.setAttribute("sref", "");
         await linksOutcome;
         if (expectedOperation === operation) {
           connections.data = undefined;
-          connections.sref = "";
+          connections.setAttribute("sref", "");
           status.textContent = `${normalizedTarget} could not be opened.`;
           showError(error);
         }
@@ -338,18 +339,18 @@ export function startConnectionsDemo(
           `${resolvedFirstRef} is not a selectable row in ${contextual.ref}.`,
         );
         currentController.abort();
-        connections.sref = "";
+        connections.setAttribute("sref", "");
         await linksOutcome;
         if (expectedOperation === operation) {
           connections.data = undefined;
-          connections.sref = "";
+          connections.setAttribute("sref", "");
           status.textContent = `${normalizedTarget} could not be opened.`;
           showError(error);
         }
         return;
       }
 
-      reader.sref = contextual.ref;
+      reader.setAttribute("sref", contextual.ref);
       reader.data = contextual;
       reader.selectedPosition = selectedPosition;
       await reader.updateComplete;
@@ -431,27 +432,33 @@ export function startConnectionsDemo(
     void navigate(detail.targetRef);
   };
   const onDisplayChange = (): void => {
-    reader.contentLanguage =
+    reader.setAttribute(
+      "content-language",
       contentLanguage.value === "primary" ||
-      contentLanguage.value === "translation"
+        contentLanguage.value === "translation"
         ? contentLanguage.value
-        : "both";
-    reader.layout =
+        : "both",
+    );
+    reader.setAttribute(
+      "layout",
       layout.value === "stacked" || layout.value === "side-by-side"
         ? layout.value
-        : "auto";
-    reader.sideOrder =
+        : "auto",
+    );
+    reader.setAttribute(
+      "side-order",
       sideOrder.value === "translation-first"
         ? "translation-first"
-        : "primary-first";
+        : "primary-first",
+    );
     reader.showAddressLabels = showAddressLabels.checked;
     connections.showPreviews = showPreviews.checked;
     const mode =
       vocalizationMode.value === "nikkud" || vocalizationMode.value === "none"
         ? vocalizationMode.value
         : "taamim_and_nikkud";
-    reader.vocalizationMode = mode;
-    connections.vocalizationMode = mode;
+    reader.setAttribute("vocalization-mode", mode);
+    connections.setAttribute("vocalization-mode", mode);
   };
 
   form.addEventListener("submit", onSubmit);
@@ -483,7 +490,7 @@ export function startConnectionsDemo(
     navigate,
     dispose: () => {
       controller?.abort();
-      connections.sref = "";
+      connections.setAttribute("sref", "");
       sourceProbe.remove();
       form.removeEventListener("submit", onSubmit);
       reader.removeEventListener("sefaria-source-select", onSourceSelect);
@@ -522,7 +529,7 @@ async function waitForSource(
     if (detail.sref === expectedRef) acquisitionError = detail.error;
   };
   const onAbort = (): void => {
-    if (source.sref === expectedRef) source.sref = "";
+    if (source.sref === expectedRef) source.setAttribute("sref", "");
   };
   source.addEventListener("sefaria-source-card-error", onError);
   signal.addEventListener("abort", onAbort, { once: true });

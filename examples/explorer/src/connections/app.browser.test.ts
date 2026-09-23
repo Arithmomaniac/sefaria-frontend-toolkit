@@ -116,8 +116,8 @@ test("local paging/category/preview display use only the current capture", async
   );
   const demo = startConnectionsDemo(document, createSefariaClient({ fetch }));
   await demo.navigate("Genesis 1:2");
-  panel().category = "Commentary";
-  panel().page = 1;
+  panel().setAttribute("category", "Commentary");
+  panel().setAttribute("page", "1");
   await panel().updateComplete;
   expect(panel().category).toBe("Commentary");
   expect(panel().page).toBe(1);
@@ -145,8 +145,8 @@ test("loading previews preserves the active category and page", async () => {
   );
   const demo = startConnectionsDemo(document, createSefariaClient({ fetch }));
   await demo.navigate("Genesis 1:2");
-  panel().category = "Commentary";
-  panel().page = 1;
+  panel().setAttribute("category", "Commentary");
+  panel().setAttribute("page", "1");
   await panel().updateComplete;
   const previewButton = [
     ...panel().shadowRoot!.querySelectorAll("button"),

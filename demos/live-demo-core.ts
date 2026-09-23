@@ -338,6 +338,19 @@ function applyPreset(form: HTMLFormElement, preset: LiveDemoPreset): void {
   }
 }
 
+/** Assigns or removes an optional scalar custom-element attribute. */
+export function setOptionalElementAttribute(
+  element: HTMLElement,
+  name: string,
+  value: string | undefined,
+): void {
+  if (value === undefined) {
+    element.removeAttribute(name);
+  } else {
+    element.setAttribute(name, value);
+  }
+}
+
 /** Returns a required element or reports the missing demo contract. */
 export function requireElement<T extends Element>(
   root: ParentNode,

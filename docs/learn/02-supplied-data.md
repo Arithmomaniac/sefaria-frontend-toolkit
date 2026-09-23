@@ -30,7 +30,7 @@ const card = document.querySelector("sefaria-source-card");
 if (!card) throw new Error("The source card is missing.");
 
 card.data = zCoreV3TextsResponse.parse(payload) as CoreV3TextsResponse;
-card.selectable = true;
+card.setAttribute("selectable", "");
 ```
 
 ## Expected result
@@ -43,7 +43,7 @@ The boundary validator proves the unknown JSON shape. The element owns selection
 
 ## Exercise
 
-Change presentation properties such as `layout`, `sideOrder`, and `vocalizationMode`. Confirm that the preview remains zero-request.
+Change presentation attributes such as `layout`, `side-order`, and `vocalization-mode`. Confirm that the preview remains zero-request.
 
 ## Source and run links
 
