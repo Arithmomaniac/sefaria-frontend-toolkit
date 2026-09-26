@@ -67,6 +67,8 @@ jobs:
     name: publish public prerelease
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.PUBLIC_PACKAGES_ENABLED == 'true' }}
     needs: check
+    outputs:
+      version: ${{ steps.release-version.outputs.version }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -104,3 +106,30 @@ jobs:
       - run: node scripts/package-publication.mjs verify --version "$PUBLISH_VERSION"
         env:
           NODE_AUTH_TOKEN: ${{ github.token }}
+      - id: release-version
+        run: echo "version=$PUBLISH_VERSION" >> "$GITHUB_OUTPUT"
+
+  script-source:
+    name: archive browser script
+    timeout-minutes: 30
+    needs: publish
+    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.PUBLIC_PACKAGES_ENABLED == 'true' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      SCRIPT_VERSION: ${{ needs.publish.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm setup:agent
+      - run: pnpm build
+      - run: pnpm build:script-source
+      - run: pnpm test:script-source dist/script-source
+      - run: node scripts/script-source-release.mjs publish
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

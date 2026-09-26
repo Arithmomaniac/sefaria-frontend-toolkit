@@ -54,6 +54,11 @@ export const EXAMPLE_BUILDS = [
 ];
 
 export const SITE_REQUIRED_FILES = [
+  "cdn/local/sefaria-elements.js",
+  "cdn/local/manifest.json",
+  "cdn/local/LICENSE.txt",
+  "cdn/local/THIRD-PARTY-NOTICES.txt",
+  "cdn/local/source.tar.gz",
   "index.html",
   "learn/01-web-components.html",
   "learn/02-supplied-data.html",
@@ -111,6 +116,7 @@ export function createSiteBuildSteps({ skipTypecheck, siteBasePath = "/" }) {
       });
     }
   }
+  steps.push({ kind: "script-source" });
   for (const example of EXAMPLE_BUILDS) {
     if (!skipTypecheck) {
       steps.push({

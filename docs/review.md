@@ -14,6 +14,18 @@ This guide defines review gates for the delivered architecture and separately id
 - [ ] Generated declarations remain the field-level transport reference.
 - [ ] Private validated component preparation remains the rendering authority; public raw data is not treated as render-ready state.
 
+## Browser script distribution
+
+- [ ] The plain-HTML smoke loads the actual production module without an import map, source alias, or custom acquisition.
+- [ ] Re-evaluating identical bytes through a distinct URL preserves the registered constructors and throws no error.
+- [ ] Package producer version and commit survive archival retries; partial package publication cannot admit a script record.
+- [ ] All active versions are restored byte-for-byte; missing/corrupt active archives block deployment.
+- [ ] Explicit retirement preserves unrelated records, is terminal, and follows the documented no-notice policy.
+- [ ] Concurrent catalog updates cannot lose earlier records, and stale aliases cannot win by completion order.
+- [ ] Runtime dependency notices, corresponding source, file hashes, and independently recomputed sizes accompany each release.
+- [ ] Validation stays read-only; only archival/retirement receive repository write permission, and only Pages deployment receives Pages identity permissions.
+- [ ] Hosted availability is not claimed from local checks; original retained URLs do not depend on repository redirects.
+
 ## OpenAPI pin and overlay
 
 - [ ] The upstream OpenAPI input comes from an explicit Sefaria commit.

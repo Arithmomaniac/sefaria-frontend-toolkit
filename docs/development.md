@@ -120,7 +120,34 @@ The generated `dist/site` directory contains the VitePress pages plus allowliste
 
 `pnpm build:site` typechecks each included example before bundling it. `pnpm build:site:bundles` skips those repeated typechecks and is used inside `pnpm check` after workspace builds. Both commands verify required output files and reject a same-origin authored-source fallback. `SITE_BASE_PATH` selects the normalized absolute base used by VitePress, every example bundle, and browser acceptance; local commands default to `/`, while the Pages workflow requires `/sefaria-frontend-toolkit/`.
 
-The separate Pages workflow runs the complete repository gate on Ubuntu with the project base, uploads only `dist/site`, and deploys only from `main` with `pages: write` and `id-token: write` scoped to the deployment job. Pull requests validate the workflow and both local and project-path contracts without deploying. The previous Reveal.js showcase, booth loop, Pages assembly, QR assets, presentation media, and presentation-only tests remain available through the full-SHA links in the [documentation archive](archive/README.md#september-14-2026-presentation-snapshot).
+The separate Pages workflow runs after successful main-push CI or explicit script retirement, and also supports manual main-only redeployment. It runs the complete repository gate on Ubuntu with the project base, restores retained script artifacts, uploads only `dist/site`, and deploys with `pages: write` and `id-token: write` scoped to the deployment job. Pull requests validate the workflow and both local and project-path contracts without deploying. The previous Reveal.js showcase, booth loop, Pages assembly, QR assets, presentation media, and presentation-only tests remain available through the full-SHA links in the [documentation archive](archive/README.md#september-14-2026-presentation-snapshot).
+
+## Browser script distribution
+
+The script-source implementation is locally qualified; first hosted publication remains pending. Its [distribution contract](specs/distribution.md#browser-script-source) is separate from authenticated GitHub Packages installation.
+
+After building the workspace, run:
+
+```powershell
+pnpm build:script-source --compare
+pnpm test:script-source dist/script-source
+```
+
+The first command writes `dist/script-source/sefaria-elements.js`, licenses, a corresponding-source archive, a hashed manifest, and a comparison report. The second exercises that exact production artifact from a separate-origin plain HTML page in Chromium, Firefox, and WebKit. `pnpm check` stages the same artifact at `dist/site/cdn/local` and runs the smoke there. `local` is a fixture identity, never a publishable version; Pages restoration replaces the complete local `cdn` directory before upload.
+
+After synchronized package publication and installed-consumer verification, the CI `script-source` job builds and tests the matching version and archives it as a GitHub Release asset. The version comes from the successful package job output, so rerunning only a failed archival job does not invent a different package version. This job alone receives the additional `contents: write` permission; it uses the short-lived workflow token.
+
+The automation-owned `script-distribution` branch stores `catalog.json`. Do not delete this branch or manually edit active hashes. A catalog record is admitted only after the uploaded archive is downloaded and validated. Catalog commits use non-forced fast-forward updates; a concurrent edit fails rather than dropping another release. A failed archive upload is not a deployed version. Recover by rerunning the failed job with its original package-version output; conflicting existing bytes require investigation, not overwrite.
+
+Every Pages deployment reconstructs all active `cdn/<version>` directories from archived bytes. It verifies the archive inventory, file hashes, source/version identity, and size report before replacing the assembled directory. `cdn/alpha` selects the newest active producer run/attempt. Missing or corrupted active assets block deployment; restore the exact archived asset or explicitly retire the affected version. A normal Pages redeploy does not build a new release.
+
+Restoration reports the complete site's byte size and blocks upload above 1,000,000,000 bytes, with the largest retained-version directories listed as cleanup candidates. Each retained directory includes its source archive, so growth requires deliberate maintenance; the budget check never retires a version automatically. Every GitHub request has a fresh 60-second deadline. Archive, Pages build, Pages deployment, and retirement jobs have outer limits of 30, 60, 15, and 10 minutes respectively.
+
+To retire a version, manually run **Retire script version** on `main` with the exact package version. The workflow records a terminal tombstone and a successful run triggers Pages to omit that path. Retirement is allowed without notice; pins may stop working, and caches may delay removal. Retiring the newest version selects the next active alias; retiring all versions leaves no script alias. The maintenance workflow does not delete the Release/source archive or waive source-distribution obligations. Do not reuse a retired version identifier.
+
+The original Pages location must remain available for retained URLs if names or URLs change. A separate repository can publish later versions without moving the original retained files. Do not rely on repository-name redirects for project-site URLs.
+
+Hosted qualification is still required after authorized publication: check anonymous module loading, MIME/CORS, matching package version, notices/source access, and an older active pin after a later deployment. Local tests do not establish hosted availability.
 
 ## Workspace
 

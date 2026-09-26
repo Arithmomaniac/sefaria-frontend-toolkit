@@ -89,8 +89,10 @@ export function validateWorkflowPolicy(workflows) {
           filename === "copilot-setup-steps.yml"
             ? ["pull_request", "push", "workflow_dispatch"]
             : isPagesWorkflow(filename)
-              ? ["push", "workflow_dispatch"]
-              : ["pull_request", "push"];
+              ? ["workflow_dispatch", "workflow_run"]
+              : isRetirementWorkflow(filename)
+                ? ["workflow_dispatch"]
+                : ["pull_request", "push"];
         if (JSON.stringify(eventNames) !== JSON.stringify(expectedEvents)) {
           issues.push(`unsupported workflow events in ${filename}`);
         }
@@ -99,6 +101,8 @@ export function validateWorkflowPolicy(workflows) {
         validateCiWorkflow(workflow, issues, filename);
       } else if (isPagesWorkflow(filename)) {
         validatePagesWorkflow(workflow, issues, filename);
+      } else if (isRetirementWorkflow(filename)) {
+        validateRetirementWorkflow(workflow, issues, filename);
       } else if (
         filename.endsWith("/copilot-setup-steps.yml") ||
         filename === "copilot-setup-steps.yml"
@@ -132,7 +136,7 @@ function validatePagesWorkflow(workflow, issues, filename) {
   const deploySteps =
     isRecord(deploy) && Array.isArray(deploy.steps) ? deploy.steps : [];
   const expectedBuildSteps = [
-    { uses: "actions/checkout@v4" },
+    { uses: "actions/checkout@v4", with: { ref: "main" } },
     { uses: "pnpm/action-setup@v4" },
     {
       uses: "actions/setup-node@v4",
@@ -143,6 +147,10 @@ function validatePagesWorkflow(workflow, issues, filename) {
     },
     { run: "pnpm setup:agent" },
     { run: "pnpm check" },
+    {
+      run: "node scripts/script-source-release.mjs restore",
+      env: { GITHUB_TOKEN: "${{ github.token }}" },
+    },
     { uses: "actions/configure-pages@v5" },
     {
       uses: "actions/upload-pages-artifact@v5",
@@ -167,7 +175,13 @@ function validatePagesWorkflow(workflow, issues, filename) {
 
   if (
     !isRecord(events) ||
-    !hasOnlyEntries(events.push, { branches: ["main"] })
+    !hasOnlyEntries(events.workflow_run, {
+      workflows: ["CI", "Retire script version"],
+      types: ["completed"],
+      branches: ["main"],
+    }) ||
+    build?.if !==
+      "${{ github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository && ((github.event.workflow_run.name == 'CI' && github.event.workflow_run.event == 'push') || (github.event.workflow_run.name == 'Retire script version' && github.event.workflow_run.event == 'workflow_dispatch')))) }}"
   ) {
     issues.push(`Pages workflow gate is not main-only in ${filename}`);
   }
@@ -179,12 +193,14 @@ function validatePagesWorkflow(workflow, issues, filename) {
       contents: "read",
       pages: "read",
     }) ||
+    build["timeout-minutes"] !== 60 ||
     !isRecord(deploy) ||
     !hasOnlyEntries(deploy.permissions, {
       contents: "read",
       pages: "write",
       "id-token": "write",
-    })
+    }) ||
+    deploy["timeout-minutes"] !== 15
   ) {
     issues.push(`Pages workflow permissions are incorrect in ${filename}`);
   }
@@ -259,7 +275,7 @@ function validateCiWorkflow(workflow, issues, filename) {
   if (
     !isRecord(jobs) ||
     JSON.stringify(Object.keys(jobs).sort()) !==
-      JSON.stringify(["check", "publish", "validation"])
+      JSON.stringify(["check", "publish", "script-source", "validation"])
   ) {
     issues.push(`unexpected CI jobs in ${filename}`);
     return;
@@ -327,6 +343,82 @@ function validateCiWorkflow(workflow, issues, filename) {
     issues.push(`CI check aggregation is not fail-closed in ${filename}`);
   }
   validatePublishJob(publish, issues, filename);
+  const script = jobs["script-source"];
+  const expectedScript = {
+    name: "archive browser script",
+    "timeout-minutes": 30,
+    needs: "publish",
+    if: "${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.PUBLIC_PACKAGES_ENABLED == 'true' }}",
+    "runs-on": "ubuntu-latest",
+    permissions: { contents: "write" },
+    env: { SCRIPT_VERSION: "${{ needs.publish.outputs.version }}" },
+    steps: [
+      { uses: "actions/checkout@v4" },
+      { uses: "pnpm/action-setup@v4" },
+      {
+        uses: "actions/setup-node@v4",
+        with: { "node-version": 22, cache: "pnpm" },
+      },
+      { run: "pnpm setup:agent" },
+      { run: "pnpm build" },
+      { run: "pnpm build:script-source" },
+      { run: "pnpm test:script-source dist/script-source" },
+      {
+        run: "node scripts/script-source-release.mjs publish",
+        env: { GITHUB_TOKEN: "${{ github.token }}" },
+      },
+    ],
+  };
+  if (!hasOnlyEntries(script, expectedScript))
+    issues.push(`Script archive gate is incorrect in ${filename}`);
+  if (
+    !hasOnlyEntries(publish.outputs, {
+      version: "${{ steps.release-version.outputs.version }}",
+    })
+  )
+    issues.push(`Script producer version output is missing in ${filename}`);
+}
+
+function validateRetirementWorkflow(workflow, issues, filename) {
+  const expected = {
+    "timeout-minutes": 10,
+    if: "${{ github.ref == 'refs/heads/main' }}",
+    "runs-on": "ubuntu-latest",
+    permissions: { contents: "write" },
+    steps: [
+      { uses: "actions/checkout@v4", with: { ref: "main" } },
+      { uses: "pnpm/action-setup@v4" },
+      {
+        uses: "actions/setup-node@v4",
+        with: { "node-version": 22, cache: "pnpm" },
+      },
+      { run: "pnpm install --frozen-lockfile" },
+      {
+        run: "node scripts/script-source-release.mjs retire",
+        env: {
+          GITHUB_TOKEN: "${{ github.token }}",
+          RETIRE_VERSION: "${{ inputs.version }}",
+        },
+      },
+    ],
+  };
+  if (
+    !hasOnlyEntries(workflow.permissions, { contents: "read" }) ||
+    !hasOnlyEntries(workflow.jobs, { retire: expected }) ||
+    !hasOnlyEntries(workflow.on, {
+      workflow_dispatch: {
+        inputs: {
+          version: {
+            description: "Exact script version to retire without notice",
+            required: true,
+            type: "string",
+          },
+        },
+      },
+    })
+  ) {
+    issues.push(`Script retirement gate is incorrect in ${filename}`);
+  }
 }
 
 function validatePublishJob(publish, issues, filename) {
@@ -343,6 +435,7 @@ function validatePublishJob(publish, issues, filename) {
     "pnpm publish .artifacts/publish/text-transform --tag alpha --access public --no-git-checks",
     "pnpm publish .artifacts/publish/web-components --tag alpha --access public --no-git-checks",
     'node scripts/package-publication.mjs verify --version "$PUBLISH_VERSION"',
+    'echo "version=$PUBLISH_VERSION" >> "$GITHUB_OUTPUT"',
   ];
   const steps = Array.isArray(publish.steps) ? publish.steps : [];
   const runs = steps
@@ -560,7 +653,20 @@ function walkWorkflow(value, valuePath, issues, filename) {
       valuePath[1] === "deploy" &&
       isPagesWorkflow(filename) &&
       entry === "write";
-    if (CREDENTIAL_NAME.test(key) && !publishToken && !pagesIdentityToken) {
+    const scriptToken =
+      key === "GITHUB_TOKEN" &&
+      entry === "${{ github.token }}" &&
+      valuePath[0] === "jobs" &&
+      (((filename === "ci.yml" || filename.endsWith("/ci.yml")) &&
+        valuePath[1] === "script-source") ||
+        (isRetirementWorkflow(filename) && valuePath[1] === "retire") ||
+        (isPagesWorkflow(filename) && valuePath[1] === "build"));
+    if (
+      CREDENTIAL_NAME.test(key) &&
+      !publishToken &&
+      !pagesIdentityToken &&
+      !scriptToken
+    ) {
       issues.push(
         `publication credential in ${filename}:${nextPath.join(".")}`,
       );
@@ -582,9 +688,17 @@ function walkWorkflow(value, valuePath, issues, filename) {
               ((permission === "contents" && access === "read") ||
                 (permission === "pages" && access === "write") ||
                 (permission === "id-token" && access === "write"))));
+        const scriptPermission =
+          valuePath[0] === "jobs" &&
+          permission === "contents" &&
+          access === "write" &&
+          (((filename === "ci.yml" || filename.endsWith("/ci.yml")) &&
+            valuePath[1] === "script-source") ||
+            (isRetirementWorkflow(filename) && valuePath[1] === "retire"));
         if (
           !publishPermission &&
           !pagesPermission &&
+          !scriptPermission &&
           (permission !== "contents" || access !== "read")
         ) {
           issues.push(
@@ -607,7 +721,13 @@ function walkWorkflow(value, valuePath, issues, filename) {
       key === "run" &&
       typeof entry === "string" &&
       PUBLISH_COMMAND.test(entry) &&
-      !(valuePath[0] === "jobs" && valuePath[1] === "publish")
+      !(
+        valuePath[0] === "jobs" &&
+        (valuePath[1] === "publish" ||
+          ((filename === "ci.yml" || filename.endsWith("/ci.yml")) &&
+            valuePath[1] === "script-source" &&
+            entry === "node scripts/script-source-release.mjs publish"))
+      )
     ) {
       issues.push(`publication command in ${filename}:${nextPath.join(".")}`);
     }
@@ -672,4 +792,11 @@ function hasOnlyEntries(value, expected) {
 
 function isPagesWorkflow(filename) {
   return filename === "pages.yml" || filename.endsWith("/pages.yml");
+}
+
+function isRetirementWorkflow(filename) {
+  return (
+    filename === "script-retirement.yml" ||
+    filename.endsWith("/script-retirement.yml")
+  );
 }

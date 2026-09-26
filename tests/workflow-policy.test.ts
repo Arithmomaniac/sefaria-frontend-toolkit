@@ -31,6 +31,83 @@ function parseWorkflow(source: string): RecordValue {
 }
 
 describe("agent-ready workflow policy", () => {
+  it("archives browser releases only after verified package publication", () => {
+    const workflow = parseWorkflow(ciSource);
+    const archive = (workflow.jobs as RecordValue)[
+      "script-source"
+    ] as RecordValue;
+    expect(archive).toBeDefined();
+    expect(archive.needs).toBe("publish");
+    expect(archive.permissions).toEqual({ contents: "write" });
+    expect(JSON.stringify(archive)).toContain(
+      "pnpm test:script-source dist/script-source",
+    );
+    expect(JSON.stringify(archive)).toContain(
+      "node scripts/script-source-release.mjs publish",
+    );
+  });
+
+  it("rejects script archive bypasses and incorrect retry version identity", () => {
+    for (const candidate of [
+      ciSource.replace("needs: publish", "needs: check"),
+      ciSource.replace(
+        "pnpm test:script-source dist/script-source",
+        "echo skipped",
+      ),
+      ciSource.replace(
+        "SCRIPT_VERSION: ${{ needs.publish.outputs.version }}",
+        "SCRIPT_VERSION: 0.0.0-alpha.${{ github.run_id }}.${{ github.run_attempt }}",
+      ),
+      ciSource.replace(
+        "      contents: write",
+        "      contents: write\n      packages: write",
+      ),
+    ]) {
+      expect(
+        validateWorkflowPolicy({ "ci.yml": candidate }).join("\n"),
+      ).toContain("Script archive gate");
+    }
+  });
+
+  it("requires trusted main-only Pages and explicit manual retirement", () => {
+    const pages = readFileSync(
+      resolve(process.cwd(), ".github/workflows/pages.yml"),
+      "utf8",
+    );
+    const retirement = readFileSync(
+      resolve(process.cwd(), ".github/workflows/script-retirement.yml"),
+      "utf8",
+    );
+    expect(
+      validateWorkflowPolicy({
+        "pages.yml": pages,
+        "script-retirement.yml": retirement,
+      }),
+    ).toEqual([]);
+    for (const candidate of [
+      pages.replace("conclusion == 'success'", "conclusion != 'failure'"),
+      pages.replace(
+        "ref: main",
+        "ref: ${{ github.event.workflow_run.head_sha }}",
+      ),
+      pages.replace(
+        "node scripts/script-source-release.mjs restore",
+        "echo skipped",
+      ),
+    ]) {
+      expect(
+        validateWorkflowPolicy({ "pages.yml": candidate }).length,
+      ).toBeGreaterThan(0);
+    }
+    expect(
+      validateWorkflowPolicy({
+        "script-retirement.yml": retirement.replace(
+          "if: ${{ github.ref == 'refs/heads/main' }}",
+          "if: true",
+        ),
+      }).length,
+    ).toBeGreaterThan(0);
+  });
   it("requires complete Linux and Windows validation behind one check", () => {
     const workflow = parseWorkflow(ciSource);
     const jobs = workflow.jobs as RecordValue;
@@ -42,6 +119,7 @@ describe("agent-ready workflow policy", () => {
     expect(Object.keys(jobs).sort()).toEqual([
       "check",
       "publish",
+      "script-source",
       "validation",
     ]);
     expect(strategy["fail-fast"]).toBe(false);

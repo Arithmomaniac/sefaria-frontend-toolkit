@@ -2,7 +2,12 @@ name: Pages
 
 on:
   workflow_dispatch:
-  push:
+  workflow_run:
+    workflows:
+      - CI
+      - Retire script version
+    types:
+      - completed
     branches:
       - main
 
@@ -16,6 +21,8 @@ concurrency:
 jobs:
   build:
     name: build Pages artifact
+    timeout-minutes: 60
+    if: ${{ github.ref == 'refs/heads/main' && (github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_repository.full_name == github.repository && ((github.event.workflow_run.name == 'CI' && github.event.workflow_run.event == 'push') || (github.event.workflow_run.name == 'Retire script version' && github.event.workflow_run.event == 'workflow_dispatch')))) }}
     permissions:
       contents: read
       pages: read
@@ -24,6 +31,8 @@ jobs:
       SITE_BASE_PATH: /sefaria-frontend-toolkit/
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -31,6 +40,9 @@ jobs:
           cache: pnpm
       - run: pnpm setup:agent
       - run: pnpm check
+      - run: node scripts/script-source-release.mjs restore
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v5
         with:
@@ -38,6 +50,7 @@ jobs:
 
   deploy:
     name: deploy Pages
+    timeout-minutes: 15
     needs: build
     permissions:
       contents: read
