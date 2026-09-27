@@ -68,7 +68,6 @@ const packageDefinitions = [
       "./acquisition",
       "./bilingual-segment",
       "./connections-panel",
-      "./popup",
       "./reader",
       "./reader-session",
       "./ref-label",
@@ -283,7 +282,6 @@ async function inspectConsumerResolution(consumer) {
     "@arithmomaniac/sefaria-web-components/acquisition",
     "@arithmomaniac/sefaria-web-components/bilingual-segment",
     "@arithmomaniac/sefaria-web-components/connections-panel",
-    "@arithmomaniac/sefaria-web-components/popup",
     "@arithmomaniac/sefaria-web-components/reader",
     "@arithmomaniac/sefaria-web-components/reader-session",
     "@arithmomaniac/sefaria-web-components/ref-label",
@@ -298,6 +296,7 @@ async function inspectConsumerResolution(consumer) {
       [
         `await Promise.all(${JSON.stringify(allNodeSafeImports)}.map((specifier) => import(specifier)));`,
         "if ('customElements' in globalThis) throw new Error('DOM registration leaked into Node-safe imports');",
+        "try { await import('@arithmomaniac/sefaria-web-components/popup'); throw new Error('Removed Popup subpath remains importable'); } catch (error) { if (error.code !== 'ERR_PACKAGE_PATH_NOT_EXPORTED') throw error; }",
       ].join(""),
     ],
     consumer,
@@ -454,10 +453,11 @@ async function smokeVanillaChromium() {
         return {
           registered:
             globalThis.customElements.get("sefaria-source-card") !== undefined,
+          popupRegistered:
+            globalThis.customElements.get("sefaria-popup") !== undefined,
           registeredTags: [
             "sefaria-bilingual-segment",
             "sefaria-connections-panel",
-            "sefaria-popup",
             "sefaria-reader",
             "sefaria-ref-label",
             "sefaria-source-card",
@@ -472,7 +472,8 @@ async function smokeVanillaChromium() {
       });
       if (
         !result.registered ||
-        result.registeredTags.length !== 7 ||
+        result.registeredTags.length !== 6 ||
+        result.popupRegistered ||
         result.state !== "ready" ||
         result.globalFetchCount !== 1 ||
         !result.text?.includes("Deterministic example Hebrew") ||

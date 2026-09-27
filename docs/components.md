@@ -2,7 +2,7 @@
 
 # Components
 
-The toolkit provides seven declarative UI components. All seven accept `sref` for standalone loading. The six ordinary elements also accept component-specific raw `data`; Reader accepts transactional raw seeds.
+The toolkit provides six declarative UI components. All six accept `sref` for standalone loading. The five ordinary elements also accept component-specific raw `data`; Reader accepts transactional raw seeds.
 
 > Choose the smallest component that completes the task. Use Reader when users need navigation.
 
@@ -16,7 +16,7 @@ The toolkit provides seven declarative UI components. All seven accept `sref` fo
 | One selected edition | [Text segment](components/text-segment.md) |
 | A canonical reference heading or link | [Reference label](components/ref-label.md) |
 | Groups of related texts and previews | [Connections panel](components/connections-panel.md) |
-| A source preview attached to authored prose | [Popup](components/popup.md) |
+| A source preview opened from authored prose | [Source Card in a host dialog](linked-article.md) |
 
 <PlaygroundEmbed project="source-card" title="Editable component catalog" :heading-level="2" />
 
@@ -43,7 +43,6 @@ Elements expose public read-only status and component-specific diagnostics/event
 | `<sefaria-bilingual-segment>` | `@arithmomaniac/sefaria-web-components/bilingual-segment` |
 | `<sefaria-source-card>` | `@arithmomaniac/sefaria-web-components/source-card` |
 | `<sefaria-connections-panel>` | `@arithmomaniac/sefaria-web-components/connections-panel` |
-| `<sefaria-popup>` | `@arithmomaniac/sefaria-web-components/popup` |
 | `<sefaria-reader>` | `@arithmomaniac/sefaria-web-components/reader` |
 
 Use the generated [custom-element reference](reference/custom-elements.md) for exact properties, events, slots, and parts. Do not hand-edit generated reference files.

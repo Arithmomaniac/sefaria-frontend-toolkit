@@ -5,10 +5,10 @@ import {
 import "@arithmomaniac/sefaria-web-components";
 import type {
   SefariaAcquisition,
-  SefariaPopup,
+  SefariaSourceCard,
 } from "@arithmomaniac/sefaria-web-components";
 
-const POPUP_ID = "linked-article-source-popup";
+const DIALOG_ID = "linked-article-source-preview";
 const LINK_SELECTOR = "a[data-sefaria-ref]";
 const STATUS_SELECTOR = "[data-linked-article-status]";
 
@@ -20,11 +20,7 @@ export function startLinkedArticle(
   root: Document = document,
   client: SefariaClient = createSefariaClient({ cache: false }),
 ): LinkedArticleApp {
-  const popup = root.createElement("sefaria-popup") as SefariaPopup;
   const acquisition: SefariaAcquisition = { kind: "client", client };
-  popup.acquisition = acquisition;
-  popup.id = POPUP_ID;
-  root.body.append(popup);
   const existingStatus = root.querySelector<HTMLElement>(STATUS_SELECTOR);
   const status = existingStatus ?? root.createElement("p");
   if (existingStatus === null) {
@@ -35,35 +31,27 @@ export function startLinkedArticle(
 
   const anchors = [...root.querySelectorAll<HTMLAnchorElement>(LINK_SELECTOR)];
   const listeners = new Map<HTMLAnchorElement, (event: MouseEvent) => void>();
-  const close = (): void => {
-    popup.setAttribute("sref", "");
-    popup.removeAttribute("open");
-  };
-  const showError = (event: Event): void => {
-    const detail = (
-      event as CustomEvent<{ readonly error: unknown; readonly sref: string }>
-    ).detail;
-    if (popup.sref !== detail.sref) {
-      return;
-    }
-    close();
-    status.textContent =
-      detail.error instanceof Error
-        ? detail.error.message
-        : String(detail.error);
-    status.setAttribute("role", "alert");
-  };
-
-  popup.addEventListener("sefaria-popup-close", close);
-  popup.addEventListener("sefaria-popup-error", showError);
+  const originalControls = new Map<HTMLAnchorElement, string | null>();
+  let active:
+    | {
+        card: SefariaSourceCard;
+        anchor: HTMLAnchorElement;
+        close(): void;
+      }
+    | undefined;
+  let destroyed = false;
 
   for (const anchor of anchors) {
     if (!isEligibleAnchor(anchor)) {
       continue;
     }
-    anchor.setAttribute("aria-controls", POPUP_ID);
+    originalControls.set(anchor, anchor.getAttribute("aria-controls"));
+    anchor.setAttribute("aria-controls", DIALOG_ID);
     const listener = (event: MouseEvent): void => {
-      if (!shouldEnhanceActivation(event, anchor)) {
+      if (
+        !isEligibleAnchor(anchor) ||
+        !shouldEnhanceActivation(event, anchor)
+      ) {
         return;
       }
       event.preventDefault();
@@ -71,30 +59,97 @@ export function startLinkedArticle(
       if (tref === undefined) {
         return;
       }
-      open(anchor, tref);
+      open(anchor, tref.trim());
     };
     listeners.set(anchor, listener);
     anchor.addEventListener("click", listener);
   }
 
   function open(anchor: HTMLAnchorElement, tref: string): void {
-    popup.anchor = anchor;
     status.textContent = "";
     status.setAttribute("role", "status");
-    popup.setAttribute("sref", tref);
-    popup.setAttribute("open", "");
+    if (active !== undefined) {
+      active.anchor = anchor;
+      active.card.setAttribute("sref", tref);
+      return;
+    }
+
+    // Each opening owns its nodes so queued close/error events cannot close a newer preview.
+    const dialog = root.createElement("dialog");
+    dialog.id = DIALOG_ID;
+    dialog.className = "source-preview";
+    dialog.setAttribute("aria-label", "Sefaria source preview");
+    const closeButton = root.createElement("button");
+    closeButton.type = "button";
+    closeButton.textContent = "Close source preview";
+    closeButton.autofocus = true;
+    const card = root.createElement("sefaria-source-card") as SefariaSourceCard;
+    card.acquisition = acquisition;
+    card.setAttribute("sref", tref);
+    const events = new AbortController();
+    const preview = {
+      card,
+      anchor,
+      close(): void {
+        if (active !== preview) return;
+        active = undefined;
+        events.abort();
+        card.setAttribute("sref", "");
+        dialog.close();
+        dialog.remove();
+        if (preview.anchor.isConnected) preview.anchor.focus();
+      },
+    };
+    active = preview;
+    closeButton.addEventListener("click", preview.close, {
+      signal: events.signal,
+    });
+    dialog.addEventListener(
+      "cancel",
+      (event) => {
+        event.preventDefault();
+        preview.close();
+      },
+      { signal: events.signal },
+    );
+    dialog.addEventListener("close", preview.close, { signal: events.signal });
+    card.addEventListener(
+      "sefaria-source-card-error",
+      (event: Event) => {
+        const { error, sref } = (
+          event as CustomEvent<{
+            readonly error: unknown;
+            readonly sref: string;
+          }>
+        ).detail;
+        if (active !== preview || card.sref !== sref) return;
+        preview.close();
+        status.textContent =
+          error instanceof Error ? error.message : String(error);
+        status.setAttribute("role", "alert");
+      },
+      { signal: events.signal },
+    );
+    dialog.append(closeButton, card);
+    root.body.append(dialog);
+    dialog.showModal();
+    closeButton.focus();
   }
 
   return {
     destroy(): void {
-      close();
-      popup.removeEventListener("sefaria-popup-close", close);
-      popup.removeEventListener("sefaria-popup-error", showError);
+      if (destroyed) return;
+      destroyed = true;
+      active?.close();
       for (const [anchor, listener] of listeners) {
         anchor.removeEventListener("click", listener);
-        anchor.removeAttribute("aria-controls");
+        if (anchor.getAttribute("aria-controls") === DIALOG_ID) {
+          const original = originalControls.get(anchor);
+          if (original === null || original === undefined)
+            anchor.removeAttribute("aria-controls");
+          else anchor.setAttribute("aria-controls", original);
+        }
       }
-      popup.remove();
       if (existingStatus === null) {
         status.remove();
       } else {

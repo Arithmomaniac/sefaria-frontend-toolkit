@@ -4,7 +4,7 @@
 
 ## Objective
 
-Choose one of the seven current elements and render either supplied raw data or a standalone reference.
+Choose one of the six current elements and render either supplied raw data or a standalone reference.
 
 ## Prerequisites
 
@@ -31,7 +31,7 @@ card.addEventListener("sefaria-source-select", (event) => {
 });
 ```
 
-The root import registers all seven elements. The element owns standalone acquisition and private preparation. Do not assign a client, URL, `fetch`, or prepared rendering object.
+The root import registers all six elements. The element owns standalone acquisition and private preparation. Do not assign a client, URL, `fetch`, or prepared rendering object.
 
 Use attributes for scalar inputs such as `sref`, `layout`, and `vocalization-mode`. Properties carry rich objects and arrays, so assign raw `data`, tagged `acquisition`, selected positions, and anchors through JavaScript properties instead.
 

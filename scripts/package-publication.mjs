@@ -60,7 +60,6 @@ const NODE_SAFE_IMPORTS = [
   "@arithmomaniac/sefaria-web-components/acquisition",
   "@arithmomaniac/sefaria-web-components/bilingual-segment",
   "@arithmomaniac/sefaria-web-components/connections-panel",
-  "@arithmomaniac/sefaria-web-components/popup",
   "@arithmomaniac/sefaria-web-components/reader",
   "@arithmomaniac/sefaria-web-components/reader-session",
   "@arithmomaniac/sefaria-web-components/ref-label",

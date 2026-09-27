@@ -16,7 +16,7 @@ The arrows show ways to combine layers, not mandatory steps. A server can stop a
 | Validated Sefaria responses for a server, script, browser app, test, or MCP host | `@arithmomaniac/sefaria-client` |
 | Safe text HTML, bounded previews, footnotes, or vocalization changes over data you already have | `@arithmomaniac/sefaria-text-transform` |
 | Corrected data for your own UI | The client contracts plus text transforms |
-| One citation, segment, passage card, popup, or connections view | A focused Web Component |
+| One citation, segment, passage card, or connections view | A focused Web Component |
 | Reading, connections, commentary navigation, and semantic history | The standalone Reader |
 
 Headless means that no browser element is registered.
@@ -62,7 +62,7 @@ The element path accepts corrected component-specific raw data and privately pre
 
 ## Add a focused component
 
-Use the [component catalog](components.md) when the product needs one reference label, text segment, bilingual segment, Source Card, Popup, or Connections Panel.
+Use the [component catalog](components.md) when the product needs one reference label, text segment, bilingual segment, Source Card or Connections Panel.
 
 1. Assign validated component-specific raw `data` for zero-request rendering, or assign `sref` for standalone loading.
 2. Optionally assign a tagged client, host capability, or disabled acquisition choice.

@@ -34,7 +34,6 @@ describe("generated public metadata", () => {
     expect(elements.map((element) => element.tagName).sort()).toEqual([
       "sefaria-bilingual-segment",
       "sefaria-connections-panel",
-      "sefaria-popup",
       "sefaria-reader",
       "sefaria-ref-label",
       "sefaria-source-card",
@@ -80,7 +79,7 @@ describe("generated public metadata", () => {
     }
   });
 
-  it("publishes declaration-derived inventory for all 18 supported subpaths", async () => {
+  it("publishes declaration-derived inventory for   all 17 supported subpaths", async () => {
     const inventory = JSON.parse(
       await readFile(
         path.join(repository, "packages/public-exports.json"),
@@ -95,7 +94,7 @@ describe("generated public metadata", () => {
         (count, packageEntry) => count + packageEntry.exports.length,
         0,
       ),
-    ).toBe(18);
+    ).toBe(17);
     for (const packageEntry of inventory.packages) {
       for (const exportEntry of packageEntry.exports) {
         expect(exportEntry.declarations.length).toBeGreaterThan(0);

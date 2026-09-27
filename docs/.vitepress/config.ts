@@ -178,7 +178,6 @@ export default defineConfig({
               link: "/components/bilingual-segment.md",
             },
             { text: "Source card", link: "/components/source-card.md" },
-            { text: "Popup", link: "/components/popup.md" },
             {
               text: "Connections panel",
               link: "/components/connections-panel.md",

@@ -10,7 +10,7 @@ This design defines a generated API foundation with corrections and declarative 
 
 ## Scope
 
-**In scope:** the Sefaria OpenAPI supply chain, the thin public client, text processing, private component preparation, declarative standalone elements, the MCP payload boundary, and authored citation-popup integration.
+**In scope:** the Sefaria OpenAPI supply chain, the thin public client, text processing, private component preparation, declarative standalone elements, the MCP payload boundary, and authored citation-preview integration.
 
 **Out of scope:** a generalized domain-model package and offline reference parsing without a concrete consumer. Cache persistence, stale fallback, retries, request coalescing, HTML server rendering, and hydration are also out of scope.
 
@@ -18,7 +18,7 @@ This design defines a generated API foundation with corrections and declarative 
 
 Core is the stable first product boundary. It is not a delivery phase or issue plan.
 
-Core includes the eight API operations, all three text-processing capabilities, the text primitives, the source card with its bounded text collection, the popup, the authored linked-article demonstration, and the MCP source-card App. The generated citation-detection submission and task-status operations remain transport capabilities; the maintained linked-article integration does not run an automatic detector. See [Development](development.md) for current implementation details.
+Core includes the eight API operations, all three text-processing capabilities, the text primitives, the source card with its bounded text collection, the host-dialog linked-article demonstration, and the MCP source-card App. The generated citation-detection submission and task-status operations remain transport capabilities; the maintained linked-article integration does not run an automatic detector. See [Development](development.md) for current implementation details.
 
 The connections panel, standalone contextual reader, DOM-free Reader session, standalone Reader, and regular-website Reader workspace are implemented outside Core. The completed cutover places ordinary request execution and cancellation in the public elements while the session retains bounded semantic history and capture ownership. The website workspace separately demonstrates lower-level spatial pane ownership.
 
@@ -128,7 +128,7 @@ Unknown inputs from MCP or another external boundary receive validation before c
 
 ## Component boundary
 
-Each public component subpath owns its raw input forms, selection/options types, events, diagnostics, and element class. Preparation types and helpers remain private. The root entry registers all seven custom elements. The DOM-free `./acquisition` entry owns tagged source choices and shared-default configuration. The completed cutover retired `./bindings` and `./reader-controller`.
+Each public component subpath owns its raw input forms, selection/options types, events, diagnostics, and element class. Preparation types and helpers remain private. The root entry registers all six custom elements. The DOM-free `./acquisition` entry owns tagged source choices and shared-default configuration. The completed cutover retired `./bindings` and `./reader-controller`.
 
 The `reader-session` subpath remains a supported advanced DOM-free semantic/raw facade. It exposes history, pins, budgets, `entryInfo`, stable source/connections raw records, and raw transitions needed by spatial hosts. It does not expose prepared child rendering or content. The `reader` subpath exposes the shared raw source-qualification boundary used by both the ordinary Reader element and spatial hosts.
 
@@ -202,7 +202,7 @@ MCP `structuredContent` carries a corrected API payload. Namespaced tool-result 
 
 ## Integrations
 
-The linked-article demonstration consumes public contracts and built artifacts. Its article author supplies ordinary Sefaria anchors. The page owns eligible activation, Popup `sref` assignment/clearing, visible host limitations, and cleanup. It does not extract article text, submit citation detection, poll tasks, bulk preload, or rewrite the host DOM.
+The linked-article demonstration consumes public contracts and built artifacts. Its article author supplies ordinary Sefaria anchors. The page owns eligible activation, a native modal dialog containing Source Card, card `sref` assignment/clearing, focus return, visible host limitations, and cleanup. It does not extract article text, submit citation detection, poll tasks, bulk preload, or rewrite the host DOM.
 
 The MCP App validates its namespaced request/status metadata and corrected API-shaped JSON before raw seed admission. The generated find-refs and async-task operations remain available transport operations, not an active automatic-Linker workflow in this repository.
 
@@ -218,4 +218,4 @@ Correct text, direction, sanitization, attribution, and accessible interaction h
 
 The client implementation has selected its generator, Zod validators, and committed artifact paths. [Development](development.md#openapi-workflow) records the current tools and workflow. These choices must continue to satisfy the offline, deterministic, and stale-output contracts.
 
-The text-segment, bilingual-segment, reference-label, source-card, popup, connections-panel, Reader, Reader-session, and acquisition entry names are current. Unrelated future component slices and broader compatibility work remain planned where identified in Development.
+The text-segment, bilingual-segment, reference-label, source-card, connections-panel, Reader, Reader-session, and acquisition entry names are current. Unrelated future component slices and broader compatibility work remain planned where identified in Development.

@@ -76,8 +76,8 @@ const cases = [
   },
   {
     file: "examples/linked-article/src/app.ts",
-    forbidden: ["popup.sref =", "popup.open ="],
-    required: ['popup.setAttribute("sref", tref)'],
+    forbidden: ["card.sref ="],
+    required: ['card.setAttribute("sref", tref)'],
   },
   {
     file: "examples/explorer/src/source-card/app.ts",
@@ -172,11 +172,6 @@ const cases = [
     file: "examples/playground/projects/text-segment/main.js",
     forbidden: ["segment.versionLanguage = ", "segment.versionTitle = "],
     required: ['segment.setAttribute("version-language"'],
-  },
-  {
-    file: "examples/playground/projects/popup/main.js",
-    forbidden: ["popup.open = "],
-    required: ['popup.setAttribute("open", "")'],
   },
 ] as const;
 

@@ -100,8 +100,8 @@ Review the initial and expanded corrections for:
 
 ## Declarative component inputs and acquisition
 
-- [ ] All seven public elements accept `sref` and support standalone loading.
-- [ ] The six non-Reader elements accept component-specific raw `data`.
+- [ ] All six public elements accept `sref` and support standalone loading.
+- [ ] The five non-Reader elements accept component-specific raw `data`.
 - [ ] Defined supplied data makes zero requests, including valid empty data.
 - [ ] Invalid supplied data supersedes pending acquisition, replaces prior content with its validation error, and never falls through to `sref`.
 - [ ] Clearing `data` resumes retained eligible `sref`; clearing both inputs in one synchronous update yields empty state.
@@ -127,7 +127,7 @@ Review the initial and expanded corrections for:
 - [ ] Reconnection resumes only still-eligible interrupted work with a new identity.
 - [ ] Reconnecting completed unchanged content makes zero requests.
 - [ ] Ordinary network failure is not automatically retried.
-- [ ] Popup can prepare while closed, and visibility alone does not start, restart, or cancel acquisition.
+- [ ] The linked-article host owns its native modal dialog, activation, Escape/button close, focus return, and card cleanup; no Popup API remains in new builds.
 
 ## Public and private boundaries
 
@@ -286,13 +286,13 @@ Review the initial and expanded corrections for:
 ## Authored linked-article integration
 
 - [ ] The authored citation retains native navigation with JavaScript disabled.
-- [ ] Eligible primary activation performs one popup factory request with the client cache disabled.
+- [ ] Eligible primary or keyboard activation opens a native modal dialog and performs one Source Card request with the client cache disabled.
 - [ ] Modifier, alternate-target, download, and non-primary activation remains native.
 - [ ] Unknown fixture JSON passes through the public client validation boundary.
-- [ ] Host and popup styles remain isolated.
+- [ ] Source Card styles remain shadow-isolated; dialog styles are scoped to the host-owned dialog.
 - [ ] Close, supersession, and destroy abort owned work and reject late completion.
-- [ ] Destroy removes only owned listeners, popup state, and accessibility attributes.
-- [ ] Each popup activation makes one v3 request; the popup element makes none.
+- [ ] Destroy removes only owned listeners and dialog state and restores prior accessibility attributes.
+- [ ] Each new opening makes one v3 request; the same active reference does not restart acquisition.
 - [ ] CSP, mixed-content, CORS, and restricted-page limitations are documented.
 
 ## Supplied-data editor
@@ -332,11 +332,11 @@ Review the initial and expanded corrections for:
 - [ ] A source card renders each visible resolved edition's attribution once outside its item collection.
 - [ ] `hideAttributions` defaults to false, and enabling it changes rendering without discarding prepared-state attribution.
 - [ ] A source card links the edition title for a validated HTTP(S) `versionSourceUrl` and keeps other source text inert.
-- [ ] The Linker popup displays source-card attribution.
+- [ ] The linked-article dialog displays Source Card attribution.
 - [ ] Interactive controls use native elements and accessible names.
 - [ ] Focus is visible.
-- [ ] Modal popups cycle Tab and Shift+Tab.
-- [ ] Escape closes a popup and focus returns to the trigger.
+- [ ] The host modal dialog cycles Tab and Shift+Tab.
+- [ ] Escape closes the host dialog and focus returns to the originating link.
 - [ ] Events cross the shadow boundary when hosts must handle them.
 
 ## Documentation

@@ -93,8 +93,20 @@ export const PRE_RETIREMENT_SHOWCASE_INVENTORY = Object.freeze([
 
 const RETIRED = new Map([
   [
+    "packages/components/src/popup-export.test.ts",
+    "The alpha Popup API and subpath were removed; root-import and tarball tests assert their absence.",
+  ],
+  [
+    "packages/components/src/popup.browser.test.ts",
+    "Popup was removed; host dialog keyboard, focus, and cleanup behavior is covered by linked-article browser and production-site tests.",
+  ],
+  [
+    "packages/components/src/popup.test.ts",
+    "Popup-only preparation and its 20-position limit were intentionally removed; previews use ordinary Source Card rendering.",
+  ],
+  [
     "demos/linker/src/detection.test.ts",
-    "Automatic prose detection was superseded by authored anchors; native navigation and popup ownership are retained in the linked-article integration.",
+    "Automatic prose detection was superseded by authored anchors;     native navigation and host-dialog ownership are retained in the linked-article integration.",
   ],
   [
     "demos/mcp/scripts/vscode-video-recorder.test.ts",

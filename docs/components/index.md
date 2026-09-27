@@ -2,7 +2,7 @@
 
 # Component usage
 
-The [component catalog](../components.md) compares all seven rendering surfaces and keeps the shared supplied-data editor. Use it first when you are choosing a surface by outcome.
+The [component catalog](../components.md) compares all six rendering surfaces and keeps the shared supplied-data editor. Use it first when you are choosing a surface by outcome.
 
 Choose a focused usage page when you already know the surface:
 
@@ -10,7 +10,6 @@ Choose a focused usage page when you already know the surface:
 - [Text segment](text-segment.md)
 - [Bilingual segment](bilingual-segment.md)
 - [Source card](source-card.md)
-- [Popup](popup.md)
 - [Connections panel](connections-panel.md)
 - [Reader](reader.md)
 

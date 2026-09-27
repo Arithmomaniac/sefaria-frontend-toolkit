@@ -32,7 +32,7 @@ hero:
 
 Sefaria is a free digital library and data source for Jewish texts and translations. A direct API response is only the start of a product: an application still has to validate unknown JSON, prepare markup and footnotes, choose how to display Hebrew vocalization, project nested text into useful rendering data, and own any live request or navigation state.
 
-The toolkit separates those jobs so that a third party can adopt only the part it needs. `@arithmomaniac/sefaria-client` validates the supported transport responses. `@arithmomaniac/sefaria-text-transform` provides pure sanitization, vocalization, preview, and footnote operations. The Web Components package adds seven declarative elements, tagged acquisition, raw Reader seeds, and semantic Reader-session records while keeping prepared rendering private.
+The toolkit separates those jobs so that a third party can adopt only the part it needs. `@arithmomaniac/sefaria-client` validates the supported transport responses. `@arithmomaniac/sefaria-text-transform` provides pure sanitization, vocalization, preview, and footnote operations. The Web Components package adds six declarative elements, tagged acquisition, raw Reader seeds, and semantic Reader-session records while keeping prepared rendering private.
 
 You can stop at any layer. A server, test, search index, AI integration, or custom renderer can use the client or text transforms without registering a custom element. A product that wants ready-made presentation can add one focused surface or the complete Reader.
 
@@ -51,7 +51,7 @@ You can stop at any layer. A server, test, search index, AI integration, or cust
   </article>
   <article class="path-card">
     <h3>Add a focused reading surface</h3>
-    <p>Use a reference label, text segment, bilingual segment, source card, popup, or connections panel when the surrounding product and navigation already belong to your application.</p>
+    <p>Use a reference label, text segment, bilingual segment,     source card or connections panel when the surrounding product and navigation already belong to your application.</p>
     <p><SiteLink to="/components.html">Choose a focused component →</SiteLink></p>
   </article>
   <article class="path-card">
@@ -63,10 +63,10 @@ You can stop at any layer. A server, test, search index, AI integration, or cust
 
 ## Evaluate without cloning
 
-The landing preview, seven-project editor, authored component states, and live examples show the current product paths in the browser. Opening the landing page and supplied-data previews makes no Sefaria request. Pages with **Start live demo** contact Sefaria only after that explicit action.
+The landing preview, six-project editor, authored component states, and live examples show the current product paths in the browser. Opening the landing page and supplied-data previews makes no Sefaria request. Pages with **Start live demo** contact Sefaria only after that explicit action.
 
 - Edit HTML, CSS, and JavaScript in the [supplied-data editor](examples/playground/index.html).
-- Compare the [seven components](components.md).
+- Compare the [six components](components.md).
 - Open the [standalone Reader](examples/reader/controlled.html?tref=Micah%206%3A8).
 
 **Develop the toolkit itself:** clone the repository and follow the repository-only [Development guide](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md).

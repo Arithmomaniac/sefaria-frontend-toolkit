@@ -30,8 +30,6 @@ export type {
 } from "./bilingual-segment.js";
 export { SefariaRefLabel, type RefLabelLanguage } from "./ref-label-element.js";
 export type { RefLabelRequest } from "./ref-label.js";
-export { SefariaPopup } from "./popup-element.js";
-export type { PopupRequest } from "./popup.js";
 export { SefariaReader } from "./reader-element.js";
 export type {
   ReaderPane,

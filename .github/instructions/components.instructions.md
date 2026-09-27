@@ -9,7 +9,7 @@ applyTo: "packages/web-components/**,examples/explorer/src/authored/**,examples/
 
 - Give every public element component-specific `sref` and raw `data` inputs; do not expose a public prepared rendering model.
 - Keep raw input, acquisition options, events, and diagnostics specific to one component surface. Do not create a generalized domain or data facade.
-- For the six non-Reader elements, defined `data` is authoritative, including valid empty data and invalid data. Invalid supplied data must supersede pending acquisition, replace prior content with the validation error, and never fall through to `sref`.
+- For the five non-Reader elements, defined `data` is authoritative, including valid empty data and invalid data. Invalid supplied data must supersede pending acquisition, replace prior content with the validation error, and never fall through to `sref`.
 - Keep deterministic validation, selection, normalization, and preparation independent of clients, caches, DOM state, and global state.
 - Use corrected generated contracts directly for complete endpoint payloads. Define narrow validators only for the component-specific selected fragments or response-shaped slices the public contract actually accepts.
 - Preserve network and abort rejections internally as original causes. Current element-owned failures must become accessible state and documented events without unhandled promise rejections; stale completions publish nothing.
@@ -18,7 +18,6 @@ applyTo: "packages/web-components/**,examples/explorer/src/authored/**,examples/
 - Use one lazy shared acquisition value per loaded module instance. Supplied data, import, and explicit per-element acquisition do not realize it. Configuration after first shared use always fails.
 - An explicit disabled, failed, or unsupported acquisition choice never falls through to browser HTTP.
 - Abort eligible active work on disconnection and resume only still-eligible interrupted work on reconnection. Do not automatically retry ordinary network failures.
-- Keep Popup preparation independent of `open`; visibility alone must not start, restart, or cancel acquisition.
 - Make composites prepare children from captured parent data through private pure helpers or private prepared receivers. Never substitute child `sref` when the parent already owns the data.
 - Prove that ten child renderings use one outer request and zero child requests.
 - Sanitize unsafe HTML before private prepared content reaches rendering.

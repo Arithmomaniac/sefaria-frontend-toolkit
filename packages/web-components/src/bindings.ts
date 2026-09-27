@@ -8,8 +8,6 @@ import type {
   ConnectionsController,
   ConnectionsControllerSnapshot,
 } from "./connections-panel.js";
-import type { SefariaPopup } from "./popup-element.js";
-import type { PopupController, PopupControllerSnapshot } from "./popup.js";
 import type { ReaderPane } from "./reader.js";
 import type {
   ReaderController,
@@ -65,37 +63,6 @@ export function bindSourceCardController(
   controller: SourceCardController,
 ): () => void {
   return bindViewModel(element, controller, sourceCardViewModel);
-}
-
-/** Binds one popup controller to one request-free element. */
-export function bindPopupController(
-  element: SefariaPopup,
-  controller: PopupController,
-): () => void {
-  const binding = reserveBinding(element);
-  const onClose = (event: Event): void => {
-    const origin = controller.snapshot.attempt;
-    queueMicrotask(() => {
-      if (
-        !isActive(element, binding) ||
-        event.defaultPrevented ||
-        controller.snapshot.attempt !== origin
-      ) {
-        return;
-      }
-      controller.cancel();
-    });
-  };
-  const listeners = [["sefaria-popup-close", onClose]] as const;
-  return activateBinding(
-    element,
-    binding,
-    () =>
-      controller.subscribe((snapshot) => {
-        setPreparedState(element, popupViewModel(snapshot));
-      }),
-    listeners,
-  );
 }
 
 /** Binds one connections controller and its local data intents to one panel. */
@@ -320,12 +287,6 @@ function refLabelViewModel(snapshot: RefLabelControllerSnapshot) {
 }
 
 function sourceCardViewModel(snapshot: SourceCardControllerSnapshot) {
-  return snapshot.attempt.state === "loading"
-    ? snapshot.attempt.viewModel
-    : snapshot.result?.viewModel;
-}
-
-function popupViewModel(snapshot: PopupControllerSnapshot) {
   return snapshot.attempt.state === "loading"
     ? snapshot.attempt.viewModel
     : snapshot.result?.viewModel;

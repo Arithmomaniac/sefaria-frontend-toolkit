@@ -67,14 +67,14 @@ These choices preserve data ownership and work when the primary side is left-to-
 
 ## The authored linked article avoids dated deployed-Linker limitations
 
-The current local popup and authored linked-article example implement:
+The authored linked-article example uses Source Card in a host-owned modal dialog:
 
-- shadow-root isolation so popup rules and fonts do not leak into the host page;
+- Source Card's shadow root isolates its text styles; the host styles only its own dialog controls;
 - host-overridable theme tokens with light and dark defaults;
 - an accessible close control, Escape handling, focus restoration, and a real Tab and Shift+Tab focus cycle; and
-- cancellation and stale-result suppression for popup requests without scanning or rewriting article text.
+- cancellation and stale-result suppression for Source Card requests without scanning or rewriting article text.
 
-The recorded August 2026 observations explain the intentional difference: the inspected deployed Linker leaked popup styles, used a fixed light theme, and suppressed Tab without moving focus. Those are dated upstream observations, not claims about every current Linker deployment or the local implementation. The maintained example now requires authored anchors and preserves native navigation rather than distributing automatic detection. See [Authored linked article](../linked-article.md), [Integration specification](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/integrations.md#popup-behavior), [Linker style isolation](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/evidence.md#linker-style-isolation), [Linker theme behavior](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/evidence.md#linker-theme-behavior), and [Linker keyboard behavior](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/evidence.md#linker-keyboard-behavior).
+The recorded August 2026 observations explain the intentional difference: the inspected deployed Linker leaked popup styles, used a fixed light theme, and suppressed Tab without moving focus. Those are dated upstream observations, not claims about every current Linker deployment or the local implementation. The maintained example now requires authored anchors and preserves native navigation rather than distributing automatic detection. See [Authored linked article](../linked-article.md), [Integration specification](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/integrations.md#authored-linked-article), [Linker style isolation](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/evidence.md#linker-style-isolation), [Linker theme behavior](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/evidence.md#linker-theme-behavior), and [Linker keyboard behavior](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/evidence.md#linker-keyboard-behavior).
 
 ## Upstream behavior we preserve rather than fix
 

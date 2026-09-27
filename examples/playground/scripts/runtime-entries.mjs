@@ -7,7 +7,6 @@ export const PUBLIC_ENTRIES = {
     "bilingual-segment",
   "@arithmomaniac/sefaria-web-components/connections-panel":
     "connections-panel",
-  "@arithmomaniac/sefaria-web-components/popup": "popup",
   "@arithmomaniac/sefaria-web-components/reader": "reader",
   "@arithmomaniac/sefaria-web-components/reader-session": "reader-session",
   "@arithmomaniac/sefaria-web-components/ref-label": "ref-label",

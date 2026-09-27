@@ -13,7 +13,6 @@ import linksFixture from "../../client/test/fixtures/links-targum-2026-08-30.jso
 import textFixture from "../../client/test/fixtures/v3-connections-genesis-target-2026-09-06.json";
 import {
   bindConnectionsController,
-  bindPopupController,
   bindSourceCardController,
 } from "./bindings.js";
 import {
@@ -22,9 +21,6 @@ import {
 } from "./connections-panel.js";
 import "./connections-panel-element.js";
 import type { SefariaConnectionsPanel } from "./connections-panel-element.js";
-import { createPopupController } from "./popup.js";
-import "./popup-element.js";
-import type { SefariaPopup } from "./popup-element.js";
 import { createSourceCardController } from "./source-card.js";
 import "./source-card-element.js";
 import type { SefariaSourceCard } from "./source-card-element.js";
@@ -118,20 +114,17 @@ test("failed binding setup releases the element for another controller", () => {
 });
 
 test("listener setup failure rolls back a binding reservation", () => {
-  render(html`<sefaria-popup></sefaria-popup>`);
-  const element = document.querySelector<SefariaPopup>("sefaria-popup");
-  if (!element) throw new Error("Popup was not rendered.");
-  const controller = createPopupController();
+  const { element, controller } = connections();
   const failure = new Error("Listener setup failed");
   const add = vi.spyOn(element, "addEventListener");
   add.mockImplementationOnce(() => {
     throw failure;
   });
 
-  expect(() => bindPopupController(element, controller)).toThrow(failure);
+  expect(() => bindConnectionsController(element, controller)).toThrow(failure);
 
   add.mockRestore();
-  const unbind = bindPopupController(element, controller);
+  const unbind = bindConnectionsController(element, controller);
   unbind();
 });
 
@@ -228,59 +221,6 @@ test("applies one current connections default action", async () => {
   unbind();
 });
 
-test("cancels popup work only when the close default remains current", async () => {
-  render(html`<sefaria-popup></sefaria-popup>`);
-  const element = document.querySelector<SefariaPopup>("sefaria-popup");
-  if (!element) throw new Error("Popup was not rendered.");
-  const controller = createPopupController();
-  const unbind = bindPopupController(element, controller);
-  const cancel = vi.spyOn(controller, "cancel");
-  const prevent = (event: Event) => event.preventDefault();
-
-  element.addEventListener("sefaria-popup-close", prevent);
-  element.dispatchEvent(
-    new CustomEvent("sefaria-popup-close", { cancelable: true }),
-  );
-  await Promise.resolve();
-  expect(cancel).not.toHaveBeenCalled();
-
-  element.removeEventListener("sefaria-popup-close", prevent);
-  element.dispatchEvent(
-    new CustomEvent("sefaria-popup-close", { cancelable: true }),
-  );
-  await Promise.resolve();
-  expect(cancel).toHaveBeenCalledOnce();
-
-  unbind();
-});
-
-test("does not let an old popup close cancel replacement work", async () => {
-  const response = deferred<Response>();
-  render(html`<sefaria-popup></sefaria-popup>`);
-  const element = document.querySelector<SefariaPopup>("sefaria-popup");
-  if (!element) throw new Error("Popup was not rendered.");
-  const controller = createPopupController(
-    createSefariaClient({
-      cache: false,
-      fetch: async () => await response.promise,
-    }),
-  );
-  const unbind = bindPopupController(element, controller);
-  const cancel = vi.spyOn(controller, "cancel");
-
-  element.dispatchEvent(
-    new CustomEvent("sefaria-popup-close", { cancelable: true }),
-  );
-  const pending = controller.load({ tref: "Micah 6:8" });
-  await Promise.resolve();
-
-  expect(cancel).not.toHaveBeenCalled();
-  const reason = new Error("Test cleanup");
-  controller.cancel(reason);
-  await expect(pending).rejects.toBe(reason);
-  unbind();
-});
-
 function connections(): {
   readonly element: SefariaConnectionsPanel;
   readonly controller: ConnectionsController;
@@ -293,15 +233,4 @@ function connections(): {
   const controller = createConnectionsController();
   controller.setSuppliedData({ tref: "Genesis 1:1" }, linksPayload);
   return { element, controller };
-}
-
-function deferred<T>(): {
-  readonly promise: Promise<T>;
-  resolve(value: T): void;
-} {
-  let resolve!: (value: T) => void;
-  const promise = new Promise<T>((complete) => {
-    resolve = complete;
-  });
-  return { promise, resolve };
 }

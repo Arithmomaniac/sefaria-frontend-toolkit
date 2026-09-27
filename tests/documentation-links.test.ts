@@ -26,7 +26,6 @@ const journey = [
   "docs/components/text-segment.md",
   "docs/components/bilingual-segment.md",
   "docs/components/source-card.md",
-  "docs/components/popup.md",
   "docs/components/connections-panel.md",
   "docs/components/reader.md",
   "docs/guides/troubleshooting.md",

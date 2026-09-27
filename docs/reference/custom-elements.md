@@ -71,37 +71,6 @@ None.
 
 None.
 
-## `<sefaria-popup>`
-
-Anchored dialog that renders supplied or acquired popup data.
-
-### Properties and attributes
-
-| Property | Attribute | Type | Default | Description |
-| --- | --- | --- | --- | --- |
-| `sref` | `sref` | `string` | `""` | Reference prepared while the connected popup is open or closed. |
-| `data` | Property only | `unknown | undefined` | `undefined` | Authoritative corrected v3 text response data. |
-| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
-| `anchor` | Property only | `HTMLElement | null` | `null` | Host element used for placement and focus restoration. |
-| `open` | `open` | `boolean` | `false` | Whether the dialog is visible. |
-| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | Hebrew vocalization preset applied to the nested source card. |
-| `status` | Property only | `SefariaElementStatus` | - | Coarse lifecycle state without exposing prepared rendering data. |
-
-### Events
-
-| Event | Description |
-| --- | --- |
-| `sefaria-popup-close` | Reports that the popup should close. |
-| `sefaria-popup-error` | Reports a current standalone loading or validation failure. |
-
-### Slots
-
-None.
-
-### CSS parts
-
-None.
-
 ## `<sefaria-reader>`
 
 Controlled or declarative reader surface for one semantic reader entry.
@@ -270,7 +239,7 @@ None.
 | `--sefaria-accent-soft` | `light-dark(rgb(142 36 73 / 10%), rgb(255 147 180 / 14%))` | Translucent accent surface. |
 | `--sefaria-danger` | `light-dark(#9c1c1c, #ffaaa4)` | Error foreground color. |
 | `--sefaria-link` | `light-dark(#8e2449, #ff93b4)` | Link foreground color. |
-| `--sefaria-shadow` | `0 1rem 3rem rgb(0 0 0 / 28%)` | Popup and elevated-surface shadow. |
+| `--sefaria-shadow` | `0 1rem 3rem rgb(0 0 0 / 28%)` | Elevated-surface shadow. |
 | `--sefaria-panel-radius` | `0.75rem` | Panel corner radius. |
 | `--sefaria-control-radius` | `0.3rem` | Control corner radius. |
 | `--sefaria-font-scale` | `1` | Component font-size multiplier. |

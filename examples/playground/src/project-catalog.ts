@@ -10,7 +10,6 @@ export const PROJECT_IDS = [
   "text-segment",
   "bilingual-segment",
   "source-card",
-  "popup",
   "connections-panel",
   "reader",
 ] as const;

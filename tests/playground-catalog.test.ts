@@ -15,7 +15,6 @@ const expectedIds = [
   "text-segment",
   "bilingual-segment",
   "source-card",
-  "popup",
   "connections-panel",
   "reader",
 ] as const;
@@ -26,7 +25,6 @@ const expectedEntries = [
   "@arithmomaniac/sefaria-web-components/acquisition",
   "@arithmomaniac/sefaria-web-components/bilingual-segment",
   "@arithmomaniac/sefaria-web-components/connections-panel",
-  "@arithmomaniac/sefaria-web-components/popup",
   "@arithmomaniac/sefaria-web-components/reader",
   "@arithmomaniac/sefaria-web-components/reader-session",
   "@arithmomaniac/sefaria-web-components/ref-label",
@@ -35,7 +33,7 @@ const expectedEntries = [
 ] as const;
 
 describe("playground project catalog", () => {
-  it("loads exactly the seven maintained projects from real manifests and files", () => {
+  it("loads exactly the six maintained projects from real manifests and files", () => {
     const manifests = Object.fromEntries(
       expectedIds.map((id) => [
         `../projects/${id}/project.json`,
@@ -116,8 +114,8 @@ describe("playground project catalog", () => {
       project: { manifest: { id: "source-card" } },
     });
     expect(selectProject(catalog, "?project=popup")).toMatchObject({
-      state: "selected",
-      project: { manifest: { id: "popup" } },
+      state: "invalid",
+      requestedId: "popup",
     });
     expect(selectProject(catalog, "?project=unknown")).toEqual({
       state: "invalid",

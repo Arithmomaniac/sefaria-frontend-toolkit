@@ -19,7 +19,6 @@ const playgroundProjects = [
   "text-segment",
   "bilingual-segment",
   "source-card",
-  "popup",
   "connections-panel",
   "reader",
 ] as const;
@@ -186,7 +185,7 @@ describe("documentation learning journey", () => {
     expect(lessonTwo).not.toContain("parallel [React path]");
   });
 
-  it("catalogs all seven current rendering surfaces without inventing APIs", async () => {
+  it("catalogs all six current rendering surfaces without inventing APIs", async () => {
     const catalog = await readFile(
       path.join(root, "docs", "components.md"),
       "utf8",
@@ -213,7 +212,6 @@ describe("documentation learning journey", () => {
       ["<sefaria-bilingual-segment>", "bilingual-segment"],
       ["<sefaria-source-card>", "source-card"],
       ["<sefaria-connections-panel>", "connections-panel"],
-      ["<sefaria-popup>", "popup"],
       ["<sefaria-reader>", "reader"],
     ]) {
       expect(catalog).toContain(element);
@@ -294,14 +292,14 @@ describe("documentation learning journey", () => {
     expect(editor.match(/rel="noreferrer"/g)).toHaveLength(3);
   });
 
-  it("describes all seven implemented components as current", async () => {
+  it("describes all six implemented components as current", async () => {
     const dataFlow = await readFile(
       path.join(root, "docs", "guides", "data-flow.md"),
       "utf8",
     );
 
     expect(dataFlow).toContain(
-      "all seven public elements support standalone `sref`",
+      "all six public elements support standalone `sref`",
     );
   });
 
@@ -361,7 +359,7 @@ describe("documentation learning journey", () => {
       expect(getStarted).toContain(definition);
     }
     expect(components).toContain(
-      "The toolkit provides seven declarative UI components.",
+      "The toolkit provides six declarative UI components.",
     );
     expect(components).not.toContain("host-admitted Reader view model");
     expect(examples).toContain("The component editor runs edited code");
@@ -723,7 +721,7 @@ describe("documentation learning journey", () => {
       expect(lessonsByName["05-customization.md"]).toContain(part);
     }
     expect(dataFlow).toContain(
-      "all seven public elements support standalone `sref`",
+      "all six public elements support standalone `sref`",
     );
     expect(readerNavigation).toContain(
       "supported advanced semantic/raw facade",

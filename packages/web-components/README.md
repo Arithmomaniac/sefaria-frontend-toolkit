@@ -2,7 +2,7 @@
 
 # `@arithmomaniac/sefaria-web-components`
 
-The package provides seven declarative Lit elements. Every element accepts standalone `sref`. The six ordinary elements also accept authoritative component-specific raw `data`; Reader accepts transactional raw source/connections seeds. Prepared rendering is private.
+The package provides six declarative Lit elements. Every element accepts standalone `sref`. The five ordinary elements also accept authoritative component-specific raw `data`; Reader accepts transactional raw source/connections seeds. Prepared rendering is private.
 
 ## Supplied data
 
@@ -54,7 +54,6 @@ Reader owns source and links acquisition, cancellation, semantic history, Back, 
 ## Lifecycle and composition
 
 - Disconnection aborts or invalidates eligible work; reconnect resumes only the still-eligible interrupted phase.
-- Popup preparation is independent of `open`.
 - Composite parents prepare children from captured data. Ten children remain one parent request and zero child requests.
 - Current failures become accessible state and component-specific error events. Stale completions publish nothing.
 - The toolkit client remains the only response-cache owner.
