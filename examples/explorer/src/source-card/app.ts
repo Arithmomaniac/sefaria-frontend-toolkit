@@ -24,6 +24,10 @@ export function startSourceCardLiveDemo(
   const form = requireElement<HTMLFormElement>(root, "#source-card-form");
   const trefInput = requireNamedInput(form, "tref");
   const primaryTitleInput = requireNamedInput(form, "primaryVersionTitle");
+  const translationLanguageInput = requireNamedInput(
+    form,
+    "translationLanguage",
+  );
   const translationTitleInput = requireNamedInput(
     form,
     "translationVersionTitle",
@@ -66,6 +70,7 @@ export function startSourceCardLiveDemo(
       trefInput.value,
       primaryTitleInput.value,
       translationTitleInput.value,
+      translationLanguageInput.value,
     );
     const loadId = ++activeLoad;
     const hadCommittedContent = result.status === "ready";
@@ -91,6 +96,11 @@ export function startSourceCardLiveDemo(
       "translation-version-title",
       request.translation?.versionTitle,
     );
+    setOptionalElementAttribute(
+      result,
+      "translation-language",
+      request.translationLanguage,
+    );
     result.setAttribute("sref", request.tref);
 
     await waitForTerminalStatus(result, loadId, () => activeLoad);
@@ -103,7 +113,7 @@ export function startSourceCardLiveDemo(
           .length ?? 0;
       requestState.textContent =
         result.status === "ready"
-          ? `${request.tref} produced ${itemCount} items from one request.`
+          ? `${request.tref} produced ${itemCount} items. See the edition attribution for the selected language.`
           : `${request.tref} produced ${result.status}.`;
     } else if (acquisitionError !== undefined) {
       requestState.dataset.state = "error";
@@ -147,6 +157,7 @@ export function startSourceCardLiveDemo(
       primaryTitleInput.value = preset.dataset.primaryVersionTitle ?? "";
       translationTitleInput.value =
         preset.dataset.translationVersionTitle ?? "";
+      translationLanguageInput.value = preset.dataset.translationLanguage ?? "";
       form.requestSubmit();
     });
   }
@@ -170,11 +181,15 @@ function createRequest(
   tref: string,
   primaryVersionTitle: string,
   translationVersionTitle: string,
+  translationLanguage: string,
 ): SourceCardRequest {
   const primary = primaryVersionTitle.trim();
   const translation = translationVersionTitle.trim();
   return {
     tref: tref.trim(),
+    ...(translationLanguage.trim()
+      ? { translationLanguage: translationLanguage.trim() }
+      : {}),
     ...(primary.length === 0 ? {} : { primary: { versionTitle: primary } }),
     ...(translation.length === 0
       ? {}

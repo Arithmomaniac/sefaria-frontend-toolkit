@@ -78,6 +78,12 @@ The integration does not detect citations, extract article text, submit a Linker
 
 ## Composition and request counts
 
+### Preferred translations
+
+Examples document `translation-language` separately from presentation-only `content-language` and strict exact-edition titles. The live Source Card explorer demonstrates French Micah 6:8 and unavailable-French Berakhot 2a:1 behind explicit activation. A successful preferred request uses one text operation; unavailable-language fallback uses two, with actual-edition attribution and no child requests.
+
+The MCP demonstration's existing default-only text adapter remains an explicit host limitation for non-default selectors. Unsupported selection must fail visibly without direct browser HTTP or substituted default success. Extending that demonstration's tool contract is separate from the component capability's support for serialized v3 selectors.
+
 If an integration already owns corrected data, it supplies raw data or a Reader seed. A parent element or session privately prepares child content from that capture. It must not assign child `sref`.
 
 Ten child renderings from one parent response require one outer request and zero child requests.

@@ -199,6 +199,7 @@ function renderSide(
     ${renderSideAdornment?.(side) ?? nothing}
     <sefaria-text-segment
       ${prepared(view)}
+      hide-attributions
       data-side=${side}
       .vocalizationMode=${presentation.vocalizationMode}
     ></sefaria-text-segment>

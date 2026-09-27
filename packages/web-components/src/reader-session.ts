@@ -21,6 +21,7 @@ import {
   type SourceCardViewModel,
 } from "./source-card.js";
 import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
+import { serializeSourceCardSelectors } from "./source-card-request.js";
 
 const DEFAULT_MAX_ENTRIES = 20;
 const DEFAULT_MAX_CAPTURE_BYTES = 20 * 1024 * 1024;
@@ -1178,6 +1179,7 @@ class ReaderSessionImpl implements ReaderSession {
     if (!current) throw new Error("Reader session has no current entry.");
     const source = current.source;
     if (
+      source?.request.translationLanguage !== request.translationLanguage ||
       source?.request.primary?.versionTitle !== request.primary?.versionTitle ||
       source?.request.translation?.versionTitle !==
         request.translation?.versionTitle
@@ -1509,6 +1511,7 @@ function validateSourceRequest(request: SourceCardRequest): void {
       throw new TypeError("Source version title must not be blank.");
     }
   }
+  serializeSourceCardSelectors(request);
 }
 
 function validateConnectionsInput(

@@ -1,5 +1,4 @@
 import {
-  text,
   type CoreV3TextsResponse,
   type CoreV3Version,
   type GetV3TextsData,
@@ -15,6 +14,11 @@ import type {
   BilingualPairPresentSide,
   BilingualPairSide,
 } from "./bilingual-pair.js";
+import {
+  acquireSelectedText,
+  normalizeTranslationLanguage,
+  preferredTranslation,
+} from "./translation-selection.js";
 import {
   ComponentControllerEngine,
   validateSuppliedComponentData,
@@ -39,6 +43,8 @@ export interface BilingualSegmentRequest {
   readonly primary?: BilingualSegmentEditionSelection;
   /** Exact edition for the translation side, when one is required. */
   readonly translation?: BilingualSegmentEditionSelection;
+  /** Preferred translation family; unavailable families fall back to Sefaria's default. */
+  readonly translationLanguage?: string;
 }
 
 /** Host-supplied state displayed while a bilingual request is pending. */
@@ -203,7 +209,7 @@ export function createBilingualSegmentViewModel(
 ): BilingualSegmentViewModel {
   serializeSelectors(request);
 
-  const resolved = resolveBilingualSides(payload.versions, request);
+  const resolved = resolveBilingualSides(payload.versions, request, payload);
   if (resolved.ambiguousSide !== undefined) {
     return {
       state: "error",
@@ -214,6 +220,9 @@ export function createBilingualSegmentViewModel(
 
   const projected: Partial<
     Record<BilingualSegmentSide, TextSegmentDataViewModel>
+  > = {};
+  const selectedEmpty: Partial<
+    Record<BilingualSegmentSide, BilingualSegmentAbsentSide>
   > = {};
 
   for (const side of SIDES) {
@@ -231,7 +240,24 @@ export function createBilingualSegmentViewModel(
       };
     }
     if (result.state === "data") {
-      projected[side] = result;
+      projected[side] =
+        side === "translation" &&
+        request.translationLanguage !== undefined &&
+        version.languageFamilyName.toLowerCase() !==
+          normalizeTranslationLanguage(request.translationLanguage)
+          ? {
+              ...result,
+              unavailableTranslationLanguage: normalizeTranslationLanguage(
+                request.translationLanguage,
+              ),
+            }
+          : result;
+    }
+    if (result.state === "empty" && request.translationLanguage !== undefined) {
+      selectedEmpty[side] = {
+        side,
+        message: `${result.message} (${version.actualLanguage})`,
+      };
     }
   }
 
@@ -254,7 +280,9 @@ export function createBilingualSegmentViewModel(
       ref: payload.ref,
       heRef: payload.heRef,
       present: { side: "primary", view: primary },
-      absent: describeAbsentBilingualSide(payload, request, "translation"),
+      absent:
+        selectedEmpty.translation ??
+        describeAbsentBilingualSide(payload, request, "translation"),
     };
   }
 
@@ -264,7 +292,9 @@ export function createBilingualSegmentViewModel(
       ref: payload.ref,
       heRef: payload.heRef,
       present: { side: "translation", view: translation },
-      absent: describeAbsentBilingualSide(payload, request, "primary"),
+      absent:
+        selectedEmpty.primary ??
+        describeAbsentBilingualSide(payload, request, "primary"),
     };
   }
 
@@ -273,8 +303,10 @@ export function createBilingualSegmentViewModel(
     ref: payload.ref,
     heRef: payload.heRef,
     absent: [
-      describeAbsentBilingualSide(payload, request, "primary"),
-      describeAbsentBilingualSide(payload, request, "translation"),
+      selectedEmpty.primary ??
+        describeAbsentBilingualSide(payload, request, "primary"),
+      selectedEmpty.translation ??
+        describeAbsentBilingualSide(payload, request, "translation"),
     ],
   };
 }
@@ -382,23 +414,13 @@ async function requestBilingualSegmentResponse(
   readonly status: 200 | 400 | 404;
 }> {
   const version = serializeSelectors(request);
-  const result = await text.getV3Texts({
-    client,
-    path: { tref: request.tref },
-    query: { version, return_format: "default" },
-    ...(signal === undefined ? {} : { signal }),
-  });
-
-  if (result.data !== undefined) {
-    return { payload: result.data, status: 200 };
-  }
-
-  const status = result.response?.status;
-  if (result.error !== undefined && (status === 400 || status === 404)) {
-    return { payload: result.error, status };
-  }
-
-  throw new Error("The v3 texts request returned no data or documented error.");
+  return await acquireSelectedText(
+    { kind: "client", client },
+    request.tref,
+    version,
+    request.translationLanguage,
+    signal ?? new AbortController().signal,
+  );
 }
 
 function projectBilingualSegmentResponse(
@@ -434,10 +456,42 @@ function assertBilingualSegmentStatus(
 export function resolveBilingualSides(
   versions: readonly CoreV3Version[],
   request: BilingualSegmentRequest,
+  payload?: CoreV3TextsResponse,
 ): {
   readonly versions: Partial<Record<BilingualSegmentSide, CoreV3Version>>;
   readonly ambiguousSide?: BilingualSegmentSide;
 } {
+  if (request.translationLanguage !== undefined) {
+    if (payload === undefined)
+      throw new TypeError(
+        "Translation preference requires captured availability metadata.",
+      );
+    const selected = preferredTranslation(
+      payload,
+      request.translationLanguage,
+      request.translation?.versionTitle,
+    );
+    const { translationLanguage: _language, ...withoutPreference } = request;
+    if (selected !== undefined || request.translation !== undefined) {
+      const primaryMatches =
+        request.primary === undefined
+          ? versions.filter(
+              (version) => version.isPrimary && version !== selected,
+            )
+          : exactSideMatches(versions, request, "primary");
+      if (primaryMatches.length > 1)
+        return { versions: {}, ambiguousSide: "primary" };
+      return {
+        versions: {
+          ...(primaryMatches[0] === undefined
+            ? {}
+            : { primary: primaryMatches[0] }),
+          ...(selected === undefined ? {} : { translation: selected }),
+        },
+      };
+    }
+    return resolveBilingualSides(versions, withoutPreference);
+  }
   const exactPrimaryMatches = exactSideMatches(versions, request, "primary");
   if (exactPrimaryMatches.length > 1) {
     return { versions: {}, ambiguousSide: "primary" };
@@ -520,7 +574,14 @@ export function describeAbsentBilingualSide(
 ): BilingualSegmentAbsentSide {
   const key = warningKeyForSide(request, side);
   for (const warning of payload.warnings) {
-    const detail = warning[key];
+    const detail =
+      warning[key] ??
+      (side === "translation" &&
+      request.translationLanguage !== undefined &&
+      request.translation === undefined &&
+      warning.translation?.warning_code === 104
+        ? warning.translation
+        : undefined);
     if (detail !== undefined) {
       return { side, message: detail.message };
     }
@@ -540,9 +601,15 @@ function warningKeyForSide(
 ): string {
   const versionTitle = request[side]?.versionTitle;
   if (versionTitle === undefined) {
-    return side;
+    return side === "translation" && request.translationLanguage !== undefined
+      ? normalizeTranslationLanguage(request.translationLanguage)
+      : side;
   }
-  return `${side}|${versionTitle.replaceAll("_", " ")}`;
+  const selector =
+    side === "translation" && request.translationLanguage !== undefined
+      ? normalizeTranslationLanguage(request.translationLanguage)
+      : side;
+  return `${selector}|${versionTitle.replaceAll("_", " ")}`;
 }
 
 const serializeSelectors = serializeBilingualSegmentSelectors;
@@ -551,14 +618,18 @@ function serializeSideSelector(
   request: BilingualSegmentRequest,
   side: BilingualSegmentSide,
 ): string {
+  const selector =
+    side === "translation" && request.translationLanguage !== undefined
+      ? normalizeTranslationLanguage(request.translationLanguage)
+      : side;
   const versionTitle = request[side]?.versionTitle;
   if (versionTitle === undefined) {
-    return side;
+    return selector;
   }
   if (versionTitle.trim().length === 0) {
     throw new TypeError(
       `Bilingual segment ${side} version title must not be blank.`,
     );
   }
-  return `${side}|${versionTitle}`;
+  return `${selector}|${versionTitle}`;
 }

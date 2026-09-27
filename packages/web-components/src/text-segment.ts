@@ -1,5 +1,4 @@
 import {
-  text,
   type CoreLinkObject,
   type CoreV3TextsResponse,
   type CoreV3Version,
@@ -17,14 +16,22 @@ import {
   type ComponentControllerAttempt,
   type ComponentControllerSnapshot,
 } from "./component-controller.js";
+import {
+  acquireSelectedText,
+  normalizeTranslationLanguage,
+  preferredTranslation,
+} from "./translation-selection.js";
 
 /** Selects one language or exact version for a text-segment request. */
-export interface TextSegmentVersionSelection {
+export type TextSegmentVersionSelection = {
   /** Full English language-family name accepted by the v3 texts API. */
-  readonly language: string;
+  readonly language?: string;
   /** Exact Sefaria version title, when a specific edition is required. */
   readonly versionTitle?: string;
-}
+} & (
+  | { readonly language: string; readonly translationLanguage?: never }
+  | { readonly translationLanguage: string; readonly language?: never }
+);
 
 /** Input owned by the non-DOM text-segment factories. */
 export interface TextSegmentRequest {
@@ -102,6 +109,13 @@ export interface TextSegmentDataViewModel {
   readonly bodyHtml: string;
   /** Ordered static footnotes referenced by body placeholders. */
   readonly notes: readonly NormalizedFootnote[];
+  /** Captured edition identity for standalone attribution. */
+  readonly edition?: Pick<
+    TextSegmentVersionMetadata,
+    "versionTitle" | "languageFamilyName" | "actualLanguage"
+  >;
+  /** Unavailable preferred family when this view displays a default translation. */
+  readonly unavailableTranslationLanguage?: string;
 }
 
 /** Read-only metadata for the edition currently displayed by the element. */
@@ -246,6 +260,33 @@ export function createTextSegmentViewModel(
   context: TextSegmentProjectionContext = {},
 ): TextSegmentViewModel {
   serializeVersionSelection(request.version);
+  if (request.version.translationLanguage !== undefined) {
+    const family = normalizeTranslationLanguage(
+      request.version.translationLanguage,
+    );
+    const preferred = preferredTranslation(
+      payload,
+      family,
+      request.version.versionTitle,
+    );
+    const candidates =
+      preferred !== undefined
+        ? [preferred]
+        : request.version.versionTitle !== undefined
+          ? []
+          : payload.versions.filter((version) => !version.isSource);
+    if (candidates.length > 1)
+      throw new TypeError(
+        "/versions: more than one default translation was captured.",
+      );
+    const selected = candidates[0];
+    if (selected === undefined)
+      return createEmptyViewModel(payload, "No translation text is available.");
+    const projected = projectTextSegmentVersion(payload, selected, context);
+    return projected.state === "data" && preferred === undefined
+      ? { ...projected, unavailableTranslationLanguage: family }
+      : projected;
+  }
   const language = request.version.language.trim().toLocaleLowerCase("en-US");
   const matches = payload.versions.filter(
     (version) =>
@@ -332,6 +373,11 @@ export function projectTextSegmentValue(
     direction: version.direction,
     bodyHtml: normalized.bodyHtml,
     notes: normalized.notes,
+    edition: {
+      versionTitle: version.versionTitle,
+      languageFamilyName: version.languageFamilyName,
+      actualLanguage: version.actualLanguage,
+    },
   };
 }
 
@@ -506,26 +552,13 @@ async function requestTextSegmentResponse(
   readonly status: 200 | 400 | 404;
 }> {
   const version = serializeVersionSelection(request.version);
-  const result = await text.getV3Texts({
-    client,
-    path: { tref: request.tref },
-    query: {
-      version: [version],
-      return_format: "default",
-    },
-    ...(signal === undefined ? {} : { signal }),
-  });
-
-  if (result.data !== undefined) {
-    return { payload: result.data, status: 200 };
-  }
-
-  const status = result.response?.status;
-  if (result.error !== undefined && (status === 400 || status === 404)) {
-    return { payload: result.error, status };
-  }
-
-  throw new Error("The v3 texts request returned no data or documented error.");
+  return await acquireSelectedText(
+    { kind: "client", client },
+    request.tref,
+    [version],
+    request.version.translationLanguage,
+    signal ?? new AbortController().signal,
+  );
 }
 
 function projectTextSegmentResponse(
@@ -604,7 +637,18 @@ function createSelectedVersionEmptyViewModel(
 function serializeVersionSelection(
   selection: TextSegmentVersionSelection,
 ): string {
-  const language = selection.language.trim();
+  if (
+    selection.translationLanguage !== undefined &&
+    selection.language !== undefined
+  ) {
+    throw new TypeError(
+      "Strict language and preferred translation cannot be combined.",
+    );
+  }
+  const language =
+    selection.translationLanguage === undefined
+      ? selection.language.trim()
+      : normalizeTranslationLanguage(selection.translationLanguage);
   if (language.length === 0) {
     throw new TypeError("Text segment language must not be blank.");
   }

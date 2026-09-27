@@ -15,6 +15,8 @@ Custom element that renders supplied or acquired bilingual-segment data.
 | `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
 | `primaryVersionTitle` | `primary-version-title` | `string | undefined` | `undefined` | Optional exact edition title for the primary role. |
 | `translationVersionTitle` | `translation-version-title` | `string | undefined` | `undefined` | Optional exact edition title for the translation role. |
+| `translationLanguage` | `translation-language` | `string | undefined` | `undefined` | Preferred translation family, falling back only when unavailable. |
+| `hideAttributions` | `hide-attributions` | `boolean` | `false` | Hides compact standalone edition attribution. |
 | `contentLanguage` | `content-language` | `BilingualSegmentContentLanguage` | `"both"` | Sides the host wants displayed. |
 | `layout` | `layout` | `BilingualSegmentLayout` | `"auto"` | Requested arrangement of the two sides. |
 | `sideOrder` | `side-order` | `BilingualSegmentSideOrder` | `"primary-first"` | Requested role order for a side-by-side arrangement. |
@@ -82,6 +84,10 @@ Controlled or declarative reader surface for one semantic reader entry.
 | `sref` | `sref` | `string` | `""` | Requested external Reader root, separate from current navigation. |
 | `data` | Property only | `ReaderRawSeedData | undefined` | `undefined` | Transactional unknown raw Reader seed. |
 | `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
+| `translationLanguage` | `translation-language` | `string | undefined` | `undefined` | Preferred family used for root and navigated translations. |
+| `primaryVersionTitle` | `primary-version-title` | `string | undefined` | `undefined` | Exact primary edition for the external root and its context. |
+| `translationVersionTitle` | `translation-version-title` | `string | undefined` | `undefined` | Exact translation edition for the external root and its context. |
+| `hideAttributions` | `hide-attributions` | `boolean` | `false` | Hides edition attribution on the source card. |
 | `activePane` | `active-pane` | `ReaderPane` | `"source"` | Host-controlled pane selected in compact presentation. |
 | `chatExport` | `chat-export` | `boolean` | `false` | Shows an explicit host-mediated chat export action when a target exists. |
 | `contentLanguage` | `content-language` | `BilingualPairContentLanguage` | `"both"` | Source-card roles displayed by the controlled reader. |
@@ -169,6 +175,7 @@ Custom element that renders supplied or acquired source-card data.
 | `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
 | `primaryVersionTitle` | `primary-version-title` | `string | undefined` | `undefined` | Optional exact edition title for the primary role. |
 | `translationVersionTitle` | `translation-version-title` | `string | undefined` | `undefined` | Optional exact edition title for the translation role. |
+| `translationLanguage` | `translation-language` | `string | undefined` | `undefined` | Preferred translation family, falling back only when unavailable. |
 | `contentLanguage` | `content-language` | `BilingualPairContentLanguage` | `"both"` | Sides the host wants displayed for every pair. |
 | `layout` | `layout` | `BilingualPairLayout` | `"auto"` | Requested arrangement for every pair. |
 | `sideOrder` | `side-order` | `BilingualPairSideOrder` | `"primary-first"` | Requested role order for every pair. |
@@ -207,6 +214,8 @@ Custom element that renders supplied or acquired text-segment data.
 | `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
 | `versionLanguage` | `version-language` | `string | undefined` | `undefined` | Optional language-family selector overriding the primary default. |
 | `versionTitle` | `version-title` | `string | undefined` | `undefined` | Optional exact edition title paired with `versionLanguage`. |
+| `translationLanguage` | `translation-language` | `string | undefined` | `undefined` | Preferred translation family, mutually exclusive with a strict version language. |
+| `hideAttributions` | `hide-attributions` | `boolean` | `false` | Hides compact edition attribution for standalone text. |
 | `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | Hebrew vocalization preset applied only to the displayed safe text. |
 | `selectedVersion` | Property only | `TextSegmentSelectedVersionInfo | undefined` | - | Metadata for the currently displayed selected edition. |
 | `status` | Property only | `SefariaElementStatus` | - | Coarse lifecycle state without exposing prepared rendering data. |

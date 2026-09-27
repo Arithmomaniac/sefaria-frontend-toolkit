@@ -1,4 +1,4 @@
-import { text, type CoreV3TextsResponse } from "@arithmomaniac/sefaria-client";
+import type { CoreV3TextsResponse } from "@arithmomaniac/sefaria-client";
 import { css, html, nothing, type PropertyValues } from "lit";
 import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
 
@@ -27,6 +27,10 @@ import {
   serializeBilingualSegmentSelectors,
 } from "./bilingual-segment.js";
 import { assertVocalizationMode } from "./vocalization-display.js";
+import {
+  acquireSelectedText,
+  type SelectedTextProgress,
+} from "./translation-selection.js";
 
 /** Sides an element renders for one `contentLanguage` value. */
 export type BilingualSegmentContentLanguage = BilingualPairContentLanguage;
@@ -44,6 +48,12 @@ export class SefariaBilingualSegment extends SefariaElement {
     sref: { type: String, useDefault: true },
     data: { attribute: false },
     acquisition: { attribute: false },
+    translationLanguage: {
+      type: String,
+      attribute: "translation-language",
+      converter: optionalStringConverter,
+    },
+    hideAttributions: { type: Boolean, attribute: "hide-attributions" },
     primaryVersionTitle: {
       type: String,
       attribute: "primary-version-title",
@@ -95,6 +105,10 @@ export class SefariaBilingualSegment extends SefariaElement {
   declare primaryVersionTitle: string | undefined;
   /** Optional exact edition title for the translation role. */
   declare translationVersionTitle: string | undefined;
+  /** Preferred translation family, falling back only when unavailable. */
+  declare translationLanguage: string | undefined;
+  /** Hides compact standalone edition attribution. */
+  declare hideAttributions: boolean;
 
   /** Sides the host wants displayed. */
   declare contentLanguage: BilingualSegmentContentLanguage;
@@ -111,11 +125,13 @@ export class SefariaBilingualSegment extends SefariaElement {
     | {
         readonly id: number;
         readonly controller: AbortController;
+        readonly progress: SelectedTextProgress;
       }
     | undefined;
   #nextOperationId = 1;
   #declarativeActive = false;
   #resumeOnConnect = false;
+  #interruptedProgress: SelectedTextProgress | undefined;
   #committedViewModel: BilingualSegmentViewModel | undefined;
   #ownedViewModel: BilingualSegmentViewModel | undefined;
   #statusOverride: SefariaElementStatus | undefined;
@@ -127,6 +143,8 @@ export class SefariaBilingualSegment extends SefariaElement {
     this.acquisition = undefined;
     this.primaryVersionTitle = undefined;
     this.translationVersionTitle = undefined;
+    this.translationLanguage = undefined;
+    this.hideAttributions = false;
     this.contentLanguage = "both";
     this.layout = "auto";
     this.sideOrder = "primary-first";
@@ -147,6 +165,7 @@ export class SefariaBilingualSegment extends SefariaElement {
 
   override disconnectedCallback(): void {
     if (this.#active !== undefined) {
+      this.#interruptedProgress = this.#active.progress;
       this.#active.controller.abort(
         new DOMException("Bilingual segment disconnected.", "AbortError"),
       );
@@ -167,8 +186,10 @@ export class SefariaBilingualSegment extends SefariaElement {
       changed.has("data") ||
       changed.has("acquisition") ||
       changed.has("primaryVersionTitle") ||
+      changed.has("translationLanguage") ||
       changed.has("translationVersionTitle")
     ) {
+      this.#interruptedProgress = undefined;
       this.#resumeOnConnect = false;
       this.#reconcile();
     }
@@ -189,13 +210,46 @@ export class SefariaBilingualSegment extends SefariaElement {
       case "error":
         return html`<p role="alert">${viewModel.message}</p>`;
       default:
-        return renderBilingualPair(viewModel, {
+        return html`${renderBilingualPair(viewModel, {
           contentLanguage: this.contentLanguage,
           layout: this.layout,
           sideOrder: this.sideOrder,
           vocalizationMode: this.vocalizationMode,
-        });
+        })}${this.#attributions(viewModel)}`;
     }
+  }
+
+  #attributions(
+    view: Exclude<BilingualSegmentViewModel, { state: "loading" | "error" }>,
+  ) {
+    if (this.hideAttributions || view.state === "empty") return nothing;
+    const sides =
+      view.state === "data"
+        ? [
+            { side: "primary", view: view.primary },
+            { side: "translation", view: view.translation },
+          ]
+        : [view.present];
+    return html`<section class="attributions" aria-label="Text editions">
+      ${sides
+        .filter(
+          ({ side }) =>
+            this.contentLanguage === "both" || this.contentLanguage === side,
+        )
+        .map(({ view: data }) => {
+          if (data.edition === undefined) return nothing;
+          const fallback =
+            data.unavailableTranslationLanguage === undefined
+              ? nothing
+              : html`<p class="translation-fallback" role="status">
+                  ${`${data.unavailableTranslationLanguage} is unavailable; showing ${data.edition.languageFamilyName}.`}
+                </p>`;
+          return html`<p class="attribution">
+              ${`${data.edition.versionTitle} (${data.edition.languageFamilyName}, ${data.edition.actualLanguage})`}
+            </p>
+            ${fallback}`;
+        })}
+    </section>`;
   }
 
   #reconcile(): void {
@@ -238,7 +292,9 @@ export class SefariaBilingualSegment extends SefariaElement {
     const active = {
       id: this.#nextOperationId++,
       controller: new AbortController(),
+      progress: this.#interruptedProgress ?? { fallback: false },
     };
+    this.#interruptedProgress = undefined;
     this.#active = active;
     this.#publish({
       state: "loading",
@@ -249,7 +305,11 @@ export class SefariaBilingualSegment extends SefariaElement {
 
   async #load(
     sref: string,
-    active: { readonly id: number; readonly controller: AbortController },
+    active: {
+      readonly id: number;
+      readonly controller: AbortController;
+      readonly progress: SelectedTextProgress;
+    },
   ): Promise<void> {
     try {
       const request = this.#request(sref);
@@ -258,20 +318,14 @@ export class SefariaBilingualSegment extends SefariaElement {
       if (acquisition.kind === "disabled") {
         throw new Error("Standalone Sefaria acquisition is disabled.");
       }
-      const response =
-        acquisition.kind === "client"
-          ? await this.#loadFromClient(
-              sref,
-              versions,
-              acquisition.client,
-              active.controller.signal,
-            )
-          : await this.#loadFromCapability(
-              sref,
-              versions,
-              acquisition.capability,
-              active.controller.signal,
-            );
+      const response = await acquireSelectedText(
+        acquisition,
+        sref,
+        versions,
+        request.translationLanguage,
+        active.controller.signal,
+        active.progress,
+      );
       if (this.#active !== active) return;
       const viewModel = this.#project(
         response.payload,
@@ -297,45 +351,6 @@ export class SefariaBilingualSegment extends SefariaElement {
         }),
       );
     }
-  }
-
-  async #loadFromClient(
-    sref: string,
-    versions: readonly string[],
-    client: Extract<SefariaAcquisition, { kind: "client" }>["client"],
-    signal: AbortSignal,
-  ): Promise<{ readonly payload: unknown; readonly status: number }> {
-    const result = await text.getV3Texts({
-      client,
-      path: { tref: sref },
-      query: { version: [...versions], return_format: "default" },
-      signal,
-    });
-    if (result.data !== undefined) {
-      return { payload: result.data, status: 200 };
-    }
-    if (result.error !== undefined && result.response !== undefined) {
-      return { payload: result.error, status: result.response.status };
-    }
-    throw new Error("The v3 texts request returned no result.");
-  }
-
-  async #loadFromCapability(
-    sref: string,
-    versions: readonly string[],
-    capability: Extract<
-      SefariaAcquisition,
-      { kind: "capability" }
-    >["capability"],
-    signal: AbortSignal,
-  ): Promise<{ readonly payload: unknown; readonly status: number }> {
-    if (capability.getText === undefined) {
-      throw new Error("The selected acquisition source does not support text.");
-    }
-    return await capability.getText(
-      { sref, versions, returnFormat: "default" },
-      signal,
-    );
   }
 
   #project(
@@ -370,6 +385,9 @@ export class SefariaBilingualSegment extends SefariaElement {
   #request(sref: string): BilingualSegmentRequest {
     return {
       tref: sref,
+      ...(this.translationLanguage === undefined
+        ? {}
+        : { translationLanguage: this.translationLanguage }),
       ...(this.primaryVersionTitle === undefined
         ? {}
         : { primary: { versionTitle: this.primaryVersionTitle } }),

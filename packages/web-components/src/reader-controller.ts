@@ -1,6 +1,5 @@
 import {
   related,
-  text,
   type CoreLinkResponse,
   type CoreV3TextsResponse,
   type SefariaClient,
@@ -32,6 +31,11 @@ import {
   type ReaderTransitionRejection,
 } from "./reader-session.js";
 import { serializeSourceCardSelectors } from "./source-card-request.js";
+import {
+  acquireSelectedText,
+  normalizeTranslationLanguage,
+  type SelectedTextProgress,
+} from "./translation-selection.js";
 import type {
   SourceCardDataViewModel,
   SourceCardNavigation,
@@ -56,6 +60,7 @@ export interface ReaderControllerDataSource {
   loadSource(
     request: SourceCardRequest,
     signal: AbortSignal,
+    progress?: SelectedTextProgress,
   ): Promise<ReaderSourceContent>;
   /** Loads admitted connections content for the exact request and projection. */
   loadConnections(
@@ -142,6 +147,22 @@ export interface ReaderControllerLoadOptions extends ReaderSessionOptions {
   readonly presentation?: ReaderPresentationPatch;
   /** Initial connections request and projection options. */
   readonly connections?: ReaderControllerInitialConnections;
+  /** Internal in-flight source qualification retained only across disconnection. */
+  readonly sourceProgress?: ReaderSourceProgress;
+}
+
+/** Private-module progress for one target/context qualification, not a response cache. */
+export interface ReaderSourceProgress {
+  /** Missing-language decision for the requested target. */
+  readonly target: SelectedTextProgress;
+  /** Missing-language decision for its containing context. */
+  readonly context: SelectedTextProgress;
+  /** Already-qualified target retained while its context is interrupted. */
+  targetContent?: ReaderSourceContent;
+}
+
+function newSourceProgress(): ReaderSourceProgress {
+  return { target: { fallback: false }, context: { fallback: false } };
 }
 
 /** Suspended element-owned Reader work eligible for lifecycle resumption. */
@@ -151,6 +172,8 @@ export type ReaderControllerSuspension =
       readonly kind: "root";
       /** Requested external root. */
       readonly request: SourceCardRequest;
+      /** Interrupted source qualification. */
+      readonly sourceProgress: ReaderSourceProgress;
     }
   | {
       /** Contextual history navigation source phase. */
@@ -159,6 +182,8 @@ export type ReaderControllerSuspension =
       readonly originEntryId: string;
       /** Requested connected source. */
       readonly targetRef: string;
+      /** Interrupted source qualification. */
+      readonly sourceProgress: ReaderSourceProgress;
     }
   | {
       /** Connections phase for an already committed source entry. */
@@ -308,28 +333,22 @@ export function createSefariaReaderDataSource(
   client: SefariaClient,
 ): ReaderControllerDataSource {
   return {
-    loadSource: async (request, signal) => {
-      const result = await text.getV3Texts({
-        client,
-        path: { tref: request.tref },
-        query: {
-          version: serializeSourceCardSelectors(request),
-          return_format: "default",
-        },
+    loadSource: async (request, signal, progress) => {
+      const response = await acquireSelectedText(
+        { kind: "client", client },
+        request.tref,
+        serializeSourceCardSelectors(request),
+        request.translationLanguage,
         signal,
-      });
-      if (result.data !== undefined) {
-        return createReaderSourceContent(result.data, request);
-      }
-      const status = result.response?.status;
-      if (result.error !== undefined && (status === 400 || status === 404)) {
-        throw new ReaderControllerError(
-          "source-http",
-          result.error.error,
-          status,
-        );
-      }
-      throw new Error("The source request returned no documented response.");
+        progress,
+      );
+      if (response.status === 200)
+        return createReaderSourceContent(response.payload, request);
+      throw new ReaderControllerError(
+        "source-http",
+        response.payload.error,
+        response.status,
+      );
     },
     loadConnections: async (request, projection, signal) => {
       const result = await related.getLinks({
@@ -359,20 +378,20 @@ export function createCapabilityReaderDataSource(
   capability: SefariaAcquisitionCapability,
 ): ReaderControllerDataSource {
   return {
-    loadSource: async (request, signal) => {
+    loadSource: async (request, signal, progress) => {
       if (capability.getText === undefined) {
         throw new Error(
           "The selected acquisition source does not support text.",
         );
       }
 
-      const response = await capability.getText(
-        {
-          sref: request.tref,
-          versions: serializeSourceCardSelectors(request),
-          returnFormat: "default",
-        },
+      const response = await acquireSelectedText(
+        { kind: "capability", capability },
+        request.tref,
+        serializeSourceCardSelectors(request),
+        request.translationLanguage,
         signal,
+        progress,
       );
       if (response.status === 200) {
         const payload = validateSuppliedComponentData<CoreV3TextsResponse>(
@@ -591,7 +610,13 @@ export async function loadReaderControllerProgressively(
   throwIfAborted(signal);
   let destination: ReaderResolvedSource;
   try {
-    destination = await resolveReaderSource(normalized, dataSource, signal);
+    destination = await resolveReaderSource(
+      normalized,
+      dataSource,
+      signal,
+      undefined,
+      options.sourceProgress,
+    );
   } catch (error) {
     throwIfAborted(signal);
     if (error instanceof ReaderControllerError) throw error;
@@ -642,11 +667,17 @@ export async function loadReaderController(
   );
 }
 
+/** Options for a controller admitted from a raw Reader seed. */
+export interface ReaderControllerSeedOptions extends ReaderSessionOptions {
+  /** Preferred family for navigation when the current entry has no source request. */
+  readonly translationLanguage?: string;
+}
+
 /** Creates a zero-request controller from already admitted reader content. */
 export function createReaderController(
   seed: ReaderEntrySeed,
   dataSource: ReaderControllerDataSource,
-  options: ReaderSessionOptions = {},
+  options: ReaderControllerSeedOptions = {},
 ): ReaderController {
   requireNavigableSeed(seed);
   return new ReaderControllerImpl(seed, dataSource, options);
@@ -664,15 +695,23 @@ class ReaderControllerImpl implements ReaderController {
   #generation = 0;
   #disposed = false;
   #notifying = false;
+  #sourceProgress = newSourceProgress();
+  #resumeSourceProgress: ReaderSourceProgress | undefined;
+  #pendingSourceRequest: SourceCardRequest | undefined;
+  readonly #seedTranslationLanguage: string | undefined;
 
   constructor(
     seed: ReaderEntrySeed,
     dataSource: ReaderControllerDataSource,
-    options: ReaderSessionOptions,
+    options: ReaderControllerSeedOptions,
   ) {
     requireNavigableSeed(seed);
     this.#session = createReaderSession(seed, options);
     this.#dataSource = dataSource;
+    this.#seedTranslationLanguage =
+      options.translationLanguage === undefined
+        ? undefined
+        : normalizeTranslationLanguage(options.translationLanguage);
     this.#reader = createReaderViewModel(this.#session.view);
     this.#snapshot = this.createSnapshot();
   }
@@ -725,6 +764,7 @@ class ReaderControllerImpl implements ReaderController {
       return;
     }
     const active = this.startPhysicalOperation();
+    this.#pendingSourceRequest = targetRequest;
     this.replaceTask({
       state: "loading-source",
       mode: "root",
@@ -736,6 +776,8 @@ class ReaderControllerImpl implements ReaderController {
         targetRequest,
         this.#dataSource,
         active.controller.signal,
+        undefined,
+        this.#sourceProgress,
       );
       if (!this.isActive(active)) return;
       const replaced = this.#session.replaceRoot({
@@ -792,10 +834,17 @@ class ReaderControllerImpl implements ReaderController {
     action: ReaderControllerConnectionSelection,
   ): Promise<void> {
     this.requireCurrent(action.originEntryId);
+    const source = this.#session.view.current.source;
+    const translationLanguage =
+      source === undefined
+        ? this.#seedTranslationLanguage
+        : source.request.translationLanguage;
     const targetRequest = normalizeSourceRequest({
       tref: action.targetRef,
+      ...(translationLanguage === undefined ? {} : { translationLanguage }),
     });
     const active = this.startPhysicalOperation();
+    this.#pendingSourceRequest = targetRequest;
     this.replaceTask({
       state: "loading-source",
       mode: "navigation",
@@ -820,6 +869,7 @@ class ReaderControllerImpl implements ReaderController {
           sourceOperationId = begun.value.operationId;
           this.#operationId = sourceOperationId;
         },
+        this.#sourceProgress,
       );
       if (!this.isActive(active)) return;
       if (!sourceOperationId) {
@@ -936,11 +986,16 @@ class ReaderControllerImpl implements ReaderController {
     if (task.state === "loading-source") {
       suspension =
         task.mode === "root"
-          ? { kind: "root", request: { tref: task.targetRef } }
+          ? {
+              kind: "root",
+              request: this.#pendingSourceRequest ?? { tref: task.targetRef },
+              sourceProgress: this.#sourceProgress,
+            }
           : {
               kind: "navigation",
               originEntryId: task.originEntryId,
               targetRef: task.targetRef,
+              sourceProgress: this.#sourceProgress,
             };
     } else if (task.state === "loading-connections") {
       const connections = this.#session.view.current.connections;
@@ -960,10 +1015,12 @@ class ReaderControllerImpl implements ReaderController {
   async resume(suspension: ReaderControllerSuspension): Promise<void> {
     this.assertUsable();
     if (suspension.kind === "root") {
+      this.#resumeSourceProgress = suspension.sourceProgress;
       await this.replaceRoot(suspension.request);
       return;
     }
     if (suspension.kind === "navigation") {
+      this.#resumeSourceProgress = suspension.sourceProgress;
       await this.openConnection({
         originEntryId: suspension.originEntryId,
         targetRef: suspension.targetRef,
@@ -1073,6 +1130,8 @@ class ReaderControllerImpl implements ReaderController {
   private startPhysicalOperation(): ActiveOperation {
     this.assertUsable();
     this.cancelActive(false);
+    this.#sourceProgress = this.#resumeSourceProgress ?? newSourceProgress();
+    this.#resumeSourceProgress = undefined;
     const controller = new AbortController();
     this.#controller = controller;
     return { generation: this.#generation, controller };
@@ -1081,6 +1140,8 @@ class ReaderControllerImpl implements ReaderController {
   private cancelActive(publish: boolean): void {
     this.#controller?.abort();
     this.#controller = undefined;
+    this.#pendingSourceRequest = undefined;
+    this.#sourceProgress = newSourceProgress();
     this.#generation += 1;
     this.cancelSessionOperation();
     this.#task = { state: "idle" };
@@ -1097,6 +1158,8 @@ class ReaderControllerImpl implements ReaderController {
   private finishPhysicalOperation(active: ActiveOperation): void {
     if (this.#controller === active.controller) {
       this.#controller = undefined;
+      this.#pendingSourceRequest = undefined;
+      this.#sourceProgress = newSourceProgress();
     }
   }
 
@@ -1232,10 +1295,15 @@ export async function resolveReaderSource(
   dataSource: ReaderControllerDataSource,
   signal: AbortSignal,
   onEffectiveRequest?: (request: SourceCardRequest) => void,
+  progress: ReaderSourceProgress = newSourceProgress(),
 ): Promise<ReaderResolvedSource> {
-  const target = await dataSource.loadSource(request, signal);
+  const target =
+    progress.targetContent ??
+    (await dataSource.loadSource(request, signal, progress.target));
+  throwIfAborted(signal);
   requireMatchingRequest(target.request, request);
   const targetData = requireNavigable(target, request.tref);
+  progress.targetContent = target;
   let selectedRef = targetData.viewModel.items.find(
     (item) => item.ref === request.tref,
   )?.ref;
@@ -1250,7 +1318,8 @@ export async function resolveReaderSource(
   if (navigation.state === "context-required") {
     const effective = withTref(request, navigation.contextRef);
     onEffectiveRequest?.(effective);
-    content = await dataSource.loadSource(effective, signal);
+    content = await dataSource.loadSource(effective, signal, progress.context);
+    throwIfAborted(signal);
     requireMatchingRequest(content.request, effective);
     navigation = requireAvailable(
       requireNavigable(content, effective.tref).navigation,
@@ -1259,7 +1328,8 @@ export async function resolveReaderSource(
   } else if (targetData.viewModel.header.ref !== navigation.sectionRef) {
     const effective = withTref(request, navigation.sectionRef);
     onEffectiveRequest?.(effective);
-    content = await dataSource.loadSource(effective, signal);
+    content = await dataSource.loadSource(effective, signal, progress.context);
+    throwIfAborted(signal);
     requireMatchingRequest(content.request, effective);
     navigation = requireAvailable(
       requireNavigable(content, effective.tref).navigation,
@@ -1347,6 +1417,13 @@ function normalizeSourceRequest(request: SourceCardRequest): SourceCardRequest {
   return deepFreeze({
     ...request,
     tref: request.tref.trim(),
+    ...(request.translationLanguage === undefined
+      ? {}
+      : {
+          translationLanguage: normalizeTranslationLanguage(
+            request.translationLanguage,
+          ),
+        }),
     ...(request.primary === undefined
       ? {}
       : { primary: { ...request.primary } }),
@@ -1365,6 +1442,7 @@ function validateSourceRequest(request: SourceCardRequest): void {
       throw new TypeError("Source version title must not be blank.");
     }
   }
+  serializeSourceCardSelectors(request);
 }
 
 function validateRootOptions(options: ReaderControllerRootOptions): void {
@@ -1422,6 +1500,14 @@ function parseSourceRequest(value: unknown, path: string): SourceCardRequest {
   const input = rawRecord(value, path);
   const request: SourceCardRequest = {
     tref: rawNonblankString(input.tref, `${path}/tref`),
+    ...(input.translationLanguage === undefined
+      ? {}
+      : {
+          translationLanguage: rawNonblankString(
+            input.translationLanguage,
+            `${path}/translationLanguage`,
+          ),
+        }),
     ...(input.primary === undefined
       ? {}
       : {
