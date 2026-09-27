@@ -1,4 +1,15 @@
 {
   "schemaVersion": 1,
-  "releases": []
+  "releases": [
+    {
+      "version": "0.0.0-alpha.36313907924.1",
+      "sourceSha": "1ca16880ac4d8413971915d63f615c674b69d77c",
+      "runId": "36313907924",
+      "runNumber": "68",
+      "runAttempt": "1",
+      "assetId": 592743756,
+      "archiveHash": "f1ff2ada25ec7cb5d9f69164bb6163f0e7fc96e512f41500d5eebeef71ae85a1",
+      "state": "active"
+    }
+  ]
 }
