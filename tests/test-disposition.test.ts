@@ -25,7 +25,7 @@ describe("immutable test disposition", () => {
     );
     expect(EXPECTED_BASELINE_TEST_COUNT).toBe(73);
     expect(EXPECTED_PRE_RETIREMENT_SHOWCASE_TEST_COUNT).toBe(9);
-    expect(EXPECTED_RETIRED_TEST_COUNT).toBe(9);
+    expect(EXPECTED_RETIRED_TEST_COUNT).toBe(12);
   });
 
   it("maps package and example migrations precisely", () => {

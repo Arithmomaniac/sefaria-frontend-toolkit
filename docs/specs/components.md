@@ -4,7 +4,7 @@
 
 ## Status
 
-The declarative standalone-loading cutover is implemented. All seven public elements accept `sref`. Text Segment, Bilingual Segment, Reference Label, Source Card, Popup, and Connections Panel also accept component-specific raw `data`. Reader accepts raw transactional seeds rather than an ordinary persistent data override.
+The declarative standalone-loading cutover is implemented. All six public elements accept `sref`. Text Segment, Bilingual Segment, Reference Label, Source Card, and Connections Panel also accept component-specific raw `data`. Reader accepts raw transactional seeds rather than an ordinary persistent data override.
 
 Unrelated future component slices remain planned where identified in [Development](../development.md).
 
@@ -28,7 +28,7 @@ The corrected generated contract is transport authority. Component validation, s
 
 ## Input precedence
 
-For the six non-Reader elements, `data !== undefined` selects supplied mode.
+For the five non-Reader elements, `data !== undefined` selects supplied mode.
 
 - Valid data makes zero requests.
 - Valid empty data remains authoritative.
@@ -64,17 +64,15 @@ Explicit failure, disablement, or an unsupported capability operation never fall
 
 Detached elements start no acquisition. Disconnection aborts or invalidates active work while retaining committed content. Reconnection resumes only the still-eligible interrupted phase with a new operation identity. Reconnecting unchanged completed content makes zero requests. Ordinary network failure is not retried automatically.
 
-Popup preparation is independent of `open`. Visibility alone does not start, restart, or cancel acquisition.
-
 Current validation, projection, acquisition, network, and abort failures become accessible element state and documented component-specific error events. Original causes and structured validation paths remain available where the event contract provides them. Superseded work publishes neither success nor failure and produces no unhandled rejection.
 
 ## Public and private API
 
-The root entry registers all seven elements. The DOM-free `./acquisition` entry exposes acquisition configuration and types. Component subpaths expose component-specific raw request/selection types. `./reader` exposes shared raw source qualification, browser data-source construction, resolved-source records, and raw seed types. `./reader-session` remains a supported advanced DOM-free semantic/raw facade.
+The root entry registers all six elements. The DOM-free `./acquisition` entry exposes acquisition configuration and types. Component subpaths expose component-specific raw request/selection types. `./reader` exposes shared raw source qualification, browser data-source construction, resolved-source records, and raw seed types. `./reader-session` remains a supported advanced DOM-free semantic/raw facade.
 
 Prepared rendering types and protocols are private. `./bindings` and `./reader-controller` are retired and absent from supported exports. Elements expose no arbitrary `fetch`, base URL, untyped host, public prepared model, or request-capable child protocol.
 
-Ordinary browser hosts use attributes for scalar public inputs, including `sref`, enum presentation choices, numbers, strings, and default-false boolean flags. A default-true boolean that must be set false remains a property exception because HTML boolean attributes cannot represent false by presence. Raw `data`, tagged `acquisition`, arrays, element anchors, and other rich values remain property-only. React 19 JSX may express both groups as props because React assigns registered custom-element properties directly.
+Ordinary browser hosts use attributes for scalar public inputs, including `sref`, enum presentation choices, numbers, strings, and default-false boolean flags. A default-true boolean that must be set false remains a property exception because HTML boolean attributes cannot represent false by presence. Raw `data`, tagged `acquisition`, arrays and other rich values remain property-only. React 19 JSX may express both groups as props because React assigns registered custom-element properties directly.
 
 Public read-only `status` reports the element's current semantic state. Reader additionally exposes read-only `rootLoading`, `selectedRef`, `currentEntryId`, and `readerError`.
 
@@ -118,10 +116,6 @@ Resolves canonical English/Hebrew labels and a canonical URL. `labelLanguage` an
 
 Owns one bounded text collection, heading, aligned role pairs, attribution, positional identity, and optional selection. Scalar, range, spanning, and nested non-spanning responses share one element. `sefaria-source-select` reports the canonical target and original position.
 
-### Popup
-
-Owns a bounded Source Card preview, anchor placement, open state, close behavior, and focus restoration. `open` controls visibility only. `sefaria-popup-close` and `sefaria-popup-error` are public events.
-
 ### Connections Panel
 
 Owns grouped connections, stable ordering, bounded 20-entry UI pages, and captured preview states. Category, page, and preview visibility changes over captured data make zero requests. Selection and paging events are composed and keyboard reachable.
@@ -143,12 +137,11 @@ Elements use open shadow roots, real interactive controls, visible focus, access
 Required tests cover:
 
 - supplied-data zero-I/O and invalid-data supersession
-- standalone loading for all seven elements
+- standalone loading for all six elements
 - shared versus explicit acquisition
 - original failure causes and no unhandled rejections
 - stale completion suppression
 - disconnect/reconnect behavior
-- Popup visibility-independent preparation
 - supplied/acquired private-preparation equivalence
 - Reader raw seed admission and semantic/raw record boundaries
 - exact one-parent/zero-child request counts, including ten-child cases

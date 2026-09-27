@@ -2,7 +2,7 @@
 
 # How declarative components obtain and render data
 
-**Current:** all seven public elements support standalone `sref`. The six ordinary elements also accept authoritative component-specific raw `data`; Reader accepts transactional raw seeds. Elements own validation, acquisition selection, cancellation, stale-result suppression, private preparation, and rendering.
+**Current:** all six public elements support standalone `sref`. The five ordinary elements also accept authoritative component-specific raw `data`; Reader accepts transactional raw seeds. Elements own validation, acquisition selection, cancellation, stale-result suppression, private preparation, and rendering.
 
 ## Start with supplied data
 
@@ -21,7 +21,7 @@ if (!card) throw new Error("The source card is missing.");
 card.data = zCoreV3TextsResponse.parse(received) as CoreV3TextsResponse;
 ```
 
-For the six non-Reader elements, defined `data` is authoritative. Valid, validly empty, and invalid supplied data all suppress `sref` acquisition. Invalid input replaces earlier content with a validation failure and does not fall through to the network. Clearing `data` lets a retained eligible `sref` run.
+For the five non-Reader elements, defined `data` is authoritative. Valid, validly empty, and invalid supplied data all suppress `sref` acquisition. Invalid input replaces earlier content with a validation failure and does not fall through to the network. Clearing `data` lets a retained eligible `sref` run.
 
 Raw data is not render-ready state. Each element validates, selects, sanitizes, and prepares it into private state before rendering. The same private preparation is used after standalone acquisition.
 
@@ -78,7 +78,7 @@ A composite owns its outer operation and privately prepares children from the ca
 
 Disconnected elements start no work. Disconnection aborts or invalidates active eligible work while retaining committed content. Reconnection resumes only the still-eligible interrupted source or links phase with a new operation identity. Ordinary network failure is not retried automatically.
 
-Popup preparation does not depend on `open`; the property controls visibility only. An activation-gated host assigns and clears Popup `sref` according to host policy.
+The linked-article host opens a native dialog on eligible activation and assigns Source Card `sref`. Closing clears and disconnects the card; the host owns focus return.
 
 Current failures are reflected in the element's read-only `status` and documented error events. Original error causes and structured validation paths remain available where the event contract provides them. Superseded work emits no stale success or failure and produces no unhandled rejection.
 

@@ -1253,7 +1253,6 @@
             "CONNECTIONS_PAGE_SIZE",
             "ConnectionsProjection",
             "ConnectionsRequest",
-            "PopupRequest",
             "ReaderPane",
             "ReaderRawConnectionsSeed",
             "ReaderRawSeedData",
@@ -1268,7 +1267,6 @@
             "SefariaElement",
             "SefariaElementStatus",
             "SefariaLinksAcquisitionRequest",
-            "SefariaPopup",
             "SefariaReader",
             "SefariaRefLabel",
             "SefariaReferenceAcquisitionRequest",
@@ -1320,12 +1318,6 @@
             "ConnectionsProjection",
             "ConnectionsRequest"
           ]
-        },
-        {
-          "subpath": "./popup",
-          "types": "./dist/popup-public.d.ts",
-          "import": "./dist/popup-public.js",
-          "declarations": ["PopupRequest"]
         },
         {
           "subpath": "./reader",

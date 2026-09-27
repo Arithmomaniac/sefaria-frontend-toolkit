@@ -15,7 +15,6 @@ const root = path.resolve(import.meta.dirname, "..");
 const tags = [
   "bilingual-segment",
   "connections-panel",
-  "popup",
   "reader",
   "ref-label",
   "source-card",
@@ -94,7 +93,6 @@ export async function testScriptSource(directory) {
             "invalid",
             "source-interaction",
             "reader-interaction",
-            "popup-interaction",
           ]) {
             const context = await browser.newContext();
             try {
@@ -186,6 +184,20 @@ export async function testScriptSource(directory) {
                   tags,
                 ),
                 true,
+              );
+              assert.equal(
+                await page.evaluate(
+                  () => !!globalThis.customElements.get("sefaria-popup"),
+                ),
+                false,
+              );
+              assert.equal(
+                await page.evaluate(
+                  async (moduleUrl) =>
+                    "SefariaPopup" in (await import(moduleUrl)),
+                  url,
+                ),
+                false,
               );
               if (scenario.endsWith("-interaction")) {
                 await exerciseInteractions(page, scenario, requests);
@@ -311,20 +323,6 @@ function interactionMarkup(scenario) {
   }
   if (scenario === "reader-interaction") {
     return `<style>sefaria-reader { display: block; height: 90vh; }</style><sefaria-reader sref="Micah 6:8"></sefaria-reader>`;
-  }
-  if (scenario === "popup-interaction") {
-    return `
-      <button id="anchor" type="button">Preview Micah 6:8</button><output id="closed">0</output>
-      <sefaria-popup sref="Micah 6:8"></sefaria-popup>
-      <script type="module">
-        await customElements.whenDefined("sefaria-popup");
-        const popup = document.querySelector("sefaria-popup");
-        const anchor = document.querySelector("#anchor");
-        popup.anchor = anchor;
-        anchor.addEventListener("click", () => { popup.open = true; });
-        let count = 0;
-        document.addEventListener("sefaria-popup-close", () => { document.querySelector("#closed").textContent = String(++count); });
-      </script>`;
   }
 }
 
@@ -489,51 +487,7 @@ async function exerciseInteractions(page, scenario, requests) {
     );
     return;
   }
-  const popup = page.locator("sefaria-popup");
-  await page.waitForFunction(
-    () =>
-      globalThis.document.querySelector("sefaria-popup")?.status === "ready",
-  );
-  assert.equal(await popup.getByRole("dialog").count(), 0);
-  const anchor = page.getByRole("button", { name: "Preview Micah 6:8" });
-  await anchor.click();
-  await popup.getByRole("dialog", { name: "Sefaria source preview" }).waitFor();
-  await popup.locator(".body-part").first().waitFor();
-  assert.match(
-    await popup.locator(".body-part").last().textContent(),
-    /He has shown/u,
-  );
-  const close = popup.getByRole("button", { name: "Close source preview" });
-  assert.equal(
-    await close.evaluate(
-      (element) => element.getRootNode().activeElement === element,
-    ),
-    true,
-  );
-  await page.keyboard.press("Escape");
-  await popup.getByRole("dialog").waitFor({ state: "detached" });
-  assert.equal(await page.locator("#closed").textContent(), "1");
-  assert.equal(
-    await anchor.evaluate(
-      (element) => globalThis.document.activeElement === element,
-    ),
-    true,
-  );
-  await anchor.press("Enter");
-  await close.click();
-  await popup.getByRole("dialog").waitFor({ state: "detached" });
-  assert.equal(await page.locator("#closed").textContent(), "2");
-  assert.equal(
-    await anchor.evaluate(
-      (element) => globalThis.document.activeElement === element,
-    ),
-    true,
-  );
-  assert.equal(
-    requests.length,
-    1,
-    "Popup opening, closing and reopening must not acquire again.",
-  );
+  throw new Error(`Unknown interaction scenario: ${scenario}`);
 }
 
 if (isMainModule(import.meta.url, process.argv[1])) {

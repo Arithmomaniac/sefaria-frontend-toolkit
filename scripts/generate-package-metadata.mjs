@@ -61,13 +61,6 @@ const eventCatalog = {
       "Reports a current standalone loading or validation failure.",
     ),
   ],
-  "sefaria-popup": [
-    event("sefaria-popup-close", "Reports that the popup should close."),
-    event(
-      "sefaria-popup-error",
-      "Reports a current standalone loading or validation failure.",
-    ),
-  ],
   "sefaria-reader": [
     event("sefaria-reader-back", "Requests navigation to the previous entry."),
     event(
@@ -184,7 +177,7 @@ const cssPropertyCatalog = [
   ),
   cssProperty(
     "--sefaria-shadow",
-    "Popup and elevated-surface shadow.",
+    "Elevated-surface shadow.",
     "0 1rem 3rem rgb(0 0 0 / 28%)",
   ),
   cssProperty("--sefaria-panel-radius", "Panel corner radius.", "0.75rem"),

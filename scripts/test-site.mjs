@@ -3,7 +3,7 @@ import path from "node:path";
 import process from "node:process";
 import { URL } from "node:url";
 
-import { chromium } from "playwright";
+import { chromium, firefox, webkit } from "playwright";
 
 import { classifySiteRequest } from "./site-request-policy.mjs";
 import { createFixtureResponse } from "./site-fixtures.mjs";
@@ -643,7 +643,7 @@ try {
       [
         "Supplied-data component editor",
         "/examples/playground/index.html",
-        "Edit and run any of seven projects",
+        "Edit and run any of six projects",
         "source-card",
       ],
       [
@@ -969,17 +969,7 @@ try {
     assertEqual(textRequests.length, 5, "Reader breadcrumb request count");
     await capture(page, "site-reader.png");
 
-    textRequests.length = 0;
-    await page.setViewportSize({ width: 1280, height: 900 });
-    await page.goto(siteRouteUrl("/examples/linked-article/"), {
-      waitUntil: "networkidle",
-    });
-    const citation = page.getByRole("link", { name: "Micah 6:8", exact: true });
-    await tabTo(page, citation, "linked-article citation", 10);
-    await page.keyboard.press("Enter");
-    await page.getByRole("button", { name: "Close source preview" }).waitFor();
-    assertEqual(textRequests.length, 1, "linked popup request count");
-    await capture(page, "site-linked-popup.png");
+    await qualifyLinkedArticle(page, textRequests);
 
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(siteRouteUrl("/components.html"), {
@@ -1189,8 +1179,144 @@ try {
   } finally {
     await browser.close();
   }
+  for (const engine of [firefox, webkit]) {
+    const dialogBrowser = await engine.launch({ headless: true });
+    try {
+      const page = await dialogBrowser.newPage();
+      const requests = [];
+      const errors = [];
+      page.on("pageerror", (error) => errors.push(error.message));
+      const fixture = JSON.parse(
+        await readFile(
+          path.join(root, "examples", "react-vite", "src", "micah-6-8.json"),
+          "utf8",
+        ),
+      );
+      await page.route("**/*", async (route) => {
+        const request = route.request();
+        const policy = classifySiteRequest({
+          method: request.method(),
+          requestUrl: request.url(),
+          siteOrigin: origin,
+        });
+        if (policy === "local") return await route.continue();
+        if (policy === "text-fixture") {
+          requests.push(request.url());
+          return await route.fulfill({
+            json: createFixtureResponse(request.url(), policy, fixture, []),
+          });
+        }
+        errors.push(`Unexpected request: ${request.url()}`);
+        await route.abort("blockedbyclient");
+      });
+      await qualifyLinkedArticle(page, requests, engine !== webkit);
+      assertEqual(
+        errors.length,
+        0,
+        `${engine.name()} linked-article errors: ${errors.join("; ")}`,
+      );
+    } finally {
+      await dialogBrowser.close();
+    }
+  }
 } finally {
   await previewServer.close();
+}
+
+async function qualifyLinkedArticle(page, requests, traverseLinks = true) {
+  requests.length = 0;
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto(siteRouteUrl("/examples/linked-article/"), {
+    waitUntil: "networkidle",
+  });
+  assertEqual(requests.length, 0, "linked-article activation gate");
+  const citation = page.getByRole("link", { name: "Micah 6:8", exact: true });
+  if (traverseLinks) {
+    await tabTo(page, citation, "linked-article citation", 10);
+  } else {
+    // WebKit's default tab policy skips links; still exercise real Enter activation.
+    await citation.focus();
+  }
+  await page.keyboard.press("Enter");
+  const dialog = page.getByRole("dialog", { name: "Sefaria source preview" });
+  const close = dialog.getByRole("button", { name: "Close source preview" });
+  await close.waitFor();
+  await page.waitForFunction(
+    () =>
+      globalThis.document.querySelector("dialog sefaria-source-card")
+        ?.status === "ready",
+  );
+  await dialog.locator(".body-part").first().waitFor();
+  assertEqual(requests.length, 1, "linked preview request count");
+  assertEqual(
+    await dialog.evaluate((element) => element.matches(":modal")),
+    true,
+    "native modal",
+  );
+  assertEqual(
+    await close.evaluate(
+      (element) => element === globalThis.document.activeElement,
+    ),
+    true,
+    "initial dialog focus",
+  );
+  for (const key of ["Tab", "Shift+Tab"]) {
+    await page.keyboard.press(key);
+    // Native dialogs can yield focus to browser chrome, but never to inert page content.
+    assertEqual(
+      await dialog.evaluate(
+        (element) =>
+          !globalThis.document.hasFocus() ||
+          element.contains(globalThis.document.activeElement),
+      ),
+      true,
+      "modal focus containment",
+    );
+    await close.focus();
+  }
+  await page.keyboard.press("Escape");
+  await dialog.waitFor({ state: "detached" });
+  assertEqual(
+    await citation.evaluate(
+      (element) => element === globalThis.document.activeElement,
+    ),
+    true,
+    "Escape restores citation focus",
+  );
+  await citation.press("Enter");
+  await page.waitForFunction(
+    () =>
+      globalThis.document.querySelector("dialog sefaria-source-card")
+        ?.status === "ready",
+  );
+  assertEqual(
+    requests.length,
+    2,
+    "reopening uses one fresh cache-disabled request",
+  );
+  await page.setViewportSize({ width: 390, height: 844 });
+  const geometry = await dialog.evaluate((element) => {
+    const bounds = element.getBoundingClientRect();
+    return (
+      bounds.left >= 0 &&
+      bounds.right <= globalThis.innerWidth &&
+      bounds.top >= 0 &&
+      bounds.bottom <= globalThis.innerHeight &&
+      element.scrollWidth <= element.clientWidth + 1
+    );
+  });
+  assertEqual(geometry, true, "narrow dialog fits viewport");
+  await capture(page, "site-linked-preview.png");
+  await close.click();
+  await dialog.waitFor({ state: "detached" });
+  assertEqual(
+    await citation.evaluate(
+      (element) => element === globalThis.document.activeElement,
+    ),
+    true,
+    "button restores citation focus",
+  );
+  assertEqual(requests.length, 2, "closing adds no requests");
 }
 
 async function qualifyInlinePlayground(
@@ -1367,7 +1493,6 @@ async function qualifyCatalogPlayground(page, sitePath, textRequests) {
     "text-segment",
     "bilingual-segment",
     "source-card",
-    "popup",
     "connections-panel",
     "reader",
   ];

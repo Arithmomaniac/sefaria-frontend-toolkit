@@ -4,6 +4,16 @@
 
 This document records source observations that support the design and specifications. It does not define product behavior or delivery status.
 
+## Host-owned preview decision
+
+**Observed September 27, 2026:** at `1ca16880ac4d8413971915d63f615c674b69d77c`, Popup combines Source Card preparation with an anchored dialog shell and a private 20-position truncation. Its preparation has no non-Popup consumer. The approved alpha API removal instead assigns modal presentation to the linked-article host and uses ordinary Source Card rendering, with no retained Popup-only limit. The owning component and integration specifications define the replacement; older Popup observations below remain historical evidence.
+
+Fresh hosted manifest reads found identical alpha and `0.0.0-alpha.36313907924.1` metadata reporting 402,492 raw bytes and 108,059 gzip bytes. This confirms the prior "first hosted publication pending" statement is stale, not that a new hosted browser qualification was run. The retained P5 pin must keep its original Popup implementation; new builds may remove it.
+
+**Local P8 qualification on September 27, 2026:** the unchanged baseline and six-element replacement were built with the same installed dependencies and compression settings. The final minified module measured **390,469 raw bytes and 106,618 gzip bytes**, reductions of 12,023 and 1,441 bytes respectively. `pnpm check` passed every stage, including 105 test files and 883 tests, the six-project editor, six-element metadata, and packed-consumer rejection of the removed subpath. Production linked-article journeys passed in Chromium, Firefox, and WebKit at both root and project URL bases. They exercised modal Source Card rendering, Enter activation, Escape/button close, originating-link focus return, narrow layout, and one new cache-disabled request per opening.
+
+Native dialog keyboard behavior can yield focus to browser chrome while the page remains inert; the smoke distinguishes that from focus escaping into background page content. WebKit's default link-tab policy skips ordinary links, so its journey focuses the authored link before real Enter activation; Chromium and Firefox additionally traverse to it with Tab. The deterministic browser suite covers modifier/default preservation, supersession, ignored aborts, errors, cleanup, and ordinary content beyond the removed 20-position limit. Review identified a padded-reference error-identity mismatch, reproduced with a failing test and corrected by trimming the authored reference before assignment. All three reviewers cleared the follow-up. No hosted publication or retained-pin mutation was performed.
+
 ## Browser script distribution observations
 
 **Observed September 26, 2026:** the pre-P5 distribution specification excluded CDN distribution, while the Pages assembler removed and rebuilt `dist/site` and the deployment replaced the complete site. Preserving published script paths therefore requires restoring archived bytes on every deployment rather than rebuilding only the current version. This observation motivates the separate browser script contract; it does not change the authenticated GitHub Packages transport.

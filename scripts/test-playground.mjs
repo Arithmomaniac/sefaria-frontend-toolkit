@@ -19,7 +19,6 @@ const projects = {
   "text-segment": "sefaria-text-segment",
   "bilingual-segment": "sefaria-bilingual-segment",
   "source-card": "sefaria-source-card",
-  popup: "sefaria-popup",
   "connections-panel": "sefaria-connections-panel",
   reader: "sefaria-reader",
 };
@@ -157,7 +156,7 @@ async function qualifyBrowser(browser, name, editorUrl, origin, graph) {
     await qualifyInvalidProject(page, editorUrl);
     await qualifyProjectEditingAndInteraction(page, probeOrigin);
   } else if (name !== "chromium" && primaryBase) {
-    await qualifyRepresentativeEditingAndPopup(page, name);
+    await qualifyRepresentativeEditing(page, name);
   }
   if (name === "chromium") {
     const narrow = await browser.newPage({
@@ -466,33 +465,6 @@ async function interactWithProject(page, project) {
       await frame.locator("#vocalization").selectOption("none");
       await frame.locator("#vocalization").selectOption("taamim_and_nikkud");
       break;
-    case "popup": {
-      const anchor = frame.getByRole("button", { name: "Preview Micah 6:8" });
-      await anchor.click();
-      const close = frame.getByRole("button", {
-        name: "Close source preview",
-      });
-      await close.waitFor();
-      assertEqual(
-        await close.evaluate(
-          (element) =>
-            element === globalThis.document.activeElement ||
-            element.getRootNode().activeElement === element,
-        ),
-        true,
-        "popup close focus",
-      );
-      await close.press("Escape");
-      await frame.getByText("Popup closed and focus restored.").waitFor();
-      assertEqual(
-        await anchor.evaluate(
-          (element) => globalThis.document.activeElement === element,
-        ),
-        true,
-        "popup anchor focus restoration",
-      );
-      break;
-    }
     case "connections-panel":
       await frame.getByRole("button", { name: "More" }).click();
       await frame.getByText("Page 2").waitFor();
@@ -525,11 +497,11 @@ async function interactWithProject(page, project) {
   }
 }
 
-async function qualifyRepresentativeEditingAndPopup(page, name) {
-  await selectProject(page, "popup");
+async function qualifyRepresentativeEditing(page, name) {
+  await selectProject(page, "source-card");
   await page.getByRole("tab", { name: "HTML" }).click();
   const editor = page.locator(".cm-content");
-  const maintained = projectSource("popup", "HTML");
+  const maintained = projectSource("source-card", "HTML");
   await editor.fill(`${maintained}\n<p id="engine-proof">${name} edit</p>`);
   await page.getByRole("button", { name: "Run" }).click();
   await previewFrame(page).getByText(`${name} edit`).waitFor();
@@ -537,14 +509,13 @@ async function qualifyRepresentativeEditingAndPopup(page, name) {
   await page.getByText("Maintained source restored exactly.").waitFor();
   await page.getByRole("button", { name: "Run" }).click();
   await previewFrame(page)
-    .getByRole("button", { name: "Preview Micah 6:8" })
-    .click();
-  const close = previewFrame(page).getByRole("button", {
-    name: "Close source preview",
-  });
-  await close.press("Escape");
+    .getByRole("button", {
+      name: "Show connections for Micah 6:8",
+    })
+    .first()
+    .press("Enter");
   await previewFrame(page)
-    .getByText("Popup closed and focus restored.")
+    .getByText(/Selected Micah 6:8 at position/u)
     .waitFor();
 }
 
@@ -601,7 +572,6 @@ async function runGraphQualification(page, graph) {
       const refLabel = await import("@arithmomaniac/sefaria-web-components/ref-label");
       const textSegment = await import("@arithmomaniac/sefaria-web-components/text-segment");
       const bilingualSegment = await import("@arithmomaniac/sefaria-web-components/bilingual-segment");
-      const popup = await import("@arithmomaniac/sefaria-web-components/popup");
       const connections = await import("@arithmomaniac/sefaria-web-components/connections-panel");
       const reader = await import("@arithmomaniac/sefaria-web-components/reader");
       const readerSession = await import("@arithmomaniac/sefaria-web-components/reader-session");
@@ -615,7 +585,6 @@ async function runGraphQualification(page, graph) {
         textSegment,
         bilingualSegment,
         pure,
-        popup,
         connections,
       ].every((value) => value !== null && typeof value === "object");
       const root = await import("@arithmomaniac/sefaria-web-components");

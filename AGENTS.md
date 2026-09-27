@@ -95,7 +95,7 @@ Do not add an OpenAPI correction before source review or a runtime contract fail
 
 ## Keep acquisition bounded and declarative
 
-Every public element can accept `sref` and component-specific raw `data`. For the six non-Reader elements, defined `data` is authoritative and must suppress acquisition, including when it is validly empty or invalid.
+Every public element can accept `sref` and component-specific raw `data`. For the five non-Reader elements, defined `data` is authoritative and must suppress acquisition, including when it is validly empty or invalid.
 
 Elements may accept only the documented tagged acquisition choice. Do not expose `fetch`, a base URL, arbitrary request functions, a host object, or a public prepared rendering model.
 

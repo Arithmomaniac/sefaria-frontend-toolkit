@@ -27,4 +27,4 @@ applyTo: "examples/mcp-app/**,examples/linked-article/**,docs/specs/integrations
 - Keep fixture data representative, fixed, and source-pinned or dated.
 - State host limitations separately from component failures.
 - Keep maintained live pages explicitly activation-gated even though the public elements support immediate standalone loading.
-- In the linked-article integration, assign Popup `sref` only after eligible activation and clear it on close or destroy; do not add automatic citation detection, polling, or bulk preload.
+- In the linked-article integration, the host owns a native modal dialog containing Source Card. Assign card `sref` only after eligible activation, clear and disconnect it on close or destroy, and return focus to the originating link. Preserve native navigation; do not add automatic citation detection, polling, hover activation, or bulk preload.

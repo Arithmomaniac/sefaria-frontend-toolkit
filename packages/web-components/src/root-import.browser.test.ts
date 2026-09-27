@@ -41,13 +41,14 @@ test("does not expose prepared state through root exports or element properties"
   for (const name of forbiddenExports) {
     expect(root).not.toHaveProperty(name);
   }
+  expect(root).not.toHaveProperty("SefariaPopup");
+  expect(customElements.get("sefaria-popup")).toBeUndefined();
 
   for (const elementClass of [
     root.SefariaTextSegment,
     root.SefariaBilingualSegment,
     root.SefariaRefLabel,
     root.SefariaSourceCard,
-    root.SefariaPopup,
     root.SefariaConnectionsPanel,
     root.SefariaReader,
   ]) {

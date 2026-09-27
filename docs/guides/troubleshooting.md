@@ -14,12 +14,11 @@ Import `@arithmomaniac/sefaria-web-components` before creating the element. DOM-
 
 ## A property change has no effect
 
-Assign raw objects, arrays, acquisition choices, and anchors as JavaScript properties:
+Assign raw objects, arrays, and acquisition choices as JavaScript properties:
 
 ```ts
 card.data = validatedPayload;
 card.acquisition = { kind: "client", client };
-popup.anchor = citationButton;
 ```
 
 Do not serialize raw data into an attribute or assign prepared rendering.
@@ -56,8 +55,8 @@ Prefill host input, not live `sref`. Assign `sref` only after the maintained pag
 
 Defined ordinary-element `data` is authoritative. Clear it before assigning a live reference.
 
-## Popup visibility changes acquisition
+## A link preview keeps loading after close
 
-`open` controls visibility only. Assign or clear Popup `sref` according to host policy.
+The host owns its dialog and must clear the Source Card reference and disconnect the card when closing. See the [linked-article example](../linked-article.md).
 
 Use the [data-flow guide](data-flow.md), [component catalog](../components.md), and generated [custom-element reference](../reference/custom-elements.md) for exact contracts.

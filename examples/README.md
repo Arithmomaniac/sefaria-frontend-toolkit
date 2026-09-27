@@ -21,7 +21,7 @@ Runnable scenario definitions live in [`explorer/src/authored`](explorer/src/aut
 
 ## Editable supplied-data projects
 
-The [component playground](playground/index.html?project=source-card) uses one reusable HTML/CSS/plain-JavaScript editor for seven maintained projects. Each project renders useful output beside the editable files, validates bounded local payloads through public client schemas, assigns public raw data through properties and scalar configuration through attributes, and makes zero Sefaria requests.
+The [component playground](playground/index.html?project=source-card) uses one reusable HTML/CSS/plain-JavaScript editor for six maintained projects. Each project renders useful output beside the editable files, validates bounded local payloads through public client schemas, assigns public raw data through properties and scalar configuration through attributes, and makes zero Sefaria requests.
 
 | Project ID | Demonstrated local behavior |
 | --- | --- |
@@ -29,7 +29,6 @@ The [component playground](playground/index.html?project=source-card) uses one r
 | `text-segment` | Select the exact Hebrew or English edition from the supplied response. |
 | `bilingual-segment` | Change side order while retaining payload-owned language roles and directions. |
 | `source-card` | Select a source row and change vocalization without requesting replacement data. |
-| `popup` | Open an anchored popup, close it with Escape, and restore trigger focus. |
 | `connections-panel` | Change captured category, page, and preview visibility with zero I/O. |
 | `reader` | Change local presentation over exact Micah 6:8 source and links coverage and show an explicit limitation for uncovered navigation. |
 
@@ -59,6 +58,6 @@ The [React Vite example](react-vite/README.md) demonstrates React 19 custom-elem
 
 ## Article and MCP host integration
 
-The [authored linked article](linked-article/) progressively enhances ordinary Micah 6:8 Sefaria anchors by assigning Popup `sref` as an attribute after eligible activation while preserving JavaScript-disabled and modifier-key navigation. The page owns its cache-disabled client choice, activation policy, visible failures, and cleanup; Popup owns cancellation and stale suppression; its [README](linked-article/README.md) identifies the public subpaths and runnable source.
+The [authored linked article](linked-article/) progressively enhances ordinary Micah 6:8 Sefaria anchors with Source Card in a host-owned native modal dialog while preserving JavaScript-disabled and modifier-key navigation. The page owns its cache-disabled client choice, activation policy, focus return, visible failures, and cleanup; Source Card owns cancellation and stale suppression; its [README](linked-article/README.md) identifies the public contracts and runnable source.
 
 The [MCP App guide](../docs/mcp-app-demo.md) packages the Reader as a self-contained MCP App. The documentation site includes a click-to-start in-browser MCP client/server and opaque sandbox without an external backend. Run `pnpm dev:mcp` for the compiled Streamable HTTP reference host. The maintained [App](mcp-app/src/app.ts), [host](mcp-app/src/host/), and [server](mcp-app/src/server/) sources keep tool requests host-mediated and transport logic separate from Reader state.

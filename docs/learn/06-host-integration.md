@@ -24,7 +24,7 @@ An authored page keeps a native citation link and enhances it only after JavaScr
 </a>
 ```
 
-The page-owned enhancement handles activation, assigns the Popup `sref` attribute with an explicit client acquisition property, clears it on close or destroy, and preserves native navigation for JavaScript-disabled and modifier-key use. <SiteLink to="/examples/linked-article/index.html">Open the hosted linked article</SiteLink>.
+The page-owned enhancement opens a native modal dialog containing Source Card, assigns its `sref` attribute with an explicit client acquisition property, clears and disconnects it on close or destroy, and preserves native navigation for JavaScript-disabled and modifier-key use. <SiteLink to="/examples/linked-article/index.html">Open the hosted linked article</SiteLink>.
 
 The MCP App starts differently. In the browser demonstration, clicking **Start live demo** creates a real MCP client/server pair in the page. The server returns API data in the MCP result's `structuredContent` field. The App treats that field as unknown JSON, validates it, and constructs the corresponding raw Reader seed. Opening the page makes zero Sefaria requests. The initial activated flow makes one text request followed by a links request, without loading the source twice. Later navigation asks the host to run the server tool; the App still does not request Sefaria directly.
 
@@ -34,7 +34,7 @@ The browser demonstration uses the packaged App resource and the official browse
 
 ## Expected result
 
-The linked article still navigates as ordinary HTML when enhancement is unavailable. With JavaScript, explicit activation opens a popup with visible loading, error, cancellation, and cleanup behavior.
+The linked article still navigates as ordinary HTML when enhancement is unavailable. With JavaScript, explicit activation opens a host dialog with visible loading, error, cancellation, and cleanup behavior.
 
 - **Browser demonstration:** waits for explicit activation, then renders live Sefaria data through in-memory MCP tools and the packaged App.
 - **Node integration path:** repository contributors can follow the repository-only [MCP development instructions](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md#run-the-mcp-app-server) for stdio and HTTP transport checks.
@@ -43,7 +43,7 @@ The linked article still navigates as ordinary HTML when enhancement is unavaila
 
 | Integration | Request owner | Rendering path |
 | --- | --- | --- |
-| Authored article | Page enhancement | Eligible activation -> Popup `sref` attribute + explicit acquisition property -> private preparation |
+| Authored article | Page enhancement | Eligible activation -> host dialog -> Source Card `sref` attribute + explicit acquisition property -> private preparation |
 | Static MCP first render | Browser-embedded server after explicit activation | Corrected payload in `structuredContent` -> public schema -> raw Reader seed -> private Reader preparation |
 | Static MCP continuation | App through the browser host's server-tool bridge | In-memory MCP tool result -> validation -> tagged host capability -> Reader |
 | MCP first render | Node server before the tool result reaches the App | Unknown `structuredContent` -> public schema -> raw Reader seed -> private Reader preparation |
@@ -53,7 +53,7 @@ The App does not call Sefaria directly. The browser demonstration proves the in-
 
 ## Exercise
 
-Disable JavaScript and follow the authored Micah 6:8 link. Re-enable JavaScript, activate it with the keyboard, then close the popup and confirm focus restoration. For MCP, open the static live host and confirm that no live result appears before **Start live demo**. Start it, then use the local Node reference host to identify which actions cross each topology's tool boundary.
+Disable JavaScript and follow the authored Micah 6:8 link. Re-enable JavaScript, activate it with the keyboard, then close the dialog and confirm focus restoration. For MCP, open the static live host and confirm that no live result appears before **Start live demo**. Start it, then use the local Node reference host to identify which actions cross each topology's tool boundary.
 
 ## Source and run links
 

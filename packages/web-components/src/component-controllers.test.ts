@@ -14,7 +14,6 @@ import unresolvedRefFixture from "../../client/test/fixtures/ref-unresolved-2026
 import textFixture from "../../client/test/fixtures/v3-connections-genesis-target-2026-09-06.json";
 import { createBilingualSegmentController } from "./bilingual-segment.js";
 import { createConnectionsController } from "./connections-panel.js";
-import { createPopupController } from "./popup.js";
 import { createRefLabelController } from "./ref-label.js";
 import { createSourceCardController } from "./source-card.js";
 import { createTextSegmentController } from "./text-segment.js";
@@ -136,28 +135,6 @@ const cases: readonly HarnessCase[] = [
     payload: textPayload,
     create: (client) => {
       const controller = createSourceCardController(client);
-      const request = { tref: "Genesis 1:2" };
-      return {
-        get snapshot() {
-          return controller.snapshot;
-        },
-        load: (signal) => controller.load(request, signal),
-        setSuppliedData: (payload, status) =>
-          controller.setSuppliedData(
-            request,
-            payload,
-            status as 200 | 400 | 404 | undefined,
-          ),
-        cancel: (reason) => controller.cancel(reason),
-        dispose: () => controller.dispose(),
-      };
-    },
-  },
-  {
-    name: "popup",
-    payload: textPayload,
-    create: (client) => {
-      const controller = createPopupController(client);
       const request = { tref: "Genesis 1:2" };
       return {
         get snapshot() {

@@ -253,7 +253,7 @@
             },
             {
               "name": "--sefaria-shadow",
-              "description": "Popup and elevated-surface shadow.",
+              "description": "Elevated-surface shadow.",
               "default": "0 1rem 3rem rgb(0 0 0 / 28%)"
             },
             {
@@ -572,7 +572,7 @@
             },
             {
               "name": "--sefaria-shadow",
-              "description": "Popup and elevated-surface shadow.",
+              "description": "Elevated-surface shadow.",
               "default": "0 1rem 3rem rgb(0 0 0 / 28%)"
             },
             {
@@ -628,255 +628,6 @@
           "declaration": {
             "name": "SefariaConnectionsPanel",
             "module": "dist/connections-panel-element.js"
-          }
-        }
-      ]
-    },
-    {
-      "kind": "javascript-module",
-      "path": "dist/popup-element.js",
-      "declarations": [
-        {
-          "kind": "class",
-          "description": "Anchored dialog that renders supplied or acquired popup data.",
-          "name": "SefariaPopup",
-          "members": [
-            {
-              "kind": "field",
-              "name": "sref",
-              "privacy": "public",
-              "type": {
-                "text": "string"
-              },
-              "description": "Reference prepared while the connected popup is open or closed.",
-              "default": "\"\"",
-              "attribute": "sref"
-            },
-            {
-              "kind": "field",
-              "name": "data",
-              "privacy": "public",
-              "type": {
-                "text": "unknown | undefined"
-              },
-              "description": "Authoritative corrected v3 text response data.",
-              "default": "undefined"
-            },
-            {
-              "kind": "field",
-              "name": "acquisition",
-              "privacy": "public",
-              "type": {
-                "text": "SefariaAcquisition | undefined"
-              },
-              "description": "Optional element-specific acquisition source.",
-              "default": "undefined"
-            },
-            {
-              "kind": "field",
-              "name": "anchor",
-              "privacy": "public",
-              "type": {
-                "text": "HTMLElement | null"
-              },
-              "description": "Host element used for placement and focus restoration.",
-              "default": "null"
-            },
-            {
-              "kind": "field",
-              "name": "open",
-              "privacy": "public",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the dialog is visible.",
-              "default": "false",
-              "attribute": "open",
-              "reflects": true
-            },
-            {
-              "kind": "field",
-              "name": "vocalizationMode",
-              "privacy": "public",
-              "type": {
-                "text": "VocalizationMode"
-              },
-              "description": "Hebrew vocalization preset applied to the nested source card.",
-              "default": "\"taamim_and_nikkud\"",
-              "attribute": "vocalization-mode"
-            },
-            {
-              "kind": "field",
-              "name": "status",
-              "type": {
-                "text": "SefariaElementStatus"
-              },
-              "description": "Coarse lifecycle state without exposing prepared rendering data.",
-              "readonly": true
-            }
-          ],
-          "events": [
-            {
-              "name": "sefaria-popup-close",
-              "description": "Reports that the popup should close.",
-              "type": {
-                "text": "CustomEvent"
-              }
-            },
-            {
-              "name": "sefaria-popup-error",
-              "description": "Reports a current standalone loading or validation failure.",
-              "type": {
-                "text": "CustomEvent"
-              }
-            }
-          ],
-          "attributes": [
-            {
-              "name": "sref",
-              "type": {
-                "text": "string"
-              },
-              "description": "Reference prepared while the connected popup is open or closed.",
-              "default": "\"\"",
-              "fieldName": "sref"
-            },
-            {
-              "name": "open",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Whether the dialog is visible.",
-              "default": "false",
-              "fieldName": "open"
-            },
-            {
-              "name": "vocalization-mode",
-              "type": {
-                "text": "VocalizationMode"
-              },
-              "description": "Hebrew vocalization preset applied to the nested source card.",
-              "default": "\"taamim_and_nikkud\"",
-              "fieldName": "vocalizationMode"
-            }
-          ],
-          "superclass": {
-            "name": "SefariaElement",
-            "module": "dist/sefaria-element.js"
-          },
-          "tagName": "sefaria-popup",
-          "customElement": true,
-          "slots": [],
-          "cssParts": [],
-          "cssProperties": [
-            {
-              "name": "--sefaria-surface",
-              "description": "Primary surface color.",
-              "default": "light-dark(#fffdf8, #2b2e2a)"
-            },
-            {
-              "name": "--sefaria-surface-muted",
-              "description": "Muted surface color.",
-              "default": "light-dark(#f5f1e8, #222521)"
-            },
-            {
-              "name": "--sefaria-fg",
-              "description": "Primary foreground color.",
-              "default": "light-dark(#25231f, #f1eee7)"
-            },
-            {
-              "name": "--sefaria-fg-muted",
-              "description": "Muted foreground color.",
-              "default": "light-dark(#6d675d, #bdb7ac)"
-            },
-            {
-              "name": "--sefaria-border",
-              "description": "Standard border color.",
-              "default": "light-dark(#d7cfc1, #555b53)"
-            },
-            {
-              "name": "--sefaria-border-strong",
-              "description": "Strong border color.",
-              "default": "light-dark(#aaa094, #73796f)"
-            },
-            {
-              "name": "--sefaria-accent",
-              "description": "Accent and focus color.",
-              "default": "light-dark(#8e2449, #ff93b4)"
-            },
-            {
-              "name": "--sefaria-accent-soft",
-              "description": "Translucent accent surface.",
-              "default": "light-dark(rgb(142 36 73 / 10%), rgb(255 147 180 / 14%))"
-            },
-            {
-              "name": "--sefaria-danger",
-              "description": "Error foreground color.",
-              "default": "light-dark(#9c1c1c, #ffaaa4)"
-            },
-            {
-              "name": "--sefaria-link",
-              "description": "Link foreground color.",
-              "default": "light-dark(#8e2449, #ff93b4)"
-            },
-            {
-              "name": "--sefaria-shadow",
-              "description": "Popup and elevated-surface shadow.",
-              "default": "0 1rem 3rem rgb(0 0 0 / 28%)"
-            },
-            {
-              "name": "--sefaria-panel-radius",
-              "description": "Panel corner radius.",
-              "default": "0.75rem"
-            },
-            {
-              "name": "--sefaria-control-radius",
-              "description": "Control corner radius.",
-              "default": "0.3rem"
-            },
-            {
-              "name": "--sefaria-font-scale",
-              "description": "Component font-size multiplier.",
-              "default": "1"
-            },
-            {
-              "name": "--sefaria-font-hebrew",
-              "description": "Hebrew body font stack.",
-              "default": "\"Noto Serif Hebrew\", \"SBL Hebrew\", \"Times New Roman\", serif"
-            },
-            {
-              "name": "--sefaria-font-english",
-              "description": "English body font stack.",
-              "default": "Georgia, \"Times New Roman\", serif"
-            },
-            {
-              "name": "--sefaria-font-label-hebrew",
-              "description": "Hebrew label font stack.",
-              "default": "\"Noto Sans Hebrew\", system-ui, sans-serif"
-            },
-            {
-              "name": "--sefaria-font-label-english",
-              "description": "English label font stack.",
-              "default": "system-ui, sans-serif"
-            }
-          ]
-        }
-      ],
-      "exports": [
-        {
-          "kind": "js",
-          "name": "SefariaPopup",
-          "declaration": {
-            "name": "SefariaPopup",
-            "module": "dist/popup-element.js"
-          }
-        },
-        {
-          "kind": "custom-element-definition",
-          "name": "sefaria-popup",
-          "declaration": {
-            "name": "SefariaPopup",
-            "module": "dist/popup-element.js"
           }
         }
       ]
@@ -1291,7 +1042,7 @@
             },
             {
               "name": "--sefaria-shadow",
-              "description": "Popup and elevated-surface shadow.",
+              "description": "Elevated-surface shadow.",
               "default": "0 1rem 3rem rgb(0 0 0 / 28%)"
             },
             {
@@ -1522,7 +1273,7 @@
             },
             {
               "name": "--sefaria-shadow",
-              "description": "Popup and elevated-surface shadow.",
+              "description": "Elevated-surface shadow.",
               "default": "0 1rem 3rem rgb(0 0 0 / 28%)"
             },
             {
@@ -1910,7 +1661,7 @@
             },
             {
               "name": "--sefaria-shadow",
-              "description": "Popup and elevated-surface shadow.",
+              "description": "Elevated-surface shadow.",
               "default": "0 1rem 3rem rgb(0 0 0 / 28%)"
             },
             {
@@ -2170,7 +1921,7 @@
             },
             {
               "name": "--sefaria-shadow",
-              "description": "Popup and elevated-surface shadow.",
+              "description": "Elevated-surface shadow.",
               "default": "0 1rem 3rem rgb(0 0 0 / 28%)"
             },
             {

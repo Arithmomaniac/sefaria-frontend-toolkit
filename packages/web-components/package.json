@@ -38,10 +38,6 @@
       "types": "./dist/connections-panel-public.d.ts",
       "import": "./dist/connections-panel-public.js"
     },
-    "./popup": {
-      "types": "./dist/popup-public.d.ts",
-      "import": "./dist/popup-public.js"
-    },
     "./reader": {
       "types": "./dist/reader-public.d.ts",
       "import": "./dist/reader-public.js"

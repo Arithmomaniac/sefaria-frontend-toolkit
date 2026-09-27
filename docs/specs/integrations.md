@@ -4,7 +4,7 @@
 
 ## Status
 
-The documentation site, supplied-data editor, standalone and spatial website Readers, MCP App, and authored linked-article integration are current. Their declarative component-input migration is implemented.
+The documentation site, supplied-data editor, standalone and spatial website Readers, MCP App, and authored linked-article integration are current. Their declarative component-input migration is implemented. The host-dialog preview replacement and six-project editor are implemented.
 
 ## Shared rules
 
@@ -24,7 +24,7 @@ Transport semantics remain unchanged: documented HTTP payloads retain their type
 
 ## Supplied-data editor
 
-The editor exposes seven maintained projects. Each validates fixed corrected payloads and assigns raw component data or Reader seeds. It does not retain public controllers, bindings, prepared models, a fetch broker, runtime package installation, CDN loading, service workers, or a live-data fallback.
+The editor exposes six maintained projects. Each validates fixed corrected payloads and assigns raw component data or Reader seeds. It does not retain public controllers, bindings, prepared models, a fetch broker, runtime package installation, CDN loading, service workers, or a live-data fallback.
 
 The trusted host owns project selection, editor state, source links, bounded diagnostics, and preview replacement. Edited code runs only in the opaque sandboxed frame under the existing CSP and finite source/asset/message limits.
 
@@ -66,9 +66,13 @@ The browser-embedded reference host continues to prove the packaged App, officia
 
 ## Authored linked article
 
-The article retains ordinary Sefaria anchors and native navigation. Eligible primary activation assigns Popup `sref`, anchor, and `open`; modifier, alternate-target, download, and non-primary activation remain native.
+The article retains ordinary Sefaria anchors and native navigation. Eligible unmodified primary or keyboard activation opens a host-owned native modal `<dialog>` containing `<sefaria-source-card>` and assigns the card's `sref`. Modifier, alternate-target, download, already-prevented, and non-primary activation remain native. Missing or invalid authored reference/URL inputs are not enhanced.
 
-The page uses an explicit cache-disabled client acquisition source. Close, supersession, and destroy clear the owned reference or remove the Popup. Popup owns its acquisition lifecycle and emits `sefaria-popup-error`; the page owns visible integration status and removes only its listeners and accessibility attributes.
+The host owns the dialog's accessible name, initial close-button focus, responsive scrollable layout, Escape/button closing, and return of focus to the originating link when it remains connected. Background content is inert while the modal is open. No anchored placement or Popup-specific 20-position truncation remains: the preview uses ordinary Source Card rendering.
+
+The page uses an explicit cache-disabled client acquisition source. Source Card owns validation, private preparation, loading/empty/partial states, cancellation, and stale-result suppression. The same active reference does not restart acquisition. Close and destroy clear the reference and disconnect the active card; reopening starts one fresh request. A changed reference supersedes pending work. Late completion or a queued close from an obsolete opening must not affect a newer preview.
+
+Current `sefaria-source-card-error` closes the dialog, returns focus, and announces the original failure in visible host status; only another eligible activation retries. The host removes only its own nodes and listeners and restores any accessibility attributes it replaced on authored links. Destroy is idempotent. Missing originating links do not cause focus errors.
 
 The integration does not detect citations, extract article text, submit a Linker task, poll, hover-activate, bulk preload, rewrite prose, or install a global script.
 
@@ -93,11 +97,11 @@ Ten child renderings from one parent response require one outer request and zero
 
 ## Completion criteria
 
-- all seven public elements use declarative inputs in maintained integrations
+- all six public elements use declarative inputs in maintained integrations
 - no maintained integration constructs public prepared rendering, owner controllers, or bindings
 - supplied paths make zero requests
 - live pages retain explicit activation gates
 - MCP continuation remains host-proxied
-- Popup visibility remains independent of preparation
+- the linked article proves modal keyboard access, Escape/button close, focus return, native navigation, exact request counts, and cleanup without a Popup element
 - Reader and composite request-count rules are tested
 - deterministic checks remain offline
