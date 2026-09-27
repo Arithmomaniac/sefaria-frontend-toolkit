@@ -14,7 +14,51 @@ The publication set contains exactly:
 - `@arithmomaniac/sefaria-text-transform`
 - `@arithmomaniac/sefaria-web-components`
 
-The package names are experimental and subject to change. The packages are published only to the npm-format GitHub Packages registry at `https://npm.pkg.github.com`; they are not published on npmjs.com and have no supported CDN distribution.
+The package names are experimental and subject to change. The packages are published only to the npm-format GitHub Packages registry at `https://npm.pkg.github.com`; they are not published on npmjs.com. The separate browser script source specified below provides anonymous loading without installing those packages.
+
+## Browser script source
+
+**Implementation status:** local build and deterministic qualification are implemented; first hosted publication remains pending. The hosting contract serves one self-contained, minified, tree-shaken ES module registering all seven existing elements. Consumers need neither package-registry authentication nor a build step, import map, external runtime dependency, or separate stylesheet. The module preserves the package-root exports and existing element contracts; it does not add acquisition, retry, caching, or rendering policy.
+
+The pinned path is `https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/<package-version>/sefaria-elements.js`. The moving path is `https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js`.
+
+```html
+<script
+  type="module"
+  src="https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
+></script>
+<sefaria-source-card sref="Micah 6:8"></sefaria-source-card>
+```
+
+Each newly published, fully verified synchronized package release automatically receives a script release with the same version and source commit. Partial package publication must not advertise a script release. The package producer's run ID and attempt own the version; a Pages redeployment does not create a version. Historical package releases are not automatically backfilled.
+
+Repeated loading must not throw, including separate evaluations of identical module bytes. Existing definitions win. Loading multiple versions does not replace registered elements, and configuring one module instance does not configure another; mixing versions and their exports is not a supported composition strategy.
+
+### Retention and hosting
+
+Published versioned files are immutable **while retained**, not permanently available. Maintainers may retire any version at any time without notice. Pinned URLs may consequently stop working. There is no automatic age- or count-based eviction, and a retired version must never be reused.
+
+GitHub Releases hold complete artifact archives. A separate automation-owned, version-controlled catalog records expected hashes, producer identity, and active or retired state. Every deployment restores every active version from its original archive, never by rebuilding old source. Missing or changed active artifacts fail deployment; absence is not retirement. Explicit retirement records a tombstone before a later deployment removes the path. Provider/browser caches may delay visible removal.
+
+The complete assembled site has a conservative publication budget of 1,000,000,000 bytes. Exceeding it blocks upload with measured size and retained-version cleanup candidates; it never triggers automatic retirement. GitHub operations have a fresh 60-second deadline per request, and hosting jobs have explicit outer time limits.
+
+The moving `alpha` directory contains the exact files of the newest active release, ordered by producer run number and attempt rather than completion time. Retiring the newest release selects the next active release. If none remain, no script alias is served and the catalog reports that state.
+
+Names and URLs may change. The existing Pages location remains the host for retained original URLs; repository redirects are not a substitute for preserving project-site files. This continuity obligation applies only while a version is retained and is not a guarantee of third-party hosting uptime.
+
+### License, source, and size
+
+Each release includes the toolkit's GPL-3.0-only license, full required third-party license notices derived from the actual bundled dependency graph, corresponding-source access, and a manifest identifying its exact source commit, dependency versions, and file hashes. Missing license or source evidence blocks publication. Retirement of script serving does not waive applicable source-distribution obligations.
+
+The build records raw bytes and gzip bytes with fixed compression settings. Measurement is over the final minified module and is checked against its bytes; it is not a claim about the encoding served by Pages. The initial delivery also records an all-elements versus per-element/shared-chunk comparison, including the complete Source Card dependency closure.
+
+### Script qualification
+
+Required deterministic acceptance uses the actual production artifact on a separate-origin plain HTML host. Only Sefaria HTTP responses may be intercepted with corrected fixtures; custom acquisition, import maps, source aliases, or development transforms cannot substitute for the script path.
+
+Acceptance proves standalone Micah 6:8 rendering, all seven registrations, duplicate evaluation, exact outer/child request counts, supplied-data behavior, visible validation failure, cross-deploy byte identity, explicit retirement, fail-closed archive restoration, and independently recomputed sizes. Local checks stay offline and cannot publish their fixture version.
+
+Hosted delivery additionally requires anonymous loading from the actual Pages URL, correct JavaScript MIME and CORS, matching package identity, accessible notices/source, and preservation of an older active pin after a later deployment. Local workflow tests alone do not establish hosted availability.
 
 ## Source and published manifests
 

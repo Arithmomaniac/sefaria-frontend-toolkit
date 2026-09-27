@@ -9,6 +9,7 @@ import {
   readSiteBasePath,
   SITE_REQUIRED_FILES,
 } from "./build-site-plan.mjs";
+import { buildScriptSource } from "./build-script-source.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const site = path.join(root, "dist", "site");
@@ -27,6 +28,12 @@ if (!examplesOnly) {
 for (const step of createSiteBuildSteps({ skipTypecheck, siteBasePath })) {
   if (step.kind === "pnpm") {
     runPnpm(step.args);
+    continue;
+  }
+  if (step.kind === "script-source") {
+    await buildScriptSource({
+      destination: path.join(stagedPublic, "cdn", "local"),
+    });
     continue;
   }
   if (step.kind === "vite") {
