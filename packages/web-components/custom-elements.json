@@ -66,6 +66,28 @@
             },
             {
               "kind": "field",
+              "name": "translationLanguage",
+              "privacy": "public",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Preferred translation family, falling back only when unavailable.",
+              "default": "undefined",
+              "attribute": "translation-language"
+            },
+            {
+              "kind": "field",
+              "name": "hideAttributions",
+              "privacy": "public",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Hides compact standalone edition attribution.",
+              "default": "false",
+              "attribute": "hide-attributions"
+            },
+            {
+              "kind": "field",
               "name": "contentLanguage",
               "privacy": "public",
               "type": {
@@ -136,6 +158,24 @@
               "description": "Reference loaded when authoritative supplied data is absent.",
               "default": "\"\"",
               "fieldName": "sref"
+            },
+            {
+              "name": "translation-language",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Preferred translation family, falling back only when unavailable.",
+              "default": "undefined",
+              "fieldName": "translationLanguage"
+            },
+            {
+              "name": "hide-attributions",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Hides compact standalone edition attribution.",
+              "default": "false",
+              "fieldName": "hideAttributions"
             },
             {
               "name": "primary-version-title",
@@ -698,6 +738,50 @@
             },
             {
               "kind": "field",
+              "name": "translationLanguage",
+              "privacy": "public",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Preferred family used for root and navigated translations.",
+              "default": "undefined",
+              "attribute": "translation-language"
+            },
+            {
+              "kind": "field",
+              "name": "primaryVersionTitle",
+              "privacy": "public",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Exact primary edition for the external root and its context.",
+              "default": "undefined",
+              "attribute": "primary-version-title"
+            },
+            {
+              "kind": "field",
+              "name": "translationVersionTitle",
+              "privacy": "public",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Exact translation edition for the external root and its context.",
+              "default": "undefined",
+              "attribute": "translation-version-title"
+            },
+            {
+              "kind": "field",
+              "name": "hideAttributions",
+              "privacy": "public",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Hides edition attribution on the source card.",
+              "default": "false",
+              "attribute": "hide-attributions"
+            },
+            {
+              "kind": "field",
               "name": "activePane",
               "privacy": "public",
               "type": {
@@ -918,6 +1002,42 @@
               "description": "Requested external Reader root, separate from current navigation.",
               "default": "\"\"",
               "fieldName": "sref"
+            },
+            {
+              "name": "translation-language",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Preferred family used for root and navigated translations.",
+              "default": "undefined",
+              "fieldName": "translationLanguage"
+            },
+            {
+              "name": "primary-version-title",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Exact primary edition for the external root and its context.",
+              "default": "undefined",
+              "fieldName": "primaryVersionTitle"
+            },
+            {
+              "name": "translation-version-title",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Exact translation edition for the external root and its context.",
+              "default": "undefined",
+              "fieldName": "translationVersionTitle"
+            },
+            {
+              "name": "hide-attributions",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Hides edition attribution on the source card.",
+              "default": "false",
+              "fieldName": "hideAttributions"
             },
             {
               "name": "active-pane",
@@ -1397,6 +1517,17 @@
             },
             {
               "kind": "field",
+              "name": "translationLanguage",
+              "privacy": "public",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Preferred translation family, falling back only when unavailable.",
+              "default": "undefined",
+              "attribute": "translation-language"
+            },
+            {
+              "kind": "field",
               "name": "contentLanguage",
               "privacy": "public",
               "type": {
@@ -1526,6 +1657,15 @@
               "description": "Reference loaded when authoritative supplied data is absent.",
               "default": "\"\"",
               "fieldName": "sref"
+            },
+            {
+              "name": "translation-language",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Preferred translation family, falling back only when unavailable.",
+              "default": "undefined",
+              "fieldName": "translationLanguage"
             },
             {
               "name": "primary-version-title",
@@ -1785,6 +1925,28 @@
             },
             {
               "kind": "field",
+              "name": "translationLanguage",
+              "privacy": "public",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Preferred translation family, mutually exclusive with a strict version language.",
+              "default": "undefined",
+              "attribute": "translation-language"
+            },
+            {
+              "kind": "field",
+              "name": "hideAttributions",
+              "privacy": "public",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Hides compact edition attribution for standalone text.",
+              "default": "false",
+              "attribute": "hide-attributions"
+            },
+            {
+              "kind": "field",
               "name": "vocalizationMode",
               "privacy": "public",
               "type": {
@@ -1831,6 +1993,24 @@
               "description": "Reference loaded when authoritative supplied data is absent.",
               "default": "\"\"",
               "fieldName": "sref"
+            },
+            {
+              "name": "translation-language",
+              "type": {
+                "text": "string | undefined"
+              },
+              "description": "Preferred translation family, mutually exclusive with a strict version language.",
+              "default": "undefined",
+              "fieldName": "translationLanguage"
+            },
+            {
+              "name": "hide-attributions",
+              "type": {
+                "text": "boolean"
+              },
+              "description": "Hides compact edition attribution for standalone text.",
+              "default": "false",
+              "fieldName": "hideAttributions"
             },
             {
               "name": "version-language",

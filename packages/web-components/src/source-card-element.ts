@@ -1,4 +1,4 @@
-import { text, type CoreV3TextsResponse } from "@arithmomaniac/sefaria-client";
+import type { CoreV3TextsResponse } from "@arithmomaniac/sefaria-client";
 import {
   css,
   html,
@@ -42,6 +42,10 @@ import type {
 } from "./source-card.js";
 import { createSourceCardViewModel } from "./source-card.js";
 import { serializeSourceCardSelectors } from "./source-card-request.js";
+import {
+  acquireSelectedText,
+  type SelectedTextProgress,
+} from "./translation-selection.js";
 
 /** Custom element that renders supplied or acquired source-card data. */
 export class SefariaSourceCard extends SefariaElement {
@@ -50,6 +54,11 @@ export class SefariaSourceCard extends SefariaElement {
     sref: { type: String, useDefault: true },
     data: { attribute: false },
     acquisition: { attribute: false },
+    translationLanguage: {
+      type: String,
+      attribute: "translation-language",
+      converter: optionalStringConverter,
+    },
     primaryVersionTitle: {
       type: String,
       attribute: "primary-version-title",
@@ -297,6 +306,8 @@ export class SefariaSourceCard extends SefariaElement {
   declare primaryVersionTitle: string | undefined;
   /** Optional exact edition title for the translation role. */
   declare translationVersionTitle: string | undefined;
+  /** Preferred translation family, falling back only when unavailable. */
+  declare translationLanguage: string | undefined;
 
   /** Sides the host wants displayed for every pair. */
   declare contentLanguage: BilingualPairContentLanguage;
@@ -322,11 +333,13 @@ export class SefariaSourceCard extends SefariaElement {
     | {
         readonly id: number;
         readonly controller: AbortController;
+        readonly progress: SelectedTextProgress;
       }
     | undefined;
   #nextOperationId = 1;
   #declarativeActive = false;
   #resumeOnConnect = false;
+  #interruptedProgress: SelectedTextProgress | undefined;
   #committedViewModel: SourceCardViewModel | undefined;
   #ownedViewModel: SourceCardViewModel | undefined;
   #statusOverride: SefariaElementStatus | undefined;
@@ -338,6 +351,7 @@ export class SefariaSourceCard extends SefariaElement {
     this.acquisition = undefined;
     this.primaryVersionTitle = undefined;
     this.translationVersionTitle = undefined;
+    this.translationLanguage = undefined;
     this.contentLanguage = "both";
     this.layout = "auto";
     this.sideOrder = "primary-first";
@@ -362,6 +376,7 @@ export class SefariaSourceCard extends SefariaElement {
 
   override disconnectedCallback(): void {
     if (this.#active !== undefined) {
+      this.#interruptedProgress = this.#active.progress;
       this.#active.controller.abort(
         new DOMException("Source card disconnected.", "AbortError"),
       );
@@ -382,8 +397,10 @@ export class SefariaSourceCard extends SefariaElement {
       changed.has("data") ||
       changed.has("acquisition") ||
       changed.has("primaryVersionTitle") ||
+      changed.has("translationLanguage") ||
       changed.has("translationVersionTitle")
     ) {
+      this.#interruptedProgress = undefined;
       this.#resumeOnConnect = false;
       this.#reconcile();
     }
@@ -476,7 +493,9 @@ export class SefariaSourceCard extends SefariaElement {
     const active = {
       id: this.#nextOperationId++,
       controller: new AbortController(),
+      progress: this.#interruptedProgress ?? { fallback: false },
     };
+    this.#interruptedProgress = undefined;
     this.#active = active;
     this.#publish({
       state: "loading",
@@ -487,7 +506,11 @@ export class SefariaSourceCard extends SefariaElement {
 
   async #load(
     sref: string,
-    active: { readonly id: number; readonly controller: AbortController },
+    active: {
+      readonly id: number;
+      readonly controller: AbortController;
+      readonly progress: SelectedTextProgress;
+    },
   ): Promise<void> {
     try {
       const request = this.#request(sref);
@@ -496,20 +519,14 @@ export class SefariaSourceCard extends SefariaElement {
       if (acquisition.kind === "disabled") {
         throw new Error("Standalone Sefaria acquisition is disabled.");
       }
-      const response =
-        acquisition.kind === "client"
-          ? await this.#loadFromClient(
-              sref,
-              versions,
-              acquisition.client,
-              active.controller.signal,
-            )
-          : await this.#loadFromCapability(
-              sref,
-              versions,
-              acquisition.capability,
-              active.controller.signal,
-            );
+      const response = await acquireSelectedText(
+        acquisition,
+        sref,
+        versions,
+        request.translationLanguage,
+        active.controller.signal,
+        active.progress,
+      );
       if (this.#active !== active) return;
       const viewModel = this.#project(
         response.payload,
@@ -532,45 +549,6 @@ export class SefariaSourceCard extends SefariaElement {
         }),
       );
     }
-  }
-
-  async #loadFromClient(
-    sref: string,
-    versions: readonly string[],
-    client: Extract<SefariaAcquisition, { kind: "client" }>["client"],
-    signal: AbortSignal,
-  ): Promise<{ readonly payload: unknown; readonly status: number }> {
-    const result = await text.getV3Texts({
-      client,
-      path: { tref: sref },
-      query: { version: [...versions], return_format: "default" },
-      signal,
-    });
-    if (result.data !== undefined) {
-      return { payload: result.data, status: 200 };
-    }
-    if (result.error !== undefined && result.response !== undefined) {
-      return { payload: result.error, status: result.response.status };
-    }
-    throw new Error("The v3 texts request returned no result.");
-  }
-
-  async #loadFromCapability(
-    sref: string,
-    versions: readonly string[],
-    capability: Extract<
-      SefariaAcquisition,
-      { kind: "capability" }
-    >["capability"],
-    signal: AbortSignal,
-  ): Promise<{ readonly payload: unknown; readonly status: number }> {
-    if (capability.getText === undefined) {
-      throw new Error("The selected acquisition source does not support text.");
-    }
-    return await capability.getText(
-      { sref, versions, returnFormat: "default" },
-      signal,
-    );
   }
 
   #project(
@@ -605,6 +583,9 @@ export class SefariaSourceCard extends SefariaElement {
   #request(sref: string): SourceCardRequest {
     return {
       tref: sref,
+      ...(this.translationLanguage === undefined
+        ? {}
+        : { translationLanguage: this.translationLanguage }),
       ...(this.primaryVersionTitle === undefined
         ? {}
         : { primary: { versionTitle: this.primaryVersionTitle } }),
@@ -848,6 +829,8 @@ export class SefariaSourceCard extends SefariaElement {
     return html`<p class="attribution" data-side=${attribution.side}>
       <span class="attribution-label">${label}</span>
       ${title} ${source}
+      ${attribution.languageFamilyName === undefined ? nothing : html`<span class="edition-language">(${attribution.languageFamilyName}, ${attribution.actualLanguage})</span>`}
+      ${attribution.unavailableTranslationLanguage === undefined ? nothing : html`<span class="translation-fallback" role="status">${attribution.unavailableTranslationLanguage} is unavailable; showing ${attribution.languageFamilyName}.</span>`}
     </p>`;
   }
 }

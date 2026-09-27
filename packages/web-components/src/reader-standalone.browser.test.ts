@@ -99,6 +99,288 @@ function rawConnectionsSeed(): NonNullable<ReaderRawSeedData["connections"]> {
   };
 }
 
+test("Reader forwards language and root editions and replaces an unchanged root after preference changes", async () => {
+  const requests: string[][] = [];
+  const element = new SefariaReader();
+  element.setAttribute("translation-language", "french");
+  element.setAttribute("primary-version-title", "Deterministic example Hebrew");
+  element.setAttribute("sref", "Micah 6");
+  element.acquisition = {
+    kind: "capability",
+    capability: {
+      getText: async (request) => {
+        requests.push([...request.versions]);
+        const payload = micahContext();
+        const translation = payload.versions.find(
+          (version) => !version.isSource,
+        )!;
+        if (request.versions.includes("french")) {
+          translation.versionTitle = "French fixture edition";
+          translation.languageFamilyName = "french";
+          translation.actualLanguage = "fr";
+        }
+        payload.available_versions = payload.versions.map((version) => ({
+          ...version,
+          title: payload.indexTitle,
+        }));
+        return { payload, status: 200 };
+      },
+      getLinks: async () => ({ payload: [], status: 200 }),
+    },
+  };
+  document.body.append(element);
+  await vi.waitFor(() => expect(element.status).toBe("ready"));
+  expect(requests).toEqual([
+    ["primary|Deterministic example Hebrew", "french"],
+  ]);
+  element.removeAttribute("translation-language");
+  await vi.waitFor(() => expect(requests).toHaveLength(2));
+  expect(requests[1]).toEqual([
+    "primary|Deterministic example Hebrew",
+    "translation",
+  ]);
+});
+
+test("Reader keeps its committed root when a new language fails or is invalid", async () => {
+  const getText = vi.fn(async () => {
+    if (getText.mock.calls.length > 1)
+      throw new Error("Selection unavailable.");
+    return { payload: micahContext(), status: 200 };
+  });
+  const element = new SefariaReader();
+  element.sref = "Micah 6";
+  element.acquisition = {
+    kind: "capability",
+    capability: {
+      getText,
+      getLinks: async () => ({ payload: [], status: 200 }),
+    },
+  };
+  document.body.append(element);
+  await vi.waitFor(() => expect(element.status).toBe("ready"));
+  const source = getPreparedState<ReaderViewModel>(element)?.source;
+  element.translationLanguage = "french";
+  await vi.waitFor(() =>
+    expect(element.readerError).toContain("Selection unavailable"),
+  );
+  expect(getPreparedState<ReaderViewModel>(element)?.source).toEqual(source);
+  element.translationLanguage = " ";
+  await vi.waitFor(() =>
+    expect(element.readerError).toContain("language-family"),
+  );
+  expect(getText).toHaveBeenCalledTimes(2);
+  expect(getPreparedState<ReaderViewModel>(element)?.source).toEqual(source);
+});
+
+test.each([false, true])(
+  "invalid Reader language cancels pending selection (committed=%s)",
+  async (committed) => {
+    let complete:
+      | ((value: { payload: CoreV3TextsResponse; status: number }) => void)
+      | undefined;
+    let pendingSignal: AbortSignal | undefined;
+    let count = 0;
+    const element = new SefariaReader();
+    element.sref = "Micah 6";
+    if (!committed) element.translationLanguage = "french";
+    element.acquisition = {
+      kind: "capability",
+      capability: {
+        getText: async (_request, signal) => {
+          count += 1;
+          if (committed && count === 1)
+            return { payload: micahContext(), status: 200 };
+          pendingSignal = signal;
+          return await new Promise((resolve) => {
+            complete = resolve;
+          });
+        },
+        getLinks: async () => ({ payload: [], status: 200 }),
+      },
+    };
+    document.body.append(element);
+    if (committed) {
+      await vi.waitFor(() => expect(element.status).toBe("ready"));
+      element.translationLanguage = "french";
+    }
+    await vi.waitFor(() => expect(complete).toBeDefined());
+    const entryId = element.currentEntryId;
+    element.translationLanguage = " ";
+    await vi.waitFor(() =>
+      expect(element.readerError).toContain("language-family"),
+    );
+    expect(pendingSignal?.aborted).toBe(true);
+    const payload = micahContext();
+    payload.versions[1]!.languageFamilyName = "french";
+    payload.versions[1]!.actualLanguage = "fr";
+    complete?.({ payload, status: 200 });
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    expect(element.currentEntryId).toBe(entryId);
+    expect(element.readerError).toContain("language-family");
+    expect(element.status).toBe("error");
+  },
+);
+
+test("connections-only Reader seed carries the element's translation preference into navigation", async () => {
+  const selected: string[][] = [];
+  const element = new SefariaReader();
+  element.data = { connections: rawConnectionsSeed() };
+  element.translationLanguage = "french";
+  element.acquisition = {
+    kind: "capability",
+    capability: {
+      getText: async (request) => {
+        selected.push([...request.versions]);
+        const payload = micahContext();
+        payload.versions[1]!.languageFamilyName = "french";
+        payload.versions[1]!.actualLanguage = "fr";
+        return { payload, status: 200 };
+      },
+      getLinks: async () => ({ payload: [], status: 200 }),
+    },
+  };
+  document.body.append(element);
+  await vi.waitFor(() => expect(element.status).toBe("ready"));
+  expect(selected).toHaveLength(0);
+  element.dispatchEvent(
+    new CustomEvent("sefaria-reader-connection-select", {
+      detail: { originEntryId: element.currentEntryId, targetRef: "Micah 6" },
+    }),
+  );
+  await vi.waitFor(() => expect(selected).toHaveLength(1));
+  expect(selected[0]).toEqual(["primary", "french"]);
+  await vi.waitFor(() => expect(element.status).toBe("ready"));
+});
+
+test("seeded Reader reconnects only its interrupted default-translation request", async () => {
+  const requests: string[][] = [];
+  const element = new SefariaReader();
+  element.data = { connections: rawConnectionsSeed() };
+  element.translationLanguage = "french";
+  element.acquisition = {
+    kind: "capability",
+    capability: {
+      getText: async (request) => {
+        requests.push([...request.versions]);
+        const payload = micahContext();
+        if (requests.length === 1) {
+          payload.versions = payload.versions.filter(
+            (version) => version.isPrimary,
+          );
+          payload.warnings = [
+            { french: { warning_code: 102, message: "Synthetic absence." } },
+          ];
+          return { payload, status: 200 };
+        }
+        if (requests.length === 2) return await new Promise(() => undefined);
+        return { payload, status: 200 };
+      },
+      getLinks: async () => ({ payload: [], status: 200 }),
+    },
+  };
+  document.body.append(element);
+  await vi.waitFor(() => expect(element.status).toBe("ready"));
+  element.dispatchEvent(
+    new CustomEvent("sefaria-reader-connection-select", {
+      detail: { originEntryId: element.currentEntryId, targetRef: "Micah 6" },
+    }),
+  );
+  await vi.waitFor(() => expect(requests).toHaveLength(2));
+  element.remove();
+  document.body.append(element);
+  await vi.waitFor(() => expect(requests).toHaveLength(3));
+  expect(requests).toEqual([
+    ["primary", "french"],
+    ["primary", "translation"],
+    ["primary", "translation"],
+  ]);
+  await vi.waitFor(() => expect(element.status).toBe("ready"));
+});
+
+test("Reader bounds target/context fallback to four text requests and one links request", async () => {
+  const requests: { sref: string; versions: readonly string[] }[] = [];
+  const getLinks = vi.fn(async () => ({ payload: [], status: 200 }));
+  const element = new SefariaReader();
+  element.sref = "Micah 6:8";
+  element.translationLanguage = "french";
+  element.acquisition = {
+    kind: "capability",
+    capability: {
+      getText: async (request) => {
+        requests.push({ sref: request.sref, versions: request.versions });
+        const payload =
+          request.sref === "Micah 6:8"
+            ? structuredClone(micahTarget)
+            : micahContext();
+        if (request.versions.includes("french")) {
+          payload.versions = payload.versions.filter(
+            (version) => version.isPrimary,
+          );
+          payload.warnings = [
+            {
+              french: {
+                warning_code: 102,
+                message: "Synthetic absence for both qualification phases.",
+              },
+            },
+          ];
+        }
+        return { payload, status: 200 };
+      },
+      getLinks,
+    },
+  };
+  document.body.append(element);
+  await vi.waitFor(() => expect(element.status).toBe("ready"));
+  expect(requests).toEqual([
+    { sref: "Micah 6:8", versions: ["primary", "french"] },
+    { sref: "Micah 6:8", versions: ["primary", "translation"] },
+    { sref: "Micah 6", versions: ["primary", "french"] },
+    { sref: "Micah 6", versions: ["primary", "translation"] },
+  ]);
+  expect(getLinks).toHaveBeenCalledTimes(1);
+});
+
+test("Reader preserves its language and interrupted fallback across reconnect", async () => {
+  const requests: string[][] = [];
+  const element = new SefariaReader();
+  element.sref = "Micah 6";
+  element.translationLanguage = "french";
+  element.acquisition = {
+    kind: "capability",
+    capability: {
+      getText: async (request) => {
+        requests.push([...request.versions]);
+        const payload = micahContext();
+        if (requests.length === 1) {
+          payload.versions = payload.versions.filter(
+            (version) => version.isPrimary,
+          );
+          payload.warnings = [
+            {
+              french: {
+                warning_code: 102,
+                message: "Synthetic missing language.",
+              },
+            },
+          ];
+          return { payload, status: 200 };
+        }
+        if (requests.length === 2) return await new Promise(() => undefined);
+        return { payload, status: 200 };
+      },
+      getLinks: async () => ({ payload: [], status: 200 }),
+    },
+  };
+  document.body.append(element);
+  await vi.waitFor(() => expect(requests).toHaveLength(2));
+  element.remove();
+  document.body.append(element);
+  await vi.waitFor(() => expect(requests).toHaveLength(3));
+  expect(requests[2]).toEqual(["primary", "translation"]);
+  await vi.waitFor(() => expect(element.status).toBe("ready"));
+});
+
 test("loads Micah 6:8 progressively through an explicit client and preserves a failed root", async () => {
   let resolveLinks!: (response: Response) => void;
   const requests: string[] = [];

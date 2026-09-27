@@ -137,12 +137,16 @@ describe("createSourceCardViewModel", () => {
         versionTitle: "Explicit source-backed compatibility composition",
         versionSource: null,
         versionSourceUrl: null,
+        actualLanguage: "he",
+        languageFamilyName: "hebrew",
       },
       {
         side: "translation",
         versionTitle: "Example English",
         versionSource: "Example publisher",
         versionSourceUrl: null,
+        actualLanguage: "en",
+        languageFamilyName: "english",
       },
     ]);
     expect(result.items).toHaveLength(1);
@@ -165,12 +169,16 @@ describe("createSourceCardViewModel", () => {
         versionTitle: "Explicit source-backed compatibility composition",
         versionSource: "javascript:alert(1)",
         versionSourceUrl: null,
+        actualLanguage: "he",
+        languageFamilyName: "hebrew",
       },
       {
         side: "translation",
         versionTitle: "Example English",
         versionSource: "https://example.test/translation",
         versionSourceUrl: "https://example.test/translation",
+        actualLanguage: "en",
+        languageFamilyName: "english",
       },
     ]);
   });

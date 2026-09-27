@@ -7,6 +7,7 @@ import type {
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
 import micahFixture from "../../../react-vite/src/micah-6-8.json";
+import captures from "../../../../packages/web-components/test/fixtures/translation-preference-2026-09-27.json";
 import { startSourceCardLiveDemo } from "./app.js";
 import v3Fixture from "../../../../packages/client/test/fixtures/v3-text-spanning-2026-08-29.json" with { type: "json" };
 
@@ -21,6 +22,7 @@ beforeEach(() => {
       <input name="tref" value="Genesis 1:1-3">
       <input name="primaryVersionTitle" value="">
       <input name="translationVersionTitle" value="">
+      <input name="translationLanguage" value="">
       <button type="submit">Load</button>
     </form>
     <button type="button" data-demo-request data-tref="Likutei Moharan 1">Preset</button>
@@ -40,6 +42,49 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals();
 });
+
+test.each(["micahFrench", "berakhotDefault"] as const)(
+  "language controls acquire and attribute %s only after activation",
+  async (name) => {
+    const loader = vi.fn<SourceCardLoader>(
+      async (): Promise<SefariaAcquisitionResponse> => ({
+        payload:
+          name === "berakhotDefault" && loader.mock.calls.length === 1
+            ? captures.berakhotMissingFrench.payload
+            : captures[name].payload,
+        status: 200,
+      }),
+    );
+    const demo = startSourceCardLiveDemo(
+      document,
+      acquisitionFromLoader(loader),
+    );
+    const input = document.querySelector<HTMLInputElement>(
+      'input[name="translationLanguage"]',
+    )!;
+    input.value = "french";
+    document.querySelector<HTMLInputElement>('input[name="tref"]')!.value =
+      captures[name].payload.ref;
+    expect(loader).not.toHaveBeenCalled();
+    await demo.loadCurrentRequest();
+    expect(loader.mock.calls.map(([request]) => request.versions)).toEqual(
+      name === "micahFrench"
+        ? [["primary", "french"]]
+        : [
+            ["primary", "french"],
+            ["primary", "translation"],
+          ],
+    );
+    expect(resultElement().shadowRoot?.textContent).toContain(
+      captures[name].payload.versions[1]!.versionTitle,
+    );
+    const form = document.querySelector<HTMLFormElement>("#display-form");
+    selectValue(form, "contentLanguage", "primary");
+    form?.dispatchEvent(new Event("change"));
+    await resultElement().updateComplete;
+    expect(loader).toHaveBeenCalledTimes(name === "micahFrench" ? 1 : 2);
+  },
+);
 
 test("reuses the completed declarative request", async () => {
   const fetchMock = vi.fn<typeof fetch>(
@@ -65,7 +110,9 @@ test("loads a preset through declarative public inputs", async () => {
 
   document.querySelector<HTMLButtonElement>("[data-demo-request]")?.click();
   await vi.waitFor(() =>
-    expect(requestState().textContent).toContain("1 items from one request"),
+    expect(requestState().textContent).toContain(
+      "1 items. See the edition attribution",
+    ),
   );
 
   expect(loader.mock.calls[0]?.[0]).toEqual({

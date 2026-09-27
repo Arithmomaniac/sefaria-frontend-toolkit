@@ -47,6 +47,52 @@ if (
 const baseLink: CoreLinkObject = parsedLinks[0];
 
 describe("reader controller initialization", () => {
+  it("carries language, but not exact root editions, through navigation and Back", async () => {
+    const rootPayload = sectionSourcePayload("Micah 6");
+    const rootRequest: SourceCardRequest = {
+      tref: "Micah 6",
+      translationLanguage: "french",
+      primary: {
+        versionTitle: rootPayload.versions.find((version) => version.isPrimary)!
+          .versionTitle,
+      },
+      translation: { versionTitle: "Root-only exact edition" },
+    };
+    const loadSource = vi.fn(async (request: SourceCardRequest) => {
+      const payload = sectionSourcePayload(request.tref);
+      payload.available_versions = payload.versions.map((version) => ({
+        ...version,
+        title: payload.indexTitle,
+      }));
+      return createReaderSourceContent(payload, request);
+    });
+    const controller = createReaderController(
+      {
+        source: createReaderSourceContent(rootPayload, rootRequest),
+      },
+      {
+        loadSource,
+        loadConnections: async (request, projection) =>
+          createReaderConnectionsContent([], request, projection),
+      },
+    );
+    const root = controller.snapshot.reader.currentEntryId;
+    await controller.openConnection({
+      originEntryId: root,
+      targetRef: "Rashi on Micah 6",
+    });
+    expect(loadSource.mock.calls.map(([request]) => request)).toEqual([
+      { tref: "Rashi on Micah 6", translationLanguage: "french" },
+    ]);
+    expect(controller.snapshot.task.state).toBe("idle");
+    expect(controller.snapshot.reader.currentEntryId).not.toBe(root);
+    controller.back({
+      originEntryId: controller.snapshot.reader.currentEntryId,
+    });
+    expect(controller.snapshot.reader.currentEntryId).toBe(root);
+    expect(loadSource).toHaveBeenCalledTimes(1);
+  });
+
   it("retains a server-qualified segment target when an alias requires context", async () => {
     const requests: {
       readonly path: string;
@@ -462,6 +508,7 @@ describe("reader controller state and operations", () => {
         },
       },
       expect.any(AbortSignal),
+      { fallback: false },
     );
     expect(loadConnections).toHaveBeenCalledWith(
       { tref: "Rashi on Micah 6:1", withText: false },
@@ -556,6 +603,7 @@ describe("reader controller state and operations", () => {
         primary: { versionTitle: "Different edition" },
       },
       expect.any(AbortSignal),
+      { fallback: false },
     );
 
     await controller.replaceRoot({ tref: "Micah 7:1" });
@@ -564,6 +612,7 @@ describe("reader controller state and operations", () => {
     expect(loadSource).toHaveBeenLastCalledWith(
       { tref: "Micah 7:1" },
       expect.any(AbortSignal),
+      { fallback: false },
     );
   });
 
@@ -627,6 +676,7 @@ describe("reader controller state and operations", () => {
     expect(loadSource).toHaveBeenCalledWith(
       { tref: "micah 6:7" },
       expect.any(AbortSignal),
+      { fallback: false },
     );
   });
 

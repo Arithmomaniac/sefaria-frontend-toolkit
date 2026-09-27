@@ -131,9 +131,10 @@
       <header>
         <h1>Live source-card demo</h1>
         <p>
-          Each preset makes one v3 text request, then projects every recursive
-          leaf into the request-free source card. Click Start live demo or a
-          preset to make the first live request.
+          Each preset makes one v3 text request (two only for an unavailable
+          preferred language), then projects every recursive leaf into the
+          request-free source card. Click Start live demo or a preset to make
+          the first live request.
         </p>
       </header>
       <div class="workspace">
@@ -202,6 +203,12 @@
               >Sefaria reference <input name="tref" value="Micah 6:8" required
             /></label>
             <label
+              >Preferred translation language
+              <input
+                name="translationLanguage"
+                placeholder="Optional, e.g. french"
+            /></label>
+            <label
               >Exact primary version title
               <input name="primaryVersionTitle" placeholder="Optional"
             /></label>
@@ -211,6 +218,30 @@
             /></label>
             <button type="submit">Start live demo</button>
           </form>
+          <p>
+            Use a full English language name, such as <code>french</code>. A
+            missing language permits one extra request for Sefaria's default
+            translation, which is not guaranteed to be English. An empty
+            preferred edition or missing exact title does not fall back.
+          </p>
+          <div class="presets">
+            <button
+              type="button"
+              data-demo-request
+              data-tref="Micah 6:8"
+              data-translation-language="french"
+            >
+              French Micah 6:8
+            </button>
+            <button
+              type="button"
+              data-demo-request
+              data-tref="Berakhot 2a:1"
+              data-translation-language="french"
+            >
+              French unavailable: Berakhot 2a:1
+            </button>
+          </div>
           <h3>Display</h3>
           <form id="display-form">
             <label

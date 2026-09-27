@@ -51,10 +51,61 @@ document.body.append(reader);
 
 Reader owns source and links acquisition, cancellation, semantic history, Back, breadcrumbs, private preparation, and errors. Raw seeds initialize or transactionally replace state. Read-only `status`, `rootLoading`, `selectedRef`, `currentEntryId`, and `readerError` expose semantic diagnostics.
 
+## Languages and editions
+
+`translation-language="french"` requests French directly. Only Sefaria's missing-language warning permits one additional request for its default translation, which is not necessarily English. An existing but empty French edition stays empty. Exact edition titles never fall back.
+
+```html
+<sefaria-source-card
+  sref="Micah 6:8"
+  translation-language="french"
+></sefaria-source-card>
+<sefaria-bilingual-segment
+  sref="Micah 6:8"
+  translation-language="french"
+  content-language="translation"
+></sefaria-bilingual-segment>
+<sefaria-text-segment
+  sref="Micah 6:8"
+  translation-language="french"
+></sefaria-text-segment>
+<sefaria-reader sref="Micah 6:8" translation-language="french"></sefaria-reader>
+```
+
+| Element | Presentation language | Acquisition language and editions |
+| --- | --- | --- |
+| Text Segment | One selected text | `translation-language` **or** strict `version-language`; optional `version-title` |
+| Bilingual Segment | `content-language`: `both`, `primary`, `translation` | `translation-language`, `primary-version-title`, `translation-version-title` |
+| Source Card | Same as Bilingual Segment | Same as Bilingual Segment |
+| Reader | Same as Bilingual Segment | Same as Bilingual Segment; exact titles apply only to the root and its context |
+| Connections Panel | Existing link previews | No independent preview language or edition requests |
+| Reference Label | `label-language` | No text edition selection |
+
+`content-language` only changes visible sides; it does not change requests. `side-order` and `layout` still control arrangement. The four text-owning elements display actual edition/language attribution and accept `hide-attributions`.
+
+For a strict French edition, add its exact title:
+
+```html
+<sefaria-source-card
+  sref="Micah 6:8"
+  translation-language="french"
+  translation-version-title="Bible du Rabbinat 1899 [fr]"
+></sefaria-source-card>
+<sefaria-text-segment
+  sref="Micah 6:8"
+  version-language="french"
+  version-title="Bible du Rabbinat 1899 [fr]"
+></sefaria-text-segment>
+```
+
+Text Segment rejects simultaneous `version-language` and `translation-language`. Its title alone selects a primary edition. For DOM-free Text Segment requests, use `version: { translationLanguage: "french" }` instead of strict `version: { language: "french" }`.
+
+Supplied data makes zero requests and must include the selected text or metadata proving the preferred language is absent. Reader carries the preferred language through navigation, but not a root's exact edition titles into unrelated works. Try French Micah and unavailable-French Berakhot in the [Source Card explorer](../../examples/explorer/source-card.html); see the [selection contract](../../docs/specs/components.md#language-and-edition-selection) for errors and request counts.
+
 ## Lifecycle and composition
 
 - Disconnection aborts or invalidates eligible work; reconnect resumes only the still-eligible interrupted phase.
-- Composite parents prepare children from captured data. Ten children remain one parent request and zero child requests.
+- Composite parents prepare children from captured data. Ten children use one parent request, or two for missing-language fallback, and zero child requests.
 - Current failures become accessible state and component-specific error events. Stale completions publish nothing.
 - The toolkit client remains the only response-cache owner.
 

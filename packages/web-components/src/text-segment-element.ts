@@ -1,4 +1,4 @@
-import { text, type CoreV3TextsResponse } from "@arithmomaniac/sefaria-client";
+import type { CoreV3TextsResponse } from "@arithmomaniac/sefaria-client";
 import { css, html, nothing, type PropertyValues } from "lit";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
@@ -6,6 +6,11 @@ import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
 import type { SefariaAcquisition } from "./acquisition.js";
 import { resolveSefariaAcquisition } from "./acquisition-state.js";
 import { optionalStringConverter } from "./attribute-converters.js";
+import {
+  acquireSelectedText,
+  normalizeTranslationLanguage,
+  type SelectedTextProgress,
+} from "./translation-selection.js";
 import { validateSuppliedComponentData } from "./component-controller.js";
 import { getPreparedState, setPreparedState } from "./prepared-state.js";
 import {
@@ -39,6 +44,12 @@ export class SefariaTextSegment extends SefariaElement {
     sref: { type: String, useDefault: true },
     data: { attribute: false },
     acquisition: { attribute: false },
+    translationLanguage: {
+      type: String,
+      attribute: "translation-language",
+      converter: optionalStringConverter,
+    },
+    hideAttributions: { type: Boolean, attribute: "hide-attributions" },
     versionLanguage: {
       type: String,
       attribute: "version-language",
@@ -127,6 +138,10 @@ export class SefariaTextSegment extends SefariaElement {
   declare versionLanguage: string | undefined;
   /** Optional exact edition title paired with `versionLanguage`. */
   declare versionTitle: string | undefined;
+  /** Preferred translation family, mutually exclusive with a strict version language. */
+  declare translationLanguage: string | undefined;
+  /** Hides compact edition attribution for standalone text. */
+  declare hideAttributions: boolean;
   /** Hebrew vocalization preset applied only to the displayed safe text. */
   declare vocalizationMode: VocalizationMode;
 
@@ -137,11 +152,13 @@ export class SefariaTextSegment extends SefariaElement {
     | {
         readonly id: number;
         readonly controller: AbortController;
+        readonly progress: SelectedTextProgress;
       }
     | undefined;
   #nextOperationId = 1;
   #declarativeActive = false;
   #resumeOnConnect = false;
+  #interruptedProgress: SelectedTextProgress | undefined;
   #committedViewModel: TextSegmentViewModel | undefined;
   #ownedViewModel: TextSegmentViewModel | undefined;
   #statusOverride: SefariaElementStatus | undefined;
@@ -153,6 +170,8 @@ export class SefariaTextSegment extends SefariaElement {
     this.acquisition = undefined;
     this.versionLanguage = undefined;
     this.versionTitle = undefined;
+    this.translationLanguage = undefined;
+    this.hideAttributions = false;
     this.vocalizationMode = "taamim_and_nikkud";
   }
 
@@ -186,6 +205,7 @@ export class SefariaTextSegment extends SefariaElement {
 
   override disconnectedCallback(): void {
     if (this.#active !== undefined) {
+      this.#interruptedProgress = this.#active.progress;
       this.#active.controller.abort(
         new DOMException("Text segment disconnected.", "AbortError"),
       );
@@ -201,8 +221,10 @@ export class SefariaTextSegment extends SefariaElement {
       changed.has("data") ||
       changed.has("acquisition") ||
       changed.has("versionLanguage") ||
+      changed.has("translationLanguage") ||
       changed.has("versionTitle")
     ) {
+      this.#interruptedProgress = undefined;
       this.#resumeOnConnect = false;
       this.#reconcile();
     }
@@ -265,6 +287,28 @@ export class SefariaTextSegment extends SefariaElement {
             : nothing
         }
       </article>
+      ${
+        this.hideAttributions || viewModel.edition === undefined
+          ? nothing
+          : html`
+              <p class="attribution">
+                ${viewModel.edition.versionTitle}
+                (${viewModel.edition.languageFamilyName},
+                ${viewModel.edition.actualLanguage})
+              </p>
+              ${
+                viewModel.unavailableTranslationLanguage === undefined
+                  ? nothing
+                  : html`
+                      <p class="translation-fallback" role="status">
+                        ${viewModel.unavailableTranslationLanguage} is
+                        unavailable; showing
+                        ${viewModel.edition.languageFamilyName}.
+                      </p>
+                    `
+              }
+            `
+      }
     `;
   }
 
@@ -324,7 +368,9 @@ export class SefariaTextSegment extends SefariaElement {
     const active = {
       id: this.#nextOperationId++,
       controller: new AbortController(),
+      progress: this.#interruptedProgress ?? { fallback: false },
     };
+    this.#interruptedProgress = undefined;
     this.#active = active;
     this.#publish({
       state: "loading",
@@ -335,7 +381,11 @@ export class SefariaTextSegment extends SefariaElement {
 
   async #load(
     sref: string,
-    active: { readonly id: number; readonly controller: AbortController },
+    active: {
+      readonly id: number;
+      readonly controller: AbortController;
+      readonly progress: SelectedTextProgress;
+    },
   ): Promise<void> {
     try {
       const versions = [this.#serializedVersion()];
@@ -344,20 +394,14 @@ export class SefariaTextSegment extends SefariaElement {
         throw new Error("Standalone Sefaria acquisition is disabled.");
       }
 
-      const response =
-        acquisition.kind === "client"
-          ? await this.#loadFromClient(
-              sref,
-              versions,
-              acquisition.client,
-              active.controller.signal,
-            )
-          : await this.#loadFromCapability(
-              sref,
-              versions,
-              acquisition.capability,
-              active.controller.signal,
-            );
+      const response = await acquireSelectedText(
+        acquisition,
+        sref,
+        versions,
+        this.translationLanguage,
+        active.controller.signal,
+        active.progress,
+      );
       if (this.#active !== active) return;
       const viewModel = this.#project(response.payload, response.status);
       if (this.#active !== active) return;
@@ -378,46 +422,8 @@ export class SefariaTextSegment extends SefariaElement {
     }
   }
 
-  async #loadFromClient(
-    sref: string,
-    versions: readonly string[],
-    client: Extract<SefariaAcquisition, { kind: "client" }>["client"],
-    signal: AbortSignal,
-  ): Promise<{ readonly payload: unknown; readonly status: number }> {
-    const result = await text.getV3Texts({
-      client,
-      path: { tref: sref },
-      query: { version: [...versions], return_format: "default" },
-      signal,
-    });
-    if (result.data !== undefined) {
-      return { payload: result.data, status: 200 };
-    }
-    if (result.error !== undefined && result.response !== undefined) {
-      return { payload: result.error, status: result.response.status };
-    }
-    throw new Error("The v3 texts request returned no result.");
-  }
-
-  async #loadFromCapability(
-    sref: string,
-    versions: readonly string[],
-    capability: Extract<
-      SefariaAcquisition,
-      { kind: "capability" }
-    >["capability"],
-    signal: AbortSignal,
-  ): Promise<{ readonly payload: unknown; readonly status: number }> {
-    if (capability.getText === undefined) {
-      throw new Error("The selected acquisition source does not support text.");
-    }
-    return await capability.getText(
-      { sref, versions, returnFormat: "default" },
-      signal,
-    );
-  }
-
   #project(payload: unknown, status: number): TextSegmentViewModel {
+    this.#serializedVersion();
     if (status === 400 || status === 404) {
       const validated = validateSuppliedComponentData<{
         readonly error: string;
@@ -434,6 +440,15 @@ export class SefariaTextSegment extends SefariaElement {
     }
     if (isSelectedTextSegmentData(payload)) {
       const selected = validateSelectedTextSegmentData(payload);
+      if (
+        this.translationLanguage !== undefined &&
+        selected.version.languageFamilyName.toLowerCase() !==
+          normalizeTranslationLanguage(this.translationLanguage)
+      ) {
+        throw new TypeError(
+          "/version: selected data cannot establish preferred-translation fallback coverage.",
+        );
+      }
       return projectTextSegmentValue(
         selected,
         selected.version,
@@ -444,6 +459,17 @@ export class SefariaTextSegment extends SefariaElement {
       { method: "GET", path: "/api/v3/texts/{tref}", status: 200 },
       payload,
     );
+    if (this.translationLanguage !== undefined) {
+      return createTextSegmentViewModel(validated, {
+        tref: this.sref,
+        version: {
+          translationLanguage: this.translationLanguage,
+          ...(this.versionTitle === undefined
+            ? {}
+            : { versionTitle: this.versionTitle }),
+        },
+      });
+    }
     if (this.versionLanguage !== undefined) {
       return createTextSegmentViewModel(validated, {
         tref: this.sref,
@@ -457,7 +483,10 @@ export class SefariaTextSegment extends SefariaElement {
     }
 
     const primary = validated.versions.filter(
-      (version) => version.isPrimary === true,
+      (version) =>
+        version.isPrimary === true &&
+        (this.versionTitle === undefined ||
+          version.versionTitle === this.versionTitle.replaceAll("_", " ")),
     );
     if (primary.length === 0) {
       return {
@@ -479,10 +508,23 @@ export class SefariaTextSegment extends SefariaElement {
   }
 
   #serializedVersion(): string {
-    if (this.versionLanguage === undefined) return "primary";
-    const language = this.versionLanguage.trim();
+    if (
+      this.translationLanguage !== undefined &&
+      this.versionLanguage !== undefined
+    ) {
+      throw new TypeError(
+        "translation-language and version-language cannot be combined.",
+      );
+    }
+    const language =
+      this.translationLanguage === undefined
+        ? (this.versionLanguage?.trim().toLowerCase() ?? "primary")
+        : normalizeTranslationLanguage(this.translationLanguage);
     if (language.length === 0) {
       throw new TypeError("Text segment version language must not be blank.");
+    }
+    if (this.versionTitle !== undefined && !this.versionTitle.trim()) {
+      throw new TypeError("Text segment version title must not be blank.");
     }
     return this.versionTitle === undefined
       ? language

@@ -1,5 +1,4 @@
 import {
-  text,
   type CoreV3TextsResponse,
   type CoreV3TextValue,
   type CoreV3Version,
@@ -19,6 +18,10 @@ import {
   type BilingualSegmentRequest,
 } from "./bilingual-segment.js";
 import { serializeSourceCardSelectors } from "./source-card-request.js";
+import {
+  acquireSelectedText,
+  normalizeTranslationLanguage,
+} from "./translation-selection.js";
 import {
   projectTextSegmentValue,
   type TextSegmentDataViewModel,
@@ -59,6 +62,8 @@ export interface SourceCardRequest {
   readonly primary?: BilingualSegmentEditionSelection;
   /** Exact edition for the translation side, when required. */
   readonly translation?: BilingualSegmentEditionSelection;
+  /** Preferred translation family; unavailable families fall back to Sefaria's default. */
+  readonly translationLanguage?: string;
 }
 
 /** Optional request-free annotation evidence keyed by exact item reference and edition title. */
@@ -95,6 +100,12 @@ export interface SourceCardAttributionViewModel {
   readonly versionSource: string | null;
   /** Validated HTTP(S) source URL, when the source text is a URL. */
   readonly versionSourceUrl?: string | null;
+  /** Actual displayed edition's language family. */
+  readonly languageFamilyName?: string;
+  /** Actual displayed edition's language identifier. */
+  readonly actualLanguage?: string;
+  /** Unavailable preferred family, when the default translation was selected. */
+  readonly unavailableTranslationLanguage?: string;
 }
 
 /** One positionally identified bilingual item in a source card. */
@@ -250,7 +261,11 @@ export function createSourceCardViewModel(
 ): SourceCardViewModel {
   serializeSourceCardSelectors(request);
   const bilingualRequest: BilingualSegmentRequest = request;
-  const resolved = resolveBilingualSides(payload.versions, bilingualRequest);
+  const resolved = resolveBilingualSides(
+    payload.versions,
+    bilingualRequest,
+    payload,
+  );
   if (resolved.ambiguousSide !== undefined) {
     return {
       state: "error",
@@ -279,7 +294,7 @@ export function createSourceCardViewModel(
   }
 
   const header = createHeader(payload);
-  const attributions = createAttributions(resolved.versions);
+  const attributions = createAttributions(resolved.versions, request);
   if (projected.items.length === 0) {
     return {
       state: "empty",
@@ -406,23 +421,13 @@ async function requestSourceCardResponse(
   readonly status: 200 | 400 | 404;
 }> {
   const version = serializeSourceCardSelectors(request);
-  const result = await text.getV3Texts({
-    client,
-    path: { tref: request.tref },
-    query: { version, return_format: "default" },
-    ...(signal === undefined ? {} : { signal }),
-  });
-
-  if (result.data !== undefined) {
-    return { payload: result.data, status: 200 };
-  }
-
-  const status = result.response?.status;
-  if (result.error !== undefined && (status === 400 || status === 404)) {
-    return { payload: result.error, status };
-  }
-
-  throw new Error("The v3 texts request returned no data or documented error.");
+  return await acquireSelectedText(
+    { kind: "client", client },
+    request.tref,
+    version,
+    request.translationLanguage,
+    signal ?? new AbortController().signal,
+  );
 }
 
 function projectSourceCardResponse(
@@ -652,6 +657,7 @@ function createHeader(payload: CoreV3TextsResponse): SourceCardHeaderViewModel {
 
 function createAttributions(
   versions: Partial<Record<BilingualPairSide, CoreV3Version>>,
+  request: SourceCardRequest,
 ): SourceCardAttributionViewModel[] {
   return SIDES.flatMap((side) => {
     const version = versions[side];
@@ -663,6 +669,18 @@ function createAttributions(
             versionTitle: version.versionTitle,
             versionSource: version.versionSource,
             versionSourceUrl: parseVersionSourceUrl(version.versionSource),
+            languageFamilyName: version.languageFamilyName,
+            actualLanguage: version.actualLanguage,
+            ...(side === "translation" &&
+            request.translationLanguage !== undefined &&
+            version.languageFamilyName.toLowerCase() !==
+              normalizeTranslationLanguage(request.translationLanguage)
+              ? {
+                  unavailableTranslationLanguage: normalizeTranslationLanguage(
+                    request.translationLanguage,
+                  ),
+                }
+              : {}),
           },
         ];
   });
