@@ -84,6 +84,7 @@ function capture(command, args) {
     ? ["/d", "/s", "/c", `pnpm ${args.join(" ")}`]
     : args;
   const result = spawnSync(executable, commandArgs, {
+    windowsHide: true,
     cwd: root,
     encoding: "utf8",
   });

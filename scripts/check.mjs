@@ -121,7 +121,10 @@ function runPnpm(stage) {
     const args = windows
       ? ["/d", "/s", "/c", `pnpm ${stage.args.join(" ")}`]
       : stage.args;
-    const child = spawn(executable, args, { stdio: "inherit" });
+    const child = spawn(executable, args, {
+      stdio: "inherit",
+      windowsHide: true,
+    });
     child.once("error", reject);
     child.once("exit", (code) => resolve(code ?? 1));
   });

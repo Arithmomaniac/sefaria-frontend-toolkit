@@ -39,6 +39,7 @@ if (
     conclusion: process.env.WORKFLOW_CONCLUSION,
     headSha: process.env.WORKFLOW_HEAD_SHA,
     checkoutSha: execFileSync("git", ["rev-parse", "HEAD"], {
+      windowsHide: true,
       encoding: "utf8",
     }).trim(),
   });

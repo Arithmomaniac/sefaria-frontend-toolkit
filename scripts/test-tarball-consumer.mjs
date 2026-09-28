@@ -825,6 +825,7 @@ async function waitForServer(url) {
 function run(command, args, cwd = repository) {
   const spec = commandSpec(command, args);
   const result = spawnSync(spec.executable, spec.args, {
+    windowsHide: true,
     cwd,
     stdio: "inherit",
   });
@@ -837,6 +838,7 @@ function run(command, args, cwd = repository) {
 
 function capture(command, args, cwd = repository) {
   const result = spawnSync(command, args, {
+    windowsHide: true,
     cwd,
     encoding: "utf8",
   });

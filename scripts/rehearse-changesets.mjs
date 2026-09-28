@@ -191,6 +191,7 @@ function run(fixture, command, args) {
     ? ["/d", "/s", "/c", `${command} ${args.join(" ")}`]
     : args;
   const result = spawnSync(executable, executableArgs, {
+    windowsHide: true,
     cwd: fixture,
     env: { ...process.env, INIT_CWD: fixture },
     stdio: "inherit",
@@ -204,6 +205,7 @@ function run(fixture, command, args) {
 
 function capture(fixture, command, args) {
   const result = spawnSync(command, args, {
+    windowsHide: true,
     cwd: fixture,
     encoding: "utf8",
   });

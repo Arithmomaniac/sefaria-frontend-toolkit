@@ -3,6 +3,8 @@ import path from "node:path";
 import process from "node:process";
 import { spawnSync } from "node:child_process";
 
+import { build } from "vite";
+
 import {
   createSiteBuildSteps,
   hasSameOriginSourceLink,
@@ -10,6 +12,7 @@ import {
   SITE_REQUIRED_FILES,
 } from "./build-site-plan.mjs";
 import { buildScriptSource } from "./build-script-source.mjs";
+import { runNodeScript, runPackageTool } from "./node-tool.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const site = path.join(root, "dist", "site");
@@ -38,16 +41,7 @@ for (const step of createSiteBuildSteps({ skipTypecheck, siteBasePath })) {
   }
   if (step.kind === "vite") {
     const destination = path.join(stagedPublic, "examples", step.route);
-    runPnpm([
-      "--filter",
-      step.packageName,
-      "exec",
-      "vite",
-      "build",
-      `--base=${step.base}`,
-      `--outDir=${destination}`,
-      "--emptyOutDir",
-    ]);
+    await buildExample(step, destination);
     continue;
   }
   if (step.kind === "mcp-app") {
@@ -77,25 +71,32 @@ for (const step of createSiteBuildSteps({ skipTypecheck, siteBasePath })) {
   }
   if (step.kind === "playground") {
     const destination = path.join(stagedPublic, "examples", step.route);
-    runPnpm(["--filter", step.packageName, "build:graph"]);
-    runPnpm([
-      "--filter",
-      step.packageName,
-      "exec",
-      "vite",
-      "build",
-      `--base=${step.base}`,
-      `--outDir=${destination}`,
-      "--emptyOutDir",
-    ]);
+    const playground = path.join(root, "examples", "playground");
+    runNodeScript(
+      path.join(playground, "scripts", "build-runtime-graph.mjs"),
+      [],
+      {
+        cwd: playground,
+      },
+    );
+    await buildExample(step, destination);
     continue;
   }
   if (!examplesOnly) {
-    runPnpm(["exec", "vitepress", "build", "docs"], {
-      ...process.env,
-      SITE_BASE_PATH: siteBasePath,
+    runPackageTool("vitepress", "vitepress", ["build", "docs"], {
+      cwd: root,
+      env: { ...process.env, SITE_BASE_PATH: siteBasePath },
     });
   }
+}
+
+async function buildExample(step, destination) {
+  const directory = step.packageName.slice("@sefaria-example/".length);
+  await build({
+    root: path.join(root, "examples", directory),
+    base: step.base,
+    build: { outDir: destination, emptyOutDir: true },
+  });
 }
 
 if (!examplesOnly) {
@@ -112,6 +113,7 @@ function runPnpm(args, env = process.env) {
     ? ["/d", "/s", "/c", `pnpm ${args.map(quoteArgument).join(" ")}`]
     : args;
   const result = spawnSync(executable, executableArgs, {
+    windowsHide: true,
     cwd: root,
     env,
     stdio: "inherit",

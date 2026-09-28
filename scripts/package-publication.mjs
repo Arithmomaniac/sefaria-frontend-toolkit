@@ -512,6 +512,7 @@ function runPnpm(args, cwd, env = process.env) {
     ? ["/d", "/s", "/c", `pnpm ${args.join(" ")}`]
     : args;
   const result = spawnSync(executable, commandArgs, {
+    windowsHide: true,
     cwd,
     env,
     stdio: "inherit",
@@ -532,7 +533,7 @@ function runNodeImports(specifiers, cwd) {
         "if ('customElements' in globalThis) throw new Error('DOM registration leaked into Node-safe imports');",
       ].join(""),
     ],
-    { cwd, encoding: "utf8" },
+    { cwd, encoding: "utf8", windowsHide: true },
   );
   if (result.status !== 0) {
     throw new Error(`Registry package imports failed: ${result.stderr}`);

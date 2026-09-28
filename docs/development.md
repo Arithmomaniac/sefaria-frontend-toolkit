@@ -234,6 +234,10 @@ This subset runs Prettier, Oxlint, integration policy, workspace builds, TypeScr
 
 The MCP acceptance transport rejects unexpected requests and uses the compiled Node server, registered resource, separate host and sandbox origins, and packaged App. TypeScript projects use ignored incremental build-information files, which reduce repeated local typecheck and build work without changing emitted artifacts.
 
+Repository validation scripts set `windowsHide: true` when starting subprocesses so Windows console windows do not appear for those commands. Existing inherited or captured stdout and stderr remain unchanged.
+
+The site and playground acceptance scripts build examples through Vite's Node API. Declaration checks, custom-elements analysis, and VitePress use the installed package's CLI entry point through Node rather than `pnpm exec` and a platform shell. The playground runtime-graph generator also runs directly through Node. These tools retain separate processes where isolation is useful; pnpm still owns workspace scripts, dependency installation, and package operations.
+
 The deterministic gate does not contact Sefaria. To opt into a bounded live-data qualification of every maintained click-to-start route, including one Reader navigation and the embedded MCP text-to-links flow, run:
 
 ```powershell

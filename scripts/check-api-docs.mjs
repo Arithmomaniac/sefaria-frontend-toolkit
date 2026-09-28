@@ -1,10 +1,11 @@
-import { spawn } from "node:child_process";
 import { readdir, readFile, rm, stat } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { pathToFileURL } from "node:url";
 
 import { parseSync } from "oxc-parser";
+
+import { runPackageTool } from "./node-tool.mjs";
 
 const repository = path.resolve(import.meta.dirname, "..");
 const outputDirectory = path.join(repository, ".toolchain", "api-docs");
@@ -160,25 +161,8 @@ export function findUndocumentedDeclarations(filename, source) {
 }
 
 async function compileDeclarations() {
-  const windows = process.platform === "win32";
-  const executable = windows ? (process.env.ComSpec ?? "cmd.exe") : "pnpm";
-  const args = windows
-    ? ["/d", "/s", "/c", "pnpm exec tsc -p tsconfig.api-docs.json"]
-    : ["exec", "tsc", "-p", "tsconfig.api-docs.json"];
-
-  await new Promise((resolve, reject) => {
-    const child = spawn(executable, args, {
-      cwd: repository,
-      stdio: "inherit",
-    });
-    child.once("error", reject);
-    child.once("exit", (code) => {
-      if (code === 0) {
-        resolve();
-      } else {
-        reject(new Error(`API declaration compilation exited with ${code}.`));
-      }
-    });
+  runPackageTool("typescript", "tsc", ["-p", "tsconfig.api-docs.json"], {
+    cwd: repository,
   });
 }
 

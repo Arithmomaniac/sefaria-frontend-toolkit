@@ -1,4 +1,3 @@
-import { spawnSync } from "node:child_process";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
@@ -7,6 +6,7 @@ import { ts } from "@custom-elements-manifest/analyzer";
 import { format, resolveConfig } from "prettier";
 
 import { verifyElementTemplateContract } from "./custom-element-template-contract.mjs";
+import { runPackageTool } from "./node-tool.mjs";
 
 const repository = path.resolve(import.meta.dirname, "..");
 const webComponentsDirectory = path.join(
@@ -243,18 +243,16 @@ process.stdout.write(
 );
 
 async function runAnalyzer() {
-  const windows = process.platform === "win32";
-  const executable = windows ? (process.env.ComSpec ?? "cmd.exe") : "pnpm";
-  const command =
-    "pnpm exec cem analyze --config packages/web-components/custom-elements-manifest.config.mjs";
-  const result = spawnSync(
-    executable,
-    windows ? ["/d", "/s", "/c", command] : command.split(" ").slice(1),
-    { cwd: repository, stdio: "inherit" },
+  runPackageTool(
+    "@custom-elements-manifest/analyzer",
+    "cem",
+    [
+      "analyze",
+      "--config",
+      "packages/web-components/custom-elements-manifest.config.mjs",
+    ],
+    { cwd: repository },
   );
-  if (result.status !== 0) {
-    throw new Error(`Custom-elements analysis exited with ${result.status}.`);
-  }
 }
 
 async function buildCustomElementsManifest() {
