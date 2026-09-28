@@ -14,6 +14,7 @@ import {
 import {
   assignCopilot,
   compareOpenApi,
+  createGitHub,
   detectDrift,
   driftIssueLabel,
   driftIssueMarker,
@@ -329,6 +330,44 @@ describe("upstream resolution", () => {
     await resolveUpstreamHead(recordingFetch, "secret-token");
 
     expect(seen[0]?.get("authorization")).toBe("Bearer secret-token");
+    expect(seen).toHaveLength(2);
+    for (const headers of seen) {
+      expect(headers.get("x-github-api-version")).toBe("2026-03-10");
+    }
+  });
+
+  it("uses the current GitHub API version for Octokit issue reads and writes", async () => {
+    const requests: { method: string; headers: Headers }[] = [];
+    const recordingFetch = (async (
+      _input: RequestInfo | URL,
+      init?: RequestInit,
+    ) => {
+      requests.push({
+        method: init?.method ?? "GET",
+        headers: new Headers(init?.headers),
+      });
+      return new Response("{}", {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      });
+    }) as typeof fetch;
+    const github = await createGitHub("test-token", recordingFetch);
+
+    await github.request("GET /repos/{owner}/{repo}/issues", {
+      owner: "Arithmomaniac",
+      repo: "sefaria-frontend-toolkit",
+    });
+    await github.request("POST /repos/{owner}/{repo}/issues", {
+      owner: "Arithmomaniac",
+      repo: "sefaria-frontend-toolkit",
+      title: "Test",
+      body: "Test",
+    });
+
+    expect(requests.map(({ method }) => method)).toEqual(["GET", "POST"]);
+    for (const { headers } of requests) {
+      expect(headers.get("x-github-api-version")).toBe("2026-03-10");
+    }
   });
 
   it("reports drift when upstream changed", async () => {
@@ -556,11 +595,23 @@ describe("drift issue", () => {
   });
 
   it("assigns the issue to the Copilot coding agent with the triage agent", async () => {
-    const { github, requests } = fakeGitHub(() => ({}));
+    const { github, requests } = fakeGitHub((route) =>
+      route === "GET /repos/{owner}/{repo}/issues/{issue_number}"
+        ? { assignees: [] }
+        : {},
+    );
 
     await assignCopilot(github, repo, 7, newCommit);
 
     expect(requests).toEqual([
+      {
+        route: "GET /repos/{owner}/{repo}/issues/{issue_number}",
+        params: {
+          owner: repo.owner,
+          repo: repo.repo,
+          issue_number: 7,
+        },
+      },
       {
         route: "POST /repos/{owner}/{repo}/issues/{issue_number}/assignees",
         params: {
@@ -576,6 +627,50 @@ describe("drift issue", () => {
           },
         },
       },
+    ]);
+  });
+
+  it.each(["copilot-swe-agent", "copilot-swe-agent[bot]"])(
+    "rejects reassignment when %s is already assigned",
+    async (login) => {
+      const { github, requests } = fakeGitHub((route) =>
+        route === "GET /repos/{owner}/{repo}/issues/{issue_number}"
+          ? { assignees: [{ login }] }
+          : {},
+      );
+
+      await expect(assignCopilot(github, repo, 7, laterCommit)).rejects.toThrow(
+        /already assigned.*manually reassign/i,
+      );
+      expect(requests.map(({ route }) => route)).toEqual([
+        "GET /repos/{owner}/{repo}/issues/{issue_number}",
+      ]);
+    },
+  );
+
+  it("recognizes the Copilot Bot identity returned by the issues REST API", async () => {
+    const { github, requests } = fakeGitHub((route) =>
+      route === "GET /repos/{owner}/{repo}/issues/{issue_number}"
+        ? { assignees: [{ login: "Copilot", type: "Bot", id: 198982749 }] }
+        : {},
+    );
+
+    await expect(assignCopilot(github, repo, 7, laterCommit)).rejects.toThrow(
+      /already assigned.*manually reassign/i,
+    );
+    expect(requests.map(({ route }) => route)).toEqual([
+      "GET /repos/{owner}/{repo}/issues/{issue_number}",
+    ]);
+  });
+
+  it("rejects an issue lookup with missing assignee data", async () => {
+    const { github, requests } = fakeGitHub(() => ({}));
+
+    await expect(assignCopilot(github, repo, 7, laterCommit)).rejects.toThrow(
+      /assignees/,
+    );
+    expect(requests.map(({ route }) => route)).toEqual([
+      "GET /repos/{owner}/{repo}/issues/{issue_number}",
     ]);
   });
 

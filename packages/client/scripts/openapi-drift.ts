@@ -18,6 +18,7 @@ const packageRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const upstreamRepositoryApi =
   "https://api.github.com/repos/Sefaria/Sefaria-Project";
 const upstreamPath = "docs/openAPI.json";
+const githubApiVersion = "2026-03-10";
 const commitPattern = /^[0-9a-f]{40}$/;
 const maxRenderedValueLength = 300;
 const maxRenderedListItems = 100;
@@ -299,7 +300,7 @@ export async function resolveUpstreamHead(
   const headers: Record<string, string> = {
     Accept: "application/vnd.github+json",
     "User-Agent": "sefaria-frontend-toolkit-openapi-drift",
-    "X-GitHub-Api-Version": "2022-11-28",
+    "X-GitHub-Api-Version": githubApiVersion,
   };
   if (token) {
     headers.Authorization = `Bearer ${token}`;
@@ -603,6 +604,28 @@ export async function assignCopilot(
       "Copilot handoff requires a complete 40-character SHA for the upstream commit.",
     );
   }
+  const { data } = await github.request(
+    "GET /repos/{owner}/{repo}/issues/{issue_number}",
+    { ...repository, issue_number: issueNumber },
+  );
+  if (!isRecord(data) || !Array.isArray(data.assignees)) {
+    throw new Error(
+      `GitHub issue #${issueNumber} lookup did not return assignees.`,
+    );
+  }
+  if (
+    data.assignees.some(
+      (assignee) =>
+        isRecord(assignee) &&
+        (assignee.login === "copilot-swe-agent" ||
+          assignee.login === "copilot-swe-agent[bot]" ||
+          (assignee.login === "Copilot" && assignee.type === "Bot")),
+    )
+  ) {
+    throw new Error(
+      `Copilot is already assigned to issue #${issueNumber}; manually reassign it to start a new triage session for ${commit}.`,
+    );
+  }
   await github.request(
     "POST /repos/{owner}/{repo}/issues/{issue_number}/assignees",
     {
@@ -650,9 +673,18 @@ function repositoryFromEnvironment(): IssueRepository {
   return { owner, repo };
 }
 
-async function createGitHub(token: string): Promise<GitHubRequester> {
+/** Creates an Octokit requester pinned to the supported GitHub REST API version. */
+export async function createGitHub(
+  token: string,
+  fetchImpl: typeof fetch = fetch,
+): Promise<GitHubRequester> {
   const { Octokit } = await import("@octokit/rest");
-  return new Octokit({ auth: token }) as unknown as GitHubRequester;
+  const octokit = new Octokit({ auth: token, request: { fetch: fetchImpl } });
+  return {
+    request: octokit.request.defaults({
+      headers: { "X-GitHub-Api-Version": githubApiVersion },
+    }),
+  };
 }
 
 async function writeOutputs(

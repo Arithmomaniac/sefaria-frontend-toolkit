@@ -16,16 +16,17 @@ You are assigned an issue opened by the scheduled `OpenAPI drift` workflow (`.gi
 ## Procedure
 
 1. Run `pnpm openapi:drift` to confirm the issue still describes the current upstream commit. If upstream moved, work on the commit the command reports and say so in the pull request.
-2. For each changed path, changed schema, and failed guard, inspect the upstream route, handler, response builder, and endpoint tests in `Sefaria/Sefaria-Project` at the target commit. Link them with complete commit SHAs.
+2. For each changed path or schema, and each failed guard if any, compare the two pinned documents and inspect the upstream route, handler, response builder, and endpoint tests in `Sefaria/Sefaria-Project` at the target commit. Link them with complete commit SHAs. If endpoint tests do not exist, say so and corroborate the change with the implementation. Changes without failed guards still need source review.
 3. Classify each change as exactly one of:
    - **No client impact**: documentation-only, or outside every generated contract.
    - **Guard update**: the source behavior our correction encodes is unchanged, but the guarded upstream text changed; update the precondition's expected value or digest.
    - **Correction change**: source shows the corrected contract must change; revise the overlay action and its guard.
    - **Correction retired**: upstream now documents what our correction supplied; remove the action and its guard.
+   - **Refresh only**: upstream documents a source-confirmed change in generated contracts, but no local overlay action or guard needs changing; take the new pin and test the resulting contract.
    - **Unresolved**: source does not settle the question. Leave the overlay unchanged for that item and list it as an open question.
-4. Edit `packages/client/openapi/overlay.yaml` only as the source review supports. Every mutation keeps an exact JSONPath target and a co-located old-state or absence precondition. Record provenance for each change in `docs/evidence.md`.
-5. Run `pnpm openapi:refresh --commit <target SHA>`. It refuses while any guard fails; fix the guards through step 4 rather than weakening them.
-6. Add or update tests for each corrected schema against the upstream implementation and its tests, then run `pnpm check`.
+4. Edit `packages/client/openapi/overlay.yaml` only as the source review supports. Every mutation keeps an exact JSONPath target and a co-located old-state or absence precondition. Record provenance for each reviewed change in `docs/evidence.md`. Record pre-existing mismatches separately as open questions, without expanding this refresh into unrelated corrections.
+5. Run `pnpm openapi:refresh --commit <target SHA>`. It refuses while any guard fails; fix the guards through step 4 rather than weakening them. Refresh does not update hard-coded pin assertions or prose: check `packages/client/test/generation.test.ts`, `docs/design.md`, `docs/specs/client.md`, `docs/development.md`, and `docs/evidence.md` for old pin references and update the owning assertions and descriptions. Do not repin independent rendering-source audits in `tests/compatibility/`.
+6. Add or update tests for each changed generated behavior, even if no overlay correction was needed; use upstream tests where they exist and record their absence otherwise. Add a changeset when public contracts change, selecting its release level based on the compatibility impact and explaining any uncertainty in the draft PR. Then run `pnpm check`.
 7. Open a **draft** pull request that says `Closes #<issue>` and contains:
    - a table with one row per change: item, classification, upstream source links, and local action
    - the open questions from step 3
