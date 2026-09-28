@@ -1,5 +1,5 @@
 import { createClient } from "@hey-api/client-fetch";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, onTestFinished, vi } from "vitest";
 
 import {
   createSefariaClient,
@@ -200,41 +200,72 @@ describe("generated Sefaria SDK", () => {
     expect(cachedFetch).toHaveBeenCalledTimes(2);
   });
 
-  it("separates request keys and applies TTL, entry, and body-size limits", async () => {
-    let responseNumber = 0;
-    const fetchMock = vi.fn<typeof fetch>(async () => {
-      responseNumber += 1;
-      return jsonResponse([
-        {
-          title: "Genesis",
-          versionTitle: `Version ${responseNumber}`,
-          versionSource: null,
-          language: "he",
-          status: null,
-        },
-      ]);
-    });
+  it("separates cached request keys", async () => {
+    const fetchMock = vi.fn<typeof fetch>(async () => jsonResponse([]));
     const client = createSefariaClient({
       baseUrl: "https://example.test",
       fetch: fetchMock,
-      cache: { ttlMs: 20, maxEntries: 1, maxBytes: 1_024 },
     });
 
-    await getTextVersions({ client, path: { tref: "Genesis 1:1" } });
-    await getTextVersions({ client, path: { tref: "Exodus 1:1" } });
-    await getTextVersions({ client, path: { tref: "Genesis 1:1" } });
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    for (const tref of ["Micah 6:8", "Micah 6:9", "Micah 6:8", "Micah 6:9"]) {
+      await getTextVersions({ client, path: { tref } });
+    }
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
 
-    await getTextVersions({ client, path: { tref: "Genesis 1:1" } });
-    expect(fetchMock).toHaveBeenCalledTimes(3);
-    await new Promise((resolve) => setTimeout(resolve, 30));
-    await getTextVersions({ client, path: { tref: "Genesis 1:1" } });
-    expect(fetchMock).toHaveBeenCalledTimes(4);
+  it("evicts cached responses at the entry limit", async () => {
+    const fetchMock = vi.fn<typeof fetch>(async () => jsonResponse([]));
+    const client = createSefariaClient({
+      baseUrl: "https://example.test",
+      fetch: fetchMock,
+      cache: { maxEntries: 1 },
+    });
 
+    for (const tref of ["Micah 6:8", "Micah 6:9", "Micah 6:8", "Micah 6:8"]) {
+      await getTextVersions({ client, path: { tref } });
+    }
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+  });
+
+  it("expires cached responses without extending TTL on a cache hit", async () => {
+    let now = 1_000;
+    // LRU captures the performance object at import and briefly memoizes now().
+    const clock = vi.spyOn(performance, "now").mockImplementation(() => now);
+    vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout"] });
+    onTestFinished(() => {
+      vi.clearAllTimers();
+      vi.useRealTimers();
+      clock.mockRestore();
+    });
+    const fetchMock = vi.fn<typeof fetch>(async () => jsonResponse([]));
+    const client = createSefariaClient({
+      baseUrl: "https://example.test",
+      fetch: fetchMock,
+      cache: { ttlMs: 20 },
+    });
+
+    await getTextVersions({ client, path: { tref: "Micah 6:8" } });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    now += 19;
+    await vi.advanceTimersByTimeAsync(19);
+    await getTextVersions({ client, path: { tref: "Micah 6:8" } });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
+    now += 2;
+    await vi.advanceTimersByTimeAsync(2);
+    await getTextVersions({ client, path: { tref: "Micah 6:8" } });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+
+    await getTextVersions({ client, path: { tref: "Micah 6:8" } });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
+  it("does not cache responses exceeding the body-size limit", async () => {
     const oversizedFetch = vi.fn<typeof fetch>(async () =>
       jsonResponse([
         {
-          title: "Genesis",
+          title: "Micah",
           versionTitle: "Too large",
           versionSource: null,
           language: "he",
@@ -248,11 +279,11 @@ describe("generated Sefaria SDK", () => {
     });
     await getTextVersions({
       client: byteBounded,
-      path: { tref: "Genesis 1:1" },
+      path: { tref: "Micah 6:8" },
     });
     await getTextVersions({
       client: byteBounded,
-      path: { tref: "Genesis 1:1" },
+      path: { tref: "Micah 6:8" },
     });
     expect(oversizedFetch).toHaveBeenCalledTimes(2);
   });
