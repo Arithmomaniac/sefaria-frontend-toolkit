@@ -32,6 +32,10 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+      - uses: actions/cache@v4
+        with:
+          path: ${{ runner.os == 'Windows' && '~\AppData\Local\ms-playwright' || '~/.cache/ms-playwright' }}
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
       - run: pnpm setup:agent
       - run: pnpm check
         env:
@@ -126,6 +130,10 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
       - run: pnpm setup:agent
       - run: pnpm build
       - run: pnpm build:script-source

@@ -218,9 +218,19 @@ The individual commands remain useful for targeted troubleshooting. Prefer `pnpm
 pnpm check
 ```
 
-The current command checks stale OpenAPI output, then runs Prettier, Oxlint, workspace builds, the production local-site assembly and browser acceptance, official Inspector stdio qualification, deterministic real HTTP/AppBridge browser acceptance, TypeScript checks, freshly emitted API-documentation checks, tests, the offline focused compatibility qualification, private tarball consumption, and changeset rehearsal. It prints the elapsed time and result of every completed stage, including the first failed stage, so a slow local run can be attributed without rerunning the complete gate. The qualification prints grouped pass, failure, unavailable-source, and intentional-difference results. It does not refresh network fixtures or contact Sefaria.
+The current command runs Prettier and Oxlint first, then stale-OpenAPI and integration-policy checks, workspace builds, official Inspector stdio qualification, deterministic real HTTP/AppBridge browser acceptance, TypeScript checks, freshly emitted API-documentation checks, public metadata, and tests. It then runs the slower production local-site assembly and site, script-source, and playground browser acceptance, followed by the offline focused compatibility qualification, private tarball consumption, and changeset rehearsal. Cheap and frequently failing stages run before the browser suites so that a failure is reported early. It prints the elapsed time and result of every completed stage, including the first failed stage, so a slow local run can be attributed without rerunning the complete gate. The qualification prints grouped pass, failure, unavailable-source, and intentional-difference results. It does not refresh network fixtures or contact Sefaria.
 
 Every run writes a bounded machine-readable result to `.artifacts/check/result.json`. CI uploads that result and allowlisted browser diagnostics only after a platform failure. A Linux success cannot hide a Windows failure: the required `check` aggregation succeeds only when the complete matrix succeeds.
+
+The Pages workflow reuses validation only when the triggering CI push run succeeded on the exact commit that Pages checked out. Only then does it run `pnpm build` and `pnpm build:site:bundles`. For every other trigger, and whenever `main` has moved past the validated commit, it runs the full `pnpm check`. CI and Pages cache Playwright browsers by operating system and lockfile hash. `pnpm setup:agent` still runs its three-browser launch probe.
+
+### Documentation-site inner loop
+
+```powershell
+pnpm check:site
+```
+
+This subset runs Prettier, Oxlint, integration policy, workspace builds, TypeScript checks including documentation snippets, API-documentation checks, the production site assembly, and site browser acceptance. Use it while iterating on documentation-site pages and site snippets. It omits package tests, public metadata, the script-source and playground browser suites, MCP acceptance, compatibility, tarball, and changeset stages. If a change touches packages, component behavior, the playground, or examples used outside the site, run the matching focused command as well. `pnpm check:site` never replaces `pnpm check`: run the complete check before review.
 
 The MCP acceptance transport rejects unexpected requests and uses the compiled Node server, registered resource, separate host and sandbox origins, and packaged App. TypeScript projects use ignored incremental build-information files, which reduce repeated local typecheck and build work without changing emitted artifacts.
 

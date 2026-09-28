@@ -15,6 +15,7 @@
     "test:script-source": "node scripts/test-script-source.mjs",
     "build:mcp": "pnpm --filter @sefaria-example/mcp-app build",
     "check": "node scripts/check.mjs",
+    "check:site": "node scripts/check.mjs --site",
     "check:api-docs": "node scripts/check-api-docs.mjs",
     "client:fixture:capture-candidate": "pnpm --filter @arithmomaniac/sefaria-client fixture:capture-candidate",
     "capture:mcp:vscode": "pnpm build:mcp && tsx examples/mcp-app/scripts/capture-vscode-host.ts --capture",

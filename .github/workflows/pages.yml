@@ -38,8 +38,24 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
       - run: pnpm setup:agent
-      - run: pnpm check
+      - name: Reuse CI validation of this commit
+        id: ci
+        run: node scripts/pages-validation.mjs
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          WORKFLOW_NAME: ${{ github.event.workflow_run.name }}
+          WORKFLOW_EVENT: ${{ github.event.workflow_run.event }}
+          WORKFLOW_CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          WORKFLOW_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+      - if: ${{ steps.ci.outputs.validated != 'true' }}
+        run: pnpm check
+      - if: ${{ steps.ci.outputs.validated == 'true' }}
+        run: pnpm build && pnpm build:site:bundles
       - run: node scripts/script-source-release.mjs restore
         env:
           GITHUB_TOKEN: ${{ github.token }}
