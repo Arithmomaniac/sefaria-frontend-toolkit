@@ -82,6 +82,7 @@ The supply chain has two modes:
 | Mode | Network access | Result |
 | --- | --- | --- |
 | Explicit refresh | Allowed | Updates the pinned input and checksum for a chosen commit |
+| Drift detection | Read-only | Reports upstream differences from the pin and may hand the report to a triage agent; never changes the pin |
 | Ordinary build and check | Forbidden | Applies the overlay and regenerates outputs from committed files |
 
 ## Pin and checksum contract
@@ -93,6 +94,14 @@ The checksum covers the committed upstream OpenAPI bytes before overlay applicat
 The refresh operation must require an explicit commit. It must not follow a mutable branch or tag.
 
 A refresh produces a reviewable diff for the pin, checksum, upstream input, overlay guards, and generated TypeScript.
+
+## Drift detection contract
+
+**Current.** Drift detection compares the committed pin with the latest commit on Sefaria's default branch that changed `docs/openAPI.json`. It resolves that commit through the GitHub API and downloads the file at that exact SHA, so the reported commit and compared bytes always agree. Equal SHA-256 digests mean no drift. Otherwise the report lists added, removed, and changed `paths` (with the changed path-item keys), added, removed, and changed `components.schemas`, other changed top-level and component keys, and every `x-sefaria-guards` precondition that would fail against upstream. It evaluates guards with the same precondition code as generation, but reports all failures instead of stopping at the first.
+
+Any request failure, unsuccessful status, missing commit SHA, or invalid JSON is an error. Detection must never report a failure as no drift.
+
+Drift is a review signal, not a correction authority. Detection never refreshes the pin, edits the overlay, commits, or merges. The scheduled workflow keeps at most one open drift issue, identified by the `openapi-drift` label and a hidden marker. It updates that issue in place, comments when the upstream commit moves, and leaves it untouched when no drift remains; the reviewed refresh closes it. When the issue is new or the upstream commit moves, the workflow may assign it to the Copilot coding agent with the repository `openapi-drift-triage` agent. That agent may propose a refresh and source-backed overlay changes only as a draft pull request, which still requires the source review in the [overlay contract](#overlay-contract) before merge.
 
 ## Overlay contract
 
@@ -241,6 +250,7 @@ Focused tests must cover:
 - overlay success for every correction
 - overlay failure after each expected old value changes
 - exact mismatch paths
+- drift detection with no drift, changed paths and schemas, every failing guard, and request, status, SHA, and JSON failures that never report no drift
 - deterministic temporary corrected output
 - deterministic generated declarations and validators
 - stale generated-output detection

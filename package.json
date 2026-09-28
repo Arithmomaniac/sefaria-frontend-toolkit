@@ -42,6 +42,7 @@
     "metadata:generate": "node scripts/generate-package-metadata.mjs",
     "package:smoke": "node scripts/test-tarball-consumer.mjs",
     "openapi:check": "pnpm --filter @arithmomaniac/sefaria-client openapi:check",
+    "openapi:drift": "pnpm --filter @arithmomaniac/sefaria-client openapi:drift",
     "openapi:generate": "pnpm --filter @arithmomaniac/sefaria-client openapi:generate",
     "openapi:refresh": "pnpm --filter @arithmomaniac/sefaria-client openapi:refresh",
     "preview:site": "vitepress preview docs --host 127.0.0.1",

@@ -92,7 +92,9 @@ export function validateWorkflowPolicy(workflows) {
               ? ["workflow_dispatch", "workflow_run"]
               : isRetirementWorkflow(filename)
                 ? ["workflow_dispatch"]
-                : ["pull_request", "push"];
+                : isDriftWorkflow(filename)
+                  ? ["schedule", "workflow_dispatch"]
+                  : ["pull_request", "push"];
         if (JSON.stringify(eventNames) !== JSON.stringify(expectedEvents)) {
           issues.push(`unsupported workflow events in ${filename}`);
         }
@@ -103,6 +105,8 @@ export function validateWorkflowPolicy(workflows) {
         validatePagesWorkflow(workflow, issues, filename);
       } else if (isRetirementWorkflow(filename)) {
         validateRetirementWorkflow(workflow, issues, filename);
+      } else if (isDriftWorkflow(filename)) {
+        validateDriftWorkflow(workflow, issues, filename);
       } else if (
         filename.endsWith("/copilot-setup-steps.yml") ||
         filename === "copilot-setup-steps.yml"
@@ -110,7 +114,13 @@ export function validateWorkflowPolicy(workflows) {
         validateCopilotSetupWorkflow(workflow, issues, filename);
       }
     }
-    if (/\$\{\{\s*secrets\./iu.test(source)) {
+    const secretSource = isDriftWorkflow(filename)
+      ? DRIFT_HANDOFF_SECRETS.reduce(
+          (remaining, reference) => remaining.replaceAll(reference, ""),
+          source,
+        )
+      : source;
+    if (/\$\{\{\s*secrets\./iu.test(secretSource)) {
       issues.push(`secret reference in ${filename}`);
     }
     walkWorkflow(workflow, [], issues, filename);
@@ -421,6 +431,82 @@ function validateRetirementWorkflow(workflow, issues, filename) {
   }
 }
 
+const DRIFT_HANDOFF_SECRETS = [
+  "${{ secrets.COPILOT_ASSIGN_TOKEN != '' }}",
+  "${{ secrets.COPILOT_ASSIGN_TOKEN }}",
+];
+
+function validateDriftWorkflow(workflow, issues, filename) {
+  const setup = [
+    { uses: "actions/checkout@v4" },
+    { uses: "pnpm/action-setup@v4" },
+    {
+      uses: "actions/setup-node@v4",
+      with: { "node-version": 22, cache: "pnpm" },
+    },
+    { run: "pnpm install --frozen-lockfile" },
+  ];
+  const available = "steps.token.outputs.available == 'true'";
+  const detect = {
+    name: "detect upstream drift",
+    "timeout-minutes": 10,
+    "runs-on": "ubuntu-latest",
+    permissions: { contents: "read", issues: "write" },
+    outputs: {
+      commit: "${{ steps.drift.outputs.commit }}",
+      handoff: "${{ steps.drift.outputs.handoff }}",
+      "issue-number": "${{ steps.drift.outputs.issue-number }}",
+    },
+    steps: [
+      ...setup,
+      {
+        id: "drift",
+        run: "pnpm openapi:drift --issue",
+        env: { GITHUB_TOKEN: "${{ github.token }}" },
+      },
+    ],
+  };
+  const handoff = {
+    name: "hand off to Copilot",
+    needs: "detect",
+    if: "${{ needs.detect.outputs.handoff == 'true' }}",
+    "timeout-minutes": 10,
+    "runs-on": "ubuntu-latest",
+    permissions: { contents: "read" },
+    env: {
+      ISSUE_NUMBER: "${{ needs.detect.outputs.issue-number }}",
+      UPSTREAM_COMMIT: "${{ needs.detect.outputs.commit }}",
+    },
+    steps: [
+      {
+        id: "token",
+        run: `echo "available=${DRIFT_HANDOFF_SECRETS[0]}" >> "$GITHUB_OUTPUT"`,
+      },
+      {
+        if: "steps.token.outputs.available != 'true'",
+        run: 'echo "::notice::COPILOT_ASSIGN_TOKEN is not set. Assign issue #$ISSUE_NUMBER to Copilot manually."',
+      },
+      ...setup.map((step) => ({ if: available, ...step })),
+      {
+        if: available,
+        run: 'pnpm openapi:drift --assign-copilot "$ISSUE_NUMBER" --commit "$UPSTREAM_COMMIT"',
+        env: { COPILOT_ASSIGN_TOKEN: DRIFT_HANDOFF_SECRETS[1] },
+      },
+    ],
+  };
+  if (
+    !hasOnlyEntries(workflow, {
+      name: "OpenAPI drift",
+      on: { schedule: [{ cron: "17 6 * * 1" }], workflow_dispatch: null },
+      permissions: {},
+      concurrency: { group: "openapi-drift", "cancel-in-progress": false },
+      jobs: { detect, handoff },
+    })
+  ) {
+    issues.push(`OpenAPI drift report-only gate is incorrect in ${filename}`);
+  }
+}
+
 function validatePublishJob(publish, issues, filename) {
   const expectedRuns = [
     "pnpm install --frozen-lockfile",
@@ -660,6 +746,7 @@ function walkWorkflow(value, valuePath, issues, filename) {
       (((filename === "ci.yml" || filename.endsWith("/ci.yml")) &&
         valuePath[1] === "script-source") ||
         (isRetirementWorkflow(filename) && valuePath[1] === "retire") ||
+        (isDriftWorkflow(filename) && valuePath[1] === "detect") ||
         (isPagesWorkflow(filename) && valuePath[1] === "build"));
     if (
       CREDENTIAL_NAME.test(key) &&
@@ -695,10 +782,17 @@ function walkWorkflow(value, valuePath, issues, filename) {
           (((filename === "ci.yml" || filename.endsWith("/ci.yml")) &&
             valuePath[1] === "script-source") ||
             (isRetirementWorkflow(filename) && valuePath[1] === "retire"));
+        const driftIssuePermission =
+          isDriftWorkflow(filename) &&
+          valuePath[0] === "jobs" &&
+          valuePath[1] === "detect" &&
+          permission === "issues" &&
+          access === "write";
         if (
           !publishPermission &&
           !pagesPermission &&
           !scriptPermission &&
+          !driftIssuePermission &&
           (permission !== "contents" || access !== "read")
         ) {
           issues.push(
@@ -792,6 +886,12 @@ function hasOnlyEntries(value, expected) {
 
 function isPagesWorkflow(filename) {
   return filename === "pages.yml" || filename.endsWith("/pages.yml");
+}
+
+function isDriftWorkflow(filename) {
+  return (
+    filename === "openapi-drift.yml" || filename.endsWith("/openapi-drift.yml")
+  );
 }
 
 function isRetirementWorkflow(filename) {

@@ -108,6 +108,56 @@ describe("agent-ready workflow policy", () => {
       }).length,
     ).toBeGreaterThan(0);
   });
+  it("admits only the exact read-only OpenAPI drift workflow and its optional handoff secret", () => {
+    const drift = readFileSync(
+      resolve(process.cwd(), ".github/workflows/openapi-drift.yml"),
+      "utf8",
+    );
+    expect(validateWorkflowPolicy({ "openapi-drift.yml": drift })).toEqual([]);
+    for (const candidate of [
+      drift.replace(
+        "      issues: write",
+        "      issues: write\n      pull-requests: write",
+      ),
+      drift.replace(
+        "      contents: read\n    env:",
+        "      issues: write\n    env:",
+      ),
+      drift.replace(
+        "pnpm openapi:drift --issue",
+        "pnpm openapi:refresh --commit x && pnpm openapi:drift --issue",
+      ),
+      drift.replace(
+        "${{ secrets.COPILOT_ASSIGN_TOKEN }}",
+        "${{ secrets.NPM_TOKEN }}",
+      ),
+      drift.replace(
+        "permissions: {}",
+        "permissions: {}\n\nenv:\n  COPILOT_ASSIGN_TOKEN: ${{ secrets.COPILOT_ASSIGN_TOKEN }}",
+      ),
+      drift.replace("  workflow_dispatch:", "  workflow_dispatch:\n  push:"),
+      drift.replace(
+        "    if: ${{ needs.detect.outputs.handoff == 'true' }}\n",
+        "",
+      ),
+    ]) {
+      expect(
+        validateWorkflowPolicy({ "openapi-drift.yml": candidate }).length,
+      ).toBeGreaterThan(0);
+    }
+    expect(
+      validateWorkflowPolicy({
+        "script-retirement.yml": readFileSync(
+          resolve(process.cwd(), ".github/workflows/script-retirement.yml"),
+          "utf8",
+        ).replace(
+          "RETIRE_VERSION: ${{ inputs.version }}",
+          "RETIRE_VERSION: ${{ secrets.COPILOT_ASSIGN_TOKEN }}",
+        ),
+      }).join("\n"),
+    ).toContain("secret reference");
+  });
+
   it("requires complete Linux and Windows validation behind one check", () => {
     const workflow = parseWorkflow(ciSource);
     const jobs = workflow.jobs as RecordValue;
