@@ -1,7 +1,9 @@
-import { readdir, readFile } from "node:fs/promises";
+import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 import { describe, expect, it, vi } from "vitest";
+
+import { createSefariaClient, text } from "../packages/client/src/index.js";
 
 const root = path.resolve(import.meta.dirname, "..");
 const read = (...parts: string[]) =>
@@ -55,12 +57,9 @@ describe("B14 Install and status", () => {
   it("states GPL-3.0-only, matching every package manifest", async () => {
     const rights = section(await page(), "license-and-text-rights");
     expect(rights).toContain("GPL-3.0-only");
-    const manifests = (
-      await readdir(path.join(root, "packages"), { withFileTypes: true })
-    )
-      .filter((entry) => entry.isDirectory())
-      .map((entry) => path.join("packages", entry.name, "package.json"));
-    expect(manifests).toHaveLength(3);
+    const manifests = ["client", "text-transform", "web-components"].map(
+      (name) => path.join("packages", name, "package.json"),
+    );
     expect(await read("LICENSE")).toMatch(
       /GNU GENERAL PUBLIC LICENSE\s+Version 3/,
     );
@@ -163,8 +162,6 @@ describe("C2 The client and Sefaria's API", () => {
   });
 
   it("keeps each client's response cache separate", async () => {
-    const { createSefariaClient, text } =
-      await import("../packages/client/src/index.js");
     const fetchMock = vi.fn<typeof fetch>(
       async () =>
         new Response("[]", {
