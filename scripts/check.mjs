@@ -14,6 +14,8 @@ const INTEGRATION_POLICY = stage("Integration policy", "integration:check");
 const WORKSPACE_BUILDS = stage("Workspace builds", "build");
 const TYPECHECK = stage("TypeScript typecheck", "typecheck");
 const API_DOCUMENTATION = stage("API documentation", "check:api-docs");
+// Generated reference pages; separate from the JSDoc coverage check above.
+const REFERENCE_FRESHNESS = stage("Reference freshness", "reference:check");
 const DOCUMENTATION_SITE = stage("Documentation site", "build:site:bundles");
 const SITE_ACCEPTANCE = stage(
   "Documentation site browser acceptance",
@@ -43,6 +45,7 @@ export const CHECK_STAGES = [
   TYPECHECK,
   API_DOCUMENTATION,
   stage("Public metadata", "metadata:check"),
+  REFERENCE_FRESHNESS,
   DOCUMENTATION_SITE,
   stage("TypeScript and browser tests", "test"),
   SITE_ACCEPTANCE,
@@ -61,6 +64,7 @@ export const SITE_CHECK_STAGES = [
   WORKSPACE_BUILDS,
   TYPECHECK,
   API_DOCUMENTATION,
+  REFERENCE_FRESHNESS,
   DOCUMENTATION_SITE,
   SITE_ACCEPTANCE,
 ];

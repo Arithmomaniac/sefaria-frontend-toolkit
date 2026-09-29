@@ -574,6 +574,8 @@ Run `pnpm package:smoke` to create an isolated Vite consumer, inspect each uncha
 
 Run `pnpm metadata:generate` after changing a public export or element contract. `pnpm metadata:check` rejects stale `packages/web-components/custom-elements.json`, `packages/public-exports.json`, and their readable summaries under `docs/reference/`.
 
+Then run `pnpm reference:generate`. It rebuilds the site's reference pages from those files, the OpenAPI overlay, the client and text-transform source (through TypeDoc), and the hand-written catalogs in `scripts/reference/`. `pnpm reference:check`, part of `pnpm check` and `pnpm check:site`, rejects a stale page. It's separate from the JSDoc coverage in `pnpm check:api-docs`.
+
 Run `pnpm changeset:rehearse` to exercise the pinned private fixed group in a disposable fixture. The current rehearsal proves the observed `0.1.1-alpha.0` to `0.1.1-alpha.1` sequence from a `0.1.0` fixture, synchronized internal dependencies and changelogs, retained private flags, and no automatic commit or tag. It remains a local Changesets qualification and is separate from the run-derived public GitHub Packages prerelease.
 
 ## Package index configuration

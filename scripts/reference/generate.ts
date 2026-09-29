@@ -5,6 +5,8 @@ import {
   renderApiCorrections,
 } from "./api-corrections.js";
 import { CLIENT_PAGE, renderClientReference } from "./client.js";
+import { COMPONENTS_PAGE, renderComponentsReference } from "./components.js";
+import { PACKAGES_PAGE, renderPackagesReference } from "./packages.js";
 import {
   TEXT_TRANSFORM_PAGE,
   renderTextTransformReference,
@@ -16,6 +18,8 @@ export const REFERENCE_PAGES: readonly Page[] = [
   { file: API_CORRECTIONS_PAGE, render: renderApiCorrections },
   { file: CLIENT_PAGE, render: renderClientReference },
   { file: TEXT_TRANSFORM_PAGE, render: renderTextTransformReference },
+  { file: COMPONENTS_PAGE, render: renderComponentsReference },
+  { file: PACKAGES_PAGE, render: renderPackagesReference },
 ];
 
 async function main(check: boolean): Promise<void> {
