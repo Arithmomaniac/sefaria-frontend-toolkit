@@ -92,7 +92,7 @@ export function smokeSiteSnippets(consumer) {
       const result = spawnSync(
         process.execPath,
         ["--experimental-strip-types", "--import", "./offline-fetch.mjs", file],
-        { cwd: consumer, encoding: "utf8" },
+        { cwd: consumer, encoding: "utf8", windowsHide: true },
       );
       if (result.status !== 0) {
         throw new Error(`${file} failed:\n${result.stderr}`);

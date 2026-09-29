@@ -25,6 +25,9 @@ const micah = JSON.parse(
   ),
 ) as { payload: { versions: { isPrimary: boolean }[] } };
 
+// Each case imports the snippet twice; cold imports are slow under a full parallel run.
+vi.setConfig({ testTimeout: 30_000 });
+
 let output: string[] = [];
 let requests: string[] = [];
 
@@ -54,14 +57,21 @@ beforeEach(() => {
         .join(" "),
     );
   });
-  vi.stubGlobal("fetch", async (input: RequestInfo | URL) => {
-    const url = input instanceof Request ? input.url : String(input);
-    requests.push(url);
-    if (url.startsWith("https://www.sefaria.org/api/v3/texts/Micah%206%3A8")) {
-      return micahResponse(url);
-    }
-    throw new TypeError(`Unexpected request: ${url}`);
-  });
+  vi.stubGlobal(
+    "fetch",
+    async (input: RequestInfo | URL, init?: RequestInit) => {
+      const signal = input instanceof Request ? input.signal : init?.signal;
+      if (signal?.aborted) throw signal.reason;
+      const url = input instanceof Request ? input.url : String(input);
+      requests.push(url);
+      if (
+        url.startsWith("https://www.sefaria.org/api/v3/texts/Micah%206%3A8")
+      ) {
+        return micahResponse(url);
+      }
+      throw new TypeError(`Unexpected request: ${url}`);
+    },
+  );
 });
 
 afterEach(() => {
@@ -140,7 +150,7 @@ function syntaxErrors(javascript: string): string[] {
   const result = spawnSync(
     process.execPath,
     ["--check", "--input-type=module"],
-    { input: javascript, encoding: "utf8" },
+    { input: javascript, encoding: "utf8", windowsHide: true },
   );
   return result.status === 0 ? [] : [result.stderr];
 }
@@ -203,4 +213,113 @@ describe("B11 page shows real output", () => {
       ).toEqual(output.map((line) => line.trimEnd()));
     },
   );
+});
+
+describe("B26 clean up stored Sefaria text", () => {
+  const page = "data-and-text-tools/clean-up-stored-sefaria-text.md";
+
+  it("generates every before-and-after row from current code", async () => {
+    const markdown = await readFile(path.join(root, "docs", page), "utf8");
+    const rows = [...markdown.matchAll(/^\| `(.+)` \| `(.*)` \|$/gmu)];
+    expect(rows.length).toBeGreaterThanOrEqual(10);
+    const { output } = await runBoth("text-markup-before-after");
+    const pairs = new Map<string, string>();
+    for (let index = 0; index + 1 < output.length; index += 1) {
+      const before = output[index];
+      if (before && !before.startsWith("  ") && output[index - 1] !== before) {
+        if (index === 0 || output[index - 1] === "") {
+          pairs.set(before, output[index + 1] ?? "");
+        }
+      }
+    }
+    for (const [, before, after] of rows) {
+      expect(pairs.get(before ?? ""), before).toBe(after);
+    }
+    expect(pairs.size).toBe(rows.length);
+  });
+
+  it("removes unsupported attributes and emits only stable attributes", async () => {
+    const { normalizeText } =
+      await import("../packages/text-transform/src/index.js");
+    const { bodyHtml } = normalizeText(
+      '<b onclick="x()" style="color:red" class="a" id="b">t</b><span dir="rtl" lang="he">ש</span><a href="javascript:x()" data-ref="Micah 6:8">M</a>',
+    );
+    expect(bodyHtml).toBe(
+      '<b>t</b><span dir="rtl">ש</span><span data-sefaria-ref="Micah 6:8">M</span>',
+    );
+    const attributes = [...bodyHtml.matchAll(/\s([a-z-]+)=/gu)].map(
+      (m) => m[1],
+    );
+    for (const attribute of attributes) {
+      expect(attribute).toMatch(/^(dir|style|data-sefaria-[a-z-]+)$/u);
+    }
+  });
+
+  it("covers every vocalization mode and both PASEQ modes", async () => {
+    const { output } = await runBoth("prepare-stored-text");
+    expect(output.map((line) => line.split(":")[0])).toEqual([
+      "taamim_and_nikkud",
+      "nikkud",
+      "none",
+      "after-space",
+      "always",
+    ]);
+    expect(output[0]).toMatch(/[\u0591-\u05af]/u);
+    expect(output[1]).not.toMatch(/[\u0591-\u05af]/u);
+    expect(output[1]).toMatch(/[\u05b0-\u05bc]/u);
+    expect(output[2]).not.toMatch(/[\u0591-\u05bd\u05bf-\u05c7]/u);
+    expect(output[3]).toContain("\u05c0");
+    expect(output[3]).not.toContain(" \u05c0");
+    expect(output[4]).not.toContain("\u05c0");
+    expect(await pageOutputAfter(page, "prepare-stored-text")).toEqual(
+      output.map((line) => line.trimEnd()),
+    );
+  });
+
+  it("shows that vocalization is not sanitization", async () => {
+    const { applyVocalizationToHtml, normalizeText } =
+      await import("../packages/text-transform/src/index.js");
+    const unsafe = '<img src="x" onerror="steal()">הִגִּ֥יד';
+    expect(applyVocalizationToHtml(unsafe, "nikkud")).toContain("onerror");
+    expect(
+      applyVocalizationToHtml(normalizeText(unsafe).bodyHtml, "nikkud"),
+    ).toBe("הִגִּיד");
+    const markdown = await readFile(path.join(root, "docs", page), "utf8");
+    const snippet = await readFile(
+      path.join(snippetDirectory, "prepare-stored-text.ts"),
+      "utf8",
+    );
+    expect(snippet.indexOf("normalizeText(storedHtml)")).toBeLessThan(
+      snippet.indexOf("applyVocalizationToHtml(html"),
+    );
+    expect(markdown).toMatch(/not a sanitizer/u);
+  });
+});
+
+describe("B25 handle errors in your code", () => {
+  it("produces all three failure kinds deterministically", async () => {
+    const { output, requests } = await runBoth("client-errors");
+    expect(requests).toEqual([]);
+    expect(output[0]).toBe(
+      "Sefaria error 404: Could not find title in reference",
+    );
+    const report = JSON.parse(
+      output[1]?.replace("Unexpected response shape: ", "") ?? "",
+    );
+    expect(report).toEqual({
+      operationId: "get-v3-texts",
+      method: "GET",
+      path: "/api/v3/texts/{tref}",
+      status: 200,
+      issues: [
+        {
+          instancePath: "",
+          keyword: "content-type",
+          message: "Expected application/json, received text/html.",
+        },
+      ],
+    });
+    expect(output[2]).toBe("Request failed: TypeError: fetch failed");
+    expect(output[3]).toBe("Request failed: AbortError: Reader left the page");
+  });
 });
