@@ -60,7 +60,7 @@ describe("repository check runner", () => {
     expect(names.indexOf("Reference freshness")).toBe(
       names.indexOf("Public metadata") + 1,
     );
-    expect(names).toHaveLength(19);
+    expect(names).toHaveLength(20);
   });
 
   it("selects the documentation-site subset only with --site", () => {
@@ -75,6 +75,7 @@ describe("repository check runner", () => {
       "TypeScript typecheck",
       "API documentation",
       "Reference freshness",
+      "Prose lint",
       "Documentation site",
       "Documentation site browser acceptance",
     ]);

@@ -212,7 +212,7 @@ export async function renderApiCorrections(): Promise<string> {
 
   const upstreamLink = `https://github.com/${source.repository}/blob/${source.commit}/${source.path}`;
   const lines: string[] = [
-    "The client is generated from Sefaria's published API description, an OpenAPI file. Where that file doesn't match what Sefaria's server code accepts or returns, the toolkit corrects the file before generating the client. This page lists each correction, the endpoints it affects, the source checks that must pass before it runs, and the changes it makes.",
+    "The toolkit generates the client from Sefaria's published API description, an OpenAPI file. Where that file doesn't match what Sefaria's server code accepts or returns, the toolkit corrects it first. This page lists each correction and the endpoints it affects. It also lists the source checks that must pass before the correction runs, and the changes it makes.",
     "",
     releaseSection(),
     "",
@@ -220,13 +220,13 @@ export async function renderApiCorrections(): Promise<string> {
     "",
     `The corrections apply to [\`${source.path}\`](${upstreamLink}) in \`${source.repository}\` at commit \`${source.commit}\`. The downloaded file must have the SHA-256 digest \`${source.sha256}\`.`,
     "",
-    "Each correction has source checks. They confirm that the parts of Sefaria's file the correction depends on are still in the state it expects: absent, or unchanged since the correction was written. The checks don't prove that the correction is still needed. If a check fails, client generation stops.",
+    "Each correction has source checks. The checks inspect the parts of Sefaria's file that the correction uses. They require each part to be absent or unchanged since the correction was written. The checks don't prove that the correction is still needed. If a check fails, client generation stops.",
     "",
-    `There are ${guards.length} corrections, made up of ${overlay.actions.length} changes. They affect ${endpointKeys.length} of the client's ${operations.length} endpoints.`,
+    `There are ${guards.length} corrections, with ${overlay.actions.length} changes in total. They affect ${endpointKeys.length} of the client's ${operations.length} endpoints.`,
     "",
     "## Corrections by endpoint",
     "",
-    "Each endpoint shows its client function, then the corrections that change the endpoint or a schema it uses.",
+    "Each endpoint shows its client function. It then lists the corrections that change the endpoint or a schema it uses.",
     "",
   ];
   for (const key of endpointKeys) {

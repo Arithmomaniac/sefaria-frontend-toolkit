@@ -426,3 +426,33 @@ describe("R5 corrections to Sefaria's API", () => {
     expect(linker).not.toMatch(/^Endpoints: .*\/api\/texts\//mu);
   });
 });
+
+describe("prose lint", () => {
+  it("flags semicolons and long sentences but skips code, tables and frontmatter", async () => {
+    const { lintProse } = await import("../scripts/check-prose.mjs");
+    const long = Array.from({ length: 31 }, () => "word").join(" ") + ".";
+    const issues = lintProse(
+      [
+        "---",
+        'title: "A; b"',
+        "---",
+        "",
+        "One; two.",
+        "",
+        long,
+        "",
+        "| a; b | c |",
+        "",
+        "```js",
+        "const a = 1;",
+        "```",
+        "",
+        "Uses `a; b` inline.",
+      ].join("\n"),
+    );
+    expect(issues.map((issue: { kind: string }) => issue.kind)).toEqual([
+      "semicolon",
+      "31 words",
+    ]);
+  });
+});

@@ -11,7 +11,7 @@ export function releaseSection(): string {
     "",
     "This page documents the code on the `main` branch, which `alpha` builds are published from. <ReleaseStamp />",
     "",
-    "The `alpha` script-tag address serves the newest script release that is still active. It isn't checked against the commit this page was built from, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as they remain hosted. An older pin can still include the removed Popup element, and it can lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.",
+    "The `alpha` script-tag address serves the newest script release that is still active. The site doesn't compare it with the commit used to build this page, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can still include the removed Popup element. It can also lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.",
   ].join("\n");
 }
 
