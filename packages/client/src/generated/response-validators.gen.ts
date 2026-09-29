@@ -16,10 +16,10 @@ import {
   zCalendarApiResponse,
   zCalendarHolidayTopicJson,
   zCalendarNextReadApi,
-  zCalendarParashaTopicJson,
   zCatJson,
   zCollectionDetailJson,
   zCollectionsListJson,
+  zCoreCalendarParashaTopicResponse,
   zCoreErrorResponse,
   zCoreIndexResponse,
   zCoreLinkResponse,
@@ -181,7 +181,7 @@ export function validateGetAliyotByParasha200(value: unknown): boolean {
 }
 
 export function validateGetCalendarParashaTopic200(value: unknown): boolean {
-  return zCalendarParashaTopicJson.safeParse(value).success;
+  return zCoreCalendarParashaTopicResponse.safeParse(value).success;
 }
 
 export function validateGetCalendarHolidayTopic200(value: unknown): boolean {

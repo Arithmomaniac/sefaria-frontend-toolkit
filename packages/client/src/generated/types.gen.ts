@@ -3290,7 +3290,7 @@ export type CalendarParashaTopicJson = {
     [key: string]: unknown;
   };
   url?: string;
-  ref?: Ref;
+  ref: Ref;
   heRef?: string;
   order?: number;
   category?: string;
@@ -3755,6 +3755,9 @@ export type CoreRefResponse =
       is_ref: false;
     }
   | CoreRefSuccess;
+
+export type CoreCalendarParashaTopicResponse =
+  CalendarParashaTopicJson | CoreErrorResponse;
 
 export type CoreIndexResponse = IndexJson | CoreErrorResponse;
 
@@ -4685,7 +4688,7 @@ export type GetCalendarParashaTopicResponses = {
   /**
    * Successful Response
    */
-  200: CalendarParashaTopicJson;
+  200: CoreCalendarParashaTopicResponse;
 };
 
 export type GetCalendarParashaTopicResponse =

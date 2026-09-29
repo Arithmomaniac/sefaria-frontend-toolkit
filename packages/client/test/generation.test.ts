@@ -754,6 +754,29 @@ describe("reviewed Core corrections", () => {
     expect(indexSchema.required).toEqual(["title", "categories", "schema"]);
   });
 
+  it("separates calendar parasha successes from HTTP 200 error objects", () => {
+    const core = correctedCore();
+    const schemas = (core.components as JsonObject).schemas as JsonObject;
+    const success = schemas.CalendarParashaTopicJSON as JsonObject;
+    expect(success.required).toEqual(["ref"]);
+    const response = schemas.CoreCalendarParashaTopicResponse as JsonObject;
+    expect(response.oneOf).toEqual([
+      { $ref: "#/components/schemas/CalendarParashaTopicJSON" },
+      { $ref: "#/components/schemas/CoreErrorResponse" },
+    ]);
+    const operation = (
+      (core.paths as JsonObject)["/api/calendars/topics/parasha"] as JsonObject
+    ).get as JsonObject;
+    expect(
+      (
+        ((operation.responses as JsonObject)["200"] as JsonObject)
+          .content as JsonObject
+      )["application/json"],
+    ).toMatchObject({
+      schema: { $ref: "#/components/schemas/CoreCalendarParashaTopicResponse" },
+    });
+  });
+
   it("models shape wire controls and leaf, collapsed, or error records", () => {
     const core = correctedCore();
     const shape = (core.paths as JsonObject)[

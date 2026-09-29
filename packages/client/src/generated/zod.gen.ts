@@ -2053,7 +2053,7 @@ export const zCalendarParashaTopicJson = z.object({
   title: z.record(z.string(), z.unknown()).optional(),
   displayValue: z.record(z.string(), z.unknown()).optional(),
   url: z.string().optional(),
-  ref: zRef.optional(),
+  ref: zRef,
   heRef: z.string().optional(),
   order: z.int().optional(),
   category: z.string().optional(),
@@ -2664,6 +2664,11 @@ export const zCoreRefResponse = z.union([
   zCoreRefSuccess,
 ]);
 
+export const zCoreCalendarParashaTopicResponse = z.union([
+  zCalendarParashaTopicJson,
+  zCoreErrorResponse,
+]);
+
 export const zCoreIndexResponse = z.union([zIndexJson, zCoreErrorResponse]);
 
 export const zCoreShapeMetadata = z.object({
@@ -2913,7 +2918,8 @@ export const zGetAliyotByParashaResponse = zAliyotJson;
 /**
  * Successful Response
  */
-export const zGetCalendarParashaTopicResponse = zCalendarParashaTopicJson;
+export const zGetCalendarParashaTopicResponse =
+  zCoreCalendarParashaTopicResponse;
 
 /**
  * Successful Response

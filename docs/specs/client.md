@@ -244,6 +244,8 @@ The client must not turn missing requested content into a transport error when t
 
 Runtime validation detects contract mismatches. A mismatch does not change the schema automatically. Source review and recorded evidence must precede an overlay correction.
 
+The calendar parasha operation's HTTP 200 response includes both a successful parasha and a JSON error for an invalid `diaspora` parameter. Its generated response contract must distinguish these shapes, preserving the JSON error as a typed HTTP 200 data variant rather than changing the status or converting it into a network failure.
+
 ## Test contract
 
 Focused tests must cover:

@@ -42,6 +42,24 @@ function jsonResponse(
 }
 
 describe("generated Sefaria SDK", () => {
+  it("preserves a calendar invalid-parameter JSON response as HTTP 200 data", async () => {
+    const body = { error: "'Diaspora' parameter must be 1 or 0." };
+    const client = createSefariaClient({
+      baseUrl: "https://example.test",
+      fetch: async () => jsonResponse(body),
+      cache: false,
+    });
+
+    const result = await calendars.getCalendarParashaTopic({
+      client,
+      query: { diaspora: "0" },
+    });
+
+    expect(result.data).toEqual(body);
+    expect(result.error).toBeUndefined();
+    expect(result.response?.status).toBe(200);
+  });
+
   it("passes the reviewed Israel parasha choice as a query parameter", async () => {
     const fetchMock = vi.fn<typeof fetch>(async () =>
       jsonResponse({ title: { en: "Parashat Hashavua" }, ref: "Micah 6:8" }),
