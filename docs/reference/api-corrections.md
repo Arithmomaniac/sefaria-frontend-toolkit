@@ -172,16 +172,16 @@ Source checks:
 - `$.components.schemas.CoreVersionMetadata` is absent.
 - `$.components.schemas.versionData` is unchanged (SHA-256 starting `30674c1ce884`).
 
-| Change                           | Action                                       | Target                                        | Description |
-| -------------------------------- | -------------------------------------------- | --------------------------------------------- | ----------- |
-| `shared-version-metadata-seed`   | Update                                       | `$.components.schemas`                        | —           |
-| `shared-version-metadata-copy`   | Copy from `$.components.schemas.VersionJSON` | `$.components.schemas.CoreVersionMetadata`    | —           |
-| `version-json-properties-remove` | Remove                                       | `$.components.schemas.VersionJSON.properties` | —           |
-| `version-json-type-remove`       | Remove                                       | `$.components.schemas.VersionJSON.type`       | —           |
-| `version-json-base`              | Update                                       | `$.components.schemas.VersionJSON`            | —           |
-| `version-data-properties-remove` | Remove                                       | `$.components.schemas.versionData.properties` | —           |
-| `version-data-type-remove`       | Remove                                       | `$.components.schemas.versionData.type`       | —           |
-| `version-data-base`              | Update                                       | `$.components.schemas.versionData`            | —           |
+| Change | Action | Target | Description |
+| --- | --- | --- | --- |
+| `shared-version-metadata-seed` | Update | `$.components.schemas` | — |
+| `shared-version-metadata-copy` | Copy from `$.components.schemas.VersionJSON` | `$.components.schemas.CoreVersionMetadata` | — |
+| `version-json-properties-remove` | Remove | `$.components.schemas.VersionJSON.properties` | — |
+| `version-json-type-remove` | Remove | `$.components.schemas.VersionJSON.type` | — |
+| `version-json-base` | Update | `$.components.schemas.VersionJSON` | — |
+| `version-data-properties-remove` | Remove | `$.components.schemas.versionData.properties` | — |
+| `version-data-type-remove` | Remove | `$.components.schemas.versionData.type` | — |
+| `version-data-base` | Update | `$.components.schemas.versionData` | — |
 
 <details>
 <summary>Values this correction sets</summary>
@@ -236,16 +236,16 @@ Source checks:
 - `$.components.schemas.SheetTopicJSON` is unchanged (SHA-256 starting `5db2a7972cc0`).
 - `$.components.schemas.UserSheetTagJSON` is unchanged (SHA-256 starting `c57345df7247`).
 
-| Change                             | Action                                          | Target                                             | Description |
-| ---------------------------------- | ----------------------------------------------- | -------------------------------------------------- | ----------- |
-| `shared-sheet-topic-seed`          | Update                                          | `$.components.schemas`                             | —           |
-| `shared-sheet-topic-copy`          | Copy from `$.components.schemas.SheetTopicJSON` | `$.components.schemas.CoreSheetTopic`              | —           |
-| `sheet-topic-properties-remove`    | Remove                                          | `$.components.schemas.SheetTopicJSON.properties`   | —           |
-| `sheet-topic-type-remove`          | Remove                                          | `$.components.schemas.SheetTopicJSON.type`         | —           |
-| `sheet-topic-base`                 | Update                                          | `$.components.schemas.SheetTopicJSON`              | —           |
-| `user-sheet-tag-properties-remove` | Remove                                          | `$.components.schemas.UserSheetTagJSON.properties` | —           |
-| `user-sheet-tag-type-remove`       | Remove                                          | `$.components.schemas.UserSheetTagJSON.type`       | —           |
-| `user-sheet-tag-base`              | Update                                          | `$.components.schemas.UserSheetTagJSON`            | —           |
+| Change | Action | Target | Description |
+| --- | --- | --- | --- |
+| `shared-sheet-topic-seed` | Update | `$.components.schemas` | — |
+| `shared-sheet-topic-copy` | Copy from `$.components.schemas.SheetTopicJSON` | `$.components.schemas.CoreSheetTopic` | — |
+| `sheet-topic-properties-remove` | Remove | `$.components.schemas.SheetTopicJSON.properties` | — |
+| `sheet-topic-type-remove` | Remove | `$.components.schemas.SheetTopicJSON.type` | — |
+| `sheet-topic-base` | Update | `$.components.schemas.SheetTopicJSON` | — |
+| `user-sheet-tag-properties-remove` | Remove | `$.components.schemas.UserSheetTagJSON.properties` | — |
+| `user-sheet-tag-type-remove` | Remove | `$.components.schemas.UserSheetTagJSON.type` | — |
+| `user-sheet-tag-base` | Update | `$.components.schemas.UserSheetTagJSON` | — |
 
 <details>
 <summary>Values this correction sets</summary>
@@ -310,17 +310,17 @@ Source checks:
 - `$.components.schemas.AllSheetsJSON.properties.sheets.items.properties.created` is unchanged (SHA-256 starting `d39ee056c680`).
 - `$.components.schemas.AllSheetsJSON.properties.sheets.items.properties.published` is unchanged (SHA-256 starting `5d0406f84838`).
 
-| Change                                    | Action | Target                                                                                   | Description |
-| ----------------------------------------- | ------ | ---------------------------------------------------------------------------------------- | ----------- |
-| `sheet-summary-id-type-remove`            | Remove | `$.components.schemas.SheetsJSON.properties.id.type`                                     | —           |
-| `sheet-summary-id`                        | Update | `$.components.schemas.SheetsJSON.properties.id`                                          | —           |
-| `sheet-summary-via`                       | Update | `$.components.schemas.SheetsJSON.properties.via`                                         | —           |
-| `sheet-summary-options-type-remove`       | Remove | `$.components.schemas.SheetsJSON.properties.options.type`                                | —           |
-| `sheet-summary-options-properties-remove` | Remove | `$.components.schemas.SheetsJSON.properties.options.properties`                          | —           |
-| `sheet-summary-options-example-remove`    | Remove | `$.components.schemas.SheetsJSON.properties.options.example`                             | —           |
-| `sheet-summary-options`                   | Update | `$.components.schemas.SheetsJSON.properties.options`                                     | —           |
-| `all-sheets-created-format-remove`        | Remove | `$.components.schemas.AllSheetsJSON.properties.sheets.items.properties.created.format`   | —           |
-| `all-sheets-published-format-remove`      | Remove | `$.components.schemas.AllSheetsJSON.properties.sheets.items.properties.published.format` | —           |
+| Change | Action | Target | Description |
+| --- | --- | --- | --- |
+| `sheet-summary-id-type-remove` | Remove | `$.components.schemas.SheetsJSON.properties.id.type` | — |
+| `sheet-summary-id` | Update | `$.components.schemas.SheetsJSON.properties.id` | — |
+| `sheet-summary-via` | Update | `$.components.schemas.SheetsJSON.properties.via` | — |
+| `sheet-summary-options-type-remove` | Remove | `$.components.schemas.SheetsJSON.properties.options.type` | — |
+| `sheet-summary-options-properties-remove` | Remove | `$.components.schemas.SheetsJSON.properties.options.properties` | — |
+| `sheet-summary-options-example-remove` | Remove | `$.components.schemas.SheetsJSON.properties.options.example` | — |
+| `sheet-summary-options` | Update | `$.components.schemas.SheetsJSON.properties.options` | — |
+| `all-sheets-created-format-remove` | Remove | `$.components.schemas.AllSheetsJSON.properties.sheets.items.properties.created.format` | — |
+| `all-sheets-published-format-remove` | Remove | `$.components.schemas.AllSheetsJSON.properties.sheets.items.properties.published.format` | — |
 
 <details>
 <summary>Values this correction sets</summary>
@@ -459,11 +459,11 @@ Source checks:
 - `$.paths['/api/manuscripts/{tref}'].get.responses['200'].content['Manuscript JSON']` is unchanged (SHA-256 starting `434d5e06ff93`).
 - `$.paths['/api/manuscripts/{tref}'].get.responses['200'].content['application/json']` is absent.
 
-| Change                       | Action                                                                                         | Target                                                                                | Description |
-| ---------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------- |
-| `manuscripts-content-seed`   | Update                                                                                         | `$.paths['/api/manuscripts/{tref}'].get.responses['200'].content`                     | —           |
-| `manuscripts-content-copy`   | Copy from `$.paths['/api/manuscripts/{tref}'].get.responses['200'].content['Manuscript JSON']` | `$.paths['/api/manuscripts/{tref}'].get.responses['200'].content['application/json']` | —           |
-| `manuscripts-content-remove` | Remove                                                                                         | `$.paths['/api/manuscripts/{tref}'].get.responses['200'].content['Manuscript JSON']`  | —           |
+| Change | Action | Target | Description |
+| --- | --- | --- | --- |
+| `manuscripts-content-seed` | Update | `$.paths['/api/manuscripts/{tref}'].get.responses['200'].content` | — |
+| `manuscripts-content-copy` | Copy from `$.paths['/api/manuscripts/{tref}'].get.responses['200'].content['Manuscript JSON']` | `$.paths['/api/manuscripts/{tref}'].get.responses['200'].content['application/json']` | — |
+| `manuscripts-content-remove` | Remove | `$.paths['/api/manuscripts/{tref}'].get.responses['200'].content['Manuscript JSON']` | — |
 
 <details>
 <summary>Values this correction sets</summary>
@@ -503,19 +503,19 @@ Source checks:
 - `$.components.schemas.VersionJSON.properties.status` is unchanged (SHA-256 starting `56639d0f6f82`).
 - `$.components.schemas.VersionJSON.properties.status.nullable` is absent.
 
-| Change                             | Action                                                                                        | Target                                                                                          | Description                                                           |
-| ---------------------------------- | --------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
-| `versions-path-seed`               | Update                                                                                        | `$.paths`                                                                                       | Create the corrected tref path before copying the upstream operation. |
-| `versions-path-copy`               | Copy from `$.paths['/api/texts/versions/{index}']`                                            | `$.paths['/api/texts/versions/{tref}']`                                                         | Copy the complete versions operation to the corrected tref path.      |
-| `versions-path-remove`             | Remove                                                                                        | `$.paths['/api/texts/versions/{index}']`                                                        | Remove the incorrectly named index path.                              |
-| `versions-parameter`               | Update                                                                                        | `$.paths['/api/texts/versions/{tref}'].parameters[0]`                                           | Match the path parameter to the route and handler.                    |
-| `versions-content-seed`            | Update                                                                                        | `$.paths['/api/texts/versions/{tref}'].get.responses['200'].content`                            | Create the JSON media-type key before copying its schema.             |
-| `versions-content-copy`            | Copy from `$.paths['/api/texts/versions/{tref}'].get.responses['200'].content['VersionJSON']` | `$.paths['/api/texts/versions/{tref}'].get.responses['200'].content['application/json']`        | Copy the version-list schema under the correct JSON media type.       |
-| `versions-response-schema-remove`  | Remove                                                                                        | `$.paths['/api/texts/versions/{tref}'].get.responses['200'].content['application/json'].schema` | Remove the array-only schema before adding the source error branch.   |
-| `versions-response-schema`         | Update                                                                                        | `$.paths['/api/texts/versions/{tref}'].get.responses['200'].content['application/json']`        | Model successful version metadata arrays and HTTP 200 JSON errors.    |
-| `versions-content-remove`          | Remove                                                                                        | `$.paths['/api/texts/versions/{tref}'].get.responses['200'].content['VersionJSON']`             | Remove the schema name that was incorrectly used as a media type.     |
-| `versions-version-source-nullable` | Update                                                                                        | `$.components.schemas.VersionJSON.properties.versionSource`                                     | Permit stored version metadata whose required source value is null.   |
-| `versions-status-nullable`         | Update                                                                                        | `$.components.schemas.VersionJSON.properties.status`                                            | Permit stored version metadata whose optional status value is null.   |
+| Change | Action | Target | Description |
+| --- | --- | --- | --- |
+| `versions-path-seed` | Update | `$.paths` | Create the corrected tref path before copying the upstream operation. |
+| `versions-path-copy` | Copy from `$.paths['/api/texts/versions/{index}']` | `$.paths['/api/texts/versions/{tref}']` | Copy the complete versions operation to the corrected tref path. |
+| `versions-path-remove` | Remove | `$.paths['/api/texts/versions/{index}']` | Remove the incorrectly named index path. |
+| `versions-parameter` | Update | `$.paths['/api/texts/versions/{tref}'].parameters[0]` | Match the path parameter to the route and handler. |
+| `versions-content-seed` | Update | `$.paths['/api/texts/versions/{tref}'].get.responses['200'].content` | Create the JSON media-type key before copying its schema. |
+| `versions-content-copy` | Copy from `$.paths['/api/texts/versions/{tref}'].get.responses['200'].content['VersionJSON']` | `$.paths['/api/texts/versions/{tref}'].get.responses['200'].content['application/json']` | Copy the version-list schema under the correct JSON media type. |
+| `versions-response-schema-remove` | Remove | `$.paths['/api/texts/versions/{tref}'].get.responses['200'].content['application/json'].schema` | Remove the array-only schema before adding the source error branch. |
+| `versions-response-schema` | Update | `$.paths['/api/texts/versions/{tref}'].get.responses['200'].content['application/json']` | Model successful version metadata arrays and HTTP 200 JSON errors. |
+| `versions-content-remove` | Remove | `$.paths['/api/texts/versions/{tref}'].get.responses['200'].content['VersionJSON']` | Remove the schema name that was incorrectly used as a media type. |
+| `versions-version-source-nullable` | Update | `$.components.schemas.VersionJSON.properties.versionSource` | Permit stored version metadata whose required source value is null. |
+| `versions-status-nullable` | Update | `$.components.schemas.VersionJSON.properties.status` | Permit stored version metadata whose optional status value is null. |
 
 <details>
 <summary>Values this correction sets</summary>
@@ -611,11 +611,11 @@ Source checks:
 - `$.paths['/api/v3/texts/{tref}'].get.responses['400']` is absent.
 - `$.paths['/api/v3/texts/{tref}'].get.responses['404']` is absent.
 
-| Change                 | Action | Target                                          | Description                                                                     |
-| ---------------------- | ------ | ----------------------------------------------- | ------------------------------------------------------------------------------- |
-| `v3-version-parameter` | Update | `$.paths['/api/v3/texts/{tref}'].parameters[0]` | Model the repeatable version selector read through request.GET.getlist.         |
-| `v3-schemas`           | Update | `$.components.schemas`                          | Add the source-backed v3 response, warning, error, and recursive value schemas. |
-| `v3-responses`         | Update | `$.paths['/api/v3/texts/{tref}'].get.responses` | Correct the success schema and document the handler's JSON error statuses.      |
+| Change | Action | Target | Description |
+| --- | --- | --- | --- |
+| `v3-version-parameter` | Update | `$.paths['/api/v3/texts/{tref}'].parameters[0]` | Model the repeatable version selector read through request.GET.getlist. |
+| `v3-schemas` | Update | `$.components.schemas` | Add the source-backed v3 response, warning, error, and recursive value schemas. |
+| `v3-responses` | Update | `$.paths['/api/v3/texts/{tref}'].get.responses` | Correct the success schema and document the handler's JSON error statuses. |
 
 <details>
 <summary>Values this correction sets</summary>
@@ -1075,13 +1075,13 @@ Source checks:
 - `$.paths['/api/ref/{tref}'].get.responses['200'].content['application/json'].schema['$ref']` equals `"#/components/schemas/RefJSON"`.
 - `$.paths['/api/ref/{tref}'].get.responses['404'].content['application/json'].schema` equals `{"type":"object","properties":{"error":{"type":"string"}}}`.
 
-| Change             | Action | Target                                                                                       | Description                                                        |
-| ------------------ | ------ | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
-| `ref-description`  | Update | `$.paths['/api/ref/{tref}'].get.description`                                                 | Correct the conditional navigation-field documentation.            |
-| `ref-schemas`      | Update | `$.components.schemas`                                                                       | Add the parse-failure and node-dependent reference response union. |
-| `ref-success`      | Update | `$.paths['/api/ref/{tref}'].get.responses['200'].content['application/json'].schema['$ref']` | Use the success-or-expected-parse-failure union for HTTP 200.      |
-| `ref-error-remove` | Remove | `$.paths['/api/ref/{tref}'].get.responses['404'].content['application/json'].schema`         | Remove the incomplete inline error schema.                         |
-| `ref-error`        | Update | `$.paths['/api/ref/{tref}'].get.responses['404'].content['application/json']`                | Reference the required Core JSON error schema.                     |
+| Change | Action | Target | Description |
+| --- | --- | --- | --- |
+| `ref-description` | Update | `$.paths['/api/ref/{tref}'].get.description` | Correct the conditional navigation-field documentation. |
+| `ref-schemas` | Update | `$.components.schemas` | Add the parse-failure and node-dependent reference response union. |
+| `ref-success` | Update | `$.paths['/api/ref/{tref}'].get.responses['200'].content['application/json'].schema['$ref']` | Use the success-or-expected-parse-failure union for HTTP 200. |
+| `ref-error-remove` | Remove | `$.paths['/api/ref/{tref}'].get.responses['404'].content['application/json'].schema` | Remove the incomplete inline error schema. |
+| `ref-error` | Update | `$.paths['/api/ref/{tref}'].get.responses['404'].content['application/json']` | Reference the required Core JSON error schema. |
 
 <details>
 <summary>Values this correction sets</summary>
@@ -1310,12 +1310,12 @@ Source checks:
 - `$.components.schemas.IndexJSON` is unchanged (SHA-256 starting `5e033d42164a`).
 - `$.paths['/api/v2/index/{title}'].get.responses['200'].content['application/json'].schema['$ref']` equals `"#/components/schemas/IndexJSON"`.
 
-| Change              | Action | Target                                                                                             | Description                                                               |
-| ------------------- | ------ | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `index-query`       | Update | `$.paths['/api/v2/index/{title}'].get.parameters`                                                  | Add the source-backed conditional response query parameters.              |
-| `index-base-schema` | Update | `$.components.schemas.IndexJSON`                                                                   | Require the source-owned success fields and add conditional query fields. |
-| `index-schema`      | Update | `$.components.schemas`                                                                             | Add the HTTP 200 success-or-error response union.                         |
-| `index-response`    | Update | `$.paths['/api/v2/index/{title}'].get.responses['200'].content['application/json'].schema['$ref']` | Use the query-aware index response schema.                                |
+| Change | Action | Target | Description |
+| --- | --- | --- | --- |
+| `index-query` | Update | `$.paths['/api/v2/index/{title}'].get.parameters` | Add the source-backed conditional response query parameters. |
+| `index-base-schema` | Update | `$.components.schemas.IndexJSON` | Require the source-owned success fields and add conditional query fields. |
+| `index-schema` | Update | `$.components.schemas` | Add the HTTP 200 success-or-error response union. |
+| `index-response` | Update | `$.paths['/api/v2/index/{title}'].get.responses['200'].content['application/json'].schema['$ref']` | Use the query-aware index response schema. |
 
 <details>
 <summary>Values this correction sets</summary>
@@ -1418,24 +1418,24 @@ Source checks:
 - `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Simple Text']['x-sefaria-original-value']` is absent.
 - `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Complex Text']['x-sefaria-original-value']` is absent.
 
-| Change                               | Action                                                                                                                                          | Target                                                                                                                                | Description                                                                 |
-| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| `shape-dependents-parameter`         | Update                                                                                                                                          | `$.paths['/api/shape/{title}'].parameters[2]`                                                                                         | Match the integer flag consumed by bool(int(...)).                          |
-| `shape-depth-remove`                 | Remove                                                                                                                                          | `$.paths['/api/shape/{title}'].parameters[1]`                                                                                         | Remove the deprecated depth parameter because the handler does not use it.  |
-| `shape-schemas`                      | Update                                                                                                                                          | `$.components.schemas`                                                                                                                | Add the lower-case list, recursive chapter, and HTTP 200 error variants.    |
-| `shape-response`                     | Update                                                                                                                                          | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].schema['$ref']`                                       | Replace the upper-case single-object schema with the source response union. |
-| `shape-simple-example-temp-seed`     | Update                                                                                                                                          | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Simple Text']`                              | Create a temporary copy target for the original simple-text example.        |
-| `shape-simple-example-temp-copy`     | Copy from `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Simple Text'].value`                        | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Simple Text']['x-sefaria-original-value']`  | Preserve the original simple-text example while changing its root type.     |
-| `shape-simple-example-value-remove`  | Remove                                                                                                                                          | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Simple Text'].value`                        | Remove the bare simple-text object.                                         |
-| `shape-simple-example-array-seed`    | Update                                                                                                                                          | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Simple Text']`                              | Create the corrected simple-text array root.                                |
-| `shape-simple-example-array-copy`    | Copy from `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Simple Text']['x-sefaria-original-value']`  | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Simple Text'].value`                        | Append the preserved simple-text object to the corrected array.             |
-| `shape-simple-example-temp-remove`   | Remove                                                                                                                                          | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Simple Text']['x-sefaria-original-value']`  | Remove the temporary simple-text overlay value.                             |
-| `shape-complex-example-temp-seed`    | Update                                                                                                                                          | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Complex Text']`                             | Create a temporary copy target for the original complex-text example.       |
-| `shape-complex-example-temp-copy`    | Copy from `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Complex Text'].value`                       | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Complex Text']['x-sefaria-original-value']` | Preserve the original complex-text example while changing its root type.    |
-| `shape-complex-example-value-remove` | Remove                                                                                                                                          | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Complex Text'].value`                       | Remove the bare complex-text object.                                        |
-| `shape-complex-example-array-seed`   | Update                                                                                                                                          | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Complex Text']`                             | Create the corrected complex-text array root.                               |
-| `shape-complex-example-array-copy`   | Copy from `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Complex Text']['x-sefaria-original-value']` | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Complex Text'].value`                       | Append the preserved complex-text object to the corrected array.            |
-| `shape-complex-example-temp-remove`  | Remove                                                                                                                                          | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Complex Text']['x-sefaria-original-value']` | Remove the temporary complex-text overlay value.                            |
+| Change | Action | Target | Description |
+| --- | --- | --- | --- |
+| `shape-dependents-parameter` | Update | `$.paths['/api/shape/{title}'].parameters[2]` | Match the integer flag consumed by bool(int(...)). |
+| `shape-depth-remove` | Remove | `$.paths['/api/shape/{title}'].parameters[1]` | Remove the deprecated depth parameter because the handler does not use it. |
+| `shape-schemas` | Update | `$.components.schemas` | Add the lower-case list, recursive chapter, and HTTP 200 error variants. |
+| `shape-response` | Update | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].schema['$ref']` | Replace the upper-case single-object schema with the source response union. |
+| `shape-simple-example-temp-seed` | Update | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Simple Text']` | Create a temporary copy target for the original simple-text example. |
+| `shape-simple-example-temp-copy` | Copy from `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Simple Text'].value` | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Simple Text']['x-sefaria-original-value']` | Preserve the original simple-text example while changing its root type. |
+| `shape-simple-example-value-remove` | Remove | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Simple Text'].value` | Remove the bare simple-text object. |
+| `shape-simple-example-array-seed` | Update | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Simple Text']` | Create the corrected simple-text array root. |
+| `shape-simple-example-array-copy` | Copy from `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Simple Text']['x-sefaria-original-value']` | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Simple Text'].value` | Append the preserved simple-text object to the corrected array. |
+| `shape-simple-example-temp-remove` | Remove | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Simple Text']['x-sefaria-original-value']` | Remove the temporary simple-text overlay value. |
+| `shape-complex-example-temp-seed` | Update | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Complex Text']` | Create a temporary copy target for the original complex-text example. |
+| `shape-complex-example-temp-copy` | Copy from `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Complex Text'].value` | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Complex Text']['x-sefaria-original-value']` | Preserve the original complex-text example while changing its root type. |
+| `shape-complex-example-value-remove` | Remove | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Complex Text'].value` | Remove the bare complex-text object. |
+| `shape-complex-example-array-seed` | Update | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Complex Text']` | Create the corrected complex-text array root. |
+| `shape-complex-example-array-copy` | Copy from `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Complex Text']['x-sefaria-original-value']` | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Complex Text'].value` | Append the preserved complex-text object to the corrected array. |
+| `shape-complex-example-temp-remove` | Remove | `$.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Complex Text']['x-sefaria-original-value']` | Remove the temporary complex-text overlay value. |
 
 <details>
 <summary>Values this correction sets</summary>
@@ -1628,13 +1628,13 @@ Source checks:
 - `$.paths['/api/links/{tref}'].get.responses['200'].content['application/json'].schema` is unchanged (SHA-256 starting `cf4a94c306c4`).
 - `$.paths['/api/links/{tref}'].get.responses['400']` is absent.
 
-| Change                     | Action | Target                                                                                 | Description                                                                |
-| -------------------------- | ------ | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `links-schemas`            | Update | `$.components.schemas`                                                                 | Add source-backed link, sheet-link, version, and whole-book error schemas. |
-| `links-category-parameter` | Update | `$.paths['/api/links/{tref}'].get.parameters[2]`                                       | Model the repeatable category filter read through request.GET.getlist.     |
-| `links-response-remove`    | Remove | `$.paths['/api/links/{tref}'].get.responses['200'].content['application/json'].schema` | Remove the incomplete array item schema before replacing it.               |
-| `links-response`           | Update | `$.paths['/api/links/{tref}'].get.responses['200'].content['application/json']`        | Use the link and optional sheet-link response union.                       |
-| `links-error`              | Update | `$.paths['/api/links/{tref}'].get.responses`                                           | Document the whole-book request error.                                     |
+| Change | Action | Target | Description |
+| --- | --- | --- | --- |
+| `links-schemas` | Update | `$.components.schemas` | Add source-backed link, sheet-link, version, and whole-book error schemas. |
+| `links-category-parameter` | Update | `$.paths['/api/links/{tref}'].get.parameters[2]` | Model the repeatable category filter read through request.GET.getlist. |
+| `links-response-remove` | Remove | `$.paths['/api/links/{tref}'].get.responses['200'].content['application/json'].schema` | Remove the incomplete array item schema before replacing it. |
+| `links-response` | Update | `$.paths['/api/links/{tref}'].get.responses['200'].content['application/json']` | Use the link and optional sheet-link response union. |
+| `links-error` | Update | `$.paths['/api/links/{tref}'].get.responses` | Document the whole-book request error. |
 
 <details>
 <summary>Values this correction sets</summary>
@@ -1915,16 +1915,16 @@ Source checks:
 - `$.components.schemas.CoreFindRefsSection` is absent.
 - `$.components.schemas.CoreFindRefsResponse` is absent.
 
-| Change                                         | Action | Target                                                                   | Description                                                                              |
-| ---------------------------------------------- | ------ | ------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------- |
-| `linker-detection-schemas`                     | Update | `$.components.schemas`                                                   | Add source-backed request and response schemas for asynchronous citation detection.      |
-| `linker-detection-request`                     | Update | `$.paths['/api/find-refs'].post.requestBody.content['application/json']` | Match the validated request accepted by the pinned handler.                              |
-| `linker-detection-query`                       | Update | `$.paths['/api/find-refs'].post`                                         | Add the query options read by the pinned response builder.                               |
-| `linker-detection-synchronous-response-remove` | Remove | `$.paths['/api/find-refs'].post.responses['200']`                        | Remove the synchronous response that the pinned handler never returns.                   |
-| `linker-pending-ready`                         | Update | `$.components.schemas.AsyncTaskPending.properties.ready`                 | Model the pinned pending response invariant.                                             |
-| `linker-success-ready`                         | Update | `$.components.schemas.AsyncTaskSuccess.properties.ready`                 | Model the pinned success response invariant.                                             |
-| `linker-success-result`                        | Update | `$.components.schemas.AsyncTaskSuccess.properties.result`                | Preserve the generic task result as unknown keyed JSON for boundary-specific validation. |
-| `linker-failure-ready`                         | Update | `$.components.schemas.AsyncTaskFailure.properties.ready`                 | Model the pinned failure response invariant.                                             |
+| Change | Action | Target | Description |
+| --- | --- | --- | --- |
+| `linker-detection-schemas` | Update | `$.components.schemas` | Add source-backed request and response schemas for asynchronous citation detection. |
+| `linker-detection-request` | Update | `$.paths['/api/find-refs'].post.requestBody.content['application/json']` | Match the validated request accepted by the pinned handler. |
+| `linker-detection-query` | Update | `$.paths['/api/find-refs'].post` | Add the query options read by the pinned response builder. |
+| `linker-detection-synchronous-response-remove` | Remove | `$.paths['/api/find-refs'].post.responses['200']` | Remove the synchronous response that the pinned handler never returns. |
+| `linker-pending-ready` | Update | `$.components.schemas.AsyncTaskPending.properties.ready` | Model the pinned pending response invariant. |
+| `linker-success-ready` | Update | `$.components.schemas.AsyncTaskSuccess.properties.ready` | Model the pinned success response invariant. |
+| `linker-success-result` | Update | `$.components.schemas.AsyncTaskSuccess.properties.result` | Preserve the generic task result as unknown keyed JSON for boundary-specific validation. |
+| `linker-failure-ready` | Update | `$.components.schemas.AsyncTaskFailure.properties.ready` | Model the pinned failure response invariant. |
 
 <details>
 <summary>Values this correction sets</summary>
