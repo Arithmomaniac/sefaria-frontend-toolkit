@@ -2,6 +2,7 @@ import { h } from "vue";
 import { useData } from "vitepress";
 import DefaultTheme from "vitepress/theme";
 
+import CodeLanguageToggle from "./CodeLanguageToggle.vue";
 import DocumentationDisclosure from "./DocumentationDisclosure.vue";
 import HeroExample from "./HeroExample.vue";
 import LandingPreview from "./LandingPreview.vue";
@@ -35,6 +36,7 @@ export default {
     });
   },
   enhanceApp({ app }) {
+    app.component("CodeLanguageToggle", CodeLanguageToggle);
     app.component("HeroExample", HeroExample);
     app.component("LandingPreview", LandingPreview);
     app.component("PlaygroundEmbed", PlaygroundEmbed);
