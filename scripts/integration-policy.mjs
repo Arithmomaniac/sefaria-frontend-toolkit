@@ -438,7 +438,10 @@ const DRIFT_HANDOFF_SECRETS = [
 
 function validateDriftWorkflow(workflow, issues, filename) {
   const setup = [
-    { uses: "actions/checkout@v4" },
+    {
+      uses: "actions/checkout@v4",
+      with: { ref: "${{ github.event.repository.default_branch }}" },
+    },
     { uses: "pnpm/action-setup@v4" },
     {
       uses: "actions/setup-node@v4",
@@ -497,7 +500,7 @@ function validateDriftWorkflow(workflow, issues, filename) {
   if (
     !hasOnlyEntries(workflow, {
       name: "OpenAPI drift",
-      on: { schedule: [{ cron: "17 6 * * 1" }], workflow_dispatch: null },
+      on: { schedule: [{ cron: "17 6 * * *" }], workflow_dispatch: null },
       permissions: {},
       concurrency: { group: "openapi-drift", "cancel-in-progress": false },
       jobs: { detect, handoff },

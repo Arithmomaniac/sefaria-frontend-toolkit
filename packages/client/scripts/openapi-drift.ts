@@ -85,13 +85,13 @@ interface DriftReportBase {
   };
 }
 
-/** A comparison whose upstream bytes match the pinned checksum. */
+/** A comparison whose upstream commit and bytes match the pin. */
 export interface NoDriftReport extends DriftReportBase {
   /** Identifies a comparison without drift. */
   readonly status: "no-drift";
 }
 
-/** A comparison whose upstream bytes differ from the pinned checksum. */
+/** A comparison whose upstream commit or bytes differ from the pin. */
 export interface DriftDetectedReport extends DriftReportBase {
   /** Identifies a comparison with drift. */
   readonly status: "drift";
@@ -145,9 +145,17 @@ export interface IssueRepository {
 /** The outcome of reconciling the drift issue with a report. */
 export type DriftIssueResult =
   | {
-      /** No drift, so no issue was touched. */
+      /** No open drift issue exists and no issue was touched. */
       readonly action: "none";
-      /** Always false without drift. */
+      /** No new triage handoff is needed. */
+      readonly handoff: false;
+    }
+  | {
+      /** The detector closed an open episode after confirming the pin is in sync. */
+      readonly action: "closed";
+      /** The resolved drift issue number. */
+      readonly issueNumber: number;
+      /** Closing an issue does not request a handoff. */
       readonly handoff: false;
     }
   | {
@@ -231,7 +239,10 @@ export function compareOpenApi(input: CompareOpenApiInput): DriftReport {
     input.upstream.bytes,
     "Upstream OpenAPI document",
   );
-  if (upstreamSha256 === source.sha256) {
+  if (
+    input.upstream.commit === source.commit &&
+    upstreamSha256 === source.sha256
+  ) {
     return { status: "no-drift", ...base };
   }
 
@@ -483,7 +494,7 @@ export function renderDriftMarkdown(report: DriftReport): string {
     `pnpm openapi:refresh --commit ${report.upstream.commit}`,
     "```",
     "",
-    "This issue is maintained by the scheduled `OpenAPI drift` workflow. It never refreshes, commits, or merges.",
+    "This issue is maintained by the scheduled `OpenAPI drift` workflow. It closes only when a later scan confirms the default-branch pin matches upstream. The workflow never refreshes, commits, or merges.",
   );
   return `${lines.join("\n")}\n`;
 }
@@ -518,28 +529,25 @@ async function ensureLabel(
   }
 }
 
-/**
- * Creates or updates the single open drift issue.
- *
- * Without drift it makes no request. An existing issue is found by label and hidden marker.
- * A comment is added, and a handoff requested, only when the upstream commit changed.
- */
+/** Reconciles the single open drift issue with the current default-branch pin. */
 export async function upsertDriftIssue(
   github: GitHubRequester,
   repository: IssueRepository,
   report: DriftReport,
 ): Promise<DriftIssueResult> {
-  if (report.status === "no-drift") {
-    return { action: "none", handoff: false };
+  if (report.status === "drift") {
+    await ensureLabel(github, repository);
   }
-  await ensureLabel(github, repository);
   const { data } = await github.request("GET /repos/{owner}/{repo}/issues", {
     ...repository,
     state: "open",
     labels: driftIssueLabel,
     per_page: 100,
   });
-  const existing = (Array.isArray(data) ? data : []).find(
+  if (!Array.isArray(data)) {
+    throw new Error("GitHub issue lookup did not return an issue list.");
+  }
+  const existing = data.find(
     (issue): issue is { number: number; body: string } =>
       isRecord(issue) &&
       !("pull_request" in issue) &&
@@ -547,6 +555,19 @@ export async function upsertDriftIssue(
       typeof issue.body === "string" &&
       issue.body.includes(driftIssueMarker),
   );
+  if (report.status === "no-drift") {
+    if (existing === undefined) {
+      return { action: "none", handoff: false };
+    }
+    await github.request("PATCH /repos/{owner}/{repo}/issues/{issue_number}", {
+      ...repository,
+      issue_number: existing.number,
+      state: "closed",
+      state_reason: "completed",
+      body: `${existing.body.trimEnd()}\n\n### Resolution\n\nClosed after the default-branch pin and upstream \`${upstreamPath}\` matched at \`${report.pinned.commit}\` (SHA-256 \`${report.pinned.sha256}\`).\n`,
+    });
+    return { action: "closed", issueNumber: existing.number, handoff: false };
+  }
   const body = renderDriftMarkdown(report);
   const title = issueTitle(report);
 

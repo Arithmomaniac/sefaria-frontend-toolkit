@@ -176,10 +176,14 @@ describe("precondition evaluation", () => {
 });
 
 describe("OpenAPI drift comparison", () => {
-  it("reports no drift when the upstream bytes match the pinned checksum", () => {
+  it("reports no drift when the upstream commit and bytes match the pin", () => {
     const report = compareOpenApi({
       pinned: { source, upstreamBytes: upstream },
-      upstream: { defaultBranch: "master", commit: newCommit, bytes: upstream },
+      upstream: {
+        defaultBranch: "master",
+        commit: source.commit,
+        bytes: upstream,
+      },
       overlay,
     });
 
@@ -188,10 +192,41 @@ describe("OpenAPI drift comparison", () => {
       pinned: { commit: source.commit, sha256: source.sha256 },
       upstream: {
         defaultBranch: "master",
-        commit: newCommit,
+        commit: source.commit,
         sha256: source.sha256,
       },
     });
+  });
+
+  it("reports commit-only drift even when upstream bytes are unchanged", () => {
+    const report = compareOpenApi({
+      pinned: { source, upstreamBytes: upstream },
+      upstream: { defaultBranch: "master", commit: newCommit, bytes: upstream },
+      overlay,
+    });
+
+    expect(report).toMatchObject({
+      status: "drift",
+      paths: { added: [], removed: [], changed: [] },
+      schemas: { added: [], removed: [], changed: [] },
+      guardFailures: [],
+    });
+  });
+
+  it("reports byte drift even when the upstream commit matches the pin", () => {
+    const document = upstreamDocument();
+    schemas(document).AddedSchema = { type: "string" };
+    const report = compareOpenApi({
+      pinned: { source, upstreamBytes: upstream },
+      upstream: {
+        defaultBranch: "master",
+        commit: source.commit,
+        bytes: encode(document),
+      },
+      overlay,
+    });
+
+    expect(report.status).toBe("drift");
   });
 
   it("reports changed paths, schemas, and other top-level keys", () => {
@@ -307,13 +342,15 @@ describe("OpenAPI drift comparison", () => {
 
 describe("upstream resolution", () => {
   it("downloads the document at the exact resolved commit", async () => {
-    const { fetchImpl, urls } = fakeFetch(upstreamRoutes(upstream));
+    const { fetchImpl, urls } = fakeFetch(
+      upstreamRoutes(upstream, source.commit),
+    );
 
     const report = await detectDrift({ fetchImpl, root: packageRoot });
 
     expect(report.status).toBe("no-drift");
-    expect(report.upstream.commit).toBe(newCommit);
-    expect(urls.at(-1)).toBe(pinnedOpenApiUrl(newCommit));
+    expect(report.upstream.commit).toBe(source.commit);
+    expect(urls.at(-1)).toBe(pinnedOpenApiUrl(source.commit));
   });
 
   it("sends the token to the GitHub API when one is supplied", async () => {
@@ -448,13 +485,17 @@ describe("upstream resolution", () => {
 describe("drift issue", () => {
   const repo = { owner: "Arithmomaniac", repo: "sefaria-frontend-toolkit" };
 
-  it("does nothing when there is no drift", async () => {
-    const { github, requests } = fakeGitHub(() => {
-      throw new Error("unexpected request");
-    });
+  it("does not create or update an issue when already in sync with none open", async () => {
+    const { github, requests } = fakeGitHub((route) =>
+      route === "GET /repos/{owner}/{repo}/issues" ? [] : {},
+    );
     const report = compareOpenApi({
       pinned: { source, upstreamBytes: upstream },
-      upstream: { defaultBranch: "master", commit: newCommit, bytes: upstream },
+      upstream: {
+        defaultBranch: "master",
+        commit: source.commit,
+        bytes: upstream,
+      },
       overlay,
     });
 
@@ -462,7 +503,140 @@ describe("drift issue", () => {
       action: "none",
       handoff: false,
     });
-    expect(requests).toEqual([]);
+    expect(requests.map(({ route }) => route)).toEqual([
+      "GET /repos/{owner}/{repo}/issues",
+    ]);
+    expect(requests[0]?.params).toMatchObject({
+      state: "open",
+      labels: driftIssueLabel,
+    });
+  });
+
+  it("closes the open episode only after the pin is in sync, preserving its drift report", async () => {
+    const existing = {
+      number: 7,
+      body: renderDriftMarkdown(driftReport()),
+    };
+    const { github, requests } = fakeGitHub((route) =>
+      route === "GET /repos/{owner}/{repo}/issues" ? [existing] : {},
+    );
+    const report = compareOpenApi({
+      pinned: { source, upstreamBytes: upstream },
+      upstream: {
+        defaultBranch: "master",
+        commit: source.commit,
+        bytes: upstream,
+      },
+      overlay,
+    });
+
+    await expect(upsertDriftIssue(github, repo, report)).resolves.toEqual({
+      action: "closed",
+      issueNumber: 7,
+      handoff: false,
+    });
+    expect(requests.map(({ route }) => route)).toEqual([
+      "GET /repos/{owner}/{repo}/issues",
+      "PATCH /repos/{owner}/{repo}/issues/{issue_number}",
+    ]);
+    expect(requests[1]?.params).toMatchObject({
+      issue_number: 7,
+      state: "closed",
+      state_reason: "completed",
+      body: expect.stringContaining(existing.body),
+    });
+    expect(requests[1]?.params.body).toContain(source.commit);
+  });
+
+  it("starts a new episode rather than reopening the closed issue after later drift", async () => {
+    const issues: { number: number; body: string; state: string }[] = [];
+    let nextIssueNumber = 37;
+    const { github, requests } = fakeGitHub((route, params) => {
+      if (route === "GET /repos/{owner}/{repo}/issues") {
+        return issues.filter((issue) => issue.state === "open");
+      }
+      if (route === "POST /repos/{owner}/{repo}/issues") {
+        const issue = {
+          number: nextIssueNumber++,
+          body: String(params.body),
+          state: "open",
+        };
+        issues.push(issue);
+        return issue;
+      }
+      if (route === "PATCH /repos/{owner}/{repo}/issues/{issue_number}") {
+        const issue = issues.find(
+          (item) => item.number === params.issue_number,
+        );
+        if (!issue) throw new Error("Unknown issue");
+        issue.state = String(params.state);
+        issue.body = String(params.body);
+        return issue;
+      }
+      return {};
+    });
+    const inSync = compareOpenApi({
+      pinned: { source, upstreamBytes: upstream },
+      upstream: {
+        defaultBranch: "master",
+        commit: source.commit,
+        bytes: upstream,
+      },
+      overlay,
+    });
+
+    expect(await upsertDriftIssue(github, repo, driftReport())).toMatchObject({
+      action: "created",
+      issueNumber: 37,
+    });
+    expect(await upsertDriftIssue(github, repo, inSync)).toEqual({
+      action: "closed",
+      issueNumber: 37,
+      handoff: false,
+    });
+    expect(
+      await upsertDriftIssue(github, repo, driftReport(laterCommit)),
+    ).toMatchObject({ action: "created", issueNumber: 38 });
+    expect(issues.map(({ number, state }) => [number, state])).toEqual([
+      [37, "closed"],
+      [38, "open"],
+    ]);
+    expect(
+      requests.filter(
+        ({ route }) => route === "POST /repos/{owner}/{repo}/issues",
+      ),
+    ).toHaveLength(2);
+  });
+
+  it("propagates issue lookup and close failures without treating them as resolved", async () => {
+    const report = compareOpenApi({
+      pinned: { source, upstreamBytes: upstream },
+      upstream: {
+        defaultBranch: "master",
+        commit: source.commit,
+        bytes: upstream,
+      },
+      overlay,
+    });
+    const lookup = fakeGitHub(() => {
+      throw new Error("Issue lookup unavailable");
+    });
+    await expect(upsertDriftIssue(lookup.github, repo, report)).rejects.toThrow(
+      "Issue lookup unavailable",
+    );
+    const close = fakeGitHub((route) => {
+      if (route === "GET /repos/{owner}/{repo}/issues") {
+        return [{ number: 7, body: renderDriftMarkdown(driftReport()) }];
+      }
+      throw new Error("Issue close unavailable");
+    });
+    await expect(upsertDriftIssue(close.github, repo, report)).rejects.toThrow(
+      "Issue close unavailable",
+    );
+    const invalid = fakeGitHub(() => ({}));
+    await expect(
+      upsertDriftIssue(invalid.github, repo, report),
+    ).rejects.toThrow("did not return an issue list");
   });
 
   it("creates the label and one issue when none is open", async () => {

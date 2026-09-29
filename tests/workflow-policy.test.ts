@@ -136,6 +136,11 @@ describe("agent-ready workflow policy", () => {
         "permissions: {}\n\nenv:\n  COPILOT_ASSIGN_TOKEN: ${{ secrets.COPILOT_ASSIGN_TOKEN }}",
       ),
       drift.replace("  workflow_dispatch:", "  workflow_dispatch:\n  push:"),
+      drift.replace("17 6 * * *", "17 6 * * 1"),
+      drift.replace(
+        "ref: ${{ github.event.repository.default_branch }}",
+        "ref: ${{ github.ref }}",
+      ),
       drift.replace(
         "    if: ${{ needs.detect.outputs.handoff == 'true' }}\n",
         "",
