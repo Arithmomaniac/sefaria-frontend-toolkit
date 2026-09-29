@@ -24,7 +24,7 @@ Set `sref` to the reference. With no other choice, the segment shows the edition
 
 <LiveEditor :code="textSegment" title="The default text" />
 
-To try changes, choose Edit, change the code, and choose Run. Styling works as it does for every component; see [Label a citation](/use-components/show-text/label-a-citation.md).
+To try changes, choose Edit, change the code, and choose Run. Styling works as it does for every component. See [Label a citation](/use-components/show-text/label-a-citation.md).
 
 ## Choose which text to show
 
@@ -35,7 +35,7 @@ To try changes, choose Edit, change the code, and choose Run. Styling works as i
 | A language family, strictly | `version-language` | Text in that language family only. There is no fallback, and it doesn't pin one edition. |
 | One exact edition | `version-title` | Alone, that title among the primary editions. With `version-language`, that title in that language. With `translation-language`, that title in your preferred translation language. |
 
-An exact title never falls back. Language values are full lowercase language-family names such as `french` or `english`, not codes such as `fr`. `translation-language` and `version-language` can't be combined; the element shows the error `translation-language and version-language cannot be combined.`
+An exact title never falls back. Language values are full lowercase language-family names such as `french` or `english`, not codes such as `fr`. You can't combine `translation-language` and `version-language`. The element shows the error `translation-language and version-language cannot be combined.`
 
 The example asks for French by translation language, then for an exact English edition by `version-language` and `version-title`.
 
@@ -43,7 +43,7 @@ The example asks for French by translation language, then for an exact English e
 
 ## When the language isn't available
 
-If Sefaria reports that it has no text in your preferred `translation-language`, the segment asks once more, for Sefaria's default translation. That translation isn't always English. The segment then adds a note such as `french is unavailable; showing english.` The example asks for French on `Berakhot 2a:1`.
+If Sefaria reports that it has no text in your preferred `translation-language`, the segment asks once more for Sefaria's default translation. That translation isn't always English. The segment then adds a note such as `french is unavailable; showing english.` The example asks for French on `Berakhot 2a:1`.
 
 <LiveEditor :code="textSegmentFallback" title="Fall back to the default translation" />
 
@@ -65,7 +65,7 @@ The example shows the default Hebrew with vowel points, then with none.
 
 ## See the source
 
-Below the text, the segment names the edition and its language, such as `Miqra according to the Masorah (hebrew, he)`. It has no link and no license. Add `hide-attributions` to hide it. For a fuller credit line, see [Show an attributed passage](/use-components/show-an-attributed-passage.md).
+Below the text, the segment names the edition and its language, such as `Miqra according to the Masorah (hebrew, he)`. It has no link and no license. To hide this line, add `hide-attributions`. For a fuller credit line, see [Show an attributed passage](/use-components/show-an-attributed-passage.md).
 
 ## When there's nothing to show
 
@@ -76,7 +76,7 @@ Below the text, the segment names the edition and its language, such as `Miqra a
 | Sefaria says the text isn't a reference | Sefaria's own message, such as `Could not find title in reference: Not a book 3.4` | `error` | No |
 | No `sref` and no `data` | Nothing | `empty` | No |
 
-Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. Unlike the label, a text that isn't a reference gives `error`, not `empty`. When Sefaria can't be reached, `status` is `error` and the error event fires, whether or not text was already showing. The error event bubbles and crosses the component boundary, and `event.detail` holds `{ error, sref }`. Invalid supplied `data` shows an error without falling back to `sref` and sends no event.
+Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. Unlike the label, a text that isn't a reference gives `error`, not `empty`. When Sefaria can't be reached, `status` is `error` and the error event fires, whether or not text was already showing. The error event bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. Invalid supplied `data` shows an error without falling back to `sref` and sends no event.
 
 The example has a good reference, a text that isn't a reference, and an empty element. Choose **Show each status** to log each one's status.
 

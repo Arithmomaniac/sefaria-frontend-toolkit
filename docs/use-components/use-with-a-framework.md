@@ -27,11 +27,11 @@ Register the elements before your framework renders them, so their JavaScript pr
 import "@arithmomaniac/sefaria-web-components";
 ```
 
-Element subpaths such as `/source-card` don't register their element; they export types and a few helpers. Package installation and versions are covered in [Install and status](/help/install-and-status.md).
+Element subpaths such as `/source-card` don't register their element. They export types and a few helpers. [Install and status](/help/install-and-status.md) covers package installation and versions.
 
 ## Attributes and properties
 
-Strings and booleans can be attributes: `sref`, `selectable`, `layout`, `content-language`, `translation-language`, `vocalization-mode` and similar settings. Objects and arrays can't be attributes. `data`, `acquisition` and `selectedPosition` are JavaScript properties only. `status` is a read-only property.
+Strings and booleans can be attributes: `sref`, `selectable`, `layout`, `content-language`, `translation-language`, `vocalization-mode`, and similar settings. Objects and arrays can't be attributes. `data`, `acquisition`, and `selectedPosition` are JavaScript properties only. `status` is a read-only property.
 
 React 19 sets a prop as a property when the element has one with that name, so the React file passes `selectedPosition` as a prop. Alpine binds attributes, so the Alpine file sets the property with `x-effect="$el.selectedPosition = ..."`.
 
@@ -43,7 +43,7 @@ Custom events bubble and cross the component boundary, so you listen for them th
 
 ### Plain JavaScript
 
-This example is the tested file `examples/site-snippets/source-card-select.html`. It runs live here, and you can read it but not edit it. It listens with `addEventListener("sefaria-source-select", ...)`.
+This example is the tested file `examples/site-snippets/source-card-select.html`. It runs live here. You can read it but not edit it. It listens with `addEventListener("sefaria-source-select", ...)`.
 
 <LiveEditor :code="vanilla" title="Source Card selection in plain JavaScript" readonly />
 
@@ -67,11 +67,11 @@ This example is the tested file `examples/alpine-vite/src/site-source-card.html`
 
 ## Requests
 
-A fresh load of each example makes one request, in any of the three frameworks. Re-rendering with the same values makes no request. Changing `sref`, `acquisition`, or the edition and language choices loads again, unless you supplied `data`; then the card redraws from your data with no request. Display settings such as `layout` and `content-language` never load again.
+A fresh load of each example makes one request, in any of the three frameworks. Re-rendering with the same values makes no request. Changing `sref`, `acquisition`, or the edition and language choices loads again. If you supplied `data`, the card instead redraws from your data with no request. Display settings such as `layout` and `content-language` never load again.
 
 ## Loading, failure and empty states
 
-Every component reports `status`: `empty`, `loading`, `ready` or `error`. In a framework, read `status` from a ref or the element. Listen for the error event the same way as the select event. For Source Card it is `sefaria-source-card-error`, with detail `{ error, sref }`.
+Every component reports `status`: `empty`, `loading`, `ready`, or `error`. In a framework, read `status` from a ref or the element. Listen for the error event the same way as the select event. For Source Card it is `sefaria-source-card-error`, with detail `{ error, sref }`.
 
 | Situation | What readers see | `status` | Error event |
 | --- | --- | --- | --- |

@@ -14,7 +14,7 @@ import react from "../../examples/react-vite/src/site-source-card-to-connections
 
 # Make components respond to each other
 
-Components don't talk to each other directly. Your page connects them with a loop that has four steps:
+Components don't talk to each other directly. Your page connects them with a four-step loop:
 
 1. A component reports what the reader did through an event.
 2. Your page updates its own state.
@@ -27,7 +27,7 @@ Each component's own events are covered in [Show an attributed passage](/use-com
 
 ## React (recommended)
 
-In React, one state value holds the selection, and it drives both components. When the card reports a selection, the handler stores it. React then re-renders both components: the card gets the new `selectedPosition`, and the panel gets the selected verse's `ref` as its `sref`.
+In React, one state value holds the selection, and it drives both components. When the card reports a selection, the handler stores it. React then re-renders both components. The card gets the new `selectedPosition`. The panel gets the selected verse's `ref` as its `sref`.
 
 This is the tested file `examples/react-vite/src/site-source-card-to-connections.tsx`. It runs in the repository's tests, not on this page. The TypeScript JSX declarations it needs are in `examples/react-vite/src/custom-elements.d.ts`.
 
@@ -47,17 +47,17 @@ In plain JavaScript, remove your listeners when you remove the components. [Use 
 
 ## Why a reactive framework helps
 
-As coordination grows, a reactive framework such as React, Vue, Svelte, or Alpine helps: one piece of state drives every component, and the framework keeps them in sync. You can do the same in plain JavaScript by keeping state in one place and updating components from one function; a framework does that bookkeeping for you.
+As coordination grows, a reactive framework such as React, Vue, Svelte, or Alpine helps. One piece of state drives every component, and the framework keeps them in sync. You can do the same in plain JavaScript. Keep state in one place and update components from one function. A framework does that bookkeeping for you.
 
 ## How many requests this adds
 
 Coordination adds only the requests each component makes for its own new inputs. It doesn't create hidden requests.
 
-On a fresh load of the example, the card makes one text request and the panel makes one links request. Changing the panel's reference starts one load, which makes one links request unless the toolkit already has that response cached. Selecting the verse that's already selected doesn't change the panel's `sref`, so nothing loads. The card makes no request when the selection changes.
+On a fresh load of the example, the card makes one text request and the panel makes one links request. Changing the panel's reference starts one load. That load makes one links request unless the toolkit already has that response cached. Selecting the verse that's already selected doesn't change the panel's `sref`, so nothing loads. The card makes no request when the selection changes.
 
 ## When to stop and use something else
 
-If you find yourself rebuilding navigation, history, and panes, use [the complete Reader](/use-components/add-the-complete-reader.md) instead. For a custom multi-pane layout, see the [composed multi-pane Reader](/examples/composed-multi-pane-reader.md) example.
+If you start rebuilding navigation, history, and panes, use [the complete Reader](/use-components/add-the-complete-reader.md) instead. For a custom multi-pane layout, see the [composed multi-pane Reader](/examples/composed-multi-pane-reader.md) example.
 
 <span class="learn-more__label">Learn more:</span> [How the toolkit works](/concepts/how-the-toolkit-works.md) · [Component events](/reference/components.md#events) {.learn-more}
 

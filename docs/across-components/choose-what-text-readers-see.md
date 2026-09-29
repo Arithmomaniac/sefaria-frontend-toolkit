@@ -12,7 +12,7 @@ import textChoiceControls from "../../examples/site-snippets/text-choice-control
 
 # Choose what text readers see
 
-This page puts the content choices for [Text Segment](/use-components/show-text/show-one-passage.md), [Bilingual Segment](/use-components/show-text/hebrew-and-translation.md), and [Source Card](/use-components/show-an-attributed-passage.md) side by side. Each choice is an HTML attribute, a setting you write inside the tag. You should already have one of those components working. If not, start with [Put your first source on a page](/use-components/start-here.md).
+This page puts the content choices for [Text Segment](/use-components/show-text/show-one-passage.md), [Bilingual Segment](/use-components/show-text/hebrew-and-translation.md), and [Source Card](/use-components/show-an-attributed-passage.md) side by side. Each choice is an HTML attribute, a setting you write inside the tag. You should already have one of those components working. If you don't have one, start with [Put your first source on a page](/use-components/start-here.md).
 
 <LiveEditor :code="textChoiceControls" title="Change the choices on a Source Card" />
 
@@ -48,13 +48,13 @@ On Text Segment, `translation-language` and `version-language` are mutually excl
 
 ## When Sefaria doesn't have that language
 
-Not every text has every translation. Ask for `french` on `Berakhot 2a:1`. Sefaria's response warns that French is missing. Only then does the component make one more request, for Sefaria's default translation, which isn't always English. The component shows a notice such as `french is unavailable; showing english.` That is two requests for a fresh load.
+Not every text has every translation. Ask for `french` on `Berakhot 2a:1`. Sefaria's response warns that French is missing. Only then does the component make one more request for Sefaria's default translation. That translation isn't always English. The component shows a notice such as `french is unavailable; showing english.` That is two requests for a fresh load.
 
 The fallback applies only to a bare language preference. Exact edition titles never fall back. An edition that exists but is empty stays empty. In Bilingual Segment and Source Card, if you pin one side's edition but give only a preferred language for the translation, that translation can still fall back.
 
 ## Set Hebrew vocalization
 
-`vocalization-mode` controls the marks written with Hebrew letters. Hebrew text can carry vowel marks (nikkud) and cantillation marks (taamim). The default, `taamim_and_nikkud`, shows both. The other modes also remove a few related marks, such as the sof pasuq (׃); for the exact behavior, see [Change vowels and cantillation](/data-and-text-tools/clean-up-stored-sefaria-text.md#change-vowels-and-cantillation).
+`vocalization-mode` controls the marks written with Hebrew letters. Hebrew text can carry vowel marks (nikkud) and cantillation marks (taamim). The default, `taamim_and_nikkud`, shows both. The other modes also remove a few related marks, such as the sof pasuq (׃). For the exact behavior, see [Change vowels and cantillation](/data-and-text-tools/clean-up-stored-sefaria-text.md#change-vowels-and-cantillation).
 
 | Value               | Hebrew shown                      |
 | ------------------- | --------------------------------- |
@@ -76,11 +76,11 @@ Two columns appear only when both sides show. `side-order` changes the visual or
 
 ## See which edition readers are shown
 
-Text Segment and Bilingual Segment show the edition title and language, both the family and the actual language, with no link. Source Card also links the edition title to its source, but only when Sefaria gives a valid http(s) address. None of them shows the license.
+Text Segment and Bilingual Segment show the edition title and language, with no link. The language appears as both the family and the actual language. Source Card also links the edition title to its source, but only when Sefaria gives a valid http(s) address. None of them shows the license.
 
 `hide-attributions` hides the attribution and the fallback note. It makes no request.
 
-Generated client types include an optional `license` field in an edition's version metadata, but the components don't display it. To check reuse rights, look up that edition's license, for example in the edition's details on Sefaria, before you republish it. This isn't legal advice.
+Generated client types include an optional `license` field in an edition's version metadata, but the components don't display it. Before you republish an edition, check its reuse rights. Look up its license, for example in the edition's details on Sefaria. This isn't legal advice.
 
 <span class="learn-more__label">Learn more:</span> [Install and status](/help/install-and-status.md#license-and-text-rights) · [Sefaria's own texts and tools](/concepts/sefarias-own-texts-and-tools.md) {.learn-more}
 
