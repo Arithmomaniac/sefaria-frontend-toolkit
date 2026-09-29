@@ -185,3 +185,22 @@ describe("B11 first successes", () => {
     expect(output[2]).toBe("1 footnote(s) kept separately.");
   });
 });
+
+async function pageOutputAfter(page: string, snippet: string) {
+  const markdown = await readFile(path.join(root, "docs", page), "utf8");
+  const start = markdown.indexOf(`snippets['${snippet}']`);
+  const block = /```text\n([\s\S]*?)\n```/.exec(markdown.slice(start));
+  return block?.[1]?.split("\n");
+}
+
+describe("B11 page shows real output", () => {
+  it.each(["text-transform-first-success", "client-and-text-first-success"])(
+    "%s output block matches the program",
+    async (name) => {
+      const { output } = await runBoth(name);
+      expect(
+        await pageOutputAfter("data-and-text-tools/start-here.md", name),
+      ).toEqual(output.map((line) => line.trimEnd()));
+    },
+  );
+});
