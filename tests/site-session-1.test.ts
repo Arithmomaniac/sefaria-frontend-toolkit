@@ -293,3 +293,91 @@ describe.each([
     expect(page).not.toContain("Genesis 1:1");
   });
 });
+
+describe("Across components pages", () => {
+  const look = read("docs/across-components/match-your-sites-look.md");
+  const text = read("docs/across-components/choose-what-text-readers-see.md");
+  const respond = read(
+    "docs/across-components/make-components-respond-to-each-other.md",
+  );
+  const tokens = [
+    ...new Set(
+      manifest.modules
+        .flatMap((module) => module.declarations ?? [])
+        .flatMap(
+          (entry) =>
+            (entry as { cssProperties?: { name: string }[] }).cssProperties ??
+            [],
+        )
+        .map((property) => property.name),
+    ),
+  ];
+
+  it("lists every generated token on the styling page", () => {
+    expect(tokens.length).toBeGreaterThan(10);
+    for (const token of tokens) expect(look).toContain(`\`${token}\``);
+  });
+
+  it("says appearance only first and teaches color-scheme setup", () => {
+    const body = look.split(/^# .+$/m)[1]!.trim();
+    expect(body.split("\n")[0]).toContain(
+      "(/across-components/choose-what-text-readers-see.md)",
+    );
+    expect(look).toContain("color-scheme: light dark");
+    expect(look).toMatch(/color-scheme: (light|dark)`/);
+  });
+
+  it("gathers text choices with request effects, fallback, and rights", () => {
+    for (const snippet of [
+      "`translation-language`",
+      "`primary-version-title`",
+      "`translation-version-title`",
+      "`vocalization-mode`",
+      "`content-language`",
+      "`hide-attributions`",
+      "Berakhot 2a:1",
+      "isn't always English",
+      "`license`",
+      "(/help/install-and-status.md#license-and-text-rights)",
+      "(/data-and-text-tools/clean-up-stored-sefaria-text.md)",
+      "(/reference/text-transform.md)",
+      "(/reference/client.md)",
+      "(/concepts/sefarias-own-texts-and-tools.md)",
+      "(/across-components/match-your-sites-look.md)",
+    ]) {
+      expect(text).toContain(snippet);
+    }
+    expect(text).not.toMatch(/consonants only/i);
+    expect(text).not.toMatch(/```html/);
+  });
+
+  it("shows the coordination loop from tested owner files", () => {
+    expect(respond).toContain(
+      'import react from "../../examples/react-vite/src/site-source-card-to-connections.tsx?raw"',
+    );
+    expect(respond).toContain(
+      'import plain from "../../examples/site-snippets/source-card-to-connections.html?raw"',
+    );
+    expect(
+      read(
+        "examples/react-vite/src/site-source-card-to-connections.browser.test.tsx",
+      ),
+    ).toContain("./site-source-card-to-connections.js");
+    for (const link of [
+      "(/use-components/add-the-complete-reader.md)",
+      "(/examples/composed-multi-pane-reader.md)",
+      "(/concepts/how-the-toolkit-works.md)",
+      "(/reference/components.md",
+    ]) {
+      expect(respond).toContain(link);
+    }
+    expect(respond).toMatch(/reactive framework/);
+  });
+
+  it("carries no status note", () => {
+    for (const page of [look, text, respond]) {
+      expect(page).not.toContain("<StatusNote");
+      expect(page).not.toMatch(/^stub: true$/m);
+    }
+  });
+});

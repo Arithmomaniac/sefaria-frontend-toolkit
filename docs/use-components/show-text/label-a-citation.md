@@ -33,7 +33,7 @@ Set CSS custom properties on `:root` or on any element that contains the label. 
 
 Your page's selectors can't reach inside the component. Style it through the `--sefaria-*` properties and the element's own box (`display`, `margin`). Inherited text settings, such as `font-weight`, can still pass in.
 
-Toolkit elements are `display: block` by default. To place a label inside a sentence, add `sefaria-ref-label { display: inline; }` to your CSS.
+The label is `display: block` by default, like the other components except the Reader. To place a label inside a sentence, add `sefaria-ref-label { display: inline; }` to your CSS.
 
 The default colors follow the reader's light or dark setting when your page declares `:root { color-scheme: light dark; }`. Setting it on a containing element also works. `color-scheme: light` or `dark` forces one. Changing styles doesn't make a new request.
 

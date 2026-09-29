@@ -264,6 +264,9 @@ const showTextPages = [
   "/use-components/use-with-a-framework.html",
   "/use-components/show-commentary-and-connected-texts.html",
   "/use-components/add-the-complete-reader.html",
+  "/across-components/match-your-sites-look.html",
+  "/across-components/choose-what-text-readers-see.html",
+  "/across-components/make-components-respond-to-each-other.html",
 ];
 
 async function loadFixture(root, name) {
@@ -321,13 +324,16 @@ async function routeOffline(
         url.pathname.startsWith("/api/v3/texts/") &&
         reference !== "Not a book 3:4"
       ) {
+        const payload = createFixtureResponse(
+          request.url(),
+          "text-fixture",
+          fixtures.text,
+          [],
+        );
         await route.fulfill({
-          json: createFixtureResponse(
-            request.url(),
-            "text-fixture",
-            fixtures.text,
-            [],
-          ),
+          json: url.searchParams.getAll("version").includes("french")
+            ? asFrench(payload)
+            : payload,
         });
         return;
       }
@@ -561,6 +567,145 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
     expectEqual(readerRequests.length, 3, "toolbar action makes no request");
     await readerPage.close();
 
+    // Styling page: forcing dark changes colors without a request.
+    const themePage = await browser.newPage({
+      viewport: { width: 1280, height: 900 },
+    });
+    const themeRequests = await routeOffline(themePage, {
+      origin,
+      localScript,
+      fixtures,
+    });
+    await themePage.goto(url(showTextPages[7]), { waitUntil: "networkidle" });
+    const themeFrame = await editorFrame(
+      themePage.locator(".live-editor").first(),
+    );
+    await themeFrame.waitForFunction(() =>
+      ["sefaria-ref-label", "sefaria-source-card"].every(
+        (tag) => globalThis.document.querySelector(tag)?.status === "ready",
+      ),
+    );
+    const themeLinkColor = () =>
+      themeFrame.evaluate(
+        () =>
+          globalThis.getComputedStyle(
+            globalThis.document
+              .querySelector("sefaria-ref-label")
+              .shadowRoot.querySelector("a"),
+          ).color,
+      );
+    const themeBefore = themeRequests.length;
+    expectEqual(
+      await themeLinkColor(),
+      "rgb(29, 78, 216)",
+      "light token color",
+    );
+    await themeFrame.locator("#dark").check();
+    await themeFrame.waitForFunction(
+      () =>
+        globalThis.getComputedStyle(
+          globalThis.document
+            .querySelector("sefaria-ref-label")
+            .shadowRoot.querySelector("a"),
+        ).color === "rgb(147, 180, 255)",
+    );
+    expectEqual(
+      themeRequests.length,
+      themeBefore,
+      "forcing dark makes no request",
+    );
+    await themePage.close();
+
+    // Text choices: display choices redraw; a language choice requests once.
+    const choicePage = await browser.newPage({
+      viewport: { width: 1280, height: 900 },
+    });
+    const choiceRequests = await routeOffline(choicePage, {
+      origin,
+      localScript,
+      fixtures,
+    });
+    await choicePage.goto(url(showTextPages[8]), { waitUntil: "networkidle" });
+    const choiceFrame = await editorFrame(
+      choicePage.locator(".live-editor").first(),
+    );
+    const cardReady = () =>
+      choiceFrame.waitForFunction(
+        () =>
+          globalThis.document.querySelector("sefaria-source-card")?.status ===
+          "ready",
+      );
+    await cardReady();
+    const textRequests = () =>
+      choiceRequests.filter((entry) => entry.startsWith("/api/v3/texts/"));
+    expectEqual(textRequests().length, 1, "initial text request");
+    await choiceFrame.selectOption("select[name=vocalization-mode]", "none");
+    await choiceFrame.selectOption(
+      "select[name=content-language]",
+      "translation",
+    );
+    await cardReady();
+    await choiceFrame.waitForTimeout(300);
+    expectEqual(textRequests().length, 1, "display choices make no request");
+    await choiceFrame.selectOption(
+      "select[name=translation-language]",
+      "french",
+    );
+    await choiceFrame.waitForFunction(
+      () =>
+        globalThis.document
+          .querySelector("sefaria-source-card")
+          ?.getAttribute("translation-language") === "french",
+    );
+    await cardReady();
+    await choiceFrame.waitForTimeout(300);
+    expectEqual(textRequests().length, 2, "language choice makes one request");
+    expectEqual(
+      textRequests()[1].includes("version=french"),
+      true,
+      "the new request asks for French",
+    );
+    await choicePage.close();
+
+    // Coordination: a selection points the panel at the verse with one request.
+    const coordPage = await browser.newPage({
+      viewport: { width: 1280, height: 900 },
+    });
+    const coordRequests = await routeOffline(coordPage, {
+      origin,
+      localScript,
+      fixtures,
+    });
+    await coordPage.goto(url(showTextPages[9]), { waitUntil: "networkidle" });
+    const coordFrame = await editorFrame(
+      coordPage.locator(".live-editor").first(),
+    );
+    await coordFrame.waitForFunction(() =>
+      ["sefaria-source-card", "sefaria-connections-panel"].every(
+        (tag) => globalThis.document.querySelector(tag)?.status === "ready",
+      ),
+    );
+    expectEqual(coordRequests.length, 2, "coordination fresh load");
+    await coordFrame
+      .locator("sefaria-source-card")
+      .getByRole("button", { name: "Show connections for Micah 6:7" })
+      .first()
+      .click();
+    await coordFrame.waitForFunction(
+      () =>
+        globalThis.document.querySelector("sefaria-connections-panel")?.sref ===
+        "Micah 6:7",
+    );
+    await coordFrame.waitForTimeout(300);
+    expectEqual(
+      JSON.stringify(
+        coordRequests.slice(2).map((entry) => entry.split("?")[0]),
+      ),
+      JSON.stringify(["/api/links/Micah 6:7"]),
+      "one links request for the new reference",
+    );
+    await coordPage.close();
+
     // Label page: styling changes do not request, and zero states render.
     const page = await browser.newPage({
       viewport: { width: 1280, height: 900 },
@@ -667,4 +812,20 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
     );
     await passage.close();
   });
+}
+
+function asFrench(payload) {
+  const copy = globalThis.structuredClone(payload);
+  for (const version of copy.versions) {
+    if (!version.isPrimary) {
+      Object.assign(version, {
+        language: "fr",
+        languageFamilyName: "french",
+        actualLanguage: "fr",
+        direction: "ltr",
+        versionTitle: "Fixture French edition [fr]",
+      });
+    }
+  }
+  return copy;
 }

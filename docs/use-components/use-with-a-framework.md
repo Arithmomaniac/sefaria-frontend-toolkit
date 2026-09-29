@@ -27,7 +27,7 @@ Register the elements before your framework renders them, so their JavaScript pr
 import "@arithmomaniac/sefaria-web-components";
 ```
 
-Element subpaths such as `/source-card` provide types only and don't register the element. Package installation and versions are covered in [Install and status](/help/install-and-status.md).
+Element subpaths such as `/source-card` don't register their element; they export types and a few helpers. Package installation and versions are covered in [Install and status](/help/install-and-status.md).
 
 ## Attributes and properties
 

@@ -1,4 +1,7 @@
-import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
+import type {
+  SefariaConnectionsPanel,
+  SefariaSourceCard,
+} from "@arithmomaniac/sefaria-web-components";
 import type { DetailedHTMLProps, HTMLAttributes, Ref } from "react";
 
 interface SourceSelection {
@@ -26,6 +29,13 @@ declare module "react" {
         "onsefaria-source-select"?: (
           event: CustomEvent<SourceSelection>,
         ) => void;
+      };
+      "sefaria-connections-panel": DetailedHTMLProps<
+        HTMLAttributes<SefariaConnectionsPanel>,
+        SefariaConnectionsPanel
+      > & {
+        ref?: Ref<SefariaConnectionsPanel>;
+        sref?: SefariaConnectionsPanel["sref"];
       };
     }
   }
