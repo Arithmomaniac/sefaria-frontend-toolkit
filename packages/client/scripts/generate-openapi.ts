@@ -434,16 +434,67 @@ export function validateOverlayDocument(overlay: OverlayDocument): void {
   }
 }
 
-function preconditionMismatch(
-  correctionId: string,
-  target: string,
-  expected: string,
-  actual: unknown,
-): never {
-  throw new Error(
-    `OpenAPI precondition mismatch for ${correctionId} at ${target}\nexpected: ${expected}\nactual: ${displayValue(
-      actual,
-    )}`,
+/** Describes one overlay precondition that a document does not satisfy. */
+export interface PreconditionMismatch {
+  /** The guard identifier whose precondition failed. */
+  readonly guardId: string;
+  /** The JSONPath expression that selected the source value. */
+  readonly target: string;
+  /** A readable description of the expected state. */
+  readonly expected: string;
+  /** The JSON-encoded actual value, or `absent`. */
+  readonly actual: string;
+}
+
+function evaluatePrecondition(
+  document: JsonObject,
+  guardId: string,
+  precondition: OverlayPrecondition,
+): PreconditionMismatch | undefined {
+  const mismatch = (
+    expected: string,
+    actual: unknown,
+  ): PreconditionMismatch => ({
+    guardId,
+    target: precondition.target,
+    expected,
+    actual: displayValue(actual),
+  });
+  const values = openapiFormat.resolveJsonPathValue(
+    document,
+    precondition.target,
+  );
+  if ("absent" in precondition.expected) {
+    return values.length === 0
+      ? undefined
+      : mismatch("absent", values.length === 1 ? values[0] : values);
+  }
+  if (values.length !== 1) {
+    return mismatch("exactly one matching value", values);
+  }
+  const actual = values[0];
+  if ("value" in precondition.expected) {
+    return stableCompactJson(actual as JsonValue) ===
+      stableCompactJson(precondition.expected.value)
+      ? undefined
+      : mismatch(displayValue(precondition.expected.value), actual);
+  }
+  return sha256(stableCompactJson(actual as JsonValue)) ===
+    precondition.expected.sha256
+    ? undefined
+    : mismatch(`SHA-256 ${precondition.expected.sha256}`, actual);
+}
+
+/** Returns every overlay precondition that the document does not satisfy, in overlay order. */
+export function evaluatePreconditions(
+  document: JsonObject,
+  guards: readonly OverlayGuard[],
+): readonly PreconditionMismatch[] {
+  return guards.flatMap((guard) =>
+    guard.preconditions.flatMap(
+      (precondition) =>
+        evaluatePrecondition(document, guard.id, precondition) ?? [],
+    ),
   );
 }
 
@@ -454,52 +505,11 @@ export function validatePreconditions(
 ): void {
   for (const guard of guards) {
     for (const precondition of guard.preconditions) {
-      const values = openapiFormat.resolveJsonPathValue(
-        document,
-        precondition.target,
-      );
-      if ("absent" in precondition.expected) {
-        if (values.length !== 0) {
-          preconditionMismatch(
-            guard.id,
-            precondition.target,
-            "absent",
-            values.length === 1 ? values[0] : values,
-          );
-        }
-        continue;
-      }
-      if (values.length !== 1) {
-        preconditionMismatch(
-          guard.id,
-          precondition.target,
-          "exactly one matching value",
-          values,
+      const mismatch = evaluatePrecondition(document, guard.id, precondition);
+      if (mismatch) {
+        throw new Error(
+          `OpenAPI precondition mismatch for ${mismatch.guardId} at ${mismatch.target}\nexpected: ${mismatch.expected}\nactual: ${mismatch.actual}`,
         );
-      }
-      const actual = values[0];
-      if ("value" in precondition.expected) {
-        if (
-          stableCompactJson(actual as JsonValue) !==
-          stableCompactJson(precondition.expected.value)
-        ) {
-          preconditionMismatch(
-            guard.id,
-            precondition.target,
-            displayValue(precondition.expected.value),
-            actual,
-          );
-        }
-      } else {
-        const actualSha256 = sha256(stableCompactJson(actual as JsonValue));
-        if (actualSha256 !== precondition.expected.sha256) {
-          preconditionMismatch(
-            guard.id,
-            precondition.target,
-            `SHA-256 ${precondition.expected.sha256}`,
-            actual,
-          );
-        }
       }
     }
   }
