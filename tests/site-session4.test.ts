@@ -141,6 +141,46 @@ describe("C1 How the toolkit works", () => {
   });
 });
 
+describe("C2 The client and Sefaria's API", () => {
+  const page = () => read("docs", "concepts", "the-client-and-sefarias-api.md");
+
+  it("is a written concept page with no status note or steps", async () => {
+    const markdown = await page();
+    expectWritten(markdown);
+    expect(markdown).not.toContain("<StatusNote");
+    expect(markdown).not.toMatch(/^\d+\. /m);
+  });
+
+  it("matches the client's cache defaults and option names", async () => {
+    const markdown = await page();
+    const cache = await read("packages", "client", "src", "response-cache.ts");
+    expect(cache).toMatch(/100/);
+    expect(markdown).toMatch(/100 entries/);
+    expect(markdown).toMatch(/10 MiB/);
+    expect(markdown).toMatch(/five minutes|5 minutes/);
+    expect(markdown).toContain("cache: false");
+    expect(markdown).toMatch(/cache: \{ ttlMs, maxEntries, maxBytes \}/);
+  });
+
+  it("tells a reader which path to report from a validation error", async () => {
+    const markdown = await page();
+    expect(markdown).toContain("SefariaContractError");
+    expect(markdown).toContain("instancePath");
+  });
+
+  it("links to the error guide, client reference, corrections and Sefaria's API", async () => {
+    const markdown = await page();
+    for (const link of [
+      "/data-and-text-tools/handle-errors-in-your-code.md",
+      "/reference/client.md",
+      "/reference/api-corrections.md",
+      "https://developers.sefaria.org",
+    ]) {
+      expect(markdown).toContain(`(${link}`);
+    }
+  });
+});
+
 describe("B15 Troubleshoot a page", () => {
   const page = () => read("docs", "help", "troubleshoot-a-page.md");
 
