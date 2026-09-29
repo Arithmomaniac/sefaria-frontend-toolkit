@@ -55,7 +55,7 @@ The example listens directly to `sefaria-connections-category-change`, `sefaria-
 
 ## Requests stay low
 
-Children receive `data` from captured records, so they don't fetch (see [How the toolkit works](/concepts/how-the-toolkit-works.md)). The example's tests check the counts. With caching disabled and no additional context load, they expect four requests for a root and child, and six after another child. Context qualification can require an additional source request; the contextual-child test expects five total. These are host acquisition requests, not duplicate child requests. Changing the category or page reprojects captured data with no request. Selecting a source again prunes descendant panes and starts one host-owned connections load. The cache-disabled reselection test verifies exactly one links request.
+Children receive `data` from captured records, so they don't fetch (see [How the toolkit works](/concepts/how-the-toolkit-works.md)). Opening a passage makes a text request and a links request. A connected passage you open adds its own text and links requests, and sometimes one more text request for its surrounding section. Changing the category or page makes no request, because the panel reuses the links it already has. Choosing a different verse in an earlier pane closes the panes opened from it and makes one links request (with the cache off).
 
 ## Run it locally
 

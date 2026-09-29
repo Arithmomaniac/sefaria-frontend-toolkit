@@ -18,7 +18,7 @@ Each component has a `status` property with one of four values:
 - `ready`: the element prepared something to show. It may be partial.
 - `error`: something failed. A first load failure shows a message. If a later reload fails, the element can keep the previous text while `status` is `error`.
 
-Check `status` first. Then use the event for the cause. The element fires `sefaria-<component>-error`, for example `sefaria-source-card-error`, when a live request or its preparation is rejected. The event's `detail` is `{ error, sref }`. A documented 400 or 404 answer and invalid supplied data show an error without that event. There is no generic ready event, so read `status`.
+Check `status` first. Then use the event for the cause. The element fires `sefaria-<component>-error`, for example `sefaria-source-card-error`, when a live request or its preparation is rejected. The event's `detail` is `{ error, sref }`. For the five elements other than the Reader, a documented 400 or 404 answer and invalid supplied data show an error without that event. The Reader does fire `sefaria-reader-error` when it rejects a seed you supplied and when its first (root) load fails; see [When there's nothing to show](/use-components/add-the-complete-reader.md#when-there-s-nothing-to-show). There is no generic ready event, so read `status`.
 
 ```html
 <sefaria-source-card sref="Micah 6:8"></sefaria-source-card>

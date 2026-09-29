@@ -48,7 +48,7 @@ You choose where data comes from with the `acquisition` property. `{ kind: "clie
 
 For the five elements other than the Reader, valid supplied `data` is authoritative. The element renders it and makes no request. Invalid supplied `data` shows an error. It does not quietly fall back to loading by `sref`.
 
-The Reader is different. Its `data` is a seed. A seed holds at least one source or connections record, each with its payload and request details, plus an optional selected reference and presentation settings. A seed is a starting point, not a finished rendering. A source seed that already covers the passage continues with one links request and does not ask for the source again.
+The Reader also takes a `data` property, but its value is a seed (a `ReaderRawSeedData` object), not finished data. A seed holds at least one source or connections record, each with its payload and request details, plus an optional selected reference and presentation settings. A seed is a starting point, not a finished rendering. A source seed that already covers the passage continues with one links request and does not ask for the source again.
 
 There is no server rendering or hydration of the components. They run in the browser.
 
@@ -69,7 +69,7 @@ Each element also has an error event named `sefaria-<element>-error`, such as `s
 
 For the five elements other than the Reader, the error event fires when a live load is rejected. A documented 400 or 404 answer from Sefaria, or invalid supplied data, sets `status` to `error` without firing the event. The Reader also fires it for a failed first load and an invalid seed. Some later Reader failures, such as connections that fail to load, show inside the Reader without the event. [Troubleshoot a page](/help/troubleshoot-a-page.md) matches each of these states to a fix.
 
-The interaction events are separate. Source Card's `sefaria-source-select` bubbles and is composed, but it is not cancelable. The Connections Panel events and the `sefaria-reader-*` events are cancelable. The Connections Panel and the Reader already handle their own controls, such as category, page, and navigation. Your page can listen, or cancel with `preventDefault`. Source Card selection and Reader chat export are left to your page.
+The interaction events are separate. Source Card's `sefaria-source-select` bubbles and is composed, but it is not cancelable. The Connections Panel's and the Reader's interaction events are cancelable; their error events are not. The Connections Panel and the Reader already handle their own controls, such as category, page, and navigation. Your page can listen, or cancel with `preventDefault`. Source Card selection and Reader chat export are left to your page.
 
 <span class="learn-more__label">Learn more:</span> [Component events](/reference/components.md#events) · [Make components respond to each other](/across-components/make-components-respond-to-each-other.md) {.learn-more}
 
@@ -82,11 +82,9 @@ These counts are for a normal first load with no cache hit. Cache hits or captur
 - Source Card makes one text request. Its Text Segment children add none, so ten children add zero requests.
 - Source Card makes two requests in total when it needs one extra request for Sefaria's default translation, which is not always English. That happens only when Sefaria reports that the `translation-language` you asked for is missing.
 - Connections Panel on its own makes one links request. Changing category or page makes none. In a standalone panel that loaded links without text, a preview request can reload the links once with text included.
-- Reader loading Micah 6:8 makes three requests: the target text, the surrounding section text, and the links. With translation fallback it can make up to four text requests plus one links request. The Reader passes its data to its child Source Card and Connections Panel, and they make no requests of their own.
+- Reader loading Micah 6:8 makes three requests: the target text, the surrounding section text, and the links. With translation fallback it can make up to four text requests plus one links request. The Reader passes its data to its child Source Card and Connections Panel, and they make no requests of their own. That's typical for a single verse. A reference that is already a whole section, such as a chapter, skips the separate section request.
 
-The client also keeps a small in-memory response cache for each client. By default it holds 100 entries, 10 MiB, for five minutes. You set it with `cache: { ttlMs, maxEntries, maxBytes }` and turn it off with `cache: false`.
-
-<span class="learn-more__label">Learn more:</span> [The client and Sefaria's API](/concepts/the-client-and-sefarias-api.md) {.learn-more}
+Each client also keeps a small in-memory response cache, so a repeat request can be answered without the network; see [The response cache](/concepts/the-client-and-sefarias-api.md#the-response-cache).
 
 ## Style isolation
 
@@ -116,4 +114,4 @@ Your renderer owns everything else:
 
 For the details, see [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md), [Clean up stored Sefaria text](/data-and-text-tools/clean-up-stored-sefaria-text.md), and [Clean text and safety](/concepts/clean-text-and-safety.md). [Sefaria's own texts and tools](/concepts/sefarias-own-texts-and-tools.md) explains references and editions.
 
-<span class="learn-more__label">Learn more:</span> [Client reference](/reference/client.md) · [Text transform reference](/reference/text-transform.md) {.learn-more}
+<span class="learn-more__label">Learn more:</span> [Client reference](/reference/client.md) · [Text tools reference](/reference/text-transform.md) {.learn-more}

@@ -72,7 +72,7 @@ pnpm --filter @sefaria-example/weekly-portion dev
 
 To install the packages in your own project, see [Install and status](/help/install-and-status.md).
 
-## Learn more
+## Next steps
 
 - [Show an attributed passage](/use-components/show-an-attributed-passage.md) covers the Source Card used here.
 - [Start here: data and text tools](/data-and-text-tools/start-here.md) covers the client on its own.
