@@ -48,7 +48,7 @@ The card gets its `sref` only at that moment, so nothing loads before a click. T
 - Ctrl-, Cmd-, Shift- or middle-click, the context menu, `target="_blank"` and pages without JavaScript keep the normal link to Sefaria.
 - The dialog is modal, so you close it before using another article link. If another activation reaches the app while the dialog is open, it reuses the dialog and changes the reference.
 - Escape or the Close button closes the dialog. Focus returns to the link if it is still connected to the page.
-- If the request fails or the response is invalid, the dialog closes and the error appears in a status area on the page (`role="alert"`). If Sefaria returns a documented HTTP error, such as a 404, the dialog stays open and the card shows the alert. To retry after that, close the dialog and open it again.
+- If the request fails or the response is invalid, the dialog closes and a status area on the page shows the error (`role="alert"`). If Sefaria returns a documented HTTP error, such as a 404, the dialog stays open and the card shows the alert. To retry after that error, close the dialog and open it again.
 - The app adds only `aria-controls` to eligible links. `destroy()` removes its listeners and restores them.
 
 ## What it doesn't do
@@ -57,7 +57,12 @@ It doesn't find citations in your text. You write the links.
 
 For automatic detection, use [Sefaria's Linker](https://developers.sefaria.org/docs/linker-v3). It scans a page and links the citations it finds.
 
-This example stores the authored reference in a data attribute. It differs in two ways: you write the links by hand instead of the Linker detecting them, and the preview opens in a modal Source Card dialog instead of the Linker's own popups. It doesn't submit your article or Linker tracking data, but opening a preview still sends a text request to Sefaria.
+This example stores the authored reference in a data attribute. It differs from the Linker in two ways:
+
+- You write the links by hand. The Linker detects them.
+- The preview opens in a modal Source Card dialog. The Linker uses its own popups.
+
+It doesn't submit your article or Linker tracking data. Opening a preview still sends a text request to Sefaria.
 
 ## Run it locally
 

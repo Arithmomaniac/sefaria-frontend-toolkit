@@ -15,7 +15,7 @@ A reference names a place in Sefaria's library. Sefaria calls it a "ref". `Micah
 
 An edition is one specific text or translation of a work. Sefaria calls it a "version". One work can have many editions, in several languages.
 
-Sefaria marks editions eligible for its primary-text selection with `isPrimary`, and more than one edition can carry the flag. This is usually the Hebrew or original text, but not always. Sefaria's own example is the Kuzari. Its primary edition is Hebrew, although the work was written in Judeo-Arabic.
+Sefaria marks editions eligible for its primary-text selection with `isPrimary`. More than one edition can carry the flag. This is usually the Hebrew or original text, but not always. Sefaria's own example is the Kuzari. Its primary edition is Hebrew, although the work was written in Judeo-Arabic.
 
 For the full explanation, read Sefaria's pages on [text references](https://developers.sefaria.org/docs/text-references) and [indexes and versions](https://developers.sefaria.org/docs/index-and-versions).
 
@@ -25,7 +25,7 @@ By default, Source Card and Bilingual Segment ask Sefaria for its primary editio
 
 To choose a language, set `translation-language` to a language family name, such as `english` or `french`. When you supply no `data`, the component then asks for a translation in that language. Supplied data is selected locally and never triggers a request.
 
-If Sefaria reports that no translation exists in that language, the component can make one more request. This time it asks for Sefaria's default translation, which isn't always English. If one is found and the attribution is visible, the attribution reports the change; if none exists, the component shows its empty state. Berakhot 2a:1 is an example where this can happen.
+If Sefaria reports that no translation exists in that language, the component can make one more request. This time it asks for Sefaria's default translation, which isn't always English. If the component finds one and the attribution is visible, the attribution reports the change. If none exists, the component shows its empty state. Berakhot 2a:1 is an example where this can happen.
 
 The component doesn't fall back in these cases:
 
@@ -45,11 +45,22 @@ These attributions don't show the edition's license. Each edition has its own. T
 
 The toolkit fits when you want Sefaria texts inside your own JavaScript page or app, with checked data, cleaned text, or ready-made display elements. Sefaria's tools can fit better, or work alongside it.
 
+### Data and code
+
 - **API.** Use [Sefaria's API](https://developers.sefaria.org/) directly from Python or another language, or when you need data the toolkit doesn't cover. Start with its [introduction](https://developers.sefaria.org/reference/getting-started) and the [texts endpoint](https://developers.sefaria.org/reference/get-v3-texts).
+
+### Citations and AI
+
 - **Linker.** The [Linker](https://developers.sefaria.org/docs/linker-v3) finds citations in your page's text and links them. The toolkit doesn't find citations. The [linked article example](/examples/linked-article.md) shows a preview for links you already have.
 - **MCP servers.** The [Sefaria MCP](https://developers.sefaria.org/docs/the-sefaria-mcp) lets AI assistants search and read Sefaria. To see the toolkit's Reader inside an AI chat, open [Reader inside AI chat](/examples/reader-inside-ai-chat.md).
+
+### Sheets and exports
+
 - **Source sheets.** Use [Sefaria's sheets documentation](https://developers.sefaria.org/docs/sheets) to work with source sheets.
 - **Data exports.** [Sefaria-Export](https://github.com/Sefaria/Sefaria-Export) offers whole-library bulk data.
+
+### Guides and examples
+
 - **Educator Playbook.** The [Educator Playbook](https://developers.sefaria.org/docs/the-educator-playbook-a-quick-guide-to-vibe-coding-with-sefaria) is a quick guide to writing raw API code with AI.
 - **Powered by Sefaria.** [This list](https://developers.sefaria.org/docs/powered-by-sefaria) shows projects built on Sefaria.
 

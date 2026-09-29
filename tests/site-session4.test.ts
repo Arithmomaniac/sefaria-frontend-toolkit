@@ -108,16 +108,28 @@ describe("C1 How the toolkit works", () => {
     expect(section(markdown, "without-components")).toContain("normalizeText");
   });
 
-  it("states scoped request counts and the supplied-data rules", async () => {
+  it("states the no-duplicate-request principle and the supplied-data rules", async () => {
     const markdown = await page();
-    expect(markdown).toMatch(/Source Card[^.]*one[^.]*request/i);
-    expect(markdown).toMatch(/two/);
-    expect(markdown).toMatch(/Reader[\s\S]{0,200}three/i);
+    expect(markdown).toMatch(
+      /children[^.]*(?:never fetch|no requests? of their own)/i,
+    );
+    expect(markdown).not.toMatch(/Source Card[^.]*one[^.]*request/i);
+    expect(markdown).not.toMatch(/\bthree requests\b/i);
+    expect(markdown).toContain(
+      "(/use-components/show-an-attributed-passage.md",
+    );
+    expect(markdown).toContain("(/use-components/add-the-complete-reader.md");
     expect(markdown).toMatch(
       /no requests?|zero requests?|doesn't make a request|makes no request/i,
     );
     expect(markdown).toMatch(/invalid[\s\S]{0,200}error/i);
     expect(markdown).toMatch(/Reader[\s\S]{0,300}seed/);
+  });
+
+  it("tells one story and leaves styling to its owner page", async () => {
+    const markdown = await page();
+    expect(markdown).not.toMatch(/shadow DOM|--sefaria-|light-dark|::part/i);
+    expect(markdown.match(/match-your-sites-look\.md/g)).toHaveLength(1);
   });
 
   it("includes one diagram and links to its neighbours", async () => {
