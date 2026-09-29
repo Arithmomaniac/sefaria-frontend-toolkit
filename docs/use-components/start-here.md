@@ -42,7 +42,7 @@ Use the script tag if your page has no build step, if you are editing a field in
 ```
 
 ```ts [Package route]
-import "@arithmomaniac/sefaria-web-components/source-card";
+import "@arithmomaniac/sefaria-web-components";
 ```
 
 ```html [Package route HTML]
