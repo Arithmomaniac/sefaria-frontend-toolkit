@@ -11,7 +11,7 @@ import { data as snippets } from "./snippets.data.ts";
 
 # Clean up stored Sefaria text
 
-You clean stored Sefaria text in two steps. First, `normalizeText` changes the markup: it makes Sefaria's HTML safe and moves footnotes aside. Then the vocalization helpers change characters, such as vowel points and cantillation. Both come from `@arithmomaniac/sefaria-text-transform` and make no network requests.
+You clean stored Sefaria text in two steps. First, `normalizeText` changes the markup. It makes Sefaria's HTML safe and moves footnotes aside. Then the vocalization helpers change characters, such as vowel points and cantillation. Both come from `@arithmomaniac/sefaria-text-transform` and make no network requests.
 
 ## What changes in the markup
 
@@ -37,14 +37,14 @@ The table is the output of this program.
 What each kind of input becomes:
 
 - **Kept as is:** the formatting tags `b`, `strong`, `i`, `em`, `u`, `small`, `sup`, `sub`, and `br`. Their attributes are removed. The one attribute kept on some elements is `dir`, when it is `ltr`, `rtl`, or `auto`.
-- **Unwrapped (tag removed, text kept):** spans without a recognized class, such as Sefaria's poetry classes, unknown tags, and links with no Sefaria reference or topic. A span with an allowed `dir` keeps just that `dir`. `href` and `src` attributes are dropped, so the output has no links or loaded resources. A web address written in the text itself stays as plain text.
+- **Unwrapped (tag removed, text kept):** spans without a recognized class (such as Sefaria's poetry classes), unknown tags, and links with no Sefaria reference or topic. A span with an allowed `dir` keeps just that `dir`. The tool drops `href` and `src` attributes, so the output has no links or loaded resources. A web address written in the text itself stays as plain text.
 - **Block tags** such as `p`, `div`, `li`, and `h1` to `h6` are removed, and their text is separated by a space.
 - **`<big>`** becomes `<span style="font-size: larger;">`.
 - **Sefaria markers** become `span` elements with `data-sefaria-*` attributes. They cover Masoretic paragraph and ketiv/qere markers, reference and topic links, footnote placeholders, and inline commentary and overlay markers. Your CSS or renderer can style or read them. [Normalized HTML output](/reference/text-transform.md#normalized-html-output) lists each attribute and its values.
 
 - **Removed completely, with their content:** active elements such as `script`, `style`, `iframe`, `object`, `embed`, `svg`, `math`, `form` and `input` elements, `audio`, `video`, and `canvas`. The reference lists the rest.
 - **Images** become their `alt` text.
-- **Footnotes:** each footnote marker becomes an empty `<span data-sefaria-note="N">` placeholder. `normalizeText` returns the footnotes in `notes`, each with `key`, `markerHtml`, and `contentHtml`. `contentHtml` is `null` when the marker had no footnote body. Options such as `allowFootnotes: false` drop footnotes, and the other `allow…` options drop other markers. No option adds a tag or attribute outside the list above.
+- **Footnotes:** each footnote marker becomes an empty `<span data-sefaria-note="N">` placeholder. `normalizeText` returns the footnotes in `notes`, each with `key`, `markerHtml`, and `contentHtml`. `contentHtml` is `null` when the marker had no footnote body. Options such as `allowFootnotes: false` drop footnotes. The other `allow…` options drop other markers. No option adds a tag or attribute outside the list above.
 
 ## Change vowels and cantillation
 
@@ -54,7 +54,7 @@ Nikkud are vowel points. Taamim are cantillation marks, the musical accents. Pic
 - `nikkud` removes cantillation and keeps vowel points. It also removes meteg and rafe, two small marks written with the vowels.
 - `none` removes vowel points too, and the sof pasuq (׃) that ends a verse. Letters, spaces, maqaf (־), digits, and most punctuation stay.
 
-A PASEQ (׀) is a vertical line between words. It is handled only when cantillation is removed, in modes `nikkud` and `none`. The default, `paseq: "after-space"`, removes a PASEQ that comes right after a space or other whitespace character, together with that one character, and keeps any other PASEQ. `paseq: "always"` removes every PASEQ and leaves the spaces around it.
+A PASEQ (׀) is a vertical line between words. The tool handles it only when you remove cantillation, in modes `nikkud` and `none`. The default, `paseq: "after-space"`, removes a PASEQ that comes right after a space or other whitespace character. It removes that one character too. It keeps any other PASEQ. `paseq: "always"` removes every PASEQ and leaves the spaces around it.
 
 Use `applyVocalization` for plain text and `applyVocalizationToHtml` for HTML. The HTML version changes the characters in text, not in tags or attribute values. Give it HTML that `normalizeText` has already produced.
 
@@ -70,7 +70,13 @@ after-space: אָדָם מַה־טּוֹב׀
 always: אָדָם  מַה־טּוֹב
 ```
 
-To build your own display step, follow `prepareForDisplay`: make the markup safe with `normalizeText`, vocalize the resulting `bodyHtml`, then vocalize each note's `markerHtml` and `contentHtml` so the footnotes match the body. It returns the safe HTML, the footnotes, and the mode you chose. The last two lines show the PASEQ modes: `after-space` drops the PASEQ after the space, and `always` also drops the one attached to the last word, leaving two spaces between the words.
+To build your own display step, follow `prepareForDisplay`:
+
+1. Make the markup safe with `normalizeText`.
+2. Vocalize the resulting `bodyHtml`.
+3. Vocalize each note's `markerHtml` and `contentHtml` so the footnotes match the body.
+
+It returns the safe HTML, the footnotes, and the mode you chose. The last two lines show the PASEQ modes. `after-space` drops the PASEQ after the space. `always` also drops the one attached to the last word. This leaves two spaces between the words.
 
 `applyVocalizationToHtml` is not a sanitizer. Given unsafe HTML, it keeps the unsafe tags and attributes. Run `normalizeText` first.
 
