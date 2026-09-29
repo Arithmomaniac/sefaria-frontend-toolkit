@@ -224,6 +224,9 @@ importers:
       '@hey-api/openapi-ts':
         specifier: 0.99.0
         version: 0.99.0(typescript@6.0.3)
+      '@octokit/rest':
+        specifier: 22.0.1
+        version: 22.0.1
       openapi-format:
         specifier: 1.33.6
         version: 1.33.6
