@@ -262,6 +262,8 @@ const showTextPages = [
   "/use-components/show-text/hebrew-and-translation.html",
   "/use-components/show-an-attributed-passage.html",
   "/use-components/use-with-a-framework.html",
+  "/use-components/show-commentary-and-connected-texts.html",
+  "/use-components/add-the-complete-reader.html",
 ];
 
 async function loadFixture(root, name) {
@@ -296,6 +298,12 @@ async function routeOffline(
         return;
       }
       const reference = decodeURIComponent(url.pathname.split("/").at(-1));
+      if (url.pathname.startsWith("/api/links/")) {
+        await route.fulfill({
+          json: reference === "Micah 6:8" ? fixtures.links : [],
+        });
+        return;
+      }
       if (url.pathname.startsWith("/api/ref/")) {
         await route.fulfill({
           json: reference === "Micah 6:8" ? fixtures.ref : fixtures.notRef,
@@ -311,7 +319,7 @@ async function routeOffline(
       }
       if (
         url.pathname.startsWith("/api/v3/texts/") &&
-        reference === "Micah 6:8"
+        reference !== "Not a book 3:4"
       ) {
         await route.fulfill({
           json: createFixtureResponse(
@@ -352,6 +360,7 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
     notRef: await loadFixture(root, "not-a-ref-2026-09-29.json"),
     text: await loadFixture(root, "micah-6-8-2026-09-28.json"),
     range: await loadFixture(root, "micah-6-6-8-2026-09-29.json"),
+    links: await loadFixture(root, "micah-6-8-links-2026-09-29.json"),
   };
   await withSite(root, siteBasePath, async ({ browser, origin, url }) => {
     // Every example on each page shows exactly its owner file.
@@ -467,6 +476,90 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
       "one Source Card request, none from its verses",
     );
     await cardPage.close();
+
+    // Connections Panel: one links request; category changes reuse it.
+    const connections = await browser.newPage({
+      viewport: { width: 1280, height: 900 },
+    });
+    const linkRequests = await routeOffline(connections, {
+      origin,
+      localScript,
+      fixtures,
+    });
+    await connections.goto(url(showTextPages[5]), { waitUntil: "networkidle" });
+    const eventsFrame = await editorFrame(
+      connections.locator(".live-editor").nth(1),
+    );
+    await eventsFrame.waitForFunction(
+      () =>
+        globalThis.document.querySelector("sefaria-connections-panel")
+          ?.status === "ready",
+    );
+    const linksBefore = linkRequests.filter((entry) =>
+      entry.startsWith("/api/links/Micah 6:8"),
+    ).length;
+    await eventsFrame
+      .locator("sefaria-connections-panel")
+      .getByRole("button", { name: /^Midrash/ })
+      .click();
+    await eventsFrame
+      .locator("#log")
+      .filter({
+        hasText: 'sefaria-connections-category-change {"category":"Midrash"}',
+      })
+      .waitFor();
+    await eventsFrame
+      .locator("sefaria-connections-panel")
+      .getByRole("button", { name: /in context$/ })
+      .first()
+      .click();
+    await eventsFrame
+      .locator("#log")
+      .filter({ hasText: "sefaria-connection-select" })
+      .waitFor();
+    expectEqual(
+      linkRequests.filter((entry) => entry.startsWith("/api/links/Micah 6:8"))
+        .length,
+      linksBefore,
+      "category change and selection make no request",
+    );
+    await connections.close();
+
+    // Reader: three requests on a fresh load; a toolbar button reads selectedRef.
+    const readerPage = await browser.newPage({
+      viewport: { width: 1280, height: 900 },
+    });
+    const readerRequests = await routeOffline(readerPage, {
+      origin,
+      localScript,
+      fixtures,
+    });
+    await readerPage.goto(url(showTextPages[6]), { waitUntil: "networkidle" });
+    const readerFrame = await editorFrame(
+      readerPage.locator(".live-editor").first(),
+    );
+    await readerFrame.waitForFunction(() => {
+      const reader = globalThis.document.querySelector("sefaria-reader");
+      return reader?.status === "ready" && reader.selectedRef === "Micah 6:8";
+    });
+    await readerFrame.waitForTimeout(300);
+    const readerLoad = readerRequests.map((entry) => entry.split("?")[0]);
+    expectEqual(
+      JSON.stringify(readerLoad),
+      JSON.stringify([
+        "/api/v3/texts/Micah 6:8",
+        "/api/v3/texts/Micah 6",
+        "/api/links/Micah 6:8",
+      ]),
+      "Reader fresh-load requests",
+    );
+    await readerFrame.locator("#bookmark").click();
+    await readerFrame
+      .locator("#message")
+      .filter({ hasText: "Bookmarked Micah 6:8." })
+      .waitFor();
+    expectEqual(readerRequests.length, 3, "toolbar action makes no request");
+    await readerPage.close();
 
     // Label page: styling changes do not request, and zero states render.
     const page = await browser.newPage({

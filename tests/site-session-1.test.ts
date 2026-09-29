@@ -230,3 +230,66 @@ describe("Use with a framework page", () => {
     }
   });
 });
+
+describe.each([
+  {
+    file: "docs/use-components/show-commentary-and-connected-texts.md",
+    tag: "sefaria-connections-panel",
+    loading: "Loading connections for Micah 6:8.",
+    errorEvent: "sefaria-connections-panel-error",
+    required: [
+      "`with-text`",
+      "`category`",
+      "`page`",
+      "`show-previews`",
+      "fresh load makes one request",
+      "(/use-components/add-the-complete-reader.md)",
+      "(/across-components/make-components-respond-to-each-other.md)",
+      "(/concepts/how-the-toolkit-works.md)",
+    ],
+  },
+  {
+    file: "docs/use-components/add-the-complete-reader.md",
+    tag: "sefaria-reader",
+    loading: "Opening Reader...",
+    errorEvent: "sefaria-reader-error",
+    required: [
+      "`active-pane`",
+      "`layout`",
+      'slot="toolbar-actions"',
+      "`selectedRef`",
+      "(/examples/composed-multi-pane-reader.md)",
+      "(/concepts/how-the-toolkit-works.md)",
+    ],
+  },
+])("$tag page", ({ file, tag, loading, errorEvent, required }) => {
+  const page = read(file);
+
+  it("is written and lists every generated event", () => {
+    expect(page).not.toMatch(/^stub: true$/m);
+    expect(page).not.toContain("<StatusNote");
+    for (const event of declaration(tag).events!.map((entry) => entry.name)) {
+      expect(page).toContain(`\`${event}\``);
+    }
+    expect(page).toContain(`\`${errorEvent}\``);
+  });
+
+  it("covers zero states, status, links, and the brief's questions", () => {
+    for (const text of [
+      loading,
+      "can't be reached",
+      "isn't a reference",
+      "`empty`",
+      "`loading`",
+      "`ready`",
+      "`error`",
+      "(/help/troubleshoot-a-page.md)",
+      "(/data-and-text-tools/give-components-your-own-data.md)",
+      "(/reference/components.md",
+      ...required,
+    ]) {
+      expect(page).toContain(text);
+    }
+    expect(page).not.toContain("Genesis 1:1");
+  });
+});
