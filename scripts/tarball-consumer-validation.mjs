@@ -125,7 +125,7 @@ export function resolveModuleFromParent({
       "-e",
       `console.log(import.meta.resolve(${JSON.stringify(specifier)}, ${JSON.stringify(parentUrl)}))`,
     ],
-    { cwd, encoding: "utf8" },
+    { cwd, encoding: "utf8", windowsHide: true },
   );
   if (result.status !== 0) {
     throw new Error(

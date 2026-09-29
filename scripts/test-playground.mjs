@@ -1,4 +1,3 @@
-import { spawnSync } from "node:child_process";
 import { Buffer } from "node:buffer";
 import crypto from "node:crypto";
 import { readFileSync } from "node:fs";
@@ -9,7 +8,9 @@ import process from "node:process";
 import { URL } from "node:url";
 
 import { chromium, firefox, webkit } from "playwright";
-import { preview } from "vite";
+import { build, preview } from "vite";
+
+import { runNodeScript } from "./node-tool.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const playground = path.join(root, "examples", "playground");
@@ -39,18 +40,19 @@ if (!probeAddress || typeof probeAddress === "string") {
 const probeOrigin = `http://127.0.0.1:${probeAddress.port}`;
 
 try {
-  runPnpm(["--filter", "@sefaria-example/playground", "build:graph"]);
+  runNodeScript(
+    path.join(playground, "scripts", "build-runtime-graph.mjs"),
+    [],
+    {
+      cwd: playground,
+    },
+  );
   for (const base of ["/", "/sefaria-frontend-toolkit/"]) {
-    runPnpm([
-      "--filter",
-      "@sefaria-example/playground",
-      "exec",
-      "vite",
-      "build",
-      `--base=${base}`,
-      "--outDir=dist",
-      "--emptyOutDir",
-    ]);
+    await build({
+      root: playground,
+      base,
+      build: { outDir: "dist", emptyOutDir: true },
+    });
     await qualifyBase(base);
   }
 } finally {
@@ -672,19 +674,6 @@ function assertLeadingParentPolicy(html) {
   if (html.includes("__PLAYGROUND_IMPORT_MAP_HASH__")) {
     throw new Error("The production parent CSP contains an unresolved hash.");
   }
-}
-
-function runPnpm(args) {
-  const windows = process.platform === "win32";
-  const executable = windows ? (process.env.ComSpec ?? "cmd.exe") : "pnpm";
-  const commandArgs = windows
-    ? ["/d", "/s", "/c", `pnpm ${args.join(" ")}`]
-    : args;
-  const result = spawnSync(executable, commandArgs, {
-    cwd: root,
-    stdio: "inherit",
-  });
-  if (result.status !== 0) throw new Error(`pnpm ${args.join(" ")} failed.`);
 }
 
 function toDataUrl(source) {

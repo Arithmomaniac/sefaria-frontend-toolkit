@@ -9,6 +9,19 @@ import {
 } from "../scripts/build-site-plan.mjs";
 
 describe("documentation site build plan", () => {
+  it("resolves each example package to its on-disk Vite root", () => {
+    for (const { packageName } of EXAMPLE_BUILDS) {
+      const directory = packageName.slice("@sefaria-example/".length);
+      const manifest = JSON.parse(
+        readFileSync(
+          path.resolve("examples", directory, "package.json"),
+          "utf8",
+        ),
+      ) as { name: string };
+      expect(manifest.name).toBe(packageName);
+    }
+  });
+
   it("assembles every maintained browser example", () => {
     expect(EXAMPLE_BUILDS.map(({ route }) => route)).toEqual([
       "playground",
@@ -127,3 +140,5 @@ describe("documentation site build plan", () => {
     ).toBe(false);
   });
 });
+import { readFileSync } from "node:fs";
+import path from "node:path";

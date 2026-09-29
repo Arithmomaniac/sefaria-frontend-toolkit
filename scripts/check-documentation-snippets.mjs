@@ -72,7 +72,7 @@ try {
   execFileSync(
     process.execPath,
     [compiler, "--project", temporaryDirectory, "--pretty", "false"],
-    { cwd: root, stdio: "inherit" },
+    { cwd: root, stdio: "inherit", windowsHide: true },
   );
   process.stdout.write(
     `Documentation snippets: ${snippets.length} TypeScript fences\n`,

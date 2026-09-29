@@ -55,7 +55,10 @@ function runCommand(command, args) {
       windows && command === "pnpm"
         ? ["/d", "/s", "/c", `pnpm ${args.join(" ")}`]
         : args;
-    const child = spawn(executable, commandArgs, { stdio: "inherit" });
+    const child = spawn(executable, commandArgs, {
+      stdio: "inherit",
+      windowsHide: true,
+    });
     child.once("error", reject);
     child.once("exit", (code) => resolve(code ?? 1));
   });

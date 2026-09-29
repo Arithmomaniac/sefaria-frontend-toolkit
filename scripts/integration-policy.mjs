@@ -123,6 +123,7 @@ function validatePagesWorkflow(workflow, issues, filename) {
     "actions/checkout@v4",
     "pnpm/action-setup@v4",
     "actions/setup-node@v4",
+    "actions/cache@v4",
     "actions/configure-pages@v5",
     "actions/upload-pages-artifact@v5",
     "actions/deploy-pages@v5",
@@ -145,8 +146,31 @@ function validatePagesWorkflow(workflow, issues, filename) {
         cache: "pnpm",
       },
     },
+    {
+      uses: "actions/cache@v4",
+      with: {
+        path: "~/.cache/ms-playwright",
+        key: "playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}",
+      },
+    },
     { run: "pnpm setup:agent" },
-    { run: "pnpm check" },
+    {
+      name: "Reuse CI validation of this commit",
+      id: "ci",
+      run: "node scripts/pages-validation.mjs",
+      env: {
+        EVENT_NAME: "${{ github.event_name }}",
+        WORKFLOW_NAME: "${{ github.event.workflow_run.name }}",
+        WORKFLOW_EVENT: "${{ github.event.workflow_run.event }}",
+        WORKFLOW_CONCLUSION: "${{ github.event.workflow_run.conclusion }}",
+        WORKFLOW_HEAD_SHA: "${{ github.event.workflow_run.head_sha }}",
+      },
+    },
+    { if: "${{ steps.ci.outputs.validated != 'true' }}", run: "pnpm check" },
+    {
+      if: "${{ steps.ci.outputs.validated == 'true' }}",
+      run: "pnpm build && pnpm build:site:bundles && pnpm test:site",
+    },
     {
       run: "node scripts/script-source-release.mjs restore",
       env: { GITHUB_TOKEN: "${{ github.token }}" },
@@ -358,6 +382,13 @@ function validateCiWorkflow(workflow, issues, filename) {
       {
         uses: "actions/setup-node@v4",
         with: { "node-version": 22, cache: "pnpm" },
+      },
+      {
+        uses: "actions/cache@v4",
+        with: {
+          path: "~/.cache/ms-playwright",
+          key: "playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}",
+        },
       },
       { run: "pnpm setup:agent" },
       { run: "pnpm build" },

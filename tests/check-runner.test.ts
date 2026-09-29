@@ -4,7 +4,13 @@ import { pathToFileURL } from "node:url";
 
 import { describe, expect, it, vi } from "vitest";
 
-import { CHECK_STAGES, isMainModule, runCheck } from "../scripts/check.mjs";
+import {
+  CHECK_STAGES,
+  isMainModule,
+  runCheck,
+  selectCheckStages,
+  SITE_CHECK_STAGES,
+} from "../scripts/check.mjs";
 
 describe("repository check runner", () => {
   it("replaces Python checks with the compiled MCP acceptance harness", () => {
@@ -28,6 +34,48 @@ describe("repository check runner", () => {
       names.indexOf("TypeScript typecheck"),
     );
     expect(names.at(-1)).toBe("Changesets rehearsal");
+  });
+
+  it("runs cheap and frequently failing stages before browser acceptance", () => {
+    const names = CHECK_STAGES.map((stage) => stage.name);
+    const firstBrowserStage = Math.min(
+      names.indexOf("Documentation site browser acceptance"),
+      names.indexOf("Script source browser acceptance"),
+      names.indexOf("Playground browser acceptance"),
+    );
+
+    expect(names.slice(0, 2)).toEqual(["Formatting", "Oxlint"]);
+    for (const stage of [
+      "TypeScript typecheck",
+      "API documentation",
+      "Public metadata",
+      "TypeScript and browser tests",
+    ]) {
+      expect(names.indexOf(stage), stage).toBeLessThan(firstBrowserStage);
+    }
+    expect(names.indexOf("Documentation site")).toBeLessThan(
+      names.indexOf("TypeScript and browser tests"),
+    );
+    expect(names).toHaveLength(18);
+  });
+
+  it("selects the documentation-site subset only with --site", () => {
+    expect(selectCheckStages([])).toBe(CHECK_STAGES);
+    expect(selectCheckStages(["--site"])).toBe(SITE_CHECK_STAGES);
+    expect(() => selectCheckStages(["--unknown"])).toThrow(/--unknown/u);
+    expect(SITE_CHECK_STAGES.map((stage) => stage.name)).toEqual([
+      "Formatting",
+      "Oxlint",
+      "Integration policy",
+      "Workspace builds",
+      "TypeScript typecheck",
+      "API documentation",
+      "Documentation site",
+      "Documentation site browser acceptance",
+    ]);
+    for (const stage of SITE_CHECK_STAGES) {
+      expect(CHECK_STAGES).toContain(stage);
+    }
   });
 
   it("builds workspace artifacts before TypeScript consumers resolve them", () => {
@@ -63,18 +111,16 @@ describe("repository check runner", () => {
 
     expect(exitCode).toBe(7);
     expect(run).toHaveBeenCalledTimes(2);
-    expect(log).toHaveBeenCalledWith(
-      expect.stringContaining("OpenAPI contracts"),
-    );
+    expect(log).toHaveBeenCalledWith(expect.stringContaining("Formatting"));
     expect(log).toHaveBeenCalledWith(expect.stringContaining("250ms"));
     expect(log).toHaveBeenCalledWith(expect.stringContaining("failed"));
     expect(writeResult).toHaveBeenLastCalledWith({
       status: "failed",
       exitCode: 7,
-      failedStage: "Integration policy",
+      failedStage: "Oxlint",
       stages: [
-        { name: "OpenAPI contracts", elapsed: 250, exitCode: 0 },
-        { name: "Integration policy", elapsed: 400, exitCode: 7 },
+        { name: "Formatting", elapsed: 250, exitCode: 0 },
+        { name: "Oxlint", elapsed: 400, exitCode: 7 },
       ],
     });
   });
@@ -96,7 +142,7 @@ describe("repository check runner", () => {
       status: "passed",
       exitCode: 0,
       failedStage: null,
-      stages: [{ name: "OpenAPI contracts", elapsed: 100, exitCode: 0 }],
+      stages: [{ name: "Formatting", elapsed: 100, exitCode: 0 }],
     });
   });
 

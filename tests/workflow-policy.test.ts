@@ -94,6 +94,19 @@ describe("agent-ready workflow policy", () => {
         "node scripts/script-source-release.mjs restore",
         "echo skipped",
       ),
+      pages.replace(
+        "if: ${{ steps.ci.outputs.validated != 'true' }}",
+        "if: false",
+      ),
+      pages.replace(
+        "if: ${{ steps.ci.outputs.validated == 'true' }}",
+        "if: true",
+      ),
+      pages.replace(
+        "WORKFLOW_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}",
+        "WORKFLOW_HEAD_SHA: ${{ github.sha }}",
+      ),
+      pages.replace(" && pnpm test:site", ""),
     ]) {
       expect(
         validateWorkflowPolicy({ "pages.yml": candidate }).length,

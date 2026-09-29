@@ -131,6 +131,7 @@ export async function buildScriptSource({
   destination = path.join(root, "dist", "script-source"),
   version = "local",
   sourceSha = execFileSync("git", ["rev-parse", "HEAD"], {
+    windowsHide: true,
     cwd: root,
     encoding: "utf8",
   }).trim(),
@@ -161,7 +162,7 @@ export async function buildScriptSource({
         "tsconfig.base.json",
         "LICENSE",
       ],
-      { cwd: root, encoding: "utf8" },
+      { cwd: root, encoding: "utf8", windowsHide: true },
     )
       .split("\0")
       .filter(Boolean);
