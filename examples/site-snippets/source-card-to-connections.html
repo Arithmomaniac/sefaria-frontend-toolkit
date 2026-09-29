@@ -1,0 +1,15 @@
+<script
+  type="module"
+  src="https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
+></script>
+<sefaria-source-card sref="Micah 6:6-8" selectable></sefaria-source-card>
+<sefaria-connections-panel sref="Micah 6:8"></sefaria-connections-panel>
+<script type="module">
+  const card = document.querySelector("sefaria-source-card");
+  const panel = document.querySelector("sefaria-connections-panel");
+  card.selectedPosition = [2];
+  card.addEventListener("sefaria-source-select", (event) => {
+    card.selectedPosition = event.detail.position;
+    panel.sref = event.detail.ref;
+  });
+</script>
