@@ -1,4 +1,4 @@
-import { access, readFile } from "node:fs/promises";
+import { access, readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
 import { describe, expect, it } from "vitest";
@@ -63,6 +63,28 @@ describe("documentation site", () => {
     }
   });
 
+  it("keeps new-structure pages free of ASCII-art diagrams", async () => {
+    const pages = await markdownFiles([
+      "docs/across-components",
+      "docs/concepts",
+      "docs/data-and-text-tools",
+      "docs/examples",
+      "docs/help",
+      "docs/reference",
+      "docs/use-components",
+    ]);
+    pages.push(path.join(root, "docs", "index.md"));
+
+    const asciiDiagram =
+      /```(?:text|txt)\r?\n(?=[\s\S]*?(?:[+|][-\s+|]{6,}|[-=]{3,}>\s|\s[|][\s\S]*?[-=]{3,}))/u;
+    const boxDrawing = /[┌┐└┘├┤─│╭╮╰╯═║]/u;
+    for (const page of pages) {
+      const source = await readFile(page, "utf8");
+      expect(source, page).not.toMatch(asciiDiagram);
+      expect(source, page).not.toMatch(boxDrawing);
+    }
+  });
+
   it("keeps current public routes and contributor-only docs", async () => {
     for (const relativePath of [
       "docs/use-components/start-here.md",
@@ -84,6 +106,25 @@ describe("documentation site", () => {
       ).resolves.toBeUndefined();
     }
   });
+
+  async function markdownFiles(directories: string[]) {
+    const files: string[] = [];
+    for (const directory of directories) {
+      for (const entry of await readdir(path.join(root, directory), {
+        withFileTypes: true,
+      })) {
+        const fullPath = path.join(root, directory, entry.name);
+        if (entry.isDirectory()) {
+          files.push(
+            ...(await markdownFiles([path.join(directory, entry.name)])),
+          );
+        } else if (entry.name.endsWith(".md")) {
+          files.push(fullPath);
+        }
+      }
+    }
+    return files;
+  }
 
   it("keeps navigation on current pages", async () => {
     const config = await readFile(

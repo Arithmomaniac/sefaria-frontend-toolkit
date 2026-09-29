@@ -20,6 +20,7 @@ applyTo: "**/*.md"
 - Do not duplicate complete generated interfaces in specifications or READMEs.
 - Make each component's private validated preparation the rendering-data authority; do not document public raw inputs as render-ready state.
 - Make diagrams identify external payloads, runtime dependencies, type-only dependencies, factory orchestration, and DOM rendering.
+- Draw diagrams in Mermaid when possible, or SVG when Mermaid cannot express them; never use ASCII-art diagrams.
 - Distinguish current implementation paths from planned paths.
 - Do not put a mutable issue or delivery DAG in normative documents.
 - Link only to current documents.

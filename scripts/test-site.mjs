@@ -423,6 +423,14 @@ try {
     );
     await page.setViewportSize({ width: 1280, height: 900 });
 
+    await page.goto(siteRouteUrl("/concepts/how-the-toolkit-works.html"), {
+      waitUntil: "networkidle",
+    });
+    await assertEqual(
+      await page.locator(".mermaid svg").count(),
+      1,
+      "Mermaid diagram SVG count",
+    );
     await page.goto(siteRouteUrl("/use-components/start-here.html"), {
       waitUntil: "networkidle",
     });

@@ -42,6 +42,10 @@ Data and text tool pages show every snippet with `<CodeLanguageToggle :snippet>`
 - Link planned pages at their final routes. Give each unbuilt destination a stub with `stub: true`, a title, one or two sentences on what it will cover, a "Coming soon" note, and a link back to Home.
 - Add each stub to the `coming-soon stubs` list in `tests/documentation-site.test.ts`.
 
+## Diagrams
+
+- Draw diagrams in Mermaid when possible, or SVG when Mermaid cannot express them; never use ASCII-art diagrams.
+
 ## Live examples (`LiveEditor`)
 
 Use `LiveEditor` for every runnable component example on a how-to page. The code shown is the code that runs.

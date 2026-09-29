@@ -122,7 +122,7 @@ describe("C1 How the toolkit works", () => {
 
   it("includes one diagram and links to its neighbours", async () => {
     const markdown = await page();
-    expect(markdown.match(/```text/g)).toHaveLength(1);
+    expect(markdown.match(/```mermaid/g)).toHaveLength(1);
     for (const link of [
       "/reference/components.md",
       "/data-and-text-tools/give-components-your-own-data.md",

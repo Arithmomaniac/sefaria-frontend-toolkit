@@ -17,23 +17,13 @@ The toolkit is three packages. Two are independent building blocks, and the thir
 - `@arithmomaniac/sefaria-text-transform` cleans Sefaria text. Its functions are `normalizeText`, `applyVocalization`, `applyVocalizationToHtml`, and `createTextPreview`. They work on strings and know nothing about the client.
 - `@arithmomaniac/sefaria-web-components` provides six elements: Reference Label (`sefaria-ref-label`), Text Segment (`sefaria-text-segment`), Bilingual Segment (`sefaria-bilingual-segment`), Source Card (`sefaria-source-card`), Connections Panel (`sefaria-connections-panel`), and Reader (`sefaria-reader`). An element takes validated data from the client, or data you supply, and calls the text tools while it prepares text to show.
 
-```text
-  Sefaria API
-      |
-      v
-+-----------------+
-|     client      |  validated data
-+-----------------+
-   |           |
-   |           v
-   |   +---------------+     +-------------+
-   |   |  components   |---->| text tools  |
-   |   +---------------+     +-------------+
-   |                               ^
-   v                               |
-+---------------+                  |
-|  your own UI  |------------------+
-+---------------+
+```mermaid
+flowchart TD
+  api[Sefaria API] --> client[client]
+  client -->|validated data| components[components]
+  client -->|validated data| ui[your own UI]
+  components --> textTools[text tools]
+  ui --> textTools
 ```
 
 The client does not pass its responses through the text tools. Components call the text tools themselves, and so does your own code if you skip the components.
