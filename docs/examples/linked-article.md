@@ -69,7 +69,7 @@ pnpm build
 pnpm dev:linked-article
 ```
 
-## Learn more
+## Next steps
 
 - [Show an attributed passage](/use-components/show-an-attributed-passage.md) covers the Source Card used here.
 - [Sefaria's own texts and tools](/concepts/sefarias-own-texts-and-tools.md) explains how this toolkit relates to Sefaria's Linker.

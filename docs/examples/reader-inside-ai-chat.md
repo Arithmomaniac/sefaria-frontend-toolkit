@@ -64,7 +64,7 @@ Run `pnpm install` and `pnpm build` from the repository root first, because the 
 
 This page doesn't cover Sefaria's own MCP servers. See [Sefaria's own texts and tools](/concepts/sefarias-own-texts-and-tools.md). It also doesn't cover chat hosts other than the two shown here.
 
-## Learn more
+## Next steps
 
 - [Add the complete Reader](/use-components/add-the-complete-reader.md)
 - [Give components your own data](/data-and-text-tools/give-components-your-own-data.md)

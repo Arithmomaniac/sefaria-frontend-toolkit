@@ -35,8 +35,7 @@ Copy the prompt, replace the last line with a description of your page and your 
 Open the page and check each item.
 
 - The page uses `<sefaria-...>` tags, such as `<sefaria-source-card>`.
-- It loads the script tag.
-- It imports the package root, if the app has a build step.
+- It loads the toolkit one way: the script tag for a page with no build step, or `import "@arithmomaniac/sefaria-web-components";` in an app with a build step.
 - The attribution is visible under the text.
 - The text comes from the component, not pasted into the page.
 - No custom code downloads text from Sefaria's website itself or strips or rewrites its HTML. The component's own requests are expected.
@@ -48,8 +47,8 @@ Open the page and check each item.
 Paste the sentence that matches the failed check.
 
 - **No toolkit tags:** "Rewrite the page to use `<sefaria-source-card sref="[your passage]">` from the Sefaria Frontend Toolkit."
-- **Script tag missing:** "Add the toolkit's script tag from llms.txt."
-- **Package import missing:** "Import the package root with `import "@arithmomaniac/sefaria-web-components";`."
+- **Toolkit not loaded, page with no build step:** "Add the toolkit's script tag from llms.txt."
+- **Toolkit not loaded, app with a build step:** "Import the package root with `import "@arithmomaniac/sefaria-web-components";`."
 - **Attribution missing:** "Keep the component's attribution visible. Remove any `hide-attributions` attribute, and don't hide it with CSS."
 - **Copied text:** "Remove the Sefaria text you pasted into the page. Let the component show it."
 - **Custom download or cleanup code:** "Replace that code with `<sefaria-source-card>`. Don't download text from Sefaria's website or strip or rewrite its HTML yourself."

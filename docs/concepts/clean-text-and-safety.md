@@ -33,7 +33,7 @@ Everything else is handled by rule:
 - **Links become inert.** With reference handling enabled, a link with a nonblank `data-ref` becomes a `span` with `data-sefaria-ref`. Named-entity links can become inert entity spans. Other links are unwrapped, keeping their safe text.
 - **Footnotes move out of the text.** When footnote handling is on, each recognized marker and its body go into `notes` with a `key`, `markerHtml`, and `contentHtml`, and a `span[data-sefaria-note]` placeholder marks where it was. A body with no marker stays as ordinary italics, and a missing body gives `contentHtml: null`. With footnotes turned off, they are omitted.
 - **Malformed HTML is recovered, not rejected.** The parser repairs it.
-- **Output growth is bounded.** The budget scales with the input size. Past it, the function throws a `RangeError`. If you need an absolute size cap, enforce it yourself.
+- **Output growth is bounded.** The output can be up to eight times the input's length, or 64 KiB of text for short inputs, whichever is larger. Ordinary Sefaria text stays far below that. Past it, the function throws a `RangeError`. If you need an absolute size cap, enforce it yourself.
 
 The tests include a hostile sample with a `javascript:` URL, event handlers, inline style, and a script. For the full output rules, see the [normalized HTML output](/reference/text-transform.md#normalized-html-output) section of the reference, and for before-and-after examples see [Clean up stored Sefaria text](/data-and-text-tools/clean-up-stored-sefaria-text.md).
 
@@ -75,4 +75,4 @@ The text tools clean the text you pass to them. They don't secure the page aroun
 
 For general background on the attack this guards against, see MDN's page on [cross-site scripting](https://developer.mozilla.org/en-US/docs/Web/Security/Attacks/XSS).
 
-<span class="learn-more__label">Learn more:</span> [How the toolkit works](/concepts/how-the-toolkit-works.md#without-components), [Text transform reference](/reference/text-transform.md) {.learn-more}
+<span class="learn-more__label">Learn more:</span> [How the toolkit works](/concepts/how-the-toolkit-works.md#without-components), [Text tools reference](/reference/text-transform.md) {.learn-more}
