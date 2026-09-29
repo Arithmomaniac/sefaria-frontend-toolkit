@@ -8,7 +8,7 @@ const VOID_TAGS = new Set(["br"]);
 /**
  * Parses an HTML fragment using browser-style recovery and decoded entities.
  *
- * @see [Parsing and serialization](../README.md#parsing-and-serialization)
+ * @see [Parsing and serialization](../IMPLEMENTATION.md#parsing-and-serialization)
  */
 export function parseHtml(html: string): ChildNode[] {
   return parseDocument(html, {

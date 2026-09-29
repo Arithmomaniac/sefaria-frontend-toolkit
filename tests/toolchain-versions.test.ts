@@ -43,6 +43,27 @@ describe("TypeScript compiler ownership", () => {
       "--workspace-root exec tsc",
     );
   });
+
+  it("isolates TypeScript 6 for TypeDoc to the reference-docs package", async () => {
+    const docsPackagePath = path.join(
+      repository,
+      "tests",
+      "reference-docs",
+      "package.json",
+    );
+    const docsPackage = await readJson<{
+      private: boolean;
+      devDependencies: Record<string, string>;
+    }>(docsPackagePath);
+    const docsRequire = createRequire(docsPackagePath);
+    const installed = docsRequire("typescript/package.json") as {
+      version: string;
+    };
+
+    expect(docsPackage.private).toBe(true);
+    expect(docsPackage.devDependencies.typescript).toBe("6.0.3");
+    expect(installed.version).toBe("6.0.3");
+  });
 });
 
 async function readJson<T>(file: string): Promise<T> {

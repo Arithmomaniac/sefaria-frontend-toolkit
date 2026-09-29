@@ -574,6 +574,8 @@ Run `pnpm package:smoke` to create an isolated Vite consumer, inspect each uncha
 
 Run `pnpm metadata:generate` after changing a public export or element contract. `pnpm metadata:check` rejects stale `packages/web-components/custom-elements.json`, `packages/public-exports.json`, and their readable summaries under `docs/reference/`.
 
+Then run `pnpm reference:generate`. It rebuilds the site's reference pages from those files, the OpenAPI overlay, the client and text-transform source (through TypeDoc), and the hand-written catalogs in `scripts/reference/`. `pnpm reference:check`, part of `pnpm check` and `pnpm check:site`, rejects a stale page. It's separate from the JSDoc coverage in `pnpm check:api-docs`.
+
 Run `pnpm changeset:rehearse` to exercise the pinned private fixed group in a disposable fixture. The current rehearsal proves the observed `0.1.1-alpha.0` to `0.1.1-alpha.1` sequence from a `0.1.0` fixture, synchronized internal dependencies and changelogs, retained private flags, and no automatic commit or tag. It remains a local Changesets qualification and is separate from the run-derived public GitHub Packages prerelease.
 
 ## Package index configuration
@@ -595,6 +597,8 @@ The workspace uses TypeScript 7.0.2 and native Oxlint rules. `pnpm lint` does no
 `pnpm check:api-docs` removes and freshly emits declaration files for handwritten package source and client scripts, then parses those declarations and requires JSDoc on exported declarations, exported interface properties, and public class properties. It ignores generated declarations and compiler-emitted private fields. This output check replaces the former `eslint-plugin-jsdoc` source check because Oxlint's JavaScript-plugin selector engine did not visit an exported class property during qualification.
 
 `@hey-api/openapi-ts` 0.99.0 still uses the TypeScript 6 compiler API. `packages/client` therefore pins TypeScript 6.0.3 for that generator only. Its `build` and `typecheck` scripts explicitly invoke the workspace-root TypeScript 7 compiler. Do not remove the local generator pin or the workspace-root compiler invocation independently; `tests/toolchain-versions.test.ts` enforces both sides of this boundary.
+
+TypeDoc 0.28 also needs the TypeScript 6 compiler API. The generated client and text-transform reference pages use it through `pnpm reference:generate`, so the private `tests/reference-docs` workspace package pins `typedoc`, `typedoc-plugin-markdown` and TypeScript 6.0.3 for that generator only. `tests/toolchain-versions.test.ts` enforces this pin too. Remove the package when TypeDoc supports TypeScript 7 ([TypeStrong/typedoc#3098](https://github.com/TypeStrong/typedoc/issues/3098)).
 
 This arrangement separates four responsibilities: Oxlint performs explicitly configured syntax and source-quality checks, the workspace TypeScript 7 compiler owns typechecking and package output, the API-documentation check owns JSDoc enforcement on freshly emitted public declarations, and the client-local TypeScript 6 compiler exists only inside the OpenAPI generator. It is a qualified compatibility arrangement, not a claim that Oxlint and declaration-output analysis are universally better than ESLint and source-AST plugins.
 

@@ -161,13 +161,13 @@ const MAM_VALUES = new Map([
 /**
  * Converts untrusted Sefaria text markup into safe, directly renderable HTML.
  *
- * The operation parses once, removes unsupported attributes, emits no URLs,
- * and extracts footnotes into result-local records. Options can narrow but
- * never widen the fixed output grammar.
+ * The operation parses once, removes unsupported attributes, emits no link or
+ * resource-loading attributes, and extracts footnotes into result-local
+ * records. Options can narrow but never widen the fixed output grammar.
  *
  * @throws {TypeError} When commentary reference input is invalid.
  * @throws {RangeError} When projected output exceeds the documented bound.
- * @see [Text normalization](../README.md#text-normalization)
+ * @see [Text normalization](../IMPLEMENTATION.md#text-normalization)
  */
 export function normalizeText(
   html: string,

@@ -18,7 +18,7 @@ const PASEQ = "\u05c0";
  * Applies a vocalization preset to plain text without Unicode normalization.
  *
  * @throws {TypeError} When a runtime mode or PASEQ value is unsupported.
- * @see [Vocalization](../README.md#vocalization)
+ * @see [Vocalization](../IMPLEMENTATION.md#vocalization)
  */
 export function applyVocalization(
   text: string,
@@ -106,7 +106,7 @@ function isFullRemovalExtra(character: string): boolean {
  * Markup and attribute values are preserved; this operation is not a sanitizer.
  *
  * @throws {TypeError} When a runtime mode or PASEQ value is unsupported.
- * @see [Vocalization](../README.md#vocalization)
+ * @see [Vocalization](../IMPLEMENTATION.md#vocalization)
  */
 export function applyVocalizationToHtml(
   html: string,

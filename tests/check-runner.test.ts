@@ -49,6 +49,7 @@ describe("repository check runner", () => {
       "TypeScript typecheck",
       "API documentation",
       "Public metadata",
+      "Reference freshness",
       "TypeScript and browser tests",
     ]) {
       expect(names.indexOf(stage), stage).toBeLessThan(firstBrowserStage);
@@ -56,7 +57,10 @@ describe("repository check runner", () => {
     expect(names.indexOf("Documentation site")).toBeLessThan(
       names.indexOf("TypeScript and browser tests"),
     );
-    expect(names).toHaveLength(18);
+    expect(names.indexOf("Reference freshness")).toBe(
+      names.indexOf("Public metadata") + 1,
+    );
+    expect(names).toHaveLength(19);
   });
 
   it("selects the documentation-site subset only with --site", () => {
@@ -70,6 +74,7 @@ describe("repository check runner", () => {
       "Workspace builds",
       "TypeScript typecheck",
       "API documentation",
+      "Reference freshness",
       "Documentation site",
       "Documentation site browser acceptance",
     ]);
