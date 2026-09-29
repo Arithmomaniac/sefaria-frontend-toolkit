@@ -286,6 +286,55 @@ describe("C4 Sefaria's own texts and tools", () => {
   });
 });
 
+describe("B22 Start with an AI assistant", () => {
+  const page = () =>
+    read("docs", "use-components", "start-with-an-ai-assistant.md");
+  const prompt = () =>
+    read("examples", "site-snippets", "ai-assistant-prompt.md");
+
+  it("is written, carries the status note, and embeds the owned prompt", async () => {
+    const markdown = await page();
+    expectWritten(markdown);
+    expect(markdown).toContain("<StatusNote />");
+    expect(markdown).toMatch(
+      /^<<< .*examples\/site-snippets\/ai-assistant-prompt\.md/m,
+    );
+  });
+
+  it("keeps the prompt pointed at the toolkit, not raw API code", async () => {
+    const text = await prompt();
+    expect(text).toContain(
+      "https://arithmomaniac.github.io/sefaria-frontend-toolkit/llms.txt",
+    );
+    expect(text).toContain("Micah 6:8");
+    expect(text).toContain("<sefaria-source-card");
+    expect(text).toContain(
+      "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js",
+    );
+    expect(text).toContain('import "@arithmomaniac/sefaria-web-components";');
+    expect(text).toMatch(/attribution/i);
+    expect(text).not.toMatch(/Genesis 1:1/);
+  });
+
+  it("gives a checklist and links to the pages it routes to", async () => {
+    const markdown = await page();
+    expect(markdown).toMatch(/^## Check the result/m);
+    for (const link of [
+      "/llms.txt",
+      "/use-components/start-here.md",
+      "/use-components/show-text/label-a-citation.md",
+      "/use-components/show-text/show-one-passage.md",
+      "/use-components/show-text/hebrew-and-translation.md",
+      "/use-components/show-an-attributed-passage.md",
+      "/help/install-and-status.md",
+      "/help/troubleshoot-a-page.md",
+      "/concepts/sefarias-own-texts-and-tools.md",
+    ]) {
+      expect(markdown).toContain(`(${link}`);
+    }
+  });
+});
+
 describe("B15 Troubleshoot a page", () => {
   const page = () => read("docs", "help", "troubleshoot-a-page.md");
 
