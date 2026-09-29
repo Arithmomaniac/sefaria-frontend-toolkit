@@ -4,6 +4,7 @@ import { loadOverlayInputs } from "../packages/client/scripts/generate-openapi.j
 import { renderApiCorrections } from "../scripts/reference/api-corrections.js";
 import { renderClientReference } from "../scripts/reference/client.js";
 import { renderComponentsReference } from "../scripts/reference/components.js";
+import { LLMS_SECTIONS, renderLlmsTxt } from "../scripts/reference/llms.js";
 import { renderPackagesReference } from "../scripts/reference/packages.js";
 import {
   renderNormalizedOutput,
@@ -18,6 +19,53 @@ const RELEASE_SENTENCE =
 // TypeDoc starts a TypeScript 6 program in a child process.
 const TYPEDOC_TIMEOUT = 120_000;
 const OLDER_PINS = /Older pinned script-tag versions keep their own behavior/u;
+
+describe("EP7 llms.txt", () => {
+  it("states status, the script-tag route, both flows and the required links", async () => {
+    const text = await renderLlmsTxt();
+    const site = "https://arithmomaniac.github.io/sefaria-frontend-toolkit";
+    expect(text).toMatch(/^# Sefaria Frontend Toolkit\n\n> /u);
+    expect(text).toMatch(/experimental and unofficial/u);
+    expect(text).toMatch(
+      /`alpha` script address serves the newest published script release/u,
+    );
+    expect(text).toMatch(/may be retired without notice/u);
+    expect(text).toContain(
+      (await read("examples/site-snippets/source-card-script-tag.html")).trim(),
+    );
+    expect(text).toContain("use the components");
+    expect(text).toContain("`@arithmomaniac/sefaria-client`");
+    for (const route of [
+      "",
+      "use-components/start-here",
+      "data-and-text-tools/start-here",
+      "help/install-and-status",
+      "use-components/start-with-an-ai-assistant",
+      "reference/components",
+      "reference/client",
+      "reference/text-transform",
+      "reference/package-imports-and-exports",
+    ]) {
+      expect(text).toContain(
+        `](${site}/${route === "" ? "" : `${route}.html`})`,
+      );
+    }
+    expect(text).not.toMatch(/Genesis 1:1/u);
+  });
+
+  it("lists only routes that exist in the site", async () => {
+    for (const section of LLMS_SECTIONS) {
+      for (const route of section.routes) {
+        await expect(read(`docs/${route}`)).resolves.toMatch(/^---/u);
+      }
+    }
+  });
+
+  it("is built into the site root", async () => {
+    const plan = await import("../scripts/build-site-plan.mjs");
+    expect(plan.SITE_REQUIRED_FILES).toContain("llms.txt");
+  });
+});
 
 describe("R1 components reference", () => {
   it("is generated from custom-elements.json and states its release", async () => {

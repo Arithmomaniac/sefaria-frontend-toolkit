@@ -1,0 +1,140 @@
+import { readFile, writeFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
+
+const SITE = "https://arithmomaniac.github.io/sefaria-frontend-toolkit";
+const docs = (route: string) => new URL(`../../docs/${route}`, import.meta.url);
+const snippet = (file: string) =>
+  readFile(
+    new URL(`../../examples/site-snippets/${file}`, import.meta.url),
+    "utf8",
+  );
+
+interface Section {
+  readonly heading: string;
+  readonly routes: readonly string[];
+}
+
+/** The site's pages, in the order an assistant should consider them. */
+export const LLMS_SECTIONS: readonly Section[] = [
+  {
+    heading: "Start here",
+    routes: [
+      "index.md",
+      "use-components/start-here.md",
+      "data-and-text-tools/start-here.md",
+      "use-components/start-with-an-ai-assistant.md",
+      "help/install-and-status.md",
+    ],
+  },
+  {
+    heading: "Use components",
+    routes: [
+      "use-components/show-text/label-a-citation.md",
+      "use-components/show-text/show-one-passage.md",
+      "use-components/show-text/hebrew-and-translation.md",
+      "use-components/show-an-attributed-passage.md",
+      "use-components/use-with-a-framework.md",
+      "use-components/show-commentary-and-connected-texts.md",
+      "use-components/add-the-complete-reader.md",
+      "across-components/match-your-sites-look.md",
+      "across-components/choose-what-text-readers-see.md",
+      "across-components/make-components-respond-to-each-other.md",
+    ],
+  },
+  {
+    heading: "Use the data and text tools",
+    routes: [
+      "data-and-text-tools/give-components-your-own-data.md",
+      "data-and-text-tools/handle-errors-in-your-code.md",
+      "data-and-text-tools/clean-up-stored-sefaria-text.md",
+    ],
+  },
+  {
+    heading: "Reference: exact names",
+    routes: [
+      "reference/components.md",
+      "reference/client.md",
+      "reference/text-transform.md",
+      "reference/package-imports-and-exports.md",
+      "reference/api-corrections.md",
+    ],
+  },
+  {
+    heading: "Concepts",
+    routes: [
+      "concepts/how-the-toolkit-works.md",
+      "concepts/the-client-and-sefarias-api.md",
+      "concepts/clean-text-and-safety.md",
+      "concepts/sefarias-own-texts-and-tools.md",
+    ],
+  },
+  {
+    heading: "Examples",
+    routes: [
+      "examples/composed-multi-pane-reader.md",
+      "examples/linked-article.md",
+      "examples/reader-inside-ai-chat.md",
+      "examples/this-weeks-portion.md",
+    ],
+  },
+  {
+    heading: "Optional",
+    routes: ["help/troubleshoot-a-page.md"],
+  },
+];
+
+async function describe(route: string): Promise<string> {
+  const source = await readFile(docs(route), "utf8");
+  const front = /^---\r?\n([\s\S]*?)\r?\n---/u.exec(source)?.[1] ?? "";
+  const field = (name: string) => {
+    const raw = new RegExp(`^${name}:\\s*(.+)$`, "mu").exec(front)?.[1];
+    if (!raw) return undefined;
+    return raw.startsWith('"') ? (JSON.parse(raw) as string) : raw.trim();
+  };
+  const title = route === "index.md" ? "Home" : (field("title") ?? route);
+  const description = field("description") ?? field("  tagline") ?? "";
+  const stub = /^stub: true$/mu.test(front);
+  // Some example routes share a name with a hosted app directory, so link the page file.
+  const url =
+    route === "index.md"
+      ? `${SITE}/`
+      : `${SITE}/${route.replace(/\.md$/u, ".html")}`;
+  return `- [${title}](${url})${stub ? " (coming soon)" : ""}: ${description}`;
+}
+
+export async function renderLlmsTxt(): Promise<string> {
+  const scriptTag = (await snippet("source-card-script-tag.html")).trim();
+  const lines = [
+    "# Sefaria Frontend Toolkit",
+    "",
+    "> Web components and TypeScript tools for showing texts from Sefaria's library on your own web pages. The components load and display sources by reference. The client fetches and checks Sefaria API responses, and the text tools make Sefaria's text HTML safe to display (`normalizeText`) and prepare it.",
+    "",
+    "Status: experimental and unofficial; not made by Sefaria. Names, packages and hosted addresses may change. The `alpha` script address serves the newest published script release that is still active. A pinned script address stays byte-for-byte the same while it's kept, but it may be retired without notice.",
+    "",
+    "Choose a path:",
+    "",
+    `- To show Sefaria texts on a page, use the components from \`@arithmomaniac/sefaria-web-components\`. They're HTML elements, so prefer them to calling the API and handling Sefaria's text HTML yourself. For a page with no build step, add this script tag and element, then read ${SITE}/use-components/start-here:`,
+    "",
+    "```html",
+    scriptTag,
+    "```",
+    "",
+    `- To work with Sefaria's data in your own code, use \`@arithmomaniac/sefaria-client\` to fetch checked API responses and \`@arithmomaniac/sefaria-text-transform\` and its \`normalizeText\` function to make text HTML safe before you show it. Start at ${SITE}/data-and-text-tools/start-here.`,
+    `- To install the npm packages, or to choose between them and the script tag, read ${SITE}/help/install-and-status.`,
+    `- If you're an assistant building a page for someone, also read ${SITE}/use-components/start-with-an-ai-assistant.`,
+    `- For exact element, function, type and import names, use the reference pages below instead of guessing.`,
+    "",
+  ];
+  for (const section of LLMS_SECTIONS) {
+    lines.push(`## ${section.heading}`, "");
+    for (const route of section.routes) lines.push(await describe(route));
+    lines.push("");
+  }
+  return `${lines.join("\n").trimEnd()}\n`;
+}
+
+if (process.argv[1] === fileURLToPath(import.meta.url)) {
+  const out = process.argv[2];
+  if (!out) throw new Error("Usage: tsx scripts/reference/llms.ts <output>");
+  await writeFile(out, await renderLlmsTxt());
+}

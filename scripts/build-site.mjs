@@ -83,6 +83,13 @@ for (const step of createSiteBuildSteps({ skipTypecheck, siteBasePath })) {
     continue;
   }
   if (!examplesOnly) {
+    // EP7: llms.txt lists the site's pages, so it is rendered from the same sources.
+    runPackageTool(
+      "tsx",
+      "tsx",
+      ["scripts/reference/llms.ts", path.join(stagedPublic, "llms.txt")],
+      { cwd: root },
+    );
     runPackageTool("vitepress", "vitepress", ["build", "docs"], {
       cwd: root,
       env: { ...process.env, SITE_BASE_PATH: siteBasePath },

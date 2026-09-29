@@ -59,6 +59,7 @@ export const SITE_REQUIRED_FILES = [
   "cdn/local/LICENSE.txt",
   "cdn/local/THIRD-PARTY-NOTICES.txt",
   "cdn/local/source.tar.gz",
+  "llms.txt",
   "index.html",
   "use-components/start-here.html",
   "learn/01-web-components.html",
