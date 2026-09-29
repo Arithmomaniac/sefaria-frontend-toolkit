@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import path from "node:path";
 
 import { defineConfig } from "vitepress";
@@ -10,6 +11,16 @@ const repository = "https://github.com/Arithmomaniac/sefaria-frontend-toolkit";
 const branch = "main";
 const repositoryRoot = path.resolve(import.meta.dirname, "..", "..");
 const siteBasePath = normalizeSiteBasePath(process.env.SITE_BASE_PATH);
+const apiLinkCatalog = JSON.parse(
+  readFileSync(
+    path.join(repositoryRoot, "scripts", "reference", "api-link-catalog.json"),
+    "utf8",
+  ),
+) as {
+  readonly name: string;
+  readonly href: string;
+  readonly page: string;
+}[];
 export default withMermaid(
   defineConfig({
     base: siteBasePath,
@@ -55,6 +66,55 @@ export default withMermaid(
           "remove-leading-provenance-block",
           removeLeadingProvenanceBlock,
         );
+        markdown.core.ruler.after("inline", "auto-link-api-code", (state) => {
+          const currentPage = `/${state.env.relativePath}`;
+          if (currentPage.startsWith("/reference/")) return;
+          const used = new Set<string>();
+          let inHeading = false;
+          let inTable = false;
+          for (const token of state.tokens) {
+            if (token.type === "heading_open") inHeading = true;
+            if (token.type === "heading_close") inHeading = false;
+            if (token.type === "table_open") inTable = true;
+            if (token.type === "table_close") inTable = false;
+            if (
+              inHeading ||
+              inTable ||
+              token.type !== "inline" ||
+              !token.children
+            ) {
+              continue;
+            }
+            let inLink = false;
+            const children = [];
+            for (const child of token.children) {
+              if (child.type === "link_open") inLink = true;
+              if (child.type === "link_close") inLink = false;
+              const entry =
+                !inLink && child.type === "code_inline"
+                  ? apiLinkCatalog.find(
+                      (candidate) =>
+                        candidate.name === child.content &&
+                        candidate.page !== currentPage &&
+                        !used.has(candidate.name),
+                    )
+                  : undefined;
+              if (!entry) {
+                children.push(child);
+                continue;
+              }
+              used.add(entry.name);
+              const open = new state.Token("link_open", "a", 1);
+              open.attrSet("href", entry.href);
+              children.push(
+                open,
+                child,
+                new state.Token("link_close", "a", -1),
+              );
+            }
+            token.children = children;
+          }
+        });
       },
     },
     themeConfig: {

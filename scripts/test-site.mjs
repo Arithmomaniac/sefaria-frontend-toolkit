@@ -41,6 +41,28 @@ try {
       path.join(root, "dist", "site", "cdn", "local", "sefaria-elements.js"),
       "utf8",
     );
+    const apiLinkCatalog = JSON.parse(
+      await readFile(
+        path.join(root, "scripts", "reference", "api-link-catalog.json"),
+        "utf8",
+      ),
+    );
+    for (const entry of apiLinkCatalog) {
+      const [pagePath, anchor] = entry.href.split("#");
+      const htmlPath = path.join(
+        root,
+        "dist",
+        "site",
+        `${pagePath.replace(/^\//u, "").replace(/\.md$/u, ".html")}`,
+      );
+      const html = await readFile(htmlPath, "utf8");
+      if (
+        anchor &&
+        !new RegExp(`id=["']${escapeRegExp(anchor)}["']`, "u").test(html)
+      ) {
+        throw new Error(`API link catalog anchor is missing: ${entry.href}`);
+      }
+    }
 
     const page = await browser.newPage({
       viewport: { width: 1280, height: 900 },
@@ -431,6 +453,21 @@ try {
       1,
       "Mermaid diagram SVG count",
     );
+    const previewLinks = await page
+      .locator("code", { hasText: "createTextPreview" })
+      .evaluateAll((nodes) =>
+        nodes.map((node) => node.parentElement?.getAttribute("href") ?? null),
+      );
+    await assertEqual(
+      previewLinks[0],
+      "/reference/text-transform.html#createtextpreview",
+      "first createTextPreview API link",
+    );
+    await assertEqual(
+      previewLinks.slice(1).filter(Boolean).length,
+      0,
+      "later createTextPreview API links",
+    );
     await page.goto(siteRouteUrl("/use-components/start-here.html"), {
       waitUntil: "networkidle",
     });
@@ -647,6 +684,10 @@ async function assertEqual(actual, expected, label) {
       `${label}: expected ${JSON.stringify(expected)}, received ${JSON.stringify(actual)}.`,
     );
   }
+}
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&");
 }
 
 async function assertNoCodeOverflow(page, label) {

@@ -1,5 +1,6 @@
 import { writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
+import { buildApiLinkCatalog } from "./api-link-catalog.js";
 import {
   API_CORRECTIONS_PAGE,
   renderApiCorrections,
@@ -22,6 +23,8 @@ export const REFERENCE_PAGES: readonly Page[] = [
   { file: PACKAGES_PAGE, render: renderPackagesReference },
 ];
 
+const API_LINK_CATALOG = new URL("./api-link-catalog.json", import.meta.url);
+
 async function main(check: boolean): Promise<void> {
   const { readFile } = await import("node:fs/promises");
   const stale: string[] = [];
@@ -33,6 +36,13 @@ async function main(check: boolean): Promise<void> {
     } else {
       await writeFile(page.file, expected);
     }
+  }
+  const catalog = `${JSON.stringify(await buildApiLinkCatalog(), null, 2)}\n`;
+  if (check) {
+    const actual = await readFile(API_LINK_CATALOG, "utf8").catch(() => "");
+    if (actual !== catalog) stale.push(fileURLToPath(API_LINK_CATALOG));
+  } else {
+    await writeFile(API_LINK_CATALOG, catalog);
   }
   if (stale.length > 0) {
     console.error(

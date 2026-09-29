@@ -1,0 +1,1031 @@
+[
+  {
+    "name": "@arithmomaniac/sefaria-client",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-client",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-client"
+  },
+  {
+    "name": "@arithmomaniac/sefaria-client/client",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-client",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-client"
+  },
+  {
+    "name": "@arithmomaniac/sefaria-client/contracts",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-client",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-client"
+  },
+  {
+    "name": "@arithmomaniac/sefaria-client/errors",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-client",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-client"
+  },
+  {
+    "name": "@arithmomaniac/sefaria-client/schemas",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-client",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-client"
+  },
+  {
+    "name": "@arithmomaniac/sefaria-client/validation",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-client",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-client"
+  },
+  {
+    "name": "@arithmomaniac/sefaria-client/validators",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-client",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-client"
+  },
+  {
+    "name": "@arithmomaniac/sefaria-text-transform",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-text-transform",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-text-transform"
+  },
+  {
+    "name": "@arithmomaniac/sefaria-web-components",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "@arithmomaniac/sefaria-web-components/acquisition",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "@arithmomaniac/sefaria-web-components/bilingual-segment",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "@arithmomaniac/sefaria-web-components/connections-panel",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "@arithmomaniac/sefaria-web-components/reader",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "@arithmomaniac/sefaria-web-components/reader-session",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "@arithmomaniac/sefaria-web-components/ref-label",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "@arithmomaniac/sefaria-web-components/source-card",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "@arithmomaniac/sefaria-web-components/text-segment",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "<sefaria-bilingual-segment>",
+    "href": "/reference/components.md#sefaria-bilingual-segment",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "sefaria-bilingual-segment"
+  },
+  {
+    "name": "<sefaria-connections-panel>",
+    "href": "/reference/components.md#sefaria-connections-panel",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "sefaria-connections-panel"
+  },
+  {
+    "name": "<sefaria-reader>",
+    "href": "/reference/components.md#sefaria-reader",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "sefaria-reader"
+  },
+  {
+    "name": "<sefaria-ref-label>",
+    "href": "/reference/components.md#sefaria-ref-label",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "sefaria-ref-label"
+  },
+  {
+    "name": "<sefaria-source-card>",
+    "href": "/reference/components.md#sefaria-source-card",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "sefaria-source-card"
+  },
+  {
+    "name": "<sefaria-text-segment>",
+    "href": "/reference/components.md#sefaria-text-segment",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "sefaria-text-segment"
+  },
+  {
+    "name": "applyVocalization",
+    "href": "/reference/text-transform.md#applyvocalization",
+    "source": "text-transform",
+    "page": "/reference/text-transform.md",
+    "anchor": "applyvocalization"
+  },
+  {
+    "name": "applyVocalizationToHtml",
+    "href": "/reference/text-transform.md#applyvocalizationtohtml",
+    "source": "text-transform",
+    "page": "/reference/text-transform.md",
+    "anchor": "applyvocalizationtohtml"
+  },
+  {
+    "name": "BilingualPairContentLanguage",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "BilingualPairLayout",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "BilingualPairSide",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "BilingualPairSideOrder",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "BilingualSegmentContentLanguage",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "BilingualSegmentEditionSelection",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "BilingualSegmentLayout",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "BilingualSegmentRequest",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "BilingualSegmentSide",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "BilingualSegmentSideOrder",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "calendars",
+    "href": "/reference/client.md#calendars",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "calendars"
+  },
+  {
+    "name": "collections",
+    "href": "/reference/client.md#collections",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "collections"
+  },
+  {
+    "name": "CommentaryReference",
+    "href": "/reference/text-transform.md#commentaryreference",
+    "source": "text-transform",
+    "page": "/reference/text-transform.md",
+    "anchor": "commentaryreference"
+  },
+  {
+    "name": "configureSefariaAcquisition",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "CONNECTIONS_PAGE_SIZE",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ConnectionsProjection",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ConnectionsRequest",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ContractIssue",
+    "href": "/reference/client.md#contractissue",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "contractissue"
+  },
+  {
+    "name": "createReaderSession",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "createSefariaClient",
+    "href": "/reference/client.md#createsefariaclient",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "createsefariaclient"
+  },
+  {
+    "name": "createSefariaReaderDataSource",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "createTextPreview",
+    "href": "/reference/text-transform.md#createtextpreview",
+    "source": "text-transform",
+    "page": "/reference/text-transform.md",
+    "anchor": "createtextpreview"
+  },
+  {
+    "name": "getResponseContract",
+    "href": "/reference/client.md#getresponsecontract",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "getresponsecontract"
+  },
+  {
+    "name": "index",
+    "href": "/reference/client.md#index",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "index"
+  },
+  {
+    "name": "lexicon",
+    "href": "/reference/client.md#lexicon",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "lexicon"
+  },
+  {
+    "name": "misc",
+    "href": "/reference/client.md#misc",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "misc"
+  },
+  {
+    "name": "NormalizedFootnote",
+    "href": "/reference/text-transform.md#normalizedfootnote",
+    "source": "text-transform",
+    "page": "/reference/text-transform.md",
+    "anchor": "normalizedfootnote"
+  },
+  {
+    "name": "NormalizedText",
+    "href": "/reference/text-transform.md#normalizedtext",
+    "source": "text-transform",
+    "page": "/reference/text-transform.md",
+    "anchor": "normalizedtext"
+  },
+  {
+    "name": "normalizeText",
+    "href": "/reference/text-transform.md#normalizetext",
+    "source": "text-transform",
+    "page": "/reference/text-transform.md",
+    "anchor": "normalizetext"
+  },
+  {
+    "name": "NormalizeTextOptions",
+    "href": "/reference/text-transform.md#normalizetextoptions",
+    "source": "text-transform",
+    "page": "/reference/text-transform.md",
+    "anchor": "normalizetextoptions"
+  },
+  {
+    "name": "PaseqMode",
+    "href": "/reference/text-transform.md#paseqmode",
+    "source": "text-transform",
+    "page": "/reference/text-transform.md",
+    "anchor": "paseqmode"
+  },
+  {
+    "name": "ReaderBreadcrumb",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderConnectionsRecord",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderDataSource",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderEntryInfo",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderOperationHandle",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderPane",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderPinHandle",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderPresentation",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderPresentationPatch",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderRawConnectionsSeed",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderRawSeedData",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderRawSourceSeed",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderResolvedSource",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderSession",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderSessionConnectionsSeed",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderSessionOptions",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderSessionSeed",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderSessionSourceSeed",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderSessionState",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderSourceRecord",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderTransition",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ReaderTransitionRejection",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ref",
+    "href": "/reference/client.md#ref",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "ref"
+  },
+  {
+    "name": "RefLabelLanguage",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "RefLabelRequest",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "related",
+    "href": "/reference/client.md#related",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "related"
+  },
+  {
+    "name": "resolveReaderSource",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "ResponseSelector",
+    "href": "/reference/client.md#responseselector",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "responseselector"
+  },
+  {
+    "name": "sefaria-bilingual-segment",
+    "href": "/reference/components.md#sefaria-bilingual-segment",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "sefaria-bilingual-segment"
+  },
+  {
+    "name": "sefaria-bilingual-segment-error",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "sefaria-connection-select",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "sefaria-connections-category-change",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "sefaria-connections-page-change",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "sefaria-connections-panel",
+    "href": "/reference/components.md#sefaria-connections-panel",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "sefaria-connections-panel"
+  },
+  {
+    "name": "sefaria-connections-panel-error",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "sefaria-connections-preview-request",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "sefaria-reader",
+    "href": "/reference/components.md#sefaria-reader",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "sefaria-reader"
+  },
+  {
+    "name": "sefaria-reader-back",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "sefaria-reader-chat-export",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "sefaria-reader-connection-select",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "sefaria-reader-connections-category-change",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "sefaria-reader-connections-page-change",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "sefaria-reader-connections-preview-request",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "sefaria-reader-error",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "sefaria-reader-history-activate",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "sefaria-reader-pane-change",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "sefaria-reader-source-select",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "sefaria-ref-label",
+    "href": "/reference/components.md#sefaria-ref-label",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "sefaria-ref-label"
+  },
+  {
+    "name": "sefaria-ref-label-error",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "sefaria-source-card",
+    "href": "/reference/components.md#sefaria-source-card",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "sefaria-source-card"
+  },
+  {
+    "name": "sefaria-source-card-error",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "sefaria-source-select",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "sefaria-text-segment",
+    "href": "/reference/components.md#sefaria-text-segment",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "sefaria-text-segment"
+  },
+  {
+    "name": "sefaria-text-segment-error",
+    "href": "/reference/components.md#events",
+    "source": "components",
+    "page": "/reference/components.md",
+    "anchor": "events"
+  },
+  {
+    "name": "SefariaAcquisition",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "SefariaAcquisitionCapability",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "SefariaAcquisitionResponse",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "SefariaBilingualSegment",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "SefariaCacheOptions",
+    "href": "/reference/client.md#sefariacacheoptions",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "sefariacacheoptions"
+  },
+  {
+    "name": "SefariaClient",
+    "href": "/reference/client.md#sefariaclient",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "sefariaclient"
+  },
+  {
+    "name": "SefariaClientOptions",
+    "href": "/reference/client.md#sefariaclientoptions",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "sefariaclientoptions"
+  },
+  {
+    "name": "SefariaConnectionsPanel",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "SefariaContractError",
+    "href": "/reference/client.md#sefariacontracterror",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "sefariacontracterror"
+  },
+  {
+    "name": "SefariaContractErrorOptions",
+    "href": "/reference/client.md#sefariacontracterroroptions",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "sefariacontracterroroptions"
+  },
+  {
+    "name": "SefariaElement",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "SefariaElementStatus",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "SefariaLinksAcquisitionRequest",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "SefariaReader",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "SefariaReferenceAcquisitionRequest",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "SefariaRefLabel",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "SefariaSourceCard",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "SefariaTextAcquisitionRequest",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "SefariaTextSegment",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "sefariaTokenDefaults",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "sheets",
+    "href": "/reference/client.md#sheets",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "sheets"
+  },
+  {
+    "name": "SourceCardRequest",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "term",
+    "href": "/reference/client.md#term",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "term"
+  },
+  {
+    "name": "text",
+    "href": "/reference/client.md#text",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "text"
+  },
+  {
+    "name": "TextPreview",
+    "href": "/reference/text-transform.md#textpreview",
+    "source": "text-transform",
+    "page": "/reference/text-transform.md",
+    "anchor": "textpreview"
+  },
+  {
+    "name": "TextSegmentReferenceData",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "TextSegmentRequest",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "TextSegmentSelectedData",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "TextSegmentSelectedVersion",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "TextSegmentSelectedVersionInfo",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "TextSegmentVersionMetadata",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "TextSegmentVersionSelection",
+    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
+    "source": "packages",
+    "page": "/reference/package-imports-and-exports.md",
+    "anchor": "arithmomaniac-sefaria-web-components"
+  },
+  {
+    "name": "topic",
+    "href": "/reference/client.md#topic",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "topic"
+  },
+  {
+    "name": "validateExternalResponse",
+    "href": "/reference/client.md#validateexternalresponse",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "validateexternalresponse"
+  },
+  {
+    "name": "ValidationResult",
+    "href": "/reference/client.md#validationresult",
+    "source": "client",
+    "page": "/reference/client.md",
+    "anchor": "validationresult"
+  },
+  {
+    "name": "VocalizationMode",
+    "href": "/reference/text-transform.md#vocalizationmode",
+    "source": "text-transform",
+    "page": "/reference/text-transform.md",
+    "anchor": "vocalizationmode"
+  },
+  {
+    "name": "VocalizationOptions",
+    "href": "/reference/text-transform.md#vocalizationoptions",
+    "source": "text-transform",
+    "page": "/reference/text-transform.md",
+    "anchor": "vocalizationoptions"
+  }
+]

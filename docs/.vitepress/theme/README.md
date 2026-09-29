@@ -45,6 +45,7 @@ Data and text tool pages show every snippet with `<CodeLanguageToggle :snippet>`
 ## Diagrams
 
 - Draw diagrams in Mermaid when possible, or SVG when Mermaid cannot express them; never use ASCII-art diagrams.
+- API names in inline code link automatically; don't hand-link them.
 
 ## Live examples (`LiveEditor`)
 
