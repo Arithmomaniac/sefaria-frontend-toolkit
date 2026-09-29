@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
 import { describe, expect, it, vi } from "vitest";
@@ -334,6 +334,23 @@ describe("B22 Start with an AI assistant", () => {
 
 describe.each([
   {
+    name: "E1 Composed multi-pane Reader",
+    file: "composed-multi-pane-reader.md",
+    route: "/examples/reader/",
+    regions: [
+      "examples/reader/src/app.ts#seed-session",
+      "examples/reader/src/app.ts#feed-source-card",
+      "examples/reader/src/app.ts#wire-connections",
+    ],
+    links: [
+      "/use-components/show-an-attributed-passage.md",
+      "/use-components/show-commentary-and-connected-texts.md",
+      "/use-components/add-the-complete-reader.md",
+      "/concepts/how-the-toolkit-works.md",
+      "/reference/components.md",
+    ],
+  },
+  {
     name: "E2 Linked article",
     file: "linked-article.md",
     route: "/examples/linked-article/",
@@ -412,6 +429,42 @@ describe("E3 VS Code steps", () => {
       expect(scripts[script]).toBeDefined();
       expect(markdown).toContain(`pnpm ${script}`);
     }
+  });
+});
+
+describe("Example app embeds", () => {
+  const examplePages = new Set([
+    "docs/examples/composed-multi-pane-reader.md",
+    "docs/examples/linked-article.md",
+    "docs/examples/reader-inside-ai-chat.md",
+    "docs/examples/this-weeks-portion.md",
+  ]);
+
+  async function* sources(dir: string): AsyncGenerator<string> {
+    for (const entry of await readdir(path.join(root, dir), {
+      withFileTypes: true,
+    })) {
+      const relative = `${dir}/${entry.name}`;
+      if (entry.isDirectory()) {
+        if (!["node_modules", "dist", "cache", ".temp"].includes(entry.name))
+          yield* sources(relative);
+      } else if (/\.(?:md|vue|ts|mjs)$/.test(entry.name)) yield relative;
+    }
+  }
+
+  it("uses allow-same-origin only on the example pages, and never calls them isolated", async () => {
+    for await (const file of sources("docs")) {
+      if (file === "docs/.vitepress/theme/README.md") continue;
+      const text = await read(...file.split("/"));
+      if (!/<iframe[^>]*sandbox="[^"]*allow-same-origin/.test(text)) continue;
+      expect(examplePages.has(file), file).toBe(true);
+    }
+    for (const file of examplePages) {
+      const text = await read(...file.split("/")).catch(() => "");
+      expect(text).not.toMatch(/\bisolat/i);
+    }
+    const editor = await read("docs", ".vitepress", "theme", "LiveEditor.vue");
+    expect(editor).not.toContain("allow-same-origin");
   });
 });
 

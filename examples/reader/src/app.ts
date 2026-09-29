@@ -256,6 +256,7 @@ export function startReaderWorkspace(
       message.textContent = "Source text is not available for this entry.";
       return message;
     }
+    // #region feed-source-card
     const source = document.createElement(
       "sefaria-source-card",
     ) as SefariaSourceCard;
@@ -278,6 +279,7 @@ export function startReaderWorkspace(
       ).detail;
       void selectSource(pane, detail.position, detail.ref);
     });
+    // #endregion feed-source-card
     return source;
   };
 
@@ -318,6 +320,7 @@ export function startReaderWorkspace(
       "vocalization-mode",
       entry.presentation.vocalizationMode,
     );
+    // #region wire-connections
     connections.addEventListener(
       "sefaria-connections-category-change",
       (event) => {
@@ -345,6 +348,7 @@ export function startReaderWorkspace(
         showError(error);
       });
     });
+    // #endregion wire-connections
     return connections;
   };
 
@@ -424,6 +428,7 @@ export function startReaderWorkspace(
     clearError();
     status.textContent = `Opening ${targetRef}.`;
     try {
+      // #region seed-session
       const destination = await resolveReaderSource(
         { tref: targetRef.trim() },
         dataSource,
@@ -445,6 +450,7 @@ export function startReaderWorkspace(
           vocalizationMode: readVocalizationMode(vocalizationMode.value),
         },
       });
+      // #endregion seed-session
       connectionsErrors.clear();
       spatial = createWorkspaceState(
         session.state.currentEntryId,

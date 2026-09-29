@@ -107,5 +107,19 @@ export async function runSessionFourSiteChecks({ root, siteBasePath }) {
     if (chatRequests.length !== 0)
       fail(`chat host fetched before start: ${chatRequests}`);
     await chat.close();
+
+    const composed = await browser.newPage();
+    const composedRequests = [];
+    await routeOffline(composed, origin, fixture, composedRequests);
+    await composed.goto(url("/examples/composed-multi-pane-reader.html"), {
+      waitUntil: "networkidle",
+    });
+    await composed
+      .frameLocator("iframe")
+      .getByRole("button", { name: /start live demo/i })
+      .waitFor();
+    if (composedRequests.length !== 0)
+      fail(`composed Reader fetched before start: ${composedRequests}`);
+    await composed.close();
   });
 }
