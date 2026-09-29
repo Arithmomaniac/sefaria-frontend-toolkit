@@ -1,74 +1,49 @@
 ---
 layout: home
 title: Sefaria Frontend Toolkit
-
 hero:
   name: Sefaria Frontend Toolkit
-  text: Bring Sefaria texts into your product
-  tagline: Fetch and validate Sefaria data, prepare text and footnotes, or add declarative reading surfaces—from one citation to a standalone Reader.
+  text: Bring Sefaria's texts into your product at the level you need
+  tagline: Drop in a tag to show a source, or use the JavaScript tools to fetch checked data and clean its text.
   actions:
     - theme: brand
-      text: Get started
-      link: /get-started.md
+      text: Use components › Start here
+      link: /use-components/start-here.md
     - theme: alt
-      text: Fetch and prepare text
-      link: /get-started.md#use-the-client-without-components
-    - theme: alt
-      text: Try the editor
-      link: /examples/playground/index.html
-      target: _blank
-      rel: noreferrer
+      text: Try without installing
+      link: /examples.md
+statusNote: true
+acknowledgement: true
+heroExample: true
+features:
+  - title: Show texts with one tag
+    details: Add one Source Card tag to your page. It loads the text, shows the attribution, and handles loading and errors.
+    link: /use-components/start-here.md
+    linkText: Use components
+  - title: Get checked data
+    details: The client fetches Sefaria data and checks its shape before your code uses it.
+    link: /data-and-text-tools/start-here.md
+    linkText: Use the data and text tools
+  - title: Clean text safely
+    details: The text tools clean up Sefaria's markup, vowels, and footnotes for display.
+    link: /data-and-text-tools/start-here.md
+    linkText: Use the data and text tools
 ---
 
 > Created/edited by GitHub Copilot; pending human review.
 
-<LandingPreview />
+## Short answers
 
-<div class="status-note">
-  <strong>Experimental and unofficial:</strong> evaluate the browser examples without cloning or install the public GitHub Packages prereleases with authentication. Package names are subject to change, and the packages are not published on npmjs.com or a CDN. See the <SiteLink to="/get-started.html#installation-status">installation instructions</SiteLink>.
-</div>
+**Will it work in my stack?** The components work in any modern browser that runs JavaScript. The client and text tools also run in Node.js. For Python or other languages, call [Sefaria's API](https://developers.sefaria.org) directly.
 
-## Why this toolkit exists
+<span class="learn-more__label">Learn more:</span> [Install and status](/help/install-and-status.md) {.learn-more}
 
-Sefaria is a free digital library and data source for Jewish texts and translations. A direct API response is only the start of a product: an application still has to validate unknown JSON, prepare markup and footnotes, choose how to display Hebrew vocalization, project nested text into useful rendering data, and own any live request or navigation state.
+**Is it official?** No. It's developed in collaboration with Sefaria, but it's an experimental project, not an official Sefaria product.
 
-The toolkit separates those jobs so that a third party can adopt only the part it needs. `@arithmomaniac/sefaria-client` validates the supported transport responses. `@arithmomaniac/sefaria-text-transform` provides pure sanitization, vocalization, preview, and footnote operations. The Web Components package adds six declarative elements, tagged acquisition, raw Reader seeds, and semantic Reader-session records while keeping prepared rendering private.
+**Why web components?** A web component is a custom HTML tag, like `<sefaria-source-card>`. The same tag works in plain HTML, React, Alpine, and other frameworks.
 
-You can stop at any layer. A server, test, search index, AI integration, or custom renderer can use the client or text transforms without registering a custom element. A product that wants ready-made presentation can add one focused surface or the complete Reader.
+<span class="learn-more__label">Learn more:</span> [Using custom elements (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements) · [How the toolkit works](/concepts/how-the-toolkit-works.md) {.learn-more}
 
-## Choose your integration depth
+**Should I use this or Sefaria's own tools?** Use Sefaria's API, Linker, source sheets, or data exports when they already do the job. Use this toolkit to put Sefaria texts inside your own JavaScript page or app.
 
-<div class="path-grid">
-  <article class="path-card">
-    <h3>Fetch and validate data</h3>
-    <p>Use <code>@arithmomaniac/sefaria-client</code> when a server, script, browser app, or MCP host needs supported Sefaria responses with runtime validation.</p>
-    <p><SiteLink to="/get-started.html#use-the-client-without-components">Use the client without components →</SiteLink></p>
-  </article>
-  <article class="path-card">
-    <h3>Prepare text you already have</h3>
-    <p>Use <code>@arithmomaniac/sefaria-text-transform</code> with API data, stored JSON, fixtures, or user input. Sanitize supported markup, extract footnotes, create bounded previews, or change vocalization without fetching.</p>
-    <p><SiteLink to="/get-started.html#use-text-transforms-without-the-client">Use the text tools on their own →</SiteLink></p>
-  </article>
-  <article class="path-card">
-    <h3>Add a focused reading surface</h3>
-    <p>Use a reference label, text segment, bilingual segment,     source card or connections panel when the surrounding product and navigation already belong to your application.</p>
-    <p><SiteLink to="/components.html">Choose a focused component →</SiteLink></p>
-  </article>
-  <article class="path-card">
-    <h3>Build a complete Reader</h3>
-    <p>Use the standalone Reader when people need to read bilingual text, inspect connections, follow commentary, and return through semantic history.</p>
-    <p><SiteLink to="/learn/04-reader.html">Follow the Reader path →</SiteLink></p>
-  </article>
-</div>
-
-## Evaluate without cloning
-
-The landing preview, six-project editor, authored component states, and live examples show the current product paths in the browser. Opening the landing page and supplied-data previews makes no Sefaria request. Pages with **Start live demo** contact Sefaria only after that explicit action.
-
-- Edit HTML, CSS, and JavaScript in the [supplied-data editor](examples/playground/index.html).
-- Compare the [six components](components.md).
-- Open the [standalone Reader](examples/reader/controlled.html?tref=Micah%206%3A8).
-
-**Develop the toolkit itself:** clone the repository and follow the repository-only [Development guide](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md).
-
-Follow [Get started](get-started.md) for the client, text-transform, custom-renderer, component, and Reader paths.
+<span class="learn-more__label">Learn more:</span> [Sefaria's own texts and tools](/concepts/sefarias-own-texts-and-tools.md) {.learn-more}

@@ -60,6 +60,7 @@ export const SITE_REQUIRED_FILES = [
   "cdn/local/THIRD-PARTY-NOTICES.txt",
   "cdn/local/source.tar.gz",
   "index.html",
+  "use-components/start-here.html",
   "learn/01-web-components.html",
   "learn/02-supplied-data.html",
   "learn/03-live-data.html",

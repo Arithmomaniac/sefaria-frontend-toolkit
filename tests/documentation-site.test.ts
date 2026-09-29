@@ -67,12 +67,25 @@ describe("documentation learning journey", () => {
       "utf8",
     );
 
-    expect(index).toContain("<LandingPreview />");
-    expect(index).toContain("Bring Sefaria texts into your product");
-    expect(index).toContain("Try the editor");
-    expect(index).toContain("Experimental and unofficial");
-    expect(index).toContain("installation-status");
-    expect(index).toContain("/examples/playground/index.html");
+    expect(index).toContain("heroExample: true");
+    expect(index).toContain(
+      "Bring Sefaria's texts into your product at the level you need",
+    );
+    expect(index).toContain("Try without installing");
+    expect(index).toContain("statusNote: true");
+    expect(index).toContain("acknowledgement: true");
+    expect(theme).toContain("Microsoft Global Hackathon 2026");
+    expect(theme).not.toMatch(/Microsoft (endorses|maintains|supports)/);
+    const statusNote = await readFile(
+      path.join(root, "docs", ".vitepress", "theme", "StatusNote.vue"),
+      "utf8",
+    );
+    expect(statusNote).toContain(
+      "Experimental and unofficial. Names and addresses may change.",
+    );
+    expect(statusNote).not.toContain("GPL");
+    expect(index).toContain("/use-components/start-here.md");
+    expect(index).toContain("/examples.md");
     expect(index).not.toContain("Published documentation");
     expect(config).toContain(
       '"https://github.com/Arithmomaniac/sefaria-frontend-toolkit"',
@@ -83,8 +96,10 @@ describe("documentation learning journey", () => {
     );
     expect(config).toContain("base: siteBasePath");
     expect(disclosure).toContain(
-      '"https://arithmomaniac.github.io/sefaria-frontend-toolkit/"',
+      '"https://github.com/Arithmomaniac/sefaria-frontend-toolkit"',
     );
+    expect(disclosure).toContain("/help/troubleshoot-a-page.html#get-support");
+    expect(disclosure).not.toContain("isolated examples");
     expect(theme).toContain('"layout-bottom"');
     expect(theme).toContain("DocumentationDisclosure");
     expect(disclosure.replace(/\s+/g, " ")).toContain(
@@ -344,12 +359,15 @@ describe("documentation learning journey", () => {
       "utf8",
     );
 
-    expect(index).toContain("Bring Sefaria texts into your product");
-    expect(index).toContain("Fetch and validate data");
-    expect(index).toContain("Prepare text you already have");
-    expect(index).toContain("Add a focused reading surface");
-    expect(index).toContain("Build a complete Reader");
-    expect(index).toContain("You can stop at any layer");
+    expect(index).toContain(
+      "Bring Sefaria's texts into your product at the level you need",
+    );
+    expect(index).toContain("linkText: Use components\n");
+    expect(
+      index.match(/linkText: Use the data and text tools\n/g),
+    ).toHaveLength(2);
+    expect(index).not.toContain("## Two ways in");
+    expect(index).toContain("heroExample: true");
     expect(index).not.toContain("headless TypeScript building blocks");
     for (const definition of [
       "A host is the application that owns the component.",
@@ -379,10 +397,11 @@ describe("documentation learning journey", () => {
       "utf8",
     );
 
-    for (const markdown of [index, getStarted, documentation]) {
+    for (const markdown of [getStarted, documentation]) {
       expect(markdown).toContain("@arithmomaniac/sefaria-client");
       expect(markdown).toContain("@arithmomaniac/sefaria-text-transform");
     }
+    expect(index).toContain("client and text tools");
 
     expect(getStarted).toContain("Use the client without components");
     expect(getStarted).toContain("getV3Texts");
@@ -473,8 +492,9 @@ describe("documentation learning journey", () => {
       "utf8",
     );
 
-    expect(index).toContain("Evaluate without cloning");
-    expect(index).toContain("Develop the toolkit itself");
+    expect(index).toContain("Try without installing");
+    expect(index).toContain("developed in collaboration with Sefaria");
+    expect(index).not.toContain("endorsed");
     expect(getStarted).toContain("Public GitHub Packages");
     expect(getStarted).toContain("read:packages");
     expect(getStarted).toContain("not published on npmjs.com");
@@ -779,5 +799,81 @@ describe("documentation learning journey", () => {
     expect(lockfile).not.toMatch(/tarball:\s+https?:\/\//);
     expect(lockfile).not.toContain("pkgs.visualstudio.com");
     expect(lockfile).not.toContain("packagefeedproxy.microsoft.io");
+  });
+});
+
+describe("coming-soon stubs", () => {
+  const plannedRoutes = [
+    "data-and-text-tools/start-here.md",
+    "use-components/show-text/label-a-citation.md",
+    "use-components/show-text/show-one-passage.md",
+    "use-components/show-text/hebrew-and-translation.md",
+    "help/install-and-status.md",
+    "help/troubleshoot-a-page.md",
+    "concepts/how-the-toolkit-works.md",
+    "concepts/sefarias-own-texts-and-tools.md",
+    "reference/components.md",
+  ];
+
+  it.each(plannedRoutes)(
+    "%s is either a marked stub or real content",
+    async (route) => {
+      const markdown = await readFile(path.join(root, "docs", route), "utf8");
+      const body = markdown.replace(/^---[\s\S]*?---/, "");
+      const isStub = /^stub: true$/m.test(markdown);
+      const hasMarker = body.includes("Coming soon");
+
+      if (isStub || hasMarker) {
+        expect(isStub, "stub frontmatter").toBe(true);
+        expect(hasMarker, "Coming soon marker").toBe(true);
+        expect(body).toContain("](/index.md)");
+      } else {
+        const words = body.split(/\s+/).filter(Boolean).length;
+        expect(words, "replacement content length").toBeGreaterThan(200);
+      }
+    },
+  );
+});
+
+describe("Learn more links", () => {
+  it("ends quickstart asides with our pages or MDN", async () => {
+    const startHere = await readFile(
+      path.join(root, "docs", "use-components", "start-here.md"),
+      "utf8",
+    );
+    const lines = startHere
+      .split(/\r?\n/)
+      .filter((line) => line.includes("Learn more:"));
+    expect(lines).toHaveLength(2);
+    expect(lines[0]).toContain(
+      "https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements",
+    );
+    expect(lines[0]).toContain("/concepts/how-the-toolkit-works.md");
+    expect(lines[1]).toContain("/concepts/how-the-toolkit-works.md#status");
+    expect(lines[1]).toContain("/help/troubleshoot-a-page.md");
+    expect(lines[1]).not.toContain("/reference/components.md");
+    for (const line of lines) {
+      expect(line.match(/\]\(/g)?.length ?? 0).toBeLessThanOrEqual(2);
+    }
+    for (const url of startHere.match(/\]\((https?:[^)]+)\)/g) ?? []) {
+      expect(url).toContain("developer.mozilla.org");
+    }
+  });
+
+  it("marks every Learn more line with the shared class", async () => {
+    for (const file of [
+      path.join(root, "docs", "index.md"),
+      path.join(root, "docs", "use-components", "start-here.md"),
+    ]) {
+      const lines = (await readFile(file, "utf8"))
+        .split(/\r?\n/)
+        .filter((line) => line.includes("Learn more"));
+      expect(lines.length, file).toBeGreaterThan(0);
+      for (const line of lines) {
+        expect(line).toMatch(
+          /^<span class="learn-more__label">Learn more:<\/span> .+ \{\.learn-more\}$/,
+        );
+      }
+    }
   });
 });

@@ -80,6 +80,13 @@ export default defineConfig({
   ],
   lastUpdated: true,
   outDir: path.join(repositoryRoot, "dist", "site"),
+  vue: {
+    template: {
+      compilerOptions: {
+        isCustomElement: (tag) => tag.startsWith("sefaria-"),
+      },
+    },
+  },
   vite: {
     publicDir: path.join(repositoryRoot, "dist", "site-public"),
   },
@@ -102,8 +109,11 @@ export default defineConfig({
   },
   themeConfig: {
     nav: [
-      { text: "Get started", link: "/get-started.md" },
-      { text: "Components", link: "/components.md" },
+      { text: "Use components", link: "/use-components/start-here.md" },
+      {
+        text: "Use data and text tools",
+        link: "/data-and-text-tools/start-here.md",
+      },
       { text: "Examples", link: "/examples.md" },
       { text: "Guides", link: "/guides/" },
       { text: "Reference", link: "/reference/custom-elements.md" },
@@ -202,10 +212,50 @@ export default defineConfig({
         {
           text: "Start building",
           items: [
-            { text: "Get started", link: "/get-started.md" },
+            {
+              text: "Use components: Start here",
+              link: "/use-components/start-here.md",
+            },
+            {
+              text: "Use the data and text tools",
+              link: "/data-and-text-tools/start-here.md",
+            },
             { text: "Components", link: "/components.md" },
             { text: "Examples", link: "/examples.md" },
             { text: "Guides", link: "/guides/" },
+          ],
+        },
+      ],
+      "/data-and-text-tools/": [
+        {
+          text: "Use the data and text tools",
+          items: [
+            { text: "Start here", link: "/data-and-text-tools/start-here.md" },
+          ],
+        },
+      ],
+      "/use-components/": [
+        {
+          text: "Use components",
+          items: [
+            { text: "Start here", link: "/use-components/start-here.md" },
+            {
+              text: "Show text",
+              items: [
+                {
+                  text: "Just the citation",
+                  link: "/use-components/show-text/label-a-citation.md",
+                },
+                {
+                  text: "One text",
+                  link: "/use-components/show-text/show-one-passage.md",
+                },
+                {
+                  text: "Hebrew and translation",
+                  link: "/use-components/show-text/hebrew-and-translation.md",
+                },
+              ],
+            },
           ],
         },
       ],
