@@ -4,11 +4,18 @@ import {
   API_CORRECTIONS_PAGE,
   renderApiCorrections,
 } from "./api-corrections.js";
+import { CLIENT_PAGE, renderClientReference } from "./client.js";
+import {
+  TEXT_TRANSFORM_PAGE,
+  renderTextTransformReference,
+} from "./text-transform.js";
 
 type Page = { readonly file: URL; readonly render: () => Promise<string> };
 
 export const REFERENCE_PAGES: readonly Page[] = [
   { file: API_CORRECTIONS_PAGE, render: renderApiCorrections },
+  { file: CLIENT_PAGE, render: renderClientReference },
+  { file: TEXT_TRANSFORM_PAGE, render: renderTextTransformReference },
 ];
 
 async function main(check: boolean): Promise<void> {

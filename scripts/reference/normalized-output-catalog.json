@@ -1,0 +1,93 @@
+[
+  {
+    "attribute": "data-sefaria-note",
+    "element": "span",
+    "input": "He has told you<sup class=\"footnote-marker\">1</sup><i class=\"footnote\">A note.</i>",
+    "meaning": "An empty placeholder where a footnote was. Its value is the note's `key` in `notes`.",
+    "option": "`allowFootnotes`"
+  },
+  {
+    "attribute": "data-sefaria-end-footnote",
+    "element": "span",
+    "input": "Text<sup class=\"endFootnote\">*</sup>",
+    "meaning": "An end-of-text footnote marker. The value is the marker's text; the element is empty.",
+    "option": "`allowFootnotes` and `allowInlineAnnotations`"
+  },
+  {
+    "attribute": "data-sefaria-commentary-marker",
+    "element": "span",
+    "input": "Text<sup class=\"itag\">a</sup>",
+    "meaning": "A commentary marker. The value is the marker's text; the element is empty.",
+    "option": "`allowInlineAnnotations`"
+  },
+  {
+    "attribute": "data-sefaria-commentator",
+    "element": "span",
+    "input": "Text<i data-commentator=\"Rashi\" data-order=\"1\" data-label=\"a\"></i>",
+    "meaning": "A commentary anchor. The value is the commentator's name. The element is empty.",
+    "option": "`allowInlineAnnotations`"
+  },
+  {
+    "attribute": "data-sefaria-label",
+    "element": "span",
+    "input": "Text<i data-commentator=\"Rashi\" data-order=\"1\" data-label=\"a\"></i>",
+    "meaning": "The commentary anchor's label, copied from the source when present.",
+    "option": "`allowInlineAnnotations`"
+  },
+  {
+    "attribute": "data-sefaria-order",
+    "element": "span",
+    "input": "Text<i data-commentator=\"Rashi\" data-order=\"1\" data-label=\"a\"></i>",
+    "meaning": "The commentary anchor's order, copied from the source when present.",
+    "option": "`allowInlineAnnotations`"
+  },
+  {
+    "attribute": "data-sefaria-overlay",
+    "element": "span",
+    "input": "Text<i data-overlay=\"Weekday Torah Reading\" data-value=\"Monday\"></i>",
+    "meaning": "An overlay anchor's name, such as a reading division. It always appears with `data-sefaria-value`. The element is empty.",
+    "option": "`allowInlineAnnotations`"
+  },
+  {
+    "attribute": "data-sefaria-value",
+    "element": "span",
+    "input": "Text<i data-overlay=\"Weekday Torah Reading\" data-value=\"Monday\"></i>",
+    "meaning": "The overlay anchor's value.",
+    "option": "`allowInlineAnnotations`"
+  },
+  {
+    "attribute": "data-sefaria-ref",
+    "element": "span",
+    "input": "See <a class=\"refLink\" href=\"/Micah.6.8\" data-ref=\"Micah 6:8\">Micah 6:8</a>",
+    "meaning": "A Sefaria reference. On a former reference link, it holds the link's reference and the link text is kept. On a commentary anchor, it holds the reference that `commentaryReferences` supplied for that commentator, order and label.",
+    "option": "`allowRefLinks`; on commentary anchors, `allowInlineAnnotations` and `commentaryReferences`"
+  },
+  {
+    "attribute": "data-sefaria-ven",
+    "element": "span",
+    "input": "See <a data-ref=\"Micah 6:8\" data-ven=\"The Contemporary Torah\">Micah 6:8</a>",
+    "meaning": "The English version title from a reference link, when present.",
+    "option": "`allowRefLinks`"
+  },
+  {
+    "attribute": "data-sefaria-vhe",
+    "element": "span",
+    "input": "See <a data-ref=\"Micah 6:8\" data-vhe=\"Miqra according to the Masorah\">Micah 6:8</a>",
+    "meaning": "The Hebrew version title from a reference link, when present.",
+    "option": "`allowRefLinks`"
+  },
+  {
+    "attribute": "data-sefaria-slug",
+    "element": "span",
+    "input": "<a class=\"namedEntityLink\" data-slug=\"micah\" href=\"/topics/micah\">Micah</a>",
+    "meaning": "A named entity's topic slug. The entity's text is kept.",
+    "option": "`allowNamedEntities`"
+  },
+  {
+    "attribute": "data-sefaria-mam",
+    "element": "span",
+    "input": "<span class=\"mam-spi-pe\">{פ}</span>",
+    "meaning": "A Miqra according to the Masorah marking. The value is one of the names in the table below.",
+    "option": "none"
+  }
+]

@@ -252,6 +252,18 @@ importers:
         specifier: workspace:*
         version: link:../../packages/text-transform
 
+  tests/reference-docs:
+    devDependencies:
+      typedoc:
+        specifier: 0.28.20
+        version: 0.28.20(typescript@6.0.3)
+      typedoc-plugin-markdown:
+        specifier: 4.13.1
+        version: 4.13.1(typedoc@0.28.20(typescript@6.0.3))
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
+
 packages:
 
   '@algolia/abtesting@1.23.0':
@@ -800,6 +812,9 @@ packages:
 
   '@floating-ui/utils@0.2.12':
     resolution: {integrity: sha1-r+/nhZSfFqxM3R5pWTWjIVct1Wo=}
+
+  '@gerrit0/mini-shiki@3.23.0':
+    resolution: {integrity: sha1-2UFPMIC4gwOxjzoxGEbjfkJNgAw=}
 
   '@github/catalyst@1.8.1':
     resolution: {integrity: sha1-82CZttTGKDqhJk4oyd0thJ1UrXY=}
@@ -2035,17 +2050,29 @@ packages:
   '@shikijs/engine-oniguruma@2.5.0':
     resolution: {integrity: sha1-Iw3laTzB2mydWcetg1k8ICcnSBc=}
 
+  '@shikijs/engine-oniguruma@3.23.0':
+    resolution: {integrity: sha1-eJQhBI1mrBszYTFp1tGLnMbjQO0=}
+
   '@shikijs/langs@2.5.0':
     resolution: {integrity: sha1-l6tQxJWSLMHKBuGSmFso3HPeXVA=}
 
+  '@shikijs/langs@3.23.0':
+    resolution: {integrity: sha1-AJWdixbH9nEiGuebOtjN5+alwRI=}
+
   '@shikijs/themes@2.5.0':
     resolution: {integrity: sha1-jGrs9z9UVWgci+wVeXz2eBYolss=}
+
+  '@shikijs/themes@3.23.0':
+    resolution: {integrity: sha1-/ZbKWtUmOQV5lbwgk2gohOGEbyc=}
 
   '@shikijs/transformers@2.5.0':
     resolution: {integrity: sha1-GQyEeG/wbEF1gKt5F3M4qUcWjFU=}
 
   '@shikijs/types@2.5.0':
     resolution: {integrity: sha1-6UnHOEgCcDpIudZCXdQWc8Fk32k=}
+
+  '@shikijs/types@3.23.0':
+    resolution: {integrity: sha1-1EFXGgWGQZJgGK496Zhm855bvfI=}
 
   '@shikijs/vscode-textmate@10.0.2':
     resolution: {integrity: sha1-qQqzHQzB37VMZqaeUVv2JPp7IiQ=}
@@ -2512,6 +2539,10 @@ packages:
   balanced-match@1.0.2:
     resolution: {integrity: sha1-6D46fj8wCzTLnYf2FfoMvzV2kO4=}
 
+  balanced-match@4.0.4:
+    resolution: {integrity: sha1-v7EGYv7tgZaixi58aOF3IMJ0F5o=}
+    engines: {node: 18 || 20 || >=22}
+
   before-after-hook@4.0.0:
     resolution: {integrity: sha1-zxRHq5Fg32pA82Idpk1v/DYFDLk=}
 
@@ -2528,6 +2559,10 @@ packages:
 
   brace-expansion@1.1.18:
     resolution: {integrity: sha1-POdNiYhRNr4VNTQfjD1EJcKaXKs=}
+
+  brace-expansion@5.0.12:
+    resolution: {integrity: sha512-YovQ3rzhaLMIrDjNDMkNS01tea93qhEhG5xy8f6+R0l+dw3Ki+5sCoIoI942iuLZTHWogWktgwVDhU09iNEimQ==}
+    engines: {node: 20 || >=22}
 
   braces@3.0.3:
     resolution: {integrity: sha1-SQMy9AkZRSJy1VqEgK3AxEE1h4k=}
@@ -2827,6 +2862,10 @@ packages:
   encodeurl@2.0.0:
     resolution: {integrity: sha1-e46omAd9fkCdOsRUdOo46vCFelg=}
     engines: {node: '>= 0.8'}
+
+  entities@4.5.0:
+    resolution: {integrity: sha1-XSaOpecRPsdMTQM7eepaNaSI+0g=}
+    engines: {node: '>=0.12'}
 
   entities@7.0.1:
     resolution: {integrity: sha1-JuioiInbY0F9y5oeeaPxvJK1l2s=}
@@ -3257,6 +3296,9 @@ packages:
     resolution: {integrity: sha1-wIhn1xp5OFxuGQIU/XL+8+X5Xws=}
     engines: {node: '>= 12.0.0'}
 
+  linkify-it@5.0.2:
+    resolution: {integrity: sha1-074KaTrz2p3ziD8eNGoOl0YajBk=}
+
   lit-element@4.2.2:
     resolution: {integrity: sha1-90/L++qUXq5WFOziKmdPpSyjNls=}
 
@@ -3286,6 +3328,9 @@ packages:
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
+  lunr@2.3.9:
+    resolution: {integrity: sha1-GLEjFCgyM33W6WTfGlp3B7JdNeE=}
+
   magic-string@0.30.21:
     resolution: {integrity: sha1-VnY+wJoPqAkd8nh5/ZTRkHjADZE=}
 
@@ -3295,12 +3340,19 @@ packages:
   mark.js@8.11.1:
     resolution: {integrity: sha1-GA8fnr74sOY45BZq1S24eb6y/8U=}
 
+  markdown-it@14.3.2:
+    resolution: {integrity: sha512-sHHjZ5fJKlgrG4qns2YwVcdNep35h5fERrfkD2YNsb9UFk0UIHarbiTaHKVMlPuWAoiilyK8Fv/jAm11slsY7Q==}
+    hasBin: true
+
   math-intrinsics@1.1.0:
     resolution: {integrity: sha1-oN10voHiqlwvJ+Zc4oNgXuTit/k=}
     engines: {node: '>= 0.4'}
 
   mdast-util-to-hast@13.2.1:
     resolution: {integrity: sha1-1/+EykmaV+LAYK5nVIrZUOaJoFM=}
+
+  mdurl@2.1.0:
+    resolution: {integrity: sha1-1xHT97zn8ixIfJG+eFRfNW+pZXM=}
 
   media-typer@1.1.1:
     resolution: {integrity: sha1-bwNUAN/jq51WB7x3VGzjDML5xrg=}
@@ -3348,6 +3400,10 @@ packages:
   mime-types@3.0.2:
     resolution: {integrity: sha1-OQAtQYJXXVrwNv+hGBAPJSSy4qs=}
     engines: {node: '>=18'}
+
+  minimatch@10.2.6:
+    resolution: {integrity: sha1-/ZVrvgt3JB6fFaxdzLHGOAYJaO8=}
+    engines: {node: 18 || 20 || >=22}
 
   minimatch@3.1.5:
     resolution: {integrity: sha1-WAyI+NVEXyvWqo88re+g3nn71p4=}
@@ -3587,6 +3643,10 @@ packages:
   proxy-addr@2.0.7:
     resolution: {integrity: sha1-8Z/mnOqzEe65S0LnDowgcPm6ECU=}
     engines: {node: '>= 0.10'}
+
+  punycode.js@2.3.1:
+    resolution: {integrity: sha1-a1PlatdViCNOefSv+pCXLH3Yzbc=}
+    engines: {node: '>=6'}
 
   punycode@2.3.1:
     resolution: {integrity: sha1-AnQi4vrsCyXhVJw+G9gwm5EztuU=}
@@ -3970,6 +4030,19 @@ packages:
     resolution: {integrity: sha1-cdGnBTKTWC4WrJ8+uvGrmqSeVXA=}
     engines: {node: '>= 18'}
 
+  typedoc-plugin-markdown@4.13.1:
+    resolution: {integrity: sha512-d3jchJ4CyIrV9w9uozTSkfMYG8IEM1RvvGOaybJ/3rRporzoX7p0lprffo95GOGUviQqP0phjHJE3bY8PQbilA==}
+    engines: {node: '>= 18'}
+    peerDependencies:
+      typedoc: 0.28.x
+
+  typedoc@0.28.20:
+    resolution: {integrity: sha1-I8nIQVh8UotWz5wNAXynF3RbsNk=}
+    engines: {node: '>= 18', pnpm: '>= 10'}
+    hasBin: true
+    peerDependencies:
+      typescript: 5.0.x || 5.1.x || 5.2.x || 5.3.x || 5.4.x || 5.5.x || 5.6.x || 5.7.x || 5.8.x || 5.9.x || 6.0.x
+
   typescript@5.4.5:
     resolution: {integrity: sha1-QszvLFcf29D2cYsdH15uXvAG9hE=}
     engines: {node: '>=14.17'}
@@ -3988,6 +4061,9 @@ packages:
   typical@4.0.0:
     resolution: {integrity: sha1-y+r/O5164eK7+vWk5vEezP3pT8Q=}
     engines: {node: '>=8'}
+
+  uc.micro@2.1.0:
+    resolution: {integrity: sha1-+NP30OxMPeo1p+PI76TLi0XJ5+4=}
 
   undici-types@8.3.0:
     resolution: {integrity: sha1-ROn8nzJEZIzeo15Pm7LWgelBCAk=}
@@ -4852,6 +4928,14 @@ snapshots:
       react-dom: 18.3.1(react@18.3.1)
 
   '@floating-ui/utils@0.2.12': {}
+
+  '@gerrit0/mini-shiki@3.23.0':
+    dependencies:
+      '@shikijs/engine-oniguruma': 3.23.0
+      '@shikijs/langs': 3.23.0
+      '@shikijs/themes': 3.23.0
+      '@shikijs/types': 3.23.0
+      '@shikijs/vscode-textmate': 10.0.2
 
   '@github/catalyst@1.8.1': {}
 
@@ -5956,13 +6040,26 @@ snapshots:
       '@shikijs/types': 2.5.0
       '@shikijs/vscode-textmate': 10.0.2
 
+  '@shikijs/engine-oniguruma@3.23.0':
+    dependencies:
+      '@shikijs/types': 3.23.0
+      '@shikijs/vscode-textmate': 10.0.2
+
   '@shikijs/langs@2.5.0':
     dependencies:
       '@shikijs/types': 2.5.0
 
+  '@shikijs/langs@3.23.0':
+    dependencies:
+      '@shikijs/types': 3.23.0
+
   '@shikijs/themes@2.5.0':
     dependencies:
       '@shikijs/types': 2.5.0
+
+  '@shikijs/themes@3.23.0':
+    dependencies:
+      '@shikijs/types': 3.23.0
 
   '@shikijs/transformers@2.5.0':
     dependencies:
@@ -5970,6 +6067,11 @@ snapshots:
       '@shikijs/types': 2.5.0
 
   '@shikijs/types@2.5.0':
+    dependencies:
+      '@shikijs/vscode-textmate': 10.0.2
+      '@types/hast': 3.0.5
+
+  '@shikijs/types@3.23.0':
     dependencies:
       '@shikijs/vscode-textmate': 10.0.2
       '@types/hast': 3.0.5
@@ -6391,6 +6493,8 @@ snapshots:
 
   balanced-match@1.0.2: {}
 
+  balanced-match@4.0.4: {}
+
   before-after-hook@4.0.0: {}
 
   binary-extensions@2.3.0: {}
@@ -6415,6 +6519,10 @@ snapshots:
     dependencies:
       balanced-match: 1.0.2
       concat-map: 0.0.1
+
+  brace-expansion@5.0.12:
+    dependencies:
+      balanced-match: 4.0.4
 
   braces@3.0.3:
     dependencies:
@@ -6687,6 +6795,8 @@ snapshots:
   emoji-regex@8.0.0: {}
 
   encodeurl@2.0.0: {}
+
+  entities@4.5.0: {}
 
   entities@7.0.1: {}
 
@@ -7137,6 +7247,10 @@ snapshots:
       lightningcss-win32-arm64-msvc: 1.33.0
       lightningcss-win32-x64-msvc: 1.33.0
 
+  linkify-it@5.0.2:
+    dependencies:
+      uc.micro: 2.1.0
+
   lit-element@4.2.2:
     dependencies:
       '@lit-labs/ssr-dom-shim': 1.6.0
@@ -7170,6 +7284,8 @@ snapshots:
     dependencies:
       react: 18.3.1
 
+  lunr@2.3.9: {}
+
   magic-string@0.30.21:
     dependencies:
       '@jridgewell/sourcemap-codec': 1.6.0
@@ -7177,6 +7293,15 @@ snapshots:
   make-error@1.3.6: {}
 
   mark.js@8.11.1: {}
+
+  markdown-it@14.3.2:
+    dependencies:
+      argparse: 2.0.1
+      entities: 4.5.0
+      linkify-it: 5.0.2
+      mdurl: 2.1.0
+      punycode.js: 2.3.1
+      uc.micro: 2.1.0
 
   math-intrinsics@1.1.0: {}
 
@@ -7191,6 +7316,8 @@ snapshots:
       unist-util-position: 5.0.0
       unist-util-visit: 5.1.0
       vfile: 6.0.3
+
+  mdurl@2.1.0: {}
 
   media-typer@1.1.1: {}
 
@@ -7231,6 +7358,10 @@ snapshots:
   mime-types@3.0.2:
     dependencies:
       mime-db: 1.54.0
+
+  minimatch@10.2.6:
+    dependencies:
+      brace-expansion: 5.0.12
 
   minimatch@3.1.5:
     dependencies:
@@ -7471,6 +7602,8 @@ snapshots:
     dependencies:
       forwarded: 0.2.0
       ipaddr.js: 1.9.1
+
+  punycode.js@2.3.1: {}
 
   punycode@2.3.1: {}
 
@@ -7921,6 +8054,19 @@ snapshots:
       media-typer: 1.1.1
       mime-types: 3.0.2
 
+  typedoc-plugin-markdown@4.13.1(typedoc@0.28.20(typescript@6.0.3)):
+    dependencies:
+      typedoc: 0.28.20(typescript@6.0.3)
+
+  typedoc@0.28.20(typescript@6.0.3):
+    dependencies:
+      '@gerrit0/mini-shiki': 3.23.0
+      lunr: 2.3.9
+      markdown-it: 14.3.2
+      minimatch: 10.2.6
+      typescript: 6.0.3
+      yaml: 2.9.0
+
   typescript@5.4.5: {}
 
   typescript@6.0.3: {}
@@ -7949,6 +8095,8 @@ snapshots:
       '@typescript/typescript-win32-x64': 7.0.2
 
   typical@4.0.0: {}
+
+  uc.micro@2.1.0: {}
 
   undici-types@8.3.0: {}
 

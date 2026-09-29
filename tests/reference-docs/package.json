@@ -1,0 +1,14 @@
+{
+  "name": "@sefaria-tests/reference-docs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "devDependencies": {
+    "typedoc": "0.28.20",
+    "typedoc-plugin-markdown": "4.13.1",
+    "typescript": "6.0.3"
+  },
+  "scripts": {
+    "typedoc": "typedoc"
+  }
+}
