@@ -50,6 +50,7 @@
     "build": "node ../../scripts/clean-package-dist.mjs && pnpm --workspace-root exec tsc -p packages/client/tsconfig.build.json",
     "fixture:capture-candidate": "tsx scripts/refresh-fixtures.ts",
     "openapi:check": "tsx scripts/generate-openapi.ts --check",
+    "openapi:drift": "tsx scripts/openapi-drift.ts",
     "openapi:generate": "tsx scripts/generate-openapi.ts",
     "openapi:refresh": "tsx scripts/refresh-openapi.ts",
     "typecheck": "pnpm --workspace-root exec tsc -p packages/client/tsconfig.json"
@@ -61,6 +62,7 @@
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.99.0",
+    "@octokit/rest": "22.0.1",
     "openapi-format": "1.33.6",
     "typescript": "6.0.3"
   }
