@@ -25,7 +25,7 @@ A request is one call from the page to Sefaria. The first two rows change what i
 | You want to… | Attribute | Requests |
 | --- | --- | --- |
 | Prefer a translation language | `translation-language` | A fresh load makes one request, or two with fallback |
-| Pin one exact edition | `primary-version-title`, `translation-version-title` (Text Segment: `version-language`, `version-title`) | A fresh load makes one request. An exact edition doesn't fall back. |
+| Pin one exact edition | `primary-version-title`, `translation-version-title` (Text Segment: `version-language`, `version-title`) | A fresh load makes one request, or two if the other side's preferred translation language falls back. A pinned edition itself doesn't fall back. |
 | Change Hebrew vowel marks and cantillation | `vocalization-mode` | None. It redraws. |
 | Show one side or both | `content-language` | None. It redraws. |
 | Stack the sides or place them side by side | `layout`, `side-order` | None. It redraws. |
@@ -54,13 +54,13 @@ The fallback applies only to a bare language preference. Exact edition titles ne
 
 ## Set Hebrew vocalization
 
-`vocalization-mode` controls the marks written with Hebrew letters. Hebrew text can carry vowel marks (nikkud) and cantillation marks (taamim). The default, `taamim_and_nikkud`, shows both.
+`vocalization-mode` controls the marks written with Hebrew letters. Hebrew text can carry vowel marks (nikkud) and cantillation marks (taamim). The default, `taamim_and_nikkud`, shows both. The other modes also remove a few related marks, such as the sof pasuq (׃); for the exact behavior, see [Change vowels and cantillation](/data-and-text-tools/clean-up-stored-sefaria-text.md#change-vowels-and-cantillation).
 
-| Value | Hebrew shown |
-| --- | --- |
-| `taamim_and_nikkud` | Vowel marks and cantillation |
-| `nikkud` | Vowel marks only |
-| `none` | No vowel points or cantillation, and no sof pasuq (`׃`) or paseq after a space. Letters, digits, and other punctuation stay. |
+| Value               | Hebrew shown                      |
+| ------------------- | --------------------------------- |
+| `taamim_and_nikkud` | Vowel marks and cantillation      |
+| `nikkud`            | Vowel marks, without cantillation |
+| `none`              | No vowel points or cantillation   |
 
 Changing the mode never makes a request. The component redraws text it already has. All three components accept it.
 
