@@ -13,8 +13,8 @@ const seed: ReaderRawSeedData = {
   selectedRef: "Micah 6:8",
 };
 
-// The Reader shows the seeded text at once. It still loads the connections
-// it wasn't given, and anything the reader navigates to next.
+// The Reader shows the seeded text at once, then loads the connections
+// it wasn't given.
 const reader = document.querySelector("sefaria-reader");
 if (reader instanceof SefariaReader) {
   reader.data = seed;
