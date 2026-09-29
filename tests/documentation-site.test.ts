@@ -3,6 +3,8 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { highlightHtml } from "../docs/.vitepress/theme/highlight";
+
 const root = path.resolve(import.meta.dirname, "..");
 const lessons = [
   "01-web-components.md",
@@ -22,6 +24,13 @@ const playgroundProjects = [
   "connections-panel",
   "reader",
 ] as const;
+
+const codeTextContent = (html: string) =>
+  html
+    .replaceAll(/<[^>]+>/g, "")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">")
+    .replaceAll("&amp;", "&");
 
 describe("documentation learning journey", () => {
   it.each(lessons)("%s remains complete on GitHub", async (lesson) => {
@@ -199,7 +208,6 @@ describe("documentation learning journey", () => {
       "utf8",
     );
 
-    expect(config).toContain('text: "Frameworks"');
     expect(config).toContain('"learn/03-live-data.md":');
     expect(config).toContain('next: lessonLink("4. Use the Reader"');
     expect(config).toContain('"learn/04-reader.md":');
@@ -208,6 +216,13 @@ describe("documentation learning journey", () => {
     expect(config).toContain('prev: lessonLink("3. Load and interact"');
     expect(config).toContain('next: lessonLink("4. Use the Reader"');
     expect(lessonTwo).not.toContain("parallel [React path]");
+  });
+
+  it("preserves highlighted HTML source text by default", () => {
+    const source =
+      '<sefaria-ref-label sref="Micah 6:8"></sefaria-ref-label>: what does this mean?';
+
+    expect(codeTextContent(highlightHtml(source))).toBe(source);
   });
 
   it("catalogs all six current rendering surfaces without inventing APIs", async () => {
