@@ -912,3 +912,18 @@ describe("Learn more links", () => {
     }
   });
 });
+
+describe("package-route imports", () => {
+  it("registers elements through the package root, not type-only subpaths", async () => {
+    const startHere = await readFile(
+      path.join(root, "docs", "use-components", "start-here.md"),
+      "utf8",
+    );
+    expect(startHere).toContain(
+      'import "@arithmomaniac/sefaria-web-components";',
+    );
+    expect(startHere).not.toMatch(
+      /import\s+"@arithmomaniac\/sefaria-web-components\/(source-card|ref-label|text-segment|bilingual-segment|connections-panel|reader)"/,
+    );
+  });
+});

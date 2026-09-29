@@ -82,6 +82,7 @@ The supply chain has two modes:
 | Mode | Network access | Result |
 | --- | --- | --- |
 | Explicit refresh | Allowed | Updates the pinned input and checksum for a chosen commit |
+| Drift detection | Read-only | Reports upstream differences from the pin and may hand the report to a triage agent; never changes the pin |
 | Ordinary build and check | Forbidden | Applies the overlay and regenerates outputs from committed files |
 
 ## Pin and checksum contract
@@ -93,6 +94,16 @@ The checksum covers the committed upstream OpenAPI bytes before overlay applicat
 The refresh operation must require an explicit commit. It must not follow a mutable branch or tag.
 
 A refresh produces a reviewable diff for the pin, checksum, upstream input, overlay guards, and generated TypeScript.
+
+## Drift detection contract
+
+**Current.** Drift detection compares the committed pin with the latest commit on Sefaria's default branch that changed `docs/openAPI.json`. It resolves that commit through the GitHub API and downloads the file at that exact SHA, so the reported commit and compared bytes always agree. Both the complete commit SHA and the SHA-256 digest must match for no drift: an identical file at a different commit still requires pin review. Otherwise the report lists added, removed, and changed `paths` (with the changed path-item keys), added, removed, and changed `components.schemas`, other changed top-level and component keys, and every `x-sefaria-guards` precondition that would fail against upstream. It evaluates guards with the same precondition code as generation, but reports all failures instead of stopping at the first.
+
+Any request failure, unsuccessful status, missing commit SHA, or invalid JSON is an error. Detection must never report a failure as no drift.
+
+Drift is a review signal, not a correction authority. Detection never refreshes the pin, edits the overlay, commits, or merges. The daily workflow checks out the repository default branch, including on manual dispatch. It keeps at most one open drift issue, identified by the `openapi-drift` label and a hidden marker, and updates that issue in place while upstream differs, commenting when the upstream commit moves. After a scan confirms the default-branch pin matches both the current upstream commit and checksum, the detector closes the open issue with a resolution note preserving the previous report. If upstream changes after that, the detector creates a new issue rather than reopening the resolved episode. A failed scan must not close an issue. When an issue is new or the upstream commit moves, the workflow may assign it to the Copilot coding agent with the repository `openapi-drift-triage` agent. If Copilot remains assigned from a prior run, the handoff must fail explicitly instead of treating a repeated add-assignee request as a new session; a maintainer reassigns Copilot manually. The agent prepares source-backed proposals only as draft pull requests, links the issue without a closing keyword, and never manages its lifecycle. Human source review under the [overlay contract](#overlay-contract) remains necessary before merge.
+
+For every changed operation or schema, triage must expand upstream and overlay-created references and check all affected consumers for semantic equivalence. When upstream now expresses an already reviewed correction across those consumers, retire the redundant overlay action and guard; any new or partially different behavior still needs qualification. Inspect the pinned upstream route, handler, response builder, and tests even when all existing guards pass. Where a public operation is safe to call and introduces new behavior, use a bounded, source-directed matrix of live Sefaria requests to examine the relevant successful, conditional, and error branches; record the dated inputs and outcomes separately from commit-pinned source evidence. A local database export is optional corroboration, not a prerequisite or authority for HTTP payloads. An unqualified contract must not silently enter the refreshed pin. Compare affected shapes with existing reusable transport components across operations; prefer an equivalent upstream shared component across its consumers or introduce a guarded shared component only when source and qualified payloads demonstrate an actual common shape, not merely similar names. Drift detection itself performs none of this qualification; the triage agent proposes it for human review.
 
 ## Overlay contract
 
@@ -241,6 +252,7 @@ Focused tests must cover:
 - overlay success for every correction
 - overlay failure after each expected old value changes
 - exact mismatch paths
+- drift detection with no drift, changed paths and schemas, every failing guard, and request, status, SHA, and JSON failures that never report no drift
 - deterministic temporary corrected output
 - deterministic generated declarations and validators
 - stale generated-output detection
