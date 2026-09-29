@@ -222,7 +222,7 @@ The current command runs Prettier and Oxlint first, then stale-OpenAPI and integ
 
 Every run writes a bounded machine-readable result to `.artifacts/check/result.json`. CI uploads that result and allowlisted browser diagnostics only after a platform failure. A Linux success cannot hide a Windows failure: the required `check` aggregation succeeds only when the complete matrix succeeds.
 
-The Pages workflow reuses validation only when the triggering CI push run succeeded on the exact commit that Pages checked out. Only then does it run `pnpm build` and `pnpm build:site:bundles`. For every other trigger, and whenever `main` has moved past the validated commit, it runs the full `pnpm check`. CI and Pages cache Playwright browsers by operating system and lockfile hash. `pnpm setup:agent` still runs its three-browser launch probe.
+The Pages workflow reuses validation only when the triggering CI push run succeeded on the exact commit that Pages checked out. Only then does it run `pnpm build`, `pnpm build:site:bundles`, and `pnpm test:site` rather than the full check. Site acceptance still qualifies the deployed `/sefaria-frontend-toolkit/` base, which differs from CI's root-path build. For every other trigger, and whenever `main` has moved past the validated commit, it runs the full `pnpm check`. CI and Pages cache Playwright browsers by operating system and lockfile hash. `pnpm setup:agent` still runs its three-browser launch probe.
 
 ### Documentation-site inner loop
 

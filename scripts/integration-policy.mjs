@@ -169,7 +169,7 @@ function validatePagesWorkflow(workflow, issues, filename) {
     { if: "${{ steps.ci.outputs.validated != 'true' }}", run: "pnpm check" },
     {
       if: "${{ steps.ci.outputs.validated == 'true' }}",
-      run: "pnpm build && pnpm build:site:bundles",
+      run: "pnpm build && pnpm build:site:bundles && pnpm test:site",
     },
     {
       run: "node scripts/script-source-release.mjs restore",

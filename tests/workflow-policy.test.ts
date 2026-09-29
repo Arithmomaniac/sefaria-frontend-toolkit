@@ -106,6 +106,7 @@ describe("agent-ready workflow policy", () => {
         "WORKFLOW_HEAD_SHA: ${{ github.event.workflow_run.head_sha }}",
         "WORKFLOW_HEAD_SHA: ${{ github.sha }}",
       ),
+      pages.replace(" && pnpm test:site", ""),
     ]) {
       expect(
         validateWorkflowPolicy({ "pages.yml": candidate }).length,
