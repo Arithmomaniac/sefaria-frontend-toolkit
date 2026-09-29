@@ -595,7 +595,6 @@ describe("documentation learning journey", () => {
 
   it("documents package builds before direct example development servers", async () => {
     for (const [filename, command] of [
-      ["README.md", "pnpm dev:vanilla"],
       [
         "examples/vanilla-vite/README.md",
         "pnpm --filter @sefaria-example/vanilla-vite dev",

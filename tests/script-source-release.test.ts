@@ -14,6 +14,7 @@ import {
   writeCatalog,
   createGithubClient,
   assertSiteSize,
+  renderVersionsIndex,
 } from "../scripts/script-source-release.mjs";
 
 const sourceSha = "a".repeat(40);
@@ -215,5 +216,59 @@ describe("script retention catalog", () => {
     await expect(
       unpackArtifact(Buffer.from("wrong"), record(1), directory),
     ).rejects.toThrow("hash");
+  });
+});
+
+describe("script-tag versions index (EP6)", () => {
+  it("lists active versions newest first, marks alpha, and omits retired addresses", () => {
+    const catalog = retireRelease(
+      admitRelease(
+        admitRelease(admitRelease(empty(), record(1)), record(2)),
+        record(3),
+      ),
+      record(2).version,
+    );
+    const html = renderVersionsIndex(catalog);
+    expect(html).toMatch(/^<!doctype html>/u);
+    const three = html.indexOf("0.0.0-alpha.3.1/sefaria-elements.js");
+    const one = html.indexOf("0.0.0-alpha.1.1/sefaria-elements.js");
+    expect(three).toBeGreaterThan(-1);
+    expect(one).toBeGreaterThan(three);
+    expect(html).not.toContain("0.0.0-alpha.2.1/sefaria-elements.js");
+    expect(html).toContain("0.0.0-alpha.2.1");
+    expect(html).toMatch(/alpha\/sefaria-elements\.js/u);
+    expect(html).toMatch(/currently serves <code>0\.0\.0-alpha\.3\.1<\/code>/u);
+    expect(html).toMatch(/may be retired without notice/u);
+    expect(html).toMatch(/Experimental and unofficial/u);
+    for (const route of [
+      "../use-components/start-here.html",
+      "../help/install-and-status.html",
+      "../reference/package-imports-and-exports.html",
+    ]) {
+      expect(html).toContain(`href="${route}"`);
+    }
+    expect(html).toContain(`/commit/${sourceSha}`);
+  });
+
+  it("is written beside the assembled versions", async () => {
+    const directory = await mkdtemp(path.join(tmpdir(), "script-index-"));
+    directories.push(directory);
+    const catalog = retireRelease(
+      admitRelease(empty(), record(1)),
+      record(1).version,
+    );
+    await assembleScripts({
+      catalog,
+      destination: path.join(directory, "cdn"),
+      download: async () => {
+        throw new Error("must not download");
+      },
+    });
+    const html = await readFile(
+      path.join(directory, "cdn", "index.html"),
+      "utf8",
+    );
+    expect(html).toBe(renderVersionsIndex(catalog));
+    expect(html).toMatch(/No version is being served/u);
   });
 });

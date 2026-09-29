@@ -167,7 +167,7 @@ const MAM_VALUES = new Map([
  *
  * @throws {TypeError} When commentary reference input is invalid.
  * @throws {RangeError} When projected output exceeds the documented bound.
- * @see [Text normalization](../README.md#text-normalization)
+ * @see [Text normalization](../IMPLEMENTATION.md#text-normalization)
  */
 export function normalizeText(
   html: string,

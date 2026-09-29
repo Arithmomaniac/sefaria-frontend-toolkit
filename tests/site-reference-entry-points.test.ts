@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { loadOverlayInputs } from "../packages/client/scripts/generate-openapi.js";
 import { renderApiCorrections } from "../scripts/reference/api-corrections.js";
@@ -22,6 +23,117 @@ const RELEASE_SENTENCE =
 // TypeDoc starts a TypeScript 6 program in a child process.
 const TYPEDOC_TIMEOUT = 120_000;
 const OLDER_PINS = /Older pinned script-tag versions keep their own behavior/u;
+
+const SITE_URL = "https://arithmomaniac.github.io/sefaria-frontend-toolkit";
+const ROUTES = {
+  home: `${SITE_URL}/`,
+  b2: `${SITE_URL}/use-components/start-here.html`,
+  b7: `${SITE_URL}/use-components/use-with-a-framework.html`,
+  b11: `${SITE_URL}/data-and-text-tools/start-here.html`,
+  b13: `${SITE_URL}/data-and-text-tools/give-components-your-own-data.html`,
+  b14: `${SITE_URL}/help/install-and-status.html`,
+  b25: `${SITE_URL}/data-and-text-tools/handle-errors-in-your-code.html`,
+  b26: `${SITE_URL}/data-and-text-tools/clean-up-stored-sefaria-text.html`,
+  c2: `${SITE_URL}/concepts/the-client-and-sefarias-api.html`,
+  c3: `${SITE_URL}/concepts/clean-text-and-safety.html`,
+  r1: `${SITE_URL}/reference/components.html`,
+  r2: `${SITE_URL}/reference/client.html`,
+  r3: `${SITE_URL}/reference/text-transform.html`,
+} as const;
+
+async function expectOwnerSnippet(readme: string, owner: string) {
+  const marker = `<!-- Snippet owner: ${owner}. Keep this block identical. -->`;
+  const start = readme.indexOf(marker);
+  expect(start, marker).toBeGreaterThan(-1);
+  const fence = /```(?:ts|html)\n([\s\S]*?)\n```/u.exec(readme.slice(start));
+  expect(fence?.[1]).toBe((await read(owner)).trim());
+}
+
+describe("EP1–EP5 README entry points", () => {
+  it.each([
+    ["README.md", ["home", "b2", "b11", "b14"]],
+    ["packages/client/README.md", ["b11", "b14", "b25", "c2", "r2"]],
+    ["packages/text-transform/README.md", ["b11", "b14", "b26", "c3", "r3"]],
+    ["packages/web-components/README.md", ["b2", "b7", "b13", "b14", "r1"]],
+  ] as const)(
+    "%s is short, states status and links its routes",
+    async (file, routes) => {
+      const readme = await read(file);
+      expect(readme.split("\n").length).toBeLessThan(90);
+      expect(readme).toMatch(/[Ee]xperimental and unofficial/u);
+      for (const route of routes)
+        expect(readme, route).toContain(`(${ROUTES[route]}`);
+      expect(readme).not.toMatch(/Genesis 1:1/u);
+      for (const [, target] of readme.matchAll(/\]\((?!https?:|#)([^)#]+)/gu)) {
+        await expect(
+          read(path.posix.join(path.posix.dirname(file), target!)),
+        ).resolves.toBeTypeOf("string");
+      }
+    },
+  );
+
+  it.each([
+    ["packages/client/README.md", "@arithmomaniac/sefaria-client"],
+    [
+      "packages/text-transform/README.md",
+      "@arithmomaniac/sefaria-text-transform",
+    ],
+    [
+      "packages/web-components/README.md",
+      "@arithmomaniac/sefaria-web-components",
+    ],
+  ])(
+    "%s gives the GitHub Packages install caveat and a maintainer link",
+    async (file, name) => {
+      const readme = await read(file);
+      expect(readme).toContain(
+        "@arithmomaniac:registry=https://npm.pkg.github.com",
+      );
+      expect(readme).toContain(`${name}@alpha`);
+      expect(readme).toMatch(/read:packages/u);
+      expect(readme).toContain(
+        `https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/${path.posix.dirname(file)}/IMPLEMENTATION.md`,
+      );
+    },
+  );
+
+  it("package READMEs pull their owner snippets", async () => {
+    await expectOwnerSnippet(
+      await read("packages/web-components/README.md"),
+      "examples/site-snippets/source-card-package.ts",
+    );
+    await expectOwnerSnippet(
+      await read("packages/client/README.md"),
+      "examples/site-snippets/client-first-success.ts",
+    );
+    await expectOwnerSnippet(
+      await read("packages/text-transform/README.md"),
+      "examples/site-snippets/text-transform-first-success.ts",
+    );
+  });
+
+  it("the web components README lists the six elements and the root import", async () => {
+    const readme = await read("packages/web-components/README.md");
+    for (const tag of [
+      "sefaria-ref-label",
+      "sefaria-text-segment",
+      "sefaria-bilingual-segment",
+      "sefaria-source-card",
+      "sefaria-connections-panel",
+      "sefaria-reader",
+    ]) {
+      expect(readme).toContain(`<${tag}>`);
+    }
+    expect(readme).toContain('import "@arithmomaniac/sefaria-web-components";');
+  });
+
+  it("the root README keeps license and links contributors to Development", async () => {
+    const readme = await read("README.md");
+    expect(readme).toContain("(LICENSE)");
+    expect(readme).toContain("(docs/development.md)");
+    expect(readme).toContain("GPL-3.0");
+  });
+});
 
 describe("EP7 llms.txt", () => {
   it("states status, the script-tag route, both flows and the required links", async () => {

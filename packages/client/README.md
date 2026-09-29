@@ -1,51 +1,66 @@
 > Created/edited by GitHub Copilot; pending human review.
 
-# `@arithmomaniac/sefaria-client`
+# @arithmomaniac/sefaria-client
 
-`@arithmomaniac/sefaria-client` is the validated transport boundary for the complete 60-operation surface in the pinned Sefaria OpenAPI document. It owns the pinned input, guarded corrections, generated contracts and Zod validators, tag-based namespaces, thin fetch client, and bounded default-on per-client response cache.
+Fetches Sefaria API responses and checks them against a corrected API description before your code uses them. It has 60 generated functions grouped by Sefaria's API sections and a bounded per-client response cache.
 
-The committed source manifest remains private to prevent accidental publication. Public GitHub Packages prereleases are available for authenticated installation; the package name is subject to change, and it is not published on npmjs.com. Follow the repository [installation instructions](../../docs/get-started.md#installation-status).
+Experimental and unofficial. Names and addresses may change. This is not an official Sefaria product.
 
-## Ordinary use
+## Install
+
+The packages are prereleases on GitHub Packages, not npmjs.com. GitHub Packages asks for a token even to download public packages. Add this to your user-level `.npmrc`, using a GitHub personal access token (classic) with `read:packages` in `NODE_AUTH_TOKEN`:
+
+```ini
+@arithmomaniac:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+```
+
+Then run `pnpm add @arithmomaniac/sefaria-client@alpha` or `npm install @arithmomaniac/sefaria-client@alpha`. Types are included; no `@types` package is needed. [Install and status](https://arithmomaniac.github.io/sefaria-frontend-toolkit/help/install-and-status.html) has the details and choices.
+
+## First success
+
+<!-- Snippet owner: examples/site-snippets/client-first-success.ts. Keep this block identical. -->
 
 ```ts
-import { createSefariaClient, text } from "@arithmomaniac/sefaria-client";
+import {
+  createSefariaClient,
+  text,
+  validateExternalResponse,
+} from "@arithmomaniac/sefaria-client";
 
 const client = createSefariaClient();
-const result = await text.getV3Texts({
+
+// 1. Fetch one passage. The client checks the response before you see it.
+const { data, error, response } = await text.getV3Texts({
   client,
   path: { tref: "Micah 6:8" },
 });
+
+if (data === undefined) {
+  console.log(`Sefaria answered HTTP ${response.status}:`, error);
+} else {
+  for (const version of data.versions) {
+    console.log(`${data.ref} · ${version.language} · ${version.versionTitle}`);
+  }
+
+  // 2. Check JSON that reaches you another way, such as from storage.
+  //    Here one field is damaged on purpose to show a failed check.
+  const stored: unknown = { ...data, isSpanning: "no" };
+  const check = validateExternalResponse(
+    { method: "GET", path: "/api/v3/texts/{tref}", status: 200 },
+    stored,
+  );
+  for (const issue of check.issues) {
+    console.log(`Invalid at ${issue.instancePath}: ${issue.message}`);
+  }
+}
 ```
 
-Component consumers can supply an existing client as the element's explicit acquisition source:
+## Next steps
 
-```ts
-import { createSefariaClient } from "@arithmomaniac/sefaria-client";
-import "@arithmomaniac/sefaria-web-components";
+- [Get checked data](https://arithmomaniac.github.io/sefaria-frontend-toolkit/data-and-text-tools/start-here.html)
+- [Handle errors in your code](https://arithmomaniac.github.io/sefaria-frontend-toolkit/data-and-text-tools/handle-errors-in-your-code.html)
+- [The client and Sefaria's API](https://arithmomaniac.github.io/sefaria-frontend-toolkit/concepts/the-client-and-sefarias-api.html)
+- [Client reference](https://arithmomaniac.github.io/sefaria-frontend-toolkit/reference/client.html)
 
-const card = document.createElement("sefaria-source-card");
-card.acquisition = { kind: "client", client: createSefariaClient() };
-card.sref = "Micah 6:8";
-document.body.append(card);
-```
-
-Applications with custom renderers use the validated client contracts directly and can apply `@arithmomaniac/sefaria-text-transform` to text they already own.
-
-## Entry points
-
-| Import | Purpose |
-| --- | --- |
-| `@arithmomaniac/sefaria-client` | Tag namespaces, client creation, generated types, validation helpers, and common errors |
-| `@arithmomaniac/sefaria-client/client` | Thin client implementation |
-| `@arithmomaniac/sefaria-client/contracts` | Generated transport declarations |
-| `@arithmomaniac/sefaria-client/schemas` | Generated Zod schemas |
-| `@arithmomaniac/sefaria-client/validators` | Generated operation/status validators |
-| `@arithmomaniac/sefaria-client/validation` | Shared validation helpers |
-| `@arithmomaniac/sefaria-client/errors` | Contract-validation error types |
-
-The root exports `text`, `index`, `related`, `calendars`, `lexicon`, `topic`, `term`, `sheets`, `collections`, `misc`, and `ref`. Endpoint functions are available only through those namespaces. JSON responses are validated against generated Zod schemas, while declared PNG responses are media-type checked and returned as `Blob` values.
-
-Documented HTTP errors remain typed response payloads. Network failures and aborts reject with Fetch API semantics. Undocumented statuses, invalid JSON, schema mismatches, or wrong media types reject as contract failures with structured paths; they are not converted to empty or success-shaped results.
-
-See [How the pieces fit together](../../docs/guides/data-flow.md) for the client-to-component path and the [client specification](../../docs/specs/client.md) for exact behavior.
+For maintainers: [IMPLEMENTATION.md](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/client/IMPLEMENTATION.md).
