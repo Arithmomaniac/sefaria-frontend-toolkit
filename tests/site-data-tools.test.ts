@@ -335,3 +335,19 @@ describe("B25 page", () => {
     expect(markdown).toContain("doesn't retry");
   });
 });
+
+describe("region excerpts", () => {
+  it("extracts the MCP Reader acquisition as parseable JavaScript", async () => {
+    const source = (
+      await readFile(path.join(root, "examples/mcp-app/src/app.ts"), "utf8")
+    ).replaceAll("\r\n", "\n");
+    const start = source.indexOf("// #region reader-acquisition\n");
+    const end = source.indexOf("// #endregion reader-acquisition");
+    expect(start).toBeGreaterThan(-1);
+    const javascript = await toJavaScript(source.slice(start, end));
+    expect(javascript).toContain(
+      "export function createMcpReaderAcquisition(host)",
+    );
+    expect(syntaxErrors(javascript)).toEqual([]);
+  });
+});

@@ -196,6 +196,9 @@ importers:
       '@arithmomaniac/sefaria-text-transform':
         specifier: workspace:*
         version: link:../../packages/text-transform
+      '@arithmomaniac/sefaria-web-components':
+        specifier: workspace:*
+        version: link:../../packages/web-components
 
   examples/vanilla-vite:
     dependencies:

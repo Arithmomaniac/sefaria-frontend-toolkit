@@ -12,22 +12,55 @@ export interface SiteSnippet {
 declare const data: Record<string, SiteSnippet>;
 export { data };
 
-const directory = path.resolve(
-  import.meta.dirname,
-  "../../examples/site-snippets",
-);
+const root = path.resolve(import.meta.dirname, "../..");
+const directory = path.join(root, "examples", "site-snippets");
+
+// Excerpts of existing examples, marked with `// #region <name>` comments.
+const regions = [
+  {
+    name: "mcp-reader-acquisition",
+    file: "examples/mcp-app/src/app.ts",
+    region: "reader-acquisition",
+  },
+];
+
+export function extractRegion(source: string, region: string): string {
+  const start = source.indexOf(`// #region ${region}\n`);
+  const end = source.indexOf(`// #endregion ${region}`);
+  if (start === -1 || end < start) {
+    throw new Error(`Missing region ${region}.`);
+  }
+  return source.slice(start + `// #region ${region}\n`.length, end);
+}
+
+async function read(file: string): Promise<string> {
+  return (await readFile(path.join(root, file), "utf8")).replaceAll(
+    "\r\n",
+    "\n",
+  );
+}
 
 export default {
-  watch: ["../../examples/site-snippets/*.ts"],
+  watch: [
+    "../../examples/site-snippets/*.ts",
+    ...regions.map(({ file }) => `../../${file}`),
+  ],
   async load(): Promise<Record<string, SiteSnippet>> {
     const snippets: Record<string, SiteSnippet> = {};
     for (const name of (await readdir(directory)).sort()) {
       if (!name.endsWith(".ts") || name.endsWith(".test.ts")) continue;
-      const typescript = (
-        await readFile(path.join(directory, name), "utf8")
-      ).replaceAll("\r\n", "\n");
+      const file = `examples/site-snippets/${name}`;
+      const typescript = await read(file);
       snippets[name.slice(0, -3)] = {
-        file: `examples/site-snippets/${name}`,
+        file,
+        typescript,
+        javascript: await toJavaScript(typescript),
+      };
+    }
+    for (const { name, file, region } of regions) {
+      const typescript = extractRegion(await read(file), region);
+      snippets[name] = {
+        file,
         typescript,
         javascript: await toJavaScript(typescript),
       };
