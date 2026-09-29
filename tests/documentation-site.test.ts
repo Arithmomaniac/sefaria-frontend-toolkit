@@ -106,18 +106,28 @@ describe("documentation learning journey", () => {
       "Documentation text was written and edited by GitHub Copilot; pending human review.",
     );
     for (const label of [
-      "Get started",
-      "Components",
+      "Use components",
+      "Use data and text tools",
       "Examples",
-      "Guides",
       "Reference",
     ]) {
       expect(config).toContain(`text: "${label}"`);
     }
+    expect(config).toContain(
+      'text: "Examples",\n        link: "/examples/composed-multi-pane-reader"',
+    );
+    expect(config).toContain(
+      '{ text: "Reference", link: "/reference/components" }',
+    );
     expect(config).toContain('search: { provider: "local" }');
-    expect(config).toContain('text: "Task guides"');
-    expect(config).toContain('text: "Advanced explanations"');
-    expect(config).toContain('text: "API reference"');
+    for (const section of [
+      "Across components",
+      "Concepts",
+      "Help",
+      "Use the data and text tools",
+    ]) {
+      expect(config).toContain(`text: "${section}"`);
+    }
     expect(config).not.toContain('text: "Contributing and internals"');
     for (const repositoryOnlyPath of [
       '"README.md"',
@@ -553,17 +563,6 @@ describe("documentation learning journey", () => {
       path.join(root, "docs", ".vitepress", "config.ts"),
       "utf8",
     );
-    const sidebar = config.indexOf("sidebar: {");
-    const stepThree = config.indexOf('link: "/learn/03-live-data.md"', sidebar);
-    const stepFour = config.indexOf('link: "/learn/04-reader.md"', stepThree);
-    const frameworks = config.indexOf('text: "Frameworks"', stepFour);
-
-    expect(sidebar).toBeGreaterThan(-1);
-    expect(stepThree).toBeGreaterThan(-1);
-    expect(stepFour).toBeGreaterThan(stepThree);
-    expect(frameworks).toBeGreaterThan(stepFour);
-    expect(config.slice(stepThree, stepFour)).not.toContain("React path");
-    expect(config.slice(stepThree, stepFour)).not.toContain("Alpine path");
     expect(config).toContain('"learn/03-live-data.md": {');
     expect(config).toContain(
       'next: lessonLink("4. Use the Reader", "/learn/04-reader.md")',
@@ -813,6 +812,27 @@ describe("coming-soon stubs", () => {
     "concepts/how-the-toolkit-works.md",
     "concepts/sefarias-own-texts-and-tools.md",
     "reference/components.md",
+    "use-components/show-an-attributed-passage.md",
+    "use-components/use-with-a-framework.md",
+    "use-components/show-commentary-and-connected-texts.md",
+    "use-components/add-the-complete-reader.md",
+    "use-components/start-with-an-ai-assistant.md",
+    "across-components/match-your-sites-look.md",
+    "across-components/choose-what-text-readers-see.md",
+    "across-components/make-components-respond-to-each-other.md",
+    "data-and-text-tools/give-components-your-own-data.md",
+    "data-and-text-tools/handle-errors-in-your-code.md",
+    "data-and-text-tools/clean-up-stored-sefaria-text.md",
+    "concepts/the-client-and-sefarias-api.md",
+    "concepts/clean-text-and-safety.md",
+    "reference/client.md",
+    "reference/text-transform.md",
+    "reference/package-imports-and-exports.md",
+    "reference/api-corrections.md",
+    "examples/composed-multi-pane-reader.md",
+    "examples/linked-article.md",
+    "examples/reader-inside-ai-chat.md",
+    "examples/this-weeks-portion.md",
   ];
 
   it.each(plannedRoutes)(

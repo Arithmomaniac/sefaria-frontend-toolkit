@@ -114,115 +114,55 @@ export default defineConfig({
         text: "Use data and text tools",
         link: "/data-and-text-tools/start-here.md",
       },
-      { text: "Examples", link: "/examples.md" },
-      { text: "Guides", link: "/guides/" },
-      { text: "Reference", link: "/reference/custom-elements.md" },
+      {
+        text: "Examples",
+        link: "/examples/composed-multi-pane-reader",
+      },
+      { text: "Reference", link: "/reference/components" },
     ],
     sidebar: {
-      "/learn/": [
+      "/use-components/": [
         {
-          text: "Get started",
-          link: "/get-started.md",
+          text: "Use components",
           items: [
+            { text: "Start here", link: "/use-components/start-here" },
             {
-              text: "1. Choose a surface",
-              link: "/learn/01-web-components.md",
+              text: "Start with an AI assistant",
+              link: "/use-components/start-with-an-ai-assistant",
             },
             {
-              text: "2. Render supplied data",
-              link: "/learn/02-supplied-data.md",
+              text: "Show text",
+              items: [
+                {
+                  text: "Label a citation",
+                  link: "/use-components/show-text/label-a-citation",
+                },
+                {
+                  text: "Show one passage",
+                  link: "/use-components/show-text/show-one-passage",
+                },
+                {
+                  text: "Show Hebrew and translation together",
+                  link: "/use-components/show-text/hebrew-and-translation",
+                },
+              ],
             },
             {
-              text: "3. Load and interact",
-              link: "/learn/03-live-data.md",
-            },
-            { text: "4. Use the Reader", link: "/learn/04-reader.md" },
-            {
-              text: "5. Customize or go headless",
-              link: "/learn/05-customization.md",
+              text: "Show an attributed passage",
+              link: "/use-components/show-an-attributed-passage",
             },
             {
-              text: "6. Integrate with a host",
-              link: "/learn/06-host-integration.md",
-            },
-          ],
-        },
-        {
-          text: "Frameworks",
-          items: [
-            { text: "React path", link: "/learn/react.md" },
-            { text: "Alpine path", link: "/learn/alpine.md" },
-          ],
-        },
-      ],
-      "/guides/": [
-        {
-          text: "Task guides",
-          link: "/guides/",
-          items: [
-            { text: "Render text", link: "/guides/render-text.md" },
-            { text: "Text markup", link: "/guides/text-markup.md" },
-            { text: "Troubleshooting", link: "/guides/troubleshooting.md" },
-          ],
-        },
-        {
-          text: "Advanced explanations",
-          items: [
-            { text: "How data flows", link: "/guides/data-flow.md" },
-            {
-              text: "Intentional differences",
-              link: "/guides/differences.md",
-            },
-          ],
-        },
-      ],
-      "/components": [
-        {
-          text: "Component usage",
-          link: "/components.html",
-          items: [
-            { text: "Reference label", link: "/components/ref-label.md" },
-            { text: "Text segment", link: "/components/text-segment.md" },
-            {
-              text: "Bilingual segment",
-              link: "/components/bilingual-segment.md",
-            },
-            { text: "Source card", link: "/components/source-card.md" },
-            {
-              text: "Connections panel",
-              link: "/components/connections-panel.md",
-            },
-            { text: "Reader", link: "/components/reader.md" },
-          ],
-        },
-      ],
-      "/reference/": [
-        {
-          text: "API reference",
-          items: [
-            {
-              text: "Custom elements",
-              link: "/reference/custom-elements.md",
-            },
-            { text: "Public exports", link: "/reference/public-exports.md" },
-          ],
-        },
-      ],
-      "/": [
-        {
-          text: "Start building",
-          items: [
-            {
-              text: "Use components: Start here",
-              link: "/use-components/start-here.md",
+              text: "Use with a framework",
+              link: "/use-components/use-with-a-framework",
             },
             {
-              text: "Use the data and text tools",
-              link: "/data-and-text-tools/start-here.md",
+              text: "Show commentary and connected texts",
+              link: "/use-components/show-commentary-and-connected-texts",
             },
-            { text: "Components", link: "/components.md" },
-            { text: "Examples", link: "/examples.md" },
-            { text: "Guides", link: "/guides/" },
+            {
+              text: "Add the complete Reader",
+              link: "/use-components/add-the-complete-reader",
+            },
           ],
         },
       ],
@@ -230,31 +170,110 @@ export default defineConfig({
         {
           text: "Use the data and text tools",
           items: [
-            { text: "Start here", link: "/data-and-text-tools/start-here.md" },
+            { text: "Start here", link: "/data-and-text-tools/start-here" },
+            {
+              text: "Give components your own data",
+              link: "/data-and-text-tools/give-components-your-own-data",
+            },
+            {
+              text: "Handle errors in your code",
+              link: "/data-and-text-tools/handle-errors-in-your-code",
+            },
+            {
+              text: "Clean up stored Sefaria text",
+              link: "/data-and-text-tools/clean-up-stored-sefaria-text",
+            },
           ],
         },
       ],
-      "/use-components/": [
+      "/across-components/": [
         {
-          text: "Use components",
+          text: "Across components",
           items: [
-            { text: "Start here", link: "/use-components/start-here.md" },
             {
-              text: "Show text",
-              items: [
-                {
-                  text: "Just the citation",
-                  link: "/use-components/show-text/label-a-citation.md",
-                },
-                {
-                  text: "One text",
-                  link: "/use-components/show-text/show-one-passage.md",
-                },
-                {
-                  text: "Hebrew and translation",
-                  link: "/use-components/show-text/hebrew-and-translation.md",
-                },
-              ],
+              text: "Match your site's look",
+              link: "/across-components/match-your-sites-look",
+            },
+            {
+              text: "Choose what text readers see",
+              link: "/across-components/choose-what-text-readers-see",
+            },
+            {
+              text: "Make components respond to each other",
+              link: "/across-components/make-components-respond-to-each-other",
+            },
+          ],
+        },
+      ],
+      "/concepts/": [
+        {
+          text: "Concepts",
+          items: [
+            {
+              text: "How the toolkit works",
+              link: "/concepts/how-the-toolkit-works",
+            },
+            {
+              text: "The client and Sefaria's API",
+              link: "/concepts/the-client-and-sefarias-api",
+            },
+            {
+              text: "Clean text and safety",
+              link: "/concepts/clean-text-and-safety",
+            },
+            {
+              text: "Sefaria's own texts and tools",
+              link: "/concepts/sefarias-own-texts-and-tools",
+            },
+          ],
+        },
+      ],
+      "/reference/": [
+        {
+          text: "Reference",
+          items: [
+            { text: "Components", link: "/reference/components" },
+            { text: "Client", link: "/reference/client" },
+            { text: "Text tools", link: "/reference/text-transform" },
+            {
+              text: "Package imports and exports",
+              link: "/reference/package-imports-and-exports",
+            },
+            {
+              text: "Corrections to Sefaria's API",
+              link: "/reference/api-corrections",
+            },
+          ],
+        },
+      ],
+      "/examples/": [
+        {
+          text: "Examples",
+          items: [
+            {
+              text: "Composed multi-pane Reader",
+              link: "/examples/composed-multi-pane-reader",
+            },
+            { text: "Linked article", link: "/examples/linked-article" },
+            {
+              text: "Reader inside AI chat",
+              link: "/examples/reader-inside-ai-chat",
+            },
+            {
+              text: "This week's portion",
+              link: "/examples/this-weeks-portion",
+            },
+          ],
+        },
+      ],
+      "/help/": [
+        {
+          text: "Help",
+          items: [
+            { text: "Install and status", link: "/help/install-and-status" },
+            {
+              text: "Troubleshoot a page",
+              link: "/help/troubleshoot-a-page",
             },
           ],
         },
