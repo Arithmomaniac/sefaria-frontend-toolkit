@@ -1,7 +1,7 @@
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 const root = path.resolve(import.meta.dirname, "..");
 const read = (...parts: string[]) =>
@@ -162,6 +162,28 @@ describe("C2 The client and Sefaria's API", () => {
     expect(markdown).toMatch(/cache: \{ ttlMs, maxEntries, maxBytes \}/);
   });
 
+  it("keeps each client's response cache separate", async () => {
+    const { createSefariaClient, text } =
+      await import("../packages/client/src/index.js");
+    const fetchMock = vi.fn<typeof fetch>(
+      async () =>
+        new Response("[]", {
+          status: 200,
+          headers: { "content-type": "application/json" },
+        }),
+    );
+    const options = { baseUrl: "https://example.test", fetch: fetchMock };
+    const first = createSefariaClient(options);
+    const second = createSefariaClient(options);
+    const request = { path: { tref: "Micah 6:8" } };
+
+    await text.getTextVersions({ client: first, ...request });
+    await text.getTextVersions({ client: first, ...request });
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    await text.getTextVersions({ client: second, ...request });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+  });
+
   it("tells a reader which path to report from a validation error", async () => {
     const markdown = await page();
     expect(markdown).toContain("SefariaContractError");
@@ -175,6 +197,89 @@ describe("C2 The client and Sefaria's API", () => {
       "/reference/client.md",
       "/reference/api-corrections.md",
       "https://developers.sefaria.org",
+    ]) {
+      expect(markdown).toContain(`(${link}`);
+    }
+  });
+});
+
+describe("C3 Clean text and safety", () => {
+  const page = () => read("docs", "concepts", "clean-text-and-safety.md");
+
+  it("is a written concept page with no status note or steps", async () => {
+    const markdown = await page();
+    expectWritten(markdown);
+    expect(markdown).not.toContain("<StatusNote");
+    expect(markdown).not.toMatch(/^\d+\. /m);
+  });
+
+  it("names the one sanitizer and the helpers that aren't", async () => {
+    const markdown = await page();
+    for (const name of [
+      "normalizeText",
+      "applyVocalization",
+      "applyVocalizationToHtml",
+      "createTextPreview",
+    ]) {
+      expect(markdown).toContain(`\`${name}\``);
+    }
+    expect(markdown).toMatch(
+      /don't sanitize|doesn't sanitize|not sanitizers?|aren't sanitizers|isn't a sanitizer|is a sanitizer/i,
+    );
+  });
+
+  it("gives a reader five cases to sort", async () => {
+    const markdown = await page();
+    const lines = markdown.split("\n");
+    const header = lines.findIndex((line) => /^\|.*Safe/i.test(line));
+    expect(header).toBeGreaterThanOrEqual(0);
+    const end = lines.findIndex(
+      (line, i) => i > header && !line.startsWith("|"),
+    );
+    const rows = lines.slice(header + 2, end < 0 ? undefined : end);
+    expect(rows).toHaveLength(5);
+  });
+
+  it("links to its neighbours", async () => {
+    const markdown = await page();
+    for (const link of [
+      "/data-and-text-tools/clean-up-stored-sefaria-text.md",
+      "/concepts/how-the-toolkit-works.md",
+      "/reference/text-transform.md#normalized-html-output",
+    ]) {
+      expect(markdown).toContain(`(${link}`);
+    }
+  });
+});
+
+describe("C4 Sefaria's own texts and tools", () => {
+  const page = () =>
+    read("docs", "concepts", "sefarias-own-texts-and-tools.md");
+
+  it("is a written concept page with no status note or steps", async () => {
+    const markdown = await page();
+    expectWritten(markdown);
+    expect(markdown).not.toContain("<StatusNote");
+    expect(markdown).not.toMatch(/^\d+\. /m);
+  });
+
+  it("explains translation choice with the fallback wording", async () => {
+    const markdown = await page();
+    expect(markdown).toContain("translation-language");
+    expect(markdown).toMatch(
+      /Sefaria's default translation, which isn't always English/,
+    );
+    expect(markdown).not.toMatch(/components? (?:show|display)s? the license/i);
+  });
+
+  it("links out to Sefaria's docs and our owner pages", async () => {
+    const markdown = await page();
+    for (const link of [
+      "/across-components/choose-what-text-readers-see.md",
+      "/help/install-and-status.md#license-and-text-rights",
+      "/examples/linked-article.md",
+      "/examples/reader-inside-ai-chat.md",
+      "https://developers.sefaria.org/",
     ]) {
       expect(markdown).toContain(`(${link}`);
     }
