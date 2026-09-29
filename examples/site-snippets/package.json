@@ -1,0 +1,13 @@
+{
+  "name": "@sefaria-example/site-snippets",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@arithmomaniac/sefaria-client": "workspace:*",
+    "@arithmomaniac/sefaria-text-transform": "workspace:*"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}

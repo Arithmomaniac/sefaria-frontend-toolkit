@@ -541,6 +541,50 @@ try {
     );
     await failurePage.locator("sefaria-source-card [role=alert]").waitFor();
     await failurePage.close();
+
+    // --- data and text tools ---
+    const dataToolsPage = await browser.newPage();
+    const dataToolsRoute = siteRouteUrl("/data-and-text-tools/start-here.html");
+    await dataToolsPage.goto(dataToolsRoute, { waitUntil: "networkidle" });
+    const toggles = dataToolsPage.locator(".code-language-toggle");
+    await assertEqual(
+      (await toggles.count()) >= 3,
+      true,
+      "data tools start here has three toggled snippets",
+    );
+    await assertText(
+      toggles.first().locator("button[aria-pressed=true]"),
+      "TypeScript",
+    );
+    await assertText(
+      toggles.first().locator("figcaption"),
+      "examples/site-snippets/client-first-success.ts",
+    );
+    await toggles.first().getByRole("button", { name: "JavaScript" }).click();
+    for (const toggle of await toggles.all()) {
+      await assertText(
+        toggle.locator("button[aria-pressed=true]"),
+        "JavaScript",
+      );
+      await assertText(toggle.locator("figcaption"), "(types removed)");
+    }
+    await dataToolsPage.reload({ waitUntil: "networkidle" });
+    await assertText(
+      toggles.last().locator("button[aria-pressed=true]"),
+      "JavaScript",
+    );
+    await assertEqual(
+      await toggles
+        .first()
+        .locator("pre")
+        .evaluate((pre) => /: unknown|import type/.test(pre.textContent)),
+      false,
+      "JavaScript snippet has no types",
+    );
+    await dataToolsPage.setViewportSize({ width: 390, height: 844 });
+    await assertNoCodeOverflow(dataToolsPage, "data tools start here at 390px");
+    await dataToolsPage.close();
+    // --- end data and text tools ---
   } finally {
     await browser.close();
   }

@@ -11,6 +11,25 @@ Every page-writing session follows these rules.
 - Global CSS in `style.css` ("Site code blocks") gives both the same 13px monospace font and wrapped lines with no horizontal scroll.
 - Don't add per-page code CSS. Change the shared rules instead.
 
+## JavaScript/TypeScript toggle
+
+Data and text tool pages show every snippet with `<CodeLanguageToggle :snippet>`. It reuses `CodeBlock`, shows TypeScript by default, and remembers the reader's choice across pages in `localStorage`. Every toggle on a page switches together.
+
+- Write each snippet once, as TypeScript, in `examples/site-snippets/<name>.ts`. Never type the JavaScript version by hand.
+- `docs/data-and-text-tools/snippets.data.ts` loads the snippets at build time. It generates the JavaScript with `scripts/strip-types.mjs`, which removes the types with `ts-blank-space`, drops lines that held only types, and formats the result with Prettier.
+- In a page, import the data and pass one snippet by file name:
+
+  ```md
+  <script setup>
+  import { data as snippets } from "./snippets.data.ts";
+  </script>
+
+  <CodeLanguageToggle :snippet="snippets['client-first-success']" />
+  ```
+
+- Put type-only imports on their own `import type` line, so the JavaScript has no leftover gaps.
+- `tests/site-data-tools.test.ts` checks that each generated JavaScript file has no type syntax and parses, and runs both versions of each snippet.
+
 ## Explanatory asides and "Learn more" links
 
 - In a tutorial or how-to, keep an explanatory aside short. End it with at most one or two links, on a line that starts with `Learn more:`. Don't let it grow into a longer explanation.
