@@ -40,7 +40,7 @@ Use `LiveEditor` for every runnable component example on a how-to page. The code
 
   Adjust the relative paths to the page's depth. `lang` defaults to `html`.
 
-- The code appears read-only through `CodeBlock`. **Edit** turns it into a text area. The change runs only when the reader chooses **Run** or presses Ctrl+Enter. **Reset** restores the owner file.
+- The code appears read-only through `CodeBlock`. **Edit** turns it into a text area. The change runs only when the reader chooses **Run** or presses Ctrl+Enter. **Reset** restores the owner file. Add `readonly` to run an example without Edit, Run, or Reset, for example when the page shows other versions of the same code that can't run here.
 - Each example runs in its own `<iframe sandbox="allow-scripts" srcdoc>`. The frame has an opaque origin, so it can't read the page and the page's styles don't reach it. Its requests carry `Origin: null`. The toolkit script host and Sefaria both allow that.
 - The frame loads when it comes within 200px of the viewport, so an example at the top of a page loads on arrival and later examples load as the reader scrolls. Nothing is requested before then.
 - A one-line script appended after the example reports the frame's height to the page, so the frame fits its content.
