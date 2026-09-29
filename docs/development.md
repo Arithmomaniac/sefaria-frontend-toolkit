@@ -38,7 +38,7 @@ For reader-oriented explanations, use the friendly guides rather than the archiv
 
 | Area | Baseline status |
 | --- | --- |
-| `packages/client` | Delivers all 60 operations in the pinned OpenAPI through 11 tag namespaces, committed corrected TypeScript contracts, reusable transport schemas, Zod validators, JSON and PNG response handling, and a status-aware fetch client with a bounded default-on per-client response cache. The corrected OpenAPI document is temporary generation output. |
+| `packages/client` | Delivers all 60 operations in the pinned OpenAPI through 11 tag namespaces, committed corrected TypeScript contracts, reusable transport schemas, Zod validators, JSON and PNG response handling, and a status-aware fetch client with a bounded default-on per-client response cache. The corrected OpenAPI document is temporary generation output. A weekly workflow reports upstream OpenAPI drift in one issue and can hand it to a Copilot triage agent that proposes a draft refresh. |
 | `packages/text-transform` | Delivers DOM-free sanitization, Hebrew vocalization modes, structured footnote extraction, and bounded connected-text previews. |
 | `packages/web-components` | Delivers six declarative elements with standalone `sref`, authoritative raw `data` for five ordinary elements, Reader raw transactional seeds, tagged acquisition, read-only status and diagnostics, lifecycle reconnect, error events, private preparation, shared raw Reader source qualification, and the supported advanced DOM-free Reader semantic/raw facade. |
 | `examples/explorer` | Provides one developer surface for supplied-data authored states and click-to-start live pages for reference labels, text segments, bilingual segments, source cards, and contextual connections. Opening a live route makes no Sefaria request before activation. |
@@ -328,6 +328,23 @@ actual: <current value>
 ```
 
 The developer must review the new upstream document. Do not change an assertion only to make generation pass.
+
+### Drift detection
+
+`pnpm openapi:drift` compares the committed pin's commit and checksum with upstream. It can access the network and changes no repository file:
+
+```powershell
+pnpm openapi:drift
+pnpm openapi:drift --report drift.json
+```
+
+It resolves the latest commit on Sefaria's default branch that changed `docs/openAPI.json`, downloads the file at that SHA, and prints the changed paths, changed schemas, and every overlay guard that would fail. The command exits `0` for both no drift and drift; read the printed status or the JSON report. It exits nonzero when a request, status, commit lookup, or JSON parse fails, so a failure never looks like no drift. Set `GITHUB_TOKEN` to raise the GitHub API rate limit.
+
+The upstream repository lookup and the Octokit issue and handoff requests explicitly use GitHub REST API version `2026-03-10`. When changing the API version, review [GitHub's breaking changes](https://docs.github.com/en/rest/about-the-rest-api/breaking-changes) for the endpoints the command uses and smoke-test the issue upsert; omitting the header currently selects the older `2022-11-28` version.
+
+The `OpenAPI drift` workflow (`.github/workflows/openapi-drift.yml`) runs the same command daily at 06:17 UTC and on manual dispatch, always using the repository default-branch checkout. Its detection job has only `contents: read` and `issues: write`. With `--issue`, the command creates or updates one open issue labeled `openapi-drift` while the pin differs, comments when the upstream commit moves, and closes the issue with a resolution note when a later scan sees the exact upstream commit and checksum pinned on the default branch. A subsequent upstream change opens a new issue. A scan failure never closes an issue. The triage draft PR links the issue without a closing keyword; its merge alone does not resolve the episode.
+
+When the issue is new or the upstream commit moves, a second job assigns the issue to the Copilot coding agent with the [`openapi-drift-triage`](../.github/agents/openapi-drift-triage.agent.md) custom agent. That agent expands referenced upstream and overlay-created objects to compare the resulting meaning across every affected consumer. An upstream equivalent of an existing reviewed correction can replace the redundant overlay action and guard; new or partially different behavior needs source review and bounded, source-directed requests to public, safe Sefaria endpoints. The agent records dated runtime evidence, assesses whether an upstream or new shared transport component fits all consumers, and then proposes a pinned refresh or overlay update as a draft PR. A local MongoDB export can corroborate a branch but is neither required nor an HTTP response authority. If evidence does not establish the contract, the agent leaves the pin unchanged and documents the gap in an investigation-only draft. It does not manage the drift issue; a human still performs the source review. GitHub requires a user token to assign Copilot, so this step uses the optional `COPILOT_ASSIGN_TOKEN` repository secret: a fine-grained personal access token for this repository only, with read and write access to actions, contents, issues, and pull requests, owned by a user with Copilot. Without that secret the job logs a notice and a maintainer can assign the issue to Copilot from the issue page. If the assignment request fails, or Copilot is already assigned when a later commit arrives, the run fails with a manual-reassignment instruction; an add-assignee request would otherwise appear to succeed without starting a new agent session. The issue already records the new commit. The first automatic handoff has not yet run, so the handoff path is implemented but unverified in production. `pnpm integration:check` pins this workflow's triggers, job permissions, commands, and its only permitted secret reference.
 
 ## Client fixture candidate capture
 

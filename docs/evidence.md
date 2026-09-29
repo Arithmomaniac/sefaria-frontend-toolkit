@@ -580,6 +580,12 @@ The reader's `heLeft` and `heRight` layout values are labelled in direction term
 
 This evidence supports a text-segment projection that accepts one already-resolved `CoreV3Version`. The bilingual composite owns role resolution, and text segment remains the single owner of segment transformation.
 
+## Upstream OpenAPI drift observation
+
+**Observed September 28, 2026 with `pnpm openapi:drift`:** the latest commit on `Sefaria/Sefaria-Project` `master` that changed `docs/openAPI.json` is [`898feda78d1bd6b24f66305081a54c8cf36406be`](https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/docs/openAPI.json), committed September 14, 2026. Its SHA-256 is `3a6057ad40ca8e7874d6be97ed2491926818e3a6939c61cca67c9878da9aa4ab`; the pinned [`1f7d0844ca6a9eddc8e48168962aacb09de75bd6`](https://github.com/Sefaria/Sefaria-Project/blob/1f7d0844ca6a9eddc8e48168962aacb09de75bd6/docs/openAPI.json) input is `2bd2618411afc668eef1d100da546b04431ce82b984da0ae96823f24a8f890e4`. The only differences are the `get` operation of `/api/calendars/topics/parasha` and the `SearchPOSTData` schema. Every `x-sefaria-guards` precondition still holds against the upstream file. This drift has not been source-reviewed, and the pin is unchanged.
+
+**Observed September 28, 2026 with GitHub REST API `2026-03-10`:** a live `pnpm openapi:drift --issue` run updated the existing [drift issue #37](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/issues/37), returned `status=drift`, `handoff=false`, and `issue-number=37`, and created no comment or duplicate issue. The `2026-03-10` header also succeeded for the upstream GitHub API read. [GitHub's version guide](https://docs.github.com/en/rest/about-the-rest-api/api-versions) gives March 10, 2028 as the end of support for `2022-11-28`; the [breaking-change guide](https://docs.github.com/en/rest/about-the-rest-api/breaking-changes?apiVersion=2026-03-10) lists removed legacy response fields for some issue endpoints, none consumed by this detector. The Copilot assignment write was not performed in this smoke test.
+
 ## Full pinned OpenAPI expansion
 
 **Observed September 20, 2026 from the pinned OpenAPI and local export:** the corrected document contains 60 operations across the `Text`, `Index`, `Related`, `Calendars`, `Lexicon`, `Topic`, `Term`, `Sheets`, `Collections`, `Misc`, and `Ref` tags. Generation retains the complete document and exposes those operations through the corresponding 11 root namespaces. No live Sefaria requests were made during this expansion.
