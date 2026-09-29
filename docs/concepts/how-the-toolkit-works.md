@@ -1,107 +1,90 @@
 ---
 title: "Concepts › How the toolkit works"
-description: "Explains the model behind the toolkit: when components load data or use data you supply, how they report status, how many requests they make, how their styles stay isolated, and what remains when you draw your own interface."
+description: "Follows one Source Card tag from your page to the screen: where its text comes from, how it is requested, how it is prepared, how it reports back, and how to do the same steps without components."
 ---
 
 > Created/edited by GitHub Copilot; pending human review.
 
 # How the toolkit works
 
-Most surprises with the toolkit come from a few shared rules. This page explains them: when an element fetches, what its status means, how many requests to expect, why styles don't leak, and where the toolkit stops when you draw your own interface.
-
-## The three packages
-
-The toolkit is three packages. Two are independent building blocks, and the third uses both.
-
-- `@arithmomaniac/sefaria-client` offers typed functions for Sefaria's API. It checks each JSON response against a schema before it returns the data.
-- `@arithmomaniac/sefaria-text-transform` cleans Sefaria text. Its functions are `normalizeText`, `applyVocalization`, `applyVocalizationToHtml`, and `createTextPreview`. They work on strings and know nothing about the client.
-- `@arithmomaniac/sefaria-web-components` provides six elements: Reference Label (`sefaria-ref-label`), Text Segment (`sefaria-text-segment`), Bilingual Segment (`sefaria-bilingual-segment`), Source Card (`sefaria-source-card`), Connections Panel (`sefaria-connections-panel`), and Reader (`sefaria-reader`). An element takes validated data from the client, or data you supply, and calls the text tools while it prepares text to show.
+The easiest way to see how the toolkit fits together is to follow one tag from your page to the screen. This page follows `<sefaria-source-card sref="Micah 6:8">` and explains, at each step, why the toolkit behaves as it does.
 
 ```mermaid
-flowchart TD
-  api[Sefaria API] --> client[client]
-  client -->|validated data| components[components]
-  client -->|validated data| ui[your own UI]
-  components --> textTools[text tools]
-  ui --> textTools
+flowchart LR
+  A["You add a tag"] --> B{"Supplied data?"}
+  B -->|"yes"| E["Prepare text (text tools)"]
+  B -->|"no: load by sref"| L{"Loaded through"}
+  L -->|"client (Sefaria)"| E
+  L -->|"host capability"| E
+  E --> G["Show it and report back (status, events)"]
+  UI["Your own UI"] -.-> CL["Client"]
+  UI -.-> TT["Text tools"]
+  TT -.-> R["Your renderer (your own status)"]
 ```
 
-The client does not pass its responses through the text tools. Components call the text tools themselves, and so does your own code if you skip the components.
+## You add a tag
 
-## When a component fetches
+You put the tag on your page. Behind it sit three packages. The client (`@arithmomaniac/sefaria-client`) fetches from Sefaria's API and checks each JSON response against a schema. The text tools (`@arithmomaniac/sefaria-text-transform`) clean text strings and know nothing about the client. The components (`@arithmomaniac/sefaria-web-components`) use both.
 
-An element other than the Reader is eligible to load when it is on the page, has a non-blank `sref` (the Sefaria reference, such as Micah 6:8), and has no supplied `data`. It does not wait to scroll into view. It then uses its acquisition choice: the default client, your client, a host capability, or disabled. Disabled makes no request and shows an error.
+Importing the script or the package registers the elements but makes no request of its own. Any tag already on the page with an `sref` then loads as usual. The shared default client is created lazily, the first time an element needs it. Nothing renders on the server: the components run in the browser.
 
-Importing the script or the package fetches nothing. The shared default client is created lazily, the first time an element actually needs it.
+With the tag in place, the element needs text to show. The next step is where that text comes from.
 
-You choose where data comes from with the `acquisition` property. `{ kind: "client", client }` uses a client you made. `{ kind: "capability", ... }` uses operations your host supplies. `{ kind: "disabled" }` turns loading off. The capability and disabled choices never fall back to the browser's own requests.
+## Where the text comes from
 
-For the five elements other than the Reader, valid supplied `data` is authoritative. The element renders it and makes no request. Invalid supplied `data` shows an error. It does not quietly fall back to loading by `sref`.
+The element has three possible sources: live loading by `sref` (through the default client, or a client you supply), `data` you supply, or a capability your host provides. If you disable loading, the element makes no request. It shows an error only when it needed to load; supplied data still renders, and a tag with no input stays empty.
 
-The Reader also takes a `data` property, but its value is a seed (a `ReaderRawSeedData` object), not finished data. A seed holds at least one source or connections record, each with its payload and request details, plus an optional selected reference and presentation settings. A seed is a starting point, not a finished rendering. A source seed that already covers the passage continues with one links request and does not ask for the source again.
+Supplied `data` wins over `sref`. You already have the text, so asking Sefaria again would waste a request and could disagree with what you gave. For the same reason, invalid `data` shows an error and does not fall back to `sref`: a silent fallback would hide your bug and show text you didn't choose.
 
-There is no server rendering or hydration of the components. They run in the browser.
+The Reader also takes `data`, but its value is a seed, a starting point it continues from. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md) for supplying data, seeds and host capabilities, and [the Components reference](/reference/components.md) for exact property shapes.
 
-<span class="learn-more__label">Learn more:</span> [Give components your own data](/data-and-text-tools/give-components-your-own-data.md) {.learn-more}
+When the text comes from `sref`, the element has to ask Sefaria for it.
 
-## Loading, ready, and error states {#status}
+## Asking Sefaria
 
-Every element has a `status` property with one of four values.
+The rule is the same everywhere: a parent fetches once and passes the data to its children. The children never fetch on their own, so the Source Card's child pieces add no requests of their own.
 
-- `empty` means there is nothing to show. Either there is no input, or the data was prepared successfully and is empty.
-- `loading` means the element is waiting for data or preparing it.
-- `ready` means something is prepared to show. It may be partial.
-- `error` means the request, the preparation, or the supplied data failed.
+Each component's page gives its exact request count. See [Show an attributed passage](/use-components/show-an-attributed-passage.md) and [Add the complete Reader](/use-components/add-the-complete-reader.md). For how the client handles requests, including its cache, see [The client and Sefaria's API](/concepts/the-client-and-sefarias-api.md).
 
-A failed later reload can keep the previous content on screen while the status is `error`. There is no generic ready or status-change event, so read `status` first when you need it.
+Once the response arrives, the text still needs preparing.
 
-Each element also has an error event named `sefaria-<element>-error`, such as `sefaria-source-card-error`. Its `detail` is `{ error, sref }`. The event bubbles and is composed, which means it crosses shadow boundaries (explained below).
+## Preparing the text
 
-For the five elements other than the Reader, the error event fires when a live load is rejected. A documented 400 or 404 answer from Sefaria, or invalid supplied data, sets `status` to `error` without firing the event. The Reader also fires it for a failed first load and an invalid seed. Some later Reader failures, such as connections that fail to load, show inside the Reader without the event. [Troubleshoot a page](/help/troubleshoot-a-page.md) matches each of these states to a fix.
+The text is HTML with Sefaria's own markup, so the component doesn't draw it as it arrives. It runs it through the text tools first. `normalizeText` keeps a fixed set of safe elements and removes active attributes, then vocalization is applied. That step is where safety comes from, and only then does the element show the text. See [Clean text and safety](/concepts/clean-text-and-safety.md).
 
-The interaction events are separate. Source Card's `sefaria-source-select` bubbles and is composed, but it is not cancelable. The Connections Panel's and the Reader's interaction events are cancelable; their error events are not. The Connections Panel and the Reader already handle their own controls, such as category, page, and navigation. Your page can listen, or cancel with `preventDefault`. Source Card selection and Reader chat export are left to your page.
+Once the text is prepared, the element can show it and tell your page how it went.
 
-<span class="learn-more__label">Learn more:</span> [Component events](/reference/components.md#events) · [Make components respond to each other](/across-components/make-components-respond-to-each-other.md) {.learn-more}
+## Reporting back {#status}
 
-## Request counts
+The element reports through its `status` property, a coarse, element-level summary:
 
-Request counts are set per component. There is no single global rule. The invariant is that a child never repeats a request its parent already made.
+- `empty`: no main content was prepared, either because there is no input or because the data was prepared successfully and is empty. An empty-state message may still show.
+- `loading`: the element is waiting for data or preparing it.
+- `ready`: something is prepared to show, and it may be partial.
+- `error`: the request, the preparation, or the supplied data failed. A failed later reload can keep the old content on screen while the status is `error`.
 
-These counts are for a normal first load with no cache hit. Cache hits or captured data can mean fewer network requests.
+The Reader's status covers its main passage; its connections can still be loading or unavailable while it is `ready`.
 
-- Source Card makes one text request. Its Text Segment children add none, so ten children add zero requests.
-- Source Card makes two requests in total when it needs one extra request for Sefaria's default translation, which is not always English. That happens only when Sefaria reports that the `translation-language` you asked for is missing.
-- Connections Panel on its own makes one links request. Changing category or page makes none. In a standalone panel that loaded links without text, a preview request can reload the links once with text included.
-- Reader loading Micah 6:8 makes three requests: the target text, the surrounding section text, and the links. With translation fallback it can make up to four text requests plus one links request. The Reader passes its data to its child Source Card and Connections Panel, and they make no requests of their own. That's typical for a single verse. A reference that is already a whole section, such as a chapter, skips the separate section request.
-
-Each client also keeps a small in-memory response cache, so a repeat request can be answered without the network; see [The response cache](/concepts/the-client-and-sefarias-api.md#the-response-cache).
-
-## Style isolation
-
-Elements render inside shadow DOM. That is a browser feature that gives an element its own private tree of markup and styles. The elements are built with Lit, a small library for such elements. Because of the shadow DOM, your page CSS doesn't reach in by accident, and component CSS doesn't leak out.
-
-You style them through custom properties, which are CSS variables that cross the shadow boundary. Examples are `--sefaria-surface`, `--sefaria-fg`, `--sefaria-accent`, `--sefaria-link`, and `--sefaria-panel-radius`.
-
-The defaults use CSS `light-dark()`. They follow the system's light or dark setting only when your page declares `color-scheme: light dark`. Setting `light` or `dark` forces one. Reader also exposes `::part(toolbar)`, `::part(history)`, `::part(source-pane)`, and `::part(connections-pane)` for targeted styling.
-
-<span class="learn-more__label">Learn more:</span> [Match your site's look](/across-components/match-your-sites-look.md) {.learn-more}
+An element can finish before your script listens, so it keeps its state in `status` instead of firing a one-time ready event you could miss. Each element also has an error event named `sefaria-<element>-error` for particular failures, such as a request that fails; the element may show the same error on the page too, and not every error fires the event. Some elements send interaction events, such as a Source Card selection or a Connections Panel category change, that your page can listen to. See [Troubleshoot a page](/help/troubleshoot-a-page.md), [Component events](/reference/components.md#events), and [Make components respond to each other](/across-components/make-components-respond-to-each-other.md).
 
 ## Using the client and text tools without components {#without-components}
 
-You can use the client and the text tools without any element. Some value stays with you.
+You can also take all these steps yourself, without components. They are the same steps, now yours.
 
-From the client you still get typed, validated data and typed errors. A response that doesn't match the schema raises `SefariaContractError`. From the text tools, `normalizeText` returns safe `bodyHtml` plus the footnotes it extracted (`notes`). It keeps a fixed set of elements and removes active attributes such as `href` and `src`. Reference links that carry Sefaria's reference data become inert markers with `data-sefaria-ref`; other links become plain text.
+You fetch with the client. It gives typed, validated data and typed errors, and a response that doesn't match the schema raises `SefariaContractError`. You prepare with the text tools. `normalizeText` returns safe `bodyHtml` plus the footnotes it extracted (`notes`). `applyVocalization` and `applyVocalizationToHtml` change vowel marks but don't sanitize, so normalize first. `createTextPreview` normalizes itself. Then you show the text and report status yourself.
 
-The vocalization functions are narrower. `applyVocalization` and `applyVocalizationToHtml` change vowel marks but don't sanitize. The HTML version expects HTML that is already normalized. `createTextPreview` calls `normalizeText` itself.
-
-Your renderer owns everything else:
+When you draw it yourself, you own:
 
 - layout
 - accessibility and keyboard behavior
 - showing attribution
 - loading states and errors
-- inserting only normalized HTML, never raw Sefaria HTML
+- inserting only normalized HTML
 
-For the details, see [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md), [Clean up stored Sefaria text](/data-and-text-tools/clean-up-stored-sefaria-text.md), and [Clean text and safety](/concepts/clean-text-and-safety.md). [Sefaria's own texts and tools](/concepts/sefarias-own-texts-and-tools.md) explains references and editions.
+For details, see [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md) and [Clean up stored Sefaria text](/data-and-text-tools/clean-up-stored-sefaria-text.md). [Sefaria's own texts and tools](/concepts/sefarias-own-texts-and-tools.md) explains references and editions.
 
 <span class="learn-more__label">Learn more:</span> [Client reference](/reference/client.md) · [Text tools reference](/reference/text-transform.md) {.learn-more}
+
+## Where to go next
+
+To change how the components look, see [Match your site's look](/across-components/match-your-sites-look.md).
