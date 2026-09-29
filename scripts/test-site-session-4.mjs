@@ -161,7 +161,7 @@ export async function runSessionFourSiteChecks({ root, siteBasePath }) {
             if (card.status === "ready") resolve();
             else if (card.status === "error" || Date.now() - started > 15_000)
               reject(new Error(`card status ${card.status}`));
-            else setTimeout(poll, 50);
+            else globalThis.setTimeout(poll, 50);
           };
           poll();
         }),
