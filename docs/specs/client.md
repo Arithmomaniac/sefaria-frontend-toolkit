@@ -23,7 +23,7 @@ The package does not own component view models, normalized domain models, render
 
 ## Source authority
 
-The upstream input is [`docs/openAPI.json` at Sefaria commit `1f7d0844ca6a9eddc8e48168962aacb09de75bd6`](https://github.com/Sefaria/Sefaria-Project/blob/1f7d0844ca6a9eddc8e48168962aacb09de75bd6/docs/openAPI.json).
+The upstream input is [`docs/openAPI.json` at Sefaria commit `898feda78d1bd6b24f66305081a54c8cf36406be`](https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/docs/openAPI.json).
 
 The pinned input plus reviewed overlay is authoritative for transport payloads. Generated declarations are the field-level public reference.
 

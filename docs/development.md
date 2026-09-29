@@ -288,7 +288,7 @@ pnpm --filter @sefaria-example/mcp-app demo
 The refresh operation requires a complete Sefaria commit SHA. It can access the network.
 
 ```powershell
-pnpm openapi:refresh --commit 1f7d0844ca6a9eddc8e48168962aacb09de75bd6
+pnpm openapi:refresh --commit 898feda78d1bd6b24f66305081a54c8cf36406be
 ```
 
 The operation downloads only the OpenAPI document from that commit. It validates the formal overlay guards before updating the committed pin, upstream input, SHA-256, and generated TypeScript.

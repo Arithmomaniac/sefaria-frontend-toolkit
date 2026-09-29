@@ -35,6 +35,7 @@ import {
   pinnedOpenApiUrl,
   refreshOpenApi,
 } from "../scripts/refresh-openapi.js";
+import { zSearchPostData } from "../src/index.js";
 
 const packageRoot = resolve(import.meta.dirname, "..");
 const require = createRequire(import.meta.url);
@@ -151,6 +152,42 @@ beforeAll(async () => {
 }, 30_000);
 
 describe("OpenAPI generation", () => {
+  it("models the source-backed parasha diaspora choice without changing its response", () => {
+    const operation = (
+      (core.paths as JsonObject)["/api/calendars/topics/parasha"] as JsonObject
+    ).get as JsonObject;
+    const parameters = operation.parameters as JsonObject[];
+    expect(parameters).toEqual([
+      expect.objectContaining({
+        name: "diaspora",
+        in: "query",
+        required: false,
+        schema: { type: "string", enum: ["0", "1"], default: "1" },
+      }),
+    ]);
+    expect(artifacts.get("src/generated/types.gen.ts")).toMatch(
+      /export type GetCalendarParashaTopicData = \{[\s\S]*?query\?: \{[\s\S]*?diaspora\?: "0" \| "1";[\s\S]*?url: "\/api\/calendars\/topics\/parasha";/,
+    );
+  });
+
+  it("does not promise score weighting when search sort_fields is omitted", () => {
+    const schema = (core.components as JsonObject).schemas as JsonObject;
+    const search = schema.SearchPOSTData as JsonObject;
+    const fields = (search.properties as JsonObject).sort_fields as JsonObject;
+    expect(fields).not.toHaveProperty("default");
+    expect(search.required ?? []).not.toContain("sort_fields");
+    expect(
+      zSearchPostData.parse({ query: "Micah", sort_method: "score" }),
+    ).not.toHaveProperty("sort_fields");
+    expect(
+      zSearchPostData.parse({
+        query: "Micah",
+        sort_method: "score",
+        sort_fields: ["pagesheetrank"],
+      }),
+    ).toHaveProperty("sort_fields", ["pagesheetrank"]);
+  });
+
   it("rejects a checksum mismatch before generation", () => {
     expect(() =>
       verifyChecksum({ sha256: "0".repeat(64) }, '{"openapi":"3.0.2"}'),
@@ -361,9 +398,9 @@ describe("OpenAPI generation", () => {
   it("uses the exact pinned upstream checksum", () => {
     expect(sha256(upstream)).toBe(source.sha256);
     expect(source).toMatchObject({
-      commit: "1f7d0844ca6a9eddc8e48168962aacb09de75bd6",
+      commit: "898feda78d1bd6b24f66305081a54c8cf36406be",
       sha256:
-        "2bd2618411afc668eef1d100da546b04431ce82b984da0ae96823f24a8f890e4",
+        "3a6057ad40ca8e7874d6be97ed2491926818e3a6939c61cca67c9878da9aa4ab",
     });
   });
 
@@ -373,11 +410,11 @@ describe("OpenAPI generation", () => {
     );
     const commit = parseCommit([
       "--commit",
-      "1F7D0844CA6A9EDDC8E48168962AACB09DE75BD6",
+      "898FEDA78D1BD6B24F66305081A54C8CF36406BE",
     ]);
-    expect(commit).toBe("1f7d0844ca6a9eddc8e48168962aacb09de75bd6");
+    expect(commit).toBe("898feda78d1bd6b24f66305081a54c8cf36406be");
     expect(pinnedOpenApiUrl(commit)).toBe(
-      "https://raw.githubusercontent.com/Sefaria/Sefaria-Project/1f7d0844ca6a9eddc8e48168962aacb09de75bd6/docs/openAPI.json",
+      "https://raw.githubusercontent.com/Sefaria/Sefaria-Project/898feda78d1bd6b24f66305081a54c8cf36406be/docs/openAPI.json",
     );
   });
 
@@ -388,7 +425,7 @@ describe("OpenAPI generation", () => {
 
     await expect(
       refreshOpenApi(
-        "1f7d0844ca6a9eddc8e48168962aacb09de75bd6",
+        "898feda78d1bd6b24f66305081a54c8cf36406be",
         async () => {
           throw failure;
         },
