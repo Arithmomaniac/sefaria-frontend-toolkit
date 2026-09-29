@@ -17,11 +17,7 @@ The toolkit has two independent packages. The client fetches from Sefaria's API 
 
 <StatusNote />
 
-```sh
-npm install @arithmomaniac/sefaria-client @arithmomaniac/sefaria-text-transform
-```
-
-You can install just one of the two packages. They are on GitHub Packages, which needs an access token before you can install. These steps need Node.js 22.12 or later. [Install and status](/help/install-and-status.md) covers the token setup and the other JavaScript runtimes the packages are meant for.
+Install `@arithmomaniac/sefaria-client`, `@arithmomaniac/sefaria-text-transform`, or both. Each works without the other. They are on GitHub Packages, which needs an access token before you can install. [Install and status](/help/install-and-status.md) shows how to set up the token and gives the exact install command for the current version. These steps need Node.js 22.12 or later; that page also lists the other JavaScript runtimes the packages are meant for.
 
 Each example below is a complete ES module. Save the JavaScript version as a file such as `fetch.mjs` and run `node fetch.mjs`. For the TypeScript version, save it as `fetch.ts` and use your usual TypeScript tooling; Node.js 22.18 and later can also run it directly with `node fetch.ts`.
 
@@ -50,7 +46,7 @@ This makes no network request. It prints two lines:
 
 `normalizeText` is the sanitizer. It removed the `onclick` attribute and turned Sefaria's `mam-spi-samekh` class into `data-sefaria-mam="setumah"`, a marker for a closed paragraph break in the Masoretic text. It returns `bodyHtml` and `notes`, which holds footnotes kept separately.
 
-`applyVocalizationToHtml(html, "nikkud")` removes cantillation marks (taamim) and keeps vowel points (nikkud). It changes only text, not markup. Normalize first, then vocalize, because the vocalization helper does not make HTML safe. The modes are `taamim_and_nikkud` (keep all), `nikkud`, and `none`. `none` also removes vowel points. It keeps letters, digits and most punctuation, but it removes the sof pasuq (׃) that ends a verse.
+`applyVocalizationToHtml(html, "nikkud")` removes the cantillation marks (taamim) and keeps the vowel points (nikkud), as the second line shows. It changes only text, not markup. Normalize first, then vocalize, because the vocalization helper does not make HTML safe. The other modes are `taamim_and_nikkud` and `none`. [Clean up stored Sefaria text](/data-and-text-tools/clean-up-stored-sefaria-text.md) lists exactly which marks each mode removes.
 
 <span class="learn-more__label">Learn more:</span> [Clean up stored Sefaria text](/data-and-text-tools/clean-up-stored-sefaria-text.md) · [Clean text and safety](/concepts/clean-text-and-safety.md) {.learn-more}
 
@@ -66,7 +62,9 @@ THE JPS TANAKH: Gender-Sensitive Edition:
 1 footnote(s) kept separately.
 ```
 
-Sefaria's poetry `<span class="...">` wrappers are gone. Ordinary formatting such as `<small>` and `<br>` stays. The footnote marker became an empty `<span data-sefaria-note="0">` placeholder, and its content is in `notes[0]`. The `typeof version.text !== "string"` check skips text for a whole chapter, which Sefaria sends as a list of strings. <span class="learn-more__label">Learn more:</span> [How the toolkit works](/concepts/how-the-toolkit-works.md) · [Give components your own data](/data-and-text-tools/give-components-your-own-data.md) {.learn-more}
+Sefaria's poetry `<span class="...">` wrappers are gone. Ordinary formatting such as `<small>` and `<br>` stays. The footnote marker became an empty `<span data-sefaria-note="0">` placeholder, and its content is in `notes[0]`. The `typeof version.text !== "string"` check skips text for a whole chapter, which Sefaria sends as a list of strings.
+
+<span class="learn-more__label">Learn more:</span> [How the toolkit works](/concepts/how-the-toolkit-works.md) · [Give components your own data](/data-and-text-tools/give-components-your-own-data.md) {.learn-more}
 
 ## Next steps
 

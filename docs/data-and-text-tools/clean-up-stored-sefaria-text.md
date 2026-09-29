@@ -40,16 +40,7 @@ What each kind of input becomes:
 - **Unwrapped (tag removed, text kept):** spans without a recognized class, such as Sefaria's poetry classes, unknown tags, and links with no Sefaria reference or topic. A span with an allowed `dir` keeps just that `dir`. `href` and `src` attributes are dropped, so the output has no links or loaded resources. A web address written in the text itself stays as plain text.
 - **Block tags** such as `p`, `div`, `li`, and `h1` to `h6` are removed, and their text is separated by a space.
 - **`<big>`** becomes `<span style="font-size: larger;">`.
-- **Sefaria markers** become `data-sefaria-*` attributes on `span` elements:
-  - `data-sefaria-mam` marks Masoretic paragraph markers and ketiv/qere. Its values are `petuchah`, `setumah`, `inverted-nun`, `ketiv-qere`, `ketiv`, `qere`, and `trivial-variant`.
-  - `data-sefaria-ref` comes from reference links, with optional `data-sefaria-ven` and `data-sefaria-vhe` for edition titles.
-  - `data-sefaria-slug` comes from topic links.
-  - `data-sefaria-note` is a footnote placeholder.
-  - `data-sefaria-commentator`, with optional `data-sefaria-label` and `data-sefaria-order`, marks where a commentary attaches. It gets a `data-sefaria-ref` only when you pass matching `commentaryReferences` to `normalizeText`.
-  - `data-sefaria-overlay` and `data-sefaria-value` mark overlays.
-  - `data-sefaria-end-footnote` and `data-sefaria-commentary-marker` mark superscript end-footnote and commentary markers.
-
-  Your CSS or renderer can style or read these. The [complete list](/reference/text-transform.md#normalized-html-output) is in the reference.
+- **Sefaria markers** become `span` elements with `data-sefaria-*` attributes. They cover Masoretic paragraph and ketiv/qere markers, reference and topic links, footnote placeholders, and inline commentary and overlay markers. Your CSS or renderer can style or read them. [Normalized HTML output](/reference/text-transform.md#normalized-html-output) lists each attribute and its values.
 
 - **Removed completely, with their content:** active elements such as `script`, `style`, `iframe`, `object`, `embed`, `svg`, `math`, `form` and `input` elements, `audio`, `video`, and `canvas`. The reference lists the rest.
 - **Images** become their `alt` text.
