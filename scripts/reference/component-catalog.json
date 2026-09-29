@@ -1,6 +1,6 @@
 {
   "sefaria-ref-label": {
-    "name": "Ref Label",
+    "name": "Reference Label",
     "howTo": "/use-components/show-text/label-a-citation.md",
     "summary": "Shows a Sefaria reference as a label, with its English and Hebrew names.",
     "data": "`data` takes the body of a successful `GET /api/ref/{tref}` response, typed `CoreRefResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it's invalid. It treats the value as a status 200 response.",

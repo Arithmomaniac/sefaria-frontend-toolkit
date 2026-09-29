@@ -1,5 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
+import { reservedTokens } from "./components.js";
 
 const SITE = "https://arithmomaniac.github.io/sefaria-frontend-toolkit";
 const REPOSITORY = "https://github.com/Arithmomaniac/sefaria-frontend-toolkit";
@@ -103,8 +104,30 @@ async function describe(route: string): Promise<string> {
   return `- [${title}](${url})${stub ? " (coming soon)" : ""}: ${description}`;
 }
 
+/** Style settings that at least one component reads. */
+async function usableTokens(): Promise<readonly string[]> {
+  const manifest = JSON.parse(
+    await readFile(
+      new URL(
+        "../../packages/web-components/custom-elements.json",
+        import.meta.url,
+      ),
+      "utf8",
+    ),
+  ) as {
+    modules: { declarations: { cssProperties?: { name: string }[] }[] }[];
+  };
+  const names = (
+    manifest.modules.flatMap((module) => module.declarations)[0]
+      ?.cssProperties ?? []
+  ).map((property) => property.name);
+  const reserved = await reservedTokens(names);
+  return names.filter((name) => !reserved.has(name));
+}
+
 export async function renderLlmsTxt(): Promise<string> {
   const scriptTag = (await snippet("source-card-script-tag.html")).trim();
+  const tokens = await usableTokens();
   const lines = [
     "# Sefaria Frontend Toolkit",
     "",
@@ -122,7 +145,9 @@ export async function renderLlmsTxt(): Promise<string> {
     "",
     `- To work with Sefaria's data in your own code, use \`@arithmomaniac/sefaria-client\` to fetch checked API responses and \`@arithmomaniac/sefaria-text-transform\` and its \`normalizeText\` function to make text HTML safe before you show it. Start at ${SITE}/data-and-text-tools/start-here.`,
     `- To install the npm packages, or to choose between them and the script tag, read ${SITE}/help/install-and-status. With a bundler, register every element once with \`import "@arithmomaniac/sefaria-web-components";\`. The element subpaths don't register their element.`,
-    `- Keep attribution. Source Card shows each edition's title, linked to its source when the source is a valid http(s) address; don't hide it with \`hide-attributions\`, and don't copy text out of a component without its attribution. The components don't show licenses; see ${SITE}/help/install-and-status.html#license-and-text-rights.`,
+    `- Keep attribution. Source Card shows each edition's title, linked to its source when the source is a valid http(s) address; don't hide it with \`hide-attributions\`, and don't copy text out of a component without its attribution. Source Card, Text Segment and Bilingual Segment show edition attribution; only Source Card links it, and none of them shows a license. Connections Panel previews, also inside the Reader, can show "Licenses reported" when Sefaria provides them. See ${SITE}/help/install-and-status.html#license-and-text-rights.`,
+    `- Source Card shows both the primary text and the translation by default (\`content-language\` defaults to \`both\`).`,
+    `- Style the elements only with the \`--sefaria-*\` settings listed at ${SITE}/reference/components.html#style-settings: ${tokens.map((name) => `\`${name}\``).join(", ")}. Don't invent other names.`,
     `- If you're an assistant building a page for someone, also read ${SITE}/use-components/start-with-an-ai-assistant. Its prompt is at ${REPOSITORY}/blob/main/examples/site-snippets/ai-assistant-prompt.md.`,
     `- For exact element, function, type and import names, use the reference pages below instead of guessing.`,
     "",

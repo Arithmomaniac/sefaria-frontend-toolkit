@@ -95,30 +95,30 @@ export class SefariaBilingualSegment extends SefariaElement {
     bilingualPairStyles,
   ];
 
-  /** Reference loaded when authoritative supplied data is absent. */
+  /** The Sefaria reference to load when `data` isn't set. */
   declare sref: string;
-  /** Authoritative corrected response-shaped data. */
+  /** Sefaria API response data to render. When it's set, the element doesn't fetch anything. */
   declare data: unknown | undefined;
-  /** Optional element-specific acquisition source. */
+  /** Chooses how this element fetches data, instead of the default. */
   declare acquisition: SefariaAcquisition | undefined;
-  /** Optional exact edition title for the primary role. */
+  /** Exact title of the edition to show as the primary text. */
   declare primaryVersionTitle: string | undefined;
-  /** Optional exact edition title for the translation role. */
+  /** Exact title of the edition to show as the translation. */
   declare translationVersionTitle: string | undefined;
-  /** Preferred translation family, falling back only when unavailable. */
+  /** Preferred translation language. Without one in that language, the element uses Sefaria's default translation. */
   declare translationLanguage: string | undefined;
-  /** Hides compact standalone edition attribution. */
+  /** Hides the edition attribution shown with the text. */
   declare hideAttributions: boolean;
 
-  /** Sides the host wants displayed. */
+  /** Which text to show: `primary`, `translation` or `both`. */
   declare contentLanguage: BilingualSegmentContentLanguage;
 
-  /** Requested arrangement of the two sides. */
+  /** How the two texts are arranged: `auto`, `stacked` or `side-by-side`. */
   declare layout: BilingualSegmentLayout;
 
-  /** Requested role order for a side-by-side arrangement. */
+  /** Which text comes first side by side: `primary-first` or `translation-first`. */
   declare sideOrder: BilingualSegmentSideOrder;
-  /** Hebrew vocalization preset applied to both displayed roles. */
+  /** How much Hebrew vowel and cantillation marking to keep. `none` removes both. */
   declare vocalizationMode: VocalizationMode;
 
   #active:
@@ -175,7 +175,7 @@ export class SefariaBilingualSegment extends SefariaElement {
     super.disconnectedCallback();
   }
 
-  /** Coarse lifecycle state without exposing prepared rendering data. */
+  /** Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
   get status(): SefariaElementStatus {
     return this.#statusOverride ?? statusOf(this.#viewModel);
   }

@@ -413,33 +413,33 @@ export class SefariaReader extends SefariaElement {
     `,
   ];
 
-  /** Requested external Reader root, separate from current navigation. */
+  /** The reference the Reader starts from. Navigating inside the Reader doesn't change it. */
   declare sref: string;
-  /** Transactional unknown raw Reader seed. */
+  /** Starting data for the Reader, which it accepts or rejects as a whole. */
   declare data: ReaderRawSeedData | undefined;
-  /** Optional element-specific acquisition source. */
+  /** Chooses how this element fetches data, instead of the default. */
   declare acquisition: SefariaAcquisition | undefined;
-  /** Preferred family used for root and navigated translations. */
+  /** Preferred translation language, for the starting text and texts you navigate to. */
   declare translationLanguage: string | undefined;
-  /** Exact primary edition for the external root and its context. */
+  /** Exact title of the primary edition for the starting reference. */
   declare primaryVersionTitle: string | undefined;
-  /** Exact translation edition for the external root and its context. */
+  /** Exact title of the translation edition for the starting reference. */
   declare translationVersionTitle: string | undefined;
-  /** Hides edition attribution on the source card. */
+  /** Hides the edition attribution on the source card. */
   declare hideAttributions: boolean;
-  /** Host-controlled pane selected in compact presentation. */
+  /** Which pane the compact layout shows: `source` or `connections`. */
   declare activePane: ReaderPane;
-  /** Shows an explicit host-mediated chat export action when a target exists. */
+  /** Shows a button that sends the selected reference to your page's chat, when one is selected. */
   declare chatExport: boolean;
-  /** Source-card roles displayed by the controlled reader. */
+  /** Which text the source card shows: `primary`, `translation` or `both`. */
   declare contentLanguage: BilingualPairContentLanguage;
-  /** Source-card bilingual arrangement. */
+  /** How the source card arranges its two texts: `auto`, `stacked` or `side-by-side`. */
   declare layout: BilingualPairLayout;
-  /** First source-card role in side-by-side layout. */
+  /** Which text comes first side by side: `primary-first` or `translation-first`. */
   declare sideOrder: BilingualPairSideOrder;
-  /** Whether captured connection previews are visible. */
+  /** Whether connection previews are shown. */
   declare showConnectionPreviews: boolean;
-  /** Hebrew vocalization preset applied to source and preview text. */
+  /** How much Hebrew vowel and cantillation marking to keep. `none` removes both. */
   declare vocalizationMode: VocalizationMode;
 
   #controller: ReaderController | undefined;
@@ -565,7 +565,7 @@ export class SefariaReader extends SefariaElement {
     super.disconnectedCallback();
   }
 
-  /** Coarse Reader lifecycle state without exposing prepared rendering data. */
+  /** Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
   get status(): SefariaElementStatus {
     const preparedStatus = getPreparedStatus(this);
     if (preparedStatus !== undefined) return preparedStatus;
@@ -574,32 +574,32 @@ export class SefariaReader extends SefariaElement {
     return this.#viewModel === undefined ? "empty" : "ready";
   }
 
-  /** Stable identity of the current retained semantic Reader entry. */
+  /** The ID of the current history entry. */
   get currentEntryId(): string | undefined {
     return this.#viewModel?.currentEntryId;
   }
 
-  /** Exact selected canonical target, when the current entry establishes one. */
+  /** The selected reference, when there is one. */
   get selectedRef(): string | undefined {
     return this.#viewModel?.selectedTarget?.ref;
   }
 
-  /** Whether a root source request is currently pending. */
+  /** Whether the starting text is still loading. */
   get rootLoading(): boolean {
     return this.#rootLoading;
   }
 
-  /** Current Reader failure message, when the latest eligible operation failed. */
+  /** The error message, when the latest action failed. */
   get readerError(): string | undefined {
     return this.#readerError;
   }
 
-  /** Whether Reader Back can activate a retained predecessor. */
+  /** Whether Back can return to an earlier entry. */
   get canGoBack(): boolean {
     return this.#viewModel?.canGoBack ?? false;
   }
 
-  /** Whether bounded retention removed older semantic history. */
+  /** Whether older history entries were dropped to stay within the history limit. */
   get historyTruncated(): boolean {
     return this.#viewModel?.historyTruncated ?? false;
   }

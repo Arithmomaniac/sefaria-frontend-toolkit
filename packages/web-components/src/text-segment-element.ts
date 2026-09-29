@@ -128,21 +128,21 @@ export class SefariaTextSegment extends SefariaElement {
     `,
   ];
 
-  /** Reference loaded when authoritative supplied data is absent. */
+  /** The Sefaria reference to load when `data` isn't set. */
   declare sref: string;
-  /** Authoritative corrected response-shaped data. */
+  /** Sefaria API response data to render. When it's set, the element doesn't fetch anything. */
   declare data: unknown | undefined;
-  /** Optional element-specific acquisition source. */
+  /** Chooses how this element fetches data, instead of the default. */
   declare acquisition: SefariaAcquisition | undefined;
-  /** Optional language-family selector overriding the primary default. */
+  /** Language of the edition to show, instead of the primary edition. */
   declare versionLanguage: string | undefined;
-  /** Optional exact edition title paired with `versionLanguage`. */
+  /** Exact title of the edition to show, used together with `versionLanguage`. */
   declare versionTitle: string | undefined;
-  /** Preferred translation family, mutually exclusive with a strict version language. */
+  /** Preferred translation language. Can't be combined with `versionLanguage`. */
   declare translationLanguage: string | undefined;
-  /** Hides compact edition attribution for standalone text. */
+  /** Hides the edition attribution. */
   declare hideAttributions: boolean;
-  /** Hebrew vocalization preset applied only to the displayed safe text. */
+  /** How much Hebrew vowel and cantillation marking to keep. `none` removes both. */
   declare vocalizationMode: VocalizationMode;
 
   #displayViewModel: TextSegmentDataViewModel | undefined;
@@ -175,7 +175,7 @@ export class SefariaTextSegment extends SefariaElement {
     this.vocalizationMode = "taamim_and_nikkud";
   }
 
-  /** Metadata for the currently displayed selected edition. */
+  /** Details of the edition currently shown. */
   get selectedVersion(): TextSegmentSelectedVersionInfo | undefined {
     const viewModel = this.#viewModel;
     return viewModel?.state === "data"
@@ -186,7 +186,7 @@ export class SefariaTextSegment extends SefariaElement {
       : undefined;
   }
 
-  /** Coarse lifecycle state without exposing prepared rendering data. */
+  /** Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
   get status(): SefariaElementStatus {
     return this.#statusOverride ?? statusOf(this.#viewModel);
   }

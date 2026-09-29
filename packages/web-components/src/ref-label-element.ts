@@ -76,19 +76,19 @@ export class SefariaRefLabel extends SefariaElement {
     `,
   ];
 
-  /** Reference loaded when authoritative supplied data is absent. */
+  /** The Sefaria reference to load when `data` isn't set. */
   declare sref: string;
 
-  /** Authoritative corrected reference response data. */
+  /** Sefaria reference response data to render. When it's set, the element doesn't fetch anything. */
   declare data: unknown | undefined;
 
-  /** Optional element-specific acquisition source. */
+  /** Chooses how this element fetches data, instead of the default. */
   declare acquisition: SefariaAcquisition | undefined;
 
-  /** Label language selected by the host. */
+  /** Language of the label. */
   declare labelLanguage: RefLabelLanguage;
 
-  /** Whether data-state labels render as canonical links. */
+  /** Whether a loaded label is a link to the reference on Sefaria. */
   declare linked: boolean;
 
   #active:
@@ -136,7 +136,7 @@ export class SefariaRefLabel extends SefariaElement {
     super.disconnectedCallback();
   }
 
-  /** Coarse lifecycle state without exposing prepared rendering data. */
+  /** Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
   get status(): SefariaElementStatus {
     return this.#statusOverride ?? statusOf(this.#viewModel);
   }

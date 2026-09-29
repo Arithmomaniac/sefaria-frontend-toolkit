@@ -110,21 +110,21 @@ export class SefariaConnectionsPanel extends SefariaElement {
       }
     `,
   ];
-  /** Reference loaded when authoritative supplied data is absent. */
+  /** The Sefaria reference to load when `data` isn't set. */
   declare sref: string;
-  /** Authoritative corrected links response data. */
+  /** Sefaria links response data to render. When it's set, the element doesn't fetch anything. */
   declare data: unknown | undefined;
-  /** Optional element-specific acquisition source. */
+  /** Chooses how this element fetches data, instead of the default. */
   declare acquisition: SefariaAcquisition | undefined;
-  /** Whether acquired or supplied links include connected text. */
+  /** Whether the links include the connected texts. */
   declare withText: boolean;
-  /** Exact category projected from the current captured response. */
+  /** Category of the loaded links to show. */
   declare category: string | undefined;
-  /** Zero-based local page projected from the current captured response. */
+  /** Zero-based page of the loaded links to show. */
   declare page: number;
-  /** Hides or reveals captured preview data without requesting it. */
+  /** Shows or hides the text previews already loaded, without fetching more. */
   declare showPreviews: boolean;
-  /** Hebrew vocalization preset applied to safe legacy-channel previews. */
+  /** How much Hebrew vowel and cantillation marking to keep in previews. `none` removes both. */
   declare vocalizationMode: VocalizationMode;
 
   #displayViewModel: ConnectionsViewModel | undefined;
@@ -185,7 +185,7 @@ export class SefariaConnectionsPanel extends SefariaElement {
     super.disconnectedCallback();
   }
 
-  /** Coarse lifecycle state without exposing prepared rendering data. */
+  /** Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
   get status(): SefariaElementStatus {
     return this.#statusOverride ?? statusOf(this.#viewModel);
   }
