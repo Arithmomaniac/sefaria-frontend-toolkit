@@ -72,28 +72,18 @@ try {
     const secondary = page.getByRole("link", {
       name: "Try without installing",
     });
-    await assertEqual(await primary.count(), 1, "primary action count");
-    await assertEqual(await secondary.count(), 1, "secondary action count");
-    for (const [label, action] of [
-      ["primary", primary],
-      ["secondary", secondary],
-    ]) {
-      const box = await action.evaluate((element) => {
-        const style = globalThis.getComputedStyle(element);
-        return {
-          height: element.getBoundingClientRect().height,
-          paddingLeft: style.paddingLeft,
-          paddingRight: style.paddingRight,
-          whiteSpace: style.whiteSpace,
-        };
-      });
-      await assertEqual(box.paddingLeft, "20px", `${label} left padding`);
-      await assertEqual(box.paddingRight, "20px", `${label} right padding`);
-      if (box.height > 44) {
-        throw new Error(`${label} action wraps: height ${box.height}px.`);
-      }
-    }
+    await assertEqual(await primary.count(), 0, "primary action count");
+    await assertEqual(await secondary.count(), 0, "secondary action count");
     await assertStatusNotes(page, "Home");
+    const taglineBottom = await page
+      .locator(".VPHomeHero .tagline")
+      .evaluate((element) => element.getBoundingClientRect().bottom);
+    const statusTop = await page
+      .locator(".VPHomeHero .status-note")
+      .evaluate((element) => element.getBoundingClientRect().top);
+    if (statusTop < taglineBottom) {
+      throw new Error("The status note must stay under the hero tagline.");
+    }
     await assertText(
       page.locator(".home-acknowledgement"),
       "This project began at the Microsoft Global Hackathon 2026.",

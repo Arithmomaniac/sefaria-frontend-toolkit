@@ -9,51 +9,6 @@ const repository = "https://github.com/Arithmomaniac/sefaria-frontend-toolkit";
 const branch = "main";
 const repositoryRoot = path.resolve(import.meta.dirname, "..", "..");
 const siteBasePath = normalizeSiteBasePath(process.env.SITE_BASE_PATH);
-const lessonLink = (text: string, link: string) => ({ text, link });
-const learningPagers = {
-  "learn/01-web-components.md": {
-    prev: lessonLink("Get started", "/get-started.md"),
-    next: lessonLink("2. Render supplied data", "/learn/02-supplied-data.md"),
-  },
-  "learn/02-supplied-data.md": {
-    prev: lessonLink("1. Choose a surface", "/learn/01-web-components.md"),
-    next: lessonLink("3. Load and interact", "/learn/03-live-data.md"),
-  },
-  "learn/03-live-data.md": {
-    prev: lessonLink("2. Render supplied data", "/learn/02-supplied-data.md"),
-    next: lessonLink("4. Use the Reader", "/learn/04-reader.md"),
-  },
-  "learn/04-reader.md": {
-    prev: lessonLink("3. Load and interact", "/learn/03-live-data.md"),
-    next: lessonLink(
-      "5. Customize or go headless",
-      "/learn/05-customization.md",
-    ),
-  },
-  "learn/05-customization.md": {
-    prev: lessonLink("4. Use the Reader", "/learn/04-reader.md"),
-    next: lessonLink(
-      "6. Integrate with a host",
-      "/learn/06-host-integration.md",
-    ),
-  },
-  "learn/06-host-integration.md": {
-    prev: lessonLink(
-      "5. Customize or go headless",
-      "/learn/05-customization.md",
-    ),
-    next: lessonLink("Browse the guides", "/guides/"),
-  },
-  "learn/react.md": {
-    prev: lessonLink("3. Load and interact", "/learn/03-live-data.md"),
-    next: lessonLink("4. Use the Reader", "/learn/04-reader.md"),
-  },
-  "learn/alpine.md": {
-    prev: lessonLink("3. Load and interact", "/learn/03-live-data.md"),
-    next: lessonLink("4. Use the Reader", "/learn/04-reader.md"),
-  },
-} as const;
-
 export default defineConfig({
   base: siteBasePath,
   title: "Sefaria Frontend Toolkit",
@@ -69,8 +24,6 @@ export default defineConfig({
     "development.md",
     "evidence.md",
     "handoff.md",
-    "guides/reader-navigation.md",
-    "reference/documentation-map.md",
     "review.md",
     "specs/**",
   ],
@@ -98,14 +51,6 @@ export default defineConfig({
         removeLeadingProvenanceBlock,
       );
     },
-  },
-  transformPageData(pageData) {
-    const pager =
-      learningPagers[pageData.relativePath as keyof typeof learningPagers];
-    if (pager) {
-      pageData.frontmatter.prev = pager.prev;
-      pageData.frontmatter.next = pager.next;
-    }
   },
   themeConfig: {
     nav: [

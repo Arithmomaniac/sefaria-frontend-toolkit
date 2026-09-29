@@ -10,14 +10,14 @@ Public GitHub Packages prereleases are available for authenticated installation.
 
 | Goal | Document |
 | --- | --- |
-| Choose an integration depth | [Get started](get-started.md) |
-| Follow the guided sequence | [Choose a surface and understand ownership](learn/01-web-components.md) |
-| Compare all rendering surfaces | [Component catalog](components.md) |
-| Edit a supplied-data component | [Six-project editor](examples.md) and [`examples/playground`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground) |
-| Find runnable examples | [Example catalog](examples.md) |
-| Solve a task or understand data flow | [Guides](guides/index.md) |
-| Add authored citation previews | [Linked article](linked-article.md) |
-| Integrate an MCP App | [MCP App demonstration](mcp-app-demo.md) |
+| Choose an integration depth | [Get started](use-components/start-here.md) |
+| Follow the guided sequence | [Choose a surface and understand ownership](use-components/start-here.md) |
+| Compare all rendering surfaces | [Component catalog](reference/components.md) |
+| Edit a supplied-data component | [Six-project editor](examples/composed-multi-pane-reader.md) and [`examples/playground`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground) |
+| Find runnable examples | [Example catalog](examples/composed-multi-pane-reader.md) |
+| Solve a task or understand data flow | [Guides](concepts/how-the-toolkit-works.md) |
+| Add authored citation previews | [Linked article](examples/linked-article.md) |
+| Integrate an MCP App | [MCP App demonstration](examples/reader-inside-ai-chat.md) |
 
 ## Package references
 
@@ -26,8 +26,8 @@ Public GitHub Packages prereleases are available for authenticated installation.
 | Use the API client | [`@arithmomaniac/sefaria-client`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/client/README.md) |
 | Use text transforms without components | [`@arithmomaniac/sefaria-text-transform`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/text-transform/README.md) |
 | Choose declarative component, acquisition, and Reader subpaths | [`@arithmomaniac/sefaria-web-components`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/web-components/README.md) |
-| Inspect generated element metadata | [Custom elements](reference/custom-elements.md) |
-| Inspect declaration-derived package exports | [Public package exports](reference/public-exports.md) |
+| Inspect generated element metadata | [Custom elements](reference/components.md) |
+| Inspect declaration-derived package exports | [Public package exports](reference/package-imports-and-exports.md) |
 
 ## Repository-only documentation
 
@@ -35,7 +35,7 @@ These Markdown files are retained for contributors and auditors but excluded fro
 
 | Goal | Document |
 | --- | --- |
-| Find the audience and owner of every maintained page | [Documentation map](reference/documentation-map.md) |
+| Find the audience and owner of every maintained page | [Documentation map](README.md) |
 | Set up the repository and run all checks | [Development](development.md) |
 | Inspect stable ownership boundaries | [Design](design.md) |
 | Review a change at the right depth | [Review](review.md) |

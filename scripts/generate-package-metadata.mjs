@@ -17,19 +17,7 @@ const webComponentsDirectory = path.join(
 const check = process.argv.includes("--check");
 const generatedFiles = {
   customElements: path.join(webComponentsDirectory, "custom-elements.json"),
-  customElementsMarkdown: path.join(
-    repository,
-    "docs",
-    "reference",
-    "custom-elements.md",
-  ),
   exports: path.join(repository, "packages", "public-exports.json"),
-  exportsMarkdown: path.join(
-    repository,
-    "docs",
-    "reference",
-    "public-exports.md",
-  ),
 };
 
 const eventCatalog = {
@@ -217,24 +205,10 @@ await emit(
   ),
 );
 await emit(
-  generatedFiles.customElementsMarkdown,
-  await formatGenerated(
-    generatedFiles.customElementsMarkdown,
-    renderCustomElementsMarkdown(customElements),
-  ),
-);
-await emit(
   generatedFiles.exports,
   await formatGenerated(
     generatedFiles.exports,
     `${JSON.stringify(publicExports, null, 2)}\n`,
-  ),
-);
-await emit(
-  generatedFiles.exportsMarkdown,
-  await formatGenerated(
-    generatedFiles.exportsMarkdown,
-    renderPublicExportsMarkdown(publicExports),
   ),
 );
 
@@ -385,105 +359,6 @@ async function buildPublicExportInventory() {
     packages.push({ name: manifest.name, exports: packageExports });
   }
   return { schemaVersion: 1, packages };
-}
-
-function renderCustomElementsMarkdown(manifest) {
-  const lines = [
-    "# Custom elements",
-    "",
-    "This file is generated from the Lit element sources and the bounded event and token catalogs in `scripts/generate-package-metadata.mjs`. Run `pnpm metadata:generate` after changing a public element contract.",
-    "",
-  ];
-  for (const declaration of manifest.modules.flatMap(
-    (module) => module.declarations,
-  )) {
-    lines.push(
-      `## \`<${declaration.tagName}>\``,
-      "",
-      declaration.description ?? "",
-      "",
-    );
-    lines.push("### Properties and attributes", "");
-    lines.push(
-      "| Property | Attribute | Type | Default | Description |",
-      "| --- | --- | --- | --- | --- |",
-    );
-    for (const member of (declaration.members ?? []).filter(
-      (entry) => entry.kind === "field" && entry.privacy !== "private",
-    )) {
-      lines.push(
-        `| \`${member.name}\` | ${member.attribute ? `\`${member.attribute}\`` : "Property only"} | \`${member.type?.text ?? "unknown"}\` | ${member.default ? `\`${member.default}\`` : "-"} | ${member.description ?? ""} |`,
-      );
-    }
-    lines.push("", "### Events", "");
-    if (declaration.events.length === 0) {
-      lines.push("None.", "");
-    } else {
-      lines.push("| Event | Description |", "| --- | --- |");
-      for (const entry of declaration.events) {
-        lines.push(`| \`${entry.name}\` | ${entry.description} |`);
-      }
-      lines.push("");
-    }
-    lines.push("### Slots", "");
-    if (declaration.slots.length === 0) {
-      lines.push("None.", "");
-    } else {
-      lines.push("| Slot | Description |", "| --- | --- |");
-      for (const entry of declaration.slots) {
-        lines.push(
-          `| ${entry.name ? `\`${entry.name}\`` : "Default"} | ${entry.description ?? ""} |`,
-        );
-      }
-      lines.push("");
-    }
-    lines.push("### CSS parts", "");
-    if (declaration.cssParts.length === 0) {
-      lines.push("None.", "");
-    } else {
-      lines.push("| Part | Description |", "| --- | --- |");
-      for (const entry of declaration.cssParts) {
-        lines.push(`| \`${entry.name}\` | ${entry.description ?? ""} |`);
-      }
-      lines.push("");
-    }
-  }
-  lines.push(
-    "## Shared CSS custom properties",
-    "",
-    "| Property | Default | Description |",
-    "| --- | --- | --- |",
-  );
-  for (const entry of cssPropertyCatalog) {
-    lines.push(
-      `| \`${entry.name}\` | \`${entry.default}\` | ${entry.description} |`,
-    );
-  }
-  return `${lines.join("\n")}\n`;
-}
-
-function renderPublicExportsMarkdown(inventory) {
-  const lines = [
-    "# Public package exports",
-    "",
-    "This file is generated from built declaration files and package export maps. Run `pnpm metadata:generate` after changing a supported subpath.",
-    "",
-  ];
-  for (const packageEntry of inventory.packages) {
-    lines.push(
-      `## \`${packageEntry.name}\``,
-      "",
-      "| Subpath | JavaScript | Types | Declarations |",
-      "| --- | --- | --- | --- |",
-    );
-    for (const entry of packageEntry.exports) {
-      lines.push(
-        `| \`${entry.subpath}\` | \`${entry.import}\` | \`${entry.types}\` | ${entry.declarations.map((name) => `\`${name}\``).join(", ")} |`,
-      );
-    }
-    lines.push("");
-  }
-  return `${lines.join("\n")}\n`;
 }
 
 function normalizeModulePaths(value) {

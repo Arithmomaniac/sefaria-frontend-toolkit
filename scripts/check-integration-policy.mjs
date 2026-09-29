@@ -27,20 +27,11 @@ const documentationFiles = tracked.filter(
     filename === "README.md" ||
     /^(?:packages|examples)\/[^/]+\/README\.md$/u.test(filename) ||
     /^docs\/(?:README|development)\.md$/u.test(filename) ||
-    filename === "docs/help/install-and-status.md" ||
-    filename.startsWith("docs/learn/"),
+    filename === "docs/help/install-and-status.md",
 );
 const journeyFiles = [
   "README.md",
   "docs/README.md",
-  "docs/learn/01-web-components.md",
-  "docs/learn/02-supplied-data.md",
-  "docs/learn/03-live-data.md",
-  "docs/learn/react.md",
-  "docs/learn/alpine.md",
-  "docs/learn/04-reader.md",
-  "docs/learn/05-customization.md",
-  "docs/learn/06-host-integration.md",
   "examples/README.md",
   "examples/react-vite/README.md",
   "examples/alpine-vite/README.md",

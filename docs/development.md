@@ -28,11 +28,11 @@ The same stage reconciles committed source-stamped inventories containing the 73
 
 For reader-oriented explanations, use the friendly guides rather than the archived demo transcripts:
 
-- [How the pieces fit together](guides/data-flow.md)
-- [Render text](guides/render-text.md)
-- [Text markup](guides/text-markup.md)
-- [Intentional differences from Sefaria](guides/differences.md)
-- [Reader navigation and host boundaries](guides/reader-navigation.md)
+- [How the pieces fit together](concepts/how-the-toolkit-works.md)
+- [Render text](data-and-text-tools/clean-up-stored-sefaria-text.md)
+- [Text markup](concepts/clean-text-and-safety.md)
+- [Intentional differences from Sefaria](concepts/sefarias-own-texts-and-tools.md)
+- [Reader navigation and host boundaries](use-components/add-the-complete-reader.md)
 
 ## Implemented on this baseline
 
@@ -499,7 +499,7 @@ pnpm dev:linked-article
 
 The development server shows the authored article page. The native citation is present in static HTML; the module enhancement opens a host-owned native dialog and assigns Source Card `sref` only after an eligible unmodified activation.
 
-The [authored linked-article guide](linked-article.md) covers native fallback, page-owned request lifecycle, strict deterministic transport, and the immutable archive for the retired automatic Linker.
+The [authored linked-article guide](examples/linked-article.md) covers native fallback, page-owned request lifecycle, strict deterministic transport, and the immutable archive for the retired automatic Linker.
 
 The browser tests exercise Source Card acquisition through a strict fixture fetch that accepts only the expected method, origin, decoded `Micah 6:8` path, and ordered query. Separate Playwright coverage starts the actual page on an assigned loopback port with JavaScript disabled and proves that activation follows the authored Sefaria URL.
 

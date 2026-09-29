@@ -7,7 +7,7 @@ applyTo: "packages/text-transform/**,docs/specs/text-processing.md"
 
 # Text-processing Instructions
 
-- Start with the [markup guide](../../docs/guides/text-markup.md) and [upstream documentation coverage](../../docs/evidence.md#upstream-documentation-coverage). Reuse the existing tag taxonomy and source/fixture evidence; investigate a named gap rather than repeating the markup audit.
+- Start with the [markup guide](../../docs/concepts/clean-text-and-safety.md) and [upstream documentation coverage](../../docs/evidence.md#upstream-documentation-coverage). Reuse the existing tag taxonomy and source/fixture evidence; investigate a named gap rather than repeating the markup audit.
 - Sefaria's documented tag support is not this package's sanitizer policy. Preserve the [local contract](../../docs/specs/text-processing.md) and distinguish documented upstream concepts from additional observations and intentional local differences.
 - Keep every public operation deterministic.
 - Do not import a client, component element, host API, or browser DOM global.

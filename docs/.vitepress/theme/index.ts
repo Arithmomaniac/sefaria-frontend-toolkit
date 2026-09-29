@@ -17,7 +17,7 @@ export default {
   Layout: () => {
     const { frontmatter } = useData();
     return h(DefaultTheme.Layout, null, {
-      "home-hero-actions-after": () =>
+      "home-hero-info-after": () =>
         frontmatter.value.statusNote
           ? h(StatusNote, { class: "hero-status" })
           : null,

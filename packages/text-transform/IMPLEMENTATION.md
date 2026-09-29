@@ -6,9 +6,9 @@ These notes are for maintainers. They were moved unchanged from the package READ
 
 `@arithmomaniac/sefaria-text-transform` provides deterministic, DOM-free operations for Sefaria text HTML and Hebrew vocalization.
 
-The committed source manifest remains private to prevent accidental publication. Public GitHub Packages prereleases are available for authenticated installation; the package name is subject to change, and it is not published on npmjs.com. Follow the repository [installation instructions](../../docs/get-started.md#installation-status).
+The committed source manifest remains private to prevent accidental publication. Public GitHub Packages prereleases are available for authenticated installation; the package name is subject to change, and it is not published on npmjs.com. Follow the repository [installation instructions](../../docs/use-components/start-here.md#installation-status).
 
-For an illustrated tour of the input, read [Text markup](../../docs/guides/text-markup.md). For the surrounding client and component pipeline, read [How the pieces fit together](../../docs/guides/data-flow.md).
+For an illustrated tour of the input, read [Text markup](../../docs/concepts/clean-text-and-safety.md). For the surrounding client and component pipeline, read [How the pieces fit together](../../docs/concepts/how-the-toolkit-works.md).
 
 ## Processing order
 

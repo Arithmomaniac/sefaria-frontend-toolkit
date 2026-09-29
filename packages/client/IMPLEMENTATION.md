@@ -6,7 +6,7 @@ These notes are for maintainers. They were moved unchanged from the package READ
 
 `@arithmomaniac/sefaria-client` is the validated transport boundary for the complete 60-operation surface in the pinned Sefaria OpenAPI document. It owns the pinned input, guarded corrections, generated contracts and Zod validators, tag-based namespaces, thin fetch client, and bounded default-on per-client response cache.
 
-The committed source manifest remains private to prevent accidental publication. Public GitHub Packages prereleases are available for authenticated installation; the package name is subject to change, and it is not published on npmjs.com. Follow the repository [installation instructions](../../docs/get-started.md#installation-status).
+The committed source manifest remains private to prevent accidental publication. Public GitHub Packages prereleases are available for authenticated installation; the package name is subject to change, and it is not published on npmjs.com. Follow the repository [installation instructions](../../docs/use-components/start-here.md#installation-status).
 
 ## Ordinary use
 
@@ -50,4 +50,4 @@ The root exports `text`, `index`, `related`, `calendars`, `lexicon`, `topic`, `t
 
 Documented HTTP errors remain typed response payloads. Network failures and aborts reject with Fetch API semantics. Undocumented statuses, invalid JSON, schema mismatches, or wrong media types reject as contract failures with structured paths; they are not converted to empty or success-shaped results.
 
-See [How the pieces fit together](../../docs/guides/data-flow.md) for the client-to-component path and the [client specification](../../docs/specs/client.md) for exact behavior.
+See [How the pieces fit together](../../docs/concepts/how-the-toolkit-works.md) for the client-to-component path and the [client specification](../../docs/specs/client.md) for exact behavior.
