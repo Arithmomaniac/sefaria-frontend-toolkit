@@ -316,16 +316,16 @@ The elements share these CSS custom properties, though not every element uses ev
 | `--sefaria-fg` | `light-dark(#25231f, #f1eee7)` | Primary foreground color. |
 | `--sefaria-fg-muted` | `light-dark(#6d675d, #bdb7ac)` | Muted foreground color. |
 | `--sefaria-border` | `light-dark(#d7cfc1, #555b53)` | Standard border color. |
-| `--sefaria-border-strong` | `light-dark(#aaa094, #73796f)` | Strong border color. |
+| `--sefaria-border-strong` | `light-dark(#aaa094, #73796f)` | Reserved. No component uses it yet. Strong border color. |
 | `--sefaria-accent` | `light-dark(#8e2449, #ff93b4)` | Accent and focus color. |
-| `--sefaria-accent-soft` | `light-dark(rgb(142 36 73 / 10%), rgb(255 147 180 / 14%))` | Translucent accent surface. |
-| `--sefaria-danger` | `light-dark(#9c1c1c, #ffaaa4)` | Error foreground color. |
+| `--sefaria-accent-soft` | `light-dark(rgb(142 36 73 / 10%), rgb(255 147 180 / 14%))` | Reserved. No component uses it yet. Translucent accent surface. |
+| `--sefaria-danger` | `light-dark(#9c1c1c, #ffaaa4)` | Reserved. No component uses it yet. Error foreground color. |
 | `--sefaria-link` | `light-dark(#8e2449, #ff93b4)` | Link foreground color. |
-| `--sefaria-shadow` | `0 1rem 3rem rgb(0 0 0 / 28%)` | Elevated-surface shadow. |
+| `--sefaria-shadow` | `0 1rem 3rem rgb(0 0 0 / 28%)` | Reserved. No component uses it yet. Elevated-surface shadow. |
 | `--sefaria-panel-radius` | `0.75rem` | Panel corner radius. |
 | `--sefaria-control-radius` | `0.3rem` | Control corner radius. |
 | `--sefaria-font-scale` | `1` | Component font-size multiplier. |
 | `--sefaria-font-hebrew` | `"Noto Serif Hebrew", "SBL Hebrew", "Times New Roman", serif` | Hebrew body font stack. |
 | `--sefaria-font-english` | `Georgia, "Times New Roman", serif` | English body font stack. |
-| `--sefaria-font-label-hebrew` | `"Noto Sans Hebrew", system-ui, sans-serif` | Hebrew label font stack. |
+| `--sefaria-font-label-hebrew` | `"Noto Sans Hebrew", system-ui, sans-serif` | Reserved. No component uses it yet. Hebrew label font stack. |
 | `--sefaria-font-label-english` | `system-ui, sans-serif` | English label font stack. |

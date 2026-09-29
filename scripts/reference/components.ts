@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import { releaseSection, renderPage } from "./release.js";
 
 export const COMPONENTS_PAGE = new URL(
@@ -45,6 +45,33 @@ interface CatalogEntry {
 const cell = (value: string) =>
   value.replaceAll("|", "\\|").replaceAll(/\s+/gu, " ").trim();
 const code = (value: string) => `\`${cell(value)}\``;
+
+export const RESERVED = "Reserved. No component uses it yet.";
+
+/**
+ * Returns the `--sefaria-*` tokens whose internal `--_sefaria-*` alias no
+ * component stylesheet reads. `tokens.ts` only declares the aliases.
+ */
+export async function reservedTokens(
+  names: readonly string[],
+): Promise<ReadonlySet<string>> {
+  const files = (await readdir(ELEMENT_SOURCES)).filter(
+    (file) =>
+      file.endsWith(".ts") && !file.includes(".test.") && file !== "tokens.ts",
+  );
+  const sources = await Promise.all(
+    files.map((file) => readFile(new URL(file, ELEMENT_SOURCES), "utf8")),
+  );
+  return new Set(
+    names.filter((name) => {
+      const alias = new RegExp(
+        `var\\(\\s*${name.replace("--sefaria-", "--_sefaria-")}\\s*[,)]`,
+        "u",
+      );
+      return !sources.some((source) => alias.test(source));
+    }),
+  );
+}
 
 interface EventDetails {
   readonly detail: string;
@@ -115,6 +142,9 @@ export async function renderComponentsReference(): Promise<string> {
     );
   const tags = declarations.map((declaration) => declaration.tagName);
   const events = await loadEventCatalog(declarations);
+  const reserved = await reservedTokens(
+    declarations[0]!.cssProperties.map((property) => property.name),
+  );
   const missing = tags.filter((tag) => !catalog[tag]);
   const unknown = Object.keys(catalog).filter((tag) => !tags.includes(tag));
   if (missing.length > 0 || unknown.length > 0) {
@@ -239,7 +269,7 @@ export async function renderComponentsReference(): Promise<string> {
     "| --- | --- | --- |",
     ...declarations[0]!.cssProperties.map(
       (property) =>
-        `| ${code(property.name)} | ${code(property.default ?? "")} | ${cell(property.description ?? "")} |`,
+        `| ${code(property.name)} | ${code(property.default ?? "")} | ${reserved.has(property.name) ? `${RESERVED} ` : ""}${cell(property.description ?? "")} |`,
     ),
   );
   return renderPage({

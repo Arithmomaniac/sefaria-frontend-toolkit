@@ -2,6 +2,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 
 const SITE = "https://arithmomaniac.github.io/sefaria-frontend-toolkit";
+const REPOSITORY = "https://github.com/Arithmomaniac/sefaria-frontend-toolkit";
 const docs = (route: string) => new URL(`../../docs/${route}`, import.meta.url);
 const snippet = (file: string) =>
   readFile(
@@ -120,8 +121,9 @@ export async function renderLlmsTxt(): Promise<string> {
     "```",
     "",
     `- To work with Sefaria's data in your own code, use \`@arithmomaniac/sefaria-client\` to fetch checked API responses and \`@arithmomaniac/sefaria-text-transform\` and its \`normalizeText\` function to make text HTML safe before you show it. Start at ${SITE}/data-and-text-tools/start-here.`,
-    `- To install the npm packages, or to choose between them and the script tag, read ${SITE}/help/install-and-status.`,
-    `- If you're an assistant building a page for someone, also read ${SITE}/use-components/start-with-an-ai-assistant.`,
+    `- To install the npm packages, or to choose between them and the script tag, read ${SITE}/help/install-and-status. With a bundler, register every element once with \`import "@arithmomaniac/sefaria-web-components";\`. The element subpaths don't register their element.`,
+    `- Keep attribution. Source Card shows each edition's title, linked to its source when the source is a valid http(s) address; don't hide it with \`hide-attributions\`, and don't copy text out of a component without its attribution. The components don't show licenses; see ${SITE}/help/install-and-status.html#license-and-text-rights.`,
+    `- If you're an assistant building a page for someone, also read ${SITE}/use-components/start-with-an-ai-assistant. Its prompt is at ${REPOSITORY}/blob/main/examples/site-snippets/ai-assistant-prompt.md.`,
     `- For exact element, function, type and import names, use the reference pages below instead of guessing.`,
     "",
   ];

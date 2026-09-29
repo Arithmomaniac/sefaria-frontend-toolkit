@@ -3,7 +3,10 @@ import { describe, expect, it } from "vitest";
 import { loadOverlayInputs } from "../packages/client/scripts/generate-openapi.js";
 import { renderApiCorrections } from "../scripts/reference/api-corrections.js";
 import { renderClientReference } from "../scripts/reference/client.js";
-import { renderComponentsReference } from "../scripts/reference/components.js";
+import {
+  RESERVED,
+  renderComponentsReference,
+} from "../scripts/reference/components.js";
 import { LLMS_SECTIONS, renderLlmsTxt } from "../scripts/reference/llms.js";
 import { renderPackagesReference } from "../scripts/reference/packages.js";
 import {
@@ -50,6 +53,11 @@ describe("EP7 llms.txt", () => {
         `](${site}/${route === "" ? "" : `${route}.html`})`,
       );
     }
+    expect(text).toContain('import "@arithmomaniac/sefaria-web-components";');
+    expect(text).toMatch(/Keep attribution/u);
+    expect(text).toContain(
+      "/blob/main/examples/site-snippets/ai-assistant-prompt.md",
+    );
     expect(text).not.toMatch(/Genesis 1:1/u);
   });
 
@@ -111,6 +119,38 @@ describe("R1 components reference", () => {
       "| Reader | `sefaria-reader-back` | Requests navigation to the previous entry. | `originEntryId`, the entry the Reader was showing | Yes |",
     );
     expect(page).toMatch(/\| Reader \| `sefaria-reader-error` \|.*\| No \|/u);
+  });
+
+  it("marks exactly the style tokens no component reads as reserved", async () => {
+    const page = await read("docs/reference/components.md");
+    const directory = "packages/web-components/src";
+    const { readdir } = await import("node:fs/promises");
+    const sources = await Promise.all(
+      (await readdir(new URL(`../${directory}`, import.meta.url)))
+        .filter(
+          (file) =>
+            file.endsWith(".ts") &&
+            !file.includes(".test.") &&
+            file !== "tokens.ts",
+        )
+        .map((file) => read(`${directory}/${file}`)),
+    );
+    const rows = [...page.matchAll(/^\| `(--sefaria-[a-z-]+)` \|.*$/gmu)];
+    expect(rows.length).toBeGreaterThan(0);
+    const reserved: string[] = [];
+    for (const [row, name] of rows) {
+      const alias = name!.replace("--sefaria-", "--_sefaria-");
+      const used = sources.some((source) => source.includes(`var(${alias}`));
+      expect(row.includes(RESERVED), name).toBe(!used);
+      if (!used) reserved.push(name!);
+    }
+    expect(reserved.sort()).toEqual([
+      "--sefaria-accent-soft",
+      "--sefaria-border-strong",
+      "--sefaria-danger",
+      "--sefaria-font-label-hebrew",
+      "--sefaria-shadow",
+    ]);
   });
 });
 
