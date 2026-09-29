@@ -54,8 +54,8 @@ A fresh load makes one request, or two with a fallback. An exact edition, or a l
 `vocalization-mode` changes Hebrew text:
 
 - `taamim_and_nikkud` (the default) keeps vowel points and cantillation.
-- `nikkud` keeps vowel points and removes cantillation.
-- `none` removes vowel points and cantillation. It also removes the sof pasuq (׃) at the end of a verse. Letters and other marks, such as `{ס}`, stay.
+- `nikkud` keeps most vowel points and removes cantillation.
+- `none` removes vowel points and cantillation, along with a few other marks such as the sof pasuq (׃). For the exact list, see [Change vowels and cantillation](/data-and-text-tools/clean-up-stored-sefaria-text.md#change-vowels-and-cantillation).
 
 The example shows the default Hebrew with vowel points, then with none.
 
