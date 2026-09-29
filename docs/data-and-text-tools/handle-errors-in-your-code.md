@@ -16,7 +16,7 @@ A generated call such as `text.getV3Texts({ client, path: { tref } })` either re
 | Kind | Returned or thrown | How to detect | Retry? |
 | --- | --- | --- | --- |
 | Documented HTTP error | Returned | `error` is set; `response.status` has the code | No |
-| Response doesn't match the API description | Thrown | Caught: `failure instanceof SefariaContractError` | Usually no; report it |
+| Response doesn't match the API description | Thrown | Caught: `failure instanceof SefariaContractError` | Usually no. Report it |
 | Request failed or was cancelled | Thrown | Any other error, often a `TypeError` or an `AbortError` | Network failure: maybe. Cancellation: no |
 
 This page covers errors in your own code. If a component on a visible page shows an error, see [Troubleshoot a page](/help/troubleshoot-a-page.md).
@@ -32,11 +32,25 @@ Request failed: TypeError: fetch failed
 Request failed: AbortError: Reader left the page
 ```
 
-The demo passes stand-in `fetch` functions to `createSefariaClient({ fetch })` so each case happens on demand without the network. In real code, use `createSefariaClient()`.
+The demo passes stand-in `fetch` functions to `createSefariaClient({ fetch })`. Each case then happens on demand, without the network. In real code, use `createSefariaClient()`.
 
-- **Documented error, returned.** When Sefaria answers with a status its API description documents as an error (for the texts API, 400 and 404), you get `{ data: undefined, error, response }`. `error` is the documented body, already checked against the description. For the texts API it is `{ error: string }`. `response.status` has the status code. (If you pass `throwOnError: true`, the call throws that checked body instead.)
-- **Contract error, thrown.** `SefariaContractError` means the response doesn't match the API description. Causes include a wrong body shape, invalid JSON, a content type the description doesn't list (such as an HTML error page), and a status the description doesn't document for that operation, such as an unexpected 500. The error has `operationId`, `method`, `path` (the path template, such as `/api/v3/texts/{tref}`), `status`, `issues`, and `response` (the original `Response`, if you need headers).
-- **Anything else, thrown.** Usually the request failed (network, DNS, offline) or you cancelled it through an `AbortSignal` passed as `signal`. A mistake in your own call, such as an invalid `baseUrl`, also lands here. You get the original error or abort reason. The client never turns these into empty or success-shaped data. Treat a cancellation as expected, not as a fault.
+- **Documented error, returned.** Sefaria may answer with a status that its API description documents as an error (for the texts API, 400 and 404). Then you get `{ data: undefined, error, response }`.
+  - `error` is the documented body, already checked against the description. For the texts API it is `{ error: string }`.
+  - `response.status` has the status code.
+  - If you pass `throwOnError: true`, the call throws that checked body instead.
+- **Contract error, thrown.** `SefariaContractError` means the response doesn't match the API description. Causes include:
+  - a wrong body shape
+  - invalid JSON
+  - a content type the description doesn't list (such as an HTML error page)
+  - a status the description doesn't document for that operation, such as an unexpected 500
+
+  The error has these fields:
+  - `operationId`, `method`, and `status`
+  - `path`, the path template, such as `/api/v3/texts/{tref}`
+  - `issues`
+  - `response`, the original `Response`, if you need headers
+
+- **Anything else, thrown.** Usually the request failed (network, DNS, offline), or you cancelled it through an `AbortSignal` passed as `signal`. A mistake in your own call, such as an invalid `baseUrl`, also lands here. You get the original error or abort reason. The client never turns these into empty or success-shaped data. Treat a cancellation as expected, not as a fault.
 
 ## Read a validation path
 
