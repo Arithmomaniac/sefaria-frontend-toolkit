@@ -74,7 +74,7 @@ A fresh load of each example makes one request, in any of the three frameworks. 
 Every component reports `status`: `empty`, `loading`, `ready` or `error`. In a framework, read `status` from a ref or the element. Listen for the error event the same way as the select event. For Source Card it is `sefaria-source-card-error`, with detail `{ error, sref }`.
 
 | Situation | What readers see | `status` | Error event |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | Waiting for Sefaria | `Loading Micah 6:6-8.` | `loading` | No |
 | Sefaria can't be reached | On a first load, the error message as an alert. If the card already showed text, it keeps that text. | `error` | `sefaria-source-card-error` |
 | Sefaria says the text isn't a reference | Sefaria's message, such as `Could not find title in reference: Not a book 3.4` | `error` | No |
