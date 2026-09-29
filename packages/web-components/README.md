@@ -15,7 +15,7 @@ The packages are prereleases on GitHub Packages, not npmjs.com. GitHub Packages 
 //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
 ```
 
-Then run `pnpm add @arithmomaniac/sefaria-web-components@alpha` or `npm install @arithmomaniac/sefaria-web-components@alpha`. Types are included; no `@types` package is needed. [Install and status](https://arithmomaniac.github.io/sefaria-frontend-toolkit/help/install-and-status.html) has the details and choices.
+Types are included; no `@types` package is needed. [Install and status](https://arithmomaniac.github.io/sefaria-frontend-toolkit/help/install-and-status.html) has the install command and the choices.
 
 ## Elements
 

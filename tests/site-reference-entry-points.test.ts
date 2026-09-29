@@ -89,7 +89,7 @@ describe("EP1–EP5 README entry points", () => {
       expect(readme).toContain(
         "@arithmomaniac:registry=https://npm.pkg.github.com",
       );
-      expect(readme).toContain(`${name}@alpha`);
+      expect(readme).toContain(name);
       expect(readme).toMatch(/read:packages/u);
       expect(readme).toContain(
         `https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/${path.posix.dirname(file)}/IMPLEMENTATION.md`,
