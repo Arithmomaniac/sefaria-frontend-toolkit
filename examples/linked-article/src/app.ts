@@ -74,6 +74,7 @@ export function startLinkedArticle(
       return;
     }
 
+    // #region open-preview
     // Each opening owns its nodes so queued close/error events cannot close a newer preview.
     const dialog = root.createElement("dialog");
     dialog.id = DIALOG_ID;
@@ -134,6 +135,7 @@ export function startLinkedArticle(
     root.body.append(dialog);
     dialog.showModal();
     closeButton.focus();
+    // #endregion open-preview
   }
 
   return {
@@ -160,6 +162,7 @@ export function startLinkedArticle(
   };
 }
 
+// #region eligible-link
 function isEligibleAnchor(anchor: HTMLAnchorElement): boolean {
   const tref = anchor.dataset.sefariaRef;
   if (tref === undefined || tref.trim().length === 0) {
@@ -193,3 +196,4 @@ function shouldEnhanceActivation(
     (anchor.target === "" || anchor.target === "_self")
   );
 }
+// #endregion eligible-link

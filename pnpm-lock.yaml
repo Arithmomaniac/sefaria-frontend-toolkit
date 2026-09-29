@@ -209,6 +209,15 @@ importers:
         specifier: workspace:*
         version: link:../../packages/web-components
 
+  examples/weekly-portion:
+    dependencies:
+      '@arithmomaniac/sefaria-client':
+        specifier: workspace:*
+        version: link:../../packages/client
+      '@arithmomaniac/sefaria-web-components':
+        specifier: workspace:*
+        version: link:../../packages/web-components
+
   packages/client:
     dependencies:
       '@hey-api/client-fetch':

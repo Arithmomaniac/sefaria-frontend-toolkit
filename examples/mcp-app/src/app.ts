@@ -184,6 +184,7 @@ export function renderReaderToolResult(
     return noCleanup;
   }
 
+  // #region seed-reader
   let seed: ReaderRawSeedData;
   try {
     if (metadata.data.kind === "source-card") {
@@ -222,6 +223,7 @@ export function renderReaderToolResult(
   const reader = new SefariaReader();
   reader.acquisition = acquisition;
   reader.data = seed;
+  // #endregion seed-reader
   reader.toggleAttribute("chat-export", interaction !== undefined);
   const status = document.createElement("p");
   status.hidden = true;

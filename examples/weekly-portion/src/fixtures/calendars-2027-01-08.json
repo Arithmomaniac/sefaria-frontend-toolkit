@@ -1,0 +1,157 @@
+{
+  "capturedAt": "2026-09-29",
+  "url": "https://www.sefaria.org/api/calendars?year=2027&month=1&day=8&diaspora=1",
+  "status": 200,
+  "payload": {
+    "date": "2027-01-08",
+    "timezone": "UTC",
+    "calendar_items": [
+      {
+        "title": { "en": "Parashat Hashavua", "he": "פרשת השבוע" },
+        "displayValue": { "en": "Vaera", "he": "וארא" },
+        "url": "Exodus.6.2-9.35",
+        "ref": "Exodus 6:2-9:35",
+        "heRef": "שמות ו׳:ב׳-ט׳:ל״ה",
+        "order": 1,
+        "category": "Tanakh",
+        "extraDetails": {
+          "aliyot": [
+            "Exodus 6:2-6:13",
+            "Exodus 6:14-6:28",
+            "Exodus 6:29-7:7",
+            "Exodus 7:8-8:6",
+            "Exodus 8:7-8:18",
+            "Exodus 8:19-9:16",
+            "Exodus 9:17-9:35",
+            "Numbers 28:9-28:15"
+          ]
+        },
+        "description": {
+          "en": "Vaera (“I Appeared”) opens as God promises to redeem the enslaved Israelites and bring them to the Promised Land. When Pharaoh repeatedly refuses to let the Israelites go, God sends a series of plagues: water turning to blood, frogs, lice, wild animals, death of livestock, boils, and hail.",
+          "he": "פרשת וארא נפתחת בהבטחת האל להוציא את בני ישראל ממצרים ולהביאם לארץ זבת חלב ודבש. משה דורש מפרעה לשלוח את בני ישראל ממצרים, אך פרעה מסרב שוב ושוב. אלוהים מביא מכות על מצרים בכל פעם שפרעה מסרב: מים הופכים לדם, מכת צפרדעים, כינים, ערוב, דבר, שחין וברד."
+        }
+      },
+      {
+        "title": { "en": "Haftarah", "he": "הפטרה" },
+        "displayValue": { "en": "Isaiah 66:1-24", "he": "ישעיהו ס״ו:א׳-כ״ד" },
+        "url": "Isaiah.66.1-24",
+        "ref": "Isaiah 66:1-24",
+        "order": 2,
+        "category": "Tanakh"
+      },
+      {
+        "title": { "en": "Daf Yomi", "he": "דף יומי" },
+        "displayValue": { "en": "Temurah 19", "he": "תמורה י״ט" },
+        "url": "Temurah.19",
+        "ref": "Temurah 19",
+        "order": 3,
+        "category": "Talmud"
+      },
+      {
+        "title": { "en": "929", "he": "929" },
+        "displayValue": { "en": "Isaiah 21 (355)", "he": "ישעיהו כ״א (355)" },
+        "url": "Isaiah.21",
+        "ref": "Isaiah 21",
+        "order": 4,
+        "category": "Tanakh"
+      },
+      {
+        "title": { "en": "Daily Mishnah", "he": "משנה יומית" },
+        "displayValue": {
+          "en": "Mishnah Negaim 14:2-3",
+          "he": "משנה נגעים י״ד:ב׳-ג׳"
+        },
+        "url": "Mishnah_Negaim.14.2-3",
+        "ref": "Mishnah Negaim 14:2-3",
+        "order": 5,
+        "category": "Mishnah"
+      },
+      {
+        "title": { "en": "Daily Rambam", "he": "הרמב\"ם היומי" },
+        "displayValue": { "en": "Nazariteship 3", "he": "הלכות נזירות ג׳" },
+        "url": "Mishneh_Torah,_Nazariteship.3",
+        "ref": "Mishneh Torah, Nazariteship 3",
+        "order": 6,
+        "category": "Halakhah"
+      },
+      {
+        "title": {
+          "en": "Daily Rambam (3 Chapters)",
+          "he": "הרמב\"ם היומי (3 פרקים)"
+        },
+        "displayValue": {
+          "en": "Transmission of the Oral Law 1-45",
+          "he": "מסירת תורה שבעל פה א׳-מ״ה"
+        },
+        "url": "Mishneh_Torah,_Transmission_of_the_Oral_Law.1-45",
+        "ref": "Mishneh Torah, Transmission of the Oral Law 1-45",
+        "order": 7,
+        "category": "Halakhah"
+      },
+      {
+        "title": { "en": "Daf a Week", "he": "דף השבוע" },
+        "displayValue": { "en": "Nazir 25", "he": "נזיר כ״ה" },
+        "url": "Nazir.25",
+        "ref": "Nazir 25",
+        "order": 8,
+        "category": "Talmud"
+      },
+      {
+        "title": { "en": "Halakhah Yomit", "he": "הלכה יומית" },
+        "displayValue": {
+          "en": "Shulchan Arukh, Orach Chayim 307:5-7",
+          "he": "שולחן ערוך, אורח חיים ש״ז:ה׳-ז׳"
+        },
+        "url": "Shulchan_Arukh,_Orach_Chayim.307.5-7",
+        "ref": "Shulchan Arukh, Orach Chayim 307:5-7",
+        "order": 9,
+        "category": "Halakhah"
+      },
+      {
+        "title": { "en": "Arukh HaShulchan Yomi", "he": "ערוך השולחן היומי" },
+        "displayValue": {
+          "en": "Orach Chaim 436:2-8",
+          "he": "אורח חיים תל״ו:ב׳-ח׳"
+        },
+        "url": "Arukh_HaShulchan,_Orach_Chaim.436.2-8",
+        "ref": "Arukh HaShulchan, Orach Chaim 436:2-8",
+        "order": 10,
+        "category": "Halakhah"
+      },
+      {
+        "title": { "en": "Tanakh Yomi", "he": "תנ\"ך יומי" },
+        "displayValue": { "en": "Kings Seder 21", "he": "מלכים סדר כא" },
+        "url": "II_Kings.4.26-6.22",
+        "ref": "II Kings 4:26-6:22",
+        "order": 11,
+        "category": "Tanakh"
+      },
+      {
+        "title": { "en": "Chok LeYisrael", "he": "חק לישראל" },
+        "displayValue": { "en": "Vaera", "he": "וארא" },
+        "url": "collections/חק-לישראל?tag=Vaera",
+        "order": 12,
+        "category": "Tanakh"
+      },
+      {
+        "title": { "en": "Tanya Yomi", "he": "תניא יומי" },
+        "displayValue": { "en": "29 Tevet", "he": "כט טבת" },
+        "url": "Tanya,_Part_I;_Likkutei_Amarim.15.1",
+        "ref": "Tanya, Part I; Likkutei Amarim 15:1",
+        "order": 15,
+        "category": "Chasidut"
+      },
+      {
+        "title": { "en": "Yerushalmi Yomi", "he": "ירושלמי יומי" },
+        "displayValue": {
+          "en": "Jerusalem Talmud Avodah Zarah 24",
+          "he": "תלמוד ירושלמי עבודה זרה כד"
+        },
+        "url": "Jerusalem_Talmud_Avodah_Zarah.3.8.4-13.1",
+        "ref": "Jerusalem Talmud Avodah Zarah 3:8:4-13:1",
+        "order": 16,
+        "category": "Talmud"
+      }
+    ]
+  }
+}

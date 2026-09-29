@@ -51,6 +51,11 @@ export const EXAMPLE_BUILDS = [
     pages: ["index.html", "live.html"],
     mcpApp: true,
   },
+  {
+    route: "weekly-portion",
+    packageName: "@sefaria-example/weekly-portion",
+    pages: ["index.html"],
+  },
 ];
 
 export const SITE_REQUIRED_FILES = [

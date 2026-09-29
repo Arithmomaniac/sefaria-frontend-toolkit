@@ -22,6 +22,11 @@ const regions = [
     file: "examples/mcp-app/src/app.ts",
     region: "reader-acquisition",
   },
+  {
+    name: "weekly-portion-calendar-call",
+    file: "examples/weekly-portion/src/app.ts",
+    region: "calendar-call",
+  },
 ];
 
 export function extractRegion(source: string, region: string): string {

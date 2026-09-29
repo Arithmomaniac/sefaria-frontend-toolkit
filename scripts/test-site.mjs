@@ -692,3 +692,8 @@ async function assertStatusNotes(page, label) {
 const { runSessionOneSiteChecks } = await import("./test-site-session-1.mjs");
 await runSessionOneSiteChecks({ root, siteBasePath });
 // --- end stage 7 session 1 ---
+
+// --- Stage 7 session 4: concepts, help, AI assistant and examples ---
+const { runSessionFourSiteChecks } = await import("./test-site-session-4.mjs");
+await runSessionFourSiteChecks({ root, siteBasePath });
+// --- end stage 7 session 4 ---

@@ -65,3 +65,11 @@ Use `LiveEditor` for every runnable component example on a how-to page. The code
 - A one-line script appended after the example reports the frame's height to the page, so the frame fits its content.
 - The highlighter adds a line break after a closing tag that has text after it on the same line. Until that changes, keep text after a closing tag on its own line so the code shown matches the code that runs. The browser check fails if they differ.
 - Checks: `scripts/test-site-session-1.mjs` covers viewport loading, isolation, shown-equals-run, Edit, Run and Reset offline. Its live check proves that the script and Sefaria load from the sandboxed frame.
+
+## Example app embeds
+
+Example pages embed the complete first-party example apps, such as `/examples/linked-article/`, in an `<iframe>` with `sandbox="allow-scripts allow-same-origin allow-popups"`, plus an "Open in a new tab" link. They show code read-only from `// #region` markers in the example source with `<<<`.
+
+- These frames are same-origin and first-party. They are **not** script-isolated: code in the frame can reach the parent page. Don't describe them as isolated.
+- The relaxed sandbox is only for built example apps that the repository owns. Never use it for code that readers can edit; `LiveEditor` keeps its `allow-scripts`-only sandbox.
+- `tests/site-session4.test.ts` checks that only the example pages use `allow-same-origin`.
