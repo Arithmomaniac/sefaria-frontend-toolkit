@@ -323,3 +323,15 @@ describe("B25 handle errors in your code", () => {
     expect(output[3]).toBe("Request failed: AbortError: Reader left the page");
   });
 });
+
+describe("B25 page", () => {
+  it("shows the real output and routes visible failures to troubleshooting", async () => {
+    const page = "data-and-text-tools/handle-errors-in-your-code.md";
+    const { output } = await runBoth("client-errors");
+    expect(await pageOutputAfter(page, "client-errors")).toEqual(output);
+    const markdown = await readFile(path.join(root, "docs", page), "utf8");
+    expect(markdown).toContain("(/help/troubleshoot-a-page.md)");
+    expect(markdown).toContain("(/help/troubleshoot-a-page.md#get-support)");
+    expect(markdown).toContain("doesn't retry");
+  });
+});
