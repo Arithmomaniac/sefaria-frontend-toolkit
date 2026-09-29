@@ -1,0 +1,20 @@
+<script
+  type="module"
+  src="https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
+></script>
+<sefaria-connections-panel sref="Micah 6:8"></sefaria-connections-panel>
+<pre id="log"></pre>
+<script type="module">
+  const log = document.querySelector("#log");
+  for (const name of [
+    "sefaria-connections-category-change",
+    "sefaria-connections-page-change",
+    "sefaria-connections-preview-request",
+    "sefaria-connection-select",
+    "sefaria-connections-panel-error",
+  ]) {
+    document.addEventListener(name, (event) => {
+      log.textContent += `${name} ${JSON.stringify(event.detail)}\n`;
+    });
+  }
+</script>

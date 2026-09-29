@@ -1,0 +1,15 @@
+<script
+  type="module"
+  src="https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
+></script>
+<sefaria-source-card sref="Micah 6:6-8" selectable></sefaria-source-card>
+<p id="selection">Select a verse number.</p>
+<script type="module">
+  const card = document.querySelector("sefaria-source-card");
+  const output = document.querySelector("#selection");
+  card.addEventListener("sefaria-source-select", (event) => {
+    const { position, ref } = event.detail;
+    card.selectedPosition = position;
+    output.textContent = `You selected ${ref} (position ${position.join(", ")}).`;
+  });
+</script>

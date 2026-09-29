@@ -1,0 +1,35 @@
+<script
+  type="module"
+  src="https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
+></script>
+<style>
+  :root {
+    color-scheme: light dark;
+  }
+
+  .themed {
+    --sefaria-surface: light-dark(#f7f9ff, #10172a);
+    --sefaria-fg: light-dark(#1b2333, #e6ebf5);
+    --sefaria-link: light-dark(#1d4ed8, #93b4ff);
+    --sefaria-accent: light-dark(#1d4ed8, #93b4ff);
+    --sefaria-border: light-dark(#c7d2e8, #34405c);
+    --sefaria-panel-radius: 0.25rem;
+    --sefaria-font-english: "Segoe UI", system-ui, sans-serif;
+    --sefaria-font-scale: 1.1;
+  }
+</style>
+<label>
+  <input type="checkbox" id="dark" />
+  Force dark
+</label>
+<div class="themed">
+  <sefaria-ref-label sref="Micah 6:8" linked></sefaria-ref-label>
+  <sefaria-source-card sref="Micah 6:8"></sefaria-source-card>
+</div>
+<script type="module">
+  document.querySelector("#dark").addEventListener("change", (event) => {
+    document.documentElement.style.colorScheme = event.target.checked
+      ? "dark"
+      : "";
+  });
+</script>

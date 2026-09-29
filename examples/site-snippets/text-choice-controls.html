@@ -1,0 +1,39 @@
+<script
+  type="module"
+  src="https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
+></script>
+<form id="choices">
+  <label>
+    Translation language
+    <select name="translation-language">
+      <option value="">Sefaria's default</option>
+      <option value="french">French</option>
+      <option value="german">German</option>
+    </select>
+  </label>
+  <label>
+    Vowel marks
+    <select name="vocalization-mode">
+      <option value="taamim_and_nikkud">Vowels and cantillation</option>
+      <option value="nikkud">Vowels only</option>
+      <option value="none">None</option>
+    </select>
+  </label>
+  <label>
+    Sides
+    <select name="content-language">
+      <option value="both">Both</option>
+      <option value="primary">Primary</option>
+      <option value="translation">Translation</option>
+    </select>
+  </label>
+</form>
+<sefaria-source-card sref="Micah 6:8"></sefaria-source-card>
+<script type="module">
+  const card = document.querySelector("sefaria-source-card");
+  document.querySelector("#choices").addEventListener("change", (event) => {
+    const { name, value } = event.target;
+    if (value) card.setAttribute(name, value);
+    else card.removeAttribute(name);
+  });
+</script>

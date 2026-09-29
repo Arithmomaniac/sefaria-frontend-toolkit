@@ -1,0 +1,3899 @@
+{
+  "capturedAt": "2026-09-29",
+  "payload": [
+    {
+      "_id": "5396837dfbfba24fa9b34fae",
+      "index_title": "Kuzari",
+      "category": "Jewish Thought",
+      "type": "",
+      "ref": "Kuzari 2:48",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Kuzari 2:48",
+      "sourceHeRef": "הכוזרי ב׳:מ״ח",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1120, 1140],
+      "commentaryNum": 2.0048,
+      "collectiveTitle": {
+        "en": "Kuzari",
+        "he": "הכוזרי"
+      },
+      "heTitle": "הכוזרי"
+    },
+    {
+      "_id": "53968422fbfba24fa9b35081",
+      "index_title": "Kuzari",
+      "category": "Jewish Thought",
+      "type": "",
+      "ref": "Kuzari 2:47",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Kuzari 2:47",
+      "sourceHeRef": "הכוזרי ב׳:מ״ז",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1120, 1140],
+      "commentaryNum": 2.0047,
+      "collectiveTitle": {
+        "en": "Kuzari",
+        "he": "הכוזרי"
+      },
+      "heTitle": "הכוזרי"
+    },
+    {
+      "_id": "53f18aedfbfba21e30177377",
+      "index_title": "Rashi on Micah",
+      "category": "Commentary",
+      "type": "commentary",
+      "ref": "Rashi on Micah 6:8:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Rashi on Micah 6:8:1",
+      "sourceHeRef": "רש\"י על מיכה ו׳:ח׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1075, 1105],
+      "commentaryNum": 8.0001,
+      "collectiveTitle": {
+        "en": "Rashi",
+        "he": "רש\"י"
+      },
+      "heTitle": "רש\"י על מיכה"
+    },
+    {
+      "_id": "53f18aedfbfba21e30177379",
+      "index_title": "Rashi on Micah",
+      "category": "Commentary",
+      "type": "commentary",
+      "ref": "Rashi on Micah 6:8:2",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Rashi on Micah 6:8:2",
+      "sourceHeRef": "רש\"י על מיכה ו׳:ח׳:ב׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1075, 1105],
+      "commentaryNum": 8.0002,
+      "collectiveTitle": {
+        "en": "Rashi",
+        "he": "רש\"י"
+      },
+      "heTitle": "רש\"י על מיכה"
+    },
+    {
+      "_id": "5875f0f4d6e4a9024cf6a8fd",
+      "index_title": "Targum Jonathan on Micah",
+      "category": "Targum",
+      "type": "targum",
+      "ref": "Targum Jonathan on Micah 6:8",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Targum Jonathan on Micah 6:8",
+      "sourceHeRef": "תרגום יונתן על מיכה ו׳:ח׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [-150, 350],
+      "commentaryNum": 6.0008,
+      "collectiveTitle": {
+        "en": "Targum Jonathan on Micah",
+        "he": "תרגום יונתן על מיכה"
+      },
+      "heTitle": "תרגום יונתן על מיכה"
+    },
+    {
+      "_id": "5901cbe7d6e4a9073e68cb37",
+      "index_title": "Radak on Micah",
+      "category": "Commentary",
+      "type": "commentary",
+      "ref": "Radak on Micah 6:8:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Radak on Micah 6:8:1",
+      "sourceHeRef": "רד\"ק על מיכה ו׳:ח׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1185, 1235],
+      "commentaryNum": 8.0001,
+      "collectiveTitle": {
+        "en": "Radak",
+        "he": "רד\"ק"
+      },
+      "heTitle": "רד\"ק על מיכה"
+    },
+    {
+      "_id": "5901cbe7d6e4a9073e68cb39",
+      "index_title": "Radak on Micah",
+      "category": "Commentary",
+      "type": "commentary",
+      "ref": "Radak on Micah 6:8:2",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Radak on Micah 6:8:2",
+      "sourceHeRef": "רד\"ק על מיכה ו׳:ח׳:ב׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1185, 1235],
+      "commentaryNum": 8.0002,
+      "collectiveTitle": {
+        "en": "Radak",
+        "he": "רד\"ק"
+      },
+      "heTitle": "רד\"ק על מיכה"
+    },
+    {
+      "_id": "5901cbe7d6e4a9073e68cb3b",
+      "index_title": "Radak on Micah",
+      "category": "Commentary",
+      "type": "commentary",
+      "ref": "Radak on Micah 6:8:3",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Radak on Micah 6:8:3",
+      "sourceHeRef": "רד\"ק על מיכה ו׳:ח׳:ג׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1185, 1235],
+      "commentaryNum": 8.0003,
+      "collectiveTitle": {
+        "en": "Radak",
+        "he": "רד\"ק"
+      },
+      "heTitle": "רד\"ק על מיכה"
+    },
+    {
+      "_id": "5901cbe7d6e4a9073e68cb3d",
+      "index_title": "Radak on Micah",
+      "category": "Commentary",
+      "type": "commentary",
+      "ref": "Radak on Micah 6:8:4",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Radak on Micah 6:8:4",
+      "sourceHeRef": "רד\"ק על מיכה ו׳:ח׳:ד׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1185, 1235],
+      "commentaryNum": 8.0004,
+      "collectiveTitle": {
+        "en": "Radak",
+        "he": "רד\"ק"
+      },
+      "heTitle": "רד\"ק על מיכה"
+    },
+    {
+      "_id": "5f1d6d5d14ddac2ba6fd08d3",
+      "index_title": "Midrash Lekach Tov",
+      "category": "Midrash",
+      "type": "commentary",
+      "ref": "Midrash Lekach Tov, Genesis 12:1:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Midrash Lekach Tov, Genesis 12:1:1",
+      "sourceHeRef": "מדרש לקח טוב, בראשית י״ב:א׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1105, 1115],
+      "commentaryNum": 1.0001,
+      "collectiveTitle": {
+        "en": "Midrash Lekach Tov",
+        "he": "מדרש לקח טוב"
+      },
+      "heTitle": "בראשית"
+    },
+    {
+      "_id": "5f1d6da95c8f935f442f3e28",
+      "index_title": "Midrash Lekach Tov",
+      "category": "Midrash",
+      "type": "commentary",
+      "ref": "Midrash Lekach Tov, Exodus 21:1:2",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Midrash Lekach Tov, Exodus 21:1:2",
+      "sourceHeRef": "מדרש לקח טוב, שמות כ״א:א׳:ב׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1105, 1115],
+      "commentaryNum": 1.0002,
+      "collectiveTitle": {
+        "en": "Midrash Lekach Tov",
+        "he": "מדרש לקח טוב"
+      },
+      "heTitle": "שמות"
+    },
+    {
+      "_id": "5f1d6f9f3353e1a24e02b85c",
+      "index_title": "Midrash Lekach Tov",
+      "category": "Midrash",
+      "type": "commentary",
+      "ref": "Midrash Lekach Tov, Genesis 45:3:2",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Midrash Lekach Tov, Genesis 45:3:2",
+      "sourceHeRef": "מדרש לקח טוב, בראשית מ״ה:ג׳:ב׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1105, 1115],
+      "commentaryNum": 3.0002,
+      "collectiveTitle": {
+        "en": "Midrash Lekach Tov",
+        "he": "מדרש לקח טוב"
+      },
+      "heTitle": "בראשית"
+    },
+    {
+      "_id": "61023ed4c795231b79e369a8",
+      "index_title": "Tzror HaMor on Torah",
+      "category": "Quoting Commentary",
+      "type": "quotation_auto",
+      "ref": "Tzror HaMor on Torah, Exodus 20:22:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Tzror HaMor on Torah, Exodus 20:22:1",
+      "sourceHeRef": "צרור המור על התורה, שמות כ׳:כ״ב:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1460, 1510],
+      "commentaryNum": 22.0001,
+      "collectiveTitle": {
+        "en": "Tzror HaMor on Torah",
+        "he": "צרור המור על התורה"
+      },
+      "heTitle": "שמות"
+    },
+    {
+      "_id": "6121b7dc8430f78f20636a1c",
+      "index_title": "Yalkut Shimoni on Torah",
+      "category": "Midrash",
+      "type": "quotation_auto",
+      "ref": "Yalkut Shimoni on Torah 683:2",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Yalkut Shimoni on Torah 683:2",
+      "sourceHeRef": "ילקוט שמעוני על התורה תרפ״ג:ב׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1100],
+      "commentaryNum": 683.0002,
+      "collectiveTitle": {
+        "en": "Yalkut Shimoni on Torah",
+        "he": "ילקוט שמעוני על התורה"
+      },
+      "heTitle": "ילקוט שמעוני על התורה"
+    },
+    {
+      "_id": "61d5d5c1f4629f2b572805b0",
+      "index_title": "Sefer HaShorashim",
+      "category": "Reference",
+      "type": "reference",
+      "ref": "Sefer HaShorashim, צנע 1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Sefer HaShorashim, צנע 1",
+      "sourceHeRef": "ספר השרשים, צנע א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1185, 1235],
+      "commentaryNum": 1,
+      "collectiveTitle": {
+        "en": "Sefer HaShorashim",
+        "he": "ספר השרשים"
+      },
+      "heTitle": "צנע"
+    },
+    {
+      "_id": "64fd531cd65a1abc1dcf153e",
+      "index_title": "Shulchan Arukh, Orach Chayim",
+      "category": "Halakhah",
+      "type": "quotation",
+      "ref": "Shulchan Arukh, Orach Chayim 1:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Shulchan Arukh, Orach Chayim 1:1",
+      "sourceHeRef": "שולחן ערוך, אורח חיים א׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1563],
+      "commentaryNum": 1.0001,
+      "collectiveTitle": {
+        "en": "Shulchan Arukh, Orach Chayim",
+        "he": "שולחן ערוך, אורח חיים"
+      },
+      "heTitle": "שולחן ערוך, אורח חיים"
+    },
+    {
+      "_id": "657eb14080c65f62e94beb5f",
+      "index_title": "Steinsaltz Introductions to Tanakh",
+      "category": "Essay",
+      "type": "essay",
+      "ref": "Steinsaltz Introductions to Tanakh, Micah, Section Preface 4",
+      "anchorRef": "Micah 6:1-8",
+      "anchorRefExpanded": [
+        "Micah 6:1",
+        "Micah 6:2",
+        "Micah 6:3",
+        "Micah 6:4",
+        "Micah 6:5",
+        "Micah 6:6",
+        "Micah 6:7",
+        "Micah 6:8"
+      ],
+      "sourceRef": "Steinsaltz Introductions to Tanakh, Micah, Section Preface 4",
+      "sourceHeRef": "ביאור שטיינזלץ, הקדמות לתנ\"ך, מיכה, מבוא לקטע ד׳",
+      "anchorVerse": 1,
+      "sourceHasEn": true,
+      "anchorVersion": {
+        "title": "ALL",
+        "language": "en"
+      },
+      "sourceVersion": {
+        "title": "ALL",
+        "language": "en"
+      },
+      "displayedText": {
+        "en": "Steinsaltz Introductions to Tanakh, Micah, Section Preface",
+        "he": "ביאור שטיינזלץ, הקדמות לתנ\"ך, מיכה, מבוא לקטע"
+      },
+      "commentaryNum": 4,
+      "collectiveTitle": {
+        "en": "Steinsaltz Introductions to Tanakh",
+        "he": "ביאור שטיינזלץ, הקדמות לתנ\"ך"
+      },
+      "heTitle": "מבוא לקטע"
+    },
+    {
+      "_id": "657eb1f880c65f62e94c12cc",
+      "index_title": "Steinsaltz on Micah",
+      "category": "Commentary",
+      "type": "commentary",
+      "ref": "Steinsaltz on Micah 6:8",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Steinsaltz on Micah 6:8",
+      "sourceHeRef": "ביאור שטיינזלץ על מיכה ו׳:ח׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "commentaryNum": 6.0008,
+      "collectiveTitle": {
+        "en": "Steinsaltz",
+        "he": "ביאור שטיינזלץ"
+      },
+      "heTitle": "ביאור שטיינזלץ על מיכה"
+    },
+    {
+      "_id": "657eb1f880c65f62e94c12ee",
+      "index_title": "Steinsaltz Introductions to Tanakh",
+      "category": "Essay",
+      "type": "essay",
+      "ref": "Steinsaltz Introductions to Tanakh, Micah, Book Introduction",
+      "anchorRef": "Micah 6:1-16",
+      "anchorRefExpanded": [
+        "Micah 6:1",
+        "Micah 6:2",
+        "Micah 6:3",
+        "Micah 6:4",
+        "Micah 6:5",
+        "Micah 6:6",
+        "Micah 6:7",
+        "Micah 6:8",
+        "Micah 6:9",
+        "Micah 6:10",
+        "Micah 6:11",
+        "Micah 6:12",
+        "Micah 6:13",
+        "Micah 6:14",
+        "Micah 6:15",
+        "Micah 6:16"
+      ],
+      "sourceRef": "Steinsaltz Introductions to Tanakh, Micah, Book Introduction",
+      "sourceHeRef": "ביאור שטיינזלץ, הקדמות לתנ\"ך, מיכה, הקדמה לספר",
+      "anchorVerse": 1,
+      "sourceHasEn": true,
+      "anchorVersion": {
+        "title": "ALL",
+        "language": "en"
+      },
+      "sourceVersion": {
+        "title": "ALL",
+        "language": "en"
+      },
+      "displayedText": {
+        "en": "Steinsaltz Introductions to Tanakh, Micah, Book Introduction",
+        "he": "ביאור שטיינזלץ, הקדמות לתנ\"ך, מיכה, הקדמה לספר"
+      },
+      "commentaryNum": 0,
+      "collectiveTitle": {
+        "en": "Steinsaltz Introductions to Tanakh",
+        "he": "ביאור שטיינזלץ, הקדמות לתנ\"ך"
+      },
+      "heTitle": "הקדמה לספר"
+    },
+    {
+      "_id": "65e9da9fb215f43691cfec26",
+      "index_title": "Tze'enah Ure'enah",
+      "category": "Commentary",
+      "type": "commentary",
+      "ref": "Tze'enah Ure'enah, Haftarot, Balak 14",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Tze'enah Ure'enah, Haftarot, Balak 14",
+      "sourceHeRef": "צאינה וראינה, הפטרות, בלק י״ד",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1590, 1616],
+      "commentaryNum": 14,
+      "collectiveTitle": {
+        "en": "Tze'enah Ure'enah",
+        "he": "צאינה וראינה"
+      },
+      "heTitle": "בלק"
+    },
+    {
+      "_id": "65e9da9fb215f43691cfec28",
+      "index_title": "Tze'enah Ure'enah",
+      "category": "Commentary",
+      "type": "commentary",
+      "ref": "Tze'enah Ure'enah, Haftarot, Balak 15-17",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Tze'enah Ure'enah, Haftarot, Balak 15-17",
+      "sourceHeRef": "צאינה וראינה, הפטרות, בלק ט״ו-י״ז",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1590, 1616],
+      "commentaryNum": 15,
+      "collectiveTitle": {
+        "en": "Tze'enah Ure'enah",
+        "he": "צאינה וראינה"
+      },
+      "heTitle": "בלק"
+    },
+    {
+      "_id": "68c2dd8a97fad5b05d3d451a",
+      "index_title": "Noam Elimelekh",
+      "category": "Chasidut",
+      "type": "quotation",
+      "ref": "Noam Elimelekh, Additions, Likutei Shoshana 20:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Noam Elimelekh, Additions, Likutei Shoshana 20:1",
+      "sourceHeRef": "נועם אלימלך, נספחים, ליקוטי שושנה כ׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1786],
+      "commentaryNum": 20.0001,
+      "collectiveTitle": {
+        "en": "Noam Elimelekh",
+        "he": "נועם אלימלך"
+      },
+      "heTitle": "ליקוטי שושנה"
+    },
+    {
+      "_id": "58ad96f7d6e4a93323dc372a",
+      "index_title": "Sukkah",
+      "category": "Talmud",
+      "type": "",
+      "ref": "Sukkah 49b:8",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Sukkah 49b:8",
+      "sourceHeRef": "סוכה מ״ט ב:ח׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [450, 550],
+      "commentaryNum": 98.0008,
+      "collectiveTitle": {
+        "en": "Sukkah",
+        "he": "סוכה"
+      },
+      "heTitle": "סוכה"
+    },
+    {
+      "_id": "5b0bc4844845f90017cd1df5",
+      "index_title": "Yismach Moshe",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Yismach Moshe, Tzav 3:1",
+      "anchorRef": "Micah 6:6-8",
+      "anchorRefExpanded": ["Micah 6:6", "Micah 6:7", "Micah 6:8"],
+      "sourceRef": "Yismach Moshe, Tzav 3:1",
+      "sourceHeRef": "ישמח משה, צו ג׳:א׳",
+      "anchorVerse": 6,
+      "sourceHasEn": false,
+      "compDate": [1790, 1840],
+      "commentaryNum": 3.0001,
+      "collectiveTitle": {
+        "en": "Yismach Moshe",
+        "he": "ישמח משה"
+      },
+      "heTitle": "צו"
+    },
+    {
+      "_id": "60b604373b3143fe8cc2079b",
+      "index_title": "Sidduro Shel Shabbat",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Sidduro Shel Shabbat, Volume I, Shoresh I 4:12",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Sidduro Shel Shabbat, Volume I, Shoresh I 4:12",
+      "sourceHeRef": "סדורו של שבת, חלק א, שורש הראשון ד׳:י״ב",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1770, 1810],
+      "commentaryNum": 4.0012,
+      "collectiveTitle": {
+        "en": "Sidduro Shel Shabbat",
+        "he": "סדורו של שבת"
+      },
+      "heTitle": "שורש הראשון"
+    },
+    {
+      "_id": "695ec5684c54e1cd02f2610d",
+      "index_title": "Sha'arei Teshuvah",
+      "category": "Musar",
+      "type": "",
+      "ref": "Sha'arei Teshuvah 3:13",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Sha'arei Teshuvah 3:13",
+      "sourceHeRef": "שערי תשובה ג׳:י״ג",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1243, 1263],
+      "commentaryNum": 3.0013,
+      "collectiveTitle": {
+        "en": "Sha'arei Teshuvah",
+        "he": "שערי תשובה"
+      },
+      "heTitle": "שערי תשובה"
+    },
+    {
+      "_id": "695ec56a7412435fbe3422c3",
+      "index_title": "Sha'arei Teshuvah",
+      "category": "Musar",
+      "type": "",
+      "ref": "Sha'arei Teshuvah 2:19",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Sha'arei Teshuvah 2:19",
+      "sourceHeRef": "שערי תשובה ב׳:י״ט",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1243, 1263],
+      "commentaryNum": 2.0019,
+      "collectiveTitle": {
+        "en": "Sha'arei Teshuvah",
+        "he": "שערי תשובה"
+      },
+      "heTitle": "שערי תשובה"
+    },
+    {
+      "_id": "695ec6dd91b3f25f5d0d6299",
+      "index_title": "Pele Yoetz",
+      "category": "Musar",
+      "type": "",
+      "ref": "Pele Yoetz 135:4",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Pele Yoetz 135:4",
+      "sourceHeRef": "פלא יועץ קל״ה:ד׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1815, 1823],
+      "commentaryNum": 135.0004,
+      "collectiveTitle": {
+        "en": "Pele Yoetz",
+        "he": "פלא יועץ"
+      }
+    },
+    {
+      "_id": "695ec70c7412435fbe3426b5",
+      "index_title": "Pele Yoetz",
+      "category": "Musar",
+      "type": "",
+      "ref": "Pele Yoetz 304:3",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Pele Yoetz 304:3",
+      "sourceHeRef": "פלא יועץ ש״ד:ג׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1815, 1823],
+      "commentaryNum": 304.0003,
+      "collectiveTitle": {
+        "en": "Pele Yoetz",
+        "he": "פלא יועץ"
+      }
+    },
+    {
+      "_id": "695ec7235e52c6548cdf6f62",
+      "index_title": "Pele Yoetz",
+      "category": "Musar",
+      "type": "",
+      "ref": "Pele Yoetz 380:14",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Pele Yoetz 380:14",
+      "sourceHeRef": "פלא יועץ ש״פ:י״ד",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1815, 1823],
+      "commentaryNum": 380.0014,
+      "collectiveTitle": {
+        "en": "Pele Yoetz",
+        "he": "פלא יועץ"
+      }
+    },
+    {
+      "_id": "695f13c74c54e1cd02f2d357",
+      "index_title": "Shulchan Arukh, Orach Chayim",
+      "category": "Halakhah",
+      "type": "",
+      "ref": "Shulchan Arukh, Orach Chayim 240:4",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Shulchan Arukh, Orach Chayim 240:4",
+      "sourceHeRef": "שולחן ערוך, אורח חיים ר״מ:ד׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1563],
+      "commentaryNum": 240.0004,
+      "collectiveTitle": {
+        "en": "Shulchan Arukh, Orach Chayim",
+        "he": "שולחן ערוך, אורח חיים"
+      },
+      "heTitle": "שולחן ערוך, אורח חיים"
+    },
+    {
+      "_id": "695f367e8b6eae08c3722471",
+      "index_title": "Midrash Tehillim",
+      "category": "Midrash",
+      "type": "",
+      "ref": "Midrash Tehillim 17:15",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Midrash Tehillim 17:15",
+      "sourceHeRef": "מדרש תהילים י״ז:ט״ו",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1050, 1450],
+      "commentaryNum": 17.0015,
+      "collectiveTitle": {
+        "en": "Midrash Tehillim",
+        "he": "מדרש תהילים"
+      },
+      "heTitle": "מדרש תהילים"
+    },
+    {
+      "_id": "695f3f948b6eae08c3723cf6",
+      "index_title": "Rabbeinu Yonah on Pirkei Avot",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Rabbeinu Yonah on Pirkei Avot 1:1:6",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Rabbeinu Yonah on Pirkei Avot 1:1:6",
+      "sourceHeRef": "רבינו יונה על פרקי אבות א׳:א׳:ו׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1200, 1260],
+      "commentaryNum": 1.0006,
+      "collectiveTitle": {
+        "en": "Rabbeinu Yonah on Pirkei Avot",
+        "he": "רבינו יונה על פרקי אבות"
+      },
+      "heTitle": "רבינו יונה על פרקי אבות"
+    },
+    {
+      "_id": "695f561835610c1ae4916549",
+      "index_title": "Tosafot Yom Tov on Mishnah Demai",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Tosafot Yom Tov on Mishnah Demai 3:3:3",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Tosafot Yom Tov on Mishnah Demai 3:3:3",
+      "sourceHeRef": "תוספות יום טוב על משנה דמאי ג׳:ג׳:ג׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1613, 1617],
+      "commentaryNum": 3.0003,
+      "collectiveTitle": {
+        "en": "Tosafot Yom Tov on Mishnah Demai",
+        "he": "תוספות יום טוב על משנה דמאי"
+      }
+    },
+    {
+      "_id": "695f5ca118573ae253d8e08b",
+      "index_title": "Rabbeinu Bahya",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Rabbeinu Bahya, Bamidbar 1:1:7",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Rabbeinu Bahya, Bamidbar 1:1:7",
+      "sourceHeRef": "רבנו בחיי, במדבר א׳:א׳:ז׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1290, 1310],
+      "commentaryNum": 1.0007,
+      "collectiveTitle": {
+        "en": "Rabbeinu Bahya",
+        "he": "רבנו בחיי"
+      },
+      "heTitle": "במדבר"
+    },
+    {
+      "_id": "695f98062611b0201f9f2514",
+      "index_title": "Rambam on Mishnah Demai",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Rambam on Mishnah Demai 3:3:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Rambam on Mishnah Demai 3:3:1",
+      "sourceHeRef": "רמב\"ם על משנה דמאי ג׳:ג׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1160, 1168],
+      "commentaryNum": 3.0001,
+      "collectiveTitle": {
+        "en": "Rambam on Mishnah Demai",
+        "he": "רמב\"ם על משנה דמאי"
+      },
+      "heTitle": "רמב\"ם על משנה דמאי"
+    },
+    {
+      "_id": "695f9c4121371d610344dde6",
+      "index_title": "Yesod Mora VeSod HaTorah",
+      "category": "Jewish Thought",
+      "type": "",
+      "ref": "Yesod Mora VeSod HaTorah 2:5",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Yesod Mora VeSod HaTorah 2:5",
+      "sourceHeRef": "יסוד מורא וסוד תורה ב׳:ה׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1158],
+      "commentaryNum": 2.0005,
+      "collectiveTitle": {
+        "en": "Yesod Mora VeSod HaTorah",
+        "he": "יסוד מורא וסוד תורה"
+      }
+    },
+    {
+      "_id": "695fa9a42611b0201f9f59e7",
+      "index_title": "Noam Elimelekh",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Noam Elimelekh, Sefer Bereshit, Chayye Sara 3:5",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Noam Elimelekh, Sefer Bereshit, Chayye Sara 3:5",
+      "sourceHeRef": "נועם אלימלך, ספר בראשית, חיי שרה ג׳:ה׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1786],
+      "commentaryNum": 3.0005,
+      "collectiveTitle": {
+        "en": "Noam Elimelekh",
+        "he": "נועם אלימלך"
+      },
+      "heTitle": "חיי שרה"
+    },
+    {
+      "_id": "695fac419806cee6831c4534",
+      "index_title": "Midrash Tanchuma",
+      "category": "Midrash",
+      "type": "",
+      "ref": "Midrash Tanchuma, Ki Tisa 31:2",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Midrash Tanchuma, Ki Tisa 31:2",
+      "sourceHeRef": "מדרש תנחומא, כי תשא ל״א:ב׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [500, 800],
+      "commentaryNum": 31.0002,
+      "collectiveTitle": {
+        "en": "Midrash Tanchuma",
+        "he": "מדרש תנחומא"
+      },
+      "heTitle": "כי תשא"
+    },
+    {
+      "_id": "695facd0b2aa134aa1b4a7f0",
+      "index_title": "Midrash Tanchuma",
+      "category": "Midrash",
+      "type": "",
+      "ref": "Midrash Tanchuma, Bamidbar 3:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Midrash Tanchuma, Bamidbar 3:1",
+      "sourceHeRef": "מדרש תנחומא, במדבר ג׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [500, 800],
+      "commentaryNum": 3.0001,
+      "collectiveTitle": {
+        "en": "Midrash Tanchuma",
+        "he": "מדרש תנחומא"
+      },
+      "heTitle": "במדבר"
+    },
+    {
+      "_id": "695fad03606cc33f11107918",
+      "index_title": "Midrash Tanchuma",
+      "category": "Midrash",
+      "type": "",
+      "ref": "Midrash Tanchuma, Shoftim 9:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Midrash Tanchuma, Shoftim 9:1",
+      "sourceHeRef": "מדרש תנחומא, שופטים ט׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [500, 800],
+      "commentaryNum": 9.0001,
+      "collectiveTitle": {
+        "en": "Midrash Tanchuma",
+        "he": "מדרש תנחומא"
+      },
+      "heTitle": "שופטים"
+    },
+    {
+      "_id": "695fb73d83a139d52c709cf4",
+      "index_title": "Midrash Tanchuma Buber",
+      "category": "Midrash",
+      "type": "",
+      "ref": "Midrash Tanchuma Buber, Miketz 8:2",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Midrash Tanchuma Buber, Miketz 8:2",
+      "sourceHeRef": "תנחומא בובר, מקץ ח׳:ב׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [150, 750],
+      "commentaryNum": 8.0002,
+      "collectiveTitle": {
+        "en": "Midrash Tanchuma Buber",
+        "he": "תנחומא בובר"
+      },
+      "heTitle": "מקץ"
+    },
+    {
+      "_id": "695fb7e72cca20470740d624",
+      "index_title": "Midrash Tanchuma Buber",
+      "category": "Midrash",
+      "type": "",
+      "ref": "Midrash Tanchuma Buber, Bamidbar 3:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Midrash Tanchuma Buber, Bamidbar 3:1",
+      "sourceHeRef": "תנחומא בובר, במדבר ג׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [150, 750],
+      "commentaryNum": 3.0001,
+      "collectiveTitle": {
+        "en": "Midrash Tanchuma Buber",
+        "he": "תנחומא בובר"
+      },
+      "heTitle": "במדבר"
+    },
+    {
+      "_id": "695fb8557749e9f5f7075658",
+      "index_title": "Midrash Tanchuma Buber",
+      "category": "Midrash",
+      "type": "",
+      "ref": "Midrash Tanchuma Buber, Shoftim 10:2",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Midrash Tanchuma Buber, Shoftim 10:2",
+      "sourceHeRef": "תנחומא בובר, שופטים י׳:ב׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [150, 750],
+      "commentaryNum": 10.0002,
+      "collectiveTitle": {
+        "en": "Midrash Tanchuma Buber",
+        "he": "תנחומא בובר"
+      },
+      "heTitle": "שופטים"
+    },
+    {
+      "_id": "695fc4653de40c4d512fee66",
+      "index_title": "Orchot Tzadikim",
+      "category": "Musar",
+      "type": "",
+      "ref": "Orchot Tzadikim 2:35",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Orchot Tzadikim 2:35",
+      "sourceHeRef": "אורחות צדיקים ב׳:ל״ה",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1400, 1500],
+      "commentaryNum": 2.0035,
+      "collectiveTitle": {
+        "en": "Orchot Tzadikim",
+        "he": "אורחות צדיקים"
+      }
+    },
+    {
+      "_id": "695fc46f7749e9f5f70775d0",
+      "index_title": "Orchot Tzadikim",
+      "category": "Musar",
+      "type": "",
+      "ref": "Orchot Tzadikim 9:74",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Orchot Tzadikim 9:74",
+      "sourceHeRef": "אורחות צדיקים ט׳:ע״ד",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1400, 1500],
+      "commentaryNum": 9.0074,
+      "collectiveTitle": {
+        "en": "Orchot Tzadikim",
+        "he": "אורחות צדיקים"
+      }
+    },
+    {
+      "_id": "695ffa3695c90783810a479a",
+      "index_title": "Steinsaltz on Makkot",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Steinsaltz on Makkot 24a:25",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Steinsaltz on Makkot 24a:25",
+      "sourceHeRef": "ביאור שטיינזלץ על מכות כ״ד א:כ״ה",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1950, 2010],
+      "commentaryNum": 47.0025,
+      "collectiveTitle": {
+        "en": "Steinsaltz on Makkot",
+        "he": "ביאור שטיינזלץ על מכות"
+      },
+      "heTitle": "ביאור שטיינזלץ על מכות"
+    },
+    {
+      "_id": "695ffb3e2d1cfff954109dc5",
+      "index_title": "Steinsaltz on Sukkah",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Steinsaltz on Sukkah 49b:8",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Steinsaltz on Sukkah 49b:8",
+      "sourceHeRef": "ביאור שטיינזלץ על סוכה מ״ט ב:ח׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1950, 2010],
+      "commentaryNum": 98.0008,
+      "collectiveTitle": {
+        "en": "Steinsaltz on Sukkah",
+        "he": "ביאור שטיינזלץ על סוכה"
+      },
+      "heTitle": "ביאור שטיינזלץ על סוכה"
+    },
+    {
+      "_id": "6960008768f25fd88ba889f1",
+      "index_title": "Shemirat HaLashon",
+      "category": "Musar",
+      "type": "",
+      "ref": "Shemirat HaLashon, Book I, The Gate of Discerning 5:6",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Shemirat HaLashon, Book I, The Gate of Discerning 5:6",
+      "sourceHeRef": "שמירת הלשון, חלק ראשון, שער התבונה ה׳:ו׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1865, 1875],
+      "commentaryNum": 5.0006,
+      "collectiveTitle": {
+        "en": "Shemirat HaLashon",
+        "he": "שמירת הלשון"
+      },
+      "heTitle": "שער התבונה"
+    },
+    {
+      "_id": "6960009a68f25fd88ba88a45",
+      "index_title": "Shemirat HaLashon",
+      "category": "Musar",
+      "type": "",
+      "ref": "Shemirat HaLashon, Book I, Epilogue 7:2",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Shemirat HaLashon, Book I, Epilogue 7:2",
+      "sourceHeRef": "שמירת הלשון, חלק ראשון, חתימת הספר ז׳:ב׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1865, 1875],
+      "commentaryNum": 7.0002,
+      "collectiveTitle": {
+        "en": "Shemirat HaLashon",
+        "he": "שמירת הלשון"
+      },
+      "heTitle": "חתימת הספר"
+    },
+    {
+      "_id": "69600467519b589dd48e7022",
+      "index_title": "Tevat Gome",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Tevat Gome, Balak 3",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Tevat Gome, Balak 3",
+      "sourceHeRef": "תיבת גמא, בלק ג׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1782],
+      "commentaryNum": 3,
+      "collectiveTitle": {
+        "en": "Tevat Gome",
+        "he": "תיבת גמא"
+      },
+      "heTitle": "בלק"
+    },
+    {
+      "_id": "69601e2395c90783810abcc5",
+      "index_title": "Sefer Mitzvot Katan",
+      "category": "Halakhah",
+      "type": "",
+      "ref": "Sefer Mitzvot Katan 57:2",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Sefer Mitzvot Katan 57:2",
+      "sourceHeRef": "ספר מצוות קטן נ״ז:ב׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1263, 1277],
+      "commentaryNum": 57.0002,
+      "collectiveTitle": {
+        "en": "Sefer Mitzvot Katan",
+        "he": "ספר מצוות קטן"
+      }
+    },
+    {
+      "_id": "69602cb012e013c43dd45a37",
+      "index_title": "Yismach Moshe",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Yismach Moshe, Noach 5:2",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Yismach Moshe, Noach 5:2",
+      "sourceHeRef": "ישמח משה, נח ה׳:ב׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1790, 1840],
+      "commentaryNum": 5.0002,
+      "collectiveTitle": {
+        "en": "Yismach Moshe",
+        "he": "ישמח משה"
+      },
+      "heTitle": "נח"
+    },
+    {
+      "_id": "69602de0e2d3ed5993bd5ee9",
+      "index_title": "Yismach Moshe",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Yismach Moshe, Tzav 7:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Yismach Moshe, Tzav 7:1",
+      "sourceHeRef": "ישמח משה, צו ז׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1790, 1840],
+      "commentaryNum": 7.0001,
+      "collectiveTitle": {
+        "en": "Yismach Moshe",
+        "he": "ישמח משה"
+      },
+      "heTitle": "צו"
+    },
+    {
+      "_id": "69602de7a24eb43e1f0a9417",
+      "index_title": "Yismach Moshe",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Yismach Moshe, Tzav 3:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Yismach Moshe, Tzav 3:1",
+      "sourceHeRef": "ישמח משה, צו ג׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1790, 1840],
+      "commentaryNum": 3.0001,
+      "collectiveTitle": {
+        "en": "Yismach Moshe",
+        "he": "ישמח משה"
+      },
+      "heTitle": "צו"
+    },
+    {
+      "_id": "6960343a12e013c43dd476b4",
+      "index_title": "Shenei Luchot HaBerit",
+      "category": "Musar",
+      "type": "",
+      "ref": "Shenei Luchot HaBerit, Shaar HaOtiyot, Tzniut 5",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Shenei Luchot HaBerit, Shaar HaOtiyot, Tzniut 5",
+      "sourceHeRef": "שני לוחות הברית, שער האותיות, אות צ' צניעות ה׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1611, 1631],
+      "commentaryNum": 5,
+      "collectiveTitle": {
+        "en": "Shenei Luchot HaBerit",
+        "he": "שני לוחות הברית"
+      },
+      "heTitle": "אות צ' צניעות"
+    },
+    {
+      "_id": "6960343a12e013c43dd476b8",
+      "index_title": "Shenei Luchot HaBerit",
+      "category": "Musar",
+      "type": "",
+      "ref": "Shenei Luchot HaBerit, Shaar HaOtiyot, Tzniut 6",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Shenei Luchot HaBerit, Shaar HaOtiyot, Tzniut 6",
+      "sourceHeRef": "שני לוחות הברית, שער האותיות, אות צ' צניעות ו׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1611, 1631],
+      "commentaryNum": 6,
+      "collectiveTitle": {
+        "en": "Shenei Luchot HaBerit",
+        "he": "שני לוחות הברית"
+      },
+      "heTitle": "אות צ' צניעות"
+    },
+    {
+      "_id": "696034bcabe37339b20b81f1",
+      "index_title": "Shenei Luchot HaBerit",
+      "category": "Musar",
+      "type": "",
+      "ref": "Shenei Luchot HaBerit, Aseret HaDibrot, Pesachim, Matzah Ashirah 1:87",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Shenei Luchot HaBerit, Aseret HaDibrot, Pesachim, Matzah Ashirah 1:87",
+      "sourceHeRef": "שני לוחות הברית, עשרת הדברות, מסכת פסחים, מצה עשירה א׳:פ״ז",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1611, 1631],
+      "commentaryNum": 1.0087,
+      "collectiveTitle": {
+        "en": "Shenei Luchot HaBerit",
+        "he": "שני לוחות הברית"
+      },
+      "heTitle": "מצה עשירה"
+    },
+    {
+      "_id": "69603678338c46700f032ffc",
+      "index_title": "Shenei Luchot HaBerit",
+      "category": "Musar",
+      "type": "",
+      "ref": "Shenei Luchot HaBerit, Torah Shebikhtav, Shoftim, Torah Ohr 59",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Shenei Luchot HaBerit, Torah Shebikhtav, Shoftim, Torah Ohr 59",
+      "sourceHeRef": "שני לוחות הברית, תורה שבכתב, שופטים, תורה אור נ״ט",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1611, 1631],
+      "commentaryNum": 59,
+      "collectiveTitle": {
+        "en": "Shenei Luchot HaBerit",
+        "he": "שני לוחות הברית"
+      },
+      "heTitle": "תורה אור"
+    },
+    {
+      "_id": "696036c3a24eb43e1f0ab283",
+      "index_title": "Shenei Luchot HaBerit",
+      "category": "Musar",
+      "type": "",
+      "ref": "Shenei Luchot HaBerit, Vavei HaAmudim 11:2",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Shenei Luchot HaBerit, Vavei HaAmudim 11:2",
+      "sourceHeRef": "שני לוחות הברית, ווי העמודים י״א:ב׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1611, 1631],
+      "commentaryNum": 11.0002,
+      "collectiveTitle": {
+        "en": "Shenei Luchot HaBerit",
+        "he": "שני לוחות הברית"
+      }
+    },
+    {
+      "_id": "6960943c1a10b08b12b0dbd9",
+      "index_title": "Yein Levanon on Avot",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Yein Levanon on Avot 6:6:13",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Yein Levanon on Avot 6:6:13",
+      "sourceHeRef": "יין לבנון על אבות ו׳:ו׳:י״ג",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1765, 1775],
+      "commentaryNum": 6.0013,
+      "collectiveTitle": {
+        "en": "Yein Levanon on Avot",
+        "he": "יין לבנון על אבות"
+      }
+    },
+    {
+      "_id": "69609425142aa4dfd573da23",
+      "index_title": "Yein Levanon on Avot",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Yein Levanon on Avot 6:1:89",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Yein Levanon on Avot 6:1:89",
+      "sourceHeRef": "יין לבנון על אבות ו׳:א׳:פ״ט",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1765, 1775],
+      "commentaryNum": 1.0089,
+      "collectiveTitle": {
+        "en": "Yein Levanon on Avot",
+        "he": "יין לבנון על אבות"
+      }
+    },
+    {
+      "_id": "696094df1a10b08b12b0df41",
+      "index_title": "Midrash Sekhel Tov",
+      "category": "Midrash",
+      "type": "",
+      "ref": "Midrash Sekhel Tov, Bereshit 47:27:16",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Midrash Sekhel Tov, Bereshit 47:27:16",
+      "sourceHeRef": "מדרש שכל טוב, בראשית מ״ז:כ״ז:ט״ז",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1139],
+      "commentaryNum": 27.0016,
+      "collectiveTitle": {
+        "en": "Midrash Sekhel Tov",
+        "he": "מדרש שכל טוב"
+      },
+      "heTitle": "בראשית"
+    },
+    {
+      "_id": "696096e89806cee6831f56a5",
+      "index_title": "Nachalat Avot on Avot",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Nachalat Avot on Avot 6:1:35",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Nachalat Avot on Avot 6:1:35",
+      "sourceHeRef": "נחלת אבות על אבות ו׳:א׳:ל״ה",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1496],
+      "commentaryNum": 1.0035,
+      "collectiveTitle": {
+        "en": "Nachalat Avot on Avot",
+        "he": "נחלת אבות על אבות"
+      }
+    },
+    {
+      "_id": "696098b49806cee6831f5eb2",
+      "index_title": "Sha'arei Teshuvah",
+      "category": "Musar",
+      "type": "",
+      "ref": "Sha'arei Teshuvah 1:25",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Sha'arei Teshuvah 1:25",
+      "sourceHeRef": "שערי תשובה א׳:כ״ה",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1243, 1263],
+      "commentaryNum": 1.0025,
+      "collectiveTitle": {
+        "en": "Sha'arei Teshuvah",
+        "he": "שערי תשובה"
+      },
+      "heTitle": "שערי תשובה"
+    },
+    {
+      "_id": "6960b6962a770537a3a0a7df",
+      "index_title": "Ohr Yisrael",
+      "category": "Musar",
+      "type": "",
+      "ref": "Ohr Yisrael 30:20",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ohr Yisrael 30:20",
+      "sourceHeRef": "אור ישראל ל׳:כ׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1835, 1875],
+      "commentaryNum": 30.002,
+      "collectiveTitle": {
+        "en": "Ohr Yisrael",
+        "he": "אור ישראל"
+      }
+    },
+    {
+      "_id": "6960ddaf2a770537a3a107f8",
+      "index_title": "Perush Maharzu on Bamidbar Rabbah",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Perush Maharzu on Bamidbar Rabbah 20:18:7",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Perush Maharzu on Bamidbar Rabbah 20:18:7",
+      "sourceHeRef": "פירוש מהרז״ו על במדבר רבה כ׳:י״ח:ז׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1810, 1830],
+      "commentaryNum": 18.0007,
+      "collectiveTitle": {
+        "en": "Perush Maharzu on Bamidbar Rabbah",
+        "he": "פירוש מהרז״ו על במדבר רבה"
+      },
+      "heTitle": "פירוש מהרז״ו על במדבר רבה"
+    },
+    {
+      "_id": "6960e01de1f334cbf255d035",
+      "index_title": "Rav Hirsch on Torah",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Rav Hirsch on Torah, Numbers 18:6:5",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Rav Hirsch on Torah, Numbers 18:6:5",
+      "sourceHeRef": "רש\"ר הירש על התורה, במדבר י״ח:ו׳:ה׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1845, 1875],
+      "commentaryNum": 6.0005,
+      "collectiveTitle": {
+        "en": "Rav Hirsch on Torah",
+        "he": "רש\"ר הירש על התורה"
+      },
+      "heTitle": "במדבר"
+    },
+    {
+      "_id": "6960e025e6f501ab1870a2ad",
+      "index_title": "Rav Hirsch on Torah",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Rav Hirsch on Torah, Numbers 20:29:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Rav Hirsch on Torah, Numbers 20:29:1",
+      "sourceHeRef": "רש\"ר הירש על התורה, במדבר כ׳:כ״ט:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1845, 1875],
+      "commentaryNum": 29.0001,
+      "collectiveTitle": {
+        "en": "Rav Hirsch on Torah",
+        "he": "רש\"ר הירש על התורה"
+      },
+      "heTitle": "במדבר"
+    },
+    {
+      "_id": "6960eaef08c58498b3542740",
+      "index_title": "Notes by Rabbi Yehoshua Hartman on Ohr Chadash",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Notes by Rabbi Yehoshua Hartman on Ohr Chadash 1:2:138",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Notes by Rabbi Yehoshua Hartman on Ohr Chadash 1:2:138",
+      "sourceHeRef": "פירושים והערות מהרב יהושע הרטמן על אור חדש א׳:ב׳:קל״ח",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [2008, 2014],
+      "commentaryNum": 2.0138,
+      "collectiveTitle": {
+        "en": "Notes by Rabbi Yehoshua Hartman on Ohr Chadash",
+        "he": "פירושים והערות מהרב יהושע הרטמן על אור חדש"
+      }
+    },
+    {
+      "_id": "6960ebea1001674249c42e97",
+      "index_title": "Notes by Rabbi Yehoshua Hartman on Ohr Chadash",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Notes by Rabbi Yehoshua Hartman on Ohr Chadash 2:7:41",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Notes by Rabbi Yehoshua Hartman on Ohr Chadash 2:7:41",
+      "sourceHeRef": "פירושים והערות מהרב יהושע הרטמן על אור חדש ב׳:ז׳:מ״א",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [2008, 2014],
+      "commentaryNum": 7.0041,
+      "collectiveTitle": {
+        "en": "Notes by Rabbi Yehoshua Hartman on Ohr Chadash",
+        "he": "פירושים והערות מהרב יהושע הרטמן על אור חדש"
+      }
+    },
+    {
+      "_id": "6960ec11cc4ed91b8c6c60ad",
+      "index_title": "Notes by Rabbi Yehoshua Hartman on Ohr Chadash",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Notes by Rabbi Yehoshua Hartman on Ohr Chadash 2:12:6",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Notes by Rabbi Yehoshua Hartman on Ohr Chadash 2:12:6",
+      "sourceHeRef": "פירושים והערות מהרב יהושע הרטמן על אור חדש ב׳:י״ב:ו׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [2008, 2014],
+      "commentaryNum": 12.0006,
+      "collectiveTitle": {
+        "en": "Notes by Rabbi Yehoshua Hartman on Ohr Chadash",
+        "he": "פירושים והערות מהרב יהושע הרטמן על אור חדש"
+      }
+    },
+    {
+      "_id": "6960f6ddd90c08b6ebe9ae46",
+      "index_title": "Notes by Rabbi Yehoshua Hartman on Gevurot Hashem",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Notes by Rabbi Yehoshua Hartman on Gevurot Hashem 6:92",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Notes by Rabbi Yehoshua Hartman on Gevurot Hashem 6:92",
+      "sourceHeRef": "פירושים והערות מהרב יהושע הרטמן על גבורות השם ו׳:צ״ב",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [2006, 2020],
+      "commentaryNum": 6.0092,
+      "collectiveTitle": {
+        "en": "Notes by Rabbi Yehoshua Hartman on Gevurot Hashem",
+        "he": "פירושים והערות מהרב יהושע הרטמן על גבורות השם"
+      }
+    },
+    {
+      "_id": "6960f7fe50683dbcf59795fe",
+      "index_title": "Notes by Rabbi Yehoshua Hartman on Gevurot Hashem",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Notes by Rabbi Yehoshua Hartman on Gevurot Hashem 24:48",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Notes by Rabbi Yehoshua Hartman on Gevurot Hashem 24:48",
+      "sourceHeRef": "פירושים והערות מהרב יהושע הרטמן על גבורות השם כ״ד:מ״ח",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [2006, 2020],
+      "commentaryNum": 24.0048,
+      "collectiveTitle": {
+        "en": "Notes by Rabbi Yehoshua Hartman on Gevurot Hashem",
+        "he": "פירושים והערות מהרב יהושע הרטמן על גבורות השם"
+      }
+    },
+    {
+      "_id": "69611f967070832641b8399a",
+      "index_title": "Shemonah Kevatzim",
+      "category": "Jewish Thought",
+      "type": "",
+      "ref": "Shemonah Kevatzim 1:729:6",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Shemonah Kevatzim 1:729:6",
+      "sourceHeRef": "שמונה קבצים א׳:תשכ״ט:ו׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1904, 1920],
+      "commentaryNum": 729.0006,
+      "collectiveTitle": {
+        "en": "Shemonah Kevatzim",
+        "he": "שמונה קבצים"
+      },
+      "heTitle": "שמונה קבצים"
+    },
+    {
+      "_id": "69612f3554c96baff5a9ca45",
+      "index_title": "Toldot Yaakov Yosef",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Toldot Yaakov Yosef, Beshalach 19",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Toldot Yaakov Yosef, Beshalach 19",
+      "sourceHeRef": "תולדות יעקב יוסף, בשלח י״ט",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1780],
+      "commentaryNum": 19,
+      "collectiveTitle": {
+        "en": "Toldot Yaakov Yosef",
+        "he": "תולדות יעקב יוסף"
+      },
+      "heTitle": "בשלח"
+    },
+    {
+      "_id": "69612f36fdecf5a2828502f0",
+      "index_title": "Toldot Yaakov Yosef",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Toldot Yaakov Yosef, Yitro 40",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Toldot Yaakov Yosef, Yitro 40",
+      "sourceHeRef": "תולדות יעקב יוסף, יתרו מ׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1780],
+      "commentaryNum": 40,
+      "collectiveTitle": {
+        "en": "Toldot Yaakov Yosef",
+        "he": "תולדות יעקב יוסף"
+      },
+      "heTitle": "יתרו"
+    },
+    {
+      "_id": "69612f3e54c96baff5a9ca84",
+      "index_title": "Toldot Yaakov Yosef",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Toldot Yaakov Yosef, Yitro 194",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Toldot Yaakov Yosef, Yitro 194",
+      "sourceHeRef": "תולדות יעקב יוסף, יתרו קצ״ד",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1780],
+      "commentaryNum": 194,
+      "collectiveTitle": {
+        "en": "Toldot Yaakov Yosef",
+        "he": "תולדות יעקב יוסף"
+      },
+      "heTitle": "יתרו"
+    },
+    {
+      "_id": "69612f80d661b6267fc36d33",
+      "index_title": "Toldot Yaakov Yosef",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Toldot Yaakov Yosef, Kedoshim 244",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Toldot Yaakov Yosef, Kedoshim 244",
+      "sourceHeRef": "תולדות יעקב יוסף, קדושים רמ״ד",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1780],
+      "commentaryNum": 244,
+      "collectiveTitle": {
+        "en": "Toldot Yaakov Yosef",
+        "he": "תולדות יעקב יוסף"
+      },
+      "heTitle": "קדושים"
+    },
+    {
+      "_id": "69612fcdde3f9bcb0d55d850",
+      "index_title": "Toldot Yaakov Yosef",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Toldot Yaakov Yosef, Korach 73",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Toldot Yaakov Yosef, Korach 73",
+      "sourceHeRef": "תולדות יעקב יוסף, קרח ע״ג",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1780],
+      "commentaryNum": 73,
+      "collectiveTitle": {
+        "en": "Toldot Yaakov Yosef",
+        "he": "תולדות יעקב יוסף"
+      },
+      "heTitle": "קרח"
+    },
+    {
+      "_id": "69613014d855c8c5bd6a8458",
+      "index_title": "Toldot Yaakov Yosef",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Toldot Yaakov Yosef, Ki Teitzei 123",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Toldot Yaakov Yosef, Ki Teitzei 123",
+      "sourceHeRef": "תולדות יעקב יוסף, כי תצא קכ״ג",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1780],
+      "commentaryNum": 123,
+      "collectiveTitle": {
+        "en": "Toldot Yaakov Yosef",
+        "he": "תולדות יעקב יוסף"
+      },
+      "heTitle": "כי תצא"
+    },
+    {
+      "_id": "69613015ea0a6e9680c0acda",
+      "index_title": "Toldot Yaakov Yosef",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Toldot Yaakov Yosef, Ki Teitzei 136",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Toldot Yaakov Yosef, Ki Teitzei 136",
+      "sourceHeRef": "תולדות יעקב יוסף, כי תצא קל״ו",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1780],
+      "commentaryNum": 136,
+      "collectiveTitle": {
+        "en": "Toldot Yaakov Yosef",
+        "he": "תולדות יעקב יוסף"
+      },
+      "heTitle": "כי תצא"
+    },
+    {
+      "_id": "6961362aea0a6e9680c0cb0b",
+      "index_title": "Reshit Chokhmah",
+      "category": "Kabbalah",
+      "type": "",
+      "ref": "Reshit Chokhmah, Chapter of Mitzvot 4:5",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Reshit Chokhmah, Chapter of Mitzvot 4:5",
+      "sourceHeRef": "ראשית חכמה, פרק המצות ד׳:ה׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 4.0005,
+      "collectiveTitle": {
+        "en": "Reshit Chokhmah",
+        "he": "ראשית חכמה"
+      }
+    },
+    {
+      "_id": "696136321949d05ae1313f24",
+      "index_title": "Reshit Chokhmah",
+      "category": "Kabbalah",
+      "type": "",
+      "ref": "Reshit Chokhmah, Chapter of Honest Commerce 41",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Reshit Chokhmah, Chapter of Honest Commerce 41",
+      "sourceHeRef": "ראשית חכמה, פרק משא ומתן באמונה מ״א",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 41,
+      "collectiveTitle": {
+        "en": "Reshit Chokhmah",
+        "he": "ראשית חכמה"
+      },
+      "heTitle": "פרק משא ומתן באמונה"
+    },
+    {
+      "_id": "69613711ea0a6e9680c0cdc3",
+      "index_title": "Return; Daily Inspiration for the Days of Awe",
+      "category": "Jewish Thought",
+      "type": "",
+      "ref": "Return; Daily Inspiration for the Days of Awe, Day Four; Humility 29",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Return; Daily Inspiration for the Days of Awe, Day Four; Humility 29",
+      "sourceHeRef": "לשוב; השראה יומית לעשרת ימי תשובה, יום רביעי; ענווה כ״ט",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "commentaryNum": 29,
+      "collectiveTitle": {
+        "en": "Return; Daily Inspiration for the Days of Awe",
+        "he": "לשוב; השראה יומית לעשרת ימי תשובה"
+      },
+      "heTitle": "יום רביעי; ענווה"
+    },
+    {
+      "_id": "69626b33f0f45886ee05eacc",
+      "index_title": "Tiferet Yisrael",
+      "category": "Jewish Thought",
+      "type": "",
+      "ref": "Tiferet Yisrael 55:3",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Tiferet Yisrael 55:3",
+      "sourceHeRef": "תפארת ישראל נ״ה:ג׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1589, 1599],
+      "commentaryNum": 55.0003,
+      "collectiveTitle": {
+        "en": "Tiferet Yisrael",
+        "he": "תפארת ישראל"
+      }
+    },
+    {
+      "_id": "696288ef16e25f24da6dbbaa",
+      "index_title": "Pesikta Rabbati",
+      "category": "Midrash",
+      "type": "",
+      "ref": "Pesikta Rabbati 45:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Pesikta Rabbati 45:1",
+      "sourceHeRef": "פסיקתא רבתי מ״ה:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [600, 900],
+      "commentaryNum": 45.0001,
+      "collectiveTitle": {
+        "en": "Pesikta Rabbati",
+        "he": "פסיקתא רבתי"
+      }
+    },
+    {
+      "_id": "69629011d622bf4ae63376c7",
+      "index_title": "Ohr LaYesharim on Jerusalem Talmud Taanit",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Ohr LaYesharim on Jerusalem Talmud Taanit 1:6:9",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ohr LaYesharim on Jerusalem Talmud Taanit 1:6:9",
+      "sourceHeRef": "אור לישרים על תלמוד ירושלמי תענית א׳:ו׳:ט׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 6.0009,
+      "collectiveTitle": {
+        "en": "Ohr LaYesharim on Jerusalem Talmud Taanit",
+        "he": "אור לישרים על תלמוד ירושלמי תענית"
+      }
+    },
+    {
+      "_id": "696293b8554ddaf7df706f5f",
+      "index_title": "Sefer Chasidim",
+      "category": "Halakhah",
+      "type": "",
+      "ref": "Sefer Chasidim 8:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Sefer Chasidim 8:1",
+      "sourceHeRef": "ספר חסידים ח׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1140, 1200],
+      "commentaryNum": 8.0001,
+      "collectiveTitle": {
+        "en": "Sefer Chasidim",
+        "he": "ספר חסידים"
+      },
+      "heTitle": "ספר חסידים"
+    },
+    {
+      "_id": "6962a24b866d5dbbf293a74a",
+      "index_title": "Tanya",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Tanya, Part IV; Iggeret HaKodesh 13:3",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Tanya, Part IV; Iggeret HaKodesh 13:3",
+      "sourceHeRef": "תניא, אגרת הקדש י״ג:ג׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1786, 1796],
+      "commentaryNum": 13.0003,
+      "collectiveTitle": {
+        "en": "Tanya",
+        "he": "תניא"
+      },
+      "heTitle": "אגרת הקדש"
+    },
+    {
+      "_id": "6962a5f1909d710368642da0",
+      "index_title": "Sources and References on Likkutei Torah",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Sources and References on Likkutei Torah, Balak 74:59",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Sources and References on Likkutei Torah, Balak 74:59",
+      "sourceHeRef": "מראי מקומות הערות וציונים על לקוטי תורה, בלק ע״ד:נ״ט",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 74.0059,
+      "collectiveTitle": {
+        "en": "Sources and References on Likkutei Torah",
+        "he": "מראי מקומות הערות וציונים על לקוטי תורה"
+      },
+      "heTitle": "בלק"
+    },
+    {
+      "_id": "6962a5fbadf31f54ca0551cb",
+      "index_title": "Sources and References on Likkutei Torah",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Sources and References on Likkutei Torah, Pinchas 78:87",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Sources and References on Likkutei Torah, Pinchas 78:87",
+      "sourceHeRef": "מראי מקומות הערות וציונים על לקוטי תורה, פנחס ע״ח:פ״ז",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 78.0087,
+      "collectiveTitle": {
+        "en": "Sources and References on Likkutei Torah",
+        "he": "מראי מקומות הערות וציונים על לקוטי תורה"
+      },
+      "heTitle": "פנחס"
+    },
+    {
+      "_id": "6962a67c909d710368642fe9",
+      "index_title": "Sources and References on Likkutei Torah",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Sources and References on Likkutei Torah, Nitzavim 48:58",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Sources and References on Likkutei Torah, Nitzavim 48:58",
+      "sourceHeRef": "מראי מקומות הערות וציונים על לקוטי תורה, נצבים מ״ח:נ״ח",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 48.0058,
+      "collectiveTitle": {
+        "en": "Sources and References on Likkutei Torah",
+        "he": "מראי מקומות הערות וציונים על לקוטי תורה"
+      },
+      "heTitle": "נצבים"
+    },
+    {
+      "_id": "6962b14c909d710368645222",
+      "index_title": "Reggio on Torah",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Reggio on Torah, Genesis 22:2:3",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Reggio on Torah, Genesis 22:2:3",
+      "sourceHeRef": "ביאור יש\"ר על התורה, בראשית כ״ב:ב׳:ג׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1790, 1810],
+      "commentaryNum": 2.0003,
+      "collectiveTitle": {
+        "en": "Reggio on Torah",
+        "he": "ביאור יש\"ר על התורה"
+      },
+      "heTitle": "בראשית"
+    },
+    {
+      "_id": "6962b1871b4034e781fe1de4",
+      "index_title": "Reggio on Torah",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Reggio on Torah, Leviticus 10:1:7",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Reggio on Torah, Leviticus 10:1:7",
+      "sourceHeRef": "ביאור יש\"ר על התורה, ויקרא י׳:א׳:ז׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1790, 1810],
+      "commentaryNum": 1.0007,
+      "collectiveTitle": {
+        "en": "Reggio on Torah",
+        "he": "ביאור יש\"ר על התורה"
+      },
+      "heTitle": "ויקרא"
+    },
+    {
+      "_id": "6962bb1f38987bb8c164298a",
+      "index_title": "Midrash Tannaim on Deuteronomy",
+      "category": "Midrash",
+      "type": "",
+      "ref": "Midrash Tannaim on Deuteronomy 23:15:10",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Midrash Tannaim on Deuteronomy 23:15:10",
+      "sourceHeRef": "מדרש תנאים על ספר דברים כ״ג:ט״ו:י׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 15.001,
+      "collectiveTitle": {
+        "en": "Midrash Tannaim on Deuteronomy",
+        "he": "מדרש תנאים על ספר דברים"
+      },
+      "heTitle": "מדרש תנאים על ספר דברים"
+    },
+    {
+      "_id": "6962c411a4b82ab0b4f1e560",
+      "index_title": "Zera Kodesh",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Zera Kodesh, On Festivals, Rosh HaShanah 7",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Zera Kodesh, On Festivals, Rosh HaShanah 7",
+      "sourceHeRef": "זרע קודש, על המועדים, ראש השנה ז׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "commentaryNum": 7,
+      "collectiveTitle": {
+        "en": "Zera Kodesh",
+        "he": "זרע קודש"
+      },
+      "heTitle": "ראש השנה"
+    },
+    {
+      "_id": "6962cac1b938ddae26980360",
+      "index_title": "Talks of Yeshayahu Leibowitz on the Parasha",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Talks of Yeshayahu Leibowitz on the Parasha, Shemot 4:5",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Talks of Yeshayahu Leibowitz on the Parasha, Shemot 4:5",
+      "sourceHeRef": "שיחות על פרשת השבוע (ליבוביץ), שמות ד׳:ה׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 4.0005,
+      "collectiveTitle": {
+        "en": "Talks of Yeshayahu Leibowitz on the Parasha",
+        "he": "שיחות על פרשת השבוע (ליבוביץ)"
+      },
+      "heTitle": "שמות"
+    },
+    {
+      "_id": "6962cae3a4b82ab0b4f1f78d",
+      "index_title": "Talks of Yeshayahu Leibowitz on the Parasha",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Talks of Yeshayahu Leibowitz on the Parasha, Ki Tisa 31:5",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Talks of Yeshayahu Leibowitz on the Parasha, Ki Tisa 31:5",
+      "sourceHeRef": "שיחות על פרשת השבוע (ליבוביץ), כי תשא ל״א:ה׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 31.0005,
+      "collectiveTitle": {
+        "en": "Talks of Yeshayahu Leibowitz on the Parasha",
+        "he": "שיחות על פרשת השבוע (ליבוביץ)"
+      },
+      "heTitle": "כי תשא"
+    },
+    {
+      "_id": "6962cd3762025ff468e61e11",
+      "index_title": "Ohel Ya'akov on Torah",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Ohel Ya'akov on Torah, Bereshit 21:3",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ohel Ya'akov on Torah, Bereshit 21:3",
+      "sourceHeRef": "אהל יעקב על התורה, בראשית כ״א:ג׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 21.0003,
+      "collectiveTitle": {
+        "en": "Ohel Ya'akov on Torah",
+        "he": "אהל יעקב על התורה"
+      },
+      "heTitle": "בראשית"
+    },
+    {
+      "_id": "6962cd38a4b82ab0b4f1ff10",
+      "index_title": "Ohel Ya'akov on Torah",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Ohel Ya'akov on Torah, Noach 3:4",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ohel Ya'akov on Torah, Noach 3:4",
+      "sourceHeRef": "אהל יעקב על התורה, נח ג׳:ד׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 3.0004,
+      "collectiveTitle": {
+        "en": "Ohel Ya'akov on Torah",
+        "he": "אהל יעקב על התורה"
+      },
+      "heTitle": "נח"
+    },
+    {
+      "_id": "6962cd7d38987bb8c1645d64",
+      "index_title": "Ohel Ya'akov on Torah",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Ohel Ya'akov on Torah, Kedoshim 12:2",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ohel Ya'akov on Torah, Kedoshim 12:2",
+      "sourceHeRef": "אהל יעקב על התורה, קדושים י״ב:ב׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 12.0002,
+      "collectiveTitle": {
+        "en": "Ohel Ya'akov on Torah",
+        "he": "אהל יעקב על התורה"
+      },
+      "heTitle": "קדושים"
+    },
+    {
+      "_id": "6962cdb1672bcc8ed53baaff",
+      "index_title": "Ohel Ya'akov on Torah",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Ohel Ya'akov on Torah, Shoftim 3:2",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ohel Ya'akov on Torah, Shoftim 3:2",
+      "sourceHeRef": "אהל יעקב על התורה, שופטים ג׳:ב׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 3.0002,
+      "collectiveTitle": {
+        "en": "Ohel Ya'akov on Torah",
+        "he": "אהל יעקב על התורה"
+      },
+      "heTitle": "שופטים"
+    },
+    {
+      "_id": "6962db8038987bb8c1648b50",
+      "index_title": "Studies in Spirituality; A Weekly Reading of the Jewish Bible",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Studies in Spirituality; A Weekly Reading of the Jewish Bible, Va'ethanan; The Power of Why 23",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Studies in Spirituality; A Weekly Reading of the Jewish Bible, Va'ethanan; The Power of Why 23",
+      "sourceHeRef": "שיעורים ברוחניות; קריאות חדשות בפרשת השבוע, ואתחנן כ״ג",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "commentaryNum": 23,
+      "collectiveTitle": {
+        "en": "Studies in Spirituality; A Weekly Reading of the Jewish Bible",
+        "he": "שיעורים ברוחניות; קריאות חדשות בפרשת השבוע"
+      },
+      "heTitle": "ואתחנן"
+    },
+    {
+      "_id": "6962dd7b3ed9dc06f783eec9",
+      "index_title": "Tze'enah Ure'enah",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Tze'enah Ure'enah, Haftarot, Balak 1",
+      "anchorRef": "Micah 5:6-6:8",
+      "anchorRefExpanded": [
+        "Micah 5:6",
+        "Micah 5:7",
+        "Micah 5:8",
+        "Micah 5:9",
+        "Micah 5:10",
+        "Micah 5:11",
+        "Micah 5:12",
+        "Micah 5:13",
+        "Micah 5:14",
+        "Micah 6:1",
+        "Micah 6:2",
+        "Micah 6:3",
+        "Micah 6:4",
+        "Micah 6:5",
+        "Micah 6:6",
+        "Micah 6:7",
+        "Micah 6:8"
+      ],
+      "sourceRef": "Tze'enah Ure'enah, Haftarot, Balak 1",
+      "sourceHeRef": "צאינה וראינה, הפטרות, בלק א׳",
+      "anchorVerse": 6,
+      "sourceHasEn": true,
+      "compDate": [1590, 1616],
+      "commentaryNum": 1,
+      "collectiveTitle": {
+        "en": "Tze'enah Ure'enah",
+        "he": "צאינה וראינה"
+      },
+      "heTitle": "בלק"
+    },
+    {
+      "_id": "6962effff833042468c01716",
+      "index_title": "To Heal a Fractured World; The Ethics of Responsibility",
+      "category": "Jewish Thought",
+      "type": "",
+      "ref": "To Heal a Fractured World; The Ethics of Responsibility, Foreword 31",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "To Heal a Fractured World; The Ethics of Responsibility, Foreword 31",
+      "sourceHeRef": "לרפא עולם שבור; החיים כקריאה לאחריות, מבוא ל״א",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 31,
+      "collectiveTitle": {
+        "en": "To Heal a Fractured World; The Ethics of Responsibility",
+        "he": "לרפא עולם שבור; החיים כקריאה לאחריות"
+      },
+      "heTitle": "מבוא"
+    },
+    {
+      "_id": "6962f12f0181e7fec6f98ae0",
+      "index_title": "Rashi on Hosea",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Rashi on Hosea 12:7:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Rashi on Hosea 12:7:1",
+      "sourceHeRef": "רש\"י על הושע י״ב:ז׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1075, 1105],
+      "commentaryNum": 7.0001,
+      "collectiveTitle": {
+        "en": "Rashi on Hosea",
+        "he": "רש\"י על הושע"
+      },
+      "heTitle": "רש\"י על הושע"
+    },
+    {
+      "_id": "6962f1820663af30281a5404",
+      "index_title": "Radical Then, Radical Now",
+      "category": "Jewish Thought",
+      "type": "",
+      "ref": "Radical Then, Radical Now, Part III; The Vision, 11 Tragedy and Triumph 19",
+      "anchorRef": "Micah 6:7-8",
+      "anchorRefExpanded": ["Micah 6:7", "Micah 6:8"],
+      "sourceRef": "Radical Then, Radical Now, Part III; The Vision, 11 Tragedy and Triumph 19",
+      "sourceHeRef": "רדיקלית אז, רדיקלית עכשיו, חלק שלישי; החזון, יא; טרגדיה וניצחון י״ט",
+      "anchorVerse": 7,
+      "sourceHasEn": false,
+      "commentaryNum": 19,
+      "collectiveTitle": {
+        "en": "Radical Then, Radical Now",
+        "he": "רדיקלית אז, רדיקלית עכשיו"
+      },
+      "heTitle": "יא; טרגדיה וניצחון"
+    },
+    {
+      "_id": "53b461ccfbfba235cfda8e0e",
+      "index_title": "Kitzur Shulchan Arukh",
+      "category": "Halakhah",
+      "type": "",
+      "ref": "Kitzur Shulchan Arukh 3:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Kitzur Shulchan Arukh 3:1",
+      "sourceHeRef": "קיצור שלחן ערוך ג׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1844, 1864],
+      "commentaryNum": 3.0001,
+      "collectiveTitle": {
+        "en": "Kitzur Shulchan Arukh",
+        "he": "קיצור שלחן ערוך"
+      },
+      "heTitle": "קיצור שלחן ערוך"
+    },
+    {
+      "_id": "53f18af6fbfba21e301776c8",
+      "index_title": "Metzudat David on Micah",
+      "category": "Commentary",
+      "type": "commentary",
+      "ref": "Metzudat David on Micah 6:8:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Metzudat David on Micah 6:8:1",
+      "sourceHeRef": "מצודת דוד על מיכה ו׳:ח׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1740, 1780],
+      "commentaryNum": 8.0001,
+      "collectiveTitle": {
+        "en": "Metzudat David",
+        "he": "מצודת דוד"
+      },
+      "heTitle": "מצודת דוד על מיכה"
+    },
+    {
+      "_id": "53f18af6fbfba21e301776ca",
+      "index_title": "Metzudat David on Micah",
+      "category": "Commentary",
+      "type": "commentary",
+      "ref": "Metzudat David on Micah 6:8:2",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Metzudat David on Micah 6:8:2",
+      "sourceHeRef": "מצודת דוד על מיכה ו׳:ח׳:ב׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1740, 1780],
+      "commentaryNum": 8.0002,
+      "collectiveTitle": {
+        "en": "Metzudat David",
+        "he": "מצודת דוד"
+      },
+      "heTitle": "מצודת דוד על מיכה"
+    },
+    {
+      "_id": "53f18b01fbfba21e301779de",
+      "index_title": "Metzudat Zion on Micah",
+      "category": "Commentary",
+      "type": "commentary",
+      "ref": "Metzudat Zion on Micah 6:8:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Metzudat Zion on Micah 6:8:1",
+      "sourceHeRef": "מצודת ציון על מיכה ו׳:ח׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1740, 1780],
+      "commentaryNum": 8.0001,
+      "collectiveTitle": {
+        "en": "Metzudat Zion",
+        "he": "מצודת ציון"
+      },
+      "heTitle": "מצודת ציון על מיכה"
+    },
+    {
+      "_id": "5404a83afbfba226b2e7f487",
+      "index_title": "Ibn Ezra on Micah",
+      "category": "Commentary",
+      "type": "commentary",
+      "ref": "Ibn Ezra on Micah 6:8:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ibn Ezra on Micah 6:8:1",
+      "sourceHeRef": "אבן עזרא על מיכה ו׳:ח׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1156],
+      "commentaryNum": 8.0001,
+      "collectiveTitle": {
+        "en": "Ibn Ezra",
+        "he": "אבן עזרא"
+      },
+      "heTitle": "אבן עזרא על מיכה"
+    },
+    {
+      "_id": "587b53efd6e4a930911206b8",
+      "index_title": "Malbim on Micah",
+      "category": "Commentary",
+      "type": "commentary",
+      "ref": "Malbim on Micah 6:8:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Malbim on Micah 6:8:1",
+      "sourceHeRef": "מלבי\"ם על מיכה ו׳:ח׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1844, 1874],
+      "commentaryNum": 8.0001,
+      "collectiveTitle": {
+        "en": "Malbim",
+        "he": "מלבי\"ם"
+      },
+      "heTitle": "מלבי\"ם על מיכה"
+    },
+    {
+      "_id": "587b559fd6e4a93091121f57",
+      "index_title": "Malbim Beur Hamilot on Micah",
+      "category": "Commentary",
+      "type": "commentary",
+      "ref": "Malbim Beur Hamilot on Micah 6:8:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Malbim Beur Hamilot on Micah 6:8:1",
+      "sourceHeRef": "מלבי\"ם באור המילות על מיכה ו׳:ח׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1844, 1874],
+      "commentaryNum": 8.0001,
+      "collectiveTitle": {
+        "en": "Malbim Beur Hamilot",
+        "he": "מלבי\"ם באור המילות"
+      },
+      "heTitle": "מלבי\"ם באור המילות על מיכה"
+    },
+    {
+      "_id": "58dd65abd6e4a9084de0c921",
+      "index_title": "Mesillat Yesharim",
+      "category": "Musar",
+      "type": "",
+      "ref": "Mesillat Yesharim 21:8",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Mesillat Yesharim 21:8",
+      "sourceHeRef": "מסילת ישרים כ״א:ח׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1738],
+      "commentaryNum": 21.0008,
+      "collectiveTitle": {
+        "en": "Mesillat Yesharim",
+        "he": "מסילת ישרים"
+      }
+    },
+    {
+      "_id": "5c47076408d98a0285f8258e",
+      "index_title": "Klein Dictionary",
+      "category": "Reference",
+      "type": "reference",
+      "ref": "Klein Dictionary, צנע 1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Klein Dictionary, צנע 1",
+      "sourceHeRef": "מילון קליין, צנע א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1973, 1983],
+      "commentaryNum": 1,
+      "collectiveTitle": {
+        "en": "Klein Dictionary",
+        "he": "מילון קליין"
+      },
+      "heTitle": "צנע"
+    },
+    {
+      "_id": "5da24cc3e418771c28a197b1",
+      "index_title": "Devash LeFi",
+      "category": "Reference",
+      "type": "",
+      "ref": "Devash LeFi, Letter Tzadi 10",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Devash LeFi, Letter Tzadi 10",
+      "sourceHeRef": "דבש לפי, מערכת צ י׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1768, 1792],
+      "commentaryNum": 10,
+      "collectiveTitle": {
+        "en": "Devash LeFi",
+        "he": "דבש לפי"
+      },
+      "heTitle": "מערכת צ"
+    },
+    {
+      "_id": "6303309af13f32ce4b95f7eb",
+      "index_title": "Ahavat Yehonatan",
+      "category": "Commentary",
+      "type": "commentary",
+      "ref": "Ahavat Yehonatan, Haftarah of Balak 17",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ahavat Yehonatan, Haftarah of Balak 17",
+      "sourceHeRef": "אהבת יהונתן, הפטרת בלק י״ז",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 17,
+      "collectiveTitle": {
+        "en": "Ahavat Yehonatan",
+        "he": "אהבת יהונתן"
+      },
+      "heTitle": "הפטרת בלק"
+    },
+    {
+      "_id": "6319cf8cb6084aa1cbef914f",
+      "index_title": "BDB",
+      "category": "Reference",
+      "type": "reference",
+      "ref": "BDB, אָהֵב 1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "BDB, אָהֵב 1",
+      "sourceHeRef": "בראון-דרייבר-בריגס, אָהֵב א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1891, 1905],
+      "commentaryNum": 1,
+      "collectiveTitle": {
+        "en": "BDB",
+        "he": "בראון-דרייבר-בריגס"
+      },
+      "heTitle": "אָהֵב"
+    },
+    {
+      "_id": "6319cfc2b6084aa1cbefb867",
+      "index_title": "BDB",
+      "category": "Reference",
+      "type": "reference",
+      "ref": "BDB, אֱלֹהִים 1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "BDB, אֱלֹהִים 1",
+      "sourceHeRef": "בראון-דרייבר-בריגס, אֱלֹהִים א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1891, 1905],
+      "commentaryNum": 1,
+      "collectiveTitle": {
+        "en": "BDB",
+        "he": "בראון-דרייבר-בריגס"
+      },
+      "heTitle": "אֱלֹהִים"
+    },
+    {
+      "_id": "6319d0b5b6084aa1cbf069cd",
+      "index_title": "BDB",
+      "category": "Reference",
+      "type": "reference",
+      "ref": "BDB, דָּרַשׁ 1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "BDB, דָּרַשׁ 1",
+      "sourceHeRef": "בראון-דרייבר-בריגס, דָּרַשׁ א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1891, 1905],
+      "commentaryNum": 1,
+      "collectiveTitle": {
+        "en": "BDB",
+        "he": "בראון-דרייבר-בריגס"
+      },
+      "heTitle": "דָּרַשׁ"
+    },
+    {
+      "_id": "6319d0e4b6084aa1cbf08867",
+      "index_title": "BDB",
+      "category": "Reference",
+      "type": "reference",
+      "ref": "BDB, הָלַךְ 1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "BDB, הָלַךְ 1",
+      "sourceHeRef": "בראון-דרייבר-בריגס, הָלַךְ א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1891, 1905],
+      "commentaryNum": 1,
+      "collectiveTitle": {
+        "en": "BDB",
+        "he": "בראון-דרייבר-בריגס"
+      },
+      "heTitle": "הָלַךְ"
+    },
+    {
+      "_id": "6319d175b6084aa1cbf0e87d",
+      "index_title": "BDB",
+      "category": "Reference",
+      "type": "reference",
+      "ref": "BDB, חֶ֫סֶד 1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "BDB, חֶ֫סֶד 1",
+      "sourceHeRef": "בראון-דרייבר-בריגס, חֶ֫סֶד א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1891, 1905],
+      "commentaryNum": 1,
+      "collectiveTitle": {
+        "en": "BDB",
+        "he": "בראון-דרייבר-בריגס"
+      },
+      "heTitle": "חֶ֫סֶד"
+    },
+    {
+      "_id": "6319d1a0b6084aa1cbf1062d",
+      "index_title": "BDB",
+      "category": "Reference",
+      "type": "reference",
+      "ref": "BDB, טוֹב² 1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "BDB, טוֹב² 1",
+      "sourceHeRef": "בראון-דרייבר-בריגס, טוֹב² א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1891, 1905],
+      "commentaryNum": 1,
+      "collectiveTitle": {
+        "en": "BDB",
+        "he": "בראון-דרייבר-בריגס"
+      },
+      "heTitle": "טוֹב²"
+    },
+    {
+      "_id": "6319d231b6084aa1cbf1713b",
+      "index_title": "BDB",
+      "category": "Reference",
+      "type": "reference",
+      "ref": "BDB, כִּי אִם־ 1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "BDB, כִּי אִם־ 1",
+      "sourceHeRef": "בראון-דרייבר-בריגס, כִּי אִם־ א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1891, 1905],
+      "commentaryNum": 1,
+      "collectiveTitle": {
+        "en": "BDB",
+        "he": "בראון-דרייבר-בריגס"
+      },
+      "heTitle": "כִּי אִם־"
+    },
+    {
+      "_id": "6319d25db6084aa1cbf19301",
+      "index_title": "BDB",
+      "category": "Reference",
+      "type": "reference",
+      "ref": "BDB, לְ 1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "BDB, לְ 1",
+      "sourceHeRef": "בראון-דרייבר-בריגס, לְ א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1891, 1905],
+      "commentaryNum": 1,
+      "collectiveTitle": {
+        "en": "BDB",
+        "he": "בראון-דרייבר-בריגס"
+      },
+      "heTitle": "לְ"
+    },
+    {
+      "_id": "6319d29ab6084aa1cbf1c077",
+      "index_title": "BDB",
+      "category": "Reference",
+      "type": "reference",
+      "ref": "BDB, מָה 1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "BDB, מָה 1",
+      "sourceHeRef": "בראון-דרייבר-בריגס, מָה א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1891, 1905],
+      "commentaryNum": 1,
+      "collectiveTitle": {
+        "en": "BDB",
+        "he": "בראון-דרייבר-בריגס"
+      },
+      "heTitle": "מָה"
+    },
+    {
+      "_id": "6319d2e9b6084aa1cbf1ffdf",
+      "index_title": "BDB",
+      "category": "Reference",
+      "type": "reference",
+      "ref": "BDB, נָגַד 1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "BDB, נָגַד 1",
+      "sourceHeRef": "בראון-דרייבר-בריגס, נָגַד א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1891, 1905],
+      "commentaryNum": 1,
+      "collectiveTitle": {
+        "en": "BDB",
+        "he": "בראון-דרייבר-בריגס"
+      },
+      "heTitle": "נָגַד"
+    },
+    {
+      "_id": "6319d3a1b6084aa1cbf2905b",
+      "index_title": "BDB",
+      "category": "Reference",
+      "type": "reference",
+      "ref": "BDB, עִם 1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "BDB, עִם 1",
+      "sourceHeRef": "בראון-דרייבר-בריגס, עִם א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1891, 1905],
+      "commentaryNum": 1,
+      "collectiveTitle": {
+        "en": "BDB",
+        "he": "בראון-דרייבר-בריגס"
+      },
+      "heTitle": "עִם"
+    },
+    {
+      "_id": "6319d40fb6084aa1cbf2e801",
+      "index_title": "BDB",
+      "category": "Reference",
+      "type": "reference",
+      "ref": "BDB, צָנַע 1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "BDB, צָנַע 1",
+      "sourceHeRef": "בראון-דרייבר-בריגס, צָנַע א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1891, 1905],
+      "commentaryNum": 1,
+      "collectiveTitle": {
+        "en": "BDB",
+        "he": "בראון-דרייבר-בריגס"
+      },
+      "heTitle": "צָנַע"
+    },
+    {
+      "_id": "6319d43fb6084aa1cbf30fd3",
+      "index_title": "BDB",
+      "category": "Reference",
+      "type": "reference",
+      "ref": "BDB, קָרָא 1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "BDB, קָרָא 1",
+      "sourceHeRef": "בראון-דרייבר-בריגס, קָרָא א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1891, 1905],
+      "commentaryNum": 1,
+      "collectiveTitle": {
+        "en": "BDB",
+        "he": "בראון-דרייבר-בריגס"
+      },
+      "heTitle": "קָרָא"
+    },
+    {
+      "_id": "6319d500b6084aa1cbf3ae03",
+      "index_title": "BDB",
+      "category": "Reference",
+      "type": "reference",
+      "ref": "BDB, מִשְׁפָּט² 1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "BDB, מִשְׁפָּט² 1",
+      "sourceHeRef": "בראון-דרייבר-בריגס, מִשְׁפָּט² א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1891, 1905],
+      "commentaryNum": 1,
+      "collectiveTitle": {
+        "en": "BDB",
+        "he": "בראון-דרייבר-בריגס"
+      },
+      "heTitle": "מִשְׁפָּט²"
+    },
+    {
+      "_id": "672925b1330a8116e8d449ae",
+      "index_title": "From Sinai to Ethiopia",
+      "category": "Halakhah",
+      "type": "",
+      "ref": "From Sinai to Ethiopia, Shulhan haOrit; The Halakhah of Ethiopian Jewry, Then and Now, 6 Foundations of the Jewish Home 8:3",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "From Sinai to Ethiopia, Shulhan haOrit; The Halakhah of Ethiopian Jewry, Then and Now, 6 Foundations of the Jewish Home 8:3",
+      "sourceHeRef": "מסיני לאתיופיה, שולחן האוּרית, השער השישי; יסודות הבית היהודי ח׳:ג׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "commentaryNum": 8.0003,
+      "collectiveTitle": {
+        "en": "From Sinai to Ethiopia",
+        "he": "מסיני לאתיופיה"
+      },
+      "heTitle": "השער השישי; יסודות הבית היהודי"
+    },
+    {
+      "_id": "596c7b98d6e4a95e6057049e",
+      "index_title": "Makkot",
+      "category": "Talmud",
+      "type": "",
+      "ref": "Makkot 24a:25",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Makkot 24a:25",
+      "sourceHeRef": "מכות כ״ד א:כ״ה",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [450, 550],
+      "commentaryNum": 47.0025,
+      "collectiveTitle": {
+        "en": "Makkot",
+        "he": "מכות"
+      },
+      "heTitle": "מכות"
+    },
+    {
+      "_id": "66092061e84ffc9594706820",
+      "index_title": "Covenant and Conversation; Leviticus; The Book of Holiness",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Covenant and Conversation; Leviticus; The Book of Holiness, Tzav, Violence and the Sacred 10",
+      "anchorRef": "Micah 6:6-8",
+      "anchorRefExpanded": ["Micah 6:6", "Micah 6:7", "Micah 6:8"],
+      "sourceRef": "Covenant and Conversation; Leviticus; The Book of Holiness, Tzav, Violence and the Sacred 10",
+      "sourceHeRef": "שיג ושיח; קריאות חדשות בפרשת השבוע, ויקרא, צו, א י׳",
+      "anchorVerse": 6,
+      "sourceHasEn": true,
+      "commentaryNum": 10,
+      "collectiveTitle": {
+        "en": "Covenant and Conversation; Leviticus; The Book of Holiness",
+        "he": "שיג ושיח; קריאות חדשות בפרשת השבוע, ויקרא"
+      },
+      "heTitle": "א"
+    },
+    {
+      "_id": "67025bfd448ee144d50a0487",
+      "index_title": "Covenant and Conversation; Hebrew Edition",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Covenant and Conversation; Hebrew Edition, Vayera, 3 8",
+      "anchorRef": "Micah 6:7-8",
+      "anchorRefExpanded": ["Micah 6:7", "Micah 6:8"],
+      "sourceRef": "Covenant and Conversation; Hebrew Edition, Vayera, 3 8",
+      "sourceHeRef": "שיג ושיח; מהדורה עברית, וירא, ויתור על בעלות ח׳",
+      "anchorVerse": 7,
+      "sourceHasEn": false,
+      "commentaryNum": 8,
+      "collectiveTitle": {
+        "en": "Covenant and Conversation; Hebrew Edition",
+        "he": "שיג ושיח; מהדורה עברית"
+      },
+      "heTitle": "ויתור על בעלות"
+    },
+    {
+      "_id": "670396661767b3fd020873af",
+      "index_title": "Covenant and Conversation Family Edition",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Covenant and Conversation Family Edition, Vayikra, I; The Prophetic View of Sacrifice 24",
+      "anchorRef": "Micah 6:6-8",
+      "anchorRefExpanded": ["Micah 6:6", "Micah 6:7", "Micah 6:8"],
+      "sourceRef": "Covenant and Conversation Family Edition, Vayikra, I; The Prophetic View of Sacrifice 24",
+      "sourceHeRef": "שיג ושיח מהדורה משפחתית, ויקרא, א כ״ד",
+      "anchorVerse": 6,
+      "sourceHasEn": true,
+      "commentaryNum": 24,
+      "collectiveTitle": {
+        "en": "Covenant and Conversation Family Edition",
+        "he": "שיג ושיח מהדורה משפחתית"
+      },
+      "heTitle": "א"
+    },
+    {
+      "_id": "670396671767b3fd020873b1",
+      "index_title": "Covenant and Conversation Family Edition",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Covenant and Conversation Family Edition, Vayikra, I; The Prophetic View of Sacrifice 44",
+      "anchorRef": "Micah 6:6-8",
+      "anchorRefExpanded": ["Micah 6:6", "Micah 6:7", "Micah 6:8"],
+      "sourceRef": "Covenant and Conversation Family Edition, Vayikra, I; The Prophetic View of Sacrifice 44",
+      "sourceHeRef": "שיג ושיח מהדורה משפחתית, ויקרא, א מ״ד",
+      "anchorVerse": 6,
+      "sourceHasEn": true,
+      "commentaryNum": 44,
+      "collectiveTitle": {
+        "en": "Covenant and Conversation Family Edition",
+        "he": "שיג ושיח מהדורה משפחתית"
+      },
+      "heTitle": "א"
+    },
+    {
+      "_id": "678f62baab1929cbbc948706",
+      "index_title": "I Believe; A Weekly Reading of the Jewish Bible",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "I Believe; A Weekly Reading of the Jewish Bible, Vayikra; The Prophetic View of Sacrifice 18",
+      "anchorRef": "Micah 6:6-8",
+      "anchorRefExpanded": ["Micah 6:6", "Micah 6:7", "Micah 6:8"],
+      "sourceRef": "I Believe; A Weekly Reading of the Jewish Bible, Vayikra; The Prophetic View of Sacrifice 18",
+      "sourceHeRef": "אני מאמין; קריאה שבועית בפרשת השבוע, ויקרא; הקורבנות בעיני הנביאים י״ח",
+      "anchorVerse": 6,
+      "sourceHasEn": true,
+      "compDate": [2020],
+      "commentaryNum": 18,
+      "collectiveTitle": {
+        "en": "I Believe; A Weekly Reading of the Jewish Bible",
+        "he": "אני מאמין; קריאה שבועית בפרשת השבוע"
+      },
+      "heTitle": "ויקרא; הקורבנות בעיני הנביאים"
+    },
+    {
+      "_id": "695efabfe1f707a0ce07e6d6",
+      "index_title": "Ein Yaakov",
+      "category": "Midrash",
+      "type": "",
+      "ref": "Ein Yaakov, Sukkah 4:15",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ein Yaakov, Sukkah 4:15",
+      "sourceHeRef": "עין יעקב, סוכה ד׳:ט״ו",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1490, 1550],
+      "commentaryNum": 4.0015,
+      "collectiveTitle": {
+        "en": "Ein Yaakov",
+        "he": "עין יעקב"
+      },
+      "heTitle": "סוכה"
+    },
+    {
+      "_id": "695efb4b8b6eae08c371bc88",
+      "index_title": "Ein Yaakov",
+      "category": "Midrash",
+      "type": "",
+      "ref": "Ein Yaakov, Makkot 3:10",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ein Yaakov, Makkot 3:10",
+      "sourceHeRef": "עין יעקב, מכות ג׳:י׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1490, 1550],
+      "commentaryNum": 3.001,
+      "collectiveTitle": {
+        "en": "Ein Yaakov",
+        "he": "עין יעקב"
+      },
+      "heTitle": "מכות"
+    },
+    {
+      "_id": "695efd5b8b6eae08c371c1c8",
+      "index_title": "Derashot HaRan",
+      "category": "Jewish Thought",
+      "type": "",
+      "ref": "Derashot HaRan 6:7",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Derashot HaRan 6:7",
+      "sourceHeRef": "דרשות הר\"ן ו׳:ז׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1320, 1370],
+      "commentaryNum": 6.0007,
+      "collectiveTitle": {
+        "en": "Derashot HaRan",
+        "he": "דרשות הר\"ן"
+      },
+      "heTitle": "דרשות הר\"ן"
+    },
+    {
+      "_id": "695f236e3d6f09c6c9851bb9",
+      "index_title": "Ein Yaakov (Glick Edition)",
+      "category": "Midrash",
+      "type": "",
+      "ref": "Ein Yaakov (Glick Edition), Sukkah 4:6",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ein Yaakov (Glick Edition), Sukkah 4:6",
+      "sourceHeRef": "עין יעקב (מאת שמואל צבי גליק), סוכה ד׳:ו׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1901, 1921],
+      "commentaryNum": 4.0006,
+      "collectiveTitle": {
+        "en": "Ein Yaakov (Glick Edition)",
+        "he": "עין יעקב (מאת שמואל צבי גליק)"
+      },
+      "heTitle": "סוכה"
+    },
+    {
+      "_id": "695f246f53ecd6dc3a29b896",
+      "index_title": "Ein Yaakov (Glick Edition)",
+      "category": "Midrash",
+      "type": "",
+      "ref": "Ein Yaakov (Glick Edition), Makkot 3:7",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ein Yaakov (Glick Edition), Makkot 3:7",
+      "sourceHeRef": "עין יעקב (מאת שמואל צבי גליק), מכות ג׳:ז׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1901, 1921],
+      "commentaryNum": 3.0007,
+      "collectiveTitle": {
+        "en": "Ein Yaakov (Glick Edition)",
+        "he": "עין יעקב (מאת שמואל צבי גליק)"
+      },
+      "heTitle": "מכות"
+    },
+    {
+      "_id": "695f8926fa002f8f00b814f0",
+      "index_title": "Machberet Menachem",
+      "category": "Reference",
+      "type": "",
+      "ref": "Machberet Menachem, Letter Tzadi 38:2",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Machberet Menachem, Letter Tzadi 38:2",
+      "sourceHeRef": "מחברת מנחם, צ ל״ח:ב׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [950, 960],
+      "commentaryNum": 38.0002,
+      "collectiveTitle": {
+        "en": "Machberet Menachem",
+        "he": "מחברת מנחם"
+      }
+    },
+    {
+      "_id": "695f9b1f7749e9f5f70707c7",
+      "index_title": "Bamidbar Rabbah",
+      "category": "Midrash",
+      "type": "",
+      "ref": "Bamidbar Rabbah 1:3",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Bamidbar Rabbah 1:3",
+      "sourceHeRef": "במדבר רבה א׳:ג׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1200],
+      "commentaryNum": 1.0003,
+      "collectiveTitle": {
+        "en": "Bamidbar Rabbah",
+        "he": "במדבר רבה"
+      },
+      "heTitle": "במדבר רבה"
+    },
+    {
+      "_id": "695fa978fd02faf1b62f6ff8",
+      "index_title": "Mesillat Yesharim",
+      "category": "Musar",
+      "type": "",
+      "ref": "Mesillat Yesharim 20:19",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Mesillat Yesharim 20:19",
+      "sourceHeRef": "מסילת ישרים כ׳:י״ט",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1738],
+      "commentaryNum": 20.0019,
+      "collectiveTitle": {
+        "en": "Mesillat Yesharim",
+        "he": "מסילת ישרים"
+      }
+    },
+    {
+      "_id": "695fd8ff13efcde012e85b07",
+      "index_title": "Be'er Mayim Chaim",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Be'er Mayim Chaim, Genesis 6:9:3",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Be'er Mayim Chaim, Genesis 6:9:3",
+      "sourceHeRef": "באר מים חיים, בראשית ו׳:ט׳:ג׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1775, 1815],
+      "commentaryNum": 9.0003,
+      "collectiveTitle": {
+        "en": "Be'er Mayim Chaim",
+        "he": "באר מים חיים"
+      },
+      "heTitle": "בראשית"
+    },
+    {
+      "_id": "695fda17a28e55a32cf8d923",
+      "index_title": "Be'er Mayim Chaim",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Be'er Mayim Chaim, Deuteronomy 6:24:6",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Be'er Mayim Chaim, Deuteronomy 6:24:6",
+      "sourceHeRef": "באר מים חיים, דברים ו׳:כ״ד:ו׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1775, 1815],
+      "commentaryNum": 24.0006,
+      "collectiveTitle": {
+        "en": "Be'er Mayim Chaim",
+        "he": "באר מים חיים"
+      },
+      "heTitle": "דברים"
+    },
+    {
+      "_id": "695ff55ac2efea3a3a2c5d30",
+      "index_title": "Akeidat Yitzchak",
+      "category": "Jewish Thought",
+      "type": "",
+      "ref": "Akeidat Yitzchak 67:8:13",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Akeidat Yitzchak 67:8:13",
+      "sourceHeRef": "עקידת יצחק ס״ז:ח׳:י״ג",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1455, 1495],
+      "commentaryNum": 8.0013,
+      "collectiveTitle": {
+        "en": "Akeidat Yitzchak",
+        "he": "עקידת יצחק"
+      }
+    },
+    {
+      "_id": "695ff57613efcde012e8926c",
+      "index_title": "Akeidat Yitzchak",
+      "category": "Jewish Thought",
+      "type": "",
+      "ref": "Akeidat Yitzchak 71:1:4",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Akeidat Yitzchak 71:1:4",
+      "sourceHeRef": "עקידת יצחק ע״א:א׳:ד׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1455, 1495],
+      "commentaryNum": 1.0004,
+      "collectiveTitle": {
+        "en": "Akeidat Yitzchak",
+        "he": "עקידת יצחק"
+      }
+    },
+    {
+      "_id": "695ff5cb53159871367f9128",
+      "index_title": "Akeidat Yitzchak",
+      "category": "Jewish Thought",
+      "type": "",
+      "ref": "Akeidat Yitzchak 90:1:4",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Akeidat Yitzchak 90:1:4",
+      "sourceHeRef": "עקידת יצחק צ׳:א׳:ד׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1455, 1495],
+      "commentaryNum": 1.0004,
+      "collectiveTitle": {
+        "en": "Akeidat Yitzchak",
+        "he": "עקידת יצחק"
+      }
+    },
+    {
+      "_id": "695ff60496492cd13896ac1c",
+      "index_title": "Akeidat Yitzchak",
+      "category": "Jewish Thought",
+      "type": "",
+      "ref": "Akeidat Yitzchak 21:1:18",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Akeidat Yitzchak 21:1:18",
+      "sourceHeRef": "עקידת יצחק כ״א:א׳:י״ח",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1455, 1495],
+      "commentaryNum": 1.0018,
+      "collectiveTitle": {
+        "en": "Akeidat Yitzchak",
+        "he": "עקידת יצחק"
+      }
+    },
+    {
+      "_id": "696005cd96492cd13896ead9",
+      "index_title": "Kad HaKemach",
+      "category": "Musar",
+      "type": "",
+      "ref": "Kad HaKemach, Theft 2:3",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Kad HaKemach, Theft 2:3",
+      "sourceHeRef": "כד הקמח, גזלה ב׳:ג׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1290, 1340],
+      "commentaryNum": 2.0003,
+      "collectiveTitle": {
+        "en": "Kad HaKemach",
+        "he": "כד הקמח"
+      },
+      "heTitle": "גזלה"
+    },
+    {
+      "_id": "69601d4964ff2ce71f46325e",
+      "index_title": "Kitzur Shulchan Arukh",
+      "category": "Halakhah",
+      "type": "",
+      "ref": "Kitzur Shulchan Arukh 150:5",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Kitzur Shulchan Arukh 150:5",
+      "sourceHeRef": "קיצור שלחן ערוך ק״נ:ה׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1844, 1864],
+      "commentaryNum": 150.0005,
+      "collectiveTitle": {
+        "en": "Kitzur Shulchan Arukh",
+        "he": "קיצור שלחן ערוך"
+      },
+      "heTitle": "קיצור שלחן ערוך"
+    },
+    {
+      "_id": "69602eef9806cee6831de8ff",
+      "index_title": "Ba'al Shem Tov",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Ba'al Shem Tov, Bamidbar 1:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ba'al Shem Tov, Bamidbar 1:1",
+      "sourceHeRef": "בעל שם טוב על התורה, במדבר א׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1700, 1760],
+      "commentaryNum": 1.0001,
+      "collectiveTitle": {
+        "en": "Ba'al Shem Tov",
+        "he": "בעל שם טוב על התורה"
+      },
+      "heTitle": "במדבר"
+    },
+    {
+      "_id": "69602f1194081bc37d0b6a15",
+      "index_title": "Mekor Mayim Chayim on Baal Shem Tov",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Mekor Mayim Chayim on Baal Shem Tov, Bereshit 50:3",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Mekor Mayim Chayim on Baal Shem Tov, Bereshit 50:3",
+      "sourceHeRef": "מקור מים חיים על בעל שם טוב, בראשית נ׳:ג׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1700, 1760],
+      "commentaryNum": 50.0003,
+      "collectiveTitle": {
+        "en": "Mekor Mayim Chayim on Baal Shem Tov",
+        "he": "מקור מים חיים על בעל שם טוב"
+      },
+      "heTitle": "בראשית"
+    },
+    {
+      "_id": "69602f33a24eb43e1f0a9924",
+      "index_title": "Mekor Mayim Chayim on Baal Shem Tov",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Mekor Mayim Chayim on Baal Shem Tov, Beshalach 16:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Mekor Mayim Chayim on Baal Shem Tov, Beshalach 16:1",
+      "sourceHeRef": "מקור מים חיים על בעל שם טוב, בשלח ט״ז:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1700, 1760],
+      "commentaryNum": 16.0001,
+      "collectiveTitle": {
+        "en": "Mekor Mayim Chayim on Baal Shem Tov",
+        "he": "מקור מים חיים על בעל שם טוב"
+      },
+      "heTitle": "בשלח"
+    },
+    {
+      "_id": "69603909ed2acb22cd8b58ee",
+      "index_title": "Arvei Nachal",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Arvei Nachal, Vayigash 2:9",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Arvei Nachal, Vayigash 2:9",
+      "sourceHeRef": "ערבי נחל, ויגש ב׳:ט׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1780, 1810],
+      "commentaryNum": 2.0009,
+      "collectiveTitle": {
+        "en": "Arvei Nachal",
+        "he": "ערבי נחל"
+      },
+      "heTitle": "ויגש"
+    },
+    {
+      "_id": "6960394c5354625dbebee76d",
+      "index_title": "Arvei Nachal",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Arvei Nachal, Balak 2:108",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Arvei Nachal, Balak 2:108",
+      "sourceHeRef": "ערבי נחל, בלק ב׳:ק״ח",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1780, 1810],
+      "commentaryNum": 2.0108,
+      "collectiveTitle": {
+        "en": "Arvei Nachal",
+        "he": "ערבי נחל"
+      },
+      "heTitle": "בלק"
+    },
+    {
+      "_id": "69603a0b12e013c43dd490aa",
+      "index_title": "Me'or Einayim",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Me'or Einayim, Shmini 1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Me'or Einayim, Shmini 1",
+      "sourceHeRef": "מאור עינים, שמיני א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1763, 1797],
+      "commentaryNum": 1,
+      "collectiveTitle": {
+        "en": "Me'or Einayim",
+        "he": "מאור עינים"
+      },
+      "heTitle": "שמיני"
+    },
+    {
+      "_id": "69606a3e1a10b08b12b04f22",
+      "index_title": "Likutei Moharan",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Likutei Moharan 31:10:6",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Likutei Moharan 31:10:6",
+      "sourceHeRef": "ליקוטי מוהר\"ן ל״א:י׳:ו׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1802, 1808],
+      "commentaryNum": 10.0006,
+      "collectiveTitle": {
+        "en": "Likutei Moharan",
+        "he": "ליקוטי מוהר\"ן"
+      }
+    },
+    {
+      "_id": "69606a4e9e89d99eb16865ed",
+      "index_title": "Likutei Moharan",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Likutei Moharan 48:3:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Likutei Moharan 48:3:1",
+      "sourceHeRef": "ליקוטי מוהר\"ן מ״ח:ג׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1802, 1808],
+      "commentaryNum": 3.0001,
+      "collectiveTitle": {
+        "en": "Likutei Moharan",
+        "he": "ליקוטי מוהר\"ן"
+      }
+    },
+    {
+      "_id": "696098ab142aa4dfd573edb2",
+      "index_title": "Benayahu on Sukkah",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Benayahu on Sukkah 49b:3",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Benayahu on Sukkah 49b:3",
+      "sourceHeRef": "בניהו על סוכה מ״ט ב:ג׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1855, 1895],
+      "commentaryNum": 98.0003,
+      "collectiveTitle": {
+        "en": "Benayahu on Sukkah",
+        "he": "בניהו על סוכה"
+      },
+      "heTitle": "בניהו על סוכה"
+    },
+    {
+      "_id": "6960b12b0594ed2e2ee32ec0",
+      "index_title": "Ben Yehoyada on Kiddushin",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Ben Yehoyada on Kiddushin 71a:4",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ben Yehoyada on Kiddushin 71a:4",
+      "sourceHeRef": "בן יהוידע על קידושין ע״א א:ד׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1860, 1900],
+      "commentaryNum": 141.0004,
+      "collectiveTitle": {
+        "en": "Ben Yehoyada on Kiddushin",
+        "he": "בן יהוידע על קידושין"
+      },
+      "heTitle": "בן יהוידע על קידושין"
+    },
+    {
+      "_id": "6960b5a3cbe5b810a679b29e",
+      "index_title": "Agra DeKala",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Agra DeKala, Balak 18",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Agra DeKala, Balak 18",
+      "sourceHeRef": "אגרא דכלה, בלק י״ח",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1801, 1841],
+      "commentaryNum": 18,
+      "collectiveTitle": {
+        "en": "Agra DeKala",
+        "he": "אגרא דכלה"
+      },
+      "heTitle": "בלק"
+    },
+    {
+      "_id": "6960f59ee85b46c8b2cc7797",
+      "index_title": "Hegyonei Uziel",
+      "category": "Jewish Thought",
+      "type": "",
+      "ref": "Hegyonei Uziel, Gate VII 1:22",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Hegyonei Uziel, Gate VII 1:22",
+      "sourceHeRef": "הגיוני עוזיאל, שער ז; יראת ה' ודעת אלקים א׳:כ״ב",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1910, 1950],
+      "commentaryNum": 1.0022,
+      "collectiveTitle": {
+        "en": "Hegyonei Uziel",
+        "he": "הגיוני עוזיאל"
+      },
+      "heTitle": "שער ז; יראת ה' ודעת אלקים"
+    },
+    {
+      "_id": "6960f5becc4ed91b8c6c7fc4",
+      "index_title": "Hegyonei Uziel",
+      "category": "Jewish Thought",
+      "type": "",
+      "ref": "Hegyonei Uziel, Gate XXIII 2:21",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Hegyonei Uziel, Gate XXIII 2:21",
+      "sourceHeRef": "הגיוני עוזיאל, שער כג; אהבת רעים ב׳:כ״א",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1910, 1950],
+      "commentaryNum": 2.0021,
+      "collectiveTitle": {
+        "en": "Hegyonei Uziel",
+        "he": "הגיוני עוזיאל"
+      },
+      "heTitle": "שער כג; אהבת רעים"
+    },
+    {
+      "_id": "6960fbc1d90c08b6ebe9c211",
+      "index_title": "Ahavat Chesed",
+      "category": "Halakhah",
+      "type": "",
+      "ref": "Ahavat Chesed, Part II 24:2",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ahavat Chesed, Part II 24:2",
+      "sourceHeRef": "אהבת חסד, חלק שני כ״ד:ב׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 24.0002,
+      "collectiveTitle": {
+        "en": "Ahavat Chesed",
+        "he": "אהבת חסד"
+      },
+      "heTitle": "חלק שני"
+    },
+    {
+      "_id": "6960fbc27cad42a14a7632ba",
+      "index_title": "Ahavat Chesed",
+      "category": "Halakhah",
+      "type": "",
+      "ref": "Ahavat Chesed, Part III 8:10",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ahavat Chesed, Part III 8:10",
+      "sourceHeRef": "אהבת חסד, חלק שלישי ח׳:י׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 8.001,
+      "collectiveTitle": {
+        "en": "Ahavat Chesed",
+        "he": "אהבת חסד"
+      },
+      "heTitle": "חלק שלישי"
+    },
+    {
+      "_id": "6960fab31001674249c465ed",
+      "index_title": "Derech Etz Chayim (Ramchal)",
+      "category": "Kabbalah",
+      "type": "",
+      "ref": "Derech Etz Chayim (Ramchal) 58",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Derech Etz Chayim (Ramchal) 58",
+      "sourceHeRef": "דרך עץ חיים (רמח\"ל) נ״ח",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1725, 1745],
+      "commentaryNum": 58,
+      "collectiveTitle": {
+        "en": "Derech Etz Chayim (Ramchal)",
+        "he": "דרך עץ חיים (רמח\"ל)"
+      },
+      "heTitle": "דרך עץ חיים (רמח\"ל)"
+    },
+    {
+      "_id": "6960fba48195eade2d4c31e5",
+      "index_title": "Ahavat Chesed",
+      "category": "Halakhah",
+      "type": "",
+      "ref": "Ahavat Chesed, Foreword 7",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ahavat Chesed, Foreword 7",
+      "sourceHeRef": "אהבת חסד, הקדמה ז׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 7,
+      "collectiveTitle": {
+        "en": "Ahavat Chesed",
+        "he": "אהבת חסד"
+      },
+      "heTitle": "הקדמה"
+    },
+    {
+      "_id": "6960fba7314f078e1aa01cf8",
+      "index_title": "Ahavat Chesed",
+      "category": "Halakhah",
+      "type": "",
+      "ref": "Ahavat Chesed, Foreword 2",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ahavat Chesed, Foreword 2",
+      "sourceHeRef": "אהבת חסד, הקדמה ב׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 2,
+      "collectiveTitle": {
+        "en": "Ahavat Chesed",
+        "he": "אהבת חסד"
+      },
+      "heTitle": "הקדמה"
+    },
+    {
+      "_id": "6960fbaa314f078e1aa01d0c",
+      "index_title": "Ahavat Chesed",
+      "category": "Halakhah",
+      "type": "",
+      "ref": "Ahavat Chesed, Part II 1:4",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ahavat Chesed, Part II 1:4",
+      "sourceHeRef": "אהבת חסד, חלק שני א׳:ד׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 1.0004,
+      "collectiveTitle": {
+        "en": "Ahavat Chesed",
+        "he": "אהבת חסד"
+      },
+      "heTitle": "חלק שני"
+    },
+    {
+      "_id": "6960fbac07934a072abb0971",
+      "index_title": "Ahavat Chesed",
+      "category": "Halakhah",
+      "type": "",
+      "ref": "Ahavat Chesed, Part II 1:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ahavat Chesed, Part II 1:1",
+      "sourceHeRef": "אהבת חסד, חלק שני א׳:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 1.0001,
+      "collectiveTitle": {
+        "en": "Ahavat Chesed",
+        "he": "אהבת חסד"
+      },
+      "heTitle": "חלק שני"
+    },
+    {
+      "_id": "6960fbafd90c08b6ebe9c1be",
+      "index_title": "Ahavat Chesed",
+      "category": "Halakhah",
+      "type": "",
+      "ref": "Ahavat Chesed, Part II 12:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ahavat Chesed, Part II 12:1",
+      "sourceHeRef": "אהבת חסד, חלק שני י״ב:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 12.0001,
+      "collectiveTitle": {
+        "en": "Ahavat Chesed",
+        "he": "אהבת חסד"
+      },
+      "heTitle": "חלק שני"
+    },
+    {
+      "_id": "696122cee8113a06f384d3af",
+      "index_title": "LeNevukhei HaTekufah",
+      "category": "Jewish Thought",
+      "type": "",
+      "ref": "LeNevukhei HaTekufah 4:1:9",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "LeNevukhei HaTekufah 4:1:9",
+      "sourceHeRef": "לנבוכי התקופה ד׳:א׳:ט׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1938, 1942],
+      "commentaryNum": 1.0009,
+      "collectiveTitle": {
+        "en": "LeNevukhei HaTekufah",
+        "he": "לנבוכי התקופה"
+      }
+    },
+    {
+      "_id": "696131fc54c96baff5a9da8c",
+      "index_title": "Ben Porat Yosef",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Ben Porat Yosef, Chayei Sara 70",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ben Porat Yosef, Chayei Sara 70",
+      "sourceHeRef": "בן פורת יוסף, חיי שרה ע׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1760, 1780],
+      "commentaryNum": 70,
+      "collectiveTitle": {
+        "en": "Ben Porat Yosef",
+        "he": "בן פורת יוסף"
+      },
+      "heTitle": "חיי שרה"
+    },
+    {
+      "_id": "69613238ea0a6e9680c0b7dc",
+      "index_title": "Ben Porat Yosef",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Ben Porat Yosef, Likkutim 114",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ben Porat Yosef, Likkutim 114",
+      "sourceHeRef": "בן פורת יוסף, ליקוטים קי״ד",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1760, 1780],
+      "commentaryNum": 114,
+      "collectiveTitle": {
+        "en": "Ben Porat Yosef",
+        "he": "בן פורת יוסף"
+      },
+      "heTitle": "ליקוטים"
+    },
+    {
+      "_id": "6961324ad661b6267fc37e4f",
+      "index_title": "Ben Porat Yosef",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Ben Porat Yosef, Shabbat HaGadol Sermons 1:118",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ben Porat Yosef, Shabbat HaGadol Sermons 1:118",
+      "sourceHeRef": "בן פורת יוסף, דרשות שבת הגדול א׳:קי״ח",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1760, 1780],
+      "commentaryNum": 1.0118,
+      "collectiveTitle": {
+        "en": "Ben Porat Yosef",
+        "he": "בן פורת יוסף"
+      },
+      "heTitle": "דרשות שבת הגדול"
+    },
+    {
+      "_id": "696133847dceacd81d845d6c",
+      "index_title": "In the Narrow Places; Daily Inspiration for the Three Weeks",
+      "category": "Jewish Thought",
+      "type": "",
+      "ref": "In the Narrow Places; Daily Inspiration for the Three Weeks, [Day Three] 19 Tammuz; God's List 25",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "In the Narrow Places; Daily Inspiration for the Three Weeks, [Day Three] 19 Tammuz; God's List 25",
+      "sourceHeRef": "בין המצרים; השראה יומית לשלשת השבועות, י\"ט תמוז כ״ה",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [2009, 2011],
+      "commentaryNum": 25,
+      "collectiveTitle": {
+        "en": "In the Narrow Places; Daily Inspiration for the Three Weeks",
+        "he": "בין המצרים; השראה יומית לשלשת השבועות"
+      },
+      "heTitle": "י\"ט תמוז"
+    },
+    {
+      "_id": "69613452de3f9bcb0d55ed7e",
+      "index_title": "Chayyim VaChesed",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Chayyim VaChesed 354:1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Chayyim VaChesed 354:1",
+      "sourceHeRef": "חיים וחסד שנ״ד:א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 354.0001,
+      "collectiveTitle": {
+        "en": "Chayyim VaChesed",
+        "he": "חיים וחסד"
+      }
+    },
+    {
+      "_id": "69629141785adb6de18cde91",
+      "index_title": "Menorat HaMaor",
+      "category": "Musar",
+      "type": "",
+      "ref": "Menorat HaMaor, iv; On Humility, Great is Humility 5",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Menorat HaMaor, iv; On Humility, Great is Humility 5",
+      "sourceHeRef": "מנורת המאור, ד; פרק הענווה, גדולה ענוה ה׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1391],
+      "commentaryNum": 5,
+      "collectiveTitle": {
+        "en": "Menorat HaMaor",
+        "he": "מנורת המאור"
+      },
+      "heTitle": "גדולה ענוה"
+    },
+    {
+      "_id": "69629145510c234709bd31f5",
+      "index_title": "Menorat HaMaor",
+      "category": "Musar",
+      "type": "",
+      "ref": "Menorat HaMaor, iv; On Humility, Great is Humility 4",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Menorat HaMaor, iv; On Humility, Great is Humility 4",
+      "sourceHeRef": "מנורת המאור, ד; פרק הענווה, גדולה ענוה ד׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "compDate": [1391],
+      "commentaryNum": 4,
+      "collectiveTitle": {
+        "en": "Menorat HaMaor",
+        "he": "מנורת המאור"
+      },
+      "heTitle": "גדולה ענוה"
+    },
+    {
+      "_id": "6962db4376336dbb7fa24261",
+      "index_title": "Essays in Ethics; A Weekly Reading of the Jewish Bible",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Essays in Ethics; A Weekly Reading of the Jewish Bible, Vayera; The Binding of Isaac 7",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Essays in Ethics; A Weekly Reading of the Jewish Bible, Vayera; The Binding of Isaac 7",
+      "sourceHeRef": "מאמרים על אתיקה; קריאות חדשות בפרשת השבוע, וירא ז׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "commentaryNum": 7,
+      "collectiveTitle": {
+        "en": "Essays in Ethics; A Weekly Reading of the Jewish Bible",
+        "he": "מאמרים על אתיקה; קריאות חדשות בפרשת השבוע"
+      },
+      "heTitle": "וירא"
+    },
+    {
+      "_id": "6962db645c6c29ff04afdffb",
+      "index_title": "I Believe; A Weekly Reading of the Jewish Bible",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "I Believe; A Weekly Reading of the Jewish Bible, Kedoshim; Made with Love 10",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "I Believe; A Weekly Reading of the Jewish Bible, Kedoshim; Made with Love 10",
+      "sourceHeRef": "אני מאמין; קריאה שבועית בפרשת השבוע, קדושים; אתיקת הקדושה י׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [2020],
+      "commentaryNum": 10,
+      "collectiveTitle": {
+        "en": "I Believe; A Weekly Reading of the Jewish Bible",
+        "he": "אני מאמין; קריאה שבועית בפרשת השבוע"
+      },
+      "heTitle": "קדושים; אתיקת הקדושה"
+    },
+    {
+      "_id": "6962dcc70e26b378ae329214",
+      "index_title": "Ma'alot HaMiddot",
+      "category": "Musar",
+      "type": "",
+      "ref": "Ma'alot HaMiddot, v; On Kindness 5",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ma'alot HaMiddot, v; On Kindness 5",
+      "sourceHeRef": "מעלות המדות, ה; מעלת גמילות חסדים ה׳",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 5,
+      "collectiveTitle": {
+        "en": "Ma'alot HaMiddot",
+        "he": "מעלות המדות"
+      },
+      "heTitle": "ה; מעלת גמילות חסדים"
+    },
+    {
+      "_id": "6962dcc93ed9dc06f783ec5c",
+      "index_title": "Ma'alot HaMiddot",
+      "category": "Musar",
+      "type": "",
+      "ref": "Ma'alot HaMiddot, ix; On Modesty and Immorality 1",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ma'alot HaMiddot, ix; On Modesty and Immorality 1",
+      "sourceHeRef": "מעלות המדות, ט; מעלת הצניעות ומדת הפריצות א׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "commentaryNum": 1,
+      "collectiveTitle": {
+        "en": "Ma'alot HaMiddot",
+        "he": "מעלות המדות"
+      },
+      "heTitle": "ט; מעלת הצניעות ומדת הפריצות"
+    },
+    {
+      "_id": "6962ddc53ed9dc06f783ef71",
+      "index_title": "Ba'al Shem Tov",
+      "category": "Chasidut",
+      "type": "",
+      "ref": "Ba'al Shem Tov, Bamidbar 1:2",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Ba'al Shem Tov, Bamidbar 1:2",
+      "sourceHeRef": "בעל שם טוב על התורה, במדבר א׳:ב׳",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1700, 1760],
+      "commentaryNum": 1.0002,
+      "collectiveTitle": {
+        "en": "Ba'al Shem Tov",
+        "he": "בעל שם טוב על התורה"
+      },
+      "heTitle": "במדבר"
+    },
+    {
+      "_id": "6962e8feac7c3cf91f367c1f",
+      "index_title": "Covenant and Conversation; Hebrew Edition",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "Covenant and Conversation; Hebrew Edition, Vaetchanan, 2 17",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Covenant and Conversation; Hebrew Edition, Vaetchanan, 2 17",
+      "sourceHeRef": "שיג ושיח; מהדורה עברית, ואתחנן, כוח הלָמָּה י״ז",
+      "anchorVerse": 8,
+      "sourceHasEn": false,
+      "commentaryNum": 17,
+      "collectiveTitle": {
+        "en": "Covenant and Conversation; Hebrew Edition",
+        "he": "שיג ושיח; מהדורה עברית"
+      },
+      "heTitle": "כוח הלָמָּה"
+    },
+    {
+      "_id": "6962f07822032573b6a644f9",
+      "index_title": "I Believe; A Weekly Reading of the Jewish Bible",
+      "category": "Quoting Commentary",
+      "type": "",
+      "ref": "I Believe; A Weekly Reading of the Jewish Bible, Balak; The Hidden Meaning of the Balaam Story 13",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "I Believe; A Weekly Reading of the Jewish Bible, Balak; The Hidden Meaning of the Balaam Story 13",
+      "sourceHeRef": "אני מאמין; קריאה שבועית בפרשת השבוע, בלק; פשרו הנסתר של סיפור בלעם י״ג",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [2020],
+      "commentaryNum": 13,
+      "collectiveTitle": {
+        "en": "I Believe; A Weekly Reading of the Jewish Bible",
+        "he": "אני מאמין; קריאה שבועית בפרשת השבוע"
+      },
+      "heTitle": "בלק; פשרו הנסתר של סיפור בלעם"
+    },
+    {
+      "_id": "69edc560477278dd9aea5873",
+      "index_title": "Abudarham",
+      "category": "Halakhah",
+      "type": "",
+      "ref": "Abudarham, Third Gate; Blessings on Commandments 33",
+      "anchorRef": "Micah 6:8",
+      "anchorRefExpanded": ["Micah 6:8"],
+      "sourceRef": "Abudarham, Third Gate; Blessings on Commandments 33",
+      "sourceHeRef": "אבודרהם, השער שלישי; ברכת המצות ל״ג",
+      "anchorVerse": 8,
+      "sourceHasEn": true,
+      "compDate": [1330, 1340],
+      "commentaryNum": 33,
+      "collectiveTitle": {
+        "en": "Abudarham",
+        "he": "אבודרהם"
+      },
+      "heTitle": "השער שלישי; ברכת המצות"
+    },
+    {
+      "_id": "69eff7ec40205f8ade8af0e0",
+      "index_title": "Abudarham",
+      "category": "Halakhah",
+      "type": "",
+      "ref": "Abudarham, Hebrew Calendar, Order of Parashiot and Haftarot 41",
+      "anchorRef": "Micah 5:7-6:8",
+      "anchorRefExpanded": [
+        "Micah 5:7",
+        "Micah 5:8",
+        "Micah 5:9",
+        "Micah 5:10",
+        "Micah 5:11",
+        "Micah 5:12",
+        "Micah 5:13",
+        "Micah 5:14",
+        "Micah 6:1",
+        "Micah 6:2",
+        "Micah 6:3",
+        "Micah 6:4",
+        "Micah 6:5",
+        "Micah 6:6",
+        "Micah 6:7",
+        "Micah 6:8"
+      ],
+      "sourceRef": "Abudarham, Hebrew Calendar, Order of Parashiot and Haftarot 41",
+      "sourceHeRef": "אבודרהם, סדר העיבור, סדר הפרשיות וההפטרות מ״א",
+      "anchorVerse": 7,
+      "sourceHasEn": true,
+      "compDate": [1330, 1340],
+      "commentaryNum": 41,
+      "collectiveTitle": {
+        "en": "Abudarham",
+        "he": "אבודרהם"
+      },
+      "heTitle": "סדר הפרשיות וההפטרות"
+    }
+  ],
+  "source": "https://www.sefaria.org/api/links/Micah%206:8?with_text=0"
+}
