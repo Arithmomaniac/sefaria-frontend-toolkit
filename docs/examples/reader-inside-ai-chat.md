@@ -11,7 +11,7 @@ import { withBase } from "vitepress";
 
 # Reader inside AI chat
 
-You are building an AI chat tool. When an answer cites Sefaria, you want readers to see the actual source. They should be able to read it and move to nearby verses without leaving the chat. You also don't want the chat window to reach out to Sefaria on its own.
+You are building an AI chat tool. When an answer cites Sefaria, you want readers to see the actual source. They should be able to read it and move to nearby verses without leaving the chat. You also don't want the chat window to contact Sefaria on its own.
 
 This example shows one way to do that with MCP. MCP is the Model Context Protocol, a standard way for AI chat apps to call tools. An MCP App is a small interactive web page tied to a tool. The chat host loads the page and delivers the tool's results to it.
 
@@ -21,7 +21,7 @@ The example is a complete app (Vite and TypeScript) in `examples/mcp-app`. It ha
 
 <a :href="withBase('/examples/mcp-app/live.html')" target="_blank" rel="noopener">Open in a new tab</a>
 
-This in-browser host stands in for a chat app. It makes no Sefaria request until you choose "Start live demo". Then it runs an MCP client and an MCP server together in the page and shows the packaged App.
+This in-browser host simulates a chat app. It makes no Sefaria request until you choose "Start live demo". Then it runs an MCP client and an MCP server together in the page and shows the packaged App.
 
 ## How it works
 
@@ -30,17 +30,24 @@ The server offers two tools:
 - `get_text` takes a `reference` and an optional `version_language`: `source`, `english` or `both`. The default is `both`.
 - `get_links_between_texts` takes a `reference` and an optional `with_text` of `"0"` or `"1"`.
 
-The server fetches from Sefaria and validates the response. It returns the API payload in the tool result's `structuredContent`: for `get_text` the payload is the content itself, and for `get_links_between_texts` it is at `structuredContent.payload`. The result's metadata (`_meta`) records the operation, status and effective request.
+The server fetches from Sefaria and validates the response. It returns the API payload in the tool result's `structuredContent`:
+
+- For `get_text`, the payload is the content itself.
+- For `get_links_between_texts`, the payload is at `structuredContent.payload`.
+
+The result's metadata (`_meta`) records the operation, status and effective request.
 
 ### The first answer
 
-The first answer carries the whole payload. The App checks the tool result and gives the Reader a seed, `reader.data`, built from it. The seed avoids fetching the same text again. A text-only seed still loads the initial connections through one host tool call. A connections-only seed shows its supplied connections with no follow-up request.
+The first answer carries the whole payload. The App checks the tool result and builds a seed from it. The App gives the seed to the Reader as `reader.data`. The seed avoids fetching the same text again.
+
+A text-only seed still loads the initial connections through one host tool call. A connections-only seed shows its supplied connections with no follow-up request.
 
 <<< ../../examples/mcp-app/src/app.ts#seed-reader{ts}
 
 ### Later navigation
 
-When you open a passage the Reader hasn't captured, it needs new data. Going back to retained history, or regrouping connections it already has, stays local. The Reader receives an `acquisition` of kind `capability`. Its `getText` and `getLinks` functions call the same server tools through the chat host, using `callServerTool`.
+When you open a passage the Reader hasn't captured, it needs new data. Going back to retained history stays local. Regrouping connections it already has also stays local. The Reader receives an `acquisition` of kind `capability`. Its `getText` and `getLinks` functions call the same server tools through the chat host, using `callServerTool`.
 
 <<< ../../examples/mcp-app/src/app.ts#reader-acquisition{ts}
 
@@ -54,7 +61,11 @@ This example supports only Sefaria's default primary edition and its default tra
 
 ## Run it in VS Code
 
-Run `pnpm install` and `pnpm build` from the repository root first, because the scripts rebuild only the example, not the libraries it imports. You need VS Code. On Windows the scripts look for `%LOCALAPPDATA%\Programs\Microsoft VS Code\Code.exe`; otherwise set `VSCODE_EXECUTABLE_PATH`. The demo profile keeps its own extensions, so GitHub Copilot Chat must be installed and signed in inside it. The walkthrough expects a VS Code build with Copilot bundled. The repository's `.vscode/mcp.json` registers the server as a stdio server: `node examples/mcp-app/dist/server/stdio.js`.
+Run `pnpm install` and `pnpm build` from the repository root first, because the scripts rebuild only the example, not the libraries it imports. You need VS Code. On Windows the scripts look for `%LOCALAPPDATA%\Programs\Microsoft VS Code\Code.exe`. Otherwise, set `VSCODE_EXECUTABLE_PATH`.
+
+The demo profile keeps its own extensions. Install GitHub Copilot Chat and sign in inside it. The walkthrough expects a VS Code build with Copilot bundled.
+
+The repository's `.vscode/mcp.json` registers the server as a stdio server: `node examples/mcp-app/dist/server/stdio.js`.
 
 - `pnpm setup:mcp:vscode` builds the example and opens a separate VS Code demo profile with MCP Apps turned on. Sign in to GitHub Copilot if asked, confirm the `sefaria-components-demo` server, then close that window.
 - `pnpm launch:mcp:vscode` builds the example and opens the demo profile (minimized on Windows). In Copilot Chat, ask: "Use the sefaria-components-demo get_text tool to show Micah 6:8 in both languages."

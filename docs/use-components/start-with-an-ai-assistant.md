@@ -9,7 +9,7 @@ description: "Give your AI coding assistant a copyable prompt so it builds a pag
 
 Use this page if you ask an AI coding assistant to build your page instead of writing every line yourself. You give the assistant a prompt and our [llms.txt](/llms.txt), a short machine-readable guide to this site for AI assistants. Then you check what it produced.
 
-Without guidance, an assistant may call Sefaria's API and clean the text by hand. The prompt steers it to the toolkit's components, which do that work for you.
+Without guidance, an assistant may call Sefaria's API and clean the text by hand. The prompt steers it to the toolkit's components. They do that work for you.
 
 <StatusNote />
 
@@ -35,11 +35,11 @@ Copy the prompt, replace the last line with a description of your page and your 
 Open the page and check each item.
 
 - The page uses `<sefaria-...>` tags, such as `<sefaria-source-card>`.
-- It loads the toolkit one way: the script tag for a page with no build step, or `import "@arithmomaniac/sefaria-web-components";` in an app with a build step.
+- It loads the toolkit one way. A page with no build step uses the script tag. An app with a build step uses `import "@arithmomaniac/sefaria-web-components";`.
 - The attribution is visible under the text.
 - The text comes from the component, not pasted into the page.
-- No custom code downloads text from Sefaria's website itself or strips or rewrites its HTML. The component's own requests are expected.
-- While a request is deliberately delayed, a loading message appears. When a request is deliberately failed, an error message appears. On success, the text replaces the loading message.
+- No custom code downloads text from Sefaria's website or strips or rewrites its HTML. The component's own requests are expected.
+- A deliberately delayed request shows a loading message. A deliberately failed request shows an error message. On success, the text replaces the loading message.
 - When you open the page, it shows your passage (for example, Micah 6:8).
 
 ## What to ask it to fix

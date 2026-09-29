@@ -46,7 +46,7 @@ Pinned addresses stay available while their version is active. A version can be 
 
 The toolkit has three packages: `@arithmomaniac/sefaria-client`, `@arithmomaniac/sefaria-text-transform`, and `@arithmomaniac/sefaria-web-components`. They are published to GitHub Packages as prereleases. They are not published on npmjs.com.
 
-GitHub Packages asks for a token, even for public packages. Create a personal access token with the `read:packages` scope ([GitHub's steps](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-to-github-packages)). Then add this to your `.npmrc`, and set `NODE_AUTH_TOKEN` to your token:
+GitHub Packages asks for a token, even for public packages. Create a personal access token with the `read:packages` scope ([GitHub's steps](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-to-github-packages)). Then add this to your `.npmrc`. Set `NODE_AUTH_TOKEN` to your token:
 
 ```ini
 @arithmomaniac:registry=https://npm.pkg.github.com
@@ -60,7 +60,7 @@ version="0.0.0-alpha.<run-id>.<run-attempt>"
 pnpm add "@arithmomaniac/sefaria-client@$version" "@arithmomaniac/sefaria-text-transform@$version" "@arithmomaniac/sefaria-web-components@$version"
 ```
 
-The packages also carry an `alpha` tag that follows the newest build, but an exact version pins the toolkit release. Commit your lockfile and install with a frozen lockfile to keep the other dependencies fixed too. The toolkit's own install check uses pnpm with this `.npmrc`; for other package managers, see their documentation, such as [Yarn's `npmScopes` setting](https://yarnpkg.com/configuration/yarnrc#npmScopes). Types are included; no `@types` package is needed.
+The packages also carry an `alpha` tag that follows the newest build. An exact version pins the toolkit release. Commit your lockfile and install with a frozen lockfile to fix the other dependencies too. The toolkit's own install check uses pnpm with this `.npmrc`. For other package managers, see their documentation, such as [Yarn's `npmScopes` setting](https://yarnpkg.com/configuration/yarnrc#npmScopes). Types are included; no `@types` package is needed.
 
 If you get a 401, 403, or `E404` error, check:
 
@@ -89,7 +89,7 @@ The toolkit is experimental and unofficial. It is developed in collaboration wit
 
 ## License and text rights {#license-and-text-rights}
 
-The toolkit is licensed under GPL-3.0-only. Generally, if you distribute a combined work that includes the toolkit, you license that work as a whole under GPLv3 and provide its corresponding source. Separate programs that are merely distributed alongside it are different. This is not legal advice; read the [GNU GPL text](https://www.gnu.org/licenses/gpl-3.0.html) and the toolkit's [LICENSE](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/LICENSE), and ask a lawyer if you're unsure. Each script version folder includes `LICENSE.txt` and `THIRD-PARTY-NOTICES.txt`.
+The toolkit is licensed under GPL-3.0-only. Generally, if you distribute a combined work that includes the toolkit, you license that work as a whole under GPLv3. You also provide its corresponding source. Separate programs that are merely distributed alongside it are different. This is not legal advice. Read the [GNU GPL text](https://www.gnu.org/licenses/gpl-3.0.html) and the toolkit's [LICENSE](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/LICENSE), and ask a lawyer if you're unsure. Each script version folder includes `LICENSE.txt` and `THIRD-PARTY-NOTICES.txt`.
 
 The rights to the texts are separate. Each Sefaria edition has its own license, so check the edition you display. On sefaria.org, open a passage and choose "About this Text" to see the current version's license. Sefaria's [Copyright and Data Use](https://developers.sefaria.org/docs/usage-of-our-name-and-logo) page explains the rules for using its data.
 
