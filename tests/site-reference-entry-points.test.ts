@@ -86,9 +86,8 @@ describe("EP1–EP5 README entry points", () => {
     "%s gives the GitHub Packages install caveat and a maintainer link",
     async (file, name) => {
       const readme = await read(file);
-      expect(readme).toContain(
-        "@arithmomaniac:registry=https://npm.pkg.github.com",
-      );
+      expect(readme).not.toContain("_authToken");
+      expect(readme).toContain("help/install-and-status.html#packages");
       expect(readme).toContain(name);
       expect(readme).toMatch(/read:packages/u);
       expect(readme).toContain(
@@ -167,6 +166,12 @@ describe("EP7 llms.txt", () => {
     }
     expect(text).toContain('import "@arithmomaniac/sefaria-web-components";');
     expect(text).toMatch(/Keep attribution/u);
+    expect(text).not.toMatch(/components don.t show licenses/u);
+    expect(text).toContain("Licenses reported");
+    expect(text).toMatch(/`content-language` defaults to `both`/u);
+    expect(text).toContain("`--sefaria-fg`");
+    expect(text).not.toContain("`--sefaria-shadow`");
+    expect(text).not.toContain("--sefaria-font-size");
     expect(text).toContain(
       "/blob/main/examples/site-snippets/ai-assistant-prompt.md",
     );

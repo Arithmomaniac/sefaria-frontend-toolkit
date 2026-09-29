@@ -10,18 +10,18 @@ Custom element that renders supplied or acquired bilingual-segment data.
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
-| `sref` | `sref` | `string` | `""` | Reference loaded when authoritative supplied data is absent. |
-| `data` | Property only | `unknown | undefined` | `undefined` | Authoritative corrected response-shaped data. |
-| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
-| `primaryVersionTitle` | `primary-version-title` | `string | undefined` | `undefined` | Optional exact edition title for the primary role. |
-| `translationVersionTitle` | `translation-version-title` | `string | undefined` | `undefined` | Optional exact edition title for the translation role. |
-| `translationLanguage` | `translation-language` | `string | undefined` | `undefined` | Preferred translation family, falling back only when unavailable. |
-| `hideAttributions` | `hide-attributions` | `boolean` | `false` | Hides compact standalone edition attribution. |
-| `contentLanguage` | `content-language` | `BilingualSegmentContentLanguage` | `"both"` | Sides the host wants displayed. |
-| `layout` | `layout` | `BilingualSegmentLayout` | `"auto"` | Requested arrangement of the two sides. |
-| `sideOrder` | `side-order` | `BilingualSegmentSideOrder` | `"primary-first"` | Requested role order for a side-by-side arrangement. |
-| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | Hebrew vocalization preset applied to both displayed roles. |
-| `status` | Property only | `SefariaElementStatus` | - | Coarse lifecycle state without exposing prepared rendering data. |
+| `sref` | `sref` | `string` | `""` | The Sefaria reference to load when `data` isn't set. |
+| `data` | Property only | `unknown | undefined` | `undefined` | Sefaria API response data to render. When it's set, the element doesn't fetch anything. |
+| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Chooses how this element fetches data, instead of the default. |
+| `primaryVersionTitle` | `primary-version-title` | `string | undefined` | `undefined` | Exact title of the edition to show as the primary text. |
+| `translationVersionTitle` | `translation-version-title` | `string | undefined` | `undefined` | Exact title of the edition to show as the translation. |
+| `translationLanguage` | `translation-language` | `string | undefined` | `undefined` | Preferred translation language. Without one in that language, the element uses Sefaria's default translation. |
+| `hideAttributions` | `hide-attributions` | `boolean` | `false` | Hides the edition attribution shown with the text. |
+| `contentLanguage` | `content-language` | `BilingualSegmentContentLanguage` | `"both"` | Which text to show: `primary`, `translation` or `both`. |
+| `layout` | `layout` | `BilingualSegmentLayout` | `"auto"` | How the two texts are arranged: `auto`, `stacked` or `side-by-side`. |
+| `sideOrder` | `side-order` | `BilingualSegmentSideOrder` | `"primary-first"` | Which text comes first side by side: `primary-first` or `translation-first`. |
+| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep. `none` removes both. |
+| `status` | Property only | `SefariaElementStatus` | - | Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
 
 ### Events
 
@@ -45,15 +45,15 @@ Category summaries and bounded connected-text details from supplied or acquired 
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
-| `sref` | `sref` | `string` | `""` | Reference loaded when authoritative supplied data is absent. |
-| `data` | Property only | `unknown | undefined` | `undefined` | Authoritative corrected links response data. |
-| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
-| `withText` | `with-text` | `boolean` | `true` | Whether acquired or supplied links include connected text. |
-| `category` | `category` | `string | undefined` | `undefined` | Exact category projected from the current captured response. |
-| `page` | `page` | `number` | `0` | Zero-based local page projected from the current captured response. |
-| `showPreviews` | `show-previews` | `boolean` | `true` | Hides or reveals captured preview data without requesting it. |
-| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | Hebrew vocalization preset applied to safe legacy-channel previews. |
-| `status` | Property only | `SefariaElementStatus` | - | Coarse lifecycle state without exposing prepared rendering data. |
+| `sref` | `sref` | `string` | `""` | The Sefaria reference to load when `data` isn't set. |
+| `data` | Property only | `unknown | undefined` | `undefined` | Sefaria links response data to render. When it's set, the element doesn't fetch anything. |
+| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Chooses how this element fetches data, instead of the default. |
+| `withText` | `with-text` | `boolean` | `true` | Whether the links include the connected texts. |
+| `category` | `category` | `string | undefined` | `undefined` | Category of the loaded links to show. |
+| `page` | `page` | `number` | `0` | Zero-based page of the loaded links to show. |
+| `showPreviews` | `show-previews` | `boolean` | `true` | Shows or hides the text previews already loaded, without fetching more. |
+| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep in previews. `none` removes both. |
+| `status` | Property only | `SefariaElementStatus` | - | Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
 
 ### Events
 
@@ -81,27 +81,27 @@ Controlled or declarative reader surface for one semantic reader entry.
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
-| `sref` | `sref` | `string` | `""` | Requested external Reader root, separate from current navigation. |
-| `data` | Property only | `ReaderRawSeedData | undefined` | `undefined` | Transactional unknown raw Reader seed. |
-| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
-| `translationLanguage` | `translation-language` | `string | undefined` | `undefined` | Preferred family used for root and navigated translations. |
-| `primaryVersionTitle` | `primary-version-title` | `string | undefined` | `undefined` | Exact primary edition for the external root and its context. |
-| `translationVersionTitle` | `translation-version-title` | `string | undefined` | `undefined` | Exact translation edition for the external root and its context. |
-| `hideAttributions` | `hide-attributions` | `boolean` | `false` | Hides edition attribution on the source card. |
-| `activePane` | `active-pane` | `ReaderPane` | `"source"` | Host-controlled pane selected in compact presentation. |
-| `chatExport` | `chat-export` | `boolean` | `false` | Shows an explicit host-mediated chat export action when a target exists. |
-| `contentLanguage` | `content-language` | `BilingualPairContentLanguage` | `"both"` | Source-card roles displayed by the controlled reader. |
-| `layout` | `layout` | `BilingualPairLayout` | `"auto"` | Source-card bilingual arrangement. |
-| `sideOrder` | `side-order` | `BilingualPairSideOrder` | `"primary-first"` | First source-card role in side-by-side layout. |
-| `showConnectionPreviews` | `show-connection-previews` | `boolean` | `true` | Whether captured connection previews are visible. |
-| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | Hebrew vocalization preset applied to source and preview text. |
-| `status` | Property only | `SefariaElementStatus` | - | Coarse Reader lifecycle state without exposing prepared rendering data. |
-| `currentEntryId` | Property only | `string | undefined` | - | Stable identity of the current retained semantic Reader entry. |
-| `selectedRef` | Property only | `string | undefined` | - | Exact selected canonical target, when the current entry establishes one. |
-| `rootLoading` | Property only | `boolean` | - | Whether a root source request is currently pending. |
-| `readerError` | Property only | `string | undefined` | - | Current Reader failure message, when the latest eligible operation failed. |
-| `canGoBack` | Property only | `boolean` | - | Whether Reader Back can activate a retained predecessor. |
-| `historyTruncated` | Property only | `boolean` | - | Whether bounded retention removed older semantic history. |
+| `sref` | `sref` | `string` | `""` | The reference the Reader starts from. Navigating inside the Reader doesn't change it. |
+| `data` | Property only | `ReaderRawSeedData | undefined` | `undefined` | Starting data for the Reader, which it accepts or rejects as a whole. |
+| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Chooses how this element fetches data, instead of the default. |
+| `translationLanguage` | `translation-language` | `string | undefined` | `undefined` | Preferred translation language, for the starting text and texts you navigate to. |
+| `primaryVersionTitle` | `primary-version-title` | `string | undefined` | `undefined` | Exact title of the primary edition for the starting reference. |
+| `translationVersionTitle` | `translation-version-title` | `string | undefined` | `undefined` | Exact title of the translation edition for the starting reference. |
+| `hideAttributions` | `hide-attributions` | `boolean` | `false` | Hides the edition attribution on the source card. |
+| `activePane` | `active-pane` | `ReaderPane` | `"source"` | Which pane the compact layout shows: `source` or `connections`. |
+| `chatExport` | `chat-export` | `boolean` | `false` | Shows a button that sends the selected reference to your page's chat, when one is selected. |
+| `contentLanguage` | `content-language` | `BilingualPairContentLanguage` | `"both"` | Which text the source card shows: `primary`, `translation` or `both`. |
+| `layout` | `layout` | `BilingualPairLayout` | `"auto"` | How the source card arranges its two texts: `auto`, `stacked` or `side-by-side`. |
+| `sideOrder` | `side-order` | `BilingualPairSideOrder` | `"primary-first"` | Which text comes first side by side: `primary-first` or `translation-first`. |
+| `showConnectionPreviews` | `show-connection-previews` | `boolean` | `true` | Whether connection previews are shown. |
+| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep. `none` removes both. |
+| `status` | Property only | `SefariaElementStatus` | - | Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
+| `currentEntryId` | Property only | `string | undefined` | - | The ID of the current history entry. |
+| `selectedRef` | Property only | `string | undefined` | - | The selected reference, when there is one. |
+| `rootLoading` | Property only | `boolean` | - | Whether the starting text is still loading. |
+| `readerError` | Property only | `string | undefined` | - | The error message, when the latest action failed. |
+| `canGoBack` | Property only | `boolean` | - | Whether Back can return to an earlier entry. |
+| `historyTruncated` | Property only | `boolean` | - | Whether older history entries were dropped to stay within the history limit. |
 
 ### Events
 
@@ -141,12 +141,12 @@ Custom element that renders supplied or acquired reference-label data.
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
-| `sref` | `sref` | `string` | `""` | Reference loaded when authoritative supplied data is absent. |
-| `data` | Property only | `unknown | undefined` | `undefined` | Authoritative corrected reference response data. |
-| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
-| `labelLanguage` | `label-language` | `RefLabelLanguage` | `"english"` | Label language selected by the host. |
-| `linked` | `linked` | `boolean` | `false` | Whether data-state labels render as canonical links. |
-| `status` | Property only | `SefariaElementStatus` | - | Coarse lifecycle state without exposing prepared rendering data. |
+| `sref` | `sref` | `string` | `""` | The Sefaria reference to load when `data` isn't set. |
+| `data` | Property only | `unknown | undefined` | `undefined` | Sefaria reference response data to render. When it's set, the element doesn't fetch anything. |
+| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Chooses how this element fetches data, instead of the default. |
+| `labelLanguage` | `label-language` | `RefLabelLanguage` | `"english"` | Language of the label. |
+| `linked` | `linked` | `boolean` | `false` | Whether a loaded label is a link to the reference on Sefaria. |
+| `status` | Property only | `SefariaElementStatus` | - | Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
 
 ### Events
 
@@ -170,21 +170,21 @@ Custom element that renders supplied or acquired source-card data.
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
-| `sref` | `sref` | `string` | `""` | Reference loaded when authoritative supplied data is absent. |
-| `data` | Property only | `unknown | undefined` | `undefined` | Authoritative corrected response-shaped data. |
-| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
-| `primaryVersionTitle` | `primary-version-title` | `string | undefined` | `undefined` | Optional exact edition title for the primary role. |
-| `translationVersionTitle` | `translation-version-title` | `string | undefined` | `undefined` | Optional exact edition title for the translation role. |
-| `translationLanguage` | `translation-language` | `string | undefined` | `undefined` | Preferred translation family, falling back only when unavailable. |
-| `contentLanguage` | `content-language` | `BilingualPairContentLanguage` | `"both"` | Sides the host wants displayed for every pair. |
-| `layout` | `layout` | `BilingualPairLayout` | `"auto"` | Requested arrangement for every pair. |
-| `sideOrder` | `side-order` | `BilingualPairSideOrder` | `"primary-first"` | Requested role order for every pair. |
-| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | Hebrew vocalization preset applied to every displayed text leaf. |
-| `showAddressLabels` | Property only | `boolean` | `true` | Whether compact address labels are visible beside rendered text sides. |
-| `selectable` | `selectable` | `boolean` | `false` | Enables selection controls for items with proven canonical targets. |
-| `selectedPosition` | Property only | `readonly number[] | undefined` | `undefined` | Host-controlled original position path, never a reference string. |
-| `hideAttributions` | `hide-attributions` | `boolean` | `false` | Whether resolved edition attribution is intentionally omitted. |
-| `status` | Property only | `SefariaElementStatus` | - | Coarse lifecycle state without exposing prepared rendering data. |
+| `sref` | `sref` | `string` | `""` | The Sefaria reference to load when `data` isn't set. |
+| `data` | Property only | `unknown | undefined` | `undefined` | Sefaria API response data to render. When it's set, the element doesn't fetch anything. |
+| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Chooses how this element fetches data, instead of the default. |
+| `primaryVersionTitle` | `primary-version-title` | `string | undefined` | `undefined` | Exact title of the edition to show as the primary text. |
+| `translationVersionTitle` | `translation-version-title` | `string | undefined` | `undefined` | Exact title of the edition to show as the translation. |
+| `translationLanguage` | `translation-language` | `string | undefined` | `undefined` | Preferred translation language. Without one in that language, the element uses Sefaria's default translation. |
+| `contentLanguage` | `content-language` | `BilingualPairContentLanguage` | `"both"` | Which text to show: `primary`, `translation` or `both`. |
+| `layout` | `layout` | `BilingualPairLayout` | `"auto"` | How each pair of texts is arranged: `auto`, `stacked` or `side-by-side`. |
+| `sideOrder` | `side-order` | `BilingualPairSideOrder` | `"primary-first"` | Which text comes first side by side: `primary-first` or `translation-first`. |
+| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep. `none` removes both. |
+| `showAddressLabels` | Property only | `boolean` | `true` | Whether small reference labels are shown beside the texts. |
+| `selectable` | `selectable` | `boolean` | `false` | Lets readers select the verses that have their own reference. |
+| `selectedPosition` | Property only | `readonly number[] | undefined` | `undefined` | Position of the selected verse, as an array of numbers rather than a reference. |
+| `hideAttributions` | `hide-attributions` | `boolean` | `false` | Hides the edition attribution. |
+| `status` | Property only | `SefariaElementStatus` | - | Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
 
 ### Events
 
@@ -209,16 +209,16 @@ Custom element that renders supplied or acquired text-segment data.
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
-| `sref` | `sref` | `string` | `""` | Reference loaded when authoritative supplied data is absent. |
-| `data` | Property only | `unknown | undefined` | `undefined` | Authoritative corrected response-shaped data. |
-| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
-| `versionLanguage` | `version-language` | `string | undefined` | `undefined` | Optional language-family selector overriding the primary default. |
-| `versionTitle` | `version-title` | `string | undefined` | `undefined` | Optional exact edition title paired with `versionLanguage`. |
-| `translationLanguage` | `translation-language` | `string | undefined` | `undefined` | Preferred translation family, mutually exclusive with a strict version language. |
-| `hideAttributions` | `hide-attributions` | `boolean` | `false` | Hides compact edition attribution for standalone text. |
-| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | Hebrew vocalization preset applied only to the displayed safe text. |
-| `selectedVersion` | Property only | `TextSegmentSelectedVersionInfo | undefined` | - | Metadata for the currently displayed selected edition. |
-| `status` | Property only | `SefariaElementStatus` | - | Coarse lifecycle state without exposing prepared rendering data. |
+| `sref` | `sref` | `string` | `""` | The Sefaria reference to load when `data` isn't set. |
+| `data` | Property only | `unknown | undefined` | `undefined` | Sefaria API response data to render. When it's set, the element doesn't fetch anything. |
+| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Chooses how this element fetches data, instead of the default. |
+| `versionLanguage` | `version-language` | `string | undefined` | `undefined` | Language of the edition to show, instead of the primary edition. |
+| `versionTitle` | `version-title` | `string | undefined` | `undefined` | Exact title of the edition to show, used together with `versionLanguage`. |
+| `translationLanguage` | `translation-language` | `string | undefined` | `undefined` | Preferred translation language. Can't be combined with `versionLanguage`. |
+| `hideAttributions` | `hide-attributions` | `boolean` | `false` | Hides the edition attribution. |
+| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep. `none` removes both. |
+| `selectedVersion` | Property only | `TextSegmentSelectedVersionInfo | undefined` | - | Details of the edition currently shown. |
+| `status` | Property only | `SefariaElementStatus` | - | Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
 
 ### Events
 

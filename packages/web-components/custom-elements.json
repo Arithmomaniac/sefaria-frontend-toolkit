@@ -18,7 +18,7 @@
               "type": {
                 "text": "string"
               },
-              "description": "Reference loaded when authoritative supplied data is absent.",
+              "description": "The Sefaria reference to load when `data` isn't set.",
               "default": "\"\"",
               "attribute": "sref"
             },
@@ -29,7 +29,7 @@
               "type": {
                 "text": "unknown | undefined"
               },
-              "description": "Authoritative corrected response-shaped data.",
+              "description": "Sefaria API response data to render. When it's set, the element doesn't fetch anything.",
               "default": "undefined"
             },
             {
@@ -39,7 +39,7 @@
               "type": {
                 "text": "SefariaAcquisition | undefined"
               },
-              "description": "Optional element-specific acquisition source.",
+              "description": "Chooses how this element fetches data, instead of the default.",
               "default": "undefined"
             },
             {
@@ -49,7 +49,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Optional exact edition title for the primary role.",
+              "description": "Exact title of the edition to show as the primary text.",
               "default": "undefined",
               "attribute": "primary-version-title"
             },
@@ -60,7 +60,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Optional exact edition title for the translation role.",
+              "description": "Exact title of the edition to show as the translation.",
               "default": "undefined",
               "attribute": "translation-version-title"
             },
@@ -71,7 +71,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Preferred translation family, falling back only when unavailable.",
+              "description": "Preferred translation language. Without one in that language, the element uses Sefaria's default translation.",
               "default": "undefined",
               "attribute": "translation-language"
             },
@@ -82,7 +82,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Hides compact standalone edition attribution.",
+              "description": "Hides the edition attribution shown with the text.",
               "default": "false",
               "attribute": "hide-attributions"
             },
@@ -93,7 +93,7 @@
               "type": {
                 "text": "BilingualSegmentContentLanguage"
               },
-              "description": "Sides the host wants displayed.",
+              "description": "Which text to show: `primary`, `translation` or `both`.",
               "default": "\"both\"",
               "attribute": "content-language"
             },
@@ -104,7 +104,7 @@
               "type": {
                 "text": "BilingualSegmentLayout"
               },
-              "description": "Requested arrangement of the two sides.",
+              "description": "How the two texts are arranged: `auto`, `stacked` or `side-by-side`.",
               "default": "\"auto\"",
               "attribute": "layout"
             },
@@ -115,7 +115,7 @@
               "type": {
                 "text": "BilingualSegmentSideOrder"
               },
-              "description": "Requested role order for a side-by-side arrangement.",
+              "description": "Which text comes first side by side: `primary-first` or `translation-first`.",
               "default": "\"primary-first\"",
               "attribute": "side-order"
             },
@@ -126,7 +126,7 @@
               "type": {
                 "text": "VocalizationMode"
               },
-              "description": "Hebrew vocalization preset applied to both displayed roles.",
+              "description": "How much Hebrew vowel and cantillation marking to keep. `none` removes both.",
               "default": "\"taamim_and_nikkud\"",
               "attribute": "vocalization-mode"
             },
@@ -136,7 +136,7 @@
               "type": {
                 "text": "SefariaElementStatus"
               },
-              "description": "Coarse lifecycle state without exposing prepared rendering data.",
+              "description": "Read-only loading state: `\"empty\"`, `\"loading\"`, `\"ready\"` or `\"error\"`.",
               "readonly": true
             }
           ],
@@ -155,7 +155,7 @@
               "type": {
                 "text": "string"
               },
-              "description": "Reference loaded when authoritative supplied data is absent.",
+              "description": "The Sefaria reference to load when `data` isn't set.",
               "default": "\"\"",
               "fieldName": "sref"
             },
@@ -164,7 +164,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Preferred translation family, falling back only when unavailable.",
+              "description": "Preferred translation language. Without one in that language, the element uses Sefaria's default translation.",
               "default": "undefined",
               "fieldName": "translationLanguage"
             },
@@ -173,7 +173,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Hides compact standalone edition attribution.",
+              "description": "Hides the edition attribution shown with the text.",
               "default": "false",
               "fieldName": "hideAttributions"
             },
@@ -182,7 +182,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Optional exact edition title for the primary role.",
+              "description": "Exact title of the edition to show as the primary text.",
               "default": "undefined",
               "fieldName": "primaryVersionTitle"
             },
@@ -191,7 +191,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Optional exact edition title for the translation role.",
+              "description": "Exact title of the edition to show as the translation.",
               "default": "undefined",
               "fieldName": "translationVersionTitle"
             },
@@ -200,7 +200,7 @@
               "type": {
                 "text": "BilingualSegmentContentLanguage"
               },
-              "description": "Sides the host wants displayed.",
+              "description": "Which text to show: `primary`, `translation` or `both`.",
               "default": "\"both\"",
               "fieldName": "contentLanguage"
             },
@@ -209,7 +209,7 @@
               "type": {
                 "text": "BilingualSegmentLayout"
               },
-              "description": "Requested arrangement of the two sides.",
+              "description": "How the two texts are arranged: `auto`, `stacked` or `side-by-side`.",
               "default": "\"auto\"",
               "fieldName": "layout"
             },
@@ -218,7 +218,7 @@
               "type": {
                 "text": "BilingualSegmentSideOrder"
               },
-              "description": "Requested role order for a side-by-side arrangement.",
+              "description": "Which text comes first side by side: `primary-first` or `translation-first`.",
               "default": "\"primary-first\"",
               "fieldName": "sideOrder"
             },
@@ -227,7 +227,7 @@
               "type": {
                 "text": "VocalizationMode"
               },
-              "description": "Hebrew vocalization preset applied to both displayed roles.",
+              "description": "How much Hebrew vowel and cantillation marking to keep. `none` removes both.",
               "default": "\"taamim_and_nikkud\"",
               "fieldName": "vocalizationMode"
             }
@@ -369,7 +369,7 @@
               "type": {
                 "text": "string"
               },
-              "description": "Reference loaded when authoritative supplied data is absent.",
+              "description": "The Sefaria reference to load when `data` isn't set.",
               "default": "\"\"",
               "attribute": "sref"
             },
@@ -380,7 +380,7 @@
               "type": {
                 "text": "unknown | undefined"
               },
-              "description": "Authoritative corrected links response data.",
+              "description": "Sefaria links response data to render. When it's set, the element doesn't fetch anything.",
               "default": "undefined"
             },
             {
@@ -390,7 +390,7 @@
               "type": {
                 "text": "SefariaAcquisition | undefined"
               },
-              "description": "Optional element-specific acquisition source.",
+              "description": "Chooses how this element fetches data, instead of the default.",
               "default": "undefined"
             },
             {
@@ -400,7 +400,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether acquired or supplied links include connected text.",
+              "description": "Whether the links include the connected texts.",
               "default": "true",
               "attribute": "with-text"
             },
@@ -411,7 +411,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Exact category projected from the current captured response.",
+              "description": "Category of the loaded links to show.",
               "default": "undefined",
               "attribute": "category"
             },
@@ -422,7 +422,7 @@
               "type": {
                 "text": "number"
               },
-              "description": "Zero-based local page projected from the current captured response.",
+              "description": "Zero-based page of the loaded links to show.",
               "default": "0",
               "attribute": "page"
             },
@@ -433,7 +433,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Hides or reveals captured preview data without requesting it.",
+              "description": "Shows or hides the text previews already loaded, without fetching more.",
               "default": "true",
               "attribute": "show-previews"
             },
@@ -444,7 +444,7 @@
               "type": {
                 "text": "VocalizationMode"
               },
-              "description": "Hebrew vocalization preset applied to safe legacy-channel previews.",
+              "description": "How much Hebrew vowel and cantillation marking to keep in previews. `none` removes both.",
               "default": "\"taamim_and_nikkud\"",
               "attribute": "vocalization-mode"
             },
@@ -454,7 +454,7 @@
               "type": {
                 "text": "SefariaElementStatus"
               },
-              "description": "Coarse lifecycle state without exposing prepared rendering data.",
+              "description": "Read-only loading state: `\"empty\"`, `\"loading\"`, `\"ready\"` or `\"error\"`.",
               "readonly": true
             }
           ],
@@ -501,7 +501,7 @@
               "type": {
                 "text": "string"
               },
-              "description": "Reference loaded when authoritative supplied data is absent.",
+              "description": "The Sefaria reference to load when `data` isn't set.",
               "default": "\"\"",
               "fieldName": "sref"
             },
@@ -510,7 +510,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether acquired or supplied links include connected text.",
+              "description": "Whether the links include the connected texts.",
               "default": "true",
               "fieldName": "withText"
             },
@@ -519,7 +519,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Exact category projected from the current captured response.",
+              "description": "Category of the loaded links to show.",
               "default": "undefined",
               "fieldName": "category"
             },
@@ -528,7 +528,7 @@
               "type": {
                 "text": "number"
               },
-              "description": "Zero-based local page projected from the current captured response.",
+              "description": "Zero-based page of the loaded links to show.",
               "default": "0",
               "fieldName": "page"
             },
@@ -537,7 +537,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Hides or reveals captured preview data without requesting it.",
+              "description": "Shows or hides the text previews already loaded, without fetching more.",
               "default": "true",
               "fieldName": "showPreviews"
             },
@@ -546,7 +546,7 @@
               "type": {
                 "text": "VocalizationMode"
               },
-              "description": "Hebrew vocalization preset applied to safe legacy-channel previews.",
+              "description": "How much Hebrew vowel and cantillation marking to keep in previews. `none` removes both.",
               "default": "\"taamim_and_nikkud\"",
               "fieldName": "vocalizationMode"
             }
@@ -712,7 +712,7 @@
               "type": {
                 "text": "string"
               },
-              "description": "Requested external Reader root, separate from current navigation.",
+              "description": "The reference the Reader starts from. Navigating inside the Reader doesn't change it.",
               "default": "\"\"",
               "attribute": "sref"
             },
@@ -723,7 +723,7 @@
               "type": {
                 "text": "ReaderRawSeedData | undefined"
               },
-              "description": "Transactional unknown raw Reader seed.",
+              "description": "Starting data for the Reader, which it accepts or rejects as a whole.",
               "default": "undefined"
             },
             {
@@ -733,7 +733,7 @@
               "type": {
                 "text": "SefariaAcquisition | undefined"
               },
-              "description": "Optional element-specific acquisition source.",
+              "description": "Chooses how this element fetches data, instead of the default.",
               "default": "undefined"
             },
             {
@@ -743,7 +743,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Preferred family used for root and navigated translations.",
+              "description": "Preferred translation language, for the starting text and texts you navigate to.",
               "default": "undefined",
               "attribute": "translation-language"
             },
@@ -754,7 +754,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Exact primary edition for the external root and its context.",
+              "description": "Exact title of the primary edition for the starting reference.",
               "default": "undefined",
               "attribute": "primary-version-title"
             },
@@ -765,7 +765,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Exact translation edition for the external root and its context.",
+              "description": "Exact title of the translation edition for the starting reference.",
               "default": "undefined",
               "attribute": "translation-version-title"
             },
@@ -776,7 +776,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Hides edition attribution on the source card.",
+              "description": "Hides the edition attribution on the source card.",
               "default": "false",
               "attribute": "hide-attributions"
             },
@@ -787,7 +787,7 @@
               "type": {
                 "text": "ReaderPane"
               },
-              "description": "Host-controlled pane selected in compact presentation.",
+              "description": "Which pane the compact layout shows: `source` or `connections`.",
               "default": "\"source\"",
               "attribute": "active-pane"
             },
@@ -798,7 +798,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Shows an explicit host-mediated chat export action when a target exists.",
+              "description": "Shows a button that sends the selected reference to your page's chat, when one is selected.",
               "default": "false",
               "attribute": "chat-export"
             },
@@ -809,7 +809,7 @@
               "type": {
                 "text": "BilingualPairContentLanguage"
               },
-              "description": "Source-card roles displayed by the controlled reader.",
+              "description": "Which text the source card shows: `primary`, `translation` or `both`.",
               "default": "\"both\"",
               "attribute": "content-language"
             },
@@ -820,7 +820,7 @@
               "type": {
                 "text": "BilingualPairLayout"
               },
-              "description": "Source-card bilingual arrangement.",
+              "description": "How the source card arranges its two texts: `auto`, `stacked` or `side-by-side`.",
               "default": "\"auto\"",
               "attribute": "layout"
             },
@@ -831,7 +831,7 @@
               "type": {
                 "text": "BilingualPairSideOrder"
               },
-              "description": "First source-card role in side-by-side layout.",
+              "description": "Which text comes first side by side: `primary-first` or `translation-first`.",
               "default": "\"primary-first\"",
               "attribute": "side-order"
             },
@@ -842,7 +842,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether captured connection previews are visible.",
+              "description": "Whether connection previews are shown.",
               "default": "true",
               "attribute": "show-connection-previews"
             },
@@ -853,7 +853,7 @@
               "type": {
                 "text": "VocalizationMode"
               },
-              "description": "Hebrew vocalization preset applied to source and preview text.",
+              "description": "How much Hebrew vowel and cantillation marking to keep. `none` removes both.",
               "default": "\"taamim_and_nikkud\"",
               "attribute": "vocalization-mode"
             },
@@ -863,7 +863,7 @@
               "type": {
                 "text": "SefariaElementStatus"
               },
-              "description": "Coarse Reader lifecycle state without exposing prepared rendering data.",
+              "description": "Read-only loading state: `\"empty\"`, `\"loading\"`, `\"ready\"` or `\"error\"`.",
               "readonly": true
             },
             {
@@ -872,7 +872,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Stable identity of the current retained semantic Reader entry.",
+              "description": "The ID of the current history entry.",
               "readonly": true
             },
             {
@@ -881,7 +881,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Exact selected canonical target, when the current entry establishes one.",
+              "description": "The selected reference, when there is one.",
               "readonly": true
             },
             {
@@ -890,7 +890,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether a root source request is currently pending.",
+              "description": "Whether the starting text is still loading.",
               "readonly": true
             },
             {
@@ -899,7 +899,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Current Reader failure message, when the latest eligible operation failed.",
+              "description": "The error message, when the latest action failed.",
               "readonly": true
             },
             {
@@ -908,7 +908,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether Reader Back can activate a retained predecessor.",
+              "description": "Whether Back can return to an earlier entry.",
               "readonly": true
             },
             {
@@ -917,7 +917,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether bounded retention removed older semantic history.",
+              "description": "Whether older history entries were dropped to stay within the history limit.",
               "readonly": true
             }
           ],
@@ -999,7 +999,7 @@
               "type": {
                 "text": "string"
               },
-              "description": "Requested external Reader root, separate from current navigation.",
+              "description": "The reference the Reader starts from. Navigating inside the Reader doesn't change it.",
               "default": "\"\"",
               "fieldName": "sref"
             },
@@ -1008,7 +1008,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Preferred family used for root and navigated translations.",
+              "description": "Preferred translation language, for the starting text and texts you navigate to.",
               "default": "undefined",
               "fieldName": "translationLanguage"
             },
@@ -1017,7 +1017,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Exact primary edition for the external root and its context.",
+              "description": "Exact title of the primary edition for the starting reference.",
               "default": "undefined",
               "fieldName": "primaryVersionTitle"
             },
@@ -1026,7 +1026,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Exact translation edition for the external root and its context.",
+              "description": "Exact title of the translation edition for the starting reference.",
               "default": "undefined",
               "fieldName": "translationVersionTitle"
             },
@@ -1035,7 +1035,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Hides edition attribution on the source card.",
+              "description": "Hides the edition attribution on the source card.",
               "default": "false",
               "fieldName": "hideAttributions"
             },
@@ -1044,7 +1044,7 @@
               "type": {
                 "text": "ReaderPane"
               },
-              "description": "Host-controlled pane selected in compact presentation.",
+              "description": "Which pane the compact layout shows: `source` or `connections`.",
               "default": "\"source\"",
               "fieldName": "activePane"
             },
@@ -1053,7 +1053,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Shows an explicit host-mediated chat export action when a target exists.",
+              "description": "Shows a button that sends the selected reference to your page's chat, when one is selected.",
               "default": "false",
               "fieldName": "chatExport"
             },
@@ -1062,7 +1062,7 @@
               "type": {
                 "text": "BilingualPairContentLanguage"
               },
-              "description": "Source-card roles displayed by the controlled reader.",
+              "description": "Which text the source card shows: `primary`, `translation` or `both`.",
               "default": "\"both\"",
               "fieldName": "contentLanguage"
             },
@@ -1071,7 +1071,7 @@
               "type": {
                 "text": "BilingualPairLayout"
               },
-              "description": "Source-card bilingual arrangement.",
+              "description": "How the source card arranges its two texts: `auto`, `stacked` or `side-by-side`.",
               "default": "\"auto\"",
               "fieldName": "layout"
             },
@@ -1080,7 +1080,7 @@
               "type": {
                 "text": "BilingualPairSideOrder"
               },
-              "description": "First source-card role in side-by-side layout.",
+              "description": "Which text comes first side by side: `primary-first` or `translation-first`.",
               "default": "\"primary-first\"",
               "fieldName": "sideOrder"
             },
@@ -1089,7 +1089,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether captured connection previews are visible.",
+              "description": "Whether connection previews are shown.",
               "default": "true",
               "fieldName": "showConnectionPreviews"
             },
@@ -1098,7 +1098,7 @@
               "type": {
                 "text": "VocalizationMode"
               },
-              "description": "Hebrew vocalization preset applied to source and preview text.",
+              "description": "How much Hebrew vowel and cantillation marking to keep. `none` removes both.",
               "default": "\"taamim_and_nikkud\"",
               "fieldName": "vocalizationMode"
             }
@@ -1238,7 +1238,7 @@
               "type": {
                 "text": "string"
               },
-              "description": "Reference loaded when authoritative supplied data is absent.",
+              "description": "The Sefaria reference to load when `data` isn't set.",
               "default": "\"\"",
               "attribute": "sref"
             },
@@ -1249,7 +1249,7 @@
               "type": {
                 "text": "unknown | undefined"
               },
-              "description": "Authoritative corrected reference response data.",
+              "description": "Sefaria reference response data to render. When it's set, the element doesn't fetch anything.",
               "default": "undefined"
             },
             {
@@ -1259,7 +1259,7 @@
               "type": {
                 "text": "SefariaAcquisition | undefined"
               },
-              "description": "Optional element-specific acquisition source.",
+              "description": "Chooses how this element fetches data, instead of the default.",
               "default": "undefined"
             },
             {
@@ -1269,7 +1269,7 @@
               "type": {
                 "text": "RefLabelLanguage"
               },
-              "description": "Label language selected by the host.",
+              "description": "Language of the label.",
               "default": "\"english\"",
               "attribute": "label-language"
             },
@@ -1280,7 +1280,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether data-state labels render as canonical links.",
+              "description": "Whether a loaded label is a link to the reference on Sefaria.",
               "default": "false",
               "attribute": "linked"
             },
@@ -1290,7 +1290,7 @@
               "type": {
                 "text": "SefariaElementStatus"
               },
-              "description": "Coarse lifecycle state without exposing prepared rendering data.",
+              "description": "Read-only loading state: `\"empty\"`, `\"loading\"`, `\"ready\"` or `\"error\"`.",
               "readonly": true
             }
           ],
@@ -1309,7 +1309,7 @@
               "type": {
                 "text": "string"
               },
-              "description": "Reference loaded when authoritative supplied data is absent.",
+              "description": "The Sefaria reference to load when `data` isn't set.",
               "default": "\"\"",
               "fieldName": "sref"
             },
@@ -1318,7 +1318,7 @@
               "type": {
                 "text": "RefLabelLanguage"
               },
-              "description": "Label language selected by the host.",
+              "description": "Language of the label.",
               "default": "\"english\"",
               "fieldName": "labelLanguage"
             },
@@ -1327,7 +1327,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether data-state labels render as canonical links.",
+              "description": "Whether a loaded label is a link to the reference on Sefaria.",
               "default": "false",
               "fieldName": "linked"
             }
@@ -1469,7 +1469,7 @@
               "type": {
                 "text": "string"
               },
-              "description": "Reference loaded when authoritative supplied data is absent.",
+              "description": "The Sefaria reference to load when `data` isn't set.",
               "default": "\"\"",
               "attribute": "sref"
             },
@@ -1480,7 +1480,7 @@
               "type": {
                 "text": "unknown | undefined"
               },
-              "description": "Authoritative corrected response-shaped data.",
+              "description": "Sefaria API response data to render. When it's set, the element doesn't fetch anything.",
               "default": "undefined"
             },
             {
@@ -1490,7 +1490,7 @@
               "type": {
                 "text": "SefariaAcquisition | undefined"
               },
-              "description": "Optional element-specific acquisition source.",
+              "description": "Chooses how this element fetches data, instead of the default.",
               "default": "undefined"
             },
             {
@@ -1500,7 +1500,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Optional exact edition title for the primary role.",
+              "description": "Exact title of the edition to show as the primary text.",
               "default": "undefined",
               "attribute": "primary-version-title"
             },
@@ -1511,7 +1511,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Optional exact edition title for the translation role.",
+              "description": "Exact title of the edition to show as the translation.",
               "default": "undefined",
               "attribute": "translation-version-title"
             },
@@ -1522,7 +1522,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Preferred translation family, falling back only when unavailable.",
+              "description": "Preferred translation language. Without one in that language, the element uses Sefaria's default translation.",
               "default": "undefined",
               "attribute": "translation-language"
             },
@@ -1533,7 +1533,7 @@
               "type": {
                 "text": "BilingualPairContentLanguage"
               },
-              "description": "Sides the host wants displayed for every pair.",
+              "description": "Which text to show: `primary`, `translation` or `both`.",
               "default": "\"both\"",
               "attribute": "content-language"
             },
@@ -1544,7 +1544,7 @@
               "type": {
                 "text": "BilingualPairLayout"
               },
-              "description": "Requested arrangement for every pair.",
+              "description": "How each pair of texts is arranged: `auto`, `stacked` or `side-by-side`.",
               "default": "\"auto\"",
               "attribute": "layout"
             },
@@ -1555,7 +1555,7 @@
               "type": {
                 "text": "BilingualPairSideOrder"
               },
-              "description": "Requested role order for every pair.",
+              "description": "Which text comes first side by side: `primary-first` or `translation-first`.",
               "default": "\"primary-first\"",
               "attribute": "side-order"
             },
@@ -1566,7 +1566,7 @@
               "type": {
                 "text": "VocalizationMode"
               },
-              "description": "Hebrew vocalization preset applied to every displayed text leaf.",
+              "description": "How much Hebrew vowel and cantillation marking to keep. `none` removes both.",
               "default": "\"taamim_and_nikkud\"",
               "attribute": "vocalization-mode"
             },
@@ -1577,7 +1577,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether compact address labels are visible beside rendered text sides.",
+              "description": "Whether small reference labels are shown beside the texts.",
               "default": "true"
             },
             {
@@ -1587,7 +1587,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Enables selection controls for items with proven canonical targets.",
+              "description": "Lets readers select the verses that have their own reference.",
               "default": "false",
               "attribute": "selectable"
             },
@@ -1598,7 +1598,7 @@
               "type": {
                 "text": "readonly number[] | undefined"
               },
-              "description": "Host-controlled original position path, never a reference string.",
+              "description": "Position of the selected verse, as an array of numbers rather than a reference.",
               "default": "undefined"
             },
             {
@@ -1608,7 +1608,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether resolved edition attribution is intentionally omitted.",
+              "description": "Hides the edition attribution.",
               "default": "false",
               "attribute": "hide-attributions"
             },
@@ -1618,7 +1618,7 @@
               "type": {
                 "text": "SefariaElementStatus"
               },
-              "description": "Coarse lifecycle state without exposing prepared rendering data.",
+              "description": "Read-only loading state: `\"empty\"`, `\"loading\"`, `\"ready\"` or `\"error\"`.",
               "readonly": true
             },
             {
@@ -1654,7 +1654,7 @@
               "type": {
                 "text": "string"
               },
-              "description": "Reference loaded when authoritative supplied data is absent.",
+              "description": "The Sefaria reference to load when `data` isn't set.",
               "default": "\"\"",
               "fieldName": "sref"
             },
@@ -1663,7 +1663,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Preferred translation family, falling back only when unavailable.",
+              "description": "Preferred translation language. Without one in that language, the element uses Sefaria's default translation.",
               "default": "undefined",
               "fieldName": "translationLanguage"
             },
@@ -1672,7 +1672,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Optional exact edition title for the primary role.",
+              "description": "Exact title of the edition to show as the primary text.",
               "default": "undefined",
               "fieldName": "primaryVersionTitle"
             },
@@ -1681,7 +1681,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Optional exact edition title for the translation role.",
+              "description": "Exact title of the edition to show as the translation.",
               "default": "undefined",
               "fieldName": "translationVersionTitle"
             },
@@ -1690,7 +1690,7 @@
               "type": {
                 "text": "BilingualPairContentLanguage"
               },
-              "description": "Sides the host wants displayed for every pair.",
+              "description": "Which text to show: `primary`, `translation` or `both`.",
               "default": "\"both\"",
               "fieldName": "contentLanguage"
             },
@@ -1699,7 +1699,7 @@
               "type": {
                 "text": "BilingualPairLayout"
               },
-              "description": "Requested arrangement for every pair.",
+              "description": "How each pair of texts is arranged: `auto`, `stacked` or `side-by-side`.",
               "default": "\"auto\"",
               "fieldName": "layout"
             },
@@ -1708,7 +1708,7 @@
               "type": {
                 "text": "BilingualPairSideOrder"
               },
-              "description": "Requested role order for every pair.",
+              "description": "Which text comes first side by side: `primary-first` or `translation-first`.",
               "default": "\"primary-first\"",
               "fieldName": "sideOrder"
             },
@@ -1717,7 +1717,7 @@
               "type": {
                 "text": "VocalizationMode"
               },
-              "description": "Hebrew vocalization preset applied to every displayed text leaf.",
+              "description": "How much Hebrew vowel and cantillation marking to keep. `none` removes both.",
               "default": "\"taamim_and_nikkud\"",
               "fieldName": "vocalizationMode"
             },
@@ -1726,7 +1726,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Whether resolved edition attribution is intentionally omitted.",
+              "description": "Hides the edition attribution.",
               "default": "false",
               "fieldName": "hideAttributions"
             },
@@ -1735,7 +1735,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Enables selection controls for items with proven canonical targets.",
+              "description": "Lets readers select the verses that have their own reference.",
               "default": "false",
               "fieldName": "selectable"
             }
@@ -1877,7 +1877,7 @@
               "type": {
                 "text": "string"
               },
-              "description": "Reference loaded when authoritative supplied data is absent.",
+              "description": "The Sefaria reference to load when `data` isn't set.",
               "default": "\"\"",
               "attribute": "sref"
             },
@@ -1888,7 +1888,7 @@
               "type": {
                 "text": "unknown | undefined"
               },
-              "description": "Authoritative corrected response-shaped data.",
+              "description": "Sefaria API response data to render. When it's set, the element doesn't fetch anything.",
               "default": "undefined"
             },
             {
@@ -1898,7 +1898,7 @@
               "type": {
                 "text": "SefariaAcquisition | undefined"
               },
-              "description": "Optional element-specific acquisition source.",
+              "description": "Chooses how this element fetches data, instead of the default.",
               "default": "undefined"
             },
             {
@@ -1908,7 +1908,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Optional language-family selector overriding the primary default.",
+              "description": "Language of the edition to show, instead of the primary edition.",
               "default": "undefined",
               "attribute": "version-language"
             },
@@ -1919,7 +1919,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Optional exact edition title paired with `versionLanguage`.",
+              "description": "Exact title of the edition to show, used together with `versionLanguage`.",
               "default": "undefined",
               "attribute": "version-title"
             },
@@ -1930,7 +1930,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Preferred translation family, mutually exclusive with a strict version language.",
+              "description": "Preferred translation language. Can't be combined with `versionLanguage`.",
               "default": "undefined",
               "attribute": "translation-language"
             },
@@ -1941,7 +1941,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Hides compact edition attribution for standalone text.",
+              "description": "Hides the edition attribution.",
               "default": "false",
               "attribute": "hide-attributions"
             },
@@ -1952,7 +1952,7 @@
               "type": {
                 "text": "VocalizationMode"
               },
-              "description": "Hebrew vocalization preset applied only to the displayed safe text.",
+              "description": "How much Hebrew vowel and cantillation marking to keep. `none` removes both.",
               "default": "\"taamim_and_nikkud\"",
               "attribute": "vocalization-mode"
             },
@@ -1962,7 +1962,7 @@
               "type": {
                 "text": "TextSegmentSelectedVersionInfo | undefined"
               },
-              "description": "Metadata for the currently displayed selected edition.",
+              "description": "Details of the edition currently shown.",
               "readonly": true
             },
             {
@@ -1971,7 +1971,7 @@
               "type": {
                 "text": "SefariaElementStatus"
               },
-              "description": "Coarse lifecycle state without exposing prepared rendering data.",
+              "description": "Read-only loading state: `\"empty\"`, `\"loading\"`, `\"ready\"` or `\"error\"`.",
               "readonly": true
             }
           ],
@@ -1990,7 +1990,7 @@
               "type": {
                 "text": "string"
               },
-              "description": "Reference loaded when authoritative supplied data is absent.",
+              "description": "The Sefaria reference to load when `data` isn't set.",
               "default": "\"\"",
               "fieldName": "sref"
             },
@@ -1999,7 +1999,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Preferred translation family, mutually exclusive with a strict version language.",
+              "description": "Preferred translation language. Can't be combined with `versionLanguage`.",
               "default": "undefined",
               "fieldName": "translationLanguage"
             },
@@ -2008,7 +2008,7 @@
               "type": {
                 "text": "boolean"
               },
-              "description": "Hides compact edition attribution for standalone text.",
+              "description": "Hides the edition attribution.",
               "default": "false",
               "fieldName": "hideAttributions"
             },
@@ -2017,7 +2017,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Optional language-family selector overriding the primary default.",
+              "description": "Language of the edition to show, instead of the primary edition.",
               "default": "undefined",
               "fieldName": "versionLanguage"
             },
@@ -2026,7 +2026,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Optional exact edition title paired with `versionLanguage`.",
+              "description": "Exact title of the edition to show, used together with `versionLanguage`.",
               "default": "undefined",
               "fieldName": "versionTitle"
             },
@@ -2035,7 +2035,7 @@
               "type": {
                 "text": "VocalizationMode"
               },
-              "description": "Hebrew vocalization preset applied only to the displayed safe text.",
+              "description": "How much Hebrew vowel and cantillation marking to keep. `none` removes both.",
               "default": "\"taamim_and_nikkud\"",
               "fieldName": "vocalizationMode"
             }

@@ -8,14 +8,7 @@ Experimental and unofficial. Names and addresses may change. This is not an offi
 
 ## Install
 
-The packages are prereleases on GitHub Packages, not npmjs.com. GitHub Packages asks for a token even to download public packages. Add this to your user-level `.npmrc`, using a GitHub personal access token (classic) with `read:packages` in `NODE_AUTH_TOKEN`:
-
-```ini
-@arithmomaniac:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
-```
-
-Types are included; no `@types` package is needed. [Install and status](https://arithmomaniac.github.io/sefaria-frontend-toolkit/help/install-and-status.html) has the install command and the choices.
+The packages are prereleases on GitHub Packages, not npmjs.com. GitHub Packages asks for a token even to download public packages. You need a GitHub personal access token (classic) with `read:packages`. Types are included; no `@types` package is needed. [Install and status › Packages](https://arithmomaniac.github.io/sefaria-frontend-toolkit/help/install-and-status.html#packages) shows the setup and the install command.
 
 ## Elements
 
