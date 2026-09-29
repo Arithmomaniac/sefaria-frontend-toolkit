@@ -2,8 +2,12 @@
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 
+import process from "node:process";
+import { URL } from "node:url";
+
 import { chromium } from "playwright";
 
+import { createFixtureResponse } from "./site-fixtures.mjs";
 import { startSitePreview } from "./site-preview-server.mjs";
 
 const scriptUrl =
@@ -116,7 +120,10 @@ export async function runSessionOneSiteChecks({ root, siteBasePath }) {
       "sandbox attribute",
     );
     const inner = page.frameLocator(".live-editor__frame").first();
-    await inner.locator("sefaria-ref-label").waitFor({ state: "attached" });
+    await inner
+      .locator("sefaria-ref-label")
+      .first()
+      .waitFor({ state: "attached" });
     const childFrame = page
       .frames()
       .find(
@@ -137,7 +144,7 @@ export async function runSessionOneSiteChecks({ root, siteBasePath }) {
     expectEqual(isolation.origin, "null", "frame origin");
     expectEqual(isolation.parentReadable, false, "frame reads parent document");
     await childFrame.waitForFunction(
-      () => customElements.get("sefaria-ref-label") !== undefined,
+      () => globalThis.customElements.get("sefaria-ref-label") !== undefined,
     );
     expectEqual(scriptRequests, 1, "script requests after scrolling");
 
@@ -178,7 +185,10 @@ export async function runSessionOneSiteChecks({ root, siteBasePath }) {
     );
 
     await editor.getByRole("button", { name: "Reset" }).click();
-    await inner.locator("sefaria-ref-label").waitFor({ state: "attached" });
+    await inner
+      .locator("sefaria-ref-label")
+      .first()
+      .waitFor({ state: "attached" });
     expectEqual(
       (await editor.locator("pre.site-code").textContent()).trim(),
       snippet,
@@ -187,7 +197,8 @@ export async function runSessionOneSiteChecks({ root, siteBasePath }) {
     expectEqual(pageErrors.length, 0, `page errors: ${pageErrors.join("; ")}`);
     await page.close();
   });
-  console.log("Session 1 site checks passed.");
+  await runShowTextChecks({ root, siteBasePath, localScript });
+  process.stdout.write("Session 1 site checks passed.\n");
 }
 
 /**
@@ -242,5 +253,238 @@ export async function runSessionOneLiveChecks({ root, siteBasePath }) {
     expectEqual(text?.allowOrigin, "*", "Sefaria CORS header");
     await page.close();
   });
-  console.log("Session 1 live checks passed.");
+  process.stdout.write("Session 1 live checks passed.\n");
+}
+
+const showTextPages = [
+  "/use-components/show-text/label-a-citation.html",
+  "/use-components/show-text/show-one-passage.html",
+  "/use-components/show-text/hebrew-and-translation.html",
+];
+
+async function loadFixture(root, name) {
+  return JSON.parse(
+    await readFile(path.join(root, "tests", "site-fixtures", name), "utf8"),
+  ).payload;
+}
+
+async function routeOffline(
+  page,
+  { origin, localScript, fixtures, failSefaria = false },
+) {
+  const sefariaRequests = [];
+  await page.route("**/*", async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+    if (url.href === scriptUrl) {
+      await route.fulfill({
+        body: localScript,
+        contentType: "text/javascript",
+      });
+      return;
+    }
+    if (url.origin === origin || ["data:", "about:"].includes(url.protocol)) {
+      await route.continue();
+      return;
+    }
+    if (url.origin === "https://www.sefaria.org") {
+      sefariaRequests.push(decodeURIComponent(url.pathname + url.search));
+      if (failSefaria) {
+        await route.abort("failed");
+        return;
+      }
+      const reference = decodeURIComponent(url.pathname.split("/").at(-1));
+      if (url.pathname.startsWith("/api/ref/")) {
+        await route.fulfill({
+          json: reference === "Micah 6:8" ? fixtures.ref : fixtures.notRef,
+        });
+        return;
+      }
+      if (
+        url.pathname.startsWith("/api/v3/texts/") &&
+        reference === "Micah 6:8"
+      ) {
+        await route.fulfill({
+          json: createFixtureResponse(
+            request.url(),
+            "text-fixture",
+            fixtures.text,
+            [],
+          ),
+        });
+        return;
+      }
+    }
+    await route.abort("blockedbyclient");
+  });
+  return sefariaRequests;
+}
+
+async function editorFrame(editor) {
+  await editor.scrollIntoViewIfNeeded();
+  const iframe = editor.locator("iframe.live-editor__frame");
+  await editor
+    .page()
+    .waitForFunction(
+      (element) => element.getAttribute("srcdoc") != null,
+      await iframe.elementHandle(),
+    );
+  for (let attempt = 0; attempt < 100; attempt += 1) {
+    const frame = await (await iframe.elementHandle()).contentFrame();
+    if (frame && frame.url() === "about:srcdoc") return frame;
+    await editor.page().waitForTimeout(50);
+  }
+  fail("editor frame did not load");
+}
+
+async function runShowTextChecks({ root, siteBasePath, localScript }) {
+  const fixtures = {
+    ref: await loadFixture(root, "micah-6-8-ref-2026-09-29.json"),
+    notRef: await loadFixture(root, "not-a-ref-2026-09-29.json"),
+    text: await loadFixture(root, "micah-6-8-2026-09-28.json"),
+  };
+  await withSite(root, siteBasePath, async ({ browser, origin, url }) => {
+    // Every example on each page shows exactly its owner file.
+    for (const route of showTextPages) {
+      const page = await browser.newPage();
+      await routeOffline(page, { origin, localScript, fixtures });
+      await page.goto(url(route), { waitUntil: "networkidle" });
+      const markdown = await readFile(
+        path.join(root, "docs", `${route.slice(1).replace(/\.html$/, ".md")}`),
+        "utf8",
+      );
+      const imports = [
+        ...markdown.matchAll(
+          /import (\w+) from "[./]+examples\/site-snippets\/([\w-]+\.html)\?raw"/g,
+        ),
+      ].map((match) => [match[1], match[2]]);
+      const usages = [...markdown.matchAll(/<LiveEditor :code="(\w+)"/g)].map(
+        (match) => imports.find(([name]) => name === match[1])[1],
+      );
+      const shown = await page
+        .locator(".live-editor pre.site-code")
+        .allTextContents();
+      expectEqual(shown.length, usages.length, `${route} example count`);
+      for (const [index, snippet] of usages.entries()) {
+        const owner = (
+          await readFile(
+            path.join(root, "examples", "site-snippets", snippet),
+            "utf8",
+          )
+        ).trim();
+        expectEqual(
+          shown[index].trim(),
+          owner,
+          `${route} ${snippet} shown code`,
+        );
+      }
+      await page.close();
+    }
+
+    // Label page: styling changes do not request, and zero states render.
+    const page = await browser.newPage({
+      viewport: { width: 1280, height: 900 },
+    });
+    const requests = await routeOffline(page, {
+      origin,
+      localScript,
+      fixtures,
+    });
+    await page.goto(url(showTextPages[0]), { waitUntil: "networkidle" });
+    const editors = page.locator(".live-editor");
+
+    const styling = await editorFrame(editors.nth(1));
+    await styling.waitForFunction(
+      () =>
+        globalThis.document.querySelector("sefaria-ref-label")?.status ===
+        "ready",
+    );
+    const before = requests.length;
+    await styling.evaluate(async () => {
+      const root = globalThis.document.documentElement;
+      root.style.setProperty("--sefaria-link", "rgb(1, 2, 3)");
+      root.style.colorScheme = "dark";
+      await new Promise((resolve) => globalThis.setTimeout(resolve, 300));
+    });
+    const linkColor = await styling.evaluate(
+      () =>
+        globalThis.getComputedStyle(
+          globalThis.document
+            .querySelector("sefaria-ref-label")
+            .shadowRoot.querySelector("a"),
+        ).color,
+    );
+    expectEqual(linkColor, "rgb(1, 2, 3)", "styled link color");
+    expectEqual(requests.length, before, "styling makes no request");
+
+    const states = await editorFrame(editors.nth(2));
+    await states.waitForFunction(() =>
+      [...globalThis.document.querySelectorAll("sefaria-ref-label")].every(
+        (label) => label.status !== "loading",
+      ),
+    );
+    await states.locator("#check").click();
+    expectEqual(
+      (await states.locator("#log").textContent()).trim(),
+      '"Micah 6:8" is ready\n"Not a book 3:4" is empty\n"" is empty',
+      "label zero states",
+    );
+    expectEqual(
+      (await states.locator("sefaria-ref-label").nth(1).textContent()) ?? "",
+      "",
+      "light DOM stays empty",
+    );
+    await page.close();
+
+    // Unreachable Sefaria: alert, error status, and the error event.
+    const failing = await browser.newPage({
+      viewport: { width: 1280, height: 900 },
+    });
+    await routeOffline(failing, {
+      origin,
+      localScript,
+      fixtures,
+      failSefaria: true,
+    });
+    await failing.goto(url(showTextPages[0]), { waitUntil: "networkidle" });
+    const failed = await editorFrame(failing.locator(".live-editor").nth(2));
+    await failed.locator("sefaria-ref-label [role=alert]").first().waitFor();
+    await failed
+      .locator("#log")
+      .filter({ hasText: "Error for Micah 6:8" })
+      .waitFor();
+    await failed.locator("#check").click();
+    await failed
+      .locator("#log")
+      .filter({ hasText: '"Micah 6:8" is error' })
+      .waitFor();
+    await failing.close();
+
+    // Text Segment: a fresh load of the default example makes one request.
+    const passage = await browser.newPage({
+      viewport: { width: 1280, height: 900 },
+    });
+    const passageRequests = await routeOffline(passage, {
+      origin,
+      localScript,
+      fixtures,
+    });
+    await passage.goto(url(showTextPages[1]), { waitUntil: "networkidle" });
+    const defaultFrame = await editorFrame(
+      passage.locator(".live-editor").first(),
+    );
+    await defaultFrame.waitForFunction(
+      () =>
+        globalThis.document.querySelector("sefaria-text-segment")?.status ===
+        "ready",
+    );
+    expectEqual(
+      passageRequests.filter((entry) =>
+        entry.startsWith("/api/v3/texts/Micah 6:8"),
+      ).length,
+      1,
+      "default passage requests",
+    );
+    await passage.close();
+  });
 }

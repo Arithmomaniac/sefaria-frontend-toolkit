@@ -29,7 +29,8 @@ const textarea = ref<HTMLTextAreaElement>();
 // A sandboxed frame has an opaque origin, so the parent can't measure it.
 // This appended script reports the document height and nothing else.
 const heightReporter =
-  "<script>new ResizeObserver(()=>parent.postMessage({liveEditorHeight:Math.ceil(document.documentElement.getBoundingClientRect().height)},'*')).observe(document.documentElement)<\/script>";
+  "<script>new ResizeObserver(()=>parent.postMessage({liveEditorHeight:Math.ceil(document.documentElement.getBoundingClientRect().height)},'*')).observe(document.documentElement)<" +
+  "/script>";
 
 const srcdoc = computed(() =>
   visible.value ? `${running.value}\n${heightReporter}` : undefined,
