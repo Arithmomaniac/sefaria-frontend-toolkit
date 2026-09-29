@@ -332,6 +332,89 @@ describe("B22 Start with an AI assistant", () => {
   });
 });
 
+describe.each([
+  {
+    name: "E2 Linked article",
+    file: "linked-article.md",
+    route: "/examples/linked-article/",
+    regions: [
+      "examples/linked-article/src/app.ts#open-preview",
+      "examples/linked-article/index.html#authored-link",
+    ],
+    links: [
+      "/use-components/show-an-attributed-passage.md",
+      "/concepts/sefarias-own-texts-and-tools.md",
+      "https://developers.sefaria.org/docs/linker-v3",
+    ],
+  },
+  {
+    name: "E3 Reader inside AI chat",
+    file: "reader-inside-ai-chat.md",
+    route: "/examples/mcp-app/live.html",
+    regions: [
+      "examples/mcp-app/src/app.ts#seed-reader",
+      "examples/mcp-app/src/app.ts#reader-acquisition",
+    ],
+    links: [
+      "/use-components/add-the-complete-reader.md",
+      "/data-and-text-tools/give-components-your-own-data.md",
+      "/concepts/sefarias-own-texts-and-tools.md",
+      "/reference/components.md",
+    ],
+  },
+])("$name", ({ file, route, regions, links }) => {
+  const page = () => read("docs", "examples", file);
+
+  it("is a written example with no status note", async () => {
+    const markdown = await page();
+    expectWritten(markdown);
+    expect(markdown).not.toContain("<StatusNote");
+  });
+
+  it("embeds the built example and links to it in a new tab", async () => {
+    const markdown = await page();
+    expect(markdown).toMatch(/<iframe[\s\S]*?sandbox="[^"]*allow-scripts/);
+    expect(markdown).toContain(`withBase('${route}')`);
+    expect(markdown).toMatch(/Open in a new tab/);
+    expect(markdown).toMatch(/complete app/i);
+  });
+
+  it("shows code read-only from regions in the owner source", async () => {
+    const markdown = await page();
+    for (const region of regions) {
+      const [source, name] = region.split("#");
+      expect(markdown).toContain(`<<< ../../${source}#${name}`);
+      expect(await read(...source!.split("/"))).toMatch(
+        new RegExp(`#region ${name}\\b`),
+      );
+    }
+  });
+
+  it("links to its neighbours", async () => {
+    const markdown = await page();
+    for (const link of links) expect(markdown).toContain(`(${link}`);
+  });
+});
+
+describe("E3 VS Code steps", () => {
+  it("names the three VS Code scripts that exist", async () => {
+    const markdown = await read("docs", "examples", "reader-inside-ai-chat.md");
+    const scripts = (
+      JSON.parse(await read("package.json")) as {
+        scripts: Record<string, string>;
+      }
+    ).scripts;
+    for (const script of [
+      "setup:mcp:vscode",
+      "launch:mcp:vscode",
+      "walkthrough:mcp:vscode",
+    ]) {
+      expect(scripts[script]).toBeDefined();
+      expect(markdown).toContain(`pnpm ${script}`);
+    }
+  });
+});
+
 describe("B15 Troubleshoot a page", () => {
   const page = () => read("docs", "help", "troubleshoot-a-page.md");
 

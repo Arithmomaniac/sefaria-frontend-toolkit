@@ -38,30 +38,31 @@ The `alpha` address serves the newest build, and it changes without notice. To s
 ></script>
 ```
 
-To find versions, open [the list of hosted versions (catalog.json)](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/catalog.json). Each entry in `releases` has a `version` and a `state` of `active` or `retired`. The top-level `alpha` field names the version the alpha address serves right now.
+To find versions, open [the list of hosted versions](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/index.html). It shows which versions are active and which version the `alpha` address serves right now. Programs can read the same list as JSON from [catalog.json](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/catalog.json).
 
-Pinned addresses stay available while their version is active. A version can be retired without notice, so check the catalog when you update your page.
+Pinned addresses stay available while their version is active. A version can be retired without notice, so check the list when you update your page.
 
 ## Packages
 
-The toolkit has three packages: `@arithmomaniac/sefaria-client`, `@arithmomaniac/sefaria-text-transform`, and `@arithmomaniac/sefaria-web-components`. They are published to GitHub Packages as prereleases, not to npmjs.com.
+The toolkit has three packages: `@arithmomaniac/sefaria-client`, `@arithmomaniac/sefaria-text-transform`, and `@arithmomaniac/sefaria-web-components`. They are published to GitHub Packages as prereleases. They are not published on npmjs.com.
 
-GitHub Packages asks for a token, even for public packages. Create a classic personal access token with the `read:packages` scope ([GitHub's steps](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-to-github-packages)). Then add this to your `.npmrc`, and set `NODE_AUTH_TOKEN` to your token:
+GitHub Packages asks for a token, even for public packages. Create a personal access token with the `read:packages` scope ([GitHub's steps](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-to-github-packages)). Then add this to your `.npmrc`, and set `NODE_AUTH_TOKEN` to your token:
 
 ```ini
 @arithmomaniac:registry=https://npm.pkg.github.com
 //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
 ```
 
-Install the package you need:
+Install an exact version. Copy the newest version number from the [package page on GitHub](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/pkgs/npm/sefaria-web-components). All three packages share the same version. Leave out the packages you don't need.
 
 ```sh
-npm install @arithmomaniac/sefaria-web-components@alpha
+version="0.0.0-alpha.<run-id>.<run-attempt>"
+pnpm add "@arithmomaniac/sefaria-client@$version" "@arithmomaniac/sefaria-text-transform@$version" "@arithmomaniac/sefaria-web-components@$version"
 ```
 
-`alpha` is the prerelease tag. To stay on one build, give an exact version instead. The `.npmrc` file works for npm and pnpm. Modern Yarn ignores `.npmrc`; see [Yarn's `npmScopes` setting](https://yarnpkg.com/configuration/yarnrc#npmScopes). Types are included; no `@types` package is needed.
+The packages also carry an `alpha` tag that follows the newest build, but an exact version pins the toolkit release. Commit your lockfile and install with a frozen lockfile to keep the other dependencies fixed too. The toolkit's own install check uses pnpm with this `.npmrc`; for other package managers, see their documentation, such as [Yarn's `npmScopes` setting](https://yarnpkg.com/configuration/yarnrc#npmScopes). Types are included; no `@types` package is needed.
 
-A 401, 403, or `E404` error is commonly caused by one of these. Check:
+If you get a 401, 403, or `E404` error, check:
 
 - the name of the failing package
 - that your token has the `read:packages` scope
