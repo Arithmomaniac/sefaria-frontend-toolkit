@@ -260,6 +260,8 @@ const showTextPages = [
   "/use-components/show-text/label-a-citation.html",
   "/use-components/show-text/show-one-passage.html",
   "/use-components/show-text/hebrew-and-translation.html",
+  "/use-components/show-an-attributed-passage.html",
+  "/use-components/use-with-a-framework.html",
 ];
 
 async function loadFixture(root, name) {
@@ -298,6 +300,13 @@ async function routeOffline(
         await route.fulfill({
           json: reference === "Micah 6:8" ? fixtures.ref : fixtures.notRef,
         });
+        return;
+      }
+      if (
+        url.pathname.startsWith("/api/v3/texts/") &&
+        reference === "Micah 6:6-8"
+      ) {
+        await route.fulfill({ json: fixtures.range });
         return;
       }
       if (
@@ -342,6 +351,7 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
     ref: await loadFixture(root, "micah-6-8-ref-2026-09-29.json"),
     notRef: await loadFixture(root, "not-a-ref-2026-09-29.json"),
     text: await loadFixture(root, "micah-6-8-2026-09-28.json"),
+    range: await loadFixture(root, "micah-6-6-8-2026-09-29.json"),
   };
   await withSite(root, siteBasePath, async ({ browser, origin, url }) => {
     // Every example on each page shows exactly its owner file.
@@ -380,6 +390,83 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
       }
       await page.close();
     }
+
+    // Framework page: read-only code blocks show their tested owner files.
+    const frameworks = await browser.newPage();
+    await routeOffline(frameworks, { origin, localScript, fixtures });
+    await frameworks.goto(url(showTextPages[4]), { waitUntil: "networkidle" });
+    const blocks = await frameworks
+      .locator("figure.site-code-block")
+      .evaluateAll((figures) =>
+        figures.map((figure) => [
+          figure.querySelector("figcaption")?.textContent?.trim(),
+          figure.querySelector("pre")?.textContent?.trim(),
+        ]),
+      );
+    for (const owner of [
+      "examples/react-vite/src/site-source-card.tsx",
+      "examples/alpine-vite/src/site-source-card.html",
+    ]) {
+      const block = blocks.find(([label]) => label === owner);
+      if (!block) fail(`no code block labelled ${owner}`);
+      expectEqual(
+        block[1],
+        (await readFile(path.join(root, owner), "utf8")).trim(),
+        `${owner} shown code`,
+      );
+    }
+    const vanillaEditor = frameworks.locator(".live-editor").first();
+    expectEqual(
+      await vanillaEditor.getByRole("button", { name: "Edit" }).count(),
+      0,
+      "read-only vanilla example has no Edit button",
+    );
+    await frameworks.close();
+
+    // Source Card page: selecting a verse delivers position and ref.
+    const cardPage = await browser.newPage({
+      viewport: { width: 1280, height: 900 },
+    });
+    const cardRequests = await routeOffline(cardPage, {
+      origin,
+      localScript,
+      fixtures,
+    });
+    await cardPage.goto(url(showTextPages[3]), { waitUntil: "networkidle" });
+    const selectFrame = await editorFrame(
+      cardPage.locator(".live-editor").first(),
+    );
+    await selectFrame.waitForFunction(
+      () =>
+        globalThis.document.querySelector("sefaria-source-card")?.status ===
+        "ready",
+    );
+    await selectFrame
+      .locator("sefaria-source-card")
+      .getByRole("button", { name: "Show connections for Micah 6:7" })
+      .first()
+      .click();
+    await selectFrame
+      .locator("#selection")
+      .filter({ hasText: "You selected Micah 6:7 (position 1)." })
+      .waitFor();
+    expectEqual(
+      await selectFrame
+        .locator("sefaria-source-card")
+        .getByRole("button", { name: "Show connections for Micah 6:7" })
+        .first()
+        .getAttribute("aria-pressed"),
+      "true",
+      "selected verse is pressed",
+    );
+    expectEqual(
+      cardRequests.filter((entry) =>
+        entry.startsWith("/api/v3/texts/Micah 6:6-8"),
+      ).length,
+      1,
+      "one Source Card request, none from its verses",
+    );
+    await cardPage.close();
 
     // Label page: styling changes do not request, and zero states render.
     const page = await browser.newPage({

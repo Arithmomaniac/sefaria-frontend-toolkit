@@ -65,6 +65,10 @@ const showTextPages = {
       "translation-language",
     ],
   },
+  "sefaria-source-card": {
+    file: "docs/use-components/show-an-attributed-passage.md",
+    attributes: ["selectable", "hide-attributions", "translation-language"],
+  },
 } as const;
 
 const manifest = JSON.parse(
@@ -85,7 +89,7 @@ const declaration = (tag: string) =>
     .find((entry) => entry.tagName === tag)!;
 
 describe.each(Object.entries(showTextPages))(
-  "Show text page for %s",
+  "Component page for %s",
   (tag, { file, attributes }) => {
     const page = read(file);
     const errorEvent = `${tag}-error`;
@@ -156,4 +160,73 @@ it("teaches shared styling and dark-mode setup on the label page", () => {
   expect(page).toContain("color-scheme: light dark");
   expect(page).toContain("--sefaria-font-scale");
   expect(page).toContain("(/across-components/match-your-sites-look.md)");
+});
+
+describe("Source Card page", () => {
+  const page = read("docs/use-components/show-an-attributed-passage.md");
+
+  it("teaches the selection event and its detail", () => {
+    expect(page).toContain("`sefaria-source-select`");
+    expect(page).toContain("`{ position, ref }`");
+    expect(page).toContain("`selectedPosition`");
+  });
+
+  it("states scoped request counts and the attribution boundary", () => {
+    expect(page).toMatch(/fresh load makes one request/);
+    expect(page).toMatch(/two/);
+    expect(page).not.toMatch(/StatusNote/);
+    expect(page).toMatch(/licen[cs]e/i);
+  });
+});
+
+describe("Use with a framework page", () => {
+  const page = read("docs/use-components/use-with-a-framework.md");
+
+  it("embeds the three tested owner files, not copies", () => {
+    expect(page).toContain(
+      'import vanilla from "../../examples/site-snippets/source-card-select.html?raw"',
+    );
+    expect(page).toContain(
+      'import react from "../../examples/react-vite/src/site-source-card.tsx?raw"',
+    );
+    expect(page).toContain(
+      'import alpine from "../../examples/alpine-vite/src/site-source-card.html?raw"',
+    );
+    expect(page).toMatch(/<LiveEditor :code="vanilla"[^>]*readonly/);
+    expect(page).not.toMatch(/```(tsx|jsx|html)/);
+    for (const owner of [
+      "examples/react-vite/src/site-source-card.browser.test.tsx",
+      "examples/alpine-vite/src/site-source-card.browser.test.ts",
+    ]) {
+      expect(read(owner)).toContain("./site-source-card");
+    }
+  });
+
+  it("carries the status note and registers through the package root", () => {
+    expect(page).toContain("<StatusNote />");
+    expect(page).toContain('import "@arithmomaniac/sefaria-web-components";');
+    expect(read("examples/react-vite/src/site-source-card.tsx")).toContain(
+      'import "@arithmomaniac/sefaria-web-components";',
+    );
+  });
+
+  it("covers zero states, status, the error event, and required links", () => {
+    for (const text of [
+      "Loading Micah 6:6-8.",
+      "can't be reached",
+      "isn't a reference",
+      "No `sref` and no `data`",
+      "`sefaria-source-card-error`",
+      "`status`",
+      "(/help/troubleshoot-a-page.md)",
+      "(/data-and-text-tools/give-components-your-own-data.md)",
+      "(/use-components/show-commentary-and-connected-texts.md)",
+      "(/use-components/add-the-complete-reader.md)",
+      "(/across-components/make-components-respond-to-each-other.md)",
+      "(/reference/components.md)",
+      "(/help/install-and-status.md)",
+    ]) {
+      expect(page).toContain(text);
+    }
+  });
 });

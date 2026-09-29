@@ -10,8 +10,9 @@ const props = withDefaults(
     code: string;
     title: string;
     lang?: CodeLanguage;
+    readonly?: boolean;
   }>(),
-  { lang: "html" },
+  { lang: "html", readonly: false },
 );
 
 const original = computed(() => props.code.trim());
@@ -92,7 +93,7 @@ onBeforeUnmount(() => {
   >
     <div class="live-editor__bar">
       <span class="live-editor__title">{{ title }}</span>
-      <span class="live-editor__actions">
+      <span v-if="!readonly" class="live-editor__actions">
         <button v-if="!editing" type="button" @click="edit">Edit</button>
         <template v-else>
           <button type="button" class="live-editor__run" @click="run">

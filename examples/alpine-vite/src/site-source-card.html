@@ -1,0 +1,13 @@
+<div x-data="{ selected: undefined }">
+  <sefaria-source-card
+    sref="Micah 6:6-8"
+    selectable
+    x-effect="$el.selectedPosition = selected?.position"
+    @sefaria-source-select="selected = $event.detail"
+  ></sefaria-source-card>
+  <p
+    x-text="selected
+      ? `You selected ${selected.ref} (position ${selected.position.join(', ')}).`
+      : 'Select a verse number.'"
+  ></p>
+</div>
