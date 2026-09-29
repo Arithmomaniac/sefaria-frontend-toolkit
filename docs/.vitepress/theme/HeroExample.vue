@@ -133,6 +133,7 @@ onMounted(async () => {
           :code="block.code"
           lang="html"
           :label="block.label"
+          pretty-breaks
         />
       </div>
       <p v-else>Loading the cleaned text…</p>

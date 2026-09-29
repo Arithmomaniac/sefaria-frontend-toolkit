@@ -8,9 +8,12 @@ const props = defineProps<{
   code: string;
   lang: CodeLanguage;
   label?: string;
+  prettyBreaks?: boolean;
 }>();
 
-const html = computed(() => highlight(props.code, props.lang));
+const html = computed(() =>
+  highlight(props.code, props.lang, { prettyBreaks: props.prettyBreaks }),
+);
 </script>
 
 <template>

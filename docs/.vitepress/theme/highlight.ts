@@ -42,7 +42,14 @@ function textRun(text: string): string {
 const htmlTag = /<\/?([\w-]+)((?:\s+[\w:-]+(?:="[^"]*")?)*)(\s*)\/?>/g;
 const htmlAttribute = /(\s+)([\w:-]+)(?:=("[^"]*"))?/g;
 
-export function highlightHtml(source: string): string {
+export interface HighlightOptions {
+  readonly prettyBreaks?: boolean;
+}
+
+export function highlightHtml(
+  source: string,
+  options: HighlightOptions = {},
+): string {
   let html = "";
   let last = 0;
   for (const match of source.matchAll(htmlTag)) {
@@ -65,6 +72,7 @@ export function highlightHtml(source: string): string {
       span("punct", close);
     last = match.index + whole.length;
     if (
+      options.prettyBreaks &&
       /^<br\b|^<\//.test(whole) &&
       last < source.length &&
       !/^\s*\n/.test(source.slice(last))
@@ -102,8 +110,12 @@ export function highlightScript(source: string): string {
 
 export type CodeLanguage = "json" | "html" | "js" | "ts";
 
-export function highlight(source: string, language: CodeLanguage): string {
+export function highlight(
+  source: string,
+  language: CodeLanguage,
+  options: HighlightOptions = {},
+): string {
   if (language === "json") return highlightJson(source);
-  if (language === "html") return highlightHtml(source);
+  if (language === "html") return highlightHtml(source, options);
   return highlightScript(source);
 }
