@@ -121,5 +121,61 @@ export async function runSessionFourSiteChecks({ root, siteBasePath }) {
     if (composedRequests.length !== 0)
       fail(`composed Reader fetched before start: ${composedRequests}`);
     await composed.close();
+
+    const { payload: calendar } = JSON.parse(
+      await readFile(
+        path.join(
+          root,
+          "examples",
+          "weekly-portion",
+          "src",
+          "fixtures",
+          "calendars-2027-01-08.json",
+        ),
+        "utf8",
+      ),
+    );
+    const weekly = await browser.newPage();
+    const calendarRequests = [];
+    const weeklyRequests = [];
+    await routeOffline(weekly, origin, fixture, weeklyRequests);
+    await weekly.route("https://www.sefaria.org/api/calendars**", (route) => {
+      calendarRequests.push(route.request().url());
+      return route.fulfill({ json: calendar });
+    });
+    await weekly.goto(url("/examples/this-weeks-portion.html"), {
+      waitUntil: "networkidle",
+    });
+    const portion = weekly.frameLocator("iframe");
+    await portion.locator("text=This week's portion: Vaera").waitFor();
+    const property = await portion
+      .locator("sefaria-source-card")
+      .evaluate((card) => card.sref);
+    if (property !== "Exodus 6:2-9:35")
+      fail(`weekly portion card sref was ${property}`);
+    await portion.locator("sefaria-source-card").evaluate(
+      (card) =>
+        new Promise((resolve, reject) => {
+          const started = Date.now();
+          const poll = () => {
+            if (card.status === "ready") resolve();
+            else if (card.status === "error" || Date.now() - started > 15_000)
+              reject(new Error(`card status ${card.status}`));
+            else setTimeout(poll, 50);
+          };
+          poll();
+        }),
+    );
+    const textRequests = weeklyRequests.filter((p) =>
+      p.startsWith("/api/v3/texts/"),
+    );
+    if (
+      textRequests.length !== 1 ||
+      decodeURIComponent(textRequests[0]) !== "/api/v3/texts/Exodus 6:2-9:35"
+    )
+      fail(`weekly portion text requests: ${textRequests}`);
+    if (calendarRequests.length !== 1)
+      fail(`weekly portion made ${calendarRequests.length} calendar requests`);
+    await weekly.close();
   });
 }

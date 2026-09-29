@@ -351,6 +351,18 @@ describe.each([
     ],
   },
   {
+    name: "E4 This week's portion",
+    file: "this-weeks-portion.md",
+    route: "/examples/weekly-portion/",
+    regions: ["examples/weekly-portion/index.html#source-card"],
+    links: [
+      "/use-components/show-an-attributed-passage.md",
+      "/data-and-text-tools/start-here.md",
+      "/reference/client.md",
+      "/reference/package-imports-and-exports.md",
+    ],
+  },
+  {
     name: "E2 Linked article",
     file: "linked-article.md",
     route: "/examples/linked-article/",
@@ -410,6 +422,19 @@ describe.each([
   it("links to its neighbours", async () => {
     const markdown = await page();
     for (const link of links) expect(markdown).toContain(`(${link}`);
+  });
+});
+
+describe("E4 calendar snippet", () => {
+  it("shows the calendar call from the example source with the language toggle", async () => {
+    const markdown = await read("docs", "examples", "this-weeks-portion.md");
+    expect(markdown).toContain(
+      `<CodeLanguageToggle :snippet="snippets['weekly-portion-calendar-call']" />`,
+    );
+    expect(
+      await read("docs", "data-and-text-tools", "snippets.data.ts"),
+    ).toContain('file: "examples/weekly-portion/src/app.ts"');
+    expect(markdown).not.toMatch(/\bfetch\(/);
   });
 });
 
