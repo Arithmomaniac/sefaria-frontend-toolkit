@@ -98,6 +98,7 @@ export async function waitForMcpConnection(
   signal?.throwIfAborted();
 }
 
+// #region reader-acquisition
 /** Creates a Reader acquisition capability backed only by host-proxied tools. */
 export function createMcpReaderAcquisition(
   host: McpReaderToolHost,
@@ -140,6 +141,7 @@ export function createMcpReaderAcquisition(
     },
   };
 }
+// #endregion reader-acquisition
 
 /** @deprecated Use createMcpReaderAcquisition. */
 export function createMcpReaderDataSource(
