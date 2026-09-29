@@ -91,6 +91,56 @@ describe("B14 Install and status", () => {
   });
 });
 
+describe("C1 How the toolkit works", () => {
+  const page = () => read("docs", "concepts", "how-the-toolkit-works.md");
+
+  it("is a written concept page with no status note or steps", async () => {
+    const markdown = await page();
+    expectWritten(markdown);
+    expect(markdown).not.toContain("<StatusNote");
+    expect(markdown).not.toMatch(/^\d+\. /m);
+  });
+
+  it("keeps the promised anchors", async () => {
+    const markdown = await page();
+    expect(section(markdown, "status")).toMatch(
+      /`empty`[\s\S]*`loading`[\s\S]*`ready`[\s\S]*`error`/,
+    );
+    expect(section(markdown, "without-components")).toContain("normalizeText");
+  });
+
+  it("states scoped request counts and the supplied-data rules", async () => {
+    const markdown = await page();
+    expect(markdown).toMatch(/Source Card[^.]*one[^.]*request/i);
+    expect(markdown).toMatch(/two/);
+    expect(markdown).toMatch(/Reader[\s\S]{0,200}three/i);
+    expect(markdown).toMatch(
+      /no requests?|zero requests?|doesn't make a request|makes no request/i,
+    );
+    expect(markdown).toMatch(/invalid[\s\S]{0,200}error/i);
+    expect(markdown).toMatch(/Reader[\s\S]{0,300}seed/);
+  });
+
+  it("includes one diagram and links to its neighbours", async () => {
+    const markdown = await page();
+    expect(markdown.match(/```text/g)).toHaveLength(1);
+    for (const link of [
+      "/reference/components.md",
+      "/data-and-text-tools/give-components-your-own-data.md",
+      "/help/troubleshoot-a-page.md",
+      "/data-and-text-tools/handle-errors-in-your-code.md",
+      "/data-and-text-tools/clean-up-stored-sefaria-text.md",
+      "/concepts/the-client-and-sefarias-api.md",
+      "/concepts/clean-text-and-safety.md",
+      "/concepts/sefarias-own-texts-and-tools.md",
+      "/reference/client.md",
+      "/reference/text-transform.md",
+    ]) {
+      expect(markdown).toContain(`(${link}`);
+    }
+  });
+});
+
 describe("B15 Troubleshoot a page", () => {
   const page = () => read("docs", "help", "troubleshoot-a-page.md");
 
