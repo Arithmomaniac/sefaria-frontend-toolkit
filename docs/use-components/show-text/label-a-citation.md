@@ -14,7 +14,7 @@ import refLabelStates from "../../../examples/site-snippets/ref-label-states.htm
 
 # Label a citation
 
-The Reference Label, `<sefaria-ref-label>`, turns a reference such as `Micah 6:8` into Sefaria's own readable name for it, in English, Hebrew, or both. It can also link to the passage on Sefaria. It is a small component, so it's a good place to learn the styling settings that every component shares.
+The Reference Label, `<sefaria-ref-label>`, turns a reference such as `Micah 6:8` into Sefaria's own readable name for it, in English, Hebrew, or both. It can also link to the passage on Sefaria. It is a small component, so it is a good place to learn the styling settings that every component shares.
 
 ## Show a label
 
@@ -29,9 +29,9 @@ The example shows a linked label, then a label in both languages. To try changes
 
 ## Match your site's colors and fonts
 
-Set CSS custom properties on `:root` or on any element that contains the label. Common ones are `--sefaria-link`, `--sefaria-fg`, `--sefaria-surface` (the component background), `--sefaria-accent`, `--sefaria-font-english`, `--sefaria-font-hebrew`, and `--sefaria-font-scale` (a multiplier; the default is 1). The same properties style the other toolkit components. `--sefaria-panel-radius` doesn't affect the label; it rounds panels in larger components.
+Set CSS custom properties on `:root` or on any element that contains the label. Common ones are `--sefaria-link`, `--sefaria-fg`, `--sefaria-surface` (the component background), `--sefaria-accent`, `--sefaria-font-english`, `--sefaria-font-hebrew`, and `--sefaria-font-scale` (a multiplier whose default is 1). The same properties style the other toolkit components. `--sefaria-panel-radius` doesn't affect the label. It rounds panels in larger components.
 
-Your page's selectors can't reach inside the component. Style it through the `--sefaria-*` properties and the element's own box (`display`, `margin`). Inherited text settings, such as `font-weight`, can still pass in.
+Your page's selectors can't reach inside the component. Style it through the `--sefaria-*` properties and the element's own box (`display`, `margin`). The component can still inherit text settings such as `font-weight`.
 
 The label is `display: block` by default, like the other components except the Reader. To place a label inside a sentence, add `sefaria-ref-label { display: inline; }` to your CSS.
 
@@ -54,7 +54,7 @@ The label's `status` property is `empty`, `loading`, `ready`, or `error`. Here i
 | Sefaria says the text isn't a reference | `"Not a book 3:4" is not a recognized Sefaria reference.` | `empty` | No |
 | No `sref` and no `data` | Nothing | `empty` | No |
 
-Read `status` from the element in JavaScript. When Sefaria can't be reached, `status` is `error` and the error event fires, whether or not text was already showing. To react to a failed load, listen for `sefaria-ref-label-error`. It bubbles and crosses the component boundary, and `event.detail` holds `{ error, sref }`. Invalid supplied `data` also shows an error and sets `status` to `error`, but it doesn't send the event, because the event is for failed loading.
+Read `status` from the element in JavaScript. When Sefaria can't be reached, `status` is `error` and the error event fires, whether or not text was already showing. To react to a failed load, listen for `sefaria-ref-label-error`. It bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. Invalid supplied `data` also shows an error and sets `status` to `error`. It doesn't send the event, because the event is for failed loading.
 
 The example has a good reference, a text that isn't a reference, and an empty label. Choose **Show each status** to log each one's status.
 

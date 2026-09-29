@@ -18,14 +18,14 @@ The Reader, `<sefaria-reader>`, is the recommended choice when you want a finish
 
 The Reader has two panes:
 
-- **Text** shows the passage in its chapter. For a reference that Sefaria loads, the Text pane opens the surrounding section and selects the matching item. For `Micah 6:8`, that's the chapter `Micah 6` with verse 8 selected.
+- **Text** shows the passage in its chapter. For a reference that Sefaria loads, the Text pane opens the surrounding section and selects the matching item. For `Micah 6:8`, that is the chapter `Micah 6` with verse 8 selected.
 - **Connections** is the same connections panel described in [Show commentary and connected texts](/use-components/show-commentary-and-connected-texts.md).
 
 ## Add the Reader and a toolbar button
 
 The example opens `Micah 6:8` and adds a Bookmark button inside the Reader. To try changes, choose Edit, change the code, and choose Run.
 
-Put your own button inside the Reader with `slot="toolbar-actions"`. In its click handler, read `reader.selectedRef`, the reference of the selected item. It's `Micah 6:8` after loading and `Micah 6:7` after a reader selects that verse. In the example, choosing Bookmark shows `Bookmarked Micah 6:8.` The click makes no request.
+Put your own button inside the Reader with `slot="toolbar-actions"`. In its click handler, read `reader.selectedRef`, the reference of the selected item. It is `Micah 6:8` after loading and `Micah 6:7` after a reader selects that verse. In the example, choosing Bookmark shows `Bookmarked Micah 6:8.` The click makes no request.
 
 <LiveEditor :code="reader" title="Reader with a Bookmark button" />
 
@@ -40,24 +40,24 @@ Put your own button inside the Reader with `slot="toolbar-actions"`. In its clic
 
 ## What your page does
 
-Your page owns where the Reader sits, how big it is, and which reference it opens (`sref`). It also owns the text choices, any extra toolbar buttons, and anything that should happen outside the Reader, such as bookmarks, analytics, or updating other components.
+Your page owns where the Reader sits, how big it is, and which reference it opens (`sref`). It also owns the text choices and any extra toolbar buttons. And it owns anything you want to happen outside the Reader, such as bookmarks, analytics, or updating other components.
 
-The Reader's interaction events tell your page what happened. They're cancelable: call `event.preventDefault()` to stop the Reader's own response. `sefaria-reader-error` is a notification and can't be canceled. See [Reference › Components](/reference/components.md#events) for details on each event.
+The Reader's interaction events tell your page what happened. They are cancelable. Call `event.preventDefault()` to stop the Reader's own response. `sefaria-reader-error` is a notification and can't be canceled. See [Reference › Components](/reference/components.md#events) for details on each event.
 
 ## Attributes
 
 - `sref`: the reference to open.
 - `active-pane`: which pane shows on a narrow Reader, `source` (the default) or `connections`.
-- `primary-version-title` and `translation-version-title` choose editions for the reference you open and its section. When a reader opens a connection, `translation-language` carries over, but those exact edition titles don't.
+- `primary-version-title` and `translation-version-title` choose editions for the reference you open and its section. When a reader opens a connection, `translation-language` carries over. Those exact edition titles don't.
 - `layout`, `content-language`, `side-order`, `vocalization-mode`, `translation-language`, and `hide-attributions` mean the same as in [Show Hebrew and translation together](/use-components/show-text/hebrew-and-translation.md). Here `layout` arranges Hebrew and translation inside the text, not the Reader's panes.
-- `show-connection-previews`: shows connection preview text. On by default; to turn it off, set `reader.showConnectionPreviews = false` (the attribute can't turn it off).
-- `chat-export`: shows a `Send … to chat` button when a selected text is open. The button fires `sefaria-reader-chat-export`; your page does the sending.
+- `show-connection-previews`: shows connection preview text. This option is on by default. To turn it off, set `reader.showConnectionPreviews = false`. The attribute can't turn it off.
+- `chat-export`: shows a `Send … to chat` button when a selected text is open. The button fires `sefaria-reader-chat-export`. Your page does the sending.
 
 Read-only properties include `status`, `selectedRef`, `canGoBack`, and `currentEntryId`.
 
 ## Events
 
-These events bubble and cross the component boundary. Interaction events' `detail` includes `originEntryId`, the history entry where it happened.
+These events bubble and cross the component boundary. The `detail` of an interaction event includes `originEntryId`, the history entry where it happened.
 
 | Event | Details (interaction events also include `originEntryId`) |
 | --- | --- |
@@ -99,7 +99,7 @@ Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`,
 | Only the connections request fails | An alert in the Connections pane. The text stays. | `ready` | No |
 | Nothing set yet: no `sref`, no `data` | Nothing | `empty` | No |
 
-Invalid supplied `data` shows an error without falling back to loading `sref`, and open content stays. Once the Reader has shown content, removing `sref` or `data` doesn't clear it. Listen for `sefaria-reader-error` to react to a failed load of the reference you set; it bubbles and crosses the component boundary, and `event.detail` holds `{ error, sref }`.
+Invalid supplied `data` shows an error without falling back to loading `sref`, and open content stays. Once the Reader has shown content, removing `sref` or `data` doesn't clear it. To react to a failed load of the reference you set, listen for `sefaria-reader-error`. It bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`.
 
 <span class="learn-more__label">Learn more:</span> [Troubleshoot a page](/help/troubleshoot-a-page.md) · [Component events](/reference/components.md#events) {.learn-more}
 
@@ -109,7 +109,7 @@ Set `data` to a seed, for example text you already fetched. It isn't a finished 
 
 ## When to compose instead
 
-Use the complete Reader when you want built-in navigation and history in one surface. If you need your own pane layout, several synchronized text panes, or your own navigation controls, compose individual components instead. See the [Composed multi-pane Reader](/examples/composed-multi-pane-reader.md) example.
+Use the complete Reader when you want built-in navigation and history in one surface. To get your own pane layout, several synchronized text panes, or your own navigation controls, compose individual components instead. See the [Composed multi-pane Reader](/examples/composed-multi-pane-reader.md) example.
 
 ## Next steps
 

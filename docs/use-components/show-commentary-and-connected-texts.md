@@ -37,7 +37,7 @@ Choosing a category lists its connections, 20 per page, with a status such as `P
 - When previews are shown and preview text is available, an entry also shows the edition and license information Sefaria reports.
 - A button whose accessible name is like `Open Bamidbar Rabbah 1:3 in context`.
 
-That button doesn't navigate. It fires an event, and your page decides what to do. For example, you can show that text in a Source Card. See [Make components respond to each other](/across-components/make-components-respond-to-each-other.md).
+That button does not navigate. It fires an event, and your page decides what to do. For example, you can show that text in a Source Card. See [Make components respond to each other](/across-components/make-components-respond-to-each-other.md).
 
 The panel changes its own category and page when a reader clicks. You can also set them yourself:
 
@@ -50,7 +50,7 @@ The panel changes its own category and page when a reader clicks. You can also s
 | `with-text` | Asks Sefaria to include the connected texts' words for previews. On by default. |
 | `vocalization-mode` | `taamim_and_nikkud` (default), `nikkud`, or `none`. See [Show one passage](/use-components/show-text/show-one-passage.md). |
 
-Because `with-text` and `show-previews` default to on, the attribute can't turn them off. Set the JavaScript property instead: `panel.withText = false` or `panel.showPreviews = false`. If `withText` is false and previews are shown, the panel shows `Preview text was not requested.` and a `Load previews` button.
+`with-text` and `show-previews` default to on, so the attribute can't turn them off. Set the JavaScript property instead: `panel.withText = false` or `panel.showPreviews = false`. If `withText` is false and previews are shown, the panel shows `Preview text was not requested.` and a `Load previews` button.
 
 ## React to what readers do
 
@@ -64,7 +64,9 @@ The panel fires five events. They bubble and cross the component boundary, so yo
 | `sefaria-connection-select` | `{ id, targetRef }` | A reader opens a connection. |
 | `sefaria-connections-panel-error` | `{ error, sref }` | Loading connections failed. |
 
-You can cancel the category and page events. Calling `event.preventDefault()` on one stops the panel from changing itself, so your page can take over. The example logs each event. Choose a category and open a connection. To try paging, choose a category with more than 20 connections, such as `Quoting Commentary (47)`, and choose More. Choose Overview to return to the summary.
+You can cancel the category and page events. Calling `event.preventDefault()` on one stops the panel from changing itself, so your page can take over.
+
+The example logs each event. Choose a category and open a connection. To try paging, choose a category with more than 20 connections, such as `Quoting Commentary (47)`, then choose More. Choose Overview to return to the summary.
 
 <LiveEditor :code="connectionsPanelEvents" title="Log the panel's events" />
 

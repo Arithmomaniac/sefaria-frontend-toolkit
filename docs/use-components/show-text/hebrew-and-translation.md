@@ -15,14 +15,14 @@ import bilingualStates from "../../../examples/site-snippets/bilingual-segment-s
 
 # Show Hebrew and translation together
 
-The Bilingual Segment, `<sefaria-bilingual-segment>`, shows one passage in two editions at once: the primary text and a translation. You choose the layout, which side comes first, the translation language, and even the exact edition for each side.
+The Bilingual Segment, `<sefaria-bilingual-segment>`, shows one passage in two editions at once: the primary text and a translation. You choose the layout, the side order, and the translation language. You can also choose the exact edition for each side.
 
 ## Show a passage in two editions
 
 Set `sref` to the reference. The component asks Sefaria once for two editions:
 
-- The **primary** edition, which is the edition Sefaria marks `isPrimary`. It's usually, but not always, the Hebrew or original text. For `Micah 6:8` it's "Miqra according to the Masorah".
-- Sefaria's **default translation**. For `Micah 6:8` it's "THE JPS TANAKH: Gender-Sensitive Edition".
+- The **primary** edition, which is the edition Sefaria marks `isPrimary`. It is usually, but not always, the Hebrew or original text. For `Micah 6:8` it is "Miqra according to the Masorah".
+- Sefaria's **default translation**. For `Micah 6:8` it is "THE JPS TANAKH: Gender-Sensitive Edition".
 
 Under the text, one line per shown side names its edition and language, such as `Miqra according to the Masorah (hebrew, he)`. The line isn't a link, and the component doesn't show a license.
 
@@ -37,10 +37,10 @@ Set these attributes on the element. Add them one at a time and choose Run to se
 | `content-language` | `both`, `primary`, `translation` | Which sides show. | No |
 | `layout` | `auto`, `stacked`, `side-by-side` | Two columns need both sides (`content-language="both"`). `auto` uses two columns at 500px of component width or more, and one below. `stacked` is always one column. `side-by-side` is two columns. | No |
 | `side-order` | `primary-first`, `translation-first` | Visual order in two-column layouts only. Stacked layouts and screen-reader order keep the primary side first. | No |
-| `translation-language` | A full lowercase language-family name, such as `french` | The language you'd like for the translation. Sefaria falls back if it has none. | Yes |
+| `translation-language` | A full lowercase language-family name, such as `french` | The language you want for the translation. Sefaria falls back if it has none. | Yes |
 | `primary-version-title` | An exact edition title | The exact primary edition. It never falls back. | Yes |
 | `translation-version-title` | An exact edition title | The exact translation edition. It never falls back. | Yes |
-| `vocalization-mode` | `taamim_and_nikkud`, `nikkud`, `none` | Hebrew marks on each side. `nikkud` removes cantillation; `none` also removes vowel points. Both remove a few other marks too; see [Change vowels and cantillation](/data-and-text-tools/clean-up-stored-sefaria-text.md#change-vowels-and-cantillation). | No |
+| `vocalization-mode` | `taamim_and_nikkud`, `nikkud`, `none` | Hebrew marks on each side. `nikkud` removes cantillation. `none` also removes vowel points. Both remove a few other marks too. See [Change vowels and cantillation](/data-and-text-tools/clean-up-stored-sefaria-text.md#change-vowels-and-cantillation). | No |
 | `hide-attributions` | Absent (default), present | Hides the edition lines and the fallback note. The text stays. | No |
 
 For the styling settings that every component shares, see [Label a citation](/use-components/show-text/label-a-citation.md).
@@ -55,7 +55,7 @@ The first element below reads side by side with the translation first, in an exa
 
 The two ways of choosing a translation behave differently:
 
-- **Preferred language** (`translation-language`) asks for the best edition in that language. If Sefaria reports that it has no text in that language, the component asks once more, for Sefaria's default translation, which isn't always English. It says so with a note such as `french is unavailable; showing english.` A fresh load makes one request, or two with a fallback.
+- **Preferred language** (`translation-language`) asks for the best edition in that language. If Sefaria reports no text in that language, the component asks once more for Sefaria's default translation. That translation isn't always English. The component adds a note such as `french is unavailable; showing english.` A fresh load makes one request, or two with a fallback.
 - **Exact edition** (`translation-version-title`, `primary-version-title`) asks for that title only and never falls back.
 
 The example asks for French on `Berakhot 2a:1`.
@@ -77,7 +77,7 @@ A short note takes the place of a side with no text, such as `No translation tex
 | Neither side has text | The notes for the missing sides | `empty` | No |
 | Invalid supplied `data` | An error message, with no fallback to a request | `error` | No |
 
-Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. When Sefaria can't be reached, `status` is `error` and the error event fires, whether or not text was already showing. The error event bubbles and crosses the component boundary, and `event.detail` holds `{ error, sref }`. It reports failed loading, not handled messages from Sefaria or invalid supplied data.
+Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. When Sefaria can't be reached, `status` is `error` and the error event fires, whether or not text was already showing. The error event bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. It reports failed loading, not handled messages from Sefaria or invalid supplied data.
 
 The example has a good reference, a text that isn't a reference, and an empty element. Choose **Show each status** to log each one's status.
 

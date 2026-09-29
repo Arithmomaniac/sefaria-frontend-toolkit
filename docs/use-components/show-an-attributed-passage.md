@@ -13,7 +13,7 @@ import sourceCardStates from "../../examples/site-snippets/source-card-states.ht
 
 # Show an attributed passage and let readers select it
 
-The Source Card, `<sefaria-source-card>`, shows a whole passage in one block: a heading, the text of each verse, and where the text came from. It is also the first component here that tells your page what a reader did, through the `sefaria-source-select` event.
+The Source Card, `<sefaria-source-card>`, shows a whole passage in one block: a heading, the text of each verse, and where the text came from. It is also the first component here that tells your page what a reader did. It does this through the `sefaria-source-select` event.
 
 ## What the card shows
 
@@ -29,17 +29,17 @@ The card takes the same text settings as Bilingual Segment: `translation-languag
 
 Attribution appears once for the whole card, not once per verse. It has one line for each edition shown, labeled `Primary text:` or `Translation:`, followed by the edition's title and language. For example, `Translation: THE JPS TANAKH: Gender-Sensitive Edition (english, en)`.
 
-Source Card is the component that links the edition title to the edition's source. It does that only when Sefaria gives a valid http(s) address, and the link opens in a new tab. Otherwise the title is plain text. The attribution doesn't show the license. For reuse rights, see [Choose what text readers see](/across-components/choose-what-text-readers-see.md).
+Source Card is the component that links the edition title to the edition's source. It does that only when Sefaria gives a valid http(s) address. The link opens in a new tab. Otherwise the title is plain text. The attribution doesn't show the license. For reuse rights, see [Choose what text readers see](/across-components/choose-what-text-readers-see.md).
 
-If you prefer a translation language and Sefaria reports it doesn't have that language for the passage, the card makes one more request for Sefaria's default translation, which isn't always English, and shows a note such as `french is unavailable; showing english.` An exact edition doesn't fall back. `hide-attributions` hides both the attribution lines and the fallback note.
+If Sefaria reports that your preferred translation language is missing for the passage, the card requests Sefaria's default translation once. That translation isn't always English. The card shows a note such as `french is unavailable; showing english.` An exact edition doesn't fall back. `hide-attributions` hides both the attribution lines and the fallback note.
 
 ## Let readers select a verse
 
-Add the `selectable` attribute. Each selectable verse gets a number button beside each text side that's shown, normally Hebrew and English. A side that's hidden or missing has no button. Each button's accessible name is `Show connections for Micah 6:7`, with the verse's own reference. Clicking the verse row works too. Keyboard users use the buttons with Tab and Enter or Space.
+Add the `selectable` attribute. Each selectable verse gets a number button beside each text side that's shown, normally Hebrew and English. A side that's hidden or missing has no button. Each button's accessible name is `Show connections for Micah 6:7`, with the verse's own reference. Clicking the verse row works too. Keyboard users press Tab to reach the buttons, then Enter or Space.
 
-A selection fires `sefaria-source-select`. It bubbles and crosses the component boundary, so you can listen on the card or on a parent. Its `event.detail` is `{ position, ref }`. For example, `{ position: [1], ref: "Micah 6:7" }`. `position` is a list of numbers that locates the verse in the passage, counting from 0. For a range such as Micah 6:6-8 it's one number, so `[1]` is the second verse.
+A selection fires `sefaria-source-select`. It bubbles and crosses the component boundary, so you can listen on the card or on a parent. Its `event.detail` is `{ position, ref }`, for example `{ position: [1], ref: "Micah 6:7" }`. `position` is a list of numbers that locates the verse in the passage, counting from 0. For a range such as Micah 6:6-8 it is one number, so `[1]` is the second verse.
 
-Your page controls the selection. The card doesn't highlight a verse by itself. To highlight it, set the card's `selectedPosition` property to `event.detail.position`. The verse's button then gets `aria-pressed="true"` and the verse gets an outline. Setting `selectedPosition` doesn't fire the event again. The event also works with supplied data, and makes no request.
+Your page controls the selection. The card does not highlight a verse by itself. To highlight it, set the card's `selectedPosition` property to `event.detail.position`. The verse's button then gets `aria-pressed="true"` and the verse gets an outline. Setting `selectedPosition` doesn't fire the event again. The event also works with supplied data and makes no request.
 
 The card adds selection buttons only when it can work out each verse's own reference. Some passages, such as ones that span chapters, still show but without selection buttons.
 
@@ -64,7 +64,7 @@ The card's `status` property is `empty`, `loading`, `ready`, or `error`. Here is
 | Sefaria says the text isn't a reference | Sefaria's message, such as `Could not find title in reference: Not a book 3.4` | `error` | No |
 | No `sref` and no `data` | Nothing | `empty` | No |
 
-Read `status` from the element in JavaScript. To react to a failed load, listen for `sefaria-source-card-error`. It bubbles and crosses the component boundary, and `event.detail` holds `{ error, sref }`. Invalid supplied `data` also shows an error and sets `status` to `error`. The card doesn't fall back to `sref` and doesn't send the event.
+Read `status` from the element in JavaScript. To react to a failed load, listen for `sefaria-source-card-error`. It bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. Invalid supplied `data` also shows an error and sets `status` to `error`. The card doesn't fall back to `sref` and doesn't send the event.
 
 The example has a good reference, a text that isn't a reference, and an empty card. Choose **Show each status** to log each one's status.
 
