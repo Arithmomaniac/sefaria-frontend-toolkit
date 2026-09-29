@@ -13,3 +13,10 @@ stub: true
 This page will show how to use the Reference Label component to display a readable citation or a link to Sefaria. It will also introduce the shared styling options.
 
 [Back to Home](/index.md)
+
+<script setup>
+import LiveEditor from "../../.vitepress/theme/LiveEditor.vue";
+import refLabel from "../../../examples/site-snippets/ref-label.html?raw";
+</script>
+
+<LiveEditor :code="refLabel" title="Reference Label" />

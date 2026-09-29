@@ -643,3 +643,8 @@ async function assertStatusNotes(page, label) {
     }
   }
 }
+
+// --- Stage 7 session 1: components pages and LiveEditor ---
+const { runSessionOneSiteChecks } = await import("./test-site-session-1.mjs");
+await runSessionOneSiteChecks({ root, siteBasePath });
+// --- end stage 7 session 1 ---

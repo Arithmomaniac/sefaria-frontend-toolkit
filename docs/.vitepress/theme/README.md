@@ -22,3 +22,27 @@ Every page-writing session follows these rules.
 
 - Link planned pages at their final routes. Give each unbuilt destination a stub with `stub: true`, a title, one or two sentences on what it will cover, a "Coming soon" note, and a link back to Home.
 - Add each stub to the `coming-soon stubs` list in `tests/documentation-site.test.ts`.
+
+## Live examples (`LiveEditor`)
+
+Use `LiveEditor` for every runnable component example on a how-to page. The code shown is the code that runs.
+
+- Keep each example in its own owner file under `examples/site-snippets/`, and import it with `?raw`. Don't paste example code into the page.
+
+  ```vue
+  <script setup>
+  import LiveEditor from "../../.vitepress/theme/LiveEditor.vue";
+  import refLabel from "../../../examples/site-snippets/ref-label.html?raw";
+  </script>
+
+  <LiveEditor :code="refLabel" title="Reference Label" />
+  ```
+
+  Adjust the relative paths to the page's depth. `lang` defaults to `html`.
+
+- The code appears read-only through `CodeBlock`. **Edit** turns it into a text area. The change runs only when the reader chooses **Run** or presses Ctrl+Enter. **Reset** restores the owner file.
+- Each example runs in its own `<iframe sandbox="allow-scripts" srcdoc>`. The frame has an opaque origin, so it can't read the page and the page's styles don't reach it. Its requests carry `Origin: null`. The toolkit script host and Sefaria both allow that.
+- The frame loads when it comes within 200px of the viewport, so an example at the top of a page loads on arrival and later examples load as the reader scrolls. Nothing is requested before then.
+- A one-line script appended after the example reports the frame's height to the page, so the frame fits its content.
+- The highlighter adds a line break after a closing tag that has text after it on the same line. Until that changes, keep text after a closing tag on its own line so the code shown matches the code that runs. The browser check fails if they differ.
+- Checks: `scripts/test-site-session-1.mjs` covers viewport loading, isolation, shown-equals-run, Edit, Run and Reset offline. Its live check proves that the script and Sefaria load from the sandboxed frame.

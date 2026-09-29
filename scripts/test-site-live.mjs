@@ -218,3 +218,8 @@ async function waitForRequestCount(requests, expected) {
     `timed out waiting for ${expected} requests; received ${requests.length}`,
   );
 }
+
+// --- Stage 7 session 1: components pages and LiveEditor ---
+const { runSessionOneLiveChecks } = await import("./test-site-session-1.mjs");
+await runSessionOneLiveChecks({ root, siteBasePath });
+// --- end stage 7 session 1 ---
