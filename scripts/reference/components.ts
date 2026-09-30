@@ -154,7 +154,7 @@ export async function renderComponentsReference(): Promise<string> {
   }
 
   const lines: string[] = [
-    `This page lists the attributes, properties, data, empty states, events, and style settings of the toolkit's ${declarations.length} elements. The generator builds it from the package's \`custom-elements.json\`.`,
+    `This page lists the attributes, properties, data, empty states, events, and style settings of the toolkit's ${["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"][declarations.length] ?? declarations.length} elements. The generator builds it from the package's \`custom-elements.json\`.`,
     "",
     'The elements are registered when you load the script tag or when you import the package root with `import "@arithmomaniac/sefaria-web-components";`. The element subpaths, such as `@arithmomaniac/sefaria-web-components/source-card`, don\'t register their element. They export types and a few helpers.',
     "",

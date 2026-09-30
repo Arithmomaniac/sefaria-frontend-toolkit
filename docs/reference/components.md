@@ -13,7 +13,7 @@ import ReleaseStamp from "./ReleaseStamp.vue";
 
 # Components reference
 
-This page lists the attributes, properties, data, empty states, events, and style settings of the toolkit's 5 elements. The generator builds it from the package's `custom-elements.json`.
+This page lists the attributes, properties, data, empty states, events, and style settings of the toolkit's five elements. The generator builds it from the package's `custom-elements.json`.
 
 The elements are registered when you load the script tag or when you import the package root with `import "@arithmomaniac/sefaria-web-components";`. The element subpaths, such as `@arithmomaniac/sefaria-web-components/source-card`, don't register their element. They export types and a few helpers.
 
@@ -21,7 +21,7 @@ The elements are registered when you load the script tag or when you import the 
 
 This page documents the code on the `main` branch, which `alpha` builds are published from. <ReleaseStamp />
 
-The `alpha` script-tag address serves the newest script release that is still active. The site doesn't compare it with the commit used to build this page, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can still include the removed Popup element. It can also lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
+The `alpha` script-tag address serves the newest script release that is still active. The site doesn't compare it with the commit used to build this page, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can still include the removed Popup and Reference Label elements. It can also lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
 
 ## Elements
 
