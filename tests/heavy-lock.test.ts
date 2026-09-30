@@ -35,10 +35,11 @@ it("recovers a stale machine-wide heavy-stage lock", async () => {
   });
 });
 
-it("does not remove a newly created lock before owner metadata appears", async () => {
+it("never reclaims a nonempty lock without owner metadata", async () => {
   const root = path.join(".artifacts", `heavy-lock-${crypto.randomUUID()}`);
   const lock = path.join(root, "lock");
   await mkdir(lock, { recursive: true });
+  await writeFile(path.join(lock, "unrecognized"), "");
   let waited = false;
 
   const pending = withHeavyStageLock(() => "ok", {
