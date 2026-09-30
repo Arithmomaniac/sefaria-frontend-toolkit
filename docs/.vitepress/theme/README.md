@@ -37,6 +37,13 @@ Data and text tool pages show every snippet with `<CodeLanguageToggle :snippet>`
 - Prefer our own Concepts or Reference page. Link to its final route, even if the page is only a "Coming soon" stub.
 - Link externally only for general web technology that we don't own, and then only to MDN or the relevant official documentation.
 
+## Shared guidance ("Applies to all components")
+
+- When a task page first introduces an idea that applies to every component, such as styling tokens, put the minimum a reader must not miss in a `::: tip Applies to all components` box. End the box with one link to the page that owns the full rules.
+- Keep the task narrative about the component on the page. Don't explain the shared rules in the narrative.
+- Later pages link to the owner page. They don't repeat the box.
+- Put rules for one component's attributes, which interrupt the narrative, in a `::: info` box with a short title, as bullets.
+
 ## Planned pages
 
 - Link planned pages at their final routes. Give each unbuilt destination a stub with `stub: true`, a title, one or two sentences on what it will cover, a "Coming soon" note, and a link back to Home.
@@ -63,6 +70,9 @@ Use `LiveEditor` for every runnable component example on a how-to page. The code
   ```
 
   Adjust the relative paths to the page's depth. `lang` defaults to `html`.
+
+- Describe what the example shows in the caption slot, not in the paragraph above: `<LiveEditor ...>The first segment asks for French.</LiveEditor>`. The caption appears in italics under the title. Use HTML (`<code>`, `<strong>`) inside it, not Markdown.
+- Code inside `<style>` and `<script>` blocks is coloured as CSS and JavaScript.
 
 - The code appears read-only through `CodeBlock`. **Edit** turns it into a text area. The change runs only when the reader chooses **Run** or presses Ctrl+Enter. **Reset** restores the owner file. Add `readonly` to run an example without Edit, Run, or Reset, for example when the page shows other versions of the same code that can't run here.
 - Each example runs in its own `<iframe sandbox="allow-scripts" srcdoc>`. The frame has an opaque origin, so it can't read the page and the page's styles don't reach it. Its requests carry `Origin: null`. The toolkit script host and Sefaria both allow that.

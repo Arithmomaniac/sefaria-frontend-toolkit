@@ -29,17 +29,17 @@ To try changes, choose Edit, change the code, and choose Run.
 
 ## Match your site's colors and fonts
 
-Set `--sefaria-*` CSS custom properties on `:root` or on any element that contains the segment. Common ones are `--sefaria-fg`, `--sefaria-surface` (the component background), `--sefaria-link`, `--sefaria-accent`, `--sefaria-font-hebrew`, `--sefaria-font-english`, and `--sefaria-font-scale` (a multiplier whose default is 1). The same properties style the other components.
-
-Your page's selectors can't reach inside the component. Style it through the `--sefaria-*` properties and the element's own box (`display`, `margin`). Inherited text settings such as `font-weight` can still pass in.
-
-Components other than the Reader are `display: block` by default.
-
-The default colors follow the reader's light or dark setting when your page declares `:root { color-scheme: light dark; }`. A containing element also works. `color-scheme: light` or `dark` forces one. Changing styles doesn't make a new request.
+Set `--sefaria-*` CSS custom properties, such as `--sefaria-fg` for text color and `--sefaria-font-scale` for size, on an element that contains the segment. Style the segment's own box, such as its padding and border, as you would any element.
 
 <LiveEditor :code="textSegmentStyling" title="Style a passage">A containing <code>div</code> sets a warm background, brown text, serif fonts, and a larger font scale. The element's own box gets padding, a rounded corner, and an accent border. Italic text passes in from the page.</LiveEditor>
 
-<span class="learn-more__label">Learn more:</span> [Match your site's look](/across-components/match-your-sites-look.md) · [Reference › Components](/reference/components.md) {.learn-more}
+::: tip Applies to all components
+
+- The same `--sefaria-*` properties style every component. Set them once on `:root` to style the whole page.
+- Your page's CSS selectors can't reach inside a component.
+- Changing styles doesn't load the text again.
+
+For every property, dark mode, and why selectors can't reach inside, see [Match your site's look](/across-components/match-your-sites-look.md). :::
 
 ## Choose which text to show
 

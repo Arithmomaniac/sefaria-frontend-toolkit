@@ -14,7 +14,7 @@ import theming from "../../examples/site-snippets/component-theming.html?raw";
 
 This page changes how components look, not which text appears. To change the text, see [Choose what text readers see](/across-components/choose-what-text-readers-see.md).
 
-[Show one passage](/use-components/show-text/show-one-passage.md#match-your-sites-colors-and-fonts) first introduced styling. This page gathers every setting.
+[Show one passage](/use-components/show-text/show-one-passage.md#match-your-sites-colors-and-fonts) introduces styling for one passage. This page gathers every setting.
 
 Every toolkit component reads the same set of CSS custom properties, called tokens, whose names start with `--sefaria-`. Set a token once and every component in scope picks it up. Tokens pass down to every component inside the element where you set them. Each component uses the tokens that apply to it. You need a page with at least one working component and access to your CSS.
 
