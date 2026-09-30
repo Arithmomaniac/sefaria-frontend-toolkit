@@ -43,7 +43,7 @@ Set these attributes on the element. Add them one at a time and choose Run to se
 | `vocalization-mode` | `taamim_and_nikkud`, `nikkud`, `none` | Hebrew marks on each side. `nikkud` removes cantillation. `none` also removes vowel points. Both remove a few other marks too. See [Change vowels and cantillation](/data-and-text-tools/clean-up-stored-sefaria-text.md#change-vowels-and-cantillation). | No |
 | `hide-attributions` | Absent (default), present | Hides the edition lines and the fallback note. The text stays. | No |
 
-For the styling settings that every component shares, see [Label a citation](/use-components/show-text/label-a-citation.md).
+For the styling settings that every component shares, see [Show one passage](/use-components/show-text/show-one-passage.md#match-your-sites-colors-and-fonts).
 
 The first element below reads side by side with the translation first, in an exact JPS 1917 edition, with vowel points but no cantillation. The second stacks the sides and asks for a French translation.
 

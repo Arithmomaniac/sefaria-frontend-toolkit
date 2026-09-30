@@ -36,7 +36,7 @@ The `alpha` script-tag address serves the newest script release that is still ac
 
 ## Reference Label
 
-`<sefaria-ref-label>`. Shows a Sefaria reference as a label, with its English and Hebrew names. [How to use it](/use-components/show-text/label-a-citation.md).
+`<sefaria-ref-label>`. Shows a Sefaria reference as a label, with its English and Hebrew names. [How to use it](/use-components/start-here.md).
 
 ### Attributes and properties
 
