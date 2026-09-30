@@ -18,18 +18,21 @@ This page puts the content choices for [Text Segment](/use-components/show-text/
 
 ## The choices at a glance
 
-A request is one call from the page to Sefaria. The first two rows change what is requested. The others only change how text that has already arrived is drawn.
+A request is one call from the page to Sefaria. Only the language and edition choices change what is requested. The other choices only change how text that has already arrived is drawn. A dash means the component has no such attribute. Reader also has attributes that aren't about text choice.
 
-| You want to… | Attribute | Requests |
-| --- | --- | --- |
-| Prefer a translation language | `translation-language` | A fresh load makes one request, or two with fallback |
-| Pin one exact edition | `primary-version-title`, `translation-version-title` (Text Segment: `version-language`, `version-title`) | A fresh load makes one request, or two if the other side's preferred translation language falls back. A pinned edition itself doesn't fall back. |
-| Change Hebrew vowel marks and cantillation | `vocalization-mode` | None. It redraws. |
-| Show one side or both | `content-language` | None. It redraws. |
-| Stack the sides or place them side by side | `layout`, `side-order` | None. It redraws. |
-| Hide Source Card's edition credit | `hide-attributions` | None. It redraws. |
+| You want to… | Text Segment | Bilingual Segment | Source Card | Reader |
+| --- | --- | --- | --- | --- |
+| Prefer a translation language | `translation-language` | `translation-language` | `translation-language` | `translation-language` |
+| Require one language family, with no fallback | `version-language` | — | — | — |
+| Pin an exact edition | `version-title`, which picks the primary edition alone, or the edition in the language set beside it | `primary-version-title`, `translation-version-title` | `primary-version-title`, `translation-version-title` | `primary-version-title`, `translation-version-title` |
+| Choose which sides show | — (one side) | `content-language` | `content-language` | `content-language` |
+| Arrange the sides | — | `layout`, `side-order` | `layout`, `side-order` | `layout`, `side-order` |
+| Change Hebrew vowel marks and cantillation | `vocalization-mode` | `vocalization-mode` | `vocalization-mode` | `vocalization-mode` |
+| Hide the edition credit | — | — | `hide-attributions` | `hide-attributions` |
 
-Bilingual Segment and Source Card request both sides even when they show one, so switching sides needs no new request. For a fresh load, Source Card makes one request for the whole card, or two when the translation falls back, however many verses it shows. Its verses make no requests of their own. Supplied data makes none.
+Source Card also has `selectable`. Every component takes `sref`.
+
+For the segments and Source Card, a fresh load makes one request, or two if a preferred translation language falls back. The Reader also loads the surrounding section and its links. A pinned edition itself doesn't fall back. Vocalization, sides, arrangement, and the edition credit make no request. They redraw. Bilingual Segment and Source Card request both sides even when they show one, so switching sides needs no new request. For a fresh load, Source Card makes one request for the whole card, or two when the translation falls back, however many verses it shows. Its verses make no requests of their own. Supplied data makes none.
 
 ## Choose a translation language
 
@@ -46,7 +49,18 @@ On Text Segment, `translation-language` and `version-language` are mutually excl
 
 ## When Sefaria doesn't have that language
 
-Not every text has every translation. Ask for `french` on `Berakhot 2a:1`. Sefaria's response warns that French is missing. Only then does the component make one more request for Sefaria's default translation. That translation isn't always English. Source Card shows a notice such as `french is unavailable; showing english.` Text Segment and Bilingual Segment show the fallback text without a notice. That is two requests for a fresh load.
+```mermaid
+flowchart TD
+  A["You set only translation-language"] --> B["One request"]
+  B --> C{"Does the response warn the language is missing?"}
+  C -->|No| D["Show that text. An empty edition stays empty."]
+  C -->|Yes| E["One more request for Sefaria's default translation"]
+  E --> F["Source Card and Reader show a notice"]
+  E --> G["Text Segment and Bilingual Segment show no notice"]
+  H["You set an exact title"] --> I["No fallback, ever"]
+```
+
+Not every text has every translation. Ask for `french` on `Berakhot 2a:1`. Sefaria's response warns that French is missing. Only then does the component make one more request for Sefaria's default translation. That translation isn't always English. Source Card and Reader show a notice such as `french is unavailable; showing english.` Text Segment and Bilingual Segment show the fallback text without a notice. That is two requests for a fresh load.
 
 The fallback applies only to a bare language preference. Exact edition titles never fall back. An edition that exists but is empty stays empty. In Bilingual Segment and Source Card, if you pin one side's edition but give only a preferred language for the translation, that translation can still fall back.
 
