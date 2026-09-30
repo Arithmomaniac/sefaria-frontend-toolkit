@@ -46,7 +46,7 @@ These styling rules apply to every toolkit component:
 | To get | Set | What happens |
 | --- | --- | --- |
 | The default edition | Nothing | Sefaria's primary edition. |
-| A translation in a language | `translation-language` | Your preferred translation language. If Sefaria has none, the segment falls back (see below). |
+| A translation in a language | `translation-language` | Your preferred translation language. If Sefaria has none, the segment shows a short notice (see below). |
 | A language family, strictly | `version-language` | Text in that language family only. There is no fallback, and it doesn't pin one edition. |
 | One exact edition | `version-title` | Alone, that title among the primary editions. With `version-language`, that title in that language. With `translation-language`, that title in your preferred translation language. |
 
@@ -62,11 +62,13 @@ These styling rules apply to every toolkit component:
 
 ## When the language isn't available
 
-If Sefaria reports that it has no text in your preferred `translation-language`, the segment asks once more for Sefaria's default translation. That translation isn't always English. The segment shows that translation without a note. [Source Card](/use-components/show-an-attributed-passage.md) tells readers about the change.
+If Sefaria reports that it has no text in your preferred `translation-language`, the segment shows a short status message, such as `No french text.`. Screen readers announce it. By default (`translation-fallback="none"`), the segment makes one request. Its `status` is `empty`, and there is no error or error event.
 
-<LiveEditor :code="textSegmentFallback" title="Fall back to the default translation">This asks for French on <code>Berakhot 2a:1</code>.</LiveEditor>
+To show Sefaria's default translation instead, set `translation-fallback="default"`. The segment makes one more request and shows that translation with no notice. That translation isn't always English. [Source Card](/use-components/show-an-attributed-passage.md) tells readers about the change.
 
-A fresh load makes one request, or two with a fallback. An exact edition, or a language that exists but has empty text, doesn't fall back.
+<LiveEditor :code="textSegmentFallback" title="No fallback, then the default translation">Both ask for French on <code>Berakhot 2a:1</code>. The first uses the default <code>none</code> and shows the notice. The second sets <code>translation-fallback="default"</code> and shows Sefaria's default translation.</LiveEditor>
+
+A fresh load makes one request. With `translation-fallback="default"` and a missing language, it makes two. An exact edition, or a language that exists but has empty text, doesn't fall back.
 
 ## Control vowel points and cantillation
 
@@ -87,6 +89,7 @@ A fresh load makes one request, or two with a fallback. An exact edition, or a l
 | Waiting for Sefaria | `Loading Micah 6:8.` | `loading` | No |
 | Sefaria can't be reached | On a first load, the error message as an alert. If the element already showed text, it keeps that text. | `error` | `sefaria-text-segment-error` |
 | Sefaria says the text isn't a reference | Sefaria's own message, such as `Could not find title in reference: Not a book 3.4` | `error` | No |
+| Sefaria has no text in your `translation-language` (default `translation-fallback="none"`) | A status message, such as `No french text.` | `empty` | No |
 | No `sref` and no `data` | Nothing | `empty` | No |
 
 Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. A text that isn't a reference gives `error`. When Sefaria can't be reached, `status` is `error` and the error event fires, whether or not text was already showing. The error event bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. Invalid supplied `data` shows an error without falling back to `sref` and sends no event.

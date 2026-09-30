@@ -35,11 +35,14 @@ flowchart TD
   Q2 -->|No| A3["translation-language"]
   A3 --> Q3("Is that language missing?")
   Q3 -->|No| A4["Show that translation"]
-  Q3 -->|Yes| A5["Load Sefaria's default translation"]
+  Q3 -->|Yes| Q4("Is the fallback on?")
+  Q4 -->|Yes| A5["Load Sefaria's default translation"]
+  Q4 -->|No| A6["Show 'No french text.'"]
 ```
 
 - **Language could be the original:** `version-language` can't be combined with `translation-language`.
 - **Preferred translation language:** After a fallback, Source Card and Reader show a notice, and the segments don't.
+- **Fallback off:** The element shows a status message and makes no second request.
 
 These choices change what the component requests.
 
@@ -64,6 +67,10 @@ These choices change what the component requests.
       <td colspan="3">—</td>
     </tr>
     <tr>
+      <th scope="row">Fall back when the language is missing</th>
+      <td colspan="4"><code>translation-fallback</code> (<code>default</code> or <code>none</code>). Text Segment and Bilingual Segment default to <code>none</code>. Source Card and Reader default to <code>default</code>.</td>
+    </tr>
+    <tr>
       <th scope="row">Pin an exact edition</th>
       <td><code>version-title</code> (see Pin an exact edition)</td>
       <td colspan="3"><code>primary-version-title</code>, <code>translation-version-title</code></td>
@@ -71,7 +78,7 @@ These choices change what the component requests.
   </tbody>
 </table>
 
-Every component takes `sref`. For the segments and Source Card, a fresh load makes one request, or two if a preferred translation language falls back. The Reader also loads the surrounding section and its links. A pinned edition doesn't fall back. Supplied data makes no request.
+Every component takes `sref`. For the segments and Source Card, a fresh load makes one request. It makes two if a preferred translation language is missing and ranslation-fallback is default. The Reader also loads the surrounding section and its links. A pinned edition doesn't fall back. Supplied data makes no request.
 
 ### Choose a translation language
 
@@ -79,9 +86,14 @@ The first choice is the language of the translation. Set `translation-language` 
 
 ### When Sefaria doesn't have that language
 
-The chart at the top of this group shows where the fallback happens.
+The chart at the top of this group shows where the fallback happens. Set it with `translation-fallback`, which is `default` or `none`.
 
-Not every text has every translation. Ask for `french` on `Berakhot 2a:1`. Sefaria's response warns that French is missing. Only then does the component make one more request for Sefaria's default translation. That translation isn't always English. Source Card and Reader show a notice such as `french is unavailable; showing english.` Text Segment and Bilingual Segment show the fallback text without a notice. That is two requests for a fresh load.
+Not every text has every translation. Ask for `french` on `Berakhot 2a:1`. Sefaria's response warns that French is missing. What happens next depends on the setting.
+
+- **`default`** is the default for Source Card and Reader. The component makes one more request for Sefaria's default translation. That translation isn't always English. Source Card and Reader show a notice such as `french is unavailable; showing english.` That is two requests for a fresh load.
+- **`none`** is the default for Text Segment and Bilingual Segment. The component makes exactly one request. It shows the status message "No french text." This isn't an error. Text Segment is `empty`. Bilingual Segment and Source Card show the primary side with status `ready`.
+
+Text Segment and Bilingual Segment show fallback text without a notice when you set `default`.
 
 The fallback applies only to a bare language preference. Exact edition titles never fall back. An edition that exists but is empty stays empty. In Bilingual Segment and Source Card, if you pin one side's edition but give only a preferred language for the translation, that translation can still fall back.
 
@@ -90,10 +102,7 @@ The fallback applies only to a bare language preference. Exact edition titles ne
 To avoid a fallback, pin an exact edition. An edition title is the name Sefaria gives one edition, for example `Bible du Rabbinat 1899 [fr]`. Primary means the edition Sefaria marks primary. That is usually, but not always, the Hebrew or original.
 
 - Bilingual Segment and Source Card: `primary-version-title` pins the primary edition. `translation-version-title` pins the translation.
-- Text Segment has three cases:
-  - `version-title` alone pins a primary edition by title. The default is the primary edition, not necessarily Hebrew.
-  - `version-title` with `version-language` pins that title in that language.
-  - `version-title` with `translation-language` requests that title in the preferred translation language.
+- Text Segment: `version-title` alone chooses another edition in the original language, such as a different Hebrew edition. To choose a translation by title, also set `translation-language`.
 
 On Text Segment, `translation-language` and `version-language` are mutually exclusive. Pick one. `version-language` alone shows any edition in that language family, including the original, with no fallback. It doesn't pin one edition.
 

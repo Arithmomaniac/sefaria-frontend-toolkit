@@ -23,15 +23,15 @@ Set `sref` to a reference such as `Micah 6:6-8`. The card shows:
 - The passage's primary edition and a translation for each verse. A range such as `Micah 6:6-8` shows each verse as its own item.
 - Attribution for the editions shown.
 
-The card takes the same text settings as Bilingual Segment: `translation-language`, `primary-version-title`, `translation-version-title`, `content-language`, `layout`, `side-order`, `vocalization-mode` and `hide-attributions`. They mean the same thing here. See [Show Hebrew and translation together](/use-components/show-text/hebrew-and-translation.md).
+The card takes the same text settings as Bilingual Segment: `translation-language`, `primary-version-title`, `translation-version-title`, `content-language`, `layout`, `side-order`, `vocalization-mode` and `hide-attributions`. It also takes `translation-fallback`, which is `default` or `none`. They mean the same thing here. See [Show Hebrew and translation together](/use-components/show-text/hebrew-and-translation.md).
 
 ## Read the attribution
 
-Attribution appears once for the whole card, not once per verse. It has one line for each edition shown, labeled `Primary text:` or `Translation:`, followed by the edition's title and language. For example, `Translation: THE JPS TANAKH: Gender-Sensitive Edition (english, en)`.
+Attribution appears once for the whole card, not once per verse. It has one line for each edition shown, labeled `Primary text:` or `Translation:`, followed by the edition's title and its language family name. For example, `Translation: THE JPS TANAKH: Gender-Sensitive Edition (english)`.
 
 Source Card is the component that links the edition title to the edition's source. It does that only when Sefaria gives a valid http(s) address. The link opens in a new tab. Otherwise the title is plain text. The attribution doesn't show the license. For reuse rights, see [Choose what text readers see](/across-components/choose-what-text-readers-see.md).
 
-If Sefaria reports that your preferred translation language is missing for the passage, the card requests Sefaria's default translation once. That translation isn't always English. The card shows a note such as `french is unavailable; showing english.` An exact edition doesn't fall back. `hide-attributions` hides both the attribution lines and the fallback note.
+If Sefaria reports that your preferred translation language is missing for the passage, the card requests Sefaria's default translation once. That translation isn't always English. The card shows a note such as `french is unavailable; showing english.` An exact edition doesn't fall back. To turn the fallback off, set `translation-fallback="none"`. The card then makes one request. The translation side shows `No french text.`, the primary side shows, and `status` is `ready` with no error. `hide-attributions` hides both the attribution lines and the fallback note.
 
 ## Let readers select a verse
 
@@ -51,7 +51,7 @@ The example selects verses in `Micah 6:6-8` and shows the last choice. To try ch
 
 ## How many requests it makes
 
-A fresh load makes one request for the whole card, or two when that fallback happens. The verses inside the card don't make their own requests, however many there are. With supplied data, the card makes none.
+A fresh load makes one request for the whole card, or two when that fallback happens. With `translation-fallback="none"`, it is always one. The verses inside the card don't make their own requests, however many there are. With supplied data, the card makes none.
 
 ## When there's nothing to show
 
