@@ -5,6 +5,7 @@ import path from "node:path";
 import { performance } from "node:perf_hooks";
 import process from "node:process";
 import { pathToFileURL } from "node:url";
+import { withHeavyStageLock } from "./heavy-lock.mjs";
 
 const stage = (name, ...args) => ({ name, args });
 
@@ -19,6 +20,16 @@ const SITE_ACCEPTANCE = stage(
   "Documentation site browser acceptance",
   "test:site",
 );
+export const HEAVY_STAGE_NAMES = new Set([
+  "Documentation site browser acceptance",
+  "Script source browser acceptance",
+  "Playground browser acceptance",
+  "Compatibility qualification",
+  "Tarball consumer",
+  "MCP Inspector stdio acceptance",
+  "MCP protocol and browser acceptance",
+  "TypeScript and browser tests",
+]);
 
 // Cheap and frequently failing stages run before the slow browser suites.
 // Tests read the assembled site, so the site bundle stage precedes them.
@@ -85,7 +96,9 @@ export async function runCheck({
   for (const stage of stages) {
     log(`\n▶ ${stage.name}`);
     const started = now();
-    const exitCode = await run(stage);
+    const exitCode = HEAVY_STAGE_NAMES.has(stage.name)
+      ? await withHeavyStageLock(() => run(stage))
+      : await run(stage);
     const elapsed = now() - started;
     results.push({ name: stage.name, elapsed, exitCode });
     log(
