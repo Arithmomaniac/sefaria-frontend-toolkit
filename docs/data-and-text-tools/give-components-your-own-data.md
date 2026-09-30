@@ -75,10 +75,9 @@ To set the shared default instead, call `configureSefariaAcquisition(choice)`. E
 
 With `capability` or `disabled`, the element never falls back to requesting Sefaria from the browser.
 
-A capability is an object with any of three async functions:
+A capability is an object with either or both of two async functions:
 
 - `getText(request, signal)`
-- `resolveReference(request, signal)`
 - `getLinks(request, signal)`
 
 Each receives its request object and an `AbortSignal`. Each returns `{ payload, status }`. Here `payload` is the corrected API response body, and `status` is its HTTP status. The component validates the payload itself.
@@ -93,6 +92,6 @@ The MCP App example is an app shown inside an AI chat. It passes `createMcpReade
 
 `getText` calls the MCP server tool `get_text`. `getLinks` calls `get_links_between_texts`. Both go through `host.callServerTool` and pass the signal along, so the host learns when work is cancelled. The code checks each tool result with `admitSourceResponse` or `admitConnectionsResponse` before returning it.
 
-This capability supports only the Reader's default selectors, the primary edition plus the translation, and it throws for others. It has no `resolveReference`. A Reader seeded in this example continues through the host tool and makes no direct browser requests to Sefaria. See [Reader inside AI chat](/examples/reader-inside-ai-chat.md).
+This capability supports only the Reader's default selectors, the primary edition plus the translation, and it throws for others. It provides both functions. A Reader seeded in this example continues through the host tool and makes no direct browser requests to Sefaria. See [Reader inside AI chat](/examples/reader-inside-ai-chat.md).
 
 <span class="learn-more__label">Learn more:</span> [How the toolkit works](/concepts/how-the-toolkit-works.md) · [Client reference](/reference/client.md) {.learn-more}
