@@ -74,40 +74,6 @@ async function removeStaleLock({
   initializationGraceMilliseconds,
   now,
 }) {
-  const recoveryLockDirectory = `${lockDirectory}.recovery`;
-  try {
-    await mkdir(recoveryLockDirectory);
-  } catch (error) {
-    if (error?.code !== "EEXIST") throw error;
-    const recoveryInfo = await stat(recoveryLockDirectory).catch(
-      () => undefined,
-    );
-    if (recoveryInfo && now() - recoveryInfo.mtimeMs > staleAfterMilliseconds) {
-      await rm(recoveryLockDirectory, { recursive: true, force: true });
-    }
-    return false;
-  }
-
-  try {
-    return await removeStaleLockWithRecoveryOwnership({
-      lockDirectory,
-      processAlive,
-      staleAfterMilliseconds,
-      initializationGraceMilliseconds,
-      now,
-    });
-  } finally {
-    await rm(recoveryLockDirectory, { recursive: true, force: true });
-  }
-}
-
-async function removeStaleLockWithRecoveryOwnership({
-  lockDirectory,
-  processAlive,
-  staleAfterMilliseconds,
-  initializationGraceMilliseconds,
-  now,
-}) {
   const owner = await readOwner(lockDirectory);
   const info = await stat(lockDirectory).catch(() => undefined);
   const directoryAge = info === undefined ? 0 : now() - info.mtimeMs;
@@ -122,30 +88,27 @@ async function removeStaleLockWithRecoveryOwnership({
       !processAlive(owner.pid)) ||
     !processAlive(owner.pid)
   ) {
-    const currentOwner = await readOwner(lockDirectory);
-    if (!sameOwner(currentOwner, owner)) return false;
-    const trashDirectory = `${lockDirectory}.stale-${process.pid}-${randomUUID()}`;
-    try {
-      await rename(lockDirectory, trashDirectory);
-    } catch (error) {
-      if (error?.code === "ENOENT") return true;
-      if (error?.code !== "EPERM") throw error;
-      if (!sameOwner(await readOwner(lockDirectory), owner)) return false;
-      await rm(lockDirectory, { recursive: true, force: true });
-      return true;
-    }
-    await rm(trashDirectory, { recursive: true, force: true });
-    return true;
+    if (info === undefined) return true;
+    const generation =
+      typeof owner?.token === "string"
+        ? owner.token
+        : `unowned-${info.birthtimeMs}-${info.ino}`;
+    return retireLock(lockDirectory, generation);
   }
   return false;
 }
 
-function sameOwner(left, right) {
-  return (
-    left?.pid === right?.pid &&
-    left?.token === right?.token &&
-    left?.createdAt === right?.createdAt
-  );
+// The stale generation's tombstone is kept: a later waiter holding the same
+// stale observation cannot rename a successor lock onto an existing target.
+export async function retireLock(lockDirectory, generation) {
+  const tombstone = `${lockDirectory}.retired-${generation.replace(/[^\w.-]/g, "_")}`;
+  try {
+    await rename(lockDirectory, tombstone);
+    return true;
+  } catch (error) {
+    if (error?.code === "ENOENT") return true;
+    return false;
+  }
 }
 
 async function readOwner(lockDirectory) {

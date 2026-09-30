@@ -3,7 +3,11 @@ import path from "node:path";
 
 import { expect, it } from "vitest";
 
-import { isProcessAlive, withHeavyStageLock } from "../scripts/heavy-lock.mjs";
+import {
+  isProcessAlive,
+  retireLock,
+  withHeavyStageLock,
+} from "../scripts/heavy-lock.mjs";
 
 it("recovers a stale machine-wide heavy-stage lock", async () => {
   const root = path.join(".artifacts", `heavy-lock-${crypto.randomUUID()}`);
@@ -107,4 +111,23 @@ it("treats EPERM from process probing as an alive process", () => {
   } finally {
     process.kill = originalKill;
   }
+});
+
+it("cannot retire a successor lock after another waiter already retired the stale owner", async () => {
+  const root = path.join(".artifacts", `heavy-lock-${crypto.randomUUID()}`);
+  const lock = path.join(root, "lock");
+  await mkdir(`${lock}.retired-stale`, { recursive: true });
+  await writeFile(path.join(`${lock}.retired-stale`, "owner.json"), "{}");
+  await mkdir(lock, { recursive: true });
+  const live = JSON.stringify({
+    pid: process.pid,
+    token: "live",
+    createdAt: 1,
+  });
+  await writeFile(path.join(lock, "owner.json"), live);
+
+  await expect(retireLock(lock, "stale")).resolves.toBe(false);
+  await expect(readFile(path.join(lock, "owner.json"), "utf8")).resolves.toBe(
+    live,
+  );
 });
