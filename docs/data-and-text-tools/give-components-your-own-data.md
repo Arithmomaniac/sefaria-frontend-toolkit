@@ -30,7 +30,7 @@ Then set `data` on the element. The example sets it even when the check fails, s
 
 The Source Card expects the texts API response, because that is the request it would have made. The [Components reference](/reference/components.md) lists the shape each element expects.
 
-Five elements treat valid `data` as authoritative and make no requests:
+Four elements treat valid `data` as authoritative and make no requests:
 
 - Text Segment (`sefaria-text-segment`)
 - Bilingual Segment (`sefaria-bilingual-segment`)
