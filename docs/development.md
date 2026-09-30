@@ -108,6 +108,8 @@ pnpm build:site
 pnpm preview:site
 ```
 
+For documentation-site iteration, `pnpm check:site:fast` is an inner-loop shortcut. It formats and lints changed files, runs the documentation-site Vitest coverage that matches changed pages, and runs API-reference freshness or prose checks only when their inputs changed. Pass `--all` to select the complete fast loop, and expect it to fall back to that same broad selection when Git cannot determine the changed paths. This command is not final proof: `pnpm check:site` and especially `pnpm check` remain the acceptance gates before review.
+
 Run the focused editor qualification:
 
 ```powershell

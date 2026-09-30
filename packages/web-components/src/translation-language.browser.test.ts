@@ -64,10 +64,29 @@ for (const Constructor of [
     document.body.append(element);
     await vi.waitFor(() => expect(element.status).toBe("ready"));
     expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(element.shadowRoot?.textContent).toContain(
-      "Bible du Rabbinat 1899 [fr]",
-    );
-    expect(element.shadowRoot?.textContent).toContain("french");
+    if (Constructor === SefariaSourceCard) {
+      expect(element.shadowRoot?.textContent).toContain(
+        "Bible du Rabbinat 1899 [fr]",
+      );
+      expect(element.shadowRoot?.textContent).toContain("french");
+    } else {
+      const leaves =
+        Constructor === SefariaTextSegment
+          ? [element]
+          : [...element.shadowRoot!.querySelectorAll("sefaria-text-segment")];
+      expect(
+        leaves.some((leaf) =>
+          leaf.shadowRoot?.textContent?.includes(
+            "Homme, on t\u2019a dit ce qui est bien",
+          ),
+        ),
+      ).toBe(true);
+      expect(
+        leaves.every(
+          (leaf) => leaf.shadowRoot?.querySelector(".attribution") == null,
+        ),
+      ).toBe(true);
+    }
     const input = fetchMock.mock.calls[0]![0];
     const url = new URL(input instanceof Request ? input.url : String(input));
     expect(url.searchParams.getAll("version")).toEqual(
@@ -110,7 +129,16 @@ for (const Constructor of [
             ["primary", "translation"],
           ],
     );
-    expect(element.shadowRoot?.textContent).toMatch(/french is\s+unavailable/u);
+    if (Constructor === SefariaSourceCard) {
+      expect(element.shadowRoot?.textContent).toMatch(
+        /french is\s+unavailable/u,
+      );
+    } else {
+      expect(element.shadowRoot?.textContent).not.toMatch(
+        /french is\s+unavailable/u,
+      );
+      expect(element.shadowRoot?.querySelector(".attribution")).toBeNull();
+    }
     const supplied = new Constructor();
     supplied.translationLanguage = "french";
     supplied.data = captured("berakhotDefault");
@@ -189,7 +217,11 @@ for (const Constructor of [
     expect(getPreparedState(element)).toEqual(committed);
   });
 
-  test(`${Constructor.name} shows the actual language and can hide attribution without I/O`, async () => {
+  test(`${Constructor.name} shows the actual language${
+    Constructor === SefariaSourceCard
+      ? " and can hide attribution without I/O"
+      : ""
+  }`, async () => {
     const getText = vi.fn(async () => ({
       payload: captured("micahFrench"),
       status: 200,
@@ -209,9 +241,15 @@ for (const Constructor of [
         leaf.shadowRoot?.querySelector('article[lang="fr"]'),
       ),
     ).toBe(true);
-    element.hideAttributions = true;
-    await element.updateComplete;
-    expect(element.shadowRoot?.querySelector(".attribution")).toBeNull();
+    if (Constructor === SefariaSourceCard) {
+      (element as InstanceType<typeof SefariaSourceCard>).hideAttributions =
+        true;
+      await element.updateComplete;
+      expect(element.shadowRoot?.querySelector(".attribution")).toBeNull();
+    } else {
+      expect("hideAttributions" in element).toBe(false);
+      expect(element.shadowRoot?.querySelector(".attribution")).toBeNull();
+    }
     expect(getText).toHaveBeenCalledTimes(1);
   });
 }

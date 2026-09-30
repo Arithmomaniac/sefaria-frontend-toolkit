@@ -49,7 +49,6 @@ export class SefariaTextSegment extends SefariaElement {
       attribute: "translation-language",
       converter: optionalStringConverter,
     },
-    hideAttributions: { type: Boolean, attribute: "hide-attributions" },
     versionLanguage: {
       type: String,
       attribute: "version-language",
@@ -140,9 +139,13 @@ export class SefariaTextSegment extends SefariaElement {
   declare versionTitle: string | undefined;
   /** Preferred translation language. Can't be combined with `versionLanguage`. */
   declare translationLanguage: string | undefined;
+<<<<<<< HEAD
   /** Hides the edition attribution. */
   declare hideAttributions: boolean;
   /** How much Hebrew vowel and cantillation marking to keep. `none` removes both. */
+=======
+  /** Hebrew vocalization preset applied only to the displayed safe text. */
+>>>>>>> origin/main
   declare vocalizationMode: VocalizationMode;
 
   #displayViewModel: TextSegmentDataViewModel | undefined;
@@ -171,7 +174,6 @@ export class SefariaTextSegment extends SefariaElement {
     this.versionLanguage = undefined;
     this.versionTitle = undefined;
     this.translationLanguage = undefined;
-    this.hideAttributions = false;
     this.vocalizationMode = "taamim_and_nikkud";
   }
 
@@ -287,28 +289,6 @@ export class SefariaTextSegment extends SefariaElement {
             : nothing
         }
       </article>
-      ${
-        this.hideAttributions || viewModel.edition === undefined
-          ? nothing
-          : html`
-              <p class="attribution">
-                ${viewModel.edition.versionTitle}
-                (${viewModel.edition.languageFamilyName},
-                ${viewModel.edition.actualLanguage})
-              </p>
-              ${
-                viewModel.unavailableTranslationLanguage === undefined
-                  ? nothing
-                  : html`
-                      <p class="translation-fallback" role="status">
-                        ${viewModel.unavailableTranslationLanguage} is
-                        unavailable; showing
-                        ${viewModel.edition.languageFamilyName}.
-                      </p>
-                    `
-              }
-            `
-      }
     `;
   }
 

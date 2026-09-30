@@ -53,7 +53,6 @@ export class SefariaBilingualSegment extends SefariaElement {
       attribute: "translation-language",
       converter: optionalStringConverter,
     },
-    hideAttributions: { type: Boolean, attribute: "hide-attributions" },
     primaryVersionTitle: {
       type: String,
       attribute: "primary-version-title",
@@ -107,8 +106,11 @@ export class SefariaBilingualSegment extends SefariaElement {
   declare translationVersionTitle: string | undefined;
   /** Preferred translation language. Without one in that language, the element uses Sefaria's default translation. */
   declare translationLanguage: string | undefined;
+<<<<<<< HEAD
   /** Hides the edition attribution shown with the text. */
   declare hideAttributions: boolean;
+=======
+>>>>>>> origin/main
 
   /** Which text to show: `primary`, `translation` or `both`. */
   declare contentLanguage: BilingualSegmentContentLanguage;
@@ -144,7 +146,6 @@ export class SefariaBilingualSegment extends SefariaElement {
     this.primaryVersionTitle = undefined;
     this.translationVersionTitle = undefined;
     this.translationLanguage = undefined;
-    this.hideAttributions = false;
     this.contentLanguage = "both";
     this.layout = "auto";
     this.sideOrder = "primary-first";
@@ -215,41 +216,8 @@ export class SefariaBilingualSegment extends SefariaElement {
           layout: this.layout,
           sideOrder: this.sideOrder,
           vocalizationMode: this.vocalizationMode,
-        })}${this.#attributions(viewModel)}`;
+        })}`;
     }
-  }
-
-  #attributions(
-    view: Exclude<BilingualSegmentViewModel, { state: "loading" | "error" }>,
-  ) {
-    if (this.hideAttributions || view.state === "empty") return nothing;
-    const sides =
-      view.state === "data"
-        ? [
-            { side: "primary", view: view.primary },
-            { side: "translation", view: view.translation },
-          ]
-        : [view.present];
-    return html`<section class="attributions" aria-label="Text editions">
-      ${sides
-        .filter(
-          ({ side }) =>
-            this.contentLanguage === "both" || this.contentLanguage === side,
-        )
-        .map(({ view: data }) => {
-          if (data.edition === undefined) return nothing;
-          const fallback =
-            data.unavailableTranslationLanguage === undefined
-              ? nothing
-              : html`<p class="translation-fallback" role="status">
-                  ${`${data.unavailableTranslationLanguage} is unavailable; showing ${data.edition.languageFamilyName}.`}
-                </p>`;
-          return html`<p class="attribution">
-              ${`${data.edition.versionTitle} (${data.edition.languageFamilyName}, ${data.edition.actualLanguage})`}
-            </p>
-            ${fallback}`;
-        })}
-    </section>`;
   }
 
   #reconcile(): void {

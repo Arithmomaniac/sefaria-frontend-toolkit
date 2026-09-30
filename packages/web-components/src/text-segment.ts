@@ -109,13 +109,6 @@ export interface TextSegmentDataViewModel {
   readonly bodyHtml: string;
   /** Ordered static footnotes referenced by body placeholders. */
   readonly notes: readonly NormalizedFootnote[];
-  /** Captured edition identity for standalone attribution. */
-  readonly edition?: Pick<
-    TextSegmentVersionMetadata,
-    "versionTitle" | "languageFamilyName" | "actualLanguage"
-  >;
-  /** Unavailable preferred family when this view displays a default translation. */
-  readonly unavailableTranslationLanguage?: string;
 }
 
 /** Read-only metadata for the edition currently displayed by the element. */
@@ -282,10 +275,7 @@ export function createTextSegmentViewModel(
     const selected = candidates[0];
     if (selected === undefined)
       return createEmptyViewModel(payload, "No translation text is available.");
-    const projected = projectTextSegmentVersion(payload, selected, context);
-    return projected.state === "data" && preferred === undefined
-      ? { ...projected, unavailableTranslationLanguage: family }
-      : projected;
+    return projectTextSegmentVersion(payload, selected, context);
   }
   const language = request.version.language.trim().toLocaleLowerCase("en-US");
   const matches = payload.versions.filter(
@@ -373,11 +363,6 @@ export function projectTextSegmentValue(
     direction: version.direction,
     bodyHtml: normalized.bodyHtml,
     notes: normalized.notes,
-    edition: {
-      versionTitle: version.versionTitle,
-      languageFamilyName: version.languageFamilyName,
-      actualLanguage: version.actualLanguage,
-    },
   };
 }
 

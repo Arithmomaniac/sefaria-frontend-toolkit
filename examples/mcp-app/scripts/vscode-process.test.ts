@@ -61,7 +61,7 @@ public static class StartupProbe {
 $si = New-Object StartupProbe+SI
 $si.cb = [Runtime.InteropServices.Marshal]::SizeOf($si)
 [StartupProbe]::GetStartupInfo([ref]$si)
-$child = Start-Process -FilePath "$env:SystemRoot\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -ArgumentList "-NoProfile","-Command","Start-Sleep -Seconds 120" -PassThru
+$child = Start-Process -WindowStyle Hidden -FilePath "$env:SystemRoot\\System32\\WindowsPowerShell\\v1.0\\powershell.exe" -ArgumentList "-NoProfile","-Command","Start-Sleep -Seconds 120" -PassThru
 @{ pid=$PID; childPid=$child.Id; args=@($One,$Two,$Three); marker=$env:VSCODE_PARITY_MARKER; startupFlags=$si.flags; showWindow=$si.show } |
   ConvertTo-Json -Compress |
   Set-Content -Encoding UTF8 -LiteralPath $Output

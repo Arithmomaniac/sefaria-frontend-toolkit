@@ -194,7 +194,7 @@ describe("projectTextSegmentVersion", () => {
   });
 
   describe("projectTextSegmentValue", () => {
-    it("projects one resolved leaf with the selected version metadata", () => {
+    it("projects one resolved leaf without segment-owned edition metadata", () => {
       const payload = sourcePayload();
       const version = englishVersion({
         versionTitle: "Resolved range translation",
@@ -210,11 +210,6 @@ describe("projectTextSegmentVersion", () => {
         direction: "ltr",
         bodyHtml: "Second.",
         notes: [],
-        edition: {
-          versionTitle: "Resolved range translation",
-          languageFamilyName: "english",
-          actualLanguage: "en",
-        },
       });
     });
 
@@ -284,11 +279,6 @@ describe("createTextSegmentViewModel", () => {
       direction: "rtl",
       bodyHtml: "In the beginning.",
       notes: [],
-      edition: {
-        versionTitle: "Example English",
-        languageFamilyName: "english",
-        actualLanguage: "en",
-      },
     });
   });
 
@@ -319,11 +309,6 @@ describe("createTextSegmentViewModel", () => {
         language: "he",
         actualLanguage: "he",
         direction: "rtl",
-        edition: {
-          versionTitle: "Explicit source-backed compatibility composition",
-          languageFamilyName: "hebrew",
-          actualLanguage: "he",
-        },
         bodyHtml:
           '<span data-sefaria-mam="trivial-variant">שְׁעָרָ֗ו</span> — When God began to create<span data-sefaria-note="0"></span> heaven',
         notes: [

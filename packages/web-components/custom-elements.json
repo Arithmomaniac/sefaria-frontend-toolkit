@@ -78,13 +78,9 @@
             {
               "kind": "field",
               "name": "hideAttributions",
-              "privacy": "public",
               "type": {
                 "text": "boolean"
-              },
-              "description": "Hides the edition attribution shown with the text.",
-              "default": "false",
-              "attribute": "hide-attributions"
+              }
             },
             {
               "kind": "field",
@@ -93,7 +89,6 @@
               "type": {
                 "text": "BilingualSegmentContentLanguage"
               },
-              "description": "Which text to show: `primary`, `translation` or `both`.",
               "default": "\"both\"",
               "attribute": "content-language"
             },
@@ -169,15 +164,6 @@
               "fieldName": "translationLanguage"
             },
             {
-              "name": "hide-attributions",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Hides the edition attribution shown with the text.",
-              "default": "false",
-              "fieldName": "hideAttributions"
-            },
-            {
               "name": "primary-version-title",
               "type": {
                 "text": "string | undefined"
@@ -200,7 +186,6 @@
               "type": {
                 "text": "BilingualSegmentContentLanguage"
               },
-              "description": "Which text to show: `primary`, `translation` or `both`.",
               "default": "\"both\"",
               "fieldName": "contentLanguage"
             },
@@ -1706,13 +1691,9 @@
             {
               "kind": "field",
               "name": "hideAttributions",
-              "privacy": "public",
               "type": {
                 "text": "boolean"
-              },
-              "description": "Hides the edition attribution.",
-              "default": "false",
-              "attribute": "hide-attributions"
+              }
             },
             {
               "kind": "field",
@@ -1771,15 +1752,6 @@
               "description": "Preferred translation language. Can't be combined with `versionLanguage`.",
               "default": "undefined",
               "fieldName": "translationLanguage"
-            },
-            {
-              "name": "hide-attributions",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Hides the edition attribution.",
-              "default": "false",
-              "fieldName": "hideAttributions"
             },
             {
               "name": "version-language",
