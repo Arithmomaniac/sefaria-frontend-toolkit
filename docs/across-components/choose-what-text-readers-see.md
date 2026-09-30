@@ -29,16 +29,16 @@ A request is one call from the page to Sefaria. A dash in the tables means the c
 
 ```mermaid
 flowchart TD
-  Q1{"Need one exact edition?"} -->|Yes| A1["Set its title"] --> A1b["Never falls back"]
-  Q1 -->|No| Q2{"Text Segment, any edition in one language?"}
-  Q2 -->|Yes| A2["version-language<br/>No fallback"]
+  Q1("Need one exact edition?") -->|Yes| A1["Set its title. It never falls back."]
+  Q1 -->|No| Q2("Text Segment only: could the language be the original, such as Hebrew?")
+  Q2 -->|Yes| A2["version-language (never falls back)"]
   Q2 -->|No| A3["translation-language"]
-  A3 --> Q3{"Language missing?"}
-  Q3 -->|No| A4["Show that text"]
+  A3 --> Q3("Is that language missing?")
+  Q3 -->|No| A4["Show that translation"]
   Q3 -->|Yes| A5["Load Sefaria's default translation"]
 ```
 
-- **Any edition in one language:** `version-language` can't be combined with `translation-language`.
+- **Language could be the original:** `version-language` can't be combined with `translation-language`.
 - **Preferred translation language:** After a fallback, Source Card and Reader show a notice, and the segments don't.
 
 These choices change what the component requests.

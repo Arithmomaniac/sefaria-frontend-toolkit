@@ -11,7 +11,7 @@ The easiest way to see how the toolkit fits together is to follow one tag from y
 
 ```mermaid
 flowchart TD
-  A["You add a tag"] --> B{"Data supplied?"}
+  A["You add a tag"] --> B("Data supplied?")
   B -->|"yes"| PREP["Prepare text"]
   B -->|"no"| LOAD["Load by sref"]
   LOAD --> PREP
