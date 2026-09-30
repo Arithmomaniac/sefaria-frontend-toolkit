@@ -29,7 +29,7 @@ A request is one call from the page to Sefaria. The first two rows change what i
 | Change Hebrew vowel marks and cantillation | `vocalization-mode` | None. It redraws. |
 | Show one side or both | `content-language` | None. It redraws. |
 | Stack the sides or place them side by side | `layout`, `side-order` | None. It redraws. |
-| Hide the edition credit | `hide-attributions` | None. It redraws. |
+| Hide Source Card's edition credit | `hide-attributions` | None. It redraws. |
 
 Bilingual Segment and Source Card request both sides even when they show one, so switching sides needs no new request. For a fresh load, Source Card makes one request for the whole card, or two when the translation falls back, however many verses it shows. Its verses make no requests of their own. Supplied data makes none.
 
@@ -48,7 +48,7 @@ On Text Segment, `translation-language` and `version-language` are mutually excl
 
 ## When Sefaria doesn't have that language
 
-Not every text has every translation. Ask for `french` on `Berakhot 2a:1`. Sefaria's response warns that French is missing. Only then does the component make one more request for Sefaria's default translation. That translation isn't always English. The component shows a notice such as `french is unavailable; showing english.` That is two requests for a fresh load.
+Not every text has every translation. Ask for `french` on `Berakhot 2a:1`. Sefaria's response warns that French is missing. Only then does the component make one more request for Sefaria's default translation. That translation isn't always English. Source Card shows a notice such as `french is unavailable; showing english.` Text Segment and Bilingual Segment show the fallback text without a notice. That is two requests for a fresh load.
 
 The fallback applies only to a bare language preference. Exact edition titles never fall back. An edition that exists but is empty stays empty. In Bilingual Segment and Source Card, if you pin one side's edition but give only a preferred language for the translation, that translation can still fall back.
 
@@ -76,9 +76,9 @@ Two columns appear only when both sides show. `side-order` changes the visual or
 
 ## See which edition readers are shown
 
-Text Segment and Bilingual Segment show the edition title and language, with no link. The language appears as both the family and the actual language. Source Card also links the edition title to its source, but only when Sefaria gives a valid http(s) address. None of them shows the license.
+Only Source Card names the edition. It shows each edition's title and language, and links the title to its source when Sefaria gives a valid http(s) address. It doesn't show the license. Text Segment and Bilingual Segment show only the text.
 
-`hide-attributions` hides the attribution and the fallback note. It makes no request.
+On Source Card, `hide-attributions` hides the credit and the fallback notice. It makes no request.
 
 Generated client types include an optional `license` field in an edition's version metadata, but the components don't display it. Before you republish an edition, check its reuse rights. Look up its license, for example in the edition's details on Sefaria. This isn't legal advice.
 

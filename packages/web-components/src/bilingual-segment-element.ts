@@ -106,11 +106,6 @@ export class SefariaBilingualSegment extends SefariaElement {
   declare translationVersionTitle: string | undefined;
   /** Preferred translation language. Without one in that language, the element uses Sefaria's default translation. */
   declare translationLanguage: string | undefined;
-<<<<<<< HEAD
-  /** Hides the edition attribution shown with the text. */
-  declare hideAttributions: boolean;
-=======
->>>>>>> origin/main
 
   /** Which text to show: `primary`, `translation` or `both`. */
   declare contentLanguage: BilingualSegmentContentLanguage;

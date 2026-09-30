@@ -41,7 +41,6 @@ Set these attributes on the element. Add them one at a time and choose Run to se
 | `primary-version-title` | An exact edition title | The exact primary edition. It never falls back. | Yes |
 | `translation-version-title` | An exact edition title | The exact translation edition. It never falls back. | Yes |
 | `vocalization-mode` | `taamim_and_nikkud`, `nikkud`, `none` | Hebrew marks on each side. `nikkud` removes cantillation. `none` also removes vowel points. Both remove a few other marks too. See [Change vowels and cantillation](/data-and-text-tools/clean-up-stored-sefaria-text.md#change-vowels-and-cantillation). | No |
-| `hide-attributions` | Absent (default), present | Hides the edition lines and the fallback note. The text stays. | No |
 
 For the styling settings that every component shares, see [Show one passage](/use-components/show-text/show-one-passage.md#match-your-sites-colors-and-fonts).
 
@@ -55,7 +54,7 @@ The first element below reads side by side with the translation first, in an exa
 
 The two ways of choosing a translation behave differently:
 
-- **Preferred language** (`translation-language`) asks for the best edition in that language. If Sefaria reports no text in that language, the component asks once more for Sefaria's default translation. That translation isn't always English. The component adds a note such as `french is unavailable; showing english.` A fresh load makes one request, or two with a fallback.
+- **Preferred language** (`translation-language`) asks for the best edition in that language. If Sefaria reports no text in that language, the component asks once more for Sefaria's default translation. That translation isn't always English. It doesn't add a note. [Source Card](/use-components/show-an-attributed-passage.md) does. A fresh load makes one request, or two with a fallback.
 - **Exact edition** (`translation-version-title`, `primary-version-title`) asks for that title only and never falls back.
 
 The example asks for French on `Berakhot 2a:1`.

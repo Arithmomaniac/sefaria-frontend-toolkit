@@ -49,7 +49,6 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | `versionLanguage` | `version-language` | `string \| undefined` | `undefined` | Language of the edition to show, instead of the primary edition. |
 | `versionTitle` | `version-title` | `string \| undefined` | `undefined` | Exact title of the edition to show, used together with `versionLanguage`. |
 | `translationLanguage` | `translation-language` | `string \| undefined` | `undefined` | Preferred translation language. Can't be combined with `versionLanguage`. |
-| `hideAttributions` | — | `boolean` | — |  |
 | `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep. `none` removes both. |
 | `selectedVersion` | — | `TextSegmentSelectedVersionInfo \| undefined` | — | Details of the edition currently shown. |
 | `status` | — | `SefariaElementStatus` | — | Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
@@ -84,8 +83,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | `primaryVersionTitle` | `primary-version-title` | `string \| undefined` | `undefined` | Exact title of the edition to show as the primary text. |
 | `translationVersionTitle` | `translation-version-title` | `string \| undefined` | `undefined` | Exact title of the edition to show as the translation. |
 | `translationLanguage` | `translation-language` | `string \| undefined` | `undefined` | Preferred translation language. Without one in that language, the element uses Sefaria's default translation. |
-| `hideAttributions` | — | `boolean` | — |  |
-| `contentLanguage` | `content-language` | `BilingualSegmentContentLanguage` | `"both"` |  |
+| `contentLanguage` | `content-language` | `BilingualSegmentContentLanguage` | `"both"` | Which text to show: `primary`, `translation` or `both`. |
 | `layout` | `layout` | `BilingualSegmentLayout` | `"auto"` | How the two texts are arranged: `auto`, `stacked` or `side-by-side`. |
 | `sideOrder` | `side-order` | `BilingualSegmentSideOrder` | `"primary-first"` | Which text comes first side by side: `primary-first` or `translation-first`. |
 | `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep. `none` removes both. |

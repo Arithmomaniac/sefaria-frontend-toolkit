@@ -77,18 +77,12 @@
             },
             {
               "kind": "field",
-              "name": "hideAttributions",
-              "type": {
-                "text": "boolean"
-              }
-            },
-            {
-              "kind": "field",
               "name": "contentLanguage",
               "privacy": "public",
               "type": {
                 "text": "BilingualSegmentContentLanguage"
               },
+              "description": "Which text to show: `primary`, `translation` or `both`.",
               "default": "\"both\"",
               "attribute": "content-language"
             },
@@ -186,6 +180,7 @@
               "type": {
                 "text": "BilingualSegmentContentLanguage"
               },
+              "description": "Which text to show: `primary`, `translation` or `both`.",
               "default": "\"both\"",
               "fieldName": "contentLanguage"
             },
@@ -1687,13 +1682,6 @@
               "description": "Preferred translation language. Can't be combined with `versionLanguage`.",
               "default": "undefined",
               "attribute": "translation-language"
-            },
-            {
-              "kind": "field",
-              "name": "hideAttributions",
-              "type": {
-                "text": "boolean"
-              }
             },
             {
               "kind": "field",

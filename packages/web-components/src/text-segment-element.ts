@@ -139,13 +139,7 @@ export class SefariaTextSegment extends SefariaElement {
   declare versionTitle: string | undefined;
   /** Preferred translation language. Can't be combined with `versionLanguage`. */
   declare translationLanguage: string | undefined;
-<<<<<<< HEAD
-  /** Hides the edition attribution. */
-  declare hideAttributions: boolean;
   /** How much Hebrew vowel and cantillation marking to keep. `none` removes both. */
-=======
-  /** Hebrew vocalization preset applied only to the displayed safe text. */
->>>>>>> origin/main
   declare vocalizationMode: VocalizationMode;
 
   #displayViewModel: TextSegmentDataViewModel | undefined;

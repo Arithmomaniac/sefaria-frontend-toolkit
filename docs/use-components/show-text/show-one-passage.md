@@ -17,7 +17,7 @@ import textSegmentStates from "../../../examples/site-snippets/text-segment-stat
 
 # Show one passage
 
-The Text Segment, `<sefaria-text-segment>`, shows the text of one passage, such as `Micah 6:8`, in one edition. It also shows where that edition comes from. For a passage in Hebrew and a translation side by side, see [Show Hebrew and translation together](/use-components/show-text/hebrew-and-translation.md).
+The Text Segment, `<sefaria-text-segment>`, shows the text of one passage, such as `Micah 6:8`, in one edition. It shows only the text. To credit the edition, see [Show an attributed passage](/use-components/show-an-attributed-passage.md). For a passage in Hebrew and a translation side by side, see [Show Hebrew and translation together](/use-components/show-text/hebrew-and-translation.md).
 
 ## Show the default text
 
@@ -60,11 +60,11 @@ For every property, dark mode, and why selectors can't reach inside, see [Match 
 
 ## When the language isn't available
 
-If Sefaria reports that it has no text in your preferred `translation-language`, the segment asks once more for Sefaria's default translation. That translation isn't always English. The segment then adds a note such as `french is unavailable; showing english.`
+If Sefaria reports that it has no text in your preferred `translation-language`, the segment asks once more for Sefaria's default translation. That translation isn't always English. The segment shows that translation without a note. [Source Card](/use-components/show-an-attributed-passage.md) tells readers about the change.
 
 <LiveEditor :code="textSegmentFallback" title="Fall back to the default translation">This asks for French on <code>Berakhot 2a:1</code>.</LiveEditor>
 
-A fresh load makes one request, or two with a fallback. An exact edition, or a language that exists but has empty text, doesn't fall back. `hide-attributions` hides both the edition line and the fallback note.
+A fresh load makes one request, or two with a fallback. An exact edition, or a language that exists but has empty text, doesn't fall back.
 
 ## Control vowel points and cantillation
 
@@ -77,10 +77,6 @@ A fresh load makes one request, or two with a fallback. An exact edition, or a l
 <LiveEditor :code="textSegmentVocalization" title="Nikkud, then none">The same Hebrew with vowel points, then with none.</LiveEditor>
 
 <span class="learn-more__label">Learn more:</span> [Clean up stored Sefaria text](/data-and-text-tools/clean-up-stored-sefaria-text.md) · [Clean text and safety](/concepts/clean-text-and-safety.md) {.learn-more}
-
-## See the source
-
-Below the text, the segment names the edition and its language, such as `Miqra according to the Masorah (hebrew, he)`. It has no link and no license. To hide this line, add `hide-attributions`. For a fuller credit line, see [Show an attributed passage](/use-components/show-an-attributed-passage.md).
 
 ## When there's nothing to show
 
