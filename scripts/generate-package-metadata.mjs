@@ -100,12 +100,6 @@ const eventCatalog = {
       "Reports a current standalone loading or seed-admission failure.",
     ),
   ],
-  "sefaria-ref-label": [
-    event(
-      "sefaria-ref-label-error",
-      "Reports a current standalone loading or validation failure.",
-    ),
-  ],
   "sefaria-source-card": [
     event(
       "sefaria-source-select",

@@ -133,35 +133,6 @@ Controlled or declarative reader surface for one semantic reader entry.
 | `source-pane`      | Scrollable source-text pane.                         |
 | `connections-pane` | Scrollable connections pane.                         |
 
-## `<sefaria-ref-label>`
-
-Custom element that renders supplied or acquired reference-label data.
-
-### Properties and attributes
-
-| Property | Attribute | Type | Default | Description |
-| --- | --- | --- | --- | --- |
-| `sref` | `sref` | `string` | `""` | Reference loaded when authoritative supplied data is absent. |
-| `data` | Property only | `unknown | undefined` | `undefined` | Authoritative corrected reference response data. |
-| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
-| `labelLanguage` | `label-language` | `RefLabelLanguage` | `"english"` | Label language selected by the host. |
-| `linked` | `linked` | `boolean` | `false` | Whether data-state labels render as canonical links. |
-| `status` | Property only | `SefariaElementStatus` | - | Coarse lifecycle state without exposing prepared rendering data. |
-
-### Events
-
-| Event | Description |
-| --- | --- |
-| `sefaria-ref-label-error` | Reports a current standalone loading or validation failure. |
-
-### Slots
-
-None.
-
-### CSS parts
-
-None.
-
 ## `<sefaria-source-card>`
 
 Custom element that renders supplied or acquired source-card data.

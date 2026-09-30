@@ -46,10 +46,6 @@
       "types": "./dist/reader-session-public.d.ts",
       "import": "./dist/reader-session-public.js"
     },
-    "./ref-label": {
-      "types": "./dist/ref-label-public.d.ts",
-      "import": "./dist/ref-label-public.js"
-    },
     "./source-card": {
       "types": "./dist/source-card-public.d.ts",
       "import": "./dist/source-card-public.js"

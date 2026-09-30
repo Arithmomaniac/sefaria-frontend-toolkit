@@ -60,7 +60,7 @@
   <!-- dotted component regions + inline labels -->
   <rect x="186" y="366" width="404" height="40" rx="6" fill="none" stroke="#e0407a" stroke-width="1.2" stroke-dasharray="4 3"/>
   <rect x="196" y="358" width="122" height="16" rx="4" fill="#2a2028"/>
-  <text x="203" y="370" font-size="9.5" font-weight="600" fill="#ff8fb0" font-family="Consolas, monospace">&lt;sefaria-ref-label&gt;</text>
+  <text x="203" y="370" font-size="9.5" font-weight="600" fill="#ff8fb0" font-family="Consolas, monospace">source-card heading</text>
 
   <rect x="186" y="418" width="404" height="104" rx="6" fill="none" stroke="#e0407a" stroke-width="1.2" stroke-dasharray="4 3"/>
   <rect x="196" y="410" width="168" height="16" rx="4" fill="#2a2028"/>

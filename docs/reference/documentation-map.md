@@ -14,7 +14,7 @@ The VitePress site excludes this map, `docs/README.md`, development, design, evi
 | `docs/index.md` | Product-site visitor choosing Reader, components, or headless APIs | Home |
 | `docs/README.md` | GitHub reader needing the complete documentation index | Repository Markdown |
 | `docs/get-started.md` | New adopter choosing a supported implementation path | Get started |
-| `docs/components.md` | Product developer comparing the six current rendering surfaces | Components |
+| `docs/components.md` | Product developer comparing the five current rendering surfaces | Components |
 | `docs/components/*.md` | Product developer looking up distinctive usage, interaction, and accessibility guidance for one surface | Components |
 | `docs/components/index.md` | Product developer entering the component usage directory | Components |
 | `docs/examples.md` | Developer choosing an isolated runnable example | Examples |
@@ -50,7 +50,7 @@ The VitePress site excludes this map, `docs/README.md`, development, design, evi
 | `packages/text-transform/README.md` | Consumer of DOM-free sanitization, vocalization, and footnotes | Reference / package |
 | `packages/web-components/README.md` | Consumer choosing component, Reader, or factory subpaths | Components / package |
 | `examples/README.md` | Developer browsing every maintained runnable example | Examples |
-| `examples/playground/index.html` and `examples/playground/projects/{ref-label,text-segment,bilingual-segment,source-card,connections-panel,reader}/` | Developer editing one of six maintained supplied-data projects in the trusted editor and opaque preview | Examples / supplied-data editor |
+| `examples/playground/index.html` and `examples/playground/projects/{text-segment,bilingual-segment,source-card,connections-panel,reader}/` | Developer editing one of five maintained supplied-data projects in the trusted editor and opaque preview | Examples / supplied-data editor |
 | `examples/explorer/README.md` | Developer working with authored states or live component diagnostics | Examples |
 | `examples/vanilla-vite/README.md` | Vanilla Vite consumer following the smallest supplied-data path | Examples |
 | `examples/react-vite/README.md` | React consumer integrating custom elements without wrappers | Examples |

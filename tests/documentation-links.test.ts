@@ -22,7 +22,6 @@ const journey = [
   "docs/learn/05-customization.md",
   "docs/learn/06-host-integration.md",
   "docs/components/index.md",
-  "docs/components/ref-label.md",
   "docs/components/text-segment.md",
   "docs/components/bilingual-segment.md",
   "docs/components/source-card.md",

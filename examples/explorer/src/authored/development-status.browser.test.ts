@@ -1,7 +1,6 @@
 import type {
   SefariaBilingualSegment,
   SefariaConnectionsPanel,
-  SefariaRefLabel,
   SefariaReader,
   SefariaSourceCard,
   SefariaTextSegment,
@@ -28,13 +27,6 @@ import {
   connectionsPanelScenarios,
   connectionsSummaryScenario,
 } from "./connections-panel.scenarios.js";
-import {
-  refLabelDataScenario,
-  refLabelEmptyScenario,
-  refLabelErrorScenario,
-  refLabelLoadingScenario,
-  refLabelScenarios,
-} from "./ref-label.scenarios.js";
 import {
   readerConnectionsLoadingScenario,
   readerConnectionsOnlyScenario,
@@ -82,7 +74,7 @@ async function renderLab(): Promise<LitElement> {
       ...(lab.shadowRoot?.querySelectorAll<
         LitElement & { updateComplete: Promise<boolean> }
       >(
-        "sefaria-ref-label, sefaria-text-segment, sefaria-bilingual-segment, sefaria-source-card, sefaria-connections-panel, sefaria-reader",
+        "sefaria-text-segment, sefaria-bilingual-segment, sefaria-source-card, sefaria-connections-panel, sefaria-reader",
       ) ?? []),
     ].map((element) => element.updateComplete),
   );
@@ -108,31 +100,6 @@ test("shows the four current text-segment states", async () => {
     textSegmentScenarios.map((scenario) => scenario.expectedStatus),
   );
   expect(textSegmentScenarios.map((scenario) => scenario.id)).toEqual([
-    "data",
-    "loading",
-    "empty",
-    "error",
-  ]);
-});
-
-test("shows the four current reference-label states", async () => {
-  expect(refLabelScenarios).toEqual([
-    refLabelDataScenario,
-    refLabelLoadingScenario,
-    refLabelEmptyScenario,
-    refLabelErrorScenario,
-  ]);
-
-  const lab = await renderLab();
-  const labels = Array.from(
-    lab.shadowRoot?.querySelectorAll<SefariaRefLabel>("sefaria-ref-label") ??
-      [],
-  );
-
-  expect(labels.map((label) => label.status)).toEqual(
-    refLabelScenarios.map((scenario) => scenario.expectedStatus),
-  );
-  expect(refLabelScenarios.map((scenario) => scenario.id)).toEqual([
     "data",
     "loading",
     "empty",

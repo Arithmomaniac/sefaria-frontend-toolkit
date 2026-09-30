@@ -6,7 +6,6 @@ The [component catalog](../components.md) compares all six rendering surfaces an
 
 Choose a focused usage page when you already know the surface:
 
-- [Reference label](ref-label.md)
 - [Text segment](text-segment.md)
 - [Bilingual segment](bilingual-segment.md)
 - [Source card](source-card.md)

@@ -2,7 +2,7 @@
 
 # Components
 
-The toolkit provides six declarative UI components. All six accept `sref` for standalone loading. The five ordinary elements also accept component-specific raw `data`; Reader accepts transactional raw seeds.
+The toolkit provides five declarative UI components. All five accept `sref` for standalone loading. The four ordinary elements also accept component-specific raw `data`; Reader accepts transactional raw seeds.
 
 > Choose the smallest component that completes the task. Use Reader when users need navigation.
 
@@ -14,7 +14,6 @@ The toolkit provides six declarative UI components. All six accept `sref` for st
 | A passage or range with attribution | [Source card](components/source-card.md) |
 | One text and translation pair | [Bilingual segment](components/bilingual-segment.md) |
 | One selected edition | [Text segment](components/text-segment.md) |
-| A canonical reference heading or link | [Reference label](components/ref-label.md) |
 | Groups of related texts and previews | [Connections panel](components/connections-panel.md) |
 | A source preview opened from authored prose | [Source Card in a host dialog](linked-article.md) |
 
@@ -38,7 +37,6 @@ Elements expose public read-only status and component-specific diagnostics/event
 
 | Element | Public type subpath |
 | --- | --- |
-| `<sefaria-ref-label>` | `@arithmomaniac/sefaria-web-components/ref-label` |
 | `<sefaria-text-segment>` | `@arithmomaniac/sefaria-web-components/text-segment` |
 | `<sefaria-bilingual-segment>` | `@arithmomaniac/sefaria-web-components/bilingual-segment` |
 | `<sefaria-source-card>` | `@arithmomaniac/sefaria-web-components/source-card` |

@@ -11,7 +11,6 @@ import { PUBLIC_ENTRIES } from "../examples/playground/scripts/runtime-entries.m
 
 const root = path.resolve(import.meta.dirname, "..");
 const expectedIds = [
-  "ref-label",
   "text-segment",
   "bilingual-segment",
   "source-card",
@@ -27,13 +26,12 @@ const expectedEntries = [
   "@arithmomaniac/sefaria-web-components/connections-panel",
   "@arithmomaniac/sefaria-web-components/reader",
   "@arithmomaniac/sefaria-web-components/reader-session",
-  "@arithmomaniac/sefaria-web-components/ref-label",
   "@arithmomaniac/sefaria-web-components/source-card",
   "@arithmomaniac/sefaria-web-components/text-segment",
 ] as const;
 
 describe("playground project catalog", () => {
-  it("loads exactly the six maintained projects from real manifests and files", () => {
+  it("loads exactly the five maintained projects from real manifests and files", () => {
     const manifests = Object.fromEntries(
       expectedIds.map((id) => [
         `../projects/${id}/project.json`,

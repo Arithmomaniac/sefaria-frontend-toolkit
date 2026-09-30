@@ -57,7 +57,7 @@ Each OpenAPI correction starts with the original Sefaria route, handler, respons
 | Request ownership | Element-owned lifecycle using a per-element source or one module-local lazy default |
 | Reader history | DOM-free reader session over semantic entries and immutable raw retained records |
 | Server-provided data | Corrected API-shaped JSON, validation, and the same private preparation |
-| Reference operations | Generated API contracts and component-owned acquisition |
+| Reference operations | Generated API contracts; no component acquires `/api/ref` |
 
 ## Ownership
 
@@ -128,13 +128,13 @@ Unknown inputs from MCP or another external boundary receive validation before c
 
 ## Component boundary
 
-Each public component subpath owns its raw input forms, selection/options types, events, diagnostics, and element class. Preparation types and helpers remain private. The root entry registers all six custom elements. The DOM-free `./acquisition` entry owns tagged source choices and shared-default configuration. The completed cutover retired `./bindings` and `./reader-controller`.
+Each public component subpath owns its raw input forms, selection/options types, events, diagnostics, and element class. Preparation types and helpers remain private. The root entry registers all five custom elements. The DOM-free `./acquisition` entry owns tagged source choices and shared-default configuration. The completed cutover retired `./bindings` and `./reader-controller`.
 
 The `reader-session` subpath remains a supported advanced DOM-free semantic/raw facade. It exposes history, pins, budgets, `entryInfo`, stable source/connections raw records, and raw transitions needed by spatial hosts. It does not expose prepared child rendering or content. The `reader` subpath exposes the shared raw source-qualification boundary used by both the ordinary Reader element and spatial hosts.
 
 A composite can resolve a child input by payload role before private preparation. Shared private helpers prevent repeated transformation logic without exposing a prepared public type.
 
-The source card owns the bounded text collection. Segment, flat range, chapter, spanning range, and nested non-spanning payloads use one composite contract; there is no separate text-range element or factory. Card items retain positional identity. Selectable single-section items use a component-owned metadata-backed address mapper, not arbitrary array-index reference synthesis.
+The source card owns the bounded text collection and renders its bilingual heading privately from the same payload. Segment, flat range, chapter, spanning range, and nested non-spanning payloads use one composite contract; there is no separate text-range element or factory. Card items retain positional identity. Selectable single-section items use a component-owned metadata-backed address mapper, not arbitrary array-index reference synthesis.
 
 Request warnings remain with the selector-owning factory or composite. A resolved-version projection cannot assign a warning for another request selector.
 
@@ -218,4 +218,4 @@ Correct text, direction, sanitization, attribution, and accessible interaction h
 
 The client implementation has selected its generator, Zod validators, and committed artifact paths. [Development](development.md#openapi-workflow) records the current tools and workflow. These choices must continue to satisfy the offline, deterministic, and stale-output contracts.
 
-The text-segment, bilingual-segment, reference-label, source-card, connections-panel, Reader, Reader-session, and acquisition entry names are current. Unrelated future component slices and broader compatibility work remain planned where identified in Development.
+The text-segment, bilingual-segment, source-card, connections-panel, Reader, Reader-session, and acquisition entry names are current. Unrelated future component slices and broader compatibility work remain planned where identified in Development.

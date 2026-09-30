@@ -2,20 +2,16 @@ import { SefariaElement } from "@arithmomaniac/sefaria-web-components";
 import { css, html, nothing } from "lit";
 import { ifDefined } from "lit/directives/if-defined.js";
 
-import refCommentary from "../../../../packages/client/test/fixtures/ref-rashi-commentary-2026-09-03.json";
-import refUnresolved from "../../../../packages/client/test/fixtures/ref-unresolved-2026-09-03.json";
 import sourceSection from "../../../../packages/client/test/fixtures/v3-connections-genesis-section-2026-09-06.json";
 import sourceTarget from "../../../../packages/client/test/fixtures/v3-connections-genesis-target-2026-09-06.json";
 import linksPayload from "../../../../packages/client/test/fixtures/links-connections-preview-2026-09-06.json";
 import { bilingualSegmentScenarios } from "./bilingual-segment.scenarios.js";
 import { connectionsPanelScenarios } from "./connections-panel.scenarios.js";
-import { refLabelScenarios } from "./ref-label.scenarios.js";
 import { readerScenarios } from "./reader.scenarios.js";
 import { sourceCardScenarios } from "./source-card.scenarios.js";
 import { textSegmentScenarios } from "./text-segment.scenarios.js";
 
 const componentIds = [
-  "ref-label",
   "text-segment",
   "bilingual-segment",
   "source-card",
@@ -33,7 +29,6 @@ const pendingAcquisition = {
   kind: "capability" as const,
   capability: {
     getText: async () => await new Promise<never>(() => undefined),
-    resolveReference: async () => await new Promise<never>(() => undefined),
     getLinks: async () => await new Promise<never>(() => undefined),
   },
 };
@@ -74,12 +69,6 @@ const readerConnectionsSeed = {
 };
 
 const componentDetails = {
-  "ref-label": {
-    label: "Reference label",
-    packagePath: "@arithmomaniac/sefaria-web-components/ref-label",
-    source: "src/authored/ref-label.scenarios.ts",
-    scenarios: refLabelScenarios,
-  },
   "text-segment": {
     label: "Text segment",
     packagePath: "@arithmomaniac/sefaria-web-components/text-segment",
@@ -412,23 +401,6 @@ class SefariaDevelopmentStatus extends SefariaElement {
       </div>
 
       ${
-        this.#show("ref-label")
-          ? html`
-              <div class="states">
-                ${this.#filter("ref-label", refLabelScenarios).map(
-                  ({ id, title }) => html`
-                    <section data-component="ref-label" data-scenario=${id}>
-                      <h2>${title}</h2>
-                      ${this.#scenarioLink("ref-label", id)}
-                      ${renderRefLabel(id)}
-                    </section>
-                  `,
-                )}
-              </div>
-            `
-          : nothing
-      }
-      ${
         this.#show("text-segment")
           ? html`
               <div class="states">
@@ -707,29 +679,6 @@ class SefariaDevelopmentStatus extends SefariaElement {
     else params.delete("diagnostics");
     history.replaceState(null, "", `?${params.toString()}`);
   }
-}
-
-function renderRefLabel(id: string) {
-  if (id === "loading") {
-    return html`<sefaria-ref-label
-      linked
-      label-language="both"
-      sref="Genesis 1:1"
-      .acquisition=${pendingAcquisition}
-    ></sefaria-ref-label>`;
-  }
-  return html`<sefaria-ref-label
-    linked
-    label-language="both"
-    sref=${id === "empty" ? "not a reference" : "Rashi on Genesis 1:1:1"}
-    .data=${
-      id === "data"
-        ? refCommentary
-        : id === "empty"
-          ? refUnresolved
-          : { is_ref: true }
-    }
-  ></sefaria-ref-label>`;
 }
 
 function renderTextSegment(id: string) {

@@ -62,7 +62,7 @@ The element path accepts corrected component-specific raw data and privately pre
 
 ## Add a focused component
 
-Use the [component catalog](components.md) when the product needs one reference label, text segment, bilingual segment, Source Card or Connections Panel.
+Use the [component catalog](components.md) when the product needs one text segment, bilingual segment, Source Card or Connections Panel.
 
 1. Assign validated component-specific raw `data` for zero-request rendering, or assign `sref` for standalone loading.
 2. Optionally assign a tagged client, host capability, or disabled acquisition choice.
