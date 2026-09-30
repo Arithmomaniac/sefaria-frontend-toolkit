@@ -37,7 +37,7 @@ Components other than the Reader are `display: block` by default.
 
 The default colors follow the reader's light or dark setting when your page declares `:root { color-scheme: light dark; }`. A containing element also works. `color-scheme: light` or `dark` forces one. Changing styles doesn't make a new request.
 
-The example sets the text color, the fonts, a larger font scale, and a transparent background. It also adds a margin and opts in to dark mode.
+The example sets a warm background, brown text, serif fonts, and a larger font scale on a containing `div`. It gives the element's own box padding, a rounded corner, and an accent border. Italic text passes in from the page. It also opts in to dark mode.
 
 <LiveEditor :code="textSegmentStyling" title="Style a passage" />
 

@@ -5,15 +5,24 @@
 <style>
   :root {
     color-scheme: light dark;
-    --sefaria-surface: transparent;
-    --sefaria-fg: light-dark(#1b2333, #e6ebf5);
-    --sefaria-font-hebrew: "Frank Ruehl CLM", "Times New Roman", serif;
-    --sefaria-font-english: "Segoe UI", system-ui, sans-serif;
-    --sefaria-font-scale: 1.25;
   }
 
-  sefaria-text-segment {
-    margin-block: 1rem;
+  .styled-passage {
+    --sefaria-surface: light-dark(#fdf3dc, #3a2f1c);
+    --sefaria-fg: light-dark(#5a2d0c, #f6d9a8);
+    --sefaria-font-hebrew: "Frank Ruehl CLM", "David", "Times New Roman", serif;
+    --sefaria-font-english: Georgia, "Times New Roman", serif;
+    --sefaria-font-scale: 1.35;
+  }
+
+  .styled-passage sefaria-text-segment {
+    display: block;
+    padding: 1rem 1.25rem;
+    border-inline-start: 6px solid light-dark(#b5651d, #e0a458);
+    border-radius: 12px;
+    font-style: italic;
   }
 </style>
-<sefaria-text-segment sref="Micah 6:8"></sefaria-text-segment>
+<div class="styled-passage">
+  <sefaria-text-segment sref="Micah 6:8"></sefaria-text-segment>
+</div>

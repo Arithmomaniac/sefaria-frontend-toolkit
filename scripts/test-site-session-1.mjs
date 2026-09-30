@@ -729,7 +729,9 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
     const before = requests.length;
     await styling.evaluate(async () => {
       const root = globalThis.document.documentElement;
-      root.style.setProperty("--sefaria-fg", "rgb(1, 2, 3)");
+      globalThis.document
+        .querySelector(".styled-passage")
+        .style.setProperty("--sefaria-fg", "rgb(1, 2, 3)");
       root.style.colorScheme = "dark";
       await new Promise((resolve) => globalThis.setTimeout(resolve, 300));
     });
