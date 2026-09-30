@@ -18,7 +18,9 @@ import {
 } from "./component-controller.js";
 import {
   acquireSelectedText,
+  noTranslationLanguageMessage,
   normalizeTranslationLanguage,
+  type TranslationFallback,
   preferredTranslation,
 } from "./translation-selection.js";
 
@@ -39,6 +41,8 @@ export interface TextSegmentRequest {
   readonly tref: GetV3TextsData["path"]["tref"];
   /** Version selection serialized into one v3 `version` query parameter. */
   readonly version: TextSegmentVersionSelection;
+  /** Missing preferred-translation policy. */
+  readonly translationFallback?: TranslationFallback;
 }
 
 /** Optional request-free evidence used while projecting safe text metadata. */
@@ -257,11 +261,33 @@ export function createTextSegmentViewModel(
     const family = normalizeTranslationLanguage(
       request.version.translationLanguage,
     );
+    if (
+      (request.translationFallback ?? "none") === "none" &&
+      request.version.versionTitle === undefined &&
+      needsNoTranslationFallback(payload, family)
+    ) {
+      return createEmptyViewModel(
+        payload,
+        noTranslationLanguageMessage(family),
+        true,
+      );
+    }
     const preferred = preferredTranslation(
       payload,
       family,
       request.version.versionTitle,
     );
+    if (
+      (request.translationFallback ?? "none") === "none" &&
+      preferred === undefined &&
+      request.version.versionTitle === undefined
+    ) {
+      return createEmptyViewModel(
+        payload,
+        noTranslationLanguageMessage(family),
+        true,
+      );
+    }
     const candidates =
       preferred !== undefined
         ? [preferred]
@@ -274,8 +300,22 @@ export function createTextSegmentViewModel(
       );
     const selected = candidates[0];
     if (selected === undefined)
-      return createEmptyViewModel(payload, "No translation text is available.");
+      return createEmptyViewModel(
+        payload,
+        (request.translationFallback ?? "none") === "none"
+          ? noTranslationLanguageMessage(family)
+          : "No translation text is available.",
+      );
     return projectTextSegmentVersion(payload, selected, context);
+  }
+
+  function needsNoTranslationFallback(
+    payload: CoreV3TextsResponse,
+    language: string,
+  ): boolean {
+    return payload.warnings.some(
+      (warning) => warning[language]?.warning_code === 102,
+    );
   }
   const language = request.version.language.trim().toLocaleLowerCase("en-US");
   const matches = payload.versions.filter(
@@ -542,6 +582,7 @@ async function requestTextSegmentResponse(
     request.tref,
     [version],
     request.version.translationLanguage,
+    request.translationFallback ?? "none",
     signal ?? new AbortController().signal,
   );
 }
@@ -578,6 +619,7 @@ function assertTextSegmentStatus(
 function createEmptyViewModel(
   payload: CoreV3TextsResponse,
   fallbackMessage: string,
+  preferFallbackMessage = false,
 ): TextSegmentEmptyViewModel {
   const warnings = payload.warnings.flatMap((warning) =>
     Object.values(warning).map((detail) => detail.message),
@@ -587,7 +629,9 @@ function createEmptyViewModel(
     state: "empty",
     ref: payload.ref,
     heRef: payload.heRef,
-    message: warnings[0] ?? fallbackMessage,
+    message: preferFallbackMessage
+      ? fallbackMessage
+      : (warnings[0] ?? fallbackMessage),
     warnings,
   };
 }

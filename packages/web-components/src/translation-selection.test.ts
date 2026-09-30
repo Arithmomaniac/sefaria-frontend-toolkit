@@ -110,6 +110,7 @@ test.each([400, 404])(
       "Micah 6:8",
       ["primary", "french"],
       "french",
+      "default",
       new AbortController().signal,
     );
     expect(result.status).toBe(status);
@@ -128,6 +129,7 @@ test("network failure preserves the original cause and does not fall back", asyn
       "Micah 6:8",
       ["french"],
       "french",
+      "default",
       new AbortController().signal,
     ),
   ).rejects.toBe(error);
@@ -142,6 +144,7 @@ test("an acquired default without the requested family or missing warning is not
       "Micah 6:8",
       ["french"],
       "french",
+      "default",
       new AbortController().signal,
     ),
   ).rejects.toThrow("/versions");
@@ -159,6 +162,7 @@ test("malformed JSON is not permission to fall back", async () => {
       "Micah 6:8",
       ["french"],
       "french",
+      "default",
       new AbortController().signal,
     ),
   ).rejects.toThrow();
@@ -181,6 +185,7 @@ test("a missing exact title is not a missing-language fallback", async () => {
     "Micah 6:8",
     ["french|Missing edition"],
     "french",
+    "default",
     new AbortController().signal,
   );
   expect(getText).toHaveBeenCalledTimes(1);
@@ -200,6 +205,7 @@ test("aborting an ignored-abort missing-language response prevents the fallback 
       "Micah 6:8",
       ["french"],
       "french",
+      "default",
       controller.signal,
     ),
   ).rejects.toBe(controller.signal.reason);

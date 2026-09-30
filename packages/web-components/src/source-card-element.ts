@@ -38,6 +38,7 @@ import { createSourceCardViewModel } from "./source-card.js";
 import { serializeSourceCardSelectors } from "./source-card-request.js";
 import {
   acquireSelectedText,
+  normalizeTranslationFallback,
   type SelectedTextProgress,
 } from "./translation-selection.js";
 
@@ -52,6 +53,12 @@ export class SefariaSourceCard extends SefariaElement {
       type: String,
       attribute: "translation-language",
       converter: optionalStringConverter,
+    },
+    translationFallback: {
+      type: String,
+      attribute: "translation-fallback",
+      reflect: true,
+      useDefault: true,
     },
     primaryVersionTitle: {
       type: String,
@@ -316,8 +323,10 @@ export class SefariaSourceCard extends SefariaElement {
   declare primaryVersionTitle: string | undefined;
   /** Optional exact edition title for the translation role. */
   declare translationVersionTitle: string | undefined;
-  /** Preferred translation family, falling back only when unavailable. */
+  /** Preferred translation family. */
   declare translationLanguage: string | undefined;
+  /** Missing preferred-translation policy. */
+  declare translationFallback: "default" | "none";
 
   /** Sides the host wants displayed for every pair. */
   declare contentLanguage: BilingualPairContentLanguage;
@@ -362,6 +371,7 @@ export class SefariaSourceCard extends SefariaElement {
     this.primaryVersionTitle = undefined;
     this.translationVersionTitle = undefined;
     this.translationLanguage = undefined;
+    this.translationFallback = "default";
     this.contentLanguage = "both";
     this.layout = "auto";
     this.sideOrder = "primary-first";
@@ -408,6 +418,7 @@ export class SefariaSourceCard extends SefariaElement {
       changed.has("acquisition") ||
       changed.has("primaryVersionTitle") ||
       changed.has("translationLanguage") ||
+      changed.has("translationFallback") ||
       changed.has("translationVersionTitle")
     ) {
       this.#interruptedProgress = undefined;
@@ -534,6 +545,7 @@ export class SefariaSourceCard extends SefariaElement {
         sref,
         versions,
         request.translationLanguage,
+        request.translationFallback ?? "default",
         active.controller.signal,
         active.progress,
       );
@@ -596,6 +608,9 @@ export class SefariaSourceCard extends SefariaElement {
       ...(this.translationLanguage === undefined
         ? {}
         : { translationLanguage: this.translationLanguage }),
+      translationFallback: normalizeTranslationFallback(
+        this.translationFallback,
+      ),
       ...(this.primaryVersionTitle === undefined
         ? {}
         : { primary: { versionTitle: this.primaryVersionTitle } }),

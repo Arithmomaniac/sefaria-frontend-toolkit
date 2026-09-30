@@ -9,6 +9,7 @@ import { optionalStringConverter } from "./attribute-converters.js";
 import {
   acquireSelectedText,
   normalizeTranslationLanguage,
+  normalizeTranslationFallback,
   type SelectedTextProgress,
 } from "./translation-selection.js";
 import { validateSuppliedComponentData } from "./component-controller.js";
@@ -48,6 +49,12 @@ export class SefariaTextSegment extends SefariaElement {
       type: String,
       attribute: "translation-language",
       converter: optionalStringConverter,
+    },
+    translationFallback: {
+      type: String,
+      attribute: "translation-fallback",
+      reflect: true,
+      useDefault: true,
     },
     versionLanguage: {
       type: String,
@@ -141,6 +148,8 @@ export class SefariaTextSegment extends SefariaElement {
   declare versionTitle: string | undefined;
   /** Preferred translation family, mutually exclusive with a strict version language. */
   declare translationLanguage: string | undefined;
+  /** Missing preferred-translation policy. */
+  declare translationFallback: "default" | "none";
   /** Hebrew vocalization preset applied only to the displayed safe text. */
   declare vocalizationMode: VocalizationMode;
 
@@ -170,6 +179,7 @@ export class SefariaTextSegment extends SefariaElement {
     this.versionLanguage = undefined;
     this.versionTitle = undefined;
     this.translationLanguage = undefined;
+    this.translationFallback = "none";
     this.vocalizationMode = "taamim_and_nikkud";
   }
 
@@ -220,6 +230,7 @@ export class SefariaTextSegment extends SefariaElement {
       changed.has("acquisition") ||
       changed.has("versionLanguage") ||
       changed.has("translationLanguage") ||
+      changed.has("translationFallback") ||
       changed.has("versionTitle")
     ) {
       this.#interruptedProgress = undefined;
@@ -365,6 +376,9 @@ export class SefariaTextSegment extends SefariaElement {
   ): Promise<void> {
     try {
       const versions = [this.#serializedVersion()];
+      const translationFallback = normalizeTranslationFallback(
+        this.translationFallback,
+      );
       const acquisition = resolveSefariaAcquisition(this.acquisition);
       if (acquisition.kind === "disabled") {
         throw new Error("Standalone Sefaria acquisition is disabled.");
@@ -375,6 +389,7 @@ export class SefariaTextSegment extends SefariaElement {
         sref,
         versions,
         this.translationLanguage,
+        translationFallback,
         active.controller.signal,
         active.progress,
       );
@@ -444,6 +459,9 @@ export class SefariaTextSegment extends SefariaElement {
             ? {}
             : { versionTitle: this.versionTitle }),
         },
+        translationFallback: normalizeTranslationFallback(
+          this.translationFallback,
+        ),
       });
     }
     if (this.versionLanguage !== undefined) {

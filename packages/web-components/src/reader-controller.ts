@@ -33,8 +33,10 @@ import {
 import { serializeSourceCardSelectors } from "./source-card-request.js";
 import {
   acquireSelectedText,
+  normalizeTranslationFallback,
   normalizeTranslationLanguage,
   type SelectedTextProgress,
+  type TranslationFallback,
 } from "./translation-selection.js";
 import type {
   SourceCardDataViewModel,
@@ -339,6 +341,7 @@ export function createSefariaReaderDataSource(
         request.tref,
         serializeSourceCardSelectors(request),
         request.translationLanguage,
+        request.translationFallback ?? "default",
         signal,
         progress,
       );
@@ -390,6 +393,7 @@ export function createCapabilityReaderDataSource(
         request.tref,
         serializeSourceCardSelectors(request),
         request.translationLanguage,
+        request.translationFallback ?? "default",
         signal,
         progress,
       );
@@ -671,6 +675,8 @@ export async function loadReaderController(
 export interface ReaderControllerSeedOptions extends ReaderSessionOptions {
   /** Preferred family for navigation when the current entry has no source request. */
   readonly translationLanguage?: string;
+  /** Missing preferred-translation policy for navigation when the current entry has no source request. */
+  readonly translationFallback?: TranslationFallback;
 }
 
 /** Creates a zero-request controller from already admitted reader content. */
@@ -699,6 +705,7 @@ class ReaderControllerImpl implements ReaderController {
   #resumeSourceProgress: ReaderSourceProgress | undefined;
   #pendingSourceRequest: SourceCardRequest | undefined;
   readonly #seedTranslationLanguage: string | undefined;
+  readonly #seedTranslationFallback: TranslationFallback | undefined;
 
   constructor(
     seed: ReaderEntrySeed,
@@ -712,6 +719,10 @@ class ReaderControllerImpl implements ReaderController {
       options.translationLanguage === undefined
         ? undefined
         : normalizeTranslationLanguage(options.translationLanguage);
+    this.#seedTranslationFallback =
+      options.translationFallback === undefined
+        ? undefined
+        : normalizeTranslationFallback(options.translationFallback);
     this.#reader = createReaderViewModel(this.#session.view);
     this.#snapshot = this.createSnapshot();
   }
@@ -839,9 +850,14 @@ class ReaderControllerImpl implements ReaderController {
       source === undefined
         ? this.#seedTranslationLanguage
         : source.request.translationLanguage;
+    const translationFallback =
+      source === undefined
+        ? this.#seedTranslationFallback
+        : source.request.translationFallback;
     const targetRequest = normalizeSourceRequest({
       tref: action.targetRef,
       ...(translationLanguage === undefined ? {} : { translationLanguage }),
+      ...(translationFallback === undefined ? {} : { translationFallback }),
     });
     const active = this.startPhysicalOperation();
     this.#pendingSourceRequest = targetRequest;
@@ -1424,6 +1440,13 @@ function normalizeSourceRequest(request: SourceCardRequest): SourceCardRequest {
             request.translationLanguage,
           ),
         }),
+    ...(request.translationFallback === undefined
+      ? {}
+      : {
+          translationFallback: normalizeTranslationFallback(
+            request.translationFallback,
+          ),
+        }),
     ...(request.primary === undefined
       ? {}
       : { primary: { ...request.primary } }),
@@ -1506,6 +1529,16 @@ function parseSourceRequest(value: unknown, path: string): SourceCardRequest {
           translationLanguage: rawNonblankString(
             input.translationLanguage,
             `${path}/translationLanguage`,
+          ),
+        }),
+    ...(input.translationFallback === undefined
+      ? {}
+      : {
+          translationFallback: normalizeTranslationFallback(
+            rawNonblankString(
+              input.translationFallback,
+              `${path}/translationFallback`,
+            ),
           ),
         }),
     ...(input.primary === undefined
