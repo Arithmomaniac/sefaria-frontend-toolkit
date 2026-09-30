@@ -202,7 +202,7 @@ export function renderVersionsIndex(input) {
       <li><strong>A pinned version</strong>, such as <code>${escapeHtml(alpha?.version ?? "0.0.0-alpha.1.1")}/sefaria-elements.js</code>, stays byte-for-byte the same while it's listed as active here. A pinned version may be retired without notice. A retired version is removed the next time the site is deployed, though caches may keep serving it for a while.</li>
       <li><strong>Your own copy.</strong> To avoid both risks, download a version and serve it from your own site, or install the packages instead. <a href="../help/install-and-status.html">Install and status</a> compares the routes.</li>
     </ul>
-    <p>Each version keeps its own behavior. An older version can still include the removed Popup element and lack attributes added since. The site's reference pages describe the newest code; <a href="../reference/package-imports-and-exports.html">Package imports and exports</a> lists the package names.</p>
+    <p>Each version keeps its own behavior. An older version can still include the removed Popup and Reference Label elements and lack attributes added since. The site's reference pages describe the newest code. <a href="../reference/package-imports-and-exports.html">Package imports and exports</a> lists the package names.</p>
     <h2>Versions</h2>
     <p>Newest first. Each directory also holds the version's <code>manifest.json</code>, <code>LICENSE.txt</code>, <code>THIRD-PARTY-NOTICES.txt</code> and <code>source.tar.gz</code>. <a href="catalog.json">catalog.json</a> has the same list as data.</p>
     <table>
