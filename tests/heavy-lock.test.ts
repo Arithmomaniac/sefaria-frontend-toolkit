@@ -183,3 +183,24 @@ it("retires a released lock into its permanent generation tombstone", async () =
     code: "ENOENT",
   });
 });
+
+it("reports a lock that could not be released instead of succeeding", async () => {
+  const root = path.join(".artifacts", `heavy-lock-${crypto.randomUUID()}`);
+  const lock = path.join(root, "lock");
+  await mkdir(root, { recursive: true });
+
+  await expect(
+    withHeavyStageLock(
+      async () => {
+        const { token } = JSON.parse(
+          await readFile(path.join(lock, "owner.json"), "utf8"),
+        );
+        await mkdir(path.join(`${lock}.retired-${token}`, "occupied"), {
+          recursive: true,
+        });
+        return "ok";
+      },
+      { lockDirectory: lock },
+    ),
+  ).rejects.toThrow(/could not release/i);
+});

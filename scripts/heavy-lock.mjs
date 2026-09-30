@@ -29,13 +29,24 @@ export async function withHeavyStageLock(
     wait,
     now,
   });
+  let result;
   try {
-    return await action();
-  } finally {
-    const owner = await readOwner(lockDirectory);
-    if (owner?.token === token) {
-      await retireLock(lockDirectory, token);
-    }
+    result = await action();
+  } catch (error) {
+    await releaseLock(lockDirectory, token).catch(() => {});
+    throw error;
+  }
+  await releaseLock(lockDirectory, token);
+  return result;
+}
+
+async function releaseLock(lockDirectory, token) {
+  const owner = await readOwner(lockDirectory);
+  if (owner?.token !== token) return;
+  if (!(await retireLock(lockDirectory, token))) {
+    throw new Error(
+      `Could not release the heavy-stage lock at ${lockDirectory}; it becomes recoverable once process ${process.pid} exits.`,
+    );
   }
 }
 
