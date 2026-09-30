@@ -102,8 +102,6 @@ export interface SourceCardAttributionViewModel {
   readonly versionSourceUrl?: string | null;
   /** Actual displayed edition's language family. */
   readonly languageFamilyName?: string;
-  /** Actual displayed edition's language identifier. */
-  readonly actualLanguage?: string;
   /** Unavailable preferred family, when the default translation was selected. */
   readonly unavailableTranslationLanguage?: string;
 }
@@ -670,7 +668,6 @@ function createAttributions(
             versionSource: version.versionSource,
             versionSourceUrl: parseVersionSourceUrl(version.versionSource),
             languageFamilyName: version.languageFamilyName,
-            actualLanguage: version.actualLanguage,
             ...(side === "translation" &&
             request.translationLanguage !== undefined &&
             version.languageFamilyName.toLowerCase() !==

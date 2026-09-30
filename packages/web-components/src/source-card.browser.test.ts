@@ -446,6 +446,25 @@ test("renders each edition attribution once outside the repeated pairs", async (
   ).toBe(false);
 });
 
+test("labels an edition with its language-family name only", async () => {
+  const host = await renderCard({
+    ...DATA,
+    attributions: [
+      {
+        side: "primary",
+        versionTitle: "Primary",
+        versionSource: null,
+        versionSourceUrl: null,
+        languageFamilyName: "hebrew",
+      },
+    ],
+  });
+
+  expect(host.shadowRoot?.querySelector(".edition-language")?.textContent).toBe(
+    "(hebrew)",
+  );
+});
+
 test("can hide edition attribution without changing the view model", async () => {
   const host = await renderCard();
   host.setAttribute("hide-attributions", "");
