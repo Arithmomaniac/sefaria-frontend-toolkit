@@ -11,7 +11,7 @@ import { data as snippets } from "./snippets.data.ts";
 
 # Give components your own data
 
-Components normally load their text from Sefaria. If you already hold the response, or you want your own server to stand between the page and Sefaria, you can change that. There are two cases.
+Components normally load their text from Sefaria. If you already hold the response, or you want your own server to stand between the page and Sefaria, you can change that. There are two cases. With `data`, the element makes no request at all. With `acquisition`, it still loads, and navigates in the Reader, but through your route.
 
 | You have… | Use… |
 | --- | --- |
@@ -41,10 +41,11 @@ When `data` is set, it wins over `sref`. In the example above, the only request 
 
 What happens with data that isn't usable:
 
-- **Invalid data.** The element shows its error state. It doesn't fall back to loading `sref`. It replaces any load already in progress.
+- **Invalid data.** The element shows its error state and drops any content it showed before. It cancels any load in progress and doesn't fall back to loading `sref`.
+- **Valid but empty data.** It is still authoritative. The element shows its empty state and doesn't load `sref`.
 - **Data set back to `undefined`.** A connected element with a non-blank `sref` loads from it again, through its acquisition choice.
 
-What counts as "nothing to show" depends on the element. The [Components reference](/reference/components.md) describes each one's states.
+Supplied data also follows the element's `translation-fallback` setting. It defaults to `none` on Text Segment and Bilingual Segment, and to `default` on Source Card. If the data lacks the translation language you asked for, the element shows the same "No french text." state as a live load would. It never requests the default translation. The [Components reference](/reference/components.md) describes each element's states.
 
 To see the failure in your own code as well, read [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md).
 
@@ -61,7 +62,7 @@ The Reader shows what the seed contains. A seed with `source` but no `connection
 
 <CodeLanguageToggle :snippet="snippets['supplied-reader-seed']" />
 
-This source-only seed makes one links request and doesn't request the source text again.
+In this example, the source-only seed makes one links request and doesn't request the source text again.
 
 ## Route loading through your host
 

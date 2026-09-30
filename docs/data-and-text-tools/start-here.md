@@ -11,13 +11,13 @@ import { data as snippets } from "./snippets.data.ts";
 
 # Fetch data or clean text
 
-The toolkit has two independent packages. The client fetches from Sefaria's API and checks each JSON response against the corrected API description. The text tools turn Sefaria's HTML into safe HTML, keep footnotes separate, and choose which vowel and cantillation marks to show. Use either one alone, or both. Neither needs a browser or a DOM, so they run on a server.
+This flow uses two independent packages from the toolkit. The client fetches from Sefaria's API and checks each JSON response against the corrected API description. The text tools turn Sefaria's HTML into safe HTML, keep footnotes separate, and choose which vowel and cantillation marks to show. Use either one alone, or both. Neither needs a browser or a DOM, so they run on a server.
 
 ## Install
 
 <StatusNote />
 
-Install `@arithmomaniac/sefaria-client`, `@arithmomaniac/sefaria-text-transform`, or both. Each works without the other. They are on GitHub Packages, which needs an access token before you can install. [Install and status](/help/install-and-status.md) shows how to set up the token and gives the exact install command for the current version. These steps need Node.js 22.12 or later. That page also lists the other JavaScript runtimes the packages are meant for.
+Install `@arithmomaniac/sefaria-client`, `@arithmomaniac/sefaria-text-transform`, or both. They are on GitHub Packages, which needs an access token before you can install. [Install and status](/help/install-and-status.md) shows how to set up the token and gives the exact install command for the current version. These steps need Node.js 22.12 or later. That page also lists the other JavaScript runtimes the packages are meant for.
 
 Each example below is a complete ES module. Save the JavaScript version as a file such as `fetch.mjs` and run `node fetch.mjs`. For the TypeScript version, save it as `fetch.ts` and use your usual TypeScript tooling. Node.js 22.18 and later can also run it directly with `node fetch.ts`.
 

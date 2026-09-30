@@ -19,6 +19,12 @@ Each choice is an HTML attribute. You write it inside the tag. Choices come in t
 - **Which text to load** is the language and edition. These change what the component requests, so a change makes a new request.
 - **How it's shown** is vocalization, sides, arrangement, and the edition credit. These redraw text the component already has and never make a request.
 
+Three terms matter throughout:
+
+- An **edition** is one specific published text on Sefaria. Its title names it, such as `Bible du Rabbinat 1899 [fr]`.
+- A **language** (or language family) is a group of editions, such as `french`. A language names many editions. A title names one.
+- The **primary edition** is the one Sefaria marks primary for that text. It's usually the original, such as Hebrew.
+
 A request is one call from the page to Sefaria. A dash in the tables means the component has no such attribute. The Reader also has attributes that aren't about text choice.
 
 ## Try them together
@@ -84,7 +90,7 @@ Every component takes `sref`. For the segments and Source Card, a fresh load mak
 
 ### Choose a translation language
 
-Set `translation-language` to a language family name such as `french`. A family is Sefaria's grouping of editions by language. The value ignores case and outer spaces. All four components accept it. On Text Segment, it shows a translation instead of the primary edition, for example `<sefaria-text-segment sref="Micah 6:8" translation-language="french">`. It returns translations only. `version-language` can also return the original.
+Set `translation-language` to a language name such as `french`. The value ignores case and outer spaces. All four components accept it. On Text Segment, it shows a translation instead of the primary edition, for example `<sefaria-text-segment sref="Micah 6:8" translation-language="french">`. It returns translations only. `version-language` can also return the original.
 
 ### When Sefaria doesn't have that language
 
@@ -101,7 +107,7 @@ Only a bare language preference can fall back. An exact edition title never fall
 
 ### Pin an exact edition
 
-To avoid a fallback, pin an exact edition. An edition title is the name Sefaria gives one edition, for example `Bible du Rabbinat 1899 [fr]`. Primary means the edition Sefaria marks primary. That is usually, but not always, the Hebrew or original.
+To avoid a fallback, pin one edition by its title. A title picks one edition, while a language picks any edition in that group.
 
 - Bilingual Segment and Source Card: `primary-version-title` pins the primary edition. `translation-version-title` pins the translation.
 - Text Segment: `version-title` alone chooses another edition in the original language, such as a different Hebrew edition. To choose a translation by title, also set `translation-language`.
