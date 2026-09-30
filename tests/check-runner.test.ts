@@ -6,11 +6,14 @@ import { describe, expect, it, vi } from "vitest";
 
 import {
   CHECK_STAGES,
+  HEAVY_STAGE_NAMES,
   isMainModule,
   runCheck,
   selectCheckStages,
   SITE_CHECK_STAGES,
 } from "../scripts/check.mjs";
+
+const root = path.resolve(import.meta.dirname, "..");
 
 describe("repository check runner", () => {
   it("replaces Python checks with the compiled MCP acceptance harness", () => {
@@ -57,6 +60,35 @@ describe("repository check runner", () => {
       names.indexOf("TypeScript and browser tests"),
     );
     expect(names).toHaveLength(18);
+  });
+
+  it("keeps fast site checks from redefining acceptance gates", async () => {
+    const packageJson = JSON.parse(
+      await readFile(path.join(root, "package.json"), "utf8"),
+    ) as { scripts: Record<string, string> };
+
+    expect(packageJson.scripts.check).toBe("node scripts/check.mjs");
+    expect(packageJson.scripts["check:site"]).toBe(
+      "node scripts/check.mjs --site",
+    );
+    expect(packageJson.scripts["check:site:fast"]).toBe(
+      "node scripts/check-site-fast.mjs",
+    );
+    expect(
+      SITE_CHECK_STAGES.every((stage) => CHECK_STAGES.includes(stage)),
+    ).toBe(true);
+  });
+
+  it("locks only heavyweight stages after cheap stages", () => {
+    const names = CHECK_STAGES.map((stage) => stage.name);
+
+    expect(names.slice(0, 5).some((name) => HEAVY_STAGE_NAMES.has(name))).toBe(
+      false,
+    );
+    expect(HEAVY_STAGE_NAMES.has("Documentation site browser acceptance")).toBe(
+      true,
+    );
+    expect(HEAVY_STAGE_NAMES.has("Formatting")).toBe(false);
   });
 
   it("selects the documentation-site subset only with --site", () => {

@@ -1,6 +1,7 @@
 import { access, copyFile, cp, mkdir, readFile, rm } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
+import console from "node:console";
 import { spawnSync } from "node:child_process";
 
 import { build } from "vite";
@@ -11,6 +12,11 @@ import {
   readSiteBasePath,
   SITE_REQUIRED_FILES,
 } from "./build-site-plan.mjs";
+import {
+  canReuseSiteBuild,
+  createSiteBuildKey,
+  writeSiteBuildKey,
+} from "./build-site-cache.mjs";
 import { buildScriptSource } from "./build-script-source.mjs";
 import { runNodeScript, runPackageTool } from "./node-tool.mjs";
 
@@ -19,7 +25,29 @@ const site = path.join(root, "dist", "site");
 const stagedPublic = path.join(root, "dist", "site-public");
 const skipTypecheck = process.argv.includes("--skip-typecheck");
 const examplesOnly = process.argv.includes("--examples-only");
+const force = process.argv.includes("--force");
 const siteBasePath = readSiteBasePath(process.argv.slice(2));
+const buildKey =
+  !skipTypecheck && !examplesOnly
+    ? await createSiteBuildKey({
+        root,
+        siteBasePath,
+        options: { skipTypecheck, examplesOnly },
+      })
+    : undefined;
+
+if (
+  buildKey !== undefined &&
+  !force &&
+  (await canReuseSiteBuild({
+    siteDirectory: site,
+    requiredFiles: SITE_REQUIRED_FILES,
+    expectedKey: buildKey,
+  }))
+) {
+  console.log("Reusing dist/site for matching build key.");
+  process.exit(0);
+}
 
 await rm(stagedPublic, { recursive: true, force: true });
 await mkdir(path.join(stagedPublic, "examples"), { recursive: true });
@@ -104,6 +132,9 @@ if (!examplesOnly) {
     await access(path.join(site, relativePath));
   }
   await verifyBuiltRoutes();
+  if (buildKey !== undefined) {
+    await writeSiteBuildKey(site, buildKey);
+  }
 }
 
 function runPnpm(args, env = process.env) {
