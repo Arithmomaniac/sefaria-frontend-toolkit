@@ -286,7 +286,19 @@ async function buildCustomElementsManifest() {
       declaration.events = eventCatalog[declaration.tagName];
       declaration.slots ??= [];
       declaration.cssParts ??= [];
-      declaration.cssProperties = cssPropertyCatalog;
+      declaration.cssProperties =
+        declaration.tagName === "sefaria-text-segment"
+          ? cssPropertyCatalog.map((entry) =>
+              entry.name === "--sefaria-surface"
+                ? {
+                    ...entry,
+                    description:
+                      "Primary surface color. Text Segment is transparent unless this is set.",
+                    default: "transparent",
+                  }
+                : entry,
+            )
+          : cssPropertyCatalog;
     }
     modules.push(
       normalizeModulePaths({

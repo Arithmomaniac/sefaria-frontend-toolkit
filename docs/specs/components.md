@@ -156,6 +156,8 @@ API HTML passes through `@arithmomaniac/sefaria-text-transform` exactly once bef
 
 Elements use open shadow roots, real interactive controls, visible focus, accessible names, semantic status/alert output, keyboard operation, and shared `--sefaria-*` theme properties. Reader exposes only its documented slot and coarse parts.
 
+Every element paints its host with `--sefaria-surface`, which defaults to a tinted surface, except Text Segment. Text Segment defaults to a transparent background so a single passage reads as page text; an explicit `--sefaria-surface`, set on the element or inherited from an ancestor, still tints it. Inside a composite, Text Segment stays transparent unless the host sets the token, so the parent's surface shows through.
+
 ## Verification
 
 Required tests cover:

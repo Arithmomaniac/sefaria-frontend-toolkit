@@ -278,7 +278,7 @@ The elements share these CSS custom properties. Not every element uses every one
 
 | Property | Default | Description |
 | --- | --- | --- |
-| `--sefaria-surface` | `light-dark(#fffdf8, #2b2e2a)` | Primary surface color. |
+| `--sefaria-surface` | `transparent` | Primary surface color. Text Segment is transparent unless this is set. |
 | `--sefaria-surface-muted` | `light-dark(#f5f1e8, #222521)` | Muted surface color. |
 | `--sefaria-fg` | `light-dark(#25231f, #f1eee7)` | Primary foreground color. |
 | `--sefaria-fg-muted` | `light-dark(#6d675d, #bdb7ac)` | Muted foreground color. |
