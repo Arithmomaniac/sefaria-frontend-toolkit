@@ -830,7 +830,7 @@ export class SefariaSourceCard extends SefariaElement {
     return html`<p class="attribution" data-side=${attribution.side}>
       <span class="attribution-label">${label}</span>
       ${title} ${source}
-      ${attribution.languageFamilyName === undefined ? nothing : html`<span class="edition-language">(${attribution.languageFamilyName}, ${attribution.actualLanguage})</span>`}
+      ${attribution.languageFamilyName === undefined ? nothing : html`<span class="edition-language">(${attribution.languageFamilyName})</span>`}
       ${attribution.unavailableTranslationLanguage === undefined ? nothing : html`<span class="translation-fallback" role="status">${attribution.unavailableTranslationLanguage} is unavailable; showing ${attribution.languageFamilyName}.</span>`}
     </p>`;
   }

@@ -37,7 +37,6 @@ function translationVersion(text: CoreV3TextValue): CoreV3Version {
     versionTitle: "Example English",
     versionSource: "Example publisher",
     language: "en",
-    actualLanguage: "en",
     languageFamilyName: "english",
     isSource: false,
     isPrimary: false,
@@ -137,7 +136,6 @@ describe("createSourceCardViewModel", () => {
         versionTitle: "Explicit source-backed compatibility composition",
         versionSource: null,
         versionSourceUrl: null,
-        actualLanguage: "he",
         languageFamilyName: "hebrew",
       },
       {
@@ -145,7 +143,6 @@ describe("createSourceCardViewModel", () => {
         versionTitle: "Example English",
         versionSource: "Example publisher",
         versionSourceUrl: null,
-        actualLanguage: "en",
         languageFamilyName: "english",
       },
     ]);
@@ -169,7 +166,6 @@ describe("createSourceCardViewModel", () => {
         versionTitle: "Explicit source-backed compatibility composition",
         versionSource: "javascript:alert(1)",
         versionSourceUrl: null,
-        actualLanguage: "he",
         languageFamilyName: "hebrew",
       },
       {
@@ -177,7 +173,6 @@ describe("createSourceCardViewModel", () => {
         versionTitle: "Example English",
         versionSource: "https://example.test/translation",
         versionSourceUrl: "https://example.test/translation",
-        actualLanguage: "en",
         languageFamilyName: "english",
       },
     ]);
