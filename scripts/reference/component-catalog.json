@@ -3,42 +3,42 @@
     "name": "Reference Label",
     "howTo": "/use-components/show-text/label-a-citation.md",
     "summary": "Shows a Sefaria reference as a label, with its English and Hebrew names.",
-    "data": "`data` takes the body of a successful `GET /api/ref/{tref}` response, typed `CoreRefResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it's invalid. It treats the value as a status 200 response.",
-    "empty": "The element shows its empty state when the response has `is_ref` set to `false`. The message is `\"<reference>\" is not a recognized Sefaria reference.`, with the reference filled in."
+    "data": "`data` takes the body of a successful `GET /api/ref/{tref}` response, typed `CoreRefResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.",
+    "empty": "The element shows its empty state when the response has `is_ref` set to `false`. The message is `\"<reference>\" is not a recognized Sefaria reference.` The element fills in the reference."
   },
   "sefaria-text-segment": {
     "name": "Text Segment",
     "howTo": "/use-components/show-text/show-one-passage.md",
     "summary": "Shows the text of one passage in one selected edition.",
-    "data": "`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. It also accepts a `TextSegmentSelectedData` object with `kind: \"selected\"`. When `data` is defined, the element uses it instead of loading `sref`, even when it's invalid. It treats the value as a status 200 response.",
-    "empty": "The element shows its empty state when the chosen edition has no text. The message depends on how the edition was chosen. If the default primary edition is missing, you see `No primary text is available.` If an edition you selected has no text, you can see a message naming that edition. On some paths the element shows the response's warning instead."
+    "data": "`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. It also accepts a `TextSegmentSelectedData` object with `kind: \"selected\"`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.",
+    "empty": "The element shows its empty state when the chosen edition has no text. The message depends on how the edition was chosen. If the default primary edition is missing, you see `No primary text is available.` If an edition you selected has no text, you can see a message that names that edition. On some paths, the element shows the response's warning instead."
   },
   "sefaria-bilingual-segment": {
     "name": "Bilingual Segment",
     "howTo": "/use-components/show-text/hebrew-and-translation.md",
-    "summary": "Shows one passage in its primary edition, the edition marked `isPrimary`, together with a translation.",
-    "data": "`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it's invalid. It treats the value as a status 200 response.",
-    "empty": "The element shows its empty state when neither side has text. Each missing side has its own message, such as `No primary text is available.` or `No translation text is available.`, or the response's warning for that side. When only one side is missing, you see the other side's text along with the missing side's message. `contentLanguage` filters which sides are shown."
+    "summary": "Shows one passage in its primary edition, together with a translation. The primary edition is the one marked `isPrimary`.",
+    "data": "`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.",
+    "empty": "The element shows its empty state when neither side has text. Each missing side has its own message, such as `No primary text is available.` or `No translation text is available.` The element can show the response's warning for that side instead. When only one side is missing, you see the other side's text and the missing side's message. `contentLanguage` filters which sides are shown."
   },
   "sefaria-source-card": {
     "name": "Source Card",
     "howTo": "/use-components/show-an-attributed-passage.md",
-    "summary": "Shows a passage as a card with a heading, its text in the primary edition and a translation, and the title of each edition shown. When an edition's source is a valid http(s) address, the title links to it; any other source appears as plain text.",
-    "data": "`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it's invalid. It treats the value as a status 200 response.",
-    "empty": "The element shows its empty state when the response has no text for either side. The card keeps its heading and edition details, and shows why each side is missing, such as `No primary text is available.`"
+    "summary": "Shows a passage as a card. The card has a heading, the text in the primary edition, a translation, and the title of each edition shown. When an edition's source is a valid http(s) address, the title links to it. Any other source appears as plain text.",
+    "data": "`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.",
+    "empty": "The element shows its empty state when the response has no text for either side. The card keeps its heading and edition details. It shows why each side is missing, such as `No primary text is available.`"
   },
   "sefaria-connections-panel": {
     "name": "Connections Panel",
     "howTo": "/use-components/show-commentary-and-connected-texts.md",
-    "summary": "Lists the commentaries and other texts that Sefaria connects to a reference, grouped by category.",
-    "data": "`data` takes the body of a `GET /api/links/{tref}` response, typed `CoreLinkResponse` from `@arithmomaniac/sefaria-client`. The element treats supplied data as a status 200 response, including when it's an API error object. When `data` is defined, the element uses it instead of loading `sref`, even when it's invalid.",
-    "empty": "The element shows its empty state when no text connections remain after sheet links are left out, so a response with only sheets is empty too. The message is `No text connections were returned.`"
+    "summary": "Lists the commentaries and other texts that Sefaria connects to a reference. It groups them by category.",
+    "data": "`data` takes the body of a `GET /api/links/{tref}` response, typed `CoreLinkResponse` from `@arithmomaniac/sefaria-client`. The element treats supplied data as a status 200 response, including when it is an API error object. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid.",
+    "empty": "The element shows its empty state when no text connections remain after the element leaves out sheet links. A response with only sheets is empty too. The message is `No text connections were returned.`"
   },
   "sefaria-reader": {
     "name": "Reader",
     "howTo": "/use-components/add-the-complete-reader.md",
-    "summary": "Shows a passage together with its connected texts, and lets readers move between them.",
-    "data": "`data` takes a `ReaderRawSeedData` object, exported as a type from `@arithmomaniac/sefaria-web-components/reader`. It needs at least one seed: `source`, a status 200 `GET /api/v3/texts/{tref}` response with the request it answers, or `connections`, a `GET /api/links/{tref}` response with its status and request. It can also set `selectedRef` and `presentation`. The Reader accepts the whole value or none of it, and a value it can't accept produces an error rather than a request. A `source` seed without `connections` still leads to a links request.",
-    "empty": "A Reader that has never had `sref` or `data` is blank, and its status is `empty`. Clearing `data` later keeps the content the Reader already accepted. A missing pane shows `Source text is not available for this entry.` or `Connections are not available for this entry.` A passage with no text is reported as a source failure, not as an empty Source Card. A valid links response with no text connections shows the Connections Panel's empty message."
+    "summary": "Shows a passage with its connected texts. Readers can move between them.",
+    "data": "`data` takes a `ReaderRawSeedData` object, exported as a type from `@arithmomaniac/sefaria-web-components/reader`. It needs at least one seed. `source` holds a status 200 `GET /api/v3/texts/{tref}` response and the request it answers. `connections` holds a `GET /api/links/{tref}` response, its status, and its request. It can also set `selectedRef` and `presentation`. The Reader accepts the whole value or none of it. A value it can't accept produces an error, not a request. A `source` seed without `connections` still leads to a links request.",
+    "empty": "A Reader that has never had `sref` or `data` is blank. Its status is `empty`. Clearing `data` later keeps the content the Reader already accepted. A missing pane shows `Source text is not available for this entry.` or `Connections are not available for this entry.` The Reader reports a passage with no text as a source failure, not as an empty Source Card. A valid links response with no text connections shows the Connections Panel's empty message."
   }
 }

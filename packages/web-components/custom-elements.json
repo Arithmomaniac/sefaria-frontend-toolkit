@@ -143,7 +143,7 @@
           "events": [
             {
               "name": "sefaria-bilingual-segment-error",
-              "description": "Reports a current standalone loading or validation failure.",
+              "description": "Reports a failure while loading or validating data from `sref`.",
               "type": {
                 "text": "CustomEvent"
               }
@@ -461,35 +461,35 @@
           "events": [
             {
               "name": "sefaria-connections-category-change",
-              "description": "Requests a different captured connection category.",
+              "description": "Asks to show a different connection category.",
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-connections-preview-request",
-              "description": "Requests captured connection previews from the host.",
+              "description": "Requests connection previews. The element loads them unless a listener cancels the event.",
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-connections-page-change",
-              "description": "Requests a different page of captured connections.",
+              "description": "Asks to show a different page of connections.",
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-connection-select",
-              "description": "Reports selection of one connected reference.",
+              "description": "Reports that a reader selected one connected reference.",
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-connections-panel-error",
-              "description": "Reports a current standalone loading or validation failure.",
+              "description": "Reports a failure while loading or validating data from `sref`.",
               "type": {
                 "text": "CustomEvent"
               }
@@ -931,63 +931,63 @@
             },
             {
               "name": "sefaria-reader-history-activate",
-              "description": "Requests activation of one retained history entry.",
+              "description": "Asks to return to one saved history entry.",
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-reader-pane-change",
-              "description": "Requests the visible compact reader pane.",
+              "description": "Asks to show a different pane in the compact layout.",
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-reader-chat-export",
-              "description": "Requests host-owned export of a reference to chat.",
+              "description": "Asks your page to send a reference to chat.",
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-reader-source-select",
-              "description": "Reports selection of one source-card item.",
+              "description": "Reports that a reader selected one item in the source card.",
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-reader-connections-category-change",
-              "description": "Requests a different connection category.",
+              "description": "Asks to show a different connection category.",
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-reader-connections-page-change",
-              "description": "Requests a different connection page.",
+              "description": "Asks to show a different connection page.",
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-reader-connection-select",
-              "description": "Reports selection of one connected reference.",
+              "description": "Reports that a reader selected one connected reference.",
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-reader-connections-preview-request",
-              "description": "Requests connection previews from the host.",
+              "description": "Requests connection previews. The element loads them unless a listener cancels the event.",
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-reader-error",
-              "description": "Reports a current standalone loading or seed-admission failure.",
+              "description": "Reports a loading failure or a rejection of the starting data.",
               "type": {
                 "text": "CustomEvent"
               }
@@ -1297,7 +1297,7 @@
           "events": [
             {
               "name": "sefaria-ref-label-error",
-              "description": "Reports a current standalone loading or validation failure.",
+              "description": "Reports a failure while loading or validating data from `sref`.",
               "type": {
                 "text": "CustomEvent"
               }
@@ -1635,14 +1635,14 @@
           "events": [
             {
               "name": "sefaria-source-select",
-              "description": "Reports selection of one source-card item.",
+              "description": "Reports that a reader selected one item in the source card.",
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-source-card-error",
-              "description": "Reports a current standalone loading or validation failure.",
+              "description": "Reports a failure while loading or validating data from `sref`.",
               "type": {
                 "text": "CustomEvent"
               }
@@ -1978,7 +1978,7 @@
           "events": [
             {
               "name": "sefaria-text-segment-error",
-              "description": "Reports a current standalone loading or validation failure.",
+              "description": "Reports a failure while loading or validating data from `sref`.",
               "type": {
                 "text": "CustomEvent"
               }

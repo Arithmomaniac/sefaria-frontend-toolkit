@@ -13,15 +13,15 @@ import ReleaseStamp from "./ReleaseStamp.vue";
 
 # Components reference
 
-This page lists the attributes, properties, data, empty states, events and style settings of the toolkit's 6 elements. It's generated from the package's `custom-elements.json`.
+This page lists the attributes, properties, data, empty states, events, and style settings of the toolkit's 6 elements. The generator builds it from the package's `custom-elements.json`.
 
-The elements are registered when you load the script tag, or when you import the package root with `import "@arithmomaniac/sefaria-web-components";`. The element subpaths, such as `@arithmomaniac/sefaria-web-components/source-card`, don't register their element; they export types and a few helpers.
+The elements are registered when you load the script tag or when you import the package root with `import "@arithmomaniac/sefaria-web-components";`. The element subpaths, such as `@arithmomaniac/sefaria-web-components/source-card`, don't register their element. They export types and a few helpers.
 
 ## Which release this describes
 
 This page documents the code on the `main` branch, which `alpha` builds are published from. <ReleaseStamp />
 
-The `alpha` script-tag address serves the newest script release that is still active. It isn't checked against the commit this page was built from, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as they remain hosted. An older pin can still include the removed Popup element, and it can lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
+The `alpha` script-tag address serves the newest script release that is still active. The site doesn't compare it with the commit used to build this page, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can still include the removed Popup element. It can also lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
 
 ## Elements
 
@@ -40,7 +40,7 @@ The `alpha` script-tag address serves the newest script release that is still ac
 
 ### Attributes and properties
 
-Set an attribute in HTML, or the property of the same name in JavaScript. A property with no attribute can be set only from JavaScript.
+Set an attribute in HTML or a property in JavaScript. If a property has no attribute, set it in JavaScript.
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
@@ -53,11 +53,11 @@ Set an attribute in HTML, or the property of the same name in JavaScript. A prop
 
 ### Data
 
-`data` takes the body of a successful `GET /api/ref/{tref}` response, typed `CoreRefResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it's invalid. It treats the value as a status 200 response.
+`data` takes the body of a successful `GET /api/ref/{tref}` response, typed `CoreRefResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
 
 ### Empty state
 
-The element shows its empty state when the response has `is_ref` set to `false`. The message is `"<reference>" is not a recognized Sefaria reference.`, with the reference filled in.
+The element shows its empty state when the response has `is_ref` set to `false`. The message is `"<reference>" is not a recognized Sefaria reference.` The element fills in the reference.
 
 ### Events
 
@@ -71,7 +71,7 @@ The element shows its empty state when the response has `is_ref` set to `false`.
 
 ### Attributes and properties
 
-Set an attribute in HTML, or the property of the same name in JavaScript. A property with no attribute can be set only from JavaScript.
+Set an attribute in HTML or a property in JavaScript. If a property has no attribute, set it in JavaScript.
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
@@ -88,11 +88,11 @@ Set an attribute in HTML, or the property of the same name in JavaScript. A prop
 
 ### Data
 
-`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. It also accepts a `TextSegmentSelectedData` object with `kind: "selected"`. When `data` is defined, the element uses it instead of loading `sref`, even when it's invalid. It treats the value as a status 200 response.
+`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. It also accepts a `TextSegmentSelectedData` object with `kind: "selected"`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
 
 ### Empty state
 
-The element shows its empty state when the chosen edition has no text. The message depends on how the edition was chosen. If the default primary edition is missing, you see `No primary text is available.` If an edition you selected has no text, you can see a message naming that edition. On some paths the element shows the response's warning instead.
+The element shows its empty state when the chosen edition has no text. The message depends on how the edition was chosen. If the default primary edition is missing, you see `No primary text is available.` If an edition you selected has no text, you can see a message that names that edition. On some paths, the element shows the response's warning instead.
 
 ### Events
 
@@ -102,11 +102,11 @@ The element shows its empty state when the chosen edition has no text. The messa
 
 ## Bilingual Segment
 
-`<sefaria-bilingual-segment>`. Shows one passage in its primary edition, the edition marked `isPrimary`, together with a translation. [How to use it](/use-components/show-text/hebrew-and-translation.md).
+`<sefaria-bilingual-segment>`. Shows one passage in its primary edition, together with a translation. The primary edition is the one marked `isPrimary`. [How to use it](/use-components/show-text/hebrew-and-translation.md).
 
 ### Attributes and properties
 
-Set an attribute in HTML, or the property of the same name in JavaScript. A property with no attribute can be set only from JavaScript.
+Set an attribute in HTML or a property in JavaScript. If a property has no attribute, set it in JavaScript.
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
@@ -125,11 +125,11 @@ Set an attribute in HTML, or the property of the same name in JavaScript. A prop
 
 ### Data
 
-`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it's invalid. It treats the value as a status 200 response.
+`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
 
 ### Empty state
 
-The element shows its empty state when neither side has text. Each missing side has its own message, such as `No primary text is available.` or `No translation text is available.`, or the response's warning for that side. When only one side is missing, you see the other side's text along with the missing side's message. `contentLanguage` filters which sides are shown.
+The element shows its empty state when neither side has text. Each missing side has its own message, such as `No primary text is available.` or `No translation text is available.` The element can show the response's warning for that side instead. When only one side is missing, you see the other side's text and the missing side's message. `contentLanguage` filters which sides are shown.
 
 ### Events
 
@@ -139,11 +139,11 @@ The element shows its empty state when neither side has text. Each missing side 
 
 ## Source Card
 
-`<sefaria-source-card>`. Shows a passage as a card with a heading, its text in the primary edition and a translation, and the title of each edition shown. When an edition's source is a valid http(s) address, the title links to it; any other source appears as plain text. [How to use it](/use-components/show-an-attributed-passage.md).
+`<sefaria-source-card>`. Shows a passage as a card. The card has a heading, the text in the primary edition, a translation, and the title of each edition shown. When an edition's source is a valid http(s) address, the title links to it. Any other source appears as plain text. [How to use it](/use-components/show-an-attributed-passage.md).
 
 ### Attributes and properties
 
-Set an attribute in HTML, or the property of the same name in JavaScript. A property with no attribute can be set only from JavaScript.
+Set an attribute in HTML or a property in JavaScript. If a property has no attribute, set it in JavaScript.
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
@@ -165,11 +165,11 @@ Set an attribute in HTML, or the property of the same name in JavaScript. A prop
 
 ### Data
 
-`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it's invalid. It treats the value as a status 200 response.
+`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
 
 ### Empty state
 
-The element shows its empty state when the response has no text for either side. The card keeps its heading and edition details, and shows why each side is missing, such as `No primary text is available.`
+The element shows its empty state when the response has no text for either side. The card keeps its heading and edition details. It shows why each side is missing, such as `No primary text is available.`
 
 ### Events
 
@@ -179,11 +179,11 @@ The element shows its empty state when the response has no text for either side.
 
 ## Connections Panel
 
-`<sefaria-connections-panel>`. Lists the commentaries and other texts that Sefaria connects to a reference, grouped by category. [How to use it](/use-components/show-commentary-and-connected-texts.md).
+`<sefaria-connections-panel>`. Lists the commentaries and other texts that Sefaria connects to a reference. It groups them by category. [How to use it](/use-components/show-commentary-and-connected-texts.md).
 
 ### Attributes and properties
 
-Set an attribute in HTML, or the property of the same name in JavaScript. A property with no attribute can be set only from JavaScript.
+Set an attribute in HTML or a property in JavaScript. If a property has no attribute, set it in JavaScript.
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
@@ -199,11 +199,11 @@ Set an attribute in HTML, or the property of the same name in JavaScript. A prop
 
 ### Data
 
-`data` takes the body of a `GET /api/links/{tref}` response, typed `CoreLinkResponse` from `@arithmomaniac/sefaria-client`. The element treats supplied data as a status 200 response, including when it's an API error object. When `data` is defined, the element uses it instead of loading `sref`, even when it's invalid.
+`data` takes the body of a `GET /api/links/{tref}` response, typed `CoreLinkResponse` from `@arithmomaniac/sefaria-client`. The element treats supplied data as a status 200 response, including when it is an API error object. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid.
 
 ### Empty state
 
-The element shows its empty state when no text connections remain after sheet links are left out, so a response with only sheets is empty too. The message is `No text connections were returned.`
+The element shows its empty state when no text connections remain after the element leaves out sheet links. A response with only sheets is empty too. The message is `No text connections were returned.`
 
 ### Events
 
@@ -213,11 +213,11 @@ The element shows its empty state when no text connections remain after sheet li
 
 ## Reader
 
-`<sefaria-reader>`. Shows a passage together with its connected texts, and lets readers move between them. [How to use it](/use-components/add-the-complete-reader.md).
+`<sefaria-reader>`. Shows a passage with its connected texts. Readers can move between them. [How to use it](/use-components/add-the-complete-reader.md).
 
 ### Attributes and properties
 
-Set an attribute in HTML, or the property of the same name in JavaScript. A property with no attribute can be set only from JavaScript.
+Set an attribute in HTML or a property in JavaScript. If a property has no attribute, set it in JavaScript.
 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
@@ -245,11 +245,11 @@ Set an attribute in HTML, or the property of the same name in JavaScript. A prop
 
 ### Data
 
-`data` takes a `ReaderRawSeedData` object, exported as a type from `@arithmomaniac/sefaria-web-components/reader`. It needs at least one seed: `source`, a status 200 `GET /api/v3/texts/{tref}` response with the request it answers, or `connections`, a `GET /api/links/{tref}` response with its status and request. It can also set `selectedRef` and `presentation`. The Reader accepts the whole value or none of it, and a value it can't accept produces an error rather than a request. A `source` seed without `connections` still leads to a links request.
+`data` takes a `ReaderRawSeedData` object, exported as a type from `@arithmomaniac/sefaria-web-components/reader`. It needs at least one seed. `source` holds a status 200 `GET /api/v3/texts/{tref}` response and the request it answers. `connections` holds a `GET /api/links/{tref}` response, its status, and its request. It can also set `selectedRef` and `presentation`. The Reader accepts the whole value or none of it. A value it can't accept produces an error, not a request. A `source` seed without `connections` still leads to a links request.
 
 ### Empty state
 
-A Reader that has never had `sref` or `data` is blank, and its status is `empty`. Clearing `data` later keeps the content the Reader already accepted. A missing pane shows `Source text is not available for this entry.` or `Connections are not available for this entry.` A passage with no text is reported as a source failure, not as an empty Source Card. A valid links response with no text connections shows the Connections Panel's empty message.
+A Reader that has never had `sref` or `data` is blank. Its status is `empty`. Clearing `data` later keeps the content the Reader already accepted. A missing pane shows `Source text is not available for this entry.` or `Connections are not available for this entry.` The Reader reports a passage with no text as a source failure, not as an empty Source Card. A valid links response with no text connections shows the Connections Panel's empty message.
 
 ### Events
 
@@ -276,38 +276,40 @@ Style these from your page with `::part(name)`.
 
 ## Events
 
-Each element dispatches `CustomEvent`s that bubble and cross shadow roots. Listen for them with `addEventListener` on the element or an ancestor. For a cancelable event, calling `preventDefault()` in your listener stops the element's own action; the element acts after your listener returns. Invalid supplied `data` puts an element into its error state. The Reader reports it with `sefaria-reader-error`; the other elements don't dispatch an error event for it.
+Each element dispatches `CustomEvent`s that bubble and cross shadow roots. Listen for them with `addEventListener` on the element or an ancestor. For a cancelable event, call `preventDefault()` in your listener to stop the element's own action. The element acts after your listener returns.
+
+Invalid supplied `data` puts an element into its error state. The Reader reports it with `sefaria-reader-error`. The other elements don't dispatch an error event for it.
 
 [Make components respond to each other](/across-components/make-components-respond-to-each-other.md) shows how to use them.
 
 | Element | Event | Description | Detail | Cancelable | What `preventDefault()` does |
 | --- | --- | --- | --- | --- | --- |
-| Reference Label | `sefaria-ref-label-error` | Reports a current standalone loading or validation failure. | `error`, the original failure; `sref`, the reference that was loading | No | — |
-| Text Segment | `sefaria-text-segment-error` | Reports a current standalone loading or validation failure. | `error`, the original failure; `sref`, the reference that was loading | No | — |
-| Bilingual Segment | `sefaria-bilingual-segment-error` | Reports a current standalone loading or validation failure. | `error`, the original failure; `sref`, the reference that was loading | No | — |
-| Source Card | `sefaria-source-select` | Reports selection of one source-card item. | `position`, the selected segment's position as an array of numbers; `ref`, its reference | No | — |
-| Source Card | `sefaria-source-card-error` | Reports a current standalone loading or validation failure. | `error`, the original failure; `sref`, the reference that was loading | No | — |
-| Connections Panel | `sefaria-connections-category-change` | Requests a different captured connection category. | `category`, the chosen category's ID, or `null` for all categories | Yes | Stops the panel from switching to that category and returning to the first page. |
-| Connections Panel | `sefaria-connections-preview-request` | Requests captured connection previews from the host. | No fields. | Yes | Stops the panel from loading previews itself. Without it, a panel that loads from `sref` requests the connections again with their text. |
-| Connections Panel | `sefaria-connections-page-change` | Requests a different page of captured connections. | `page`, the zero-based page number | Yes | Stops the panel from changing page. |
-| Connections Panel | `sefaria-connection-select` | Reports selection of one connected reference. | `id`, the connection's ID; `targetRef`, the connected text's reference | Yes | Nothing; the panel has no default action for this event. |
-| Connections Panel | `sefaria-connections-panel-error` | Reports a current standalone loading or validation failure. | `error`, the original failure; `sref`, the reference that was loading | No | — |
+| Reference Label | `sefaria-ref-label-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No | — |
+| Text Segment | `sefaria-text-segment-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No | — |
+| Bilingual Segment | `sefaria-bilingual-segment-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No | — |
+| Source Card | `sefaria-source-select` | Reports that a reader selected one item in the source card. | `position` is the selected segment's position as an array of numbers. `ref` is its reference. | No | — |
+| Source Card | `sefaria-source-card-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No | — |
+| Connections Panel | `sefaria-connections-category-change` | Asks to show a different connection category. | `category` is the chosen category's ID, or `null` for all categories. | Yes | Stops the panel from switching to that category and returning to the first page. |
+| Connections Panel | `sefaria-connections-preview-request` | Requests connection previews. The element loads them unless a listener cancels the event. | No fields. | Yes | Stops the panel from loading previews itself. If you don't call it, a panel that loads from `sref` requests the connections again with their text. |
+| Connections Panel | `sefaria-connections-page-change` | Asks to show a different page of connections. | `page` is the zero-based page number. | Yes | Stops the panel from changing page. |
+| Connections Panel | `sefaria-connection-select` | Reports that a reader selected one connected reference. | `id` is the connection's ID. `targetRef` is the connected text's reference. | Yes | Nothing. The panel has no default action for this event. |
+| Connections Panel | `sefaria-connections-panel-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No | — |
 | Reader | `sefaria-reader-back` | Requests navigation to the previous entry. | `originEntryId`, the entry the Reader was showing | Yes | Stops the Reader from going back. |
-| Reader | `sefaria-reader-history-activate` | Requests activation of one retained history entry. | `originEntryId`; `entryId`, the history entry chosen; `label`, its label | Yes | Stops the Reader from returning to that entry. |
-| Reader | `sefaria-reader-pane-change` | Requests the visible compact reader pane. | `originEntryId`; `pane`, `"source"` or `"connections"` | Yes | Stops the Reader from switching pane. |
-| Reader | `sefaria-reader-chat-export` | Requests host-owned export of a reference to chat. | `originEntryId`; `targetRef`, the reference to send | Yes | Nothing; the Reader has no default action. Your page handles the export. |
-| Reader | `sefaria-reader-source-select` | Reports selection of one source-card item. | `originEntryId`; `position`; `ref`, as in `sefaria-source-select` | Yes | Stops the Reader from selecting that segment. |
-| Reader | `sefaria-reader-connections-category-change` | Requests a different connection category. | `originEntryId`; `category`, as in `sefaria-connections-category-change` | Yes | Stops the Reader from switching category. |
-| Reader | `sefaria-reader-connections-page-change` | Requests a different connection page. | `originEntryId`; `page`, as in `sefaria-connections-page-change` | Yes | Stops the Reader from changing page. |
-| Reader | `sefaria-reader-connection-select` | Reports selection of one connected reference. | `originEntryId`; `id` and `targetRef`, as in `sefaria-connection-select` | Yes | Stops the Reader from opening the connected text. |
-| Reader | `sefaria-reader-connections-preview-request` | Requests connection previews from the host. | `originEntryId` | Yes | Stops the Reader from loading previews. |
-| Reader | `sefaria-reader-error` | Reports a current standalone loading or seed-admission failure. | `error`, the original failure; `sref`, the Reader's requested reference, which can be empty when the failure came from supplied `data` | No | — |
+| Reader | `sefaria-reader-history-activate` | Asks to return to one saved history entry. | `originEntryId` is the entry the Reader was showing. `entryId` is the history entry chosen. `label` is its label. | Yes | Stops the Reader from returning to that entry. |
+| Reader | `sefaria-reader-pane-change` | Asks to show a different pane in the compact layout. | `originEntryId` is the entry the Reader was showing. `pane` is `"source"` or `"connections"`. | Yes | Stops the Reader from switching pane. |
+| Reader | `sefaria-reader-chat-export` | Asks your page to send a reference to chat. | `originEntryId` is the entry the Reader was showing. `targetRef` is the reference to send. | Yes | Nothing. The Reader has no default action. Your page handles the export. |
+| Reader | `sefaria-reader-source-select` | Reports that a reader selected one item in the source card. | `originEntryId` is the entry the Reader was showing. `position` and `ref` are the same as in `sefaria-source-select`. | Yes | Stops the Reader from selecting that segment. |
+| Reader | `sefaria-reader-connections-category-change` | Asks to show a different connection category. | `originEntryId` is the entry the Reader was showing. `category` is the same as in `sefaria-connections-category-change`. | Yes | Stops the Reader from switching category. |
+| Reader | `sefaria-reader-connections-page-change` | Asks to show a different connection page. | `originEntryId` is the entry the Reader was showing. `page` is the same as in `sefaria-connections-page-change`. | Yes | Stops the Reader from changing page. |
+| Reader | `sefaria-reader-connection-select` | Reports that a reader selected one connected reference. | `originEntryId` is the entry the Reader was showing. `id` and `targetRef` are the same as in `sefaria-connection-select`. | Yes | Stops the Reader from opening the connected text. |
+| Reader | `sefaria-reader-connections-preview-request` | Requests connection previews. The element loads them unless a listener cancels the event. | `originEntryId` | Yes | Stops the Reader from loading previews. |
+| Reader | `sefaria-reader-error` | Reports a loading failure or a rejection of the starting data. | `error` is the original failure. `sref` is the Reader's requested reference. It can be empty when the failure came from supplied `data`. | No | — |
 
 <a id="style-settings"></a>
 
 ## Style settings
 
-The elements share these CSS custom properties, though not every element uses every one. Set them on the element or on any ancestor. [Match your site's look](/across-components/match-your-sites-look.md) shows how.
+The elements share these CSS custom properties. Not every element uses every one. Set them on the element or on any ancestor. [Match your site's look](/across-components/match-your-sites-look.md) shows how.
 
 | Property | Default | Description |
 | --- | --- | --- |

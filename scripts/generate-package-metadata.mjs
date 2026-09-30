@@ -24,90 +24,90 @@ const eventCatalog = {
   "sefaria-bilingual-segment": [
     event(
       "sefaria-bilingual-segment-error",
-      "Reports a current standalone loading or validation failure.",
+      "Reports a failure while loading or validating data from `sref`.",
     ),
   ],
   "sefaria-connections-panel": [
     event(
       "sefaria-connections-category-change",
-      "Requests a different captured connection category.",
+      "Asks to show a different connection category.",
     ),
     event(
       "sefaria-connections-preview-request",
-      "Requests captured connection previews from the host.",
+      "Requests connection previews. The element loads them unless a listener cancels the event.",
     ),
     event(
       "sefaria-connections-page-change",
-      "Requests a different page of captured connections.",
+      "Asks to show a different page of connections.",
     ),
     event(
       "sefaria-connection-select",
-      "Reports selection of one connected reference.",
+      "Reports that a reader selected one connected reference.",
     ),
     event(
       "sefaria-connections-panel-error",
-      "Reports a current standalone loading or validation failure.",
+      "Reports a failure while loading or validating data from `sref`.",
     ),
   ],
   "sefaria-reader": [
     event("sefaria-reader-back", "Requests navigation to the previous entry."),
     event(
       "sefaria-reader-history-activate",
-      "Requests activation of one retained history entry.",
+      "Asks to return to one saved history entry.",
     ),
     event(
       "sefaria-reader-pane-change",
-      "Requests the visible compact reader pane.",
+      "Asks to show a different pane in the compact layout.",
     ),
     event(
       "sefaria-reader-chat-export",
-      "Requests host-owned export of a reference to chat.",
+      "Asks your page to send a reference to chat.",
     ),
     event(
       "sefaria-reader-source-select",
-      "Reports selection of one source-card item.",
+      "Reports that a reader selected one item in the source card.",
     ),
     event(
       "sefaria-reader-connections-category-change",
-      "Requests a different connection category.",
+      "Asks to show a different connection category.",
     ),
     event(
       "sefaria-reader-connections-page-change",
-      "Requests a different connection page.",
+      "Asks to show a different connection page.",
     ),
     event(
       "sefaria-reader-connection-select",
-      "Reports selection of one connected reference.",
+      "Reports that a reader selected one connected reference.",
     ),
     event(
       "sefaria-reader-connections-preview-request",
-      "Requests connection previews from the host.",
+      "Requests connection previews. The element loads them unless a listener cancels the event.",
     ),
     event(
       "sefaria-reader-error",
-      "Reports a current standalone loading or seed-admission failure.",
+      "Reports a loading failure or a rejection of the starting data.",
     ),
   ],
   "sefaria-ref-label": [
     event(
       "sefaria-ref-label-error",
-      "Reports a current standalone loading or validation failure.",
+      "Reports a failure while loading or validating data from `sref`.",
     ),
   ],
   "sefaria-source-card": [
     event(
       "sefaria-source-select",
-      "Reports selection of one source-card item.",
+      "Reports that a reader selected one item in the source card.",
     ),
     event(
       "sefaria-source-card-error",
-      "Reports a current standalone loading or validation failure.",
+      "Reports a failure while loading or validating data from `sref`.",
     ),
   ],
   "sefaria-text-segment": [
     event(
       "sefaria-text-segment-error",
-      "Reports a current standalone loading or validation failure.",
+      "Reports a failure while loading or validating data from `sref`.",
     ),
   ],
 };

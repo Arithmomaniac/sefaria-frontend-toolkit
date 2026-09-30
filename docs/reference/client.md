@@ -13,17 +13,21 @@ import ReleaseStamp from "./ReleaseStamp.vue";
 
 # Client reference
 
-This page describes `@arithmomaniac/sefaria-client`: the function that creates a client, its options, the error it throws for a response that doesn't match its contract, the validation helpers, and the generated functions for each part of Sefaria's API.
+This page describes how to create a client with `@arithmomaniac/sefaria-client` and set its options. It also describes the error for a response that doesn't match its contract, the validation helpers, and the generated API functions.
 
 ## Which release this describes
 
 This page documents the code on the `main` branch, which `alpha` builds are published from. <ReleaseStamp />
 
-The `alpha` script-tag address serves the newest script release that is still active. It isn't checked against the commit this page was built from, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as they remain hosted. An older pin can still include the removed Popup element, and it can lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
+The `alpha` script-tag address serves the newest script release that is still active. The site doesn't compare it with the commit used to build this page, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can still include the removed Popup element. It can also lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
 
 ## Client, options, errors and validation
 
-These names are written by hand. Import them from the package root. `createSefariaClient`, `SefariaClient`, `SefariaClientOptions` and `SefariaCacheOptions` are also exported from `@arithmomaniac/sefaria-client/client`. `SefariaContractError`, `SefariaContractErrorOptions` and `ContractIssue` are also exported from `/errors`, and the validation helpers from `/validation`.
+These names are written by hand. Import them from the package root. You can also import some from subpaths:
+
+- `createSefariaClient`, `SefariaClient`, `SefariaClientOptions`, and `SefariaCacheOptions` from `@arithmomaniac/sefaria-client/client`.
+- `SefariaContractError`, `SefariaContractErrorOptions`, and `ContractIssue` from `/errors`.
+- The validation helpers from `/validation`.
 
 ### Functions
 
@@ -241,11 +245,12 @@ Non-throwing validation result for externally supplied response-shaped JSON.
 
 ## Generated functions by namespace
 
-The client has 60 generated functions, one for each endpoint in the corrected API description. They're grouped into namespaces that follow the sections of [Sefaria's API](https://developers.sefaria.org/), and each namespace is exported from the package root. Call a function with a client and its request options, for example `text.getV3Texts({ client, path: { tref: "Micah 6:8" } })`.
+The client has 60 generated functions, one for each endpoint in the corrected API description. The functions are grouped into namespaces that follow the sections of [Sefaria's API](https://developers.sefaria.org/), and each namespace is exported from the package root. Call a function with a client and its request options, for example `text.getV3Texts({ client, path: { tref: "Micah 6:8" } })`.
 
-- **Options type** describes the path, query and body options the function accepts.
+- **Options type** describes the path, query, and body options that the function accepts.
 - **Responses type** maps each documented success status to its response body. **Errors type**, where there is one, does the same for documented error statuses.
-- **Validators** check a response body for one status. The client runs them on the responses it receives; you can also call them on JSON from elsewhere. A binary response has no validator; the client checks only its status and content type.
+- **Validators** check a response body for one status. The client runs them on the responses it receives. You can also call them on JSON from elsewhere.
+- A binary response has no validator. The client checks only its status and content type.
 
 ### `text`
 
@@ -364,11 +369,11 @@ The client has 60 generated functions, one for each endpoint in the corrected AP
 
 ## Generated types, schemas and validators
 
-The package root also exports the generated types, schemas and validators. They aren't listed one by one here.
+The package root also exports the generated types, schemas, and validators. This page doesn't list them one by one.
 
-- **Types** such as `GetV3TextsData` and `GetV3TextsResponses` are exported as TypeScript types from the package root and from `@arithmomaniac/sefaria-client/contracts`.
-- **Zod schemas** have names starting with `z`, such as `zCoreV3TextsResponse`. They're exported from the package root and from `@arithmomaniac/sefaria-client/schemas`.
-- **Validators** have names such as `validateGetV3Texts200`, the function name plus the status. They're exported from the package root and from `@arithmomaniac/sefaria-client/validators`.
+- **Types**, such as `GetV3TextsData` and `GetV3TextsResponses`, are TypeScript types. The package exports them from the root and from `@arithmomaniac/sefaria-client/contracts`.
+- **Zod schemas** have names starting with `z`, such as `zCoreV3TextsResponse`. The package exports them from the root and from `@arithmomaniac/sefaria-client/schemas`.
+- **Validators** have names such as `validateGetV3Texts200`, which is the function name plus the status. The package exports them from the root and from `@arithmomaniac/sefaria-client/validators`.
 
 [Reference › Package imports and exports](/reference/package-imports-and-exports.md) lists every subpath.
 

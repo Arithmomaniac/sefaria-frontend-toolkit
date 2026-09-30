@@ -13,25 +13,25 @@ import ReleaseStamp from "./ReleaseStamp.vue";
 
 # Corrections to Sefaria's API description
 
-The client is generated from Sefaria's published API description, an OpenAPI file. Where that file doesn't match what Sefaria's server code accepts or returns, the toolkit corrects the file before generating the client. This page lists each correction, the endpoints it affects, the source checks that must pass before it runs, and the changes it makes.
+The toolkit generates the client from Sefaria's published API description, an OpenAPI file. Where that file doesn't match what Sefaria's server code accepts or returns, the toolkit corrects it first. This page lists each correction and the endpoints it affects. It also lists the source checks that must pass before the correction runs, and the changes it makes.
 
 ## Which release this describes
 
 This page documents the code on the `main` branch, which `alpha` builds are published from. <ReleaseStamp />
 
-The `alpha` script-tag address serves the newest script release that is still active. It isn't checked against the commit this page was built from, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as they remain hosted. An older pin can still include the removed Popup element, and it can lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
+The `alpha` script-tag address serves the newest script release that is still active. The site doesn't compare it with the commit used to build this page, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can still include the removed Popup element. It can also lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
 
 ## The pinned source
 
 The corrections apply to [`docs/openAPI.json`](https://github.com/Sefaria/Sefaria-Project/blob/1f7d0844ca6a9eddc8e48168962aacb09de75bd6/docs/openAPI.json) in `Sefaria/Sefaria-Project` at commit `1f7d0844ca6a9eddc8e48168962aacb09de75bd6`. The downloaded file must have the SHA-256 digest `2bd2618411afc668eef1d100da546b04431ce82b984da0ae96823f24a8f890e4`.
 
-Each correction has source checks. They confirm that the parts of Sefaria's file the correction depends on are still in the state it expects: absent, or unchanged since the correction was written. The checks don't prove that the correction is still needed. If a check fails, client generation stops.
+Each correction has source checks. The checks inspect the parts of Sefaria's file that the correction uses. They require each part to be absent or unchanged since the correction was written. The checks don't prove that the correction is still needed. If a check fails, client generation stops.
 
-There are 11 corrections, made up of 80 changes. They affect 18 of the client's 60 endpoints.
+There are 11 corrections, with 80 changes in total. They affect 18 of the client's 60 endpoints.
 
 ## Corrections by endpoint
 
-Each endpoint shows its client function, then the corrections that change the endpoint or a schema it uses.
+Each endpoint shows its client function. It then lists the corrections that change the endpoint or a schema it uses.
 
 ### `GET /api/async/{task_id}`
 
@@ -163,7 +163,7 @@ Client function: `text.getV3Texts`
 
 Correction ID: `shared-version-metadata`
 
-The pinned description defines version metadata separately in `VersionJSON` and `versionData`. The correction points both at one shared `CoreVersionMetadata` schema, so they share a metadata base. The v3 text schemas extend that base with extra fields and requirements.
+The pinned description defines version metadata twice, in `VersionJSON` and `versionData`. The correction points both at one shared `CoreVersionMetadata` schema. The v3 text schemas extend that schema with extra fields and requirements.
 
 Endpoints: `GET /api/texts/random`, `GET /api/texts/versions/{tref}`, `GET /api/texts/{tref}`, `GET /api/v3/texts/{tref}`.
 
@@ -298,7 +298,7 @@ Source checks:
 
 Correction ID: `sheet-summary-contract`
 
-The pinned description already gave the sheet `id` a string type, `via` a nullable string, and the display options and `date-time` formats. The correction changes `id` to an integer or a string and `via` to a nullable integer, and revises the option value types. It also allows an empty array for `options` and removes the `date-time` formats from `created` and `published`.
+The pinned description already gave the sheet `id` a string type and `via` a nullable string. It also gave the display options and `date-time` formats. The correction changes `id` to an integer or a string. It changes `via` to a nullable integer and revises the option value types. It also allows an empty array for `options`. It removes the `date-time` formats from `created` and `published`.
 
 Endpoints: `GET /api/related/{tref}`, `GET /api/sheets/all-sheets/{limiter}/{offset}`, `GET /api/sheets/ref/{ref}`, `GET /api/sheets/user/{user_id}`, `GET /api/sheets/user/{user_id}/{sort_by}/{limiter}/{offset}`.
 
@@ -450,7 +450,7 @@ Source checks:
 
 Correction ID: `manuscripts-content-type`
 
-For `GET /api/manuscripts/{tref}`, the published description files the 200 response under a media-type key named `Manuscript JSON`. The correction moves that schema under `application/json`, which it treats as the type the route serves.
+For `GET /api/manuscripts/{tref}`, the published description files the 200 response under a media-type key named `Manuscript JSON`. The correction moves that schema under `application/json`. It treats that as the type the route serves.
 
 Endpoints: `GET /api/manuscripts/{tref}`.
 
@@ -484,7 +484,7 @@ Source checks:
 
 Correction ID: `versions-contract`
 
-The published description names the path `/api/texts/versions/{index}`. According to the correction's notes, the pinned route and handler take a reference. The correction renames it to `GET /api/texts/versions/{tref}`. The 200 response is a version list or a JSON error, and stored versions may have a null `versionSource` or `status`.
+The published description names the path `/api/texts/versions/{index}`. According to the correction's notes, the pinned route and handler take a reference. The correction renames the path to `GET /api/texts/versions/{tref}`. The 200 response is a version list or a JSON error. Stored versions can have a null `versionSource` or `status`.
 
 Endpoints: `GET /api/texts/random`, `GET /api/texts/versions/{tref}`, `GET /api/texts/{tref}`, `GET /api/v3/texts/{tref}`.
 
@@ -589,7 +589,10 @@ Source checks:
 
 Correction ID: `v3-text-contract`
 
-The published description for `GET /api/v3/texts/{tref}` already had a `warnings` array with unconstrained items. The correction adds a repeatable `version` selector and nested nullable text values, and types and constrains `warnings`. It also documents 400 responses (invalid return format or text adapter failure) and 404 responses (invalid, empty or unavailable reference) with the Core JSON error schema.
+The published description for `GET /api/v3/texts/{tref}` already had a `warnings` array with unconstrained items. The correction adds a repeatable `version` selector and nested nullable text values. It also types and constrains `warnings`. It documents two error responses with the Core JSON error schema:
+
+- 400: an invalid return format or a text adapter failure.
+- 404: an invalid, empty, or unavailable reference.
 
 Endpoints: `GET /api/links/{tref}`, `GET /api/ref/{tref}`, `GET /api/shape/{title}`, `GET /api/texts/versions/{tref}`, `GET /api/v2/index/{title}`, `GET /api/v3/texts/{tref}`.
 
@@ -1062,7 +1065,7 @@ Source checks:
 
 Correction ID: `ref-contract`
 
-The published description for `GET /api/ref/{tref}` does not fully cover the fields that depend on the node type, and its 404 has an incomplete inline error schema. The correction rewrites the description of those fields. It makes the 200 response a union of success and expected parse failure, and points the 404 at the Core JSON error schema.
+The published description for `GET /api/ref/{tref}` does not fully cover the fields that depend on the node type. Its 404 has an incomplete inline error schema. The correction rewrites the description of those fields. It makes the 200 response a union of success and expected parse failure. It points the 404 at the Core JSON error schema.
 
 Endpoints: `GET /api/ref/{tref}`.
 
@@ -1299,7 +1302,7 @@ Source checks:
 
 Correction ID: `index-contract`
 
-The published description for `GET /api/v2/index/{title}` doesn't list the conditional query parameters, such as `content_counts`. The correction adds those parameters and the `firstSectionRef` and `relatedTopics` properties. It models the HTTP 200 response as a success-or-error union.
+The published description for `GET /api/v2/index/{title}` doesn't list the conditional query parameters, such as `content_counts`. The correction adds those parameters and the `firstSectionRef` and `relatedTopics` properties. It models the HTTP 200 response as a union of success and error.
 
 Endpoints: `GET /api/index/{title}`, `GET /api/v2/index/{title}`.
 
@@ -1397,7 +1400,7 @@ Source checks:
 
 Correction ID: `shape-contract`
 
-For `GET /api/shape/{title}`, the published description gives a single-object schema with mixed property casing and documents `depth` without deprecating it. According to the correction's notes, the handler does not use `depth`, so the correction removes it. The dependent-texts flag becomes the string values `"0"` and `"1"`, and the response becomes a list-based union with an error variant. The examples become arrays.
+For `GET /api/shape/{title}`, the published description gives a single-object schema with mixed property casing. It documents `depth` without deprecating it. According to the correction's notes, the handler does not use `depth`, so the correction removes it. The dependent-texts flag becomes the string values `"0"` and `"1"`. The response becomes a list-based union with an error variant. The examples become arrays.
 
 Endpoints: `GET /api/shape/{title}`.
 
@@ -1611,7 +1614,7 @@ Source checks:
 
 Correction ID: `links-contract`
 
-The published description for `GET /api/links/{tref}` has an incomplete array item schema for the 200 response and does not model a repeatable category filter. The correction adds link and sheet-link schemas and allows repeated category filters. It also documents an HTTP 400 error for whole-book references that request text.
+The published description for `GET /api/links/{tref}` omits fields from the array items in the 200 response. It also omits the repeatable category filter. The correction adds link and sheet-link schemas and allows repeated category filters. It also documents an HTTP 400 error for whole-book references that request text.
 
 Endpoints: `GET /api/links/{tref}`.
 
@@ -1898,7 +1901,7 @@ Source checks:
 
 Correction ID: `linker-detection-contract`
 
-The published description for `POST /api/find-refs` already defined the request body, the 202 response and the task states. The correction replaces the body schema, adds query options and constrains `ready`. It removes the POST 200 entry, because the correction's notes say the pinned handler does not return one. It makes `result` an open JSON object with unknown-valued properties, to be validated for each task.
+The published description for `POST /api/find-refs` already defined the request body, the 202 response, and the task states. The correction replaces the body schema, adds query options, and constrains `ready`. It removes the POST 200 entry, because the correction's notes say the pinned handler does not return one. It makes `result` an open JSON object with unknown-valued properties. Callers must validate the result for the specific task.
 
 Endpoints: `GET /api/async/{task_id}`, `POST /api/find-refs`.
 
