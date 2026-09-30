@@ -56,10 +56,10 @@ Use `LiveEditor` for every runnable component example on a how-to page. The code
   ```vue
   <script setup>
   import LiveEditor from "../../.vitepress/theme/LiveEditor.vue";
-  import sourceCard from "../../../examples/site-snippets/source-card.html?raw";
+  import textSegment from "../../../examples/site-snippets/text-segment.html?raw";
   </script>
 
-  <LiveEditor :code="sourceCard" title="Source Card" />
+  <LiveEditor :code="textSegment" title="Text Segment" />
   ```
 
   Adjust the relative paths to the page's depth. `lang` defaults to `html`.

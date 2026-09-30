@@ -14,7 +14,7 @@ import theming from "../../examples/site-snippets/component-theming.html?raw";
 
 This page changes how components look, not which text appears. To change the text, see [Choose what text readers see](/across-components/choose-what-text-readers-see.md).
 
-This page gathers every styling setting.
+[Show one passage](/use-components/show-text/show-one-passage.md#match-your-sites-colors-and-fonts) first introduced styling. This page gathers every setting.
 
 Every toolkit component reads the same set of CSS custom properties, called tokens, whose names start with `--sefaria-`. Set a token once and every component in scope picks it up. Tokens pass down to every component inside the element where you set them. Each component uses the tokens that apply to it. You need a page with at least one working component and access to your CSS.
 
@@ -46,7 +46,7 @@ Components you haven't restyled keep their default look. Tokens you don't set ke
 | `--sefaria-font-hebrew` | Hebrew text font. The default starts with "Noto Serif Hebrew". |
 | `--sefaria-font-english` | English text font. The default starts with Georgia. |
 | `--sefaria-font-label-hebrew` | Reserved. No component uses it yet, so setting it has no visible effect today. |
-| `--sefaria-font-label-english` | Font for Reader buttons and its loading message. Default: `system-ui, sans-serif`. Reference labels and history labels use `--sefaria-font-english`. |
+| `--sefaria-font-label-english` | Font for Reader buttons and its loading message. Default: `system-ui, sans-serif`. History labels use `--sefaria-font-english`. |
 
 Hebrew reference and verse-number labels use `--sefaria-font-hebrew`.
 
@@ -76,7 +76,7 @@ Components render inside a shadow DOM, a browser feature that keeps a component'
 
 You can style a component through the tokens, through the element's own box (`display`, `margin`, width), and, for the Reader, through its named parts: `sefaria-reader::part(toolbar)`, `::part(history)`, `::part(source-pane)`, and `::part(connections-pane)`. Inherited text settings such as `font-weight` can still pass in.
 
-The Reader uses `display: grid`. The other components are `display: block` by default.
+The Reader uses `display: grid`. The other components are `display: block` by default. Set `margin` or `display` on the element itself to place it in your layout.
 
 Styling never makes a request. Changing tokens, the color scheme, or box styles only redraws what is already there.
 

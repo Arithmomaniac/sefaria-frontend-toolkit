@@ -7,6 +7,7 @@ description: "Show one passage of Sefaria text in the edition or translation you
 
 <script setup>
 import LiveEditor from "../../.vitepress/theme/LiveEditor.vue";
+import textSegmentStyling from "../../../examples/site-snippets/text-segment-styling.html?raw";
 import textSegment from "../../../examples/site-snippets/text-segment.html?raw";
 import textSegmentEdition from "../../../examples/site-snippets/text-segment-edition.html?raw";
 import textSegmentVocalization from "../../../examples/site-snippets/text-segment-vocalization.html?raw";
@@ -24,7 +25,23 @@ Set `sref` to the reference. With no other choice, the segment shows the edition
 
 <LiveEditor :code="textSegment" title="The default text" />
 
-To try changes, choose Edit, change the code, and choose Run. Styling works as it does for every component.
+To try changes, choose Edit, change the code, and choose Run.
+
+## Match your site's colors and fonts
+
+Set `--sefaria-*` CSS custom properties on `:root` or on any element that contains the segment. Common ones are `--sefaria-fg`, `--sefaria-surface` (the component background), `--sefaria-link`, `--sefaria-accent`, `--sefaria-font-hebrew`, `--sefaria-font-english`, and `--sefaria-font-scale` (a multiplier whose default is 1). The same properties style the other components.
+
+Your page's selectors can't reach inside the component. Style it through the `--sefaria-*` properties and the element's own box (`display`, `margin`). Inherited text settings such as `font-weight` can still pass in.
+
+Components other than the Reader are `display: block` by default.
+
+The default colors follow the reader's light or dark setting when your page declares `:root { color-scheme: light dark; }`. A containing element also works. `color-scheme: light` or `dark` forces one. Changing styles doesn't make a new request.
+
+The example sets the text color, the fonts, a larger font scale, and a transparent background. It also adds a margin and opts in to dark mode.
+
+<LiveEditor :code="textSegmentStyling" title="Style a passage" />
+
+<span class="learn-more__label">Learn more:</span> [Match your site's look](/across-components/match-your-sites-look.md) · [Reference › Components](/reference/components.md) {.learn-more}
 
 ## Choose which text to show
 
@@ -76,7 +93,7 @@ Below the text, the segment names the edition and its language, such as `Miqra a
 | Sefaria says the text isn't a reference | Sefaria's own message, such as `Could not find title in reference: Not a book 3.4` | `error` | No |
 | No `sref` and no `data` | Nothing | `empty` | No |
 
-Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. Unlike the label, a text that isn't a reference gives `error`, not `empty`. When Sefaria can't be reached, `status` is `error` and the error event fires, whether or not text was already showing. The error event bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. Invalid supplied `data` shows an error without falling back to `sref` and sends no event.
+Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. A text that isn't a reference gives `error`. When Sefaria can't be reached, `status` is `error` and the error event fires, whether or not text was already showing. The error event bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. Invalid supplied `data` shows an error without falling back to `sref` and sends no event.
 
 The example has a good reference, a text that isn't a reference, and an empty element. Choose **Show each status** to log each one's status.
 

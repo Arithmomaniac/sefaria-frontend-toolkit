@@ -46,8 +46,8 @@ async function withSite(root, siteBasePath, run) {
   }
 }
 
-const editorRoute = "/use-components/show-an-attributed-passage.html";
-const editorSnippet = "source-card-select.html";
+const editorRoute = "/use-components/show-text/show-one-passage.html";
+const editorSnippet = "text-segment.html";
 
 /** Offline LiveEditor checks: local toolkit script, no Sefaria access. */
 export async function runSessionOneSiteChecks({ root, siteBasePath }) {
@@ -121,7 +121,7 @@ export async function runSessionOneSiteChecks({ root, siteBasePath }) {
     );
     const inner = page.frameLocator(".live-editor__frame").first();
     await inner
-      .locator("sefaria-source-card")
+      .locator("sefaria-text-segment")
       .first()
       .waitFor({ state: "attached" });
     const childFrame = page
@@ -144,7 +144,7 @@ export async function runSessionOneSiteChecks({ root, siteBasePath }) {
     expectEqual(isolation.origin, "null", "frame origin");
     expectEqual(isolation.parentReadable, false, "frame reads parent document");
     await childFrame.waitForFunction(
-      () => globalThis.customElements.get("sefaria-source-card") !== undefined,
+      () => globalThis.customElements.get("sefaria-text-segment") !== undefined,
     );
     expectEqual(scriptRequests, 1, "script requests after scrolling");
 
@@ -186,7 +186,7 @@ export async function runSessionOneSiteChecks({ root, siteBasePath }) {
 
     await editor.getByRole("button", { name: "Reset" }).click();
     await inner
-      .locator("sefaria-source-card")
+      .locator("sefaria-text-segment")
       .first()
       .waitFor({ state: "attached" });
     expectEqual(
@@ -221,7 +221,7 @@ export async function runSessionOneLiveChecks({ root, siteBasePath }) {
         });
       }
     });
-    await page.goto(url("/use-components/show-an-attributed-passage.html"));
+    await page.goto(url(editorRoute));
     await page.locator(".live-editor").first().scrollIntoViewIfNeeded();
     const childFrame = await (async () => {
       for (let attempt = 0; attempt < 100; attempt += 1) {
@@ -300,15 +300,19 @@ async function routeOffline(
         return;
       }
       const reference = decodeURIComponent(url.pathname.split("/").at(-1));
-      if (url.pathname.startsWith("/api/links/")) {
+      if (
+        url.pathname.startsWith("/api/v3/texts/") &&
+        reference === "Not a book 3:4"
+      ) {
         await route.fulfill({
-          json: reference === "Micah 6:8" ? fixtures.links : [],
+          status: 400,
+          json: { error: "Could not find title in reference: Not a book 3.4" },
         });
         return;
       }
-      if (url.pathname.startsWith("/api/ref/")) {
+      if (url.pathname.startsWith("/api/links/")) {
         await route.fulfill({
-          json: reference === "Micah 6:8" ? fixtures.ref : fixtures.notRef,
+          json: reference === "Micah 6:8" ? fixtures.links : [],
         });
         return;
       }
@@ -361,8 +365,6 @@ async function editorFrame(editor) {
 
 async function runShowTextChecks({ root, siteBasePath, localScript }) {
   const fixtures = {
-    ref: await loadFixture(root, "micah-6-8-ref-2026-09-29.json"),
-    notRef: await loadFixture(root, "not-a-ref-2026-09-29.json"),
     text: await loadFixture(root, "micah-6-8-2026-09-28.json"),
     range: await loadFixture(root, "micah-6-6-8-2026-09-29.json"),
     links: await loadFixture(root, "micah-6-8-links-2026-09-29.json"),
@@ -579,10 +581,10 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
     const themeFrame = await editorFrame(
       themePage.locator(".live-editor").first(),
     );
-    await themeFrame.waitForFunction(
-      () =>
-        globalThis.document.querySelector("sefaria-source-card")?.status ===
-        "ready",
+    await themeFrame.waitForFunction(() =>
+      ["sefaria-source-card"].every(
+        (tag) => globalThis.document.querySelector(tag)?.status === "ready",
+      ),
     );
     const themeLinkColor = () =>
       themeFrame.evaluate(
@@ -590,7 +592,7 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
           globalThis.getComputedStyle(
             globalThis.document
               .querySelector("sefaria-source-card")
-              .shadowRoot.querySelector("a"),
+              .shadowRoot.querySelector("a[href]"),
           ).color,
       );
     const themeBefore = themeRequests.length;
@@ -605,7 +607,7 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
         globalThis.getComputedStyle(
           globalThis.document
             .querySelector("sefaria-source-card")
-            .shadowRoot.querySelector("a"),
+            .shadowRoot.querySelector("a[href]"),
         ).color === "rgb(147, 180, 255)",
     );
     expectEqual(
@@ -704,6 +706,85 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
       "one links request for the new reference",
     );
     await coordPage.close();
+
+    // Passage page: styling changes do not request, and zero states render.
+    const page = await browser.newPage({
+      viewport: { width: 1280, height: 900 },
+    });
+    const requests = await routeOffline(page, {
+      origin,
+      localScript,
+      fixtures,
+    });
+    await page.goto(url(showTextPages[0]), { waitUntil: "networkidle" });
+    const editorTitled = (title) =>
+      page.locator(`.live-editor[aria-label="Live example: ${title}"]`);
+
+    const styling = await editorFrame(editorTitled("Style a passage"));
+    await styling.waitForFunction(
+      () =>
+        globalThis.document.querySelector("sefaria-text-segment")?.status ===
+        "ready",
+    );
+    const before = requests.length;
+    await styling.evaluate(async () => {
+      const root = globalThis.document.documentElement;
+      root.style.setProperty("--sefaria-fg", "rgb(1, 2, 3)");
+      root.style.colorScheme = "dark";
+      await new Promise((resolve) => globalThis.setTimeout(resolve, 300));
+    });
+    const textColor = await styling.evaluate(
+      () =>
+        globalThis.getComputedStyle(
+          globalThis.document.querySelector("sefaria-text-segment"),
+        ).color,
+    );
+    expectEqual(textColor, "rgb(1, 2, 3)", "styled text color");
+    expectEqual(requests.length, before, "styling makes no request");
+
+    const states = await editorFrame(
+      editorTitled("Read status and listen for errors"),
+    );
+    await states.waitForFunction(() =>
+      [...globalThis.document.querySelectorAll("sefaria-text-segment")].every(
+        (segment) => segment.status !== "loading",
+      ),
+    );
+    await states.locator("#check").click();
+    expectEqual(
+      (await states.locator("#log").textContent()).trim(),
+      '"Micah 6:8" is ready\n"Not a book 3:4" is error\n"" is empty',
+      "passage zero states",
+    );
+    await page.close();
+
+    // Unreachable Sefaria: alert, error status, and the error event.
+    const failing = await browser.newPage({
+      viewport: { width: 1280, height: 900 },
+    });
+    await routeOffline(failing, {
+      origin,
+      localScript,
+      fixtures,
+      failSefaria: true,
+    });
+    await failing.goto(url(showTextPages[0]), { waitUntil: "networkidle" });
+    const failed = await editorFrame(
+      failing.locator(
+        '.live-editor[aria-label="Live example: Read status and listen for errors"]',
+      ),
+    );
+    await failed.locator("sefaria-text-segment [role=alert]").first().waitFor();
+    await failed
+      .locator("#log")
+      .filter({ hasText: "Error for Micah 6:8" })
+      .waitFor();
+    await failed.locator("#check").click();
+    await failed
+      .locator("#log")
+      .filter({ hasText: '"Micah 6:8" is error' })
+      .waitFor();
+    await failing.close();
 
     // Text Segment: a fresh load of the default example makes one request.
     const passage = await browser.newPage({
