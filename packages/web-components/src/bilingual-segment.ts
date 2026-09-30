@@ -16,6 +16,7 @@ import type {
 } from "./bilingual-pair.js";
 import {
   acquireSelectedText,
+  needsTranslationFallback,
   noTranslationLanguageMessage,
   normalizeTranslationLanguage,
   preferredTranslation,
@@ -464,7 +465,7 @@ export function resolveBilingualSides(
     const selected =
       (request.translationFallback ?? "none") === "none" &&
       request.translation?.versionTitle === undefined &&
-      payload.warnings.some((warning) => warning[family]?.warning_code === 102)
+      needsTranslationFallback(payload, family)
         ? undefined
         : preferredTranslation(
             payload,

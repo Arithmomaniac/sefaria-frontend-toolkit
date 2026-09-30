@@ -29,6 +29,7 @@ import {
 import { assertVocalizationMode } from "./vocalization-display.js";
 import type {
   SourceCardAttributionViewModel,
+  SourceCardDataViewModel,
   SourceCardHeaderViewModel,
   SourceCardItemViewModel,
   SourceCardRequest,
@@ -459,9 +460,17 @@ export class SefariaSourceCard extends SefariaElement {
           </p>
           ${this.#renderAttributions(viewModel.attributions)}
         `;
-      case "data":
+      case "data": {
+        const absentMessages = this.#absentMessages(viewModel);
         return html`
           ${this.#renderHeader(viewModel.header)}
+          ${
+            absentMessages.length === 0
+              ? nothing
+              : html`<p role="status" aria-live="polite">
+                  ${absentMessages.join(" ")}
+                </p>`
+          }
           <section class="items" aria-label="Source text">
             ${repeat(
               viewModel.items,
@@ -471,7 +480,18 @@ export class SefariaSourceCard extends SefariaElement {
           </section>
           ${this.#renderAttributions(viewModel.attributions)}
         `;
+      }
     }
+  }
+
+  #absentMessages(viewModel: SourceCardDataViewModel): string[] {
+    return [
+      ...new Set(
+        viewModel.items.flatMap((item) =>
+          item.pair.state === "partial" ? [item.pair.absent.message] : [],
+        ),
+      ),
+    ];
   }
 
   #reconcile(): void {

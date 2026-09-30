@@ -151,6 +151,40 @@ test("an acquired default without the requested family or missing warning is not
   expect(getText).toHaveBeenCalledTimes(1);
 });
 
+test("an acquired disabled fallback response without the requested family still needs the warning", async () => {
+  const getText = vi.fn(async () => ({ payload: capture(), status: 200 }));
+  await expect(
+    acquireSelectedText(
+      { kind: "capability", capability: { getText } },
+      "Micah 6:8",
+      ["french"],
+      "french",
+      "none",
+      new AbortController().signal,
+    ),
+  ).rejects.toThrow("/versions");
+  expect(getText).toHaveBeenCalledTimes(1);
+});
+
+test("disabled fallback still rejects contradictory missing-language evidence", () => {
+  const value = capture();
+  value.warnings = [{ english: { warning_code: 102, message: "Unavailable" } }];
+  expect(() =>
+    createTextSegmentViewModel(value, {
+      tref: "Micah 6:8",
+      version: { translationLanguage: "english" },
+      translationFallback: "none",
+    }),
+  ).toThrow("/warnings");
+  expect(() =>
+    createSourceCardViewModel(value, {
+      tref: "Micah 6:8",
+      translationLanguage: "english",
+      translationFallback: "none",
+    }),
+  ).toThrow("/warnings");
+});
+
 test("malformed JSON is not permission to fall back", async () => {
   const getText = vi.fn(async () => ({
     payload: { warnings: [{ french: { warning_code: 102 } }] },

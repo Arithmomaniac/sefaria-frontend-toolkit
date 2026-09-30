@@ -261,7 +261,10 @@ export function createSourceCardViewModel(
   context: SourceCardProjectionContext = {},
 ): SourceCardViewModel {
   serializeSourceCardSelectors(request);
-  const bilingualRequest: BilingualSegmentRequest = request;
+  const bilingualRequest: BilingualSegmentRequest = {
+    ...request,
+    translationFallback: request.translationFallback ?? "default",
+  };
   const resolved = resolveBilingualSides(
     payload.versions,
     bilingualRequest,

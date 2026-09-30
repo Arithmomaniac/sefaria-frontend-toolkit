@@ -429,6 +429,9 @@ export class SefariaTextSegment extends SefariaElement {
     if (status !== 200) {
       throw new Error(`Unsupported text response status ${status}.`);
     }
+    const translationFallback = normalizeTranslationFallback(
+      this.translationFallback,
+    );
     if (isSelectedTextSegmentData(payload)) {
       const selected = validateSelectedTextSegmentData(payload);
       if (
@@ -459,9 +462,7 @@ export class SefariaTextSegment extends SefariaElement {
             ? {}
             : { versionTitle: this.versionTitle }),
         },
-        translationFallback: normalizeTranslationFallback(
-          this.translationFallback,
-        ),
+        translationFallback,
       });
     }
     if (this.versionLanguage !== undefined) {

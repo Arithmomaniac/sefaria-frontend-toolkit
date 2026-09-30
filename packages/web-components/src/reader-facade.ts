@@ -42,10 +42,10 @@ export interface ReaderResolvedSource {
   readonly record: ReaderSourceRecord;
   /** Exact effective request covered by the retained record. */
   readonly effectiveRequest: SourceCardRequest;
-  /** Exact canonical selected reference. */
-  readonly selectedRef: string;
-  /** Exact selected source position. */
-  readonly selectedPosition: readonly number[];
+  /** Exact canonical selected reference, absent when the source has no renderable selectable text. */
+  readonly selectedRef?: string;
+  /** Exact selected source position, absent when the source has no renderable selectable text. */
+  readonly selectedPosition?: readonly number[];
 }
 
 /** Creates a client-backed raw Reader data source with standard selectors. */
@@ -69,8 +69,12 @@ export async function resolveReaderSource(
   return Object.freeze({
     record: resolved.record,
     effectiveRequest: resolved.record.effectiveRequest,
-    selectedRef: resolved.selectedRef,
-    selectedPosition: resolved.selectedPosition,
+    ...(resolved.selectedRef === undefined
+      ? {}
+      : { selectedRef: resolved.selectedRef }),
+    ...(resolved.selectedPosition === undefined
+      ? {}
+      : { selectedPosition: resolved.selectedPosition }),
   });
 }
 

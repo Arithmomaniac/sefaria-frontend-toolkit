@@ -183,6 +183,11 @@ for (const Constructor of [
     await vi.waitFor(() =>
       expect(element.shadowRoot?.textContent).toContain("No french text."),
     );
+    if (Constructor === SefariaSourceCard) {
+      expect(
+        element.shadowRoot?.querySelector('[role="status"]')?.textContent,
+      ).toContain("No french text.");
+    }
     expect(element.shadowRoot?.textContent).not.toMatch(
       /unavailable; showing/u,
     );
@@ -201,6 +206,35 @@ for (const Constructor of [
     expect(element.shadowRoot?.querySelector('[role="alert"]')).not.toBeNull();
     expect(getText).not.toHaveBeenCalled();
   });
+
+  if (Constructor === SefariaTextSegment) {
+    test(`${Constructor.name} rejects invalid translation fallback before selected supplied data`, async () => {
+      const element = new SefariaTextSegment();
+      element.setAttribute("translation-fallback", "maybe");
+      element.data = {
+        kind: "selected",
+        ref: "Micah 6:8",
+        heRef: "מיכה ו׳:ח׳",
+        version: {
+          versionTitle: "Selected",
+          language: "en",
+          actualLanguage: "en",
+          languageFamilyName: "english",
+          direction: "ltr",
+          text: "Selected text.",
+        },
+      };
+      document.body.append(element);
+      await element.updateComplete;
+      expect(element.status).toBe("error");
+      expect(
+        element.shadowRoot?.querySelector('[role="alert"]'),
+      ).not.toBeNull();
+      expect(element.shadowRoot?.textContent).toContain(
+        'Translation fallback must be "default" or "none".',
+      );
+    });
+  }
 
   test(`${Constructor.name} does not fall back for an available empty edition`, async () => {
     const getText = vi.fn(async () => ({
@@ -308,6 +342,33 @@ for (const Constructor of [
     expect(getText).toHaveBeenCalledTimes(1);
   });
 }
+
+test("SefariaSourceCard materializes default fallback when the request omits it", async () => {
+  const requested: string[][] = [];
+  const element = new SefariaSourceCard();
+  element.translationLanguage = "french";
+  element.sref = "Berakhot 2a:1";
+  element.acquisition = {
+    kind: "capability",
+    capability: {
+      getText: async (request) => {
+        requested.push([...request.versions]);
+        return {
+          payload:
+            requested.length === 1 ? missing() : captured("berakhotDefault"),
+          status: 200,
+        };
+      },
+    },
+  };
+  document.body.append(element);
+  await vi.waitFor(() => expect(element.status).toBe("ready"));
+  expect(requested).toEqual([
+    ["primary", "french"],
+    ["primary", "translation"],
+  ]);
+  expect(element.shadowRoot?.textContent).toMatch(/unavailable; showing/u);
+});
 
 test.each([false, true])(
   "ten Source Card children use only outer requests (fallback=%s)",

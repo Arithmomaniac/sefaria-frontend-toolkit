@@ -522,6 +522,12 @@ describe("reader root replacement", () => {
     expect(
       session.replaceRootFromCurrentSource({
         tref: "Micah 6:8",
+        translationFallback: "none",
+      }),
+    ).toBeUndefined();
+    expect(
+      session.replaceRootFromCurrentSource({
+        tref: "Micah 6:8",
         primary: { versionTitle: "Different edition" },
       }),
     ).toBeUndefined();

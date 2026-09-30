@@ -149,10 +149,10 @@ export async function acquireSelectedText(
     first.status === 200 &&
     family !== undefined &&
     versions.includes(family) &&
-    translationFallback === "default" &&
     !first.payload.versions.some(
       (version) => version.languageFamilyName.toLowerCase() === family,
-    )
+    ) &&
+    !needsTranslationFallback(first.payload, family)
   ) {
     throw new TypeError(
       "/versions: the requested language is absent without a matching missing-language warning.",

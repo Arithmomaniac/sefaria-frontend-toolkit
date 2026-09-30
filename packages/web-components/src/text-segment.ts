@@ -18,6 +18,7 @@ import {
 } from "./component-controller.js";
 import {
   acquireSelectedText,
+  needsTranslationFallback,
   noTranslationLanguageMessage,
   normalizeTranslationLanguage,
   type TranslationFallback,
@@ -264,7 +265,7 @@ export function createTextSegmentViewModel(
     if (
       (request.translationFallback ?? "none") === "none" &&
       request.version.versionTitle === undefined &&
-      needsNoTranslationFallback(payload, family)
+      needsTranslationFallback(payload, family)
     ) {
       return createEmptyViewModel(
         payload,
@@ -307,15 +308,6 @@ export function createTextSegmentViewModel(
           : "No translation text is available.",
       );
     return projectTextSegmentVersion(payload, selected, context);
-  }
-
-  function needsNoTranslationFallback(
-    payload: CoreV3TextsResponse,
-    language: string,
-  ): boolean {
-    return payload.warnings.some(
-      (warning) => warning[language]?.warning_code === 102,
-    );
   }
   const language = request.version.language.trim().toLocaleLowerCase("en-US");
   const matches = payload.versions.filter(
