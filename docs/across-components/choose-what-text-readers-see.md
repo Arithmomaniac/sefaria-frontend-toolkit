@@ -12,14 +12,14 @@ import textChoiceControls from "../../examples/site-snippets/text-choice-control
 
 # Choose what text readers see
 
-This page puts the content choices for [Text Segment](/use-components/show-text/show-one-passage.md), [Bilingual Segment](/use-components/show-text/hebrew-and-translation.md), and [Source Card](/use-components/show-an-attributed-passage.md) side by side. You should already have one of those components working. If you don't, start with [Put your first source on a page](/use-components/start-here.md).
+This page puts the content choices for [Text Segment](/use-components/show-text/show-one-passage.md), [Bilingual Segment](/use-components/show-text/hebrew-and-translation.md), and [Source Card](/use-components/show-an-attributed-passage.md), and the Reader side by side. This page assumes that you have one of those components working. If you don't, start with [Put your first source on a page](/use-components/start-here.md).
 
 Each choice is an HTML attribute, a setting you write inside the tag. Choices come in two kinds:
 
-- **Which text to load** is the language and edition. These change what is requested, so a change makes a new request.
-- **How it's shown** is vocalization, sides, arrangement, and the edition credit. These redraw text the component already has, with no new request.
+- **Which text to load** is the language and edition. These change what the component requests, so a change makes a new request.
+- **How it's shown** is vocalization, sides, arrangement, and the edition credit. These redraw text the component already has and never make a request.
 
-A request is one call from the page to Sefaria. A dash in the tables means the component has no such attribute.
+A request is one call from the page to Sefaria. A dash in the tables means the component has no such attribute. The Reader also has attributes that aren't about text choice.
 
 ## Try them together
 
@@ -27,7 +27,21 @@ A request is one call from the page to Sefaria. A dash in the tables means the c
 
 ## Choose which text to load
 
-These choices change what is requested.
+```mermaid
+flowchart TD
+  A{"Need one exact edition?"}
+  A -->|Yes| B["Set its title: version-title on Text Segment, primary-version-title or translation-version-title on the others"]
+  B --> C["It never falls back"]
+  A -->|No| D{"Text Segment and you want only one language family?"}
+  D -->|Yes| E["version-language: no fallback. Can't combine with translation-language"]
+  D -->|No| F["translation-language"]
+  F --> G{"Does Sefaria's response say the language is missing?"}
+  G -->|No| H["Show that text"]
+  G -->|Yes| I["One more request for Sefaria's default translation"]
+  I --> J["Source Card and Reader show a notice. The segments don't"]
+```
+
+These choices change what the component requests.
 
 <table>
   <thead>
@@ -51,32 +65,21 @@ These choices change what is requested.
     </tr>
     <tr>
       <th scope="row">Pin an exact edition</th>
-      <td><code>version-title</code>, which picks the primary edition alone, or the edition in the language set beside it</td>
+      <td><code>version-title</code> (see Pin an exact edition)</td>
       <td colspan="3"><code>primary-version-title</code>, <code>translation-version-title</code></td>
     </tr>
   </tbody>
 </table>
 
-Every component takes sref. For the segments and Source Card, a fresh load makes one request, or two if a preferred translation language falls back. The Reader also loads the surrounding section and its links. A pinned edition doesn't fall back. Supplied data makes no request. Reader also has attributes that aren't about text choice.
+Every component takes `sref`. For the segments and Source Card, a fresh load makes one request, or two if a preferred translation language falls back. The Reader also loads the surrounding section and its links. A pinned edition doesn't fall back. Supplied data makes no request.
 
 ### Choose a translation language
 
-The first choice is the language of the translation. Set `translation-language` to a language family name such as `french`. A family is Sefaria's grouping of editions by language. The value is trimmed and is not case sensitive. All three components accept it. On Text Segment, it shows a translation instead of the primary edition, for example `<sefaria-text-segment sref="Micah 6:8" translation-language="french">`.
+The first choice is the language of the translation. Set `translation-language` to a language family name such as `french`. A family is Sefaria's grouping of editions by language. The value is trimmed and is not case sensitive. All four components accept it. On Text Segment, it shows a translation instead of the primary edition, for example `<sefaria-text-segment sref="Micah 6:8" translation-language="french">`.
 
 ### When Sefaria doesn't have that language
 
-A preferred language can be missing for some texts.
-
-```mermaid
-flowchart TD
-  A["You set only translation-language"] --> B["One request"]
-  B --> C{"Does the response warn the language is missing?"}
-  C -->|No| D["Show that text. An empty edition stays empty."]
-  C -->|Yes| E["One more request for Sefaria's default translation"]
-  E --> F["Source Card and Reader show a notice"]
-  E --> G["Text Segment and Bilingual Segment show no notice"]
-  H["You set an exact title"] --> I["No fallback, ever"]
-```
+The chart at the top of this group shows where the fallback happens.
 
 Not every text has every translation. Ask for `french` on `Berakhot 2a:1`. Sefaria's response warns that French is missing. Only then does the component make one more request for Sefaria's default translation. That translation isn't always English. Source Card and Reader show a notice such as `french is unavailable; showing english.` Text Segment and Bilingual Segment show the fallback text without a notice. That is two requests for a fresh load.
 
@@ -87,9 +90,12 @@ The fallback applies only to a bare language preference. Exact edition titles ne
 To avoid a fallback, pin an exact edition. An edition title is the name Sefaria gives one edition, for example `Bible du Rabbinat 1899 [fr]`. Primary means the edition Sefaria marks primary. That is usually, but not always, the Hebrew or original.
 
 - Bilingual Segment and Source Card: `primary-version-title` pins the primary edition. `translation-version-title` pins the translation.
-- Text Segment: `version-language` and `version-title` together pin one edition. Its default is the primary edition, not necessarily Hebrew.
+- Text Segment has three cases:
+  - `version-title` alone pins a primary edition by title. The default is the primary edition, not necessarily Hebrew.
+  - `version-title` with `version-language` pins that title in that language.
+  - `version-title` with `translation-language` requests that title in the preferred translation language.
 
-On Text Segment, `translation-language` and `version-language` are mutually exclusive. Pick one.
+On Text Segment, `translation-language` and `version-language` are mutually exclusive. Pick one. `version-language` alone chooses a language family with no fallback. It doesn't pin one edition.
 
 ## Choose how it's shown
 
@@ -128,7 +134,7 @@ These choices redraw text that has already arrived.
   </tbody>
 </table>
 
-Source Card also has selectable. Switching sides needs no new request, because Bilingual Segment and Source Card request both sides even when they show one. For a fresh load, Source Card makes one request for the whole card, however many verses it shows. Its verses make no requests of their own.
+Source Card also has `selectable`. Switching sides needs no new request, because Bilingual Segment and Source Card request both sides even when they show one. For a fresh load, Source Card makes one request for the whole card, however many verses it shows. Its verses make no requests of their own.
 
 ### Set Hebrew vocalization
 
@@ -140,7 +146,7 @@ Vocalization only changes how text is drawn. `vocalization-mode` controls the ma
 | `nikkud`            | Vowel marks, without cantillation |
 | `none`              | No vowel points or cantillation   |
 
-Changing the mode never makes a request. The component redraws text it already has. All three components accept it.
+The component redraws text it already has, so this never makes a request. All four components accept it.
 
 ### Choose the sides and their arrangement
 
@@ -150,11 +156,11 @@ Sides and arrangement are two more display choices. They apply only to Bilingual
 - `layout` is `auto`, `stacked`, or `side-by-side`. The default is `auto`.
 - `side-order` is `primary-first` or `translation-first`. The default is `primary-first`.
 
-Two columns appear only when both sides show. `side-order` changes the visual order only in two-column layouts. None of these choices makes a request.
+Two columns appear only when both sides show. `side-order` changes the visual order only in two-column layouts.
 
 ### See which edition readers are shown
 
-After you choose the sides, decide whether readers see the edition credit. Only Source Card names the edition. It shows each edition's title and language, and links the title to its source when Sefaria gives a valid http(s) address. It doesn't show the license. Text Segment and Bilingual Segment show only the text.
+Only Source Card and Reader name the edition. It shows each edition's title and language, and links the title to its source when Sefaria gives a valid http(s) address. It doesn't show the license. Text Segment and Bilingual Segment show only the text.
 
 On Source Card, `hide-attributions` hides the credit and the fallback notice. It makes no request.
 
