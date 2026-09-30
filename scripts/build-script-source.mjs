@@ -52,7 +52,6 @@ export async function bundleElements({ split = false } = {}) {
                 "bilingual-segment",
                 "connections-panel",
                 "reader",
-                "ref-label",
                 "source-card",
                 "text-segment",
               ].map((name) => [

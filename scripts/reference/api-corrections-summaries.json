@@ -27,6 +27,10 @@
     "title": "Reference lookup response",
     "summary": "The published description for `GET /api/ref/{tref}` does not fully cover the fields that depend on the node type. Its 404 has an incomplete inline error schema. The correction rewrites the description of those fields. It makes the 200 response a union of success and expected parse failure. It points the 404 at the Core JSON error schema."
   },
+  "calendar-parasha-error-contract": {
+    "title": "Calendar parasha response",
+    "summary": "The published description for `GET /api/calendars/topics/parasha` models every HTTP 200 response as successful calendar data. The correction requires the `ref` field on successful responses and makes the 200 response a union of successful calendar data and the Core JSON error schema."
+  },
   "index-contract": {
     "title": "Index response",
     "summary": "The published description for `GET /api/v2/index/{title}` doesn't list the conditional query parameters, such as `content_counts`. The correction adds those parameters and the `firstSectionRef` and `relatedTopics` properties. It models the HTTP 200 response as a union of success and error."

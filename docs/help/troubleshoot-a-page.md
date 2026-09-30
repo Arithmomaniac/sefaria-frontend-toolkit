@@ -56,7 +56,7 @@ There is no generic ready event, so read `status`.
 
 **What you see:** an error message from Sefaria, and `status` is `error`.
 
-**Why:** some requests get a 400 or 404 answer with a message, and the component shows that message. Reference Label is different. An unrecognized reference is a successful answer. So `status` is `empty`, and the label says the reference isn't recognized.
+**Why:** some requests get a 400 or 404 answer with a message, and the component shows that message.
 
 **Fix:** check the spelling of `sref`. Try a reference that you know works, such as `Micah 6:8`.
 

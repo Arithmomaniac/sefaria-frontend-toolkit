@@ -14,6 +14,7 @@ import {
   validateGetAsyncTaskStatus200,
   validateGetAsyncTaskStatus202,
   validateGetAsyncTaskStatus500,
+  validateGetCalendarParashaTopic200,
   validateGetIndexV2200,
   validateGetLinks200,
   validateGetLinks400,
@@ -58,6 +59,24 @@ async function readFixture(name: string): Promise<unknown> {
 }
 
 describe("public generated response validators", () => {
+  it("distinguishes the dated calendar invalid-parameter response from a successful parasha", async () => {
+    const error = await readFixture("calendar-parasha-error-2026-09-29.json");
+    const contract = getResponseContract({
+      method: "GET",
+      path: "/api/calendars/topics/parasha",
+      status: 200,
+    });
+
+    expect(contract?.schema?.safeParse(error)).toMatchObject({
+      success: true,
+      data: error,
+    });
+    expect(validateGetCalendarParashaTopic200(error)).toBe(true);
+    expect(validateGetCalendarParashaTopic200({})).toBe(false);
+    expect(validateGetCalendarParashaTopic200({ error: 3 })).toBe(false);
+    expect(validateGetCalendarParashaTopic200({ ref: "Micah 6:8" })).toBe(true);
+  });
+
   it("validates every documented JSON response example", async () => {
     const inputs = await loadCommittedInputs();
     const api = extractApiDocument(

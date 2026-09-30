@@ -58,7 +58,6 @@ Paste the sentence that matches the failed check.
 ## Next steps
 
 - [Start here](/use-components/start-here.md): the same first page, written by hand.
-- [Label a citation](/use-components/show-text/label-a-citation.md)
 - [Show one passage](/use-components/show-text/show-one-passage.md)
 - [Show Hebrew and translation together](/use-components/show-text/hebrew-and-translation.md)
 - [Show an attributed passage](/use-components/show-an-attributed-passage.md)

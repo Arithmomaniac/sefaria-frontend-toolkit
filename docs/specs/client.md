@@ -23,7 +23,7 @@ The package does not own component view models, normalized domain models, render
 
 ## Source authority
 
-The upstream input is [`docs/openAPI.json` at Sefaria commit `1f7d0844ca6a9eddc8e48168962aacb09de75bd6`](https://github.com/Sefaria/Sefaria-Project/blob/1f7d0844ca6a9eddc8e48168962aacb09de75bd6/docs/openAPI.json).
+The upstream input is [`docs/openAPI.json` at Sefaria commit `898feda78d1bd6b24f66305081a54c8cf36406be`](https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/docs/openAPI.json).
 
 The pinned input plus reviewed overlay is authoritative for transport payloads. Generated declarations are the field-level public reference.
 
@@ -243,6 +243,8 @@ The client must not catch a network or abort failure and return an HTTP-style su
 The client must not turn missing requested content into a transport error when the API returned a valid success payload. The owning component factory decides its partial or empty state.
 
 Runtime validation detects contract mismatches. A mismatch does not change the schema automatically. Source review and recorded evidence must precede an overlay correction.
+
+The calendar parasha operation's HTTP 200 response includes both a successful parasha and a JSON error for an invalid `diaspora` parameter. Its generated response contract must distinguish these shapes, preserving the JSON error as a typed HTTP 200 data variant rather than changing the status or converting it into a network failure.
 
 ## Test contract
 

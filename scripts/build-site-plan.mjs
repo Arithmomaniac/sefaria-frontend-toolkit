@@ -13,7 +13,6 @@ export const EXAMPLE_BUILDS = [
     pages: [
       "index.html",
       "authored.html",
-      "ref-label.html",
       "text-segment.html",
       "bilingual-segment.html",
       "source-card.html",

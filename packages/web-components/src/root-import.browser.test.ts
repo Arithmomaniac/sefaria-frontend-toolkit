@@ -9,7 +9,6 @@ test("imports the browser root without realizing acquisition", async () => {
     SefariaBilingualSegment: expect.any(Function),
     SefariaConnectionsPanel: expect.any(Function),
     SefariaReader: expect.any(Function),
-    SefariaRefLabel: expect.any(Function),
     SefariaTextSegment: expect.any(Function),
   });
   expect(fetchMock).not.toHaveBeenCalled();
@@ -43,11 +42,12 @@ test("does not expose prepared state through root exports or element properties"
   }
   expect(root).not.toHaveProperty("SefariaPopup");
   expect(customElements.get("sefaria-popup")).toBeUndefined();
+  expect(root).not.toHaveProperty("SefariaRefLabel");
+  expect(customElements.get("sefaria-ref-label")).toBeUndefined();
 
   for (const elementClass of [
     root.SefariaTextSegment,
     root.SefariaBilingualSegment,
-    root.SefariaRefLabel,
     root.SefariaSourceCard,
     root.SefariaConnectionsPanel,
     root.SefariaReader,

@@ -29,7 +29,6 @@ try {
       ...[
         ["text segment", "/examples/explorer/text-segment.html"],
         ["bilingual segment", "/examples/explorer/bilingual-segment.html"],
-        ["reference label", "/examples/explorer/ref-label.html"],
         ["source card", "/examples/explorer/source-card.html"],
       ].map(([name, route]) => ({
         name,

@@ -17,11 +17,6 @@ const cases = [
     required: ['segment.setAttribute("layout", "side-by-side")'],
   },
   {
-    file: "examples/playground/projects/ref-label/main.js",
-    forbidden: ["label.sref =", "label.linked ="],
-    required: ['label.setAttribute("sref", "Micah 6:8")'],
-  },
-  {
     file: "examples/playground/projects/connections-panel/main.js",
     forbidden: ["panel.sref =", "panel.withText =", "panel.category ="],
     required: ['panel.setAttribute("sref", "Micah 6:8")'],
@@ -137,15 +132,6 @@ const cases = [
       "result.sref = ",
       "result.versionLanguage = ",
       "result.versionTitle = ",
-    ],
-    required: ['result.setAttribute("sref", request.tref)'],
-  },
-  {
-    file: "examples/explorer/src/ref-label/app.ts",
-    forbidden: [
-      "result.sref = ",
-      "result.labelLanguage = ",
-      "result.linked = ",
     ],
     required: ['result.setAttribute("sref", request.tref)'],
   },

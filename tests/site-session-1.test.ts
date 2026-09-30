@@ -41,10 +41,6 @@ describe("LiveEditor", () => {
 });
 
 const showTextPages = {
-  "sefaria-ref-label": {
-    file: "docs/use-components/show-text/label-a-citation.md",
-    attributes: ["sref", "label-language", "linked"],
-  },
   "sefaria-text-segment": {
     file: "docs/use-components/show-text/show-one-passage.md",
     attributes: [
@@ -154,13 +150,6 @@ describe.each(Object.entries(showTextPages))(
     });
   },
 );
-
-it("teaches shared styling and dark-mode setup on the label page", () => {
-  const page = read(showTextPages["sefaria-ref-label"].file);
-  expect(page).toContain("color-scheme: light dark");
-  expect(page).toContain("--sefaria-font-scale");
-  expect(page).toContain("(/across-components/match-your-sites-look.md)");
-});
 
 describe("Source Card page", () => {
   const page = read("docs/use-components/show-an-attributed-passage.md");

@@ -8,7 +8,6 @@ export {
   type SefariaAcquisitionCapability,
   type SefariaAcquisitionResponse,
   type SefariaLinksAcquisitionRequest,
-  type SefariaReferenceAcquisitionRequest,
   type SefariaTextAcquisitionRequest,
 } from "./acquisition.js";
 export type {
@@ -28,8 +27,6 @@ export type {
   BilingualSegmentRequest,
   BilingualSegmentSide,
 } from "./bilingual-segment.js";
-export { SefariaRefLabel, type RefLabelLanguage } from "./ref-label-element.js";
-export type { RefLabelRequest } from "./ref-label.js";
 export { SefariaReader } from "./reader-element.js";
 export type {
   ReaderPane,

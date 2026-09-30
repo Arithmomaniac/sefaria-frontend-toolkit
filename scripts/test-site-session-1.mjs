@@ -46,8 +46,8 @@ async function withSite(root, siteBasePath, run) {
   }
 }
 
-const editorRoute = "/use-components/show-text/label-a-citation.html";
-const editorSnippet = "ref-label.html";
+const editorRoute = "/use-components/show-an-attributed-passage.html";
+const editorSnippet = "source-card-select.html";
 
 /** Offline LiveEditor checks: local toolkit script, no Sefaria access. */
 export async function runSessionOneSiteChecks({ root, siteBasePath }) {
@@ -121,7 +121,7 @@ export async function runSessionOneSiteChecks({ root, siteBasePath }) {
     );
     const inner = page.frameLocator(".live-editor__frame").first();
     await inner
-      .locator("sefaria-ref-label")
+      .locator("sefaria-source-card")
       .first()
       .waitFor({ state: "attached" });
     const childFrame = page
@@ -144,7 +144,7 @@ export async function runSessionOneSiteChecks({ root, siteBasePath }) {
     expectEqual(isolation.origin, "null", "frame origin");
     expectEqual(isolation.parentReadable, false, "frame reads parent document");
     await childFrame.waitForFunction(
-      () => globalThis.customElements.get("sefaria-ref-label") !== undefined,
+      () => globalThis.customElements.get("sefaria-source-card") !== undefined,
     );
     expectEqual(scriptRequests, 1, "script requests after scrolling");
 
@@ -186,7 +186,7 @@ export async function runSessionOneSiteChecks({ root, siteBasePath }) {
 
     await editor.getByRole("button", { name: "Reset" }).click();
     await inner
-      .locator("sefaria-ref-label")
+      .locator("sefaria-source-card")
       .first()
       .waitFor({ state: "attached" });
     expectEqual(
@@ -221,7 +221,7 @@ export async function runSessionOneLiveChecks({ root, siteBasePath }) {
         });
       }
     });
-    await page.goto(url("/use-components/show-text/label-a-citation.html"));
+    await page.goto(url("/use-components/show-an-attributed-passage.html"));
     await page.locator(".live-editor").first().scrollIntoViewIfNeeded();
     const childFrame = await (async () => {
       for (let attempt = 0; attempt < 100; attempt += 1) {
@@ -257,7 +257,6 @@ export async function runSessionOneLiveChecks({ root, siteBasePath }) {
 }
 
 const showTextPages = [
-  "/use-components/show-text/label-a-citation.html",
   "/use-components/show-text/show-one-passage.html",
   "/use-components/show-text/hebrew-and-translation.html",
   "/use-components/show-an-attributed-passage.html",
@@ -409,7 +408,7 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
     // Framework page: read-only code blocks show their tested owner files.
     const frameworks = await browser.newPage();
     await routeOffline(frameworks, { origin, localScript, fixtures });
-    await frameworks.goto(url(showTextPages[4]), { waitUntil: "networkidle" });
+    await frameworks.goto(url(showTextPages[3]), { waitUntil: "networkidle" });
     const blocks = await frameworks
       .locator("figure.site-code-block")
       .evaluateAll((figures) =>
@@ -447,7 +446,7 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
       localScript,
       fixtures,
     });
-    await cardPage.goto(url(showTextPages[3]), { waitUntil: "networkidle" });
+    await cardPage.goto(url(showTextPages[2]), { waitUntil: "networkidle" });
     const selectFrame = await editorFrame(
       cardPage.locator(".live-editor").first(),
     );
@@ -492,7 +491,7 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
       localScript,
       fixtures,
     });
-    await connections.goto(url(showTextPages[5]), { waitUntil: "networkidle" });
+    await connections.goto(url(showTextPages[4]), { waitUntil: "networkidle" });
     const eventsFrame = await editorFrame(
       connections.locator(".live-editor").nth(1),
     );
@@ -540,7 +539,7 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
       localScript,
       fixtures,
     });
-    await readerPage.goto(url(showTextPages[6]), { waitUntil: "networkidle" });
+    await readerPage.goto(url(showTextPages[5]), { waitUntil: "networkidle" });
     const readerFrame = await editorFrame(
       readerPage.locator(".live-editor").first(),
     );
@@ -576,21 +575,21 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
       localScript,
       fixtures,
     });
-    await themePage.goto(url(showTextPages[7]), { waitUntil: "networkidle" });
+    await themePage.goto(url(showTextPages[6]), { waitUntil: "networkidle" });
     const themeFrame = await editorFrame(
       themePage.locator(".live-editor").first(),
     );
-    await themeFrame.waitForFunction(() =>
-      ["sefaria-ref-label", "sefaria-source-card"].every(
-        (tag) => globalThis.document.querySelector(tag)?.status === "ready",
-      ),
+    await themeFrame.waitForFunction(
+      () =>
+        globalThis.document.querySelector("sefaria-source-card")?.status ===
+        "ready",
     );
     const themeLinkColor = () =>
       themeFrame.evaluate(
         () =>
           globalThis.getComputedStyle(
             globalThis.document
-              .querySelector("sefaria-ref-label")
+              .querySelector("sefaria-source-card")
               .shadowRoot.querySelector("a"),
           ).color,
       );
@@ -605,7 +604,7 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
       () =>
         globalThis.getComputedStyle(
           globalThis.document
-            .querySelector("sefaria-ref-label")
+            .querySelector("sefaria-source-card")
             .shadowRoot.querySelector("a"),
         ).color === "rgb(147, 180, 255)",
     );
@@ -625,7 +624,7 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
       localScript,
       fixtures,
     });
-    await choicePage.goto(url(showTextPages[8]), { waitUntil: "networkidle" });
+    await choicePage.goto(url(showTextPages[7]), { waitUntil: "networkidle" });
     const choiceFrame = await editorFrame(
       choicePage.locator(".live-editor").first(),
     );
@@ -676,7 +675,7 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
       localScript,
       fixtures,
     });
-    await coordPage.goto(url(showTextPages[9]), { waitUntil: "networkidle" });
+    await coordPage.goto(url(showTextPages[8]), { waitUntil: "networkidle" });
     const coordFrame = await editorFrame(
       coordPage.locator(".live-editor").first(),
     );
@@ -706,85 +705,6 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
     );
     await coordPage.close();
 
-    // Label page: styling changes do not request, and zero states render.
-    const page = await browser.newPage({
-      viewport: { width: 1280, height: 900 },
-    });
-    const requests = await routeOffline(page, {
-      origin,
-      localScript,
-      fixtures,
-    });
-    await page.goto(url(showTextPages[0]), { waitUntil: "networkidle" });
-    const editors = page.locator(".live-editor");
-
-    const styling = await editorFrame(editors.nth(1));
-    await styling.waitForFunction(
-      () =>
-        globalThis.document.querySelector("sefaria-ref-label")?.status ===
-        "ready",
-    );
-    const before = requests.length;
-    await styling.evaluate(async () => {
-      const root = globalThis.document.documentElement;
-      root.style.setProperty("--sefaria-link", "rgb(1, 2, 3)");
-      root.style.colorScheme = "dark";
-      await new Promise((resolve) => globalThis.setTimeout(resolve, 300));
-    });
-    const linkColor = await styling.evaluate(
-      () =>
-        globalThis.getComputedStyle(
-          globalThis.document
-            .querySelector("sefaria-ref-label")
-            .shadowRoot.querySelector("a"),
-        ).color,
-    );
-    expectEqual(linkColor, "rgb(1, 2, 3)", "styled link color");
-    expectEqual(requests.length, before, "styling makes no request");
-
-    const states = await editorFrame(editors.nth(2));
-    await states.waitForFunction(() =>
-      [...globalThis.document.querySelectorAll("sefaria-ref-label")].every(
-        (label) => label.status !== "loading",
-      ),
-    );
-    await states.locator("#check").click();
-    expectEqual(
-      (await states.locator("#log").textContent()).trim(),
-      '"Micah 6:8" is ready\n"Not a book 3:4" is empty\n"" is empty',
-      "label zero states",
-    );
-    expectEqual(
-      (await states.locator("sefaria-ref-label").nth(1).textContent()) ?? "",
-      "",
-      "light DOM stays empty",
-    );
-    await page.close();
-
-    // Unreachable Sefaria: alert, error status, and the error event.
-    const failing = await browser.newPage({
-      viewport: { width: 1280, height: 900 },
-    });
-    await routeOffline(failing, {
-      origin,
-      localScript,
-      fixtures,
-      failSefaria: true,
-    });
-    await failing.goto(url(showTextPages[0]), { waitUntil: "networkidle" });
-    const failed = await editorFrame(failing.locator(".live-editor").nth(2));
-    await failed.locator("sefaria-ref-label [role=alert]").first().waitFor();
-    await failed
-      .locator("#log")
-      .filter({ hasText: "Error for Micah 6:8" })
-      .waitFor();
-    await failed.locator("#check").click();
-    await failed
-      .locator("#log")
-      .filter({ hasText: '"Micah 6:8" is error' })
-      .waitFor();
-    await failing.close();
-
     // Text Segment: a fresh load of the default example makes one request.
     const passage = await browser.newPage({
       viewport: { width: 1280, height: 900 },
@@ -794,7 +714,7 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
       localScript,
       fixtures,
     });
-    await passage.goto(url(showTextPages[1]), { waitUntil: "networkidle" });
+    await passage.goto(url(showTextPages[0]), { waitUntil: "networkidle" });
     const defaultFrame = await editorFrame(
       passage.locator(".live-editor").first(),
     );

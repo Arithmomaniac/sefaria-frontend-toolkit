@@ -24,7 +24,7 @@ Set `sref` to the reference. With no other choice, the segment shows the edition
 
 <LiveEditor :code="textSegment" title="The default text" />
 
-To try changes, choose Edit, change the code, and choose Run. Styling works as it does for every component. See [Label a citation](/use-components/show-text/label-a-citation.md).
+To try changes, choose Edit, change the code, and choose Run. Styling works as it does for every component.
 
 ## Choose which text to show
 

@@ -6,7 +6,6 @@ import {
 } from "./policy.js";
 
 export const PROJECT_IDS = [
-  "ref-label",
   "text-segment",
   "bilingual-segment",
   "source-card",

@@ -28,7 +28,8 @@ import { pinnedOpenApiUrl } from "../scripts/refresh-openapi.js";
 
 const packageRoot = resolve(import.meta.dirname, "..");
 const repositoryUrl = "https://api.github.com/repos/Sefaria/Sefaria-Project";
-const newCommit = "898feda78d1bd6b24f66305081a54c8cf36406be";
+// A synthetic complete SHA must remain different from the committed pin.
+const newCommit = "b".repeat(40);
 const laterCommit = "a".repeat(40);
 
 let source: OpenApiSource;

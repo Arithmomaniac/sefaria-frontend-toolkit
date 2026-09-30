@@ -43,7 +43,6 @@ const ELEMENT_SUBPATHS = new Set([
   "./bilingual-segment",
   "./connections-panel",
   "./reader",
-  "./ref-label",
   "./source-card",
   "./text-segment",
 ]);

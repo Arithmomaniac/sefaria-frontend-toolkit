@@ -14,7 +14,7 @@ import theming from "../../examples/site-snippets/component-theming.html?raw";
 
 This page changes how components look, not which text appears. To change the text, see [Choose what text readers see](/across-components/choose-what-text-readers-see.md).
 
-[Label a citation](/use-components/show-text/label-a-citation.md) first introduced styling. This page gathers every setting.
+This page gathers every styling setting.
 
 Every toolkit component reads the same set of CSS custom properties, called tokens, whose names start with `--sefaria-`. Set a token once and every component in scope picks it up. Tokens pass down to every component inside the element where you set them. Each component uses the tokens that apply to it. You need a page with at least one working component and access to your CSS.
 
@@ -40,7 +40,7 @@ Components you haven't restyled keep their default look. Tokens you don't set ke
 | `--sefaria-danger` | Reserved. No component uses it yet, so setting it has no visible effect today. |
 | `--sefaria-link` | Link color. |
 | `--sefaria-shadow` | Reserved. No component uses it yet, so setting it has no visible effect today. |
-| `--sefaria-panel-radius` | Corner rounding of panels such as cards and the connections panel. Default: `0.75rem`. It doesn't affect Reference Label. |
+| `--sefaria-panel-radius` | Corner rounding of panels such as cards and the connections panel. Default: `0.75rem`. |
 | `--sefaria-control-radius` | Corner rounding of Connections Panel buttons and Source Card verse-number buttons. Default `0.3rem`. The Reader's own buttons stay pill-shaped. |
 | `--sefaria-font-scale` | Multiplies each component's base font size. Default `1`. Text sized relative to it follows. Some Reader interface text has fixed sizes and doesn't. |
 | `--sefaria-font-hebrew` | Hebrew text font. The default starts with "Noto Serif Hebrew". |
@@ -76,7 +76,7 @@ Components render inside a shadow DOM, a browser feature that keeps a component'
 
 You can style a component through the tokens, through the element's own box (`display`, `margin`, width), and, for the Reader, through its named parts: `sefaria-reader::part(toolbar)`, `::part(history)`, `::part(source-pane)`, and `::part(connections-pane)`. Inherited text settings such as `font-weight` can still pass in.
 
-The Reader uses `display: grid`. The other components are `display: block` by default. To put a label inside a sentence, add `sefaria-ref-label { display: inline; }` to your CSS.
+The Reader uses `display: grid`. The other components are `display: block` by default.
 
 Styling never makes a request. Changing tokens, the color scheme, or box styles only redraws what is already there.
 

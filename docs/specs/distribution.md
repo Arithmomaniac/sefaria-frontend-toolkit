@@ -18,7 +18,7 @@ The package names are experimental and subject to change. The packages are publi
 
 ## Browser script source
 
-**Implementation status:** local build and deterministic qualification are implemented, and a P5 release is hosted. New builds produce one self-contained, minified, tree-shaken ES module registering all six remaining elements. Consumers need neither package-registry authentication nor a build step, import map, external runtime dependency, or separate stylesheet. The module preserves the package-root exports and existing element contracts; it does not add acquisition, retry, caching, or rendering policy.
+**Implementation status:** local build and deterministic qualification are implemented, and a P5 release is hosted. New builds produce one self-contained, minified, tree-shaken ES module registering all five remaining elements. Consumers need neither package-registry authentication nor a build step, import map, external runtime dependency, or separate stylesheet. The module preserves the package-root exports and existing element contracts; it does not add acquisition, retry, caching, or rendering policy.
 
 The pinned path is `https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/<package-version>/sefaria-elements.js`. The moving path is `https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js`.
 
@@ -58,7 +58,7 @@ The build records raw bytes and gzip bytes with fixed compression settings. Meas
 
 Required deterministic acceptance uses the actual production artifact on a separate-origin plain HTML host. Only Sefaria HTTP responses may be intercepted with corrected fixtures; custom acquisition, import maps, source aliases, or development transforms cannot substitute for the script path.
 
-Acceptance proves standalone Micah 6:8 rendering, all six registrations and absence of Popup in new builds, duplicate evaluation, exact outer/child request counts, supplied-data behavior, visible validation failure, cross-deploy byte identity, explicit retirement, fail-closed archive restoration, and independently recomputed sizes. Local checks stay offline and cannot publish their fixture version.
+Acceptance proves standalone Micah 6:8 rendering, all five registrations and absence of Popup and Reference Label in new builds, duplicate evaluation, exact outer/child request counts, supplied-data behavior, visible validation failure, cross-deploy byte identity, explicit retirement, fail-closed archive restoration, and independently recomputed sizes. Local checks stay offline and cannot publish their fixture version.
 
 Hosted delivery additionally requires anonymous loading from the actual Pages URL, correct JavaScript MIME and CORS, matching package identity, accessible notices/source, and preservation of an older active pin after a later deployment. Local workflow tests alone do not establish hosted availability.
 

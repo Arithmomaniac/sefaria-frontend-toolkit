@@ -4,7 +4,7 @@
 
 ## Status
 
-The documentation site, supplied-data editor, standalone and spatial website Readers, MCP App, and authored linked-article integration are current. Their declarative component-input migration is implemented. The host-dialog preview replacement and six-project editor are implemented.
+The documentation site, supplied-data editor, standalone and spatial website Readers, MCP App, and authored linked-article integration are current. Their declarative component-input migration is implemented. The host-dialog preview replacement and five-project editor are implemented.
 
 ## Shared rules
 
@@ -24,7 +24,7 @@ Transport semantics remain unchanged: documented HTTP payloads retain their type
 
 ## Supplied-data editor
 
-The editor exposes six maintained projects. Each validates fixed corrected payloads and assigns raw component data or Reader seeds. It does not retain public controllers, bindings, prepared models, a fetch broker, runtime package installation, CDN loading, service workers, or a live-data fallback.
+The editor exposes five maintained projects. Each validates fixed corrected payloads and assigns raw component data or Reader seeds. It does not retain public controllers, bindings, prepared models, a fetch broker, runtime package installation, CDN loading, service workers, or a live-data fallback.
 
 The trusted host owns project selection, editor state, source links, bounded diagnostics, and preview replacement. Edited code runs only in the opaque sandboxed frame under the existing CSP and finite source/asset/message limits.
 
@@ -103,7 +103,7 @@ Ten child renderings from one parent response require one outer request and zero
 
 ## Completion criteria
 
-- all six public elements use declarative inputs in maintained integrations
+- all five public elements use declarative inputs in maintained integrations
 - no maintained integration constructs public prepared rendering, owner controllers, or bindings
 - supplied paths make zero requests
 - live pages retain explicit activation gates

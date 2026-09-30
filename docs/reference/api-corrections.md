@@ -23,11 +23,11 @@ The `alpha` script-tag address serves the newest script release that is still ac
 
 ## The pinned source
 
-The corrections apply to [`docs/openAPI.json`](https://github.com/Sefaria/Sefaria-Project/blob/1f7d0844ca6a9eddc8e48168962aacb09de75bd6/docs/openAPI.json) in `Sefaria/Sefaria-Project` at commit `1f7d0844ca6a9eddc8e48168962aacb09de75bd6`. The downloaded file must have the SHA-256 digest `2bd2618411afc668eef1d100da546b04431ce82b984da0ae96823f24a8f890e4`.
+The corrections apply to [`docs/openAPI.json`](https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/docs/openAPI.json) in `Sefaria/Sefaria-Project` at commit `898feda78d1bd6b24f66305081a54c8cf36406be`. The downloaded file must have the SHA-256 digest `3a6057ad40ca8e7874d6be97ed2491926818e3a6939c61cca67c9878da9aa4ab`.
 
 Each correction has source checks. The checks inspect the parts of Sefaria's file that the correction uses. They require each part to be absent or unchanged since the correction was written. The checks don't prove that the correction is still needed. If a check fails, client generation stops.
 
-There are 11 corrections, with 80 changes in total. They affect 18 of the client's 60 endpoints.
+There are 12 corrections, with 83 changes in total. They affect 19 of the client's 60 endpoints.
 
 ## Corrections by endpoint
 
@@ -38,6 +38,13 @@ Each endpoint shows its client function. It then lists the corrections that chan
 Client function: `misc.getAsyncTaskStatus`
 
 - [Citation detection (find-refs)](#linker-detection-contract)
+
+### `GET /api/calendars/topics/parasha`
+
+Client function: `calendars.getCalendarParashaTopic`
+
+- [Text (v3) response](#v3-text-contract)
+- [Calendar parasha response](#calendar-parasha-error-contract)
 
 ### `POST /api/find-refs`
 
@@ -594,7 +601,7 @@ The published description for `GET /api/v3/texts/{tref}` already had a `warnings
 - 400: an invalid return format or a text adapter failure.
 - 404: an invalid, empty, or unavailable reference.
 
-Endpoints: `GET /api/links/{tref}`, `GET /api/ref/{tref}`, `GET /api/shape/{title}`, `GET /api/texts/versions/{tref}`, `GET /api/v2/index/{title}`, `GET /api/v3/texts/{tref}`.
+Endpoints: `GET /api/calendars/topics/parasha`, `GET /api/links/{tref}`, `GET /api/ref/{tref}`, `GET /api/shape/{title}`, `GET /api/texts/versions/{tref}`, `GET /api/v2/index/{title}`, `GET /api/v3/texts/{tref}`.
 
 Source checks:
 
@@ -1292,6 +1299,64 @@ Source checks:
     "$ref": "#/components/schemas/CoreErrorResponse"
   }
 }
+```
+
+</details>
+
+<a id="calendar-parasha-error-contract"></a>
+
+### Calendar parasha response
+
+Correction ID: `calendar-parasha-error-contract`
+
+The published description for `GET /api/calendars/topics/parasha` models every HTTP 200 response as successful calendar data. The correction requires the `ref` field on successful responses and makes the 200 response a union of successful calendar data and the Core JSON error schema.
+
+Endpoints: `GET /api/calendars/topics/parasha`.
+
+Source checks:
+
+- `$.components.schemas.CalendarParashaTopicJSON.required` is absent.
+- `$.components.schemas.CoreCalendarParashaTopicResponse` is absent.
+- `$.paths['/api/calendars/topics/parasha'].get.responses['200'].content['application/json'].schema['$ref']` equals `"#/components/schemas/CalendarParashaTopicJSON"`.
+
+| Change | Action | Target | Description |
+| --- | --- | --- | --- |
+| `calendar-parasha-success-ref` | Update | `$.components.schemas.CalendarParashaTopicJSON` | Require the ref always provided by the successful calendar response builder. |
+| `calendar-parasha-response-schema` | Update | `$.components.schemas` | Distinguish successful calendar data from HTTP 200 JSON errors. |
+| `calendar-parasha-response-ref` | Update | `$.paths['/api/calendars/topics/parasha'].get.responses['200'].content['application/json'].schema['$ref']` | Use the calendar success-or-error response schema. |
+
+<details>
+<summary>Values this correction sets</summary>
+
+`calendar-parasha-success-ref`:
+
+```json
+{
+  "required": ["ref"]
+}
+```
+
+`calendar-parasha-response-schema`:
+
+```json
+{
+  "CoreCalendarParashaTopicResponse": {
+    "oneOf": [
+      {
+        "$ref": "#/components/schemas/CalendarParashaTopicJSON"
+      },
+      {
+        "$ref": "#/components/schemas/CoreErrorResponse"
+      }
+    ]
+  }
+}
+```
+
+`calendar-parasha-response-ref`:
+
+```json
+"#/components/schemas/CoreCalendarParashaTopicResponse"
 ```
 
 </details>

@@ -204,8 +204,7 @@ input:not([type="checkbox"]) {
   color: var(--cp-danger);
 }
 
-sefaria-text-segment,
-sefaria-ref-label {
+sefaria-text-segment {
   --sefaria-surface: var(--cp-surface);
   --sefaria-fg: var(--cp-text);
   --sefaria-fg-muted: var(--cp-text-muted);

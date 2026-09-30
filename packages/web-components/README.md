@@ -2,7 +2,7 @@
 
 # @arithmomaniac/sefaria-web-components
 
-Six browser-standard custom elements that show Sefaria texts, each loading by a reference or rendering data you supply.
+Five browser-standard custom elements that show Sefaria texts, each loading by a reference or rendering data you supply.
 
 Experimental and unofficial. Names and addresses may change. This is not an official Sefaria product.
 
@@ -14,7 +14,6 @@ The packages are prereleases on GitHub Packages, not npmjs.com. GitHub Packages 
 
 Import the package root once to register every element: `import "@arithmomaniac/sefaria-web-components";`. Each element loads by `sref` or renders data you supply through its `data` property.
 
-- `<sefaria-ref-label>`: a reference's English and Hebrew names
 - `<sefaria-text-segment>`: one passage in one edition
 - `<sefaria-bilingual-segment>`: one passage in its primary edition with a translation
 - `<sefaria-source-card>`: a source with its text and attribution

@@ -180,6 +180,17 @@ x-sefaria-guards:
             properties:
               error:
                 type: string
+  - id: calendar-parasha-error-contract
+    preconditions:
+      - target: $.components.schemas.CalendarParashaTopicJSON.required
+        expected:
+          absent: true
+      - target: $.components.schemas.CoreCalendarParashaTopicResponse
+        expected:
+          absent: true
+      - target: $.paths['/api/calendars/topics/parasha'].get.responses['200'].content['application/json'].schema['$ref']
+        expected:
+          value: "#/components/schemas/CalendarParashaTopicJSON"
   - id: index-contract
     preconditions:
       - target: $.paths['/api/v2/index/{title}'].get.parameters
@@ -1204,6 +1215,27 @@ actions:
     update:
       schema:
         $ref: "#/components/schemas/CoreErrorResponse"
+  - x-action-id: calendar-parasha-success-ref
+    x-correction-id: calendar-parasha-error-contract
+    target: $.components.schemas.CalendarParashaTopicJSON
+    description: Require the ref always provided by the successful calendar response builder.
+    update:
+      required:
+        - ref
+  - x-action-id: calendar-parasha-response-schema
+    x-correction-id: calendar-parasha-error-contract
+    target: $.components.schemas
+    description: Distinguish successful calendar data from HTTP 200 JSON errors.
+    update:
+      CoreCalendarParashaTopicResponse:
+        oneOf:
+          - $ref: "#/components/schemas/CalendarParashaTopicJSON"
+          - $ref: "#/components/schemas/CoreErrorResponse"
+  - x-action-id: calendar-parasha-response-ref
+    x-correction-id: calendar-parasha-error-contract
+    target: "$.paths['/api/calendars/topics/parasha'].get.responses['200'].content['application/json'].schema['$ref']"
+    description: Use the calendar success-or-error response schema.
+    update: "#/components/schemas/CoreCalendarParashaTopicResponse"
   - x-action-id: index-query
     x-correction-id: index-contract
     target: "$.paths['/api/v2/index/{title}'].get.parameters"

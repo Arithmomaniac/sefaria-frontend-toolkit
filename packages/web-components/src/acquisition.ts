@@ -20,12 +20,6 @@ export interface SefariaTextAcquisitionRequest {
   readonly returnFormat: "default";
 }
 
-/** Reference-resolution operation requested by a standalone component. */
-export interface SefariaReferenceAcquisitionRequest {
-  /** Public Sefaria reference. */
-  readonly sref: string;
-}
-
 /** Links operation requested by a standalone component. */
 export interface SefariaLinksAcquisitionRequest {
   /** Public Sefaria reference. */
@@ -41,11 +35,7 @@ export interface SefariaAcquisitionCapability {
     request: SefariaTextAcquisitionRequest,
     signal: AbortSignal,
   ) => Promise<SefariaAcquisitionResponse>;
-  /** Performs a reference-resolution operation when supported by the host. */
-  readonly resolveReference?: (
-    request: SefariaReferenceAcquisitionRequest,
-    signal: AbortSignal,
-  ) => Promise<SefariaAcquisitionResponse>;
+
   /** Performs a links operation when supported by the host. */
   readonly getLinks?: (
     request: SefariaLinksAcquisitionRequest,

@@ -1,11 +1,4 @@
 {
-  "sefaria-ref-label": {
-    "name": "Reference Label",
-    "howTo": "/use-components/show-text/label-a-citation.md",
-    "summary": "Shows a Sefaria reference as a label, with its English and Hebrew names.",
-    "data": "`data` takes the body of a successful `GET /api/ref/{tref}` response, typed `CoreRefResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.",
-    "empty": "The element shows its empty state when the response has `is_ref` set to `false`. The message is `\"<reference>\" is not a recognized Sefaria reference.` The element fills in the reference."
-  },
   "sefaria-text-segment": {
     "name": "Text Segment",
     "howTo": "/use-components/show-text/show-one-passage.md",

@@ -16,7 +16,6 @@ const tags = [
   "bilingual-segment",
   "connections-panel",
   "reader",
-  "ref-label",
   "source-card",
   "text-segment",
 ].map((name) => `sefaria-${name}`);
@@ -187,16 +186,19 @@ export async function testScriptSource(directory) {
               );
               assert.equal(
                 await page.evaluate(
-                  () => !!globalThis.customElements.get("sefaria-popup"),
+                  () =>
+                    !!globalThis.customElements.get("sefaria-popup") ||
+                    !!globalThis.customElements.get("sefaria-ref-label"),
                 ),
                 false,
               );
               assert.equal(
-                await page.evaluate(
-                  async (moduleUrl) =>
-                    "SefariaPopup" in (await import(moduleUrl)),
-                  url,
-                ),
+                await page.evaluate(async (moduleUrl) => {
+                  const module = await import(moduleUrl);
+                  return ["SefariaPopup", "SefariaRefLabel"].some(
+                    (name) => name in module,
+                  );
+                }, url),
                 false,
               );
               if (scenario.endsWith("-interaction")) {

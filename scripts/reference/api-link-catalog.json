@@ -98,13 +98,6 @@
     "anchor": "arithmomaniac-sefaria-web-components"
   },
   {
-    "name": "@arithmomaniac/sefaria-web-components/ref-label",
-    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
-    "source": "packages",
-    "page": "/reference/package-imports-and-exports.md",
-    "anchor": "arithmomaniac-sefaria-web-components"
-  },
-  {
     "name": "@arithmomaniac/sefaria-web-components/source-card",
     "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
     "source": "packages",
@@ -138,13 +131,6 @@
     "source": "components",
     "page": "/reference/components.md",
     "anchor": "sefaria-reader"
-  },
-  {
-    "name": "<sefaria-ref-label>",
-    "href": "/reference/components.md#sefaria-ref-label",
-    "source": "components",
-    "page": "/reference/components.md",
-    "anchor": "sefaria-ref-label"
   },
   {
     "name": "<sefaria-source-card>",
@@ -553,20 +539,6 @@
     "anchor": "ref"
   },
   {
-    "name": "RefLabelLanguage",
-    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
-    "source": "packages",
-    "page": "/reference/package-imports-and-exports.md",
-    "anchor": "arithmomaniac-sefaria-web-components"
-  },
-  {
-    "name": "RefLabelRequest",
-    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
-    "source": "packages",
-    "page": "/reference/package-imports-and-exports.md",
-    "anchor": "arithmomaniac-sefaria-web-components"
-  },
-  {
     "name": "related",
     "href": "/reference/client.md#related",
     "source": "client",
@@ -721,20 +693,6 @@
     "anchor": "events"
   },
   {
-    "name": "sefaria-ref-label",
-    "href": "/reference/components.md#sefaria-ref-label",
-    "source": "components",
-    "page": "/reference/components.md",
-    "anchor": "sefaria-ref-label"
-  },
-  {
-    "name": "sefaria-ref-label-error",
-    "href": "/reference/components.md#events",
-    "source": "components",
-    "page": "/reference/components.md",
-    "anchor": "events"
-  },
-  {
     "name": "sefaria-source-card",
     "href": "/reference/components.md#sefaria-source-card",
     "source": "components",
@@ -862,20 +820,6 @@
   },
   {
     "name": "SefariaReader",
-    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
-    "source": "packages",
-    "page": "/reference/package-imports-and-exports.md",
-    "anchor": "arithmomaniac-sefaria-web-components"
-  },
-  {
-    "name": "SefariaReferenceAcquisitionRequest",
-    "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
-    "source": "packages",
-    "page": "/reference/package-imports-and-exports.md",
-    "anchor": "arithmomaniac-sefaria-web-components"
-  },
-  {
-    "name": "SefariaRefLabel",
     "href": "/reference/package-imports-and-exports.md#arithmomaniac-sefaria-web-components",
     "source": "packages",
     "page": "/reference/package-imports-and-exports.md",

@@ -88,12 +88,6 @@ const eventCatalog = {
       "Reports a loading failure or a rejection of the starting data.",
     ),
   ],
-  "sefaria-ref-label": [
-    event(
-      "sefaria-ref-label-error",
-      "Reports a failure while loading or validating data from `sref`.",
-    ),
-  ],
   "sefaria-source-card": [
     event(
       "sefaria-source-select",

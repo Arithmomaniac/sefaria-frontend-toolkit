@@ -21,18 +21,12 @@ import {
   type BilingualPairSideOrder,
 } from "./bilingual-pair.js";
 import { validateSuppliedComponentData } from "./component-controller.js";
-import {
-  getPreparedState,
-  prepared,
-  setPreparedState,
-} from "./prepared-state.js";
-import "./ref-label-element.js";
+import { getPreparedState, setPreparedState } from "./prepared-state.js";
 import {
   SefariaElement,
   type SefariaElementStatus,
 } from "./sefaria-element.js";
 import { assertVocalizationMode } from "./vocalization-display.js";
-import type { RefLabelDataViewModel } from "./ref-label.js";
 import type {
   SourceCardAttributionViewModel,
   SourceCardHeaderViewModel,
@@ -111,6 +105,22 @@ export class SefariaSourceCard extends SefariaElement {
         border-block-end: 1px solid var(--_sefaria-border);
       }
 
+      .ref-heading {
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 0.35em;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+      }
+
+      .ref-heading .english {
+        font-family: var(--_sefaria-font-english);
+      }
+
+      .ref-heading .hebrew {
+        font-family: var(--_sefaria-font-hebrew);
+      }
       .payload-label {
         display: flex;
         flex-wrap: wrap;
@@ -766,20 +776,11 @@ export class SefariaSourceCard extends SefariaElement {
   }
 
   #renderHeader(header: SourceCardHeaderViewModel): TemplateResult {
-    const label: RefLabelDataViewModel = {
-      state: "data",
-      normalized: header.ref,
-      hebrew: header.heRef,
-      urlRef: "",
-      url: "",
-      indexTitle: header.indexTitle,
-      nodeType: "",
-    };
     return html`<header>
-      <sefaria-ref-label
-        ${prepared(label)}
-        label-language="both"
-      ></sefaria-ref-label>
+      <span class="ref-heading"
+        ><span class="english" lang="en" dir="ltr">${header.ref}</span
+        ><span class="hebrew" lang="he" dir="rtl">${header.heRef}</span></span
+      >
     </header>`;
   }
 

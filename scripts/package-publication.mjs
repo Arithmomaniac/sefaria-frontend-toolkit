@@ -62,7 +62,6 @@ const NODE_SAFE_IMPORTS = [
   "@arithmomaniac/sefaria-web-components/connections-panel",
   "@arithmomaniac/sefaria-web-components/reader",
   "@arithmomaniac/sefaria-web-components/reader-session",
-  "@arithmomaniac/sefaria-web-components/ref-label",
   "@arithmomaniac/sefaria-web-components/source-card",
   "@arithmomaniac/sefaria-web-components/text-segment",
 ];

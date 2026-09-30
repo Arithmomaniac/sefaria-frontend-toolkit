@@ -147,7 +147,7 @@ describe("documentation site", () => {
 
   it("preserves highlighted HTML source text by default", () => {
     const source =
-      '<sefaria-ref-label sref="Micah 6:8"></sefaria-ref-label>: what does this mean?';
+      '<sefaria-source-card sref="Micah 6:8"></sefaria-source-card>';
     expect(codeTextContent(highlightHtml(source))).toBe(source);
   });
 

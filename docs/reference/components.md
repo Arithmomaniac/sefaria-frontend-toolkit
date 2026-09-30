@@ -13,7 +13,7 @@ import ReleaseStamp from "./ReleaseStamp.vue";
 
 # Components reference
 
-This page lists the attributes, properties, data, empty states, events, and style settings of the toolkit's 6 elements. The generator builds it from the package's `custom-elements.json`.
+This page lists the attributes, properties, data, empty states, events, and style settings of the toolkit's 5 elements. The generator builds it from the package's `custom-elements.json`.
 
 The elements are registered when you load the script tag or when you import the package root with `import "@arithmomaniac/sefaria-web-components";`. The element subpaths, such as `@arithmomaniac/sefaria-web-components/source-card`, don't register their element. They export types and a few helpers.
 
@@ -25,43 +25,11 @@ The `alpha` script-tag address serves the newest script release that is still ac
 
 ## Elements
 
-- [Reference Label](#sefaria-ref-label): `<sefaria-ref-label>`
 - [Text Segment](#sefaria-text-segment): `<sefaria-text-segment>`
 - [Bilingual Segment](#sefaria-bilingual-segment): `<sefaria-bilingual-segment>`
 - [Source Card](#sefaria-source-card): `<sefaria-source-card>`
 - [Connections Panel](#sefaria-connections-panel): `<sefaria-connections-panel>`
 - [Reader](#sefaria-reader): `<sefaria-reader>`
-
-<a id="sefaria-ref-label"></a>
-
-## Reference Label
-
-`<sefaria-ref-label>`. Shows a Sefaria reference as a label, with its English and Hebrew names. [How to use it](/use-components/show-text/label-a-citation.md).
-
-### Attributes and properties
-
-Set an attribute in HTML or a property in JavaScript. If a property has no attribute, set it in JavaScript.
-
-| Property | Attribute | Type | Default | Description |
-| --- | --- | --- | --- | --- |
-| `sref` | `sref` | `string` | `""` | The Sefaria reference to load when `data` isn't set. |
-| `data` | — | `unknown \| undefined` | `undefined` | Sefaria reference response data to render. When it's set, the element doesn't fetch anything. |
-| `acquisition` | — | `SefariaAcquisition \| undefined` | `undefined` | Chooses how this element fetches data, instead of the default. |
-| `labelLanguage` | `label-language` | `RefLabelLanguage` | `"english"` | Language of the label. |
-| `linked` | `linked` | `boolean` | `false` | Whether a loaded label is a link to the reference on Sefaria. |
-| `status` | — | `SefariaElementStatus` | — | Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
-
-### Data
-
-`data` takes the body of a successful `GET /api/ref/{tref}` response, typed `CoreRefResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
-
-### Empty state
-
-The element shows its empty state when the response has `is_ref` set to `false`. The message is `"<reference>" is not a recognized Sefaria reference.` The element fills in the reference.
-
-### Events
-
-`sefaria-ref-label-error`. See [Events](#events).
 
 <a id="sefaria-text-segment"></a>
 
@@ -284,7 +252,6 @@ Invalid supplied `data` puts an element into its error state. The Reader reports
 
 | Element | Event | Description | Detail | Cancelable | What `preventDefault()` does |
 | --- | --- | --- | --- | --- | --- |
-| Reference Label | `sefaria-ref-label-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No | — |
 | Text Segment | `sefaria-text-segment-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No | — |
 | Bilingual Segment | `sefaria-bilingual-segment-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No | — |
 | Source Card | `sefaria-source-select` | Reports that a reader selected one item in the source card. | `position` is the selected segment's position as an array of numbers. `ref` is its reference. | No | — |

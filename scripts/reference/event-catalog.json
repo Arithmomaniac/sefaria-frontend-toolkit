@@ -1,28 +1,23 @@
 {
-  "sefaria-ref-label-error": {
-    "detail": "`error` is the original failure. `sref` is the reference that was loading.",
-    "cancelable": false,
-    "preventDefault": "—"
-  },
   "sefaria-text-segment-error": {
     "detail": "`error` is the original failure. `sref` is the reference that was loading.",
     "cancelable": false,
-    "preventDefault": "—"
+    "preventDefault": "\u2014"
   },
   "sefaria-bilingual-segment-error": {
     "detail": "`error` is the original failure. `sref` is the reference that was loading.",
     "cancelable": false,
-    "preventDefault": "—"
+    "preventDefault": "\u2014"
   },
   "sefaria-source-card-error": {
     "detail": "`error` is the original failure. `sref` is the reference that was loading.",
     "cancelable": false,
-    "preventDefault": "—"
+    "preventDefault": "\u2014"
   },
   "sefaria-source-select": {
     "detail": "`position` is the selected segment's position as an array of numbers. `ref` is its reference.",
     "cancelable": false,
-    "preventDefault": "—"
+    "preventDefault": "\u2014"
   },
   "sefaria-connections-category-change": {
     "detail": "`category` is the chosen category's ID, or `null` for all categories.",
@@ -47,7 +42,7 @@
   "sefaria-connections-panel-error": {
     "detail": "`error` is the original failure. `sref` is the reference that was loading.",
     "cancelable": false,
-    "preventDefault": "—"
+    "preventDefault": "\u2014"
   },
   "sefaria-reader-back": {
     "detail": "`originEntryId`, the entry the Reader was showing",
@@ -97,6 +92,6 @@
   "sefaria-reader-error": {
     "detail": "`error` is the original failure. `sref` is the Reader's requested reference. It can be empty when the failure came from supplied `data`.",
     "cancelable": false,
-    "preventDefault": "—"
+    "preventDefault": "\u2014"
   }
 }

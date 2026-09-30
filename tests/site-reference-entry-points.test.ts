@@ -111,10 +111,9 @@ describe("EP1–EP5 README entry points", () => {
     );
   });
 
-  it("the web components README lists the six elements and the root import", async () => {
+  it("the web components README lists the five elements and the root import", async () => {
     const readme = await read("packages/web-components/README.md");
     for (const tag of [
-      "sefaria-ref-label",
       "sefaria-text-segment",
       "sefaria-bilingual-segment",
       "sefaria-source-card",
@@ -214,7 +213,7 @@ describe("R1 components reference", () => {
       }[];
     };
     const declarations = manifest.modules.flatMap((m) => m.declarations);
-    expect(declarations).toHaveLength(6);
+    expect(declarations).toHaveLength(5);
     expect(page).toContain('<a id="events"></a>');
     for (const declaration of declarations) {
       const start = page.indexOf(`<a id="${declaration.tagName}"></a>`);

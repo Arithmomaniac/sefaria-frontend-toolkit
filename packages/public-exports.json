@@ -32,6 +32,7 @@
             "CollectionsListJson",
             "ContractIssue",
             "CoreBilingualText",
+            "CoreCalendarParashaTopicResponse",
             "CoreErrorResponse",
             "CoreFindRefsMatch",
             "CoreFindRefsReferenceData",
@@ -430,6 +431,7 @@
             "zCollectionSummaryJson",
             "zCollectionsListJson",
             "zCoreBilingualText",
+            "zCoreCalendarParashaTopicResponse",
             "zCoreErrorResponse",
             "zCoreFindRefsMatch",
             "zCoreFindRefsReferenceData",
@@ -630,6 +632,7 @@
             "CollectionSummaryJson",
             "CollectionsListJson",
             "CoreBilingualText",
+            "CoreCalendarParashaTopicResponse",
             "CoreErrorResponse",
             "CoreFindRefsMatch",
             "CoreFindRefsReferenceData",
@@ -958,6 +961,7 @@
             "zCollectionSummaryJson",
             "zCollectionsListJson",
             "zCoreBilingualText",
+            "zCoreCalendarParashaTopicResponse",
             "zCoreErrorResponse",
             "zCoreFindRefsMatch",
             "zCoreFindRefsReferenceData",
@@ -1257,8 +1261,6 @@
             "ReaderRawConnectionsSeed",
             "ReaderRawSeedData",
             "ReaderRawSourceSeed",
-            "RefLabelLanguage",
-            "RefLabelRequest",
             "SefariaAcquisition",
             "SefariaAcquisitionCapability",
             "SefariaAcquisitionResponse",
@@ -1268,8 +1270,6 @@
             "SefariaElementStatus",
             "SefariaLinksAcquisitionRequest",
             "SefariaReader",
-            "SefariaRefLabel",
-            "SefariaReferenceAcquisitionRequest",
             "SefariaSourceCard",
             "SefariaTextAcquisitionRequest",
             "SefariaTextSegment",
@@ -1294,7 +1294,6 @@
             "SefariaAcquisitionCapability",
             "SefariaAcquisitionResponse",
             "SefariaLinksAcquisitionRequest",
-            "SefariaReferenceAcquisitionRequest",
             "SefariaTextAcquisitionRequest",
             "configureSefariaAcquisition"
           ]
@@ -1357,12 +1356,6 @@
             "ReaderTransitionRejection",
             "createReaderSession"
           ]
-        },
-        {
-          "subpath": "./ref-label",
-          "types": "./dist/ref-label-public.d.ts",
-          "import": "./dist/ref-label-public.js",
-          "declarations": ["RefLabelRequest"]
         },
         {
           "subpath": "./source-card",

@@ -32,7 +32,6 @@ The Source Card expects the texts API response, because that is the request it w
 
 Five elements treat valid `data` as authoritative and make no requests:
 
-- Reference Label (`sefaria-ref-label`)
 - Text Segment (`sefaria-text-segment`)
 - Bilingual Segment (`sefaria-bilingual-segment`)
 - Source Card (`sefaria-source-card`)

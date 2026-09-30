@@ -93,6 +93,18 @@ export const PRE_RETIREMENT_SHOWCASE_INVENTORY = Object.freeze([
 
 const RETIRED = new Map([
   [
+    "packages/components/src/ref-label.browser.test.ts",
+    "The alpha Reference Label element was removed; Source Card browser tests cover its private heading and root-import tests assert the tag is unregistered.",
+  ],
+  [
+    "packages/components/src/ref-label.test.ts",
+    "Reference Label preparation and its /api/ref acquisition were removed; Source Card renders its heading from its own v3 text payload.",
+  ],
+  [
+    "demos/explorer/src/ref-label/app.browser.test.ts",
+    "The Reference Label explorer page was removed with the element.",
+  ],
+  [
     "packages/components/src/popup-export.test.ts",
     "The alpha Popup API and subpath were removed; root-import and tarball tests assert their absence.",
   ],
