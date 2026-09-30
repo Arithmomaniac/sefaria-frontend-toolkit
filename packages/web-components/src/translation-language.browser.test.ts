@@ -46,6 +46,12 @@ function response(value: unknown): Response {
 
 afterEach(() => document.body.replaceChildren());
 
+test("translation fallback defaults are element-specific", async () => {
+  expect(new SefariaTextSegment().translationFallback).toBe("none");
+  expect(new SefariaBilingualSegment().translationFallback).toBe("none");
+  expect(new SefariaSourceCard().translationFallback).toBe("default");
+});
+
 for (const Constructor of [
   SefariaTextSegment,
   SefariaBilingualSegment,
@@ -105,6 +111,7 @@ for (const Constructor of [
     const requested: string[][] = [];
     const element = new Constructor();
     element.setAttribute("translation-language", "french");
+    element.setAttribute("translation-fallback", "default");
     element.sref = "Berakhot 2a:1";
     element.acquisition = {
       kind: "capability",
@@ -141,12 +148,93 @@ for (const Constructor of [
     }
     const supplied = new Constructor();
     supplied.translationLanguage = "french";
+    supplied.setAttribute("translation-fallback", "default");
     supplied.data = captured("berakhotDefault");
     supplied.acquisition = { kind: "disabled" };
     document.body.append(supplied);
     await supplied.updateComplete;
     expect(getPreparedState(supplied)).toEqual(getPreparedState(element));
   });
+
+  test(`${Constructor.name} can disable missing-language fallback`, async () => {
+    const requested: string[][] = [];
+    const element = new Constructor();
+    element.setAttribute("translation-language", "french");
+    element.setAttribute("translation-fallback", "none");
+    element.sref = "Berakhot 2a:1";
+    element.acquisition = {
+      kind: "capability",
+      capability: {
+        getText: async (request) => {
+          requested.push([...request.versions]);
+          return { payload: missing(), status: 200 };
+        },
+      },
+    };
+    document.body.append(element);
+    await vi.waitFor(() =>
+      expect(["ready", "empty"]).toContain(element.status),
+    );
+    expect(requested).toEqual(
+      Constructor === SefariaTextSegment
+        ? [["french"]]
+        : [["primary", "french"]],
+    );
+    await vi.waitFor(() =>
+      expect(element.shadowRoot?.textContent).toContain("No french text."),
+    );
+    if (Constructor === SefariaSourceCard) {
+      expect(
+        element.shadowRoot?.querySelector('[role="status"]')?.textContent,
+      ).toContain("No french text.");
+    }
+    expect(element.shadowRoot?.textContent).not.toMatch(
+      /unavailable; showing/u,
+    );
+    expect(getPreparedState(element)).not.toMatchObject({ state: "error" });
+  });
+
+  test(`${Constructor.name} rejects invalid translation fallback`, async () => {
+    const getText = vi.fn(async () => ({ payload: missing(), status: 200 }));
+    const element = new Constructor();
+    element.setAttribute("translation-language", "french");
+    element.setAttribute("translation-fallback", "maybe");
+    element.sref = "Berakhot 2a:1";
+    element.acquisition = { kind: "capability", capability: { getText } };
+    document.body.append(element);
+    await vi.waitFor(() => expect(element.status).toBe("error"));
+    expect(element.shadowRoot?.querySelector('[role="alert"]')).not.toBeNull();
+    expect(getText).not.toHaveBeenCalled();
+  });
+
+  if (Constructor === SefariaTextSegment) {
+    test(`${Constructor.name} rejects invalid translation fallback before selected supplied data`, async () => {
+      const element = new SefariaTextSegment();
+      element.setAttribute("translation-fallback", "maybe");
+      element.data = {
+        kind: "selected",
+        ref: "Micah 6:8",
+        heRef: "מיכה ו׳:ח׳",
+        version: {
+          versionTitle: "Selected",
+          language: "en",
+          actualLanguage: "en",
+          languageFamilyName: "english",
+          direction: "ltr",
+          text: "Selected text.",
+        },
+      };
+      document.body.append(element);
+      await element.updateComplete;
+      expect(element.status).toBe("error");
+      expect(
+        element.shadowRoot?.querySelector('[role="alert"]'),
+      ).not.toBeNull();
+      expect(element.shadowRoot?.textContent).toContain(
+        'Translation fallback must be "default" or "none".',
+      );
+    });
+  }
 
   test(`${Constructor.name} does not fall back for an available empty edition`, async () => {
     const getText = vi.fn(async () => ({
@@ -188,6 +276,7 @@ for (const Constructor of [
       | undefined;
     const element = new Constructor();
     element.translationLanguage = "french";
+    element.setAttribute("translation-fallback", "default");
     element.sref = "Berakhot 2a:1";
     element.acquisition = {
       kind: "capability",
@@ -253,6 +342,33 @@ for (const Constructor of [
     expect(getText).toHaveBeenCalledTimes(1);
   });
 }
+
+test("SefariaSourceCard materializes default fallback when the request omits it", async () => {
+  const requested: string[][] = [];
+  const element = new SefariaSourceCard();
+  element.translationLanguage = "french";
+  element.sref = "Berakhot 2a:1";
+  element.acquisition = {
+    kind: "capability",
+    capability: {
+      getText: async (request) => {
+        requested.push([...request.versions]);
+        return {
+          payload:
+            requested.length === 1 ? missing() : captured("berakhotDefault"),
+          status: 200,
+        };
+      },
+    },
+  };
+  document.body.append(element);
+  await vi.waitFor(() => expect(element.status).toBe("ready"));
+  expect(requested).toEqual([
+    ["primary", "french"],
+    ["primary", "translation"],
+  ]);
+  expect(element.shadowRoot?.textContent).toMatch(/unavailable; showing/u);
+});
 
 test.each([false, true])(
   "ten Source Card children use only outer requests (fallback=%s)",

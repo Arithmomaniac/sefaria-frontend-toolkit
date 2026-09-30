@@ -71,9 +71,21 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Preferred translation language. Without one in that language, the element uses Sefaria's default translation.",
+              "description": "Preferred translation language. `translationFallback` controls what happens when Sefaria has none.",
               "default": "undefined",
               "attribute": "translation-language"
+            },
+            {
+              "kind": "field",
+              "name": "translationFallback",
+              "privacy": "public",
+              "type": {
+                "text": "\"default\" | \"none\""
+              },
+              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a \"No <language> text.\" status.",
+              "default": "\"none\"",
+              "attribute": "translation-fallback",
+              "reflects": true
             },
             {
               "kind": "field",
@@ -153,9 +165,18 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Preferred translation language. Without one in that language, the element uses Sefaria's default translation.",
+              "description": "Preferred translation language. `translationFallback` controls what happens when Sefaria has none.",
               "default": "undefined",
               "fieldName": "translationLanguage"
+            },
+            {
+              "name": "translation-fallback",
+              "type": {
+                "text": "\"default\" | \"none\""
+              },
+              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a \"No <language> text.\" status.",
+              "default": "\"none\"",
+              "fieldName": "translationFallback"
             },
             {
               "name": "primary-version-title",
@@ -729,6 +750,18 @@
             },
             {
               "kind": "field",
+              "name": "translationFallback",
+              "privacy": "public",
+              "type": {
+                "text": "\"default\" | \"none\""
+              },
+              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a \"No <language> text.\" status.",
+              "default": "\"default\"",
+              "attribute": "translation-fallback",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "primaryVersionTitle",
               "privacy": "public",
               "type": {
@@ -991,6 +1024,15 @@
               "description": "Preferred translation language, for the starting text and texts you navigate to.",
               "default": "undefined",
               "fieldName": "translationLanguage"
+            },
+            {
+              "name": "translation-fallback",
+              "type": {
+                "text": "\"default\" | \"none\""
+              },
+              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a \"No <language> text.\" status.",
+              "default": "\"default\"",
+              "fieldName": "translationFallback"
             },
             {
               "name": "primary-version-title",
@@ -1271,9 +1313,21 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Preferred translation language. Without one in that language, the element uses Sefaria's default translation.",
+              "description": "Preferred translation language. `translationFallback` controls what happens when Sefaria has none.",
               "default": "undefined",
               "attribute": "translation-language"
+            },
+            {
+              "kind": "field",
+              "name": "translationFallback",
+              "privacy": "public",
+              "type": {
+                "text": "\"default\" | \"none\""
+              },
+              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a \"No <language> text.\" status.",
+              "default": "\"default\"",
+              "attribute": "translation-fallback",
+              "reflects": true
             },
             {
               "kind": "field",
@@ -1412,9 +1466,18 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Preferred translation language. Without one in that language, the element uses Sefaria's default translation.",
+              "description": "Preferred translation language. `translationFallback` controls what happens when Sefaria has none.",
               "default": "undefined",
               "fieldName": "translationLanguage"
+            },
+            {
+              "name": "translation-fallback",
+              "type": {
+                "text": "\"default\" | \"none\""
+              },
+              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a \"No <language> text.\" status.",
+              "default": "\"default\"",
+              "fieldName": "translationFallback"
             },
             {
               "name": "primary-version-title",
@@ -1685,6 +1748,18 @@
             },
             {
               "kind": "field",
+              "name": "translationFallback",
+              "privacy": "public",
+              "type": {
+                "text": "\"default\" | \"none\""
+              },
+              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a \"No <language> text.\" status.",
+              "default": "\"none\"",
+              "attribute": "translation-fallback",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "vocalizationMode",
               "privacy": "public",
               "type": {
@@ -1740,6 +1815,15 @@
               "description": "Preferred translation language. Can't be combined with `versionLanguage`.",
               "default": "undefined",
               "fieldName": "translationLanguage"
+            },
+            {
+              "name": "translation-fallback",
+              "type": {
+                "text": "\"default\" | \"none\""
+              },
+              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a \"No <language> text.\" status.",
+              "default": "\"none\"",
+              "fieldName": "translationFallback"
             },
             {
               "name": "version-language",

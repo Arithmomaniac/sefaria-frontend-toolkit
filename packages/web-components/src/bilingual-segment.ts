@@ -16,8 +16,11 @@ import type {
 } from "./bilingual-pair.js";
 import {
   acquireSelectedText,
+  needsTranslationFallback,
+  noTranslationLanguageMessage,
   normalizeTranslationLanguage,
   preferredTranslation,
+  type TranslationFallback,
 } from "./translation-selection.js";
 import {
   ComponentControllerEngine,
@@ -43,8 +46,10 @@ export interface BilingualSegmentRequest {
   readonly primary?: BilingualSegmentEditionSelection;
   /** Exact edition for the translation side, when one is required. */
   readonly translation?: BilingualSegmentEditionSelection;
-  /** Preferred translation family; unavailable families fall back to Sefaria's default. */
+  /** Preferred translation family. */
   readonly translationLanguage?: string;
+  /** Missing preferred-translation policy. */
+  readonly translationFallback?: TranslationFallback;
 }
 
 /** Host-supplied state displayed while a bilingual request is pending. */
@@ -408,6 +413,7 @@ async function requestBilingualSegmentResponse(
     request.tref,
     version,
     request.translationLanguage,
+    request.translationFallback ?? "none",
     signal ?? new AbortController().signal,
   );
 }
@@ -455,13 +461,27 @@ export function resolveBilingualSides(
       throw new TypeError(
         "Translation preference requires captured availability metadata.",
       );
-    const selected = preferredTranslation(
-      payload,
-      request.translationLanguage,
-      request.translation?.versionTitle,
-    );
-    const { translationLanguage: _language, ...withoutPreference } = request;
-    if (selected !== undefined || request.translation !== undefined) {
+    const family = normalizeTranslationLanguage(request.translationLanguage);
+    const selected =
+      (request.translationFallback ?? "none") === "none" &&
+      request.translation?.versionTitle === undefined &&
+      needsTranslationFallback(payload, family)
+        ? undefined
+        : preferredTranslation(
+            payload,
+            request.translationLanguage,
+            request.translation?.versionTitle,
+          );
+    const {
+      translationLanguage: _language,
+      translationFallback: _fallback,
+      ...withoutPreference
+    } = request;
+    if (
+      selected !== undefined ||
+      request.translation !== undefined ||
+      (request.translationFallback ?? "none") === "none"
+    ) {
       const primaryMatches =
         request.primary === undefined
           ? versions.filter(
@@ -561,6 +581,17 @@ export function describeAbsentBilingualSide(
   request: BilingualSegmentRequest,
   side: BilingualSegmentSide,
 ): BilingualSegmentAbsentSide {
+  if (
+    side === "translation" &&
+    request.translationLanguage !== undefined &&
+    request.translation === undefined &&
+    (request.translationFallback ?? "none") === "none"
+  ) {
+    return {
+      side,
+      message: noTranslationLanguageMessage(request.translationLanguage),
+    };
+  }
   const key = warningKeyForSide(request, side);
   for (const warning of payload.warnings) {
     const detail =
@@ -572,6 +603,17 @@ export function describeAbsentBilingualSide(
         ? warning.translation
         : undefined);
     if (detail !== undefined) {
+      if (
+        side === "translation" &&
+        request.translationLanguage !== undefined &&
+        (request.translationFallback ?? "none") === "none" &&
+        detail.warning_code === 102
+      ) {
+        return {
+          side,
+          message: noTranslationLanguageMessage(request.translationLanguage),
+        };
+      }
       return { side, message: detail.message };
     }
   }

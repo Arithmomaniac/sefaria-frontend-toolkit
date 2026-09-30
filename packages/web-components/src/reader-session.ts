@@ -1180,6 +1180,8 @@ class ReaderSessionImpl implements ReaderSession {
     const source = current.source;
     if (
       source?.request.translationLanguage !== request.translationLanguage ||
+      (source?.request.translationFallback ?? "default") !==
+        (request.translationFallback ?? "default") ||
       source?.request.primary?.versionTitle !== request.primary?.versionTitle ||
       source?.request.translation?.versionTitle !==
         request.translation?.versionTitle

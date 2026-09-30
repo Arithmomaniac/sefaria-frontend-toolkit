@@ -21,6 +21,7 @@ import { serializeSourceCardSelectors } from "./source-card-request.js";
 import {
   acquireSelectedText,
   normalizeTranslationLanguage,
+  type TranslationFallback,
 } from "./translation-selection.js";
 import {
   projectTextSegmentValue,
@@ -62,8 +63,10 @@ export interface SourceCardRequest {
   readonly primary?: BilingualSegmentEditionSelection;
   /** Exact edition for the translation side, when required. */
   readonly translation?: BilingualSegmentEditionSelection;
-  /** Preferred translation family; unavailable families fall back to Sefaria's default. */
+  /** Preferred translation family. */
   readonly translationLanguage?: string;
+  /** Missing preferred-translation policy. */
+  readonly translationFallback?: TranslationFallback;
 }
 
 /** Optional request-free annotation evidence keyed by exact item reference and edition title. */
@@ -102,8 +105,6 @@ export interface SourceCardAttributionViewModel {
   readonly versionSourceUrl?: string | null;
   /** Actual displayed edition's language family. */
   readonly languageFamilyName?: string;
-  /** Actual displayed edition's language identifier. */
-  readonly actualLanguage?: string;
   /** Unavailable preferred family, when the default translation was selected. */
   readonly unavailableTranslationLanguage?: string;
 }
@@ -260,7 +261,10 @@ export function createSourceCardViewModel(
   context: SourceCardProjectionContext = {},
 ): SourceCardViewModel {
   serializeSourceCardSelectors(request);
-  const bilingualRequest: BilingualSegmentRequest = request;
+  const bilingualRequest: BilingualSegmentRequest = {
+    ...request,
+    translationFallback: request.translationFallback ?? "default",
+  };
   const resolved = resolveBilingualSides(
     payload.versions,
     bilingualRequest,
@@ -426,6 +430,7 @@ async function requestSourceCardResponse(
     request.tref,
     version,
     request.translationLanguage,
+    request.translationFallback ?? "default",
     signal ?? new AbortController().signal,
   );
 }
@@ -670,7 +675,6 @@ function createAttributions(
             versionSource: version.versionSource,
             versionSourceUrl: parseVersionSourceUrl(version.versionSource),
             languageFamilyName: version.languageFamilyName,
-            actualLanguage: version.actualLanguage,
             ...(side === "translation" &&
             request.translationLanguage !== undefined &&
             version.languageFamilyName.toLowerCase() !==

@@ -341,6 +341,59 @@ test("Reader bounds target/context fallback to four text requests and one links 
   expect(getLinks).toHaveBeenCalledTimes(1);
 });
 
+test("Reader disables fallback and propagates the policy to navigated sources", async () => {
+  const requests: { sref: string; versions: readonly string[] }[] = [];
+  const getLinks = vi.fn(async () => ({ payload: [], status: 200 }));
+  const element = new SefariaReader();
+  element.sref = "Micah 6:8";
+  element.translationLanguage = "french";
+  element.translationFallback = "none";
+  element.acquisition = {
+    kind: "capability",
+    capability: {
+      getText: async (request) => {
+        requests.push({ sref: request.sref, versions: request.versions });
+        const payload =
+          request.sref === "Micah 6:8"
+            ? structuredClone(micahTarget)
+            : micahContext();
+        payload.versions = payload.versions.filter(
+          (version) => version.isPrimary,
+        );
+        payload.warnings = [
+          {
+            french: {
+              warning_code: 102,
+              message: "Synthetic missing language.",
+            },
+          },
+        ];
+        return { payload, status: 200 };
+      },
+      getLinks,
+    },
+  };
+  document.body.append(element);
+  await vi.waitFor(() => expect(element.status).toBe("ready"));
+  expect(JSON.stringify(getPreparedState(element))).toContain(
+    "No french text.",
+  );
+  element.dispatchEvent(
+    new CustomEvent("sefaria-reader-connection-select", {
+      detail: { originEntryId: element.currentEntryId, targetRef: "Micah 6" },
+    }),
+  );
+  await vi.waitFor(() =>
+    expect(requests.map((request) => request.sref)).toContain("Micah 6"),
+  );
+  expect(requests).toEqual([
+    { sref: "Micah 6:8", versions: ["primary", "french"] },
+    { sref: "Micah 6", versions: ["primary", "french"] },
+    { sref: "Micah 6", versions: ["primary", "french"] },
+  ]);
+  expect(getLinks).toHaveBeenCalledTimes(1);
+});
+
 test("Reader preserves its language and interrupted fallback across reconnect", async () => {
   const requests: string[][] = [];
   const element = new SefariaReader();

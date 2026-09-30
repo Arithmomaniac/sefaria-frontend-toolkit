@@ -17,7 +17,10 @@ import { resolveSefariaAcquisition } from "./acquisition-state.js";
 import { optionalStringConverter } from "./attribute-converters.js";
 import { serializeSourceCardSelectors } from "./source-card-request.js";
 import type { SourceCardRequest } from "./source-card.js";
-import { normalizeTranslationLanguage } from "./translation-selection.js";
+import {
+  normalizeTranslationFallback,
+  normalizeTranslationLanguage,
+} from "./translation-selection.js";
 import { bindReaderController } from "./bindings.js";
 import {
   getPreparedState,
@@ -87,6 +90,12 @@ export class SefariaReader extends SefariaElement {
       type: String,
       attribute: "translation-language",
       converter: optionalStringConverter,
+    },
+    translationFallback: {
+      type: String,
+      attribute: "translation-fallback",
+      reflect: true,
+      useDefault: true,
     },
     primaryVersionTitle: {
       type: String,
@@ -421,6 +430,8 @@ export class SefariaReader extends SefariaElement {
   declare acquisition: SefariaAcquisition | undefined;
   /** Preferred translation language, for the starting text and texts you navigate to. */
   declare translationLanguage: string | undefined;
+  /** What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a "No <language> text." status. */
+  declare translationFallback: "default" | "none";
   /** Exact title of the primary edition for the starting reference. */
   declare primaryVersionTitle: string | undefined;
   /** Exact title of the translation edition for the starting reference. */
@@ -466,6 +477,7 @@ export class SefariaReader extends SefariaElement {
         readonly data: ReaderRawSeedData | undefined;
         readonly acquisition: SefariaAcquisition | undefined;
         readonly translationLanguage: string | undefined;
+        readonly translationFallback: "default" | "none";
         readonly primaryVersionTitle: string | undefined;
         readonly translationVersionTitle: string | undefined;
       }
@@ -485,6 +497,7 @@ export class SefariaReader extends SefariaElement {
     this.data = undefined;
     this.acquisition = undefined;
     this.translationLanguage = undefined;
+    this.translationFallback = "default";
     this.primaryVersionTitle = undefined;
     this.translationVersionTitle = undefined;
     this.hideAttributions = false;
@@ -508,6 +521,7 @@ export class SefariaReader extends SefariaElement {
         this.data !== disconnectedInputs.data ||
         this.acquisition !== disconnectedInputs.acquisition ||
         this.translationLanguage !== disconnectedInputs.translationLanguage ||
+        this.translationFallback !== disconnectedInputs.translationFallback ||
         this.primaryVersionTitle !== disconnectedInputs.primaryVersionTitle ||
         this.translationVersionTitle !==
           disconnectedInputs.translationVersionTitle;
@@ -548,6 +562,7 @@ export class SefariaReader extends SefariaElement {
       data: this.data,
       acquisition: this.acquisition,
       translationLanguage: this.translationLanguage,
+      translationFallback: this.translationFallback,
       primaryVersionTitle: this.primaryVersionTitle,
       translationVersionTitle: this.translationVersionTitle,
     };
@@ -607,6 +622,7 @@ export class SefariaReader extends SefariaElement {
   protected override willUpdate(changed: PropertyValues<this>): void {
     const selectionChanged =
       changed.has("translationLanguage") ||
+      changed.has("translationFallback") ||
       changed.has("primaryVersionTitle") ||
       changed.has("translationVersionTitle");
     if (
@@ -937,12 +953,17 @@ export class SefariaReader extends SefariaElement {
         this.translationLanguage === undefined
           ? undefined
           : normalizeTranslationLanguage(this.translationLanguage);
+      const translationFallback = normalizeTranslationFallback(
+        this.translationFallback,
+      );
       const admitted = createReaderEntrySeedFromRawData(data);
       const sourceRequest = admitted.sourceRequest;
       if (
         sourceRequest !== undefined &&
         ((translationLanguage !== undefined &&
           translationLanguage !== sourceRequest.translationLanguage) ||
+          translationFallback !==
+            (sourceRequest.translationFallback ?? "default") ||
           (this.primaryVersionTitle !== undefined &&
             this.primaryVersionTitle !== sourceRequest.primary?.versionTitle) ||
           (this.translationVersionTitle !== undefined &&
@@ -972,7 +993,10 @@ export class SefariaReader extends SefariaElement {
           },
         },
         this.#createLazyDataSource(),
-        translationLanguage === undefined ? {} : { translationLanguage },
+        {
+          ...(translationLanguage === undefined ? {} : { translationLanguage }),
+          translationFallback,
+        },
       );
       this.#declarativeActive = true;
       this.#seedCommitted = true;
@@ -1054,6 +1078,9 @@ export class SefariaReader extends SefariaElement {
               this.translationLanguage,
             ),
           }),
+      translationFallback: normalizeTranslationFallback(
+        this.translationFallback,
+      ),
       ...(this.primaryVersionTitle === undefined
         ? {}
         : { primary: { versionTitle: this.primaryVersionTitle } }),

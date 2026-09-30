@@ -29,6 +29,7 @@ import {
 import { assertVocalizationMode } from "./vocalization-display.js";
 import type {
   SourceCardAttributionViewModel,
+  SourceCardDataViewModel,
   SourceCardHeaderViewModel,
   SourceCardItemViewModel,
   SourceCardRequest,
@@ -38,6 +39,7 @@ import { createSourceCardViewModel } from "./source-card.js";
 import { serializeSourceCardSelectors } from "./source-card-request.js";
 import {
   acquireSelectedText,
+  normalizeTranslationFallback,
   type SelectedTextProgress,
 } from "./translation-selection.js";
 
@@ -52,6 +54,12 @@ export class SefariaSourceCard extends SefariaElement {
       type: String,
       attribute: "translation-language",
       converter: optionalStringConverter,
+    },
+    translationFallback: {
+      type: String,
+      attribute: "translation-fallback",
+      reflect: true,
+      useDefault: true,
     },
     primaryVersionTitle: {
       type: String,
@@ -316,8 +324,10 @@ export class SefariaSourceCard extends SefariaElement {
   declare primaryVersionTitle: string | undefined;
   /** Exact title of the edition to show as the translation. */
   declare translationVersionTitle: string | undefined;
-  /** Preferred translation language. Without one in that language, the element uses Sefaria's default translation. */
+  /** Preferred translation language. `translationFallback` controls what happens when Sefaria has none. */
   declare translationLanguage: string | undefined;
+  /** What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a "No <language> text." status. */
+  declare translationFallback: "default" | "none";
 
   /** Which text to show: `primary`, `translation` or `both`. */
   declare contentLanguage: BilingualPairContentLanguage;
@@ -362,6 +372,7 @@ export class SefariaSourceCard extends SefariaElement {
     this.primaryVersionTitle = undefined;
     this.translationVersionTitle = undefined;
     this.translationLanguage = undefined;
+    this.translationFallback = "default";
     this.contentLanguage = "both";
     this.layout = "auto";
     this.sideOrder = "primary-first";
@@ -408,6 +419,7 @@ export class SefariaSourceCard extends SefariaElement {
       changed.has("acquisition") ||
       changed.has("primaryVersionTitle") ||
       changed.has("translationLanguage") ||
+      changed.has("translationFallback") ||
       changed.has("translationVersionTitle")
     ) {
       this.#interruptedProgress = undefined;
@@ -448,9 +460,17 @@ export class SefariaSourceCard extends SefariaElement {
           </p>
           ${this.#renderAttributions(viewModel.attributions)}
         `;
-      case "data":
+      case "data": {
+        const absentMessages = this.#absentMessages(viewModel);
         return html`
           ${this.#renderHeader(viewModel.header)}
+          ${
+            absentMessages.length === 0
+              ? nothing
+              : html`<p role="status" aria-live="polite">
+                  ${absentMessages.join(" ")}
+                </p>`
+          }
           <section class="items" aria-label="Source text">
             ${repeat(
               viewModel.items,
@@ -460,7 +480,18 @@ export class SefariaSourceCard extends SefariaElement {
           </section>
           ${this.#renderAttributions(viewModel.attributions)}
         `;
+      }
     }
+  }
+
+  #absentMessages(viewModel: SourceCardDataViewModel): string[] {
+    return [
+      ...new Set(
+        viewModel.items.flatMap((item) =>
+          item.pair.state === "partial" ? [item.pair.absent.message] : [],
+        ),
+      ),
+    ];
   }
 
   #reconcile(): void {
@@ -534,6 +565,7 @@ export class SefariaSourceCard extends SefariaElement {
         sref,
         versions,
         request.translationLanguage,
+        request.translationFallback ?? "default",
         active.controller.signal,
         active.progress,
       );
@@ -596,6 +628,9 @@ export class SefariaSourceCard extends SefariaElement {
       ...(this.translationLanguage === undefined
         ? {}
         : { translationLanguage: this.translationLanguage }),
+      translationFallback: normalizeTranslationFallback(
+        this.translationFallback,
+      ),
       ...(this.primaryVersionTitle === undefined
         ? {}
         : { primary: { versionTitle: this.primaryVersionTitle } }),
@@ -830,7 +865,7 @@ export class SefariaSourceCard extends SefariaElement {
     return html`<p class="attribution" data-side=${attribution.side}>
       <span class="attribution-label">${label}</span>
       ${title} ${source}
-      ${attribution.languageFamilyName === undefined ? nothing : html`<span class="edition-language">(${attribution.languageFamilyName}, ${attribution.actualLanguage})</span>`}
+      ${attribution.languageFamilyName === undefined ? nothing : html`<span class="edition-language">(${attribution.languageFamilyName})</span>`}
       ${attribution.unavailableTranslationLanguage === undefined ? nothing : html`<span class="translation-fallback" role="status">${attribution.unavailableTranslationLanguage} is unavailable; showing ${attribution.languageFamilyName}.</span>`}
     </p>`;
   }

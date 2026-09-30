@@ -444,7 +444,9 @@ export function startReaderWorkspace(
       session = createReaderSession({
         source: {
           record: destination.record,
-          selectedPosition: destination.selectedPosition,
+          ...(destination.selectedPosition === undefined
+            ? {}
+            : { selectedPosition: destination.selectedPosition }),
         },
         presentation: {
           vocalizationMode: readVocalizationMode(vocalizationMode.value),
@@ -465,13 +467,15 @@ export function startReaderWorkspace(
           .querySelector<SefariaSourceCard>("sefaria-source-card")
           ?.revealSelection();
       }
-      await loadConnections(
-        spatial.panes[0]!.id,
-        session.state.currentEntryId,
-        destination.selectedRef,
-        currentGeneration,
-        currentController.signal,
-      );
+      if (destination.selectedRef !== undefined) {
+        await loadConnections(
+          spatial.panes[0]!.id,
+          session.state.currentEntryId,
+          destination.selectedRef,
+          currentGeneration,
+          currentController.signal,
+        );
+      }
     } catch (error) {
       if (
         !currentController.signal.aborted &&
@@ -529,7 +533,9 @@ export function startReaderWorkspace(
         session.completeSourceNavigation(begun.value.operationId, {
           source: {
             record: destination.record,
-            selectedPosition: destination.selectedPosition,
+            ...(destination.selectedPosition === undefined
+              ? {}
+              : { selectedPosition: destination.selectedPosition }),
           },
         }),
       ).session;
@@ -547,13 +553,15 @@ export function startReaderWorkspace(
       if (!childPane) throw new Error("Child source pane was not created.");
       pinPane(childPane);
       render();
-      await loadConnections(
-        childPane.id,
-        childPane.entryId,
-        destination.selectedRef,
-        currentGeneration,
-        currentController.signal,
-      );
+      if (destination.selectedRef !== undefined) {
+        await loadConnections(
+          childPane.id,
+          childPane.entryId,
+          destination.selectedRef,
+          currentGeneration,
+          currentController.signal,
+        );
+      }
     } catch (error) {
       if (
         !currentController.signal.aborted &&
