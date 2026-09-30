@@ -45,7 +45,7 @@
   <!-- inner primitive callout -->
   <rect x="80" y="340" width="558" height="84" rx="7" fill="none" stroke="#e8bcc9" stroke-width="1.2" stroke-dasharray="4 3"/>
   <rect x="86" y="332" width="234" height="17" rx="4" fill="#fdf1f4"/>
-  <text x="94" y="345" font-size="9.5" font-weight="600" fill="#b11f4b" font-family="Consolas, monospace">&lt;sefaria-bilingual-segment&gt; + ref-label</text>
+  <text x="94" y="345" font-size="9.5" font-weight="600" fill="#b11f4b" font-family="Consolas, monospace">&lt;sefaria-bilingual-segment&gt;</text>
 
   <!-- connections -->
   <line x1="86" y1="438" x2="630" y2="438" stroke="#e4e0da"/>
