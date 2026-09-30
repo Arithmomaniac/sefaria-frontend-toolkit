@@ -63,6 +63,14 @@ describe("documentation site", () => {
     }
   });
 
+  it("keeps custom-container closings on their own line", async () => {
+    const pages = await markdownFiles(["docs"]);
+    for (const page of pages) {
+      const text = await readFile(page, "utf8");
+      expect(text, page).not.toMatch(/\S[ \t]*:::[ \t]*$/mu);
+    }
+  });
+
   it("keeps new-structure pages free of ASCII-art diagrams", async () => {
     const pages = await markdownFiles([
       "docs/across-components",
