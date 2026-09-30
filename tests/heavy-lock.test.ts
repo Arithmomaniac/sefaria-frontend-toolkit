@@ -16,7 +16,7 @@ it("recovers a stale machine-wide heavy-stage lock", async () => {
   await import("node:fs/promises").then(({ writeFile }) =>
     writeFile(
       path.join(lock, "owner.json"),
-      JSON.stringify({ pid: 999999, createdAt: 0 }),
+      JSON.stringify({ pid: 999999, token: "dead", createdAt: 0 }),
     ),
   );
 
@@ -130,4 +130,32 @@ it("cannot retire a successor lock after another waiter already retired the stal
   await expect(readFile(path.join(lock, "owner.json"), "utf8")).resolves.toBe(
     live,
   );
+});
+
+it("never reclaims a lock without a valid owner token", async () => {
+  const root = path.join(".artifacts", `heavy-lock-${crypto.randomUUID()}`);
+  const lock = path.join(root, "lock");
+  await mkdir(lock, { recursive: true });
+  await writeFile(
+    path.join(lock, "owner.json"),
+    JSON.stringify({ pid: 999999, createdAt: 0 }),
+  );
+  let waits = 0;
+
+  const pending = withHeavyStageLock(() => "ok", {
+    lockDirectory: lock,
+    processAlive: () => false,
+    wait: async () => {
+      waits += 1;
+      if (waits === 3) {
+        await import("node:fs/promises").then(({ rm }) =>
+          rm(lock, { recursive: true, force: true }),
+        );
+      }
+    },
+    now: () => Date.now() + 60 * 60 * 1_000,
+  });
+
+  await expect(pending).resolves.toBe("ok");
+  expect(waits).toBe(3);
 });

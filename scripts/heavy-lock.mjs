@@ -1,4 +1,4 @@
-import { mkdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import os from "node:os";
 import path from "node:path";
@@ -17,8 +17,6 @@ export async function withHeavyStageLock(
     pid = process.pid,
     processAlive = isProcessAlive,
     wait = sleep,
-    staleAfterMilliseconds = 30 * 60 * 1_000,
-    initializationGraceMilliseconds = 5_000,
     now = Date.now,
   } = {},
 ) {
@@ -29,8 +27,6 @@ export async function withHeavyStageLock(
     token,
     processAlive,
     wait,
-    staleAfterMilliseconds,
-    initializationGraceMilliseconds,
     now,
   });
   try {
@@ -44,56 +40,48 @@ export async function withHeavyStageLock(
 }
 
 async function acquireLock(options) {
+  const pendingDirectory = `${options.lockDirectory}.pending-${options.token}`;
   for (;;) {
+    await mkdir(pendingDirectory, { recursive: true });
+    await writeFile(
+      path.join(pendingDirectory, "owner.json"),
+      `${JSON.stringify({
+        pid: options.pid,
+        token: options.token,
+        createdAt: options.now(),
+      })}\n`,
+    );
     try {
-      await mkdir(options.lockDirectory);
-      await writeFile(
-        path.join(options.lockDirectory, "owner.json"),
-        `${JSON.stringify({
-          pid: options.pid,
-          token: options.token,
-          createdAt: options.now(),
-        })}\n`,
-      );
+      // Publishing a fully written directory means the lock is never observable
+      // without its owner, and renaming onto a nonempty directory fails on
+      // POSIX and Windows alike.
+      await rename(pendingDirectory, options.lockDirectory);
       const owner = await readOwner(options.lockDirectory);
-      if (owner?.token !== options.token) continue;
-      return;
+      if (owner?.token === options.token) return;
     } catch (error) {
-      if (error?.code === "ENOENT") continue;
-      if (error?.code !== "EEXIST") throw error;
-      if (await removeStaleLock(options)) continue;
-      await options.wait(250);
+      if (!["EEXIST", "ENOTEMPTY", "EPERM", "EACCES"].includes(error?.code)) {
+        await rm(pendingDirectory, { recursive: true, force: true });
+        throw error;
+      }
     }
+    if (await removeStaleLock(options)) continue;
+    await options.wait(250);
   }
 }
 
-async function removeStaleLock({
-  lockDirectory,
-  processAlive,
-  staleAfterMilliseconds,
-  initializationGraceMilliseconds,
-  now,
-}) {
+async function removeStaleLock({ lockDirectory, processAlive }) {
   const owner = await readOwner(lockDirectory);
-  const info = await stat(lockDirectory).catch(() => undefined);
-  const directoryAge = info === undefined ? 0 : now() - info.mtimeMs;
-  if (owner === undefined && directoryAge < initializationGraceMilliseconds) {
+  // Locks without a token were not created by this protocol; leave them for
+  // manual removal rather than guessing their generation.
+  if (typeof owner?.token !== "string" || owner.token.length === 0) {
     return false;
   }
   if (
-    owner === undefined ||
     !Number.isInteger(owner.pid) ||
     !Number.isFinite(owner.createdAt) ||
-    (now() - owner.createdAt > staleAfterMilliseconds &&
-      !processAlive(owner.pid)) ||
     !processAlive(owner.pid)
   ) {
-    if (info === undefined) return true;
-    const generation =
-      typeof owner?.token === "string"
-        ? owner.token
-        : `unowned-${info.birthtimeMs}-${info.ino}`;
-    return retireLock(lockDirectory, generation);
+    return retireLock(lockDirectory, owner.token);
   }
   return false;
 }
