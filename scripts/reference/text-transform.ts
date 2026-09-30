@@ -99,7 +99,7 @@ export async function renderNormalizedOutput(): Promise<string> {
     "",
     `- These formatting elements are kept, with no attributes except \`dir\` on \`<i>\`: ${tags.map((tag) => `\`<${tag}>\``).join(", ")}.`,
     "- `<br>` is kept with no attributes.",
-    '- `<big>` becomes `<span style="font-size: larger;">`. This is the only `style` attribute in the output; incoming styles are removed.',
+    '- `<big>` becomes `<span style="font-size: larger;">`. This is the only `style` attribute in the output. Incoming styles are removed.',
     "- `<img>` is replaced by its `alt` text.",
     "- Toolkit-specific markup is output as `<span>` elements with the attributes below.",
     "- Block elements, such as `<blockquote>`, are unwrapped with a separator kept between their contents.",

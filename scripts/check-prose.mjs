@@ -28,37 +28,45 @@ export const PROSE_FILES = [
 export const MAX_SENTENCE_WORDS = 30;
 
 // Pages that still warn instead of failing until their Simple English pass lands.
-export const WARN_ONLY = new Set([
-  "index.md",
-  "use-components",
-  "data-and-text-tools",
-  "across-components",
-  "concepts",
-  "help",
-  "examples",
-  "reference/text-transform.md",
-  "reference/package-imports-and-exports.md",
+/** Brief-required wording kept verbatim; exempt from the semicolon rule. */
+export const ALLOWED_SENTENCES = new Set([
+  "Types are included; no `@types` package is needed.",
 ]);
+
+/** Pages that only warn. Empty: every new-structure page must pass. */
+export const WARN_ONLY = new Set([]);
 
 /** Returns the checkable prose of a Markdown page, one paragraph per entry. */
 export function proseParagraphs(markdown) {
   const withoutFront = markdown.replace(/^---\r?\n[\s\S]*?\r?\n---\r?\n/u, "");
   const paragraphs = [];
   let fenced = false;
+  let inScript = false;
   let current = [];
   const flush = () => {
     if (current.length > 0) paragraphs.push(current.join(" "));
     current = [];
   };
   for (const line of withoutFront.split(/\r?\n/u)) {
-    if (/^\s*(```|~~~)/u.test(line) || /^<\/?script\b/u.test(line.trim())) {
+    if (/^\s*(```|~~~)/u.test(line)) {
       fenced = !fenced;
+      flush();
+      continue;
+    }
+    if (!fenced && /^<script\b/u.test(line.trim())) {
+      inScript = true;
+      flush();
+      continue;
+    }
+    if (!fenced && /^<\/script>/u.test(line.trim())) {
+      inScript = false;
       flush();
       continue;
     }
     const trimmed = line.trim();
     if (
       fenced ||
+      inScript ||
       trimmed === "" ||
       trimmed.startsWith("|") ||
       trimmed.startsWith("<") ||
@@ -88,10 +96,16 @@ export function proseParagraphs(markdown) {
 export function lintProse(markdown) {
   const issues = [];
   for (const paragraph of proseParagraphs(markdown)) {
-    if (paragraph.includes(";")) {
+    let checked = paragraph;
+    for (const allowed of ALLOWED_SENTENCES) {
+      checked = checked
+        .replace(allowed, "")
+        .replace(allowed.replace(/`[^`]*`/gu, "CODE"), "");
+    }
+    if (checked.includes(";")) {
       issues.push({ kind: "semicolon", text: paragraph });
     }
-    for (const sentence of paragraph.split(/(?<=[.!?])\s+(?=[A-Z"“(*])/u)) {
+    for (const sentence of paragraph.split(/(?<=[.!?])\s+(?=[A-Z"“(*[`])/u)) {
       const words = sentence.split(/\s+/u).filter(Boolean).length;
       if (words > MAX_SENTENCE_WORDS) {
         issues.push({ kind: `${words} words`, text: sentence });

@@ -455,4 +455,28 @@ describe("prose lint", () => {
       "31 words",
     ]);
   });
+
+  it("skips script tags inside code fences and script blocks outside them", async () => {
+    const { lintProse } = await import("../scripts/check-prose.mjs");
+    const issues = lintProse(
+      [
+        "```html",
+        "<script>",
+        "  const card = 1;",
+        "</script>",
+        "```",
+        "",
+        "```ts",
+        'import "x";',
+        "```",
+        "",
+        "<script setup>",
+        "const a = 1;",
+        "</script>",
+        "",
+        "Plain prose.",
+      ].join("\n"),
+    );
+    expect(issues).toEqual([]);
+  });
 });

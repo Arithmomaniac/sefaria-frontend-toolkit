@@ -14,7 +14,7 @@ import { data as snippets } from "../data-and-text-tools/snippets.data.ts";
 
 You want a page that shows this week's Torah portion. You don't want to edit the reference by hand each week.
 
-When the example loads, it looks up the portion for your current local date; reload to update it. It makes one client call to Sefaria's calendar, reads the portion's reference from the answer, and sets that reference on a Source Card.
+When the example loads, it looks up the portion for your current local date. Reload the page to update it. It makes one client call to Sefaria's calendar, reads the portion's reference from the answer, and sets that reference on a Source Card.
 
 This is a complete app (Vite and TypeScript) in `examples/weekly-portion`. It loads live when this page opens. You can't edit it here. To read its source, see [the example on GitHub](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/weekly-portion).
 

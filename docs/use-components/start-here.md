@@ -29,7 +29,7 @@ The card fetches the text from Sefaria when it appears on the page. While it wai
 
 ## Script tag or package
 
-Use the script tag if your page has no build step, if you are editing a field in a content management system, or if you just want to try the toolkit quickly. Use the package if your app already has a build step. The package lets you import the component, bundle it with your code, and let your framework control when it loads.
+Use the script tag if your page has no build step, or if you're editing a field in a content management system. It's also the quickest way to try the toolkit. Use the package if your app already has a build step. The package lets you import the component, bundle it with your code, and let your framework control when it loads.
 
 ::: code-group
 
