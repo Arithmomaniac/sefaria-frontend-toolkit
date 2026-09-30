@@ -30,8 +30,12 @@ A request is one call from the page to Sefaria. A dash in the tables means the c
 ```mermaid
 flowchart TD
   Q1("Need one exact edition?") -->|Yes| A1["Set its title. It never falls back."]
-  Q1 -->|No| Q2("Text Segment only: could the language be the original, such as Hebrew?")
-  Q2 -->|Yes| A2["version-language (never falls back)"]
+  Q1 -->|No| Q2
+  subgraph TS["Text Segment only"]
+    direction TB
+    Q2("Could the language be the original, such as Hebrew?")
+    Q2 -->|Yes| A2["version-language (never falls back)"]
+  end
   Q2 -->|No| A3["translation-language"]
   A3 --> Q3("Is that language missing?")
   Q3 -->|No| A4["Show that translation"]
