@@ -47,7 +47,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | `data` | — | `unknown \| undefined` | `undefined` | Sefaria API response data to render. When it's set, the element doesn't fetch anything. |
 | `acquisition` | — | `SefariaAcquisition \| undefined` | `undefined` | Chooses how this element fetches data, instead of the default. |
 | `versionLanguage` | `version-language` | `string \| undefined` | `undefined` | Language of the edition to show, instead of the primary edition. |
-| `versionTitle` | `version-title` | `string \| undefined` | `undefined` | Exact title of the edition to show, used together with `versionLanguage`. |
+| `versionTitle` | `version-title` | `string \| undefined` | `undefined` | `version-title` alone chooses another edition in the original language. To choose a translation by title, also set `translation-language`. |
 | `translationLanguage` | `translation-language` | `string \| undefined` | `undefined` | Preferred translation language. Can't be combined with `versionLanguage`. |
 | `translationFallback` | `translation-fallback` | `"default" \| "none"` | `"none"` | What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". |
 | `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep. `none` removes both. |

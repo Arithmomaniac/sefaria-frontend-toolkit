@@ -1731,7 +1731,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Exact title of the edition to show, used together with `versionLanguage`.",
+              "description": "`version-title` alone chooses another edition in the original language. To choose a translation by title, also set `translation-language`.",
               "default": "undefined",
               "attribute": "version-title"
             },
@@ -1839,7 +1839,7 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Exact title of the edition to show, used together with `versionLanguage`.",
+              "description": "`version-title` alone chooses another edition in the original language. To choose a translation by title, also set `translation-language`.",
               "default": "undefined",
               "fieldName": "versionTitle"
             },

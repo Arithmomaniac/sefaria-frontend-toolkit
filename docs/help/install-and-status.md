@@ -95,10 +95,10 @@ The rights to the texts are separate. Each Sefaria edition has its own license, 
 
 Attribution works like this:
 
-- Source Card shows each side's edition title and language. It links the title to the edition's source only when the source is a valid http(s) address.
-- Text Segment and Bilingual Segment show the title and language, without a link.
+- Source Card and Reader show each side's edition title and one full language-family name, such as `(english)`. They link the title to the edition's source only when the source is a valid http(s) address.
+- Text Segment and Bilingual Segment show no edition attribution.
 
-These three attributions don't show the license. The Connections Panel (also inside the Reader) can show "Licenses reported" in a connection preview when Sefaria provides it. Sefaria's API returns optional `license` fields, so your own code can read and display them too.
+These attributions don't show the license. The Connections Panel (also inside the Reader) can show "Licenses reported" in a connection preview when Sefaria provides it. Sefaria's API returns optional `license` fields, so your own code can read and display them too.
 
 ## Where to go next
 

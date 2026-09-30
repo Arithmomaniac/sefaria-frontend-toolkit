@@ -49,7 +49,9 @@ The Reader's interaction events tell your page what happened. They are cancelabl
 - `sref`: the reference to open.
 - `active-pane`: which pane shows on a narrow Reader, `source` (the default) or `connections`.
 - `primary-version-title` and `translation-version-title` choose editions for the reference you open and its section. When a reader opens a connection, `translation-language` carries over. Those exact edition titles don't.
-- `layout`, `content-language`, `side-order`, `vocalization-mode`, `translation-language`, and `hide-attributions` mean the same as in [Show Hebrew and translation together](/use-components/show-text/hebrew-and-translation.md). Here `layout` arranges Hebrew and translation inside the text, not the Reader's panes.
+- `layout`, `content-language`, `side-order`, `vocalization-mode`, and `translation-language` mean the same as in [Show Hebrew and translation together](/use-components/show-text/hebrew-and-translation.md). Here `layout` arranges Hebrew and translation inside the text, not the Reader's panes.
+- `translation-fallback`: `default` or `none`. The Reader's default is `default`. Bilingual Segment defaults to `none`. See [Choose what text readers see](/across-components/choose-what-text-readers-see.md) for the shared choices.
+- `hide-attributions`: hides the edition attribution on each displayed side. Bilingual Segment has no such attribute.
 - `show-connection-previews`: shows connection preview text. This option is on by default. To turn it off, set `reader.showConnectionPreviews = false`. The attribute can't turn it off.
 - `chat-export`: shows a `Send … to chat` button when a selected text is open. The button fires `sefaria-reader-chat-export`. Your page does the sending.
 
@@ -77,9 +79,9 @@ These events bubble and cross the component boundary. The `detail` of an interac
 Unlike the smaller components, the Reader makes several requests.
 
 - A fresh load of `Micah 6:8` makes three: the verse's text, its chapter's text, and its connections.
-- If your preferred translation language isn't available from Sefaria, a load can make up to four text requests plus one connections request.
+- If your preferred translation language isn't available and `translation-fallback` is `default`, a load can make up to four text requests plus one connections request. With `none`, there is no fallback text request, so a load stays at three.
 - Selecting another verse makes one connections request.
-- Opening a connection makes up to three requests: its text, its section, and its connections. With a preferred translation language that Sefaria lacks, it can make up to five.
+- Opening a connection makes up to three requests: its text, its section, and its connections. With a missing translation language and `translation-fallback="default"`, it can make up to five. With `none`, it stays at three.
 - Back makes none. Changing a connections category or page makes none.
 
 If you supply a source-only `data` seed, the Reader makes one connections request and doesn't reload the text.

@@ -25,7 +25,7 @@ By default, Source Card and Bilingual Segment ask Sefaria for its primary editio
 
 To choose a language, set `translation-language` to a language family name, such as `english` or `french`. When you supply no `data`, the component then asks for a translation in that language. Supplied data is selected locally and never triggers a request.
 
-If Sefaria reports that no translation exists in that language, the component can make one more request. This time it asks for Sefaria's default translation, which isn't always English. If the component finds one and the attribution is visible, the attribution reports the change. If none exists, the component shows its empty state. Berakhot 2a:1 is an example where this can happen.
+If Sefaria reports that no translation exists in that language, the ranslation-fallback setting decides what happens. It defaults to one on Text Segment and Bilingual Segment. They make one request and show a status such as No french text. Bilingual Segment still shows the primary side. It defaults to default on Source Card and Reader. They make one more request for Sefaria's default translation, which isn't always English. If they find one, the attribution reports the change. If none exists, the component shows its empty state. Berakhot 2a:1 is an example where this can happen. To set it, see [Choose what text readers see](/across-components/choose-what-text-readers-see.md).
 
 The component doesn't fall back in these cases:
 
@@ -37,7 +37,7 @@ To pin an exact edition by title, see [Choose what text readers see](/across-com
 
 ## How to tell which edition is shown
 
-Every attribution shows the edition's title and language. Source Card also labels each side as primary or translation. It links the title to the edition's source when that source is a valid http(s) address. Text Segment and Bilingual Segment show the title and language without a link.
+Only Source Card and Reader show edition attribution. Each attribution shows the edition's title and one language name. Source Card also labels each side as primary or translation. It links the title to the edition's source when that source is a valid http(s) address. Text Segment and Bilingual Segment show no attribution.
 
 These attributions don't show the edition's license. Each edition has its own. To check the rights for text you plan to reuse, read [License and text rights](/help/install-and-status.md#license-and-text-rights). Sefaria's [Copyright and Data Use](https://developers.sefaria.org/docs/usage-of-our-name-and-logo) page and its [help article on licensing](https://help.sefaria.org/hc/en-us/articles/18490043237148-How-to-Find-and-Understand-Licensing-or-Copyright-Information) explain the rules.
 

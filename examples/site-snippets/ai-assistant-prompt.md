@@ -9,7 +9,7 @@ Install route:
 
 Rules:
 
-- Keep the component's attribution visible. Don't hide it with the `hide-attributions` attribute or with CSS.
+- If the page uses Source Card or Reader, keep its attribution visible. Don't hide it with the `hide-attributions` attribute or with CSS.
 - Write no code that downloads text from Sefaria's website itself, and no code that strips or rewrites its HTML. The toolkit does that work.
 - Don't copy Sefaria text into the page.
 - Let the component handle loading and errors.

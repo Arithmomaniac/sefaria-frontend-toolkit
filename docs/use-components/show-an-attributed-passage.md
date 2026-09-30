@@ -23,7 +23,7 @@ Set `sref` to a reference such as `Micah 6:6-8`. The card shows:
 - The passage's primary edition and a translation for each verse. A range such as `Micah 6:6-8` shows each verse as its own item.
 - Attribution for the editions shown.
 
-The card takes the same text settings as Bilingual Segment: `translation-language`, `primary-version-title`, `translation-version-title`, `content-language`, `layout`, `side-order`, `vocalization-mode` and `hide-attributions`. It also takes `translation-fallback`, which is `default` or `none`. For Source Card the default is `default`. All of these attributes mean the same thing here. See [Show Hebrew and translation together](/use-components/show-text/hebrew-and-translation.md).
+The card takes the same text settings as Bilingual Segment: `translation-language`, `primary-version-title`, `translation-version-title`, `content-language`, `layout`, `side-order`, and `vocalization-mode`. It also takes `translation-fallback`, which is `default` or `none`. The default differs: it is `default` on Source Card but `none` on Bilingual Segment. Source Card alone has `hide-attributions`, which hides the attribution. Bilingual Segment has no such attribute. The shared attributes mean the same thing here. See [Show Hebrew and translation together](/use-components/show-text/hebrew-and-translation.md).
 
 ## Read the attribution
 

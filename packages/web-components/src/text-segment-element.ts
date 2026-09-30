@@ -144,7 +144,7 @@ export class SefariaTextSegment extends SefariaElement {
   declare acquisition: SefariaAcquisition | undefined;
   /** Language of the edition to show, instead of the primary edition. */
   declare versionLanguage: string | undefined;
-  /** Exact title of the edition to show, used together with `versionLanguage`. */
+  /** `version-title` alone chooses another edition in the original language. To choose a translation by title, also set `translation-language`. */
   declare versionTitle: string | undefined;
   /** Preferred translation language. Can't be combined with `versionLanguage`. */
   declare translationLanguage: string | undefined;

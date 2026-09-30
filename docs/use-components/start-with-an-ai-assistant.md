@@ -36,7 +36,7 @@ Open the page and check each item.
 
 - The page uses `<sefaria-...>` tags, such as `<sefaria-source-card>`.
 - It loads the toolkit one way. A page with no build step uses the script tag. An app with a build step uses `import "@arithmomaniac/sefaria-web-components";`.
-- The attribution is visible under the text.
+- If the page uses Source Card or Reader, its attribution is visible.
 - The text comes from the component, not pasted into the page.
 - No custom code downloads text from Sefaria's website or strips or rewrites its HTML. The component's own requests are expected.
 - A deliberately delayed request shows a loading message. A deliberately failed request shows an error message. On success, the text replaces the loading message.
@@ -49,7 +49,7 @@ Paste the sentence that matches the failed check.
 - **No toolkit tags:** "Rewrite the page to use `<sefaria-source-card sref="[your passage]">` from the Sefaria Frontend Toolkit."
 - **Toolkit not loaded, page with no build step:** "Add the toolkit's script tag from llms.txt."
 - **Toolkit not loaded, app with a build step:** "Import the package root with `import "@arithmomaniac/sefaria-web-components";`."
-- **Attribution missing:** "Keep the component's attribution visible. Remove any `hide-attributions` attribute, and don't hide it with CSS."
+- **Attribution missing:** "Keep the attribution visible in Source Card and Reader. Remove any `hide-attributions` attribute, and don't hide it with CSS."
 - **Copied text:** "Remove the Sefaria text you pasted into the page. Let the component show it."
 - **Custom download or cleanup code:** "Replace that code with `<sefaria-source-card>`. Don't download text from Sefaria's website or strip or rewrite its HTML yourself."
 - **Loading or error message missing:** "Let the component show its own loading and error messages. Don't replace them."

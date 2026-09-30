@@ -80,7 +80,7 @@ These choices change what the component requests.
   </tbody>
 </table>
 
-Every component takes `sref`. For the segments and Source Card, a fresh load makes one request. It makes two if the translation language is missing and `translation-fallback` is `default`. The Reader also loads the surrounding section and its links. Supplied data makes no request.
+Every component takes `sref`. For the segments and Source Card, a fresh load makes one request. It makes two if the translation language is missing and `translation-fallback` is `default`. The Reader also loads the surrounding section and its links. Supplied data makes no request for the non-Reader elements. A Reader seed with only source data still makes one links request. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md).
 
 ### Choose a translation language
 
@@ -92,7 +92,7 @@ The chart above shows where the fallback happens. Set it with `translation-fallb
 
 Not every text has every translation. Ask for `french` on `Berakhot 2a:1`. Sefaria's response warns that French is missing. The setting decides what happens next.
 
-- **`default`** is the default for Source Card and Reader. The component makes one more request for Sefaria's default translation. That translation isn't always English. Source Card and Reader show a notice such as `french is unavailable; showing english.` A fresh load makes two requests.
+- **`default`** is the default for Source Card and Reader. The component makes one more request for Sefaria's default translation. That translation isn't always English. Source Card and Reader show a notice such as `french is unavailable; showing english.` For the text operation, a fresh load makes two requests. The Reader repeats this for its surrounding section and also requests links.
 - **`none`** is the default for Text Segment and Bilingual Segment. The component makes no second request. It shows the status message "No french text." This isn't an error. Text Segment is `empty`. Bilingual Segment and Source Card show the primary side with status `ready`.
 
 With `default`, Text Segment and Bilingual Segment show the fallback text without a notice.
@@ -145,7 +145,7 @@ These choices redraw text that has already arrived.
   </tbody>
 </table>
 
-Source Card also has `selectable`. Switching sides makes no request, because both components request both sides even when they show one. Source Card makes one request for the whole card, however many verses it shows.
+Source Card also has `selectable`. Switching sides makes no request, because all three components with sides request both sides even when they show one. Source Card makes one text request for the whole card, however many verses it shows. It makes a second request only when the fallback applies.
 
 ### Set Hebrew vocalization
 
@@ -161,7 +161,7 @@ All four components accept it.
 
 ### Choose the sides and their arrangement
 
-Sides and arrangement apply only to Bilingual Segment and Source Card.
+Sides and arrangement apply to Bilingual Segment, Source Card, and Reader.
 
 - `content-language` is `both`, `primary`, or `translation`. The default is `both`.
 - `layout` is `auto`, `stacked`, or `side-by-side`. The default is `auto`.

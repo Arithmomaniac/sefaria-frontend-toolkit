@@ -38,7 +38,7 @@ Set these attributes on the element. Add them one at a time and choose Run to se
 | `layout` | `auto`, `stacked`, `side-by-side` | Two columns need both sides (`content-language="both"`). `auto` uses two columns when the component is 500px wide or more, and one column below that. `stacked` is always one column. `side-by-side` is always two columns. | No |
 | `side-order` | `primary-first`, `translation-first` | Visual order in two-column layouts only. Stacked layouts and screen-reader order keep the primary side first. | No |
 | `translation-language` | A full lowercase language-family name, such as `french` | The language you want for the translation. | Yes |
-| `translation-fallback` | `none`, `default` | What happens when Sefaria has no text in your preferred language. See [Preferred language or exact edition](#preferred-language-or-exact-edition). | Only with `default` |
+| `translation-fallback` | `none`, `default` | What happens when Sefaria has no text in your preferred language. See [Preferred language or exact edition](#preferred-language-or-exact-edition). | Yes. Changing it starts a new request. `default` can add a second request when the language is missing. |
 | `primary-version-title` | An exact edition title | The exact primary edition. It never falls back. | Yes |
 | `translation-version-title` | An exact edition title | The exact translation edition. It never falls back. | Yes |
 | `vocalization-mode` | `taamim_and_nikkud`, `nikkud`, `none` | Hebrew marks on each side. `nikkud` removes cantillation. `none` also removes vowel points. Both also remove a few other marks. See [Change vowels and cantillation](/data-and-text-tools/clean-up-stored-sefaria-text.md#change-vowels-and-cantillation). | No |
