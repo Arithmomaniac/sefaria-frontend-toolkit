@@ -159,3 +159,27 @@ it("never reclaims a lock without a valid owner token", async () => {
   await expect(pending).resolves.toBe("ok");
   expect(waits).toBe(3);
 });
+
+it("retires a released lock into its permanent generation tombstone", async () => {
+  const root = path.join(".artifacts", `heavy-lock-${crypto.randomUUID()}`);
+  const lock = path.join(root, "lock");
+  await mkdir(root, { recursive: true });
+  let token = "";
+
+  await withHeavyStageLock(
+    async () => {
+      token = JSON.parse(
+        await readFile(path.join(lock, "owner.json"), "utf8"),
+      ).token;
+    },
+    { lockDirectory: lock },
+  );
+
+  const retired = JSON.parse(
+    await readFile(path.join(`${lock}.retired-${token}`, "owner.json"), "utf8"),
+  );
+  expect(retired.token).toBe(token);
+  await expect(readFile(path.join(lock, "owner.json"))).rejects.toMatchObject({
+    code: "ENOENT",
+  });
+});

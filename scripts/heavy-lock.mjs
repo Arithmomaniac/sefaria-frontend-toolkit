@@ -34,7 +34,7 @@ export async function withHeavyStageLock(
   } finally {
     const owner = await readOwner(lockDirectory);
     if (owner?.token === token) {
-      await rm(lockDirectory, { recursive: true, force: true });
+      await retireLock(lockDirectory, token);
     }
   }
 }
@@ -86,8 +86,9 @@ async function removeStaleLock({ lockDirectory, processAlive }) {
   return false;
 }
 
-// The stale generation's tombstone is kept: a later waiter holding the same
-// stale observation cannot rename a successor lock onto an existing target.
+// Every relinquished generation, whether released or recovered, keeps a
+// nonempty tombstone: a waiter holding an outdated observation of that
+// generation cannot rename a successor lock onto the existing target.
 export async function retireLock(lockDirectory, generation) {
   const tombstone = `${lockDirectory}.retired-${generation.replace(/[^\w.-]/g, "_")}`;
   try {
