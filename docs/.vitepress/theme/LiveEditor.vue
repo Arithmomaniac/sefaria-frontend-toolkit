@@ -105,6 +105,7 @@ onBeforeUnmount(() => {
         </button>
       </span>
     </div>
+    <p v-if="$slots.default" class="live-editor__caption"><slot /></p>
     <CodeBlock v-if="!editing" :code="running" :lang="lang" />
     <textarea
       v-else
@@ -197,6 +198,13 @@ onBeforeUnmount(() => {
   font-size: 13px;
   line-height: 1.6;
   resize: vertical;
+}
+
+.live-editor__caption {
+  margin: 0;
+  color: var(--vp-c-text-2);
+  font-size: 0.9rem;
+  font-style: italic;
 }
 
 .live-editor__hint {

@@ -42,6 +42,26 @@ function textRun(text: string): string {
 const htmlTag = /<\/?([\w-]+)((?:\s+[\w:-]+(?:="[^"]*")?)*)(\s*)\/?>/g;
 const htmlAttribute = /(\s+)([\w:-]+)(?:=("[^"]*"))?/g;
 
+const cssToken =
+  /(\/\*[\s\S]*?\*\/)|("(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*')|((?:^|[;{])\s*)(--[\w-]+|[a-z-]+)(?=\s*:(?![^;{}]*\{))|([^{};\s][^{};]*?)(?=\s*\{)|(#[0-9a-fA-F]{3,8}\b|-?\d*\.?\d+(?:px|rem|em|%|ms|s|deg|vh|vw)?\b)/gm;
+
+export function highlightCss(source: string): string {
+  let html = "";
+  let last = 0;
+  for (const match of source.matchAll(cssToken)) {
+    html += escapeHtml(source.slice(last, match.index));
+    const [whole, comment, string, prefix, property, selector, number] = match;
+    if (comment !== undefined) html += span("comment", comment);
+    else if (string !== undefined) html += span("string", string);
+    else if (property !== undefined)
+      html += escapeHtml(prefix) + span("attr", property);
+    else if (selector !== undefined) html += span("tag", selector);
+    else if (number !== undefined) html += span("number", number);
+    last = match.index + whole.length;
+  }
+  return html + escapeHtml(source.slice(last));
+}
+
 export interface HighlightOptions {
   readonly prettyBreaks?: boolean;
 }
@@ -52,11 +72,23 @@ export function highlightHtml(
 ): string {
   let html = "";
   let last = 0;
+  let rawBlock: string | undefined;
+  const between = (text: string) =>
+    rawBlock === "style"
+      ? highlightCss(text)
+      : rawBlock === "script"
+        ? highlightScript(text)
+        : textRun(text);
   for (const match of source.matchAll(htmlTag)) {
-    html += textRun(source.slice(last, match.index));
+    html += between(source.slice(last, match.index));
     const [whole, name, attributes, trailing] = match;
     const open = whole.startsWith("</") ? "</" : "<";
     const close = whole.endsWith("/>") ? "/>" : ">";
+    const lower = name.toLowerCase();
+    rawBlock =
+      open === "<" && (lower === "style" || lower === "script")
+        ? lower
+        : undefined;
     let attributeHtml = "";
     for (const attribute of attributes.matchAll(htmlAttribute)) {
       attributeHtml += attribute[1] + span("attr", attribute[2]);
