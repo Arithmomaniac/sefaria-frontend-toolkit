@@ -1,9 +1,9 @@
-import { mkdir, readFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import { expect, it } from "vitest";
 
-import { withHeavyStageLock } from "../scripts/heavy-lock.mjs";
+import { isProcessAlive, withHeavyStageLock } from "../scripts/heavy-lock.mjs";
 
 it("recovers a stale machine-wide heavy-stage lock", async () => {
   const root = path.join(".artifacts", `heavy-lock-${crypto.randomUUID()}`);
@@ -51,4 +51,60 @@ it("does not remove a newly created lock before owner metadata appears", async (
 
   await expect(pending).resolves.toBe("ok");
   expect(waited).toBe(true);
+});
+
+it("allows only one concurrent holder during stale-lock recovery", async () => {
+  const root = path.join(".artifacts", `heavy-lock-${crypto.randomUUID()}`);
+  const lock = path.join(root, "lock");
+  await mkdir(lock, { recursive: true });
+  await writeFile(
+    path.join(lock, "owner.json"),
+    JSON.stringify({ pid: 999999, token: "stale", createdAt: 0 }),
+  );
+
+  let active = 0;
+  let maximumActive = 0;
+  let firstRelease!: () => void;
+  const firstEntered = new Promise<void>((resolve) => {
+    firstRelease = resolve;
+  });
+
+  async function action() {
+    active += 1;
+    maximumActive = Math.max(maximumActive, active);
+    await firstEntered;
+    active -= 1;
+  }
+
+  const first = withHeavyStageLock(action, {
+    lockDirectory: lock,
+    processAlive: (pid: number) => pid !== 999999,
+    wait: async () => {},
+    now: () => 1_000,
+  });
+  const second = withHeavyStageLock(action, {
+    lockDirectory: lock,
+    processAlive: (pid: number) => pid !== 999999,
+    wait: async () => {},
+    now: () => 1_000,
+  });
+
+  await Promise.resolve();
+  firstRelease();
+  await Promise.all([first, second]);
+  expect(maximumActive).toBe(1);
+});
+
+it("treats EPERM from process probing as an alive process", () => {
+  const originalKill = process.kill;
+  process.kill = (() => {
+    const error = new Error("operation not permitted") as NodeJS.ErrnoException;
+    error.code = "EPERM";
+    throw error;
+  }) as typeof process.kill;
+  try {
+    expect(isProcessAlive(123)).toBe(true);
+  } finally {
+    process.kill = originalKill;
+  }
 });

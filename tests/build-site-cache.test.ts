@@ -5,6 +5,7 @@ import { expect, it } from "vitest";
 
 import {
   canReuseSiteBuild,
+  createSiteBuildKey,
   writeSiteBuildKey,
 } from "../scripts/build-site-cache.mjs";
 import { publishSitePreview } from "../scripts/site-preview-copy.mjs";
@@ -53,4 +54,40 @@ it("copies preview output outside the build directory atomically", async () => {
       readFile(path.join(published, "index.html"), "utf8"),
     ),
   ).resolves.toBe("first");
+});
+
+it("invalidates site reuse when an imported demo source changes at the same commit", async () => {
+  const root = path.join(
+    ".artifacts",
+    `site-cache-input-${crypto.randomUUID()}`,
+  );
+  const demo = path.join(root, "demos");
+  await mkdir(demo, { recursive: true });
+  await writeFile(path.join(root, "package.json"), "{}");
+  await writeFile(
+    path.join(demo, "shared.ts"),
+    "export const label = 'first';\n",
+  );
+
+  const exec = (_root: string, args: string[]) =>
+    args[0] === "rev-parse" ? "abc" : "demos/shared.ts\npackage.json";
+  const first = await createSiteBuildKey({
+    root,
+    siteBasePath: "/",
+    options: {},
+    exec,
+  });
+  await writeFile(
+    path.join(demo, "shared.ts"),
+    "export const label = 'second';\n",
+  );
+  const second = await createSiteBuildKey({
+    root,
+    siteBasePath: "/",
+    options: {},
+    exec,
+  });
+
+  expect(second.head).toBe(first.head);
+  expect(second.inputs).not.toBe(first.inputs);
 });

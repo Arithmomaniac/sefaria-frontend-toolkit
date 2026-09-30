@@ -57,6 +57,7 @@ async function listInputFiles(root, exec) {
     "ls-files",
     "-co",
     "--exclude-standard",
+    "demos",
     "docs",
     "examples",
     "packages",

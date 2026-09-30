@@ -1,4 +1,4 @@
-import { mkdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import { randomUUID } from "node:crypto";
 import os from "node:os";
 import path from "node:path";
@@ -55,6 +55,8 @@ async function acquireLock(options) {
           createdAt: options.now(),
         })}\n`,
       );
+      const owner = await readOwner(options.lockDirectory);
+      if (owner?.token !== options.token) continue;
       return;
     } catch (error) {
       if (error?.code === "ENOENT") continue;
@@ -66,6 +68,40 @@ async function acquireLock(options) {
 }
 
 async function removeStaleLock({
+  lockDirectory,
+  processAlive,
+  staleAfterMilliseconds,
+  initializationGraceMilliseconds,
+  now,
+}) {
+  const recoveryLockDirectory = `${lockDirectory}.recovery`;
+  try {
+    await mkdir(recoveryLockDirectory);
+  } catch (error) {
+    if (error?.code !== "EEXIST") throw error;
+    const recoveryInfo = await stat(recoveryLockDirectory).catch(
+      () => undefined,
+    );
+    if (recoveryInfo && now() - recoveryInfo.mtimeMs > staleAfterMilliseconds) {
+      await rm(recoveryLockDirectory, { recursive: true, force: true });
+    }
+    return false;
+  }
+
+  try {
+    return await removeStaleLockWithRecoveryOwnership({
+      lockDirectory,
+      processAlive,
+      staleAfterMilliseconds,
+      initializationGraceMilliseconds,
+      now,
+    });
+  } finally {
+    await rm(recoveryLockDirectory, { recursive: true, force: true });
+  }
+}
+
+async function removeStaleLockWithRecoveryOwnership({
   lockDirectory,
   processAlive,
   staleAfterMilliseconds,
@@ -86,10 +122,30 @@ async function removeStaleLock({
       !processAlive(owner.pid)) ||
     !processAlive(owner.pid)
   ) {
-    await rm(lockDirectory, { recursive: true, force: true });
+    const currentOwner = await readOwner(lockDirectory);
+    if (!sameOwner(currentOwner, owner)) return false;
+    const trashDirectory = `${lockDirectory}.stale-${process.pid}-${randomUUID()}`;
+    try {
+      await rename(lockDirectory, trashDirectory);
+    } catch (error) {
+      if (error?.code === "ENOENT") return true;
+      if (error?.code !== "EPERM") throw error;
+      if (!sameOwner(await readOwner(lockDirectory), owner)) return false;
+      await rm(lockDirectory, { recursive: true, force: true });
+      return true;
+    }
+    await rm(trashDirectory, { recursive: true, force: true });
     return true;
   }
   return false;
+}
+
+function sameOwner(left, right) {
+  return (
+    left?.pid === right?.pid &&
+    left?.token === right?.token &&
+    left?.createdAt === right?.createdAt
+  );
 }
 
 async function readOwner(lockDirectory) {
@@ -102,11 +158,13 @@ async function readOwner(lockDirectory) {
   }
 }
 
-function isProcessAlive(pid) {
+export function isProcessAlive(pid) {
   try {
     process.kill(pid, 0);
     return true;
-  } catch {
+  } catch (error) {
+    if (error?.code === "EPERM") return true;
+    if (error?.code === "ESRCH") return false;
     return false;
   }
 }
