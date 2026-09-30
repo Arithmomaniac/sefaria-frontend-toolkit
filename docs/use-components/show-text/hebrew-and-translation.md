@@ -35,13 +35,13 @@ Set these attributes on the element. Add them one at a time and choose Run to se
 | Attribute | Values (default first) | What it changes | Changes what's requested? |
 | --- | --- | --- | --- |
 | `content-language` | `both`, `primary`, `translation` | Which sides show. | No |
-| `layout` | `auto`, `stacked`, `side-by-side` | Two columns need both sides (`content-language="both"`). `auto` uses two columns at 500px of component width or more, and one below. `stacked` is always one column. `side-by-side` is two columns. | No |
+| `layout` | `auto`, `stacked`, `side-by-side` | Two columns need both sides (`content-language="both"`). `auto` uses two columns when the component is 500px wide or more, and one column below that. `stacked` is always one column. `side-by-side` is always two columns. | No |
 | `side-order` | `primary-first`, `translation-first` | Visual order in two-column layouts only. Stacked layouts and screen-reader order keep the primary side first. | No |
 | `translation-language` | A full lowercase language-family name, such as `french` | The language you want for the translation. | Yes |
 | `translation-fallback` | `none`, `default` | What happens when Sefaria has no text in your preferred language. See [Preferred language or exact edition](#preferred-language-or-exact-edition). | Only with `default` |
 | `primary-version-title` | An exact edition title | The exact primary edition. It never falls back. | Yes |
 | `translation-version-title` | An exact edition title | The exact translation edition. It never falls back. | Yes |
-| `vocalization-mode` | `taamim_and_nikkud`, `nikkud`, `none` | Hebrew marks on each side. `nikkud` removes cantillation. `none` also removes vowel points. Both remove a few other marks too. See [Change vowels and cantillation](/data-and-text-tools/clean-up-stored-sefaria-text.md#change-vowels-and-cantillation). | No |
+| `vocalization-mode` | `taamim_and_nikkud`, `nikkud`, `none` | Hebrew marks on each side. `nikkud` removes cantillation. `none` also removes vowel points. Both also remove a few other marks. See [Change vowels and cantillation](/data-and-text-tools/clean-up-stored-sefaria-text.md#change-vowels-and-cantillation). | No |
 
 For the styling settings that every component shares, see [Show one passage](/use-components/show-text/show-one-passage.md#match-your-sites-colors-and-fonts).
 
@@ -56,17 +56,17 @@ The first element below reads side by side with the translation first, in an exa
 The two ways of choosing a translation behave differently:
 
 - **Preferred language** (`translation-language`) asks for the best edition in that language. A fresh load makes one request. If Sefaria has no text in that language, what happens next depends on `translation-fallback`:
-  - `none` is the default. The primary side shows. The translation side shows a status message such as `No french text.`, which screen readers also read. The status is `ready`, or `empty` if nothing can be shown. There is no error and no more requests.
-  - `default` makes one more request for Sefaria's default translation. That translation isn't always English. It shows no notice. This makes two requests in all.
+  - `none` is the default. The primary side shows. The translation side shows a note such as `No french text.`, and screen readers read it too. There is no error and no more requests.
+  - `default` makes one more request for Sefaria's default translation. That translation isn't always English, and the component shows no notice that it is a fallback. The total is two requests.
 - **Exact edition** (`translation-version-title`, `primary-version-title`) asks for that title only and never falls back.
 
-The example asks for French on `Berakhot 2a:1` and leaves `translation-fallback` at `none`.
+Both examples ask for French on `Berakhot 2a:1`. The first leaves `translation-fallback` at its default, `none`. The second sets `translation-fallback="default"`.
 
-<LiveEditor :code="bilingualFallback" title="A language Sefaria doesn't have" />
+<LiveEditor :code="bilingualFallback" title="A language Sefaria doesn't have"><strong>The first element</strong> shows the primary text and <code>No french text.</code> (one request). <strong>The second</strong> shows the primary text and Sefaria's default translation (two requests).</LiveEditor>
 
 ### When a side has no text
 
-A short note takes the place of a side with no text, such as `No translation text is available.` or `No french text.` The other side still shows. An edition that exists but has empty text doesn't trigger a fallback. To choose editions and vocalization for a single side, see [Show one passage](/use-components/show-text/show-one-passage.md).
+A side with no text shows a short note, such as `No translation text is available.` or `No french text.` The other side still shows. An edition that exists but has empty text doesn't trigger a fallback. To choose editions and vocalization for a single side, see [Show one passage](/use-components/show-text/show-one-passage.md).
 
 ## When there's nothing to show
 
@@ -77,10 +77,10 @@ A short note takes the place of a side with no text, such as `No translation tex
 | Sefaria says the text isn't a reference | Sefaria's message, such as `Could not find title in reference: Not a book 3.4` | `error` | No |
 | No `sref` and no `data` | Nothing | `empty` | No |
 | Neither side has text | The notes for the missing sides | `empty` | No |
-| Preferred language missing, with `translation-fallback="none"` | The primary side, and `No french text.` on the translation side | `ready`, or `empty` if nothing can be shown | No |
+| Preferred language missing, with `translation-fallback="none"` | The primary side, and `No french text.` on the translation side | `ready`, or `empty` if neither side has text | No |
 | Invalid supplied `data` | An error message, with no fallback to a request | `error` | No |
 
-Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. When Sefaria can't be reached, `status` is `error` and the error event fires, whether or not text was already showing. The error event bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. It reports failed loading, not handled messages from Sefaria or invalid supplied data.
+Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. When Sefaria can't be reached, `status` is `error` and the error event fires, whether or not text was already showing. The event bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. It reports failed loading only. It doesn't report Sefaria's handled messages or invalid supplied `data`.
 
 The example has a good reference, a text that isn't a reference, and an empty element. Choose **Show each status** to log each one's status.
 

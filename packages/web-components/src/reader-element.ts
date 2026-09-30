@@ -430,7 +430,7 @@ export class SefariaReader extends SefariaElement {
   declare acquisition: SefariaAcquisition | undefined;
   /** Preferred translation language, for the starting text and texts you navigate to. */
   declare translationLanguage: string | undefined;
-  /** What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a "No <language> text." status. */
+  /** What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". */
   declare translationFallback: "default" | "none";
   /** Exact title of the primary edition for the starting reference. */
   declare primaryVersionTitle: string | undefined;

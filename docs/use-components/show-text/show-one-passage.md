@@ -31,7 +31,7 @@ To try changes, choose Edit, change the code, and choose Run.
 
 Set `--sefaria-*` CSS custom properties, such as `--sefaria-fg` for text color and `--sefaria-font-scale` for size, on an element that contains the segment. Style the segment's own box, such as its padding and border, as you would any element.
 
-<LiveEditor :code="textSegmentStyling" title="Style a passage">A containing <code>div</code> sets a warm background, brown text, serif fonts, and a larger font scale. The element's own box gets padding, a rounded corner, and an accent border. Italic text passes in from the page.</LiveEditor>
+<LiveEditor :code="textSegmentStyling" title="Style a passage">A containing <code>div</code> sets a warm background, brown text, serif fonts, and a larger font scale. The element's own box gets padding, a rounded corner, an accent border, and italic text.</LiveEditor>
 
 These styling rules apply to every toolkit component:
 
@@ -46,7 +46,7 @@ These styling rules apply to every toolkit component:
 | To get | Set | What happens |
 | --- | --- | --- |
 | The default edition | Nothing | Sefaria's primary edition. |
-| A translation in a language | `translation-language` | Your preferred translation language. If Sefaria has none, the segment shows a short notice (see below). |
+| A translation in a language | `translation-language` | A translation in that language. If Sefaria has none, the segment shows a short notice (see [When the language isn't available](#when-the-language-isn-t-available)). |
 | A language family, strictly | `version-language` | Text in that language family only. There is no fallback, and it doesn't pin one edition. |
 | One exact edition | `version-title` | Alone, that title among the primary editions. With `version-language`, that title in that language. With `translation-language`, that title in your preferred translation language. |
 
@@ -62,13 +62,13 @@ These styling rules apply to every toolkit component:
 
 ## When the language isn't available
 
-If Sefaria reports that it has no text in your preferred `translation-language`, the segment shows a short status message, such as `No french text.`. Screen readers announce it. By default (`translation-fallback="none"`), the segment makes one request. Its `status` is `empty`, and there is no error or error event.
+If Sefaria reports that it has no text in your `translation-language`, the segment shows a short status message, such as `No french text.`. Screen readers announce it. By default (`translation-fallback="none"`), the segment makes one request. Its `status` is `empty`, and there is no error or error event.
 
 To show Sefaria's default translation instead, set `translation-fallback="default"`. The segment makes one more request and shows that translation with no notice. That translation isn't always English. [Source Card](/use-components/show-an-attributed-passage.md) tells readers about the change.
 
 <LiveEditor :code="textSegmentFallback" title="No fallback, then the default translation">Both ask for French on <code>Berakhot 2a:1</code>. The first uses the default <code>none</code> and shows the notice. The second sets <code>translation-fallback="default"</code> and shows Sefaria's default translation.</LiveEditor>
 
-A fresh load makes one request. With `translation-fallback="default"` and a missing language, it makes two. An exact edition, or a language that exists but has empty text, doesn't fall back.
+With `translation-fallback="default"` and a missing language, the segment makes two requests. An exact edition, or a language that exists but has empty text, doesn't fall back.
 
 ## Control vowel points and cantillation
 
@@ -78,7 +78,7 @@ A fresh load makes one request. With `translation-fallback="default"` and a miss
 - `nikkud` keeps most vowel points and removes cantillation.
 - `none` removes vowel points and cantillation, along with a few other marks such as the sof pasuq (׃). For the exact list, see [Change vowels and cantillation](/data-and-text-tools/clean-up-stored-sefaria-text.md#change-vowels-and-cantillation).
 
-<LiveEditor :code="textSegmentVocalization" title="Nikkud, then none">The same Hebrew with vowel points, then with none.</LiveEditor>
+<LiveEditor :code="textSegmentVocalization" title="Nikkud, then none">The same Hebrew with vowel points and no cantillation (<code>nikkud</code>), then with neither (<code>none</code>).</LiveEditor>
 
 <span class="learn-more__label">Learn more:</span> [Clean up stored Sefaria text](/data-and-text-tools/clean-up-stored-sefaria-text.md) · [Clean text and safety](/concepts/clean-text-and-safety.md) {.learn-more}
 
@@ -92,7 +92,7 @@ A fresh load makes one request. With `translation-fallback="default"` and a miss
 | Sefaria has no text in your `translation-language` (default `translation-fallback="none"`) | A status message, such as `No french text.` | `empty` | No |
 | No `sref` and no `data` | Nothing | `empty` | No |
 
-Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. A text that isn't a reference gives `error`. When Sefaria can't be reached, `status` is `error` and the error event fires, whether or not text was already showing. The error event bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. Invalid supplied `data` shows an error without falling back to `sref` and sends no event.
+Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. When Sefaria can't be reached, `status` is `error` and the error event fires, whether or not text was already showing. The error event bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. If the supplied `data` is invalid, the segment shows an error and sends no event. It doesn't fall back to `sref`.
 
 <LiveEditor :code="textSegmentStates" title="Read status and listen for errors">A good reference, a text that isn't a reference, and an empty element. Choose <strong>Show each status</strong> to log each one's status.</LiveEditor>
 
@@ -100,7 +100,7 @@ Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`,
 
 ## Use your own data
 
-If you already have Sefaria's text response, set the `data` property to it. The segment then makes zero requests. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md).
+If you already have Sefaria's text response, set the `data` property to it. The segment then makes no requests. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md).
 
 ## Next steps
 

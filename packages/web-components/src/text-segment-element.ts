@@ -148,7 +148,7 @@ export class SefariaTextSegment extends SefariaElement {
   declare versionTitle: string | undefined;
   /** Preferred translation language. Can't be combined with `versionLanguage`. */
   declare translationLanguage: string | undefined;
-  /** What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a "No <language> text." status. */
+  /** What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". */
   declare translationFallback: "default" | "none";
   /** How much Hebrew vowel and cantillation marking to keep. `none` removes both. */
   declare vocalizationMode: VocalizationMode;

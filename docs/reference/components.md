@@ -49,7 +49,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | `versionLanguage` | `version-language` | `string \| undefined` | `undefined` | Language of the edition to show, instead of the primary edition. |
 | `versionTitle` | `version-title` | `string \| undefined` | `undefined` | Exact title of the edition to show, used together with `versionLanguage`. |
 | `translationLanguage` | `translation-language` | `string \| undefined` | `undefined` | Preferred translation language. Can't be combined with `versionLanguage`. |
-| `translationFallback` | `translation-fallback` | `"default" \| "none"` | `"none"` | What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a "No <language> text." status. |
+| `translationFallback` | `translation-fallback` | `"default" \| "none"` | `"none"` | What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". |
 | `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep. `none` removes both. |
 | `selectedVersion` | — | `TextSegmentSelectedVersionInfo \| undefined` | — | Details of the edition currently shown. |
 | `status` | — | `SefariaElementStatus` | — | Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
@@ -84,7 +84,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | `primaryVersionTitle` | `primary-version-title` | `string \| undefined` | `undefined` | Exact title of the edition to show as the primary text. |
 | `translationVersionTitle` | `translation-version-title` | `string \| undefined` | `undefined` | Exact title of the edition to show as the translation. |
 | `translationLanguage` | `translation-language` | `string \| undefined` | `undefined` | Preferred translation language. `translationFallback` controls what happens when Sefaria has none. |
-| `translationFallback` | `translation-fallback` | `"default" \| "none"` | `"none"` | What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a "No <language> text." status. |
+| `translationFallback` | `translation-fallback` | `"default" \| "none"` | `"none"` | What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". |
 | `contentLanguage` | `content-language` | `BilingualSegmentContentLanguage` | `"both"` | Which text to show: `primary`, `translation` or `both`. |
 | `layout` | `layout` | `BilingualSegmentLayout` | `"auto"` | How the two texts are arranged: `auto`, `stacked` or `side-by-side`. |
 | `sideOrder` | `side-order` | `BilingualSegmentSideOrder` | `"primary-first"` | Which text comes first side by side: `primary-first` or `translation-first`. |
@@ -121,7 +121,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | `primaryVersionTitle` | `primary-version-title` | `string \| undefined` | `undefined` | Exact title of the edition to show as the primary text. |
 | `translationVersionTitle` | `translation-version-title` | `string \| undefined` | `undefined` | Exact title of the edition to show as the translation. |
 | `translationLanguage` | `translation-language` | `string \| undefined` | `undefined` | Preferred translation language. `translationFallback` controls what happens when Sefaria has none. |
-| `translationFallback` | `translation-fallback` | `"default" \| "none"` | `"default"` | What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a "No <language> text." status. |
+| `translationFallback` | `translation-fallback` | `"default" \| "none"` | `"default"` | What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". |
 | `contentLanguage` | `content-language` | `BilingualPairContentLanguage` | `"both"` | Which text to show: `primary`, `translation` or `both`. |
 | `layout` | `layout` | `BilingualPairLayout` | `"auto"` | How each pair of texts is arranged: `auto`, `stacked` or `side-by-side`. |
 | `sideOrder` | `side-order` | `BilingualPairSideOrder` | `"primary-first"` | Which text comes first side by side: `primary-first` or `translation-first`. |
@@ -194,7 +194,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | `data` | — | `ReaderRawSeedData \| undefined` | `undefined` | Starting data for the Reader, which it accepts or rejects as a whole. |
 | `acquisition` | — | `SefariaAcquisition \| undefined` | `undefined` | Chooses how this element fetches data, instead of the default. |
 | `translationLanguage` | `translation-language` | `string \| undefined` | `undefined` | Preferred translation language, for the starting text and texts you navigate to. |
-| `translationFallback` | `translation-fallback` | `"default" \| "none"` | `"default"` | What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a "No <language> text." status. |
+| `translationFallback` | `translation-fallback` | `"default" \| "none"` | `"default"` | What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". |
 | `primaryVersionTitle` | `primary-version-title` | `string \| undefined` | `undefined` | Exact title of the primary edition for the starting reference. |
 | `translationVersionTitle` | `translation-version-title` | `string \| undefined` | `undefined` | Exact title of the translation edition for the starting reference. |
 | `hideAttributions` | `hide-attributions` | `boolean` | `false` | Hides the edition attribution on the source card. |

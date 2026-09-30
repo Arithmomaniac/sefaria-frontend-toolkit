@@ -326,7 +326,7 @@ export class SefariaSourceCard extends SefariaElement {
   declare translationVersionTitle: string | undefined;
   /** Preferred translation language. `translationFallback` controls what happens when Sefaria has none. */
   declare translationLanguage: string | undefined;
-  /** What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a "No <language> text." status. */
+  /** What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". */
   declare translationFallback: "default" | "none";
 
   /** Which text to show: `primary`, `translation` or `both`. */

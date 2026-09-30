@@ -12,9 +12,9 @@ import textChoiceControls from "../../examples/site-snippets/text-choice-control
 
 # Choose what text readers see
 
-This page puts the content choices for [Text Segment](/use-components/show-text/show-one-passage.md), [Bilingual Segment](/use-components/show-text/hebrew-and-translation.md), and [Source Card](/use-components/show-an-attributed-passage.md), and the Reader side by side. This page assumes that you have one of those components working. If you don't, start with [Put your first source on a page](/use-components/start-here.md).
+This page compares the content choices for [Text Segment](/use-components/show-text/show-one-passage.md), [Bilingual Segment](/use-components/show-text/hebrew-and-translation.md), [Source Card](/use-components/show-an-attributed-passage.md), and the Reader. It assumes that one of those components already works. If you don't, start with [Put your first source on a page](/use-components/start-here.md).
 
-Each choice is an HTML attribute, a setting you write inside the tag. Choices come in two kinds:
+Each choice is an HTML attribute. You write it inside the tag. Choices come in two kinds:
 
 - **Which text to load** is the language and edition. These change what the component requests, so a change makes a new request.
 - **How it's shown** is vocalization, sides, arrangement, and the edition credit. These redraw text the component already has and never make a request.
@@ -37,12 +37,10 @@ flowchart TD
   Q3 -->|No| A4["Show that translation"]
   Q3 -->|Yes| Q4("Is the fallback on?")
   Q4 -->|Yes| A5["Load Sefaria's default translation"]
-  Q4 -->|No| A6["Show 'No french text.'"]
+  Q4 -->|No| A6["Show a status message"]
 ```
 
 - **Language could be the original:** `version-language` can't be combined with `translation-language`.
-- **Preferred translation language:** After a fallback, Source Card and Reader show a notice, and the segments don't.
-- **Fallback off:** The element shows a status message and makes no second request.
 
 These choices change what the component requests.
 
@@ -78,24 +76,24 @@ These choices change what the component requests.
   </tbody>
 </table>
 
-Every component takes `sref`. For the segments and Source Card, a fresh load makes one request. It makes two if a preferred translation language is missing and ranslation-fallback is default. The Reader also loads the surrounding section and its links. A pinned edition doesn't fall back. Supplied data makes no request.
+Every component takes `sref`. For the segments and Source Card, a fresh load makes one request. It makes two if the translation language is missing and `translation-fallback` is `default`. The Reader also loads the surrounding section and its links. Supplied data makes no request.
 
 ### Choose a translation language
 
-The first choice is the language of the translation. Set `translation-language` to a language family name such as `french`. A family is Sefaria's grouping of editions by language. The value is trimmed and is not case sensitive. All four components accept it. On Text Segment, it shows a translation instead of the primary edition, for example `<sefaria-text-segment sref="Micah 6:8" translation-language="french">`. It returns translations only, never the original, while `version-language` can return the original.
+Set `translation-language` to a language family name such as `french`. A family is Sefaria's grouping of editions by language. The value ignores case and outer spaces. All four components accept it. On Text Segment, it shows a translation instead of the primary edition, for example `<sefaria-text-segment sref="Micah 6:8" translation-language="french">`. It returns translations only. `version-language` can also return the original.
 
 ### When Sefaria doesn't have that language
 
-The chart at the top of this group shows where the fallback happens. Set it with `translation-fallback`, which is `default` or `none`.
+The chart above shows where the fallback happens. Set it with `translation-fallback`: `default` or `none`.
 
-Not every text has every translation. Ask for `french` on `Berakhot 2a:1`. Sefaria's response warns that French is missing. What happens next depends on the setting.
+Not every text has every translation. Ask for `french` on `Berakhot 2a:1`. Sefaria's response warns that French is missing. The setting decides what happens next.
 
-- **`default`** is the default for Source Card and Reader. The component makes one more request for Sefaria's default translation. That translation isn't always English. Source Card and Reader show a notice such as `french is unavailable; showing english.` That is two requests for a fresh load.
-- **`none`** is the default for Text Segment and Bilingual Segment. The component makes exactly one request. It shows the status message "No french text." This isn't an error. Text Segment is `empty`. Bilingual Segment and Source Card show the primary side with status `ready`.
+- **`default`** is the default for Source Card and Reader. The component makes one more request for Sefaria's default translation. That translation isn't always English. Source Card and Reader show a notice such as `french is unavailable; showing english.` A fresh load makes two requests.
+- **`none`** is the default for Text Segment and Bilingual Segment. The component makes no second request. It shows the status message "No french text." This isn't an error. Text Segment is `empty`. Bilingual Segment and Source Card show the primary side with status `ready`.
 
-Text Segment and Bilingual Segment show fallback text without a notice when you set `default`.
+With `default`, Text Segment and Bilingual Segment show the fallback text without a notice.
 
-The fallback applies only to a bare language preference. Exact edition titles never fall back. An edition that exists but is empty stays empty. In Bilingual Segment and Source Card, if you pin one side's edition but give only a preferred language for the translation, that translation can still fall back.
+Only a bare language preference can fall back. An exact edition title never falls back, and an empty edition stays empty. In Bilingual Segment and Source Card, you can pin one side and give only a language for the translation. That translation can still fall back.
 
 ### Pin an exact edition
 
@@ -143,11 +141,11 @@ These choices redraw text that has already arrived.
   </tbody>
 </table>
 
-Source Card also has `selectable`. Switching sides needs no new request, because Bilingual Segment and Source Card request both sides even when they show one. For a fresh load, Source Card makes one request for the whole card, however many verses it shows. Its verses make no requests of their own.
+Source Card also has `selectable`. Switching sides makes no request, because both components request both sides even when they show one. Source Card makes one request for the whole card, however many verses it shows.
 
 ### Set Hebrew vocalization
 
-Vocalization only changes how text is drawn. `vocalization-mode` controls the marks written with Hebrew letters. Hebrew text can carry vowel marks (nikkud) and cantillation marks (taamim). The default, `taamim_and_nikkud`, shows both. The other modes also remove a few related marks, such as the sof pasuq (׃). For the exact behavior, see [Change vowels and cantillation](/data-and-text-tools/clean-up-stored-sefaria-text.md#change-vowels-and-cantillation).
+`vocalization-mode` controls the marks written with Hebrew letters. Hebrew text can carry vowel marks (nikkud) and cantillation marks (taamim). The default, `taamim_and_nikkud`, shows both. The other modes also remove related marks, such as the sof pasuq (׃). For exact behavior, see [Change vowels and cantillation](/data-and-text-tools/clean-up-stored-sefaria-text.md#change-vowels-and-cantillation).
 
 | Value               | Hebrew shown                      |
 | ------------------- | --------------------------------- |
@@ -155,11 +153,11 @@ Vocalization only changes how text is drawn. `vocalization-mode` controls the ma
 | `nikkud`            | Vowel marks, without cantillation |
 | `none`              | No vowel points or cantillation   |
 
-The component redraws text it already has, so this never makes a request. All four components accept it.
+All four components accept it.
 
 ### Choose the sides and their arrangement
 
-Sides and arrangement are two more display choices. They apply only to Bilingual Segment and Source Card, not Text Segment.
+Sides and arrangement apply only to Bilingual Segment and Source Card.
 
 - `content-language` is `both`, `primary`, or `translation`. The default is `both`.
 - `layout` is `auto`, `stacked`, or `side-by-side`. The default is `auto`.
@@ -169,7 +167,7 @@ Two columns appear only when both sides show. `side-order` changes the visual or
 
 ### See which edition readers are shown
 
-Only Source Card and Reader name the edition. It shows each edition's title and language, and links the title to its source when Sefaria gives a valid http(s) address. It doesn't show the license. Text Segment and Bilingual Segment show only the text.
+Only Source Card and Reader name the edition. They show each edition's title and language. They link the title to its source when Sefaria gives a valid http(s) address. They don't show the license. Text Segment and Bilingual Segment show only the text.
 
 On Source Card, `hide-attributions` hides the credit and the fallback notice. It makes no request.
 
@@ -179,7 +177,7 @@ Generated client types include an optional `license` field in an edition's versi
 
 ## Clean up stored text
 
-Setting vocalization changes only how text is shown. Cleaning stored text is a separate job for the text tools.
+Vocalization changes only how text is shown. Cleaning stored text is a separate job for the text tools.
 
 <span class="learn-more__label">Learn more:</span> [Clean up stored Sefaria text](/data-and-text-tools/clean-up-stored-sefaria-text.md) · [Reference › Text tools](/reference/text-transform.md) {.learn-more}
 

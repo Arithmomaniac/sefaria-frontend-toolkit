@@ -82,7 +82,7 @@
               "type": {
                 "text": "\"default\" | \"none\""
               },
-              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a \"No <language> text.\" status.",
+              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as \"No french text.\".",
               "default": "\"none\"",
               "attribute": "translation-fallback",
               "reflects": true
@@ -174,7 +174,7 @@
               "type": {
                 "text": "\"default\" | \"none\""
               },
-              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a \"No <language> text.\" status.",
+              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as \"No french text.\".",
               "default": "\"none\"",
               "fieldName": "translationFallback"
             },
@@ -755,7 +755,7 @@
               "type": {
                 "text": "\"default\" | \"none\""
               },
-              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a \"No <language> text.\" status.",
+              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as \"No french text.\".",
               "default": "\"default\"",
               "attribute": "translation-fallback",
               "reflects": true
@@ -1030,7 +1030,7 @@
               "type": {
                 "text": "\"default\" | \"none\""
               },
-              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a \"No <language> text.\" status.",
+              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as \"No french text.\".",
               "default": "\"default\"",
               "fieldName": "translationFallback"
             },
@@ -1324,7 +1324,7 @@
               "type": {
                 "text": "\"default\" | \"none\""
               },
-              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a \"No <language> text.\" status.",
+              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as \"No french text.\".",
               "default": "\"default\"",
               "attribute": "translation-fallback",
               "reflects": true
@@ -1475,7 +1475,7 @@
               "type": {
                 "text": "\"default\" | \"none\""
               },
-              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a \"No <language> text.\" status.",
+              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as \"No french text.\".",
               "default": "\"default\"",
               "fieldName": "translationFallback"
             },
@@ -1753,7 +1753,7 @@
               "type": {
                 "text": "\"default\" | \"none\""
               },
-              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a \"No <language> text.\" status.",
+              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as \"No french text.\".",
               "default": "\"none\"",
               "attribute": "translation-fallback",
               "reflects": true
@@ -1821,7 +1821,7 @@
               "type": {
                 "text": "\"default\" | \"none\""
               },
-              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a \"No <language> text.\" status.",
+              "description": "What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as \"No french text.\".",
               "default": "\"none\"",
               "fieldName": "translationFallback"
             },
