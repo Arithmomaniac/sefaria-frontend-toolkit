@@ -30,7 +30,7 @@ A request is one call from the page to Sefaria. A dash in the tables means the c
 ```mermaid
 flowchart TD
   Q1{"Need one exact edition?"} -->|Yes| A1["Set its title"] --> A1b["Never falls back"]
-  Q1 -->|No| Q2{"Text Segment, one language family only?"}
+  Q1 -->|No| Q2{"Text Segment, any edition in one language?"}
   Q2 -->|Yes| A2["version-language<br/>No fallback"]
   Q2 -->|No| A3["translation-language"]
   A3 --> Q3{"Language missing?"}
@@ -38,8 +38,8 @@ flowchart TD
   Q3 -->|Yes| A5["Load Sefaria's default translation"]
 ```
 
-- **One language family:** `version-language` can't be combined with `translation-language`.
-- **Preferred language:** After a fallback, Source Card and Reader show a notice, and the segments don't.
+- **Any edition in one language:** `version-language` can't be combined with `translation-language`.
+- **Preferred translation language:** After a fallback, Source Card and Reader show a notice, and the segments don't.
 
 These choices change what the component requests.
 
@@ -55,11 +55,11 @@ These choices change what the component requests.
   </thead>
   <tbody>
     <tr>
-      <th scope="row">Prefer a translation language</th>
+      <th scope="row">Show a translation in a language</th>
       <td colspan="4"><code>translation-language</code></td>
     </tr>
     <tr>
-      <th scope="row">Require one language family, with no fallback</th>
+      <th scope="row">Show any edition in a language, including the original</th>
       <td><code>version-language</code></td>
       <td colspan="3">—</td>
     </tr>
@@ -75,7 +75,7 @@ Every component takes `sref`. For the segments and Source Card, a fresh load mak
 
 ### Choose a translation language
 
-The first choice is the language of the translation. Set `translation-language` to a language family name such as `french`. A family is Sefaria's grouping of editions by language. The value is trimmed and is not case sensitive. All four components accept it. On Text Segment, it shows a translation instead of the primary edition, for example `<sefaria-text-segment sref="Micah 6:8" translation-language="french">`.
+The first choice is the language of the translation. Set `translation-language` to a language family name such as `french`. A family is Sefaria's grouping of editions by language. The value is trimmed and is not case sensitive. All four components accept it. On Text Segment, it shows a translation instead of the primary edition, for example `<sefaria-text-segment sref="Micah 6:8" translation-language="french">`. It returns translations only, never the original, while `version-language` can return the original.
 
 ### When Sefaria doesn't have that language
 
@@ -95,7 +95,7 @@ To avoid a fallback, pin an exact edition. An edition title is the name Sefaria 
   - `version-title` with `version-language` pins that title in that language.
   - `version-title` with `translation-language` requests that title in the preferred translation language.
 
-On Text Segment, `translation-language` and `version-language` are mutually exclusive. Pick one. `version-language` alone chooses a language family with no fallback. It doesn't pin one edition.
+On Text Segment, `translation-language` and `version-language` are mutually exclusive. Pick one. `version-language` alone shows any edition in that language family, including the original, with no fallback. It doesn't pin one edition.
 
 ## Choose how it's shown
 
