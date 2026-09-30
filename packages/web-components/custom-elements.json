@@ -77,17 +77,6 @@
             },
             {
               "kind": "field",
-              "name": "hideAttributions",
-              "privacy": "public",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Hides compact standalone edition attribution.",
-              "default": "false",
-              "attribute": "hide-attributions"
-            },
-            {
-              "kind": "field",
               "name": "contentLanguage",
               "privacy": "public",
               "type": {
@@ -167,15 +156,6 @@
               "description": "Preferred translation family, falling back only when unavailable.",
               "default": "undefined",
               "fieldName": "translationLanguage"
-            },
-            {
-              "name": "hide-attributions",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Hides compact standalone edition attribution.",
-              "default": "false",
-              "fieldName": "hideAttributions"
             },
             {
               "name": "primary-version-title",
@@ -1705,17 +1685,6 @@
             },
             {
               "kind": "field",
-              "name": "hideAttributions",
-              "privacy": "public",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Hides compact edition attribution for standalone text.",
-              "default": "false",
-              "attribute": "hide-attributions"
-            },
-            {
-              "kind": "field",
               "name": "vocalizationMode",
               "privacy": "public",
               "type": {
@@ -1771,15 +1740,6 @@
               "description": "Preferred translation family, mutually exclusive with a strict version language.",
               "default": "undefined",
               "fieldName": "translationLanguage"
-            },
-            {
-              "name": "hide-attributions",
-              "type": {
-                "text": "boolean"
-              },
-              "description": "Hides compact edition attribution for standalone text.",
-              "default": "false",
-              "fieldName": "hideAttributions"
             },
             {
               "name": "version-language",

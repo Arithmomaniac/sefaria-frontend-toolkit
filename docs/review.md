@@ -328,9 +328,9 @@ Review the initial and expanded corrections for:
 - [ ] Components emit no global style.
 - [ ] Custom properties use the `--sefaria-*` prefix.
 - [ ] Direction comes from prepared-state data.
-- [ ] Text segments contain no repeated edition attribution.
+- [ ] Text Segment and Bilingual Segment render no edition attribution and expose no attribution-hiding property.
 - [ ] A source card renders each visible resolved edition's attribution once outside its item collection.
-- [ ] `hideAttributions` defaults to false, and enabling it changes rendering without discarding prepared-state attribution.
+- [ ] `hideAttributions` on Source Card and Reader defaults to false, and enabling it changes rendering without discarding prepared-state attribution.
 - [ ] A source card links the edition title for a validated HTTP(S) `versionSourceUrl` and keeps other source text inert.
 - [ ] The linked-article dialog displays Source Card attribution.
 - [ ] Interactive controls use native elements and accessible names.

@@ -240,18 +240,7 @@ export function createBilingualSegmentViewModel(
       };
     }
     if (result.state === "data") {
-      projected[side] =
-        side === "translation" &&
-        request.translationLanguage !== undefined &&
-        version.languageFamilyName.toLowerCase() !==
-          normalizeTranslationLanguage(request.translationLanguage)
-          ? {
-              ...result,
-              unavailableTranslationLanguage: normalizeTranslationLanguage(
-                request.translationLanguage,
-              ),
-            }
-          : result;
+      projected[side] = result;
     }
     if (result.state === "empty" && request.translationLanguage !== undefined) {
       selectedEmpty[side] = {
