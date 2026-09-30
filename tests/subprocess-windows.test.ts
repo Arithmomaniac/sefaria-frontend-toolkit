@@ -45,3 +45,15 @@ it("hides validation subprocess consoles", () => {
   }
   expect(checked).toBeGreaterThan(0);
 });
+
+it("hides Windows PowerShell child probes in example scripts and tests", async () => {
+  const files = [
+    path.resolve("examples", "mcp-app", "scripts", "vscode-process.test.ts"),
+  ];
+  for (const file of files) {
+    const contents = readFileSync(file, "utf8");
+    const visiblePowerShellLaunch =
+      /Start-Process(?![^\r\n]*-WindowStyle\s+Hidden)[^\r\n]*powershell\.exe/iu;
+    expect(contents, file).not.toMatch(visiblePowerShellLaunch);
+  }
+});
