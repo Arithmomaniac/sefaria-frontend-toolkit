@@ -171,7 +171,6 @@ export default defineConfig({
           text: "Component usage",
           link: "/components.html",
           items: [
-            { text: "Reference label", link: "/components/ref-label.md" },
             { text: "Text segment", link: "/components/text-segment.md" },
             {
               text: "Bilingual segment",

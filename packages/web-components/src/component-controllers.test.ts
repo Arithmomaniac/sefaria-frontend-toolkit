@@ -1,7 +1,6 @@
 import {
   createSefariaClient,
   zCoreLinkResponse,
-  zCoreRefResponse,
   zCoreV3TextsResponse,
   type SefariaClient,
 } from "@arithmomaniac/sefaria-client";
@@ -9,18 +8,13 @@ import { afterEach, describe, expect, test, vi } from "vitest";
 
 import linksErrorFixture from "../../client/test/fixtures/links-error-2026-08-30.json";
 import linksFixture from "../../client/test/fixtures/links-targum-2026-08-30.json";
-import refFixture from "../../client/test/fixtures/ref-genesis-segment-2026-09-03.json";
-import unresolvedRefFixture from "../../client/test/fixtures/ref-unresolved-2026-09-03.json";
 import textFixture from "../../client/test/fixtures/v3-connections-genesis-target-2026-09-06.json";
 import { createBilingualSegmentController } from "./bilingual-segment.js";
 import { createConnectionsController } from "./connections-panel.js";
-import { createRefLabelController } from "./ref-label.js";
 import { createSourceCardController } from "./source-card.js";
 import { createTextSegmentController } from "./text-segment.js";
 
 const textPayload = zCoreV3TextsResponse.parse(textFixture);
-const refPayload = zCoreRefResponse.parse(refFixture);
-const unresolvedRefPayload = zCoreRefResponse.parse(unresolvedRefFixture);
 const linksPayload = zCoreLinkResponse.parse(linksFixture);
 const linksErrorPayload = zCoreLinkResponse.parse(linksErrorFixture);
 
@@ -100,30 +94,6 @@ const cases: readonly HarnessCase[] = [
             request,
             payload,
             status as 200 | 400 | 404 | undefined,
-          ),
-        cancel: (reason) => controller.cancel(reason),
-        dispose: () => controller.dispose(),
-      };
-    },
-  },
-  {
-    name: "reference label",
-    payload: refPayload,
-    create: (client) => {
-      const controller = createRefLabelController(client, {
-        siteOrigin: "https://example.test",
-      });
-      const request = { tref: "Genesis 1:2" };
-      return {
-        get snapshot() {
-          return controller.snapshot;
-        },
-        load: (signal) => controller.load(request, signal),
-        setSuppliedData: (payload, status) =>
-          controller.setSuppliedData(
-            request,
-            payload,
-            status as 200 | 404 | undefined,
           ),
         cancel: (reason) => controller.cancel(reason),
         dispose: () => controller.dispose(),
@@ -245,21 +215,6 @@ describe.each(cases)("$name controller", ({ create, payload }) => {
     expect(result).toBe(controller.snapshot.result?.viewModel);
     expect(controller.snapshot.attempt).toEqual({ state: "idle" });
   });
-});
-
-test("reference-label supplied data preserves deterministic options and 200 empty", () => {
-  const controller = createRefLabelController(undefined, {
-    siteOrigin: "https://example.test/path",
-  });
-  const request = { tref: "Genesis 1:2" };
-
-  expect(controller.setSuppliedData(request, refPayload)).toMatchObject({
-    state: "data",
-    url: expect.stringMatching(/^https:\/\/example\.test\//u),
-  });
-  expect(
-    controller.setSuppliedData(request, unresolvedRefPayload),
-  ).toMatchObject({ state: "empty" });
 });
 
 test("immutable publications do not freeze caller-owned request objects", () => {

@@ -13,7 +13,7 @@ Public GitHub Packages prereleases are available for authenticated installation.
 | Choose an integration depth | [Get started](get-started.md) |
 | Follow the guided sequence | [Choose a surface and understand ownership](learn/01-web-components.md) |
 | Compare all rendering surfaces | [Component catalog](components.md) |
-| Edit a supplied-data component | [Six-project editor](examples.md) and [`examples/playground`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground) |
+| Edit a supplied-data component | [Five-project editor](examples.md) and [`examples/playground`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/playground) |
 | Find runnable examples | [Example catalog](examples.md) |
 | Solve a task or understand data flow | [Guides](guides/index.md) |
 | Add authored citation previews | [Linked article](linked-article.md) |

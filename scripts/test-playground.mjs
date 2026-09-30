@@ -16,7 +16,6 @@ const root = path.resolve(import.meta.dirname, "..");
 const playground = path.join(root, "examples", "playground");
 const browsers = { chromium, firefox, webkit };
 const projects = {
-  "ref-label": "sefaria-ref-label",
   "text-segment": "sefaria-text-segment",
   "bilingual-segment": "sefaria-bilingual-segment",
   "source-card": "sefaria-source-card",
@@ -427,12 +426,6 @@ async function editEveryFile(page, project) {
 async function interactWithProject(page, project) {
   const frame = previewFrame(page);
   switch (project) {
-    case "ref-label":
-      await frame.getByRole("button", { name: "Unresolved" }).click();
-      await frame
-        .getByText("Showing the endpoint's unresolved state.")
-        .waitFor();
-      break;
     case "text-segment":
       await frame.locator("#edition").selectOption("english");
       await frame.getByText("en · ltr").waitFor();
@@ -571,7 +564,6 @@ async function runGraphQualification(page, graph) {
       const client = await import("@arithmomaniac/sefaria-client");
       const validation = await import("@arithmomaniac/sefaria-client/validation");
       const acquisition = await import("@arithmomaniac/sefaria-web-components/acquisition");
-      const refLabel = await import("@arithmomaniac/sefaria-web-components/ref-label");
       const textSegment = await import("@arithmomaniac/sefaria-web-components/text-segment");
       const bilingualSegment = await import("@arithmomaniac/sefaria-web-components/bilingual-segment");
       const connections = await import("@arithmomaniac/sefaria-web-components/connections-panel");
@@ -583,7 +575,6 @@ async function runGraphQualification(page, graph) {
         readerSession.createReaderSession,
       ].every((value) => typeof value === "function");
       const pureEntriesReady = [
-        refLabel,
         textSegment,
         bilingualSegment,
         pure,

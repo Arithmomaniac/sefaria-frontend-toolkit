@@ -12,7 +12,6 @@ Start with a Source Card for a passage, range, heading, aligned text, and attrib
 | <SiteLink to="/examples/explorer/source-card.html">Live source card</SiteLink> | Standalone loading after explicit activation |
 | <SiteLink to="/examples/explorer/bilingual-segment.html">Live bilingual segment</SiteLink> | Primary/translation roles and layout |
 | <SiteLink to="/examples/explorer/text-segment.html">Live text segment</SiteLink> | One selected edition, markup, and footnotes |
-| <SiteLink to="/examples/explorer/ref-label.html">Live reference label</SiteLink> | Canonical labels and links |
 
 ## Put a Source Card in a browser app
 

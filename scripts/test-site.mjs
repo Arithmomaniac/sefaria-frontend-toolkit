@@ -449,8 +449,8 @@ try {
     for (const [route, project, title] of [
       [
         "/learn/01-web-components.html",
-        "ref-label",
-        "Component editor: Edit a supplied-data reference label",
+        "text-segment",
+        "Component editor: Edit a supplied-data text segment",
       ],
       [
         "/learn/02-supplied-data.html",
@@ -509,10 +509,10 @@ try {
     await page.goto(siteRouteUrl("/learn/01-web-components.html"), {
       waitUntil: "networkidle",
     });
-    const refLabelEditor = page.frameLocator(
-      'iframe[title="Component editor: Edit a supplied-data reference label"]',
+    const lessonEditor = page.frameLocator(
+      'iframe[title="Component editor: Edit a supplied-data text segment"]',
     );
-    await refLabelEditor
+    await lessonEditor
       .getByText("Preview rendered with supplied data.")
       .waitFor({ timeout: 30_000 });
     for (const name of [
@@ -521,28 +521,28 @@ try {
       "Open the separate live demo",
     ]) {
       assertEqual(
-        await refLabelEditor.getByRole("link", { name }).getAttribute("target"),
+        await lessonEditor.getByRole("link", { name }).getAttribute("target"),
         "_blank",
         `${name} embedded editor target`,
       );
     }
     assertEqual(
-      await refLabelEditor
+      await lessonEditor
         .getByRole("link", { name: "Package setup" })
         .getAttribute("href"),
       "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/development.md#build-and-pack-the-private-libraries",
       "embedded editor package setup",
     );
-    const refLabelSource = await refLabelEditor
+    const lessonSource = await lessonEditor
       .getByRole("link", { name: "View active source" })
       .getAttribute("href");
     if (
-      refLabelSource !==
-      "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/projects/ref-label/index.html"
+      lessonSource !==
+      "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/projects/text-segment/index.html"
     ) {
-      throw new Error(`Unexpected reference-label source: ${refLabelSource}`);
+      throw new Error(`Unexpected text-segment source: ${lessonSource}`);
     }
-    assertEqual(textRequests.length, 0, "reference-label lesson request count");
+    assertEqual(textRequests.length, 0, "first lesson request count");
 
     for (const [name, route, action] of [
       [
@@ -553,11 +553,6 @@ try {
       [
         "bilingual-segment",
         "/examples/explorer/bilingual-segment.html",
-        "Start live demo",
-      ],
-      [
-        "reference-label",
-        "/examples/explorer/ref-label.html",
         "Start live demo",
       ],
       ["source-card", "/examples/explorer/source-card.html", "Start live demo"],
@@ -643,7 +638,7 @@ try {
       [
         "Supplied-data component editor",
         "/examples/playground/index.html",
-        "Edit and run any of six projects",
+        "Edit and run any of five projects",
         "source-card",
       ],
       [
@@ -1489,7 +1484,6 @@ async function qualifyCatalogPlayground(page, sitePath, textRequests) {
     .getByText("Preview rendered with supplied data.")
     .waitFor({ timeout: 30_000 });
   const projects = [
-    "ref-label",
     "text-segment",
     "bilingual-segment",
     "source-card",

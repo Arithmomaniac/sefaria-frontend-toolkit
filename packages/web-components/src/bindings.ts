@@ -14,11 +14,7 @@ import type {
   ReaderControllerSnapshot,
 } from "./reader-controller.js";
 import type { SefariaReader } from "./reader-element.js";
-import type { SefariaRefLabel } from "./ref-label-element.js";
-import type {
-  RefLabelController,
-  RefLabelControllerSnapshot,
-} from "./ref-label.js";
+
 import type { SefariaSourceCard } from "./source-card-element.js";
 import type {
   SourceCardController,
@@ -47,14 +43,6 @@ export function bindBilingualSegmentController(
   controller: BilingualSegmentController,
 ): () => void {
   return bindViewModel(element, controller, bilingualSegmentViewModel);
-}
-
-/** Binds one reference-label controller to one request-free element. */
-export function bindRefLabelController(
-  element: SefariaRefLabel,
-  controller: RefLabelController,
-): () => void {
-  return bindViewModel(element, controller, refLabelViewModel);
 }
 
 /** Binds one source-card controller to one request-free element. */
@@ -275,12 +263,6 @@ function textSegmentViewModel(snapshot: TextSegmentControllerSnapshot) {
 function bilingualSegmentViewModel(
   snapshot: BilingualSegmentControllerSnapshot,
 ) {
-  return snapshot.attempt.state === "loading"
-    ? snapshot.attempt.viewModel
-    : snapshot.result?.viewModel;
-}
-
-function refLabelViewModel(snapshot: RefLabelControllerSnapshot) {
   return snapshot.attempt.state === "loading"
     ? snapshot.attempt.viewModel
     : snapshot.result?.viewModel;

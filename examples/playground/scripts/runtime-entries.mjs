@@ -9,7 +9,6 @@ export const PUBLIC_ENTRIES = {
     "connections-panel",
   "@arithmomaniac/sefaria-web-components/reader": "reader",
   "@arithmomaniac/sefaria-web-components/reader-session": "reader-session",
-  "@arithmomaniac/sefaria-web-components/ref-label": "ref-label",
   "@arithmomaniac/sefaria-web-components/source-card": "source-card",
   "@arithmomaniac/sefaria-web-components/text-segment": "text-segment",
 };

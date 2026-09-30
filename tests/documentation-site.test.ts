@@ -15,7 +15,6 @@ const lessons = [
   "alpine.md",
 ];
 const playgroundProjects = [
-  "ref-label",
   "text-segment",
   "bilingual-segment",
   "source-card",
@@ -185,7 +184,7 @@ describe("documentation learning journey", () => {
     expect(lessonTwo).not.toContain("parallel [React path]");
   });
 
-  it("catalogs all six current rendering surfaces without inventing APIs", async () => {
+  it("catalogs all five current rendering surfaces without inventing APIs", async () => {
     const catalog = await readFile(
       path.join(root, "docs", "components.md"),
       "utf8",
@@ -207,7 +206,6 @@ describe("documentation learning journey", () => {
     );
 
     for (const [element, subpath] of [
-      ["<sefaria-ref-label>", "ref-label"],
       ["<sefaria-text-segment>", "text-segment"],
       ["<sefaria-bilingual-segment>", "bilingual-segment"],
       ["<sefaria-source-card>", "source-card"],
@@ -237,7 +235,7 @@ describe("documentation learning journey", () => {
 
   it("places maintained editable projects in the learning path", async () => {
     const expectedEmbeds = new Map([
-      ["01-web-components.md", "ref-label"],
+      ["01-web-components.md", "text-segment"],
       ["02-supplied-data.md", "source-card"],
       ["03-live-data.md", "source-card"],
       ["04-reader.md", "reader"],
@@ -292,14 +290,14 @@ describe("documentation learning journey", () => {
     expect(editor.match(/rel="noreferrer"/g)).toHaveLength(3);
   });
 
-  it("describes all six implemented components as current", async () => {
+  it("describes all five implemented components as current", async () => {
     const dataFlow = await readFile(
       path.join(root, "docs", "guides", "data-flow.md"),
       "utf8",
     );
 
     expect(dataFlow).toContain(
-      "all six public elements support standalone `sref`",
+      "all five public elements support standalone `sref`",
     );
   });
 
@@ -359,7 +357,7 @@ describe("documentation learning journey", () => {
       expect(getStarted).toContain(definition);
     }
     expect(components).toContain(
-      "The toolkit provides six declarative UI components.",
+      "The toolkit provides five declarative UI components.",
     );
     expect(components).not.toContain("host-admitted Reader view model");
     expect(examples).toContain("The component editor runs edited code");
@@ -721,7 +719,7 @@ describe("documentation learning journey", () => {
       expect(lessonsByName["05-customization.md"]).toContain(part);
     }
     expect(dataFlow).toContain(
-      "all six public elements support standalone `sref`",
+      "all five public elements support standalone `sref`",
     );
     expect(readerNavigation).toContain(
       "supported advanced semantic/raw facade",

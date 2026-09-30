@@ -377,25 +377,32 @@ test("makes no request while rendering the full card", async () => {
 test("renders the payload-derived bilingual header by default", async () => {
   const host = await renderCard();
   const header = host.shadowRoot?.querySelector("header");
-  const label = header?.querySelector("sefaria-ref-label");
-  await label?.updateComplete;
+  const english = header?.querySelector<HTMLElement>('[lang="en"]');
+  const hebrew = header?.querySelector<HTMLElement>('[lang="he"]');
 
-  expect(label?.shadowRoot?.textContent).toContain("Genesis 1:1-2");
-  expect(label?.shadowRoot?.textContent).toContain("בראשית א׳:א׳-ב׳");
-  expect(label?.shadowRoot?.querySelector("a")).toBeNull();
+  expect(header?.querySelector("sefaria-ref-label")).toBeNull();
+  expect(customElements.get("sefaria-ref-label")).toBeUndefined();
+  expect(english?.textContent).toBe("Genesis 1:1-2");
+  expect(english?.dir).toBe("ltr");
+  expect(hebrew?.textContent).toBe("בראשית א׳:א׳-ב׳");
+  expect(hebrew?.dir).toBe("rtl");
+  host.style.setProperty("--sefaria-font-hebrew", "serif-test-hebrew");
+  expect(getComputedStyle(hebrew!).fontFamily).toContain("serif-test-hebrew");
+  expect(getComputedStyle(english!.parentElement!).display).toBe("inline-flex");
+  expect(getComputedStyle(english!.parentElement!).flexWrap).toBe("wrap");
+  expect(header?.querySelector("a")).toBeNull();
   expect(getComputedStyle(header!).borderBottomStyle).toBe("solid");
   expect(getComputedStyle(header!).paddingBottom).toBe("12px");
 });
 
-test("composes the private reference label without requesting", async () => {
+test("renders the private heading without requesting", async () => {
   const fetchMock = vi.fn();
   vi.stubGlobal("fetch", fetchMock);
   const host = await renderCard(DATA);
-  const label = host.shadowRoot?.querySelector("sefaria-ref-label");
-  await label?.updateComplete;
+  const header = host.shadowRoot?.querySelector("header");
 
-  expect(label?.shadowRoot?.textContent).toContain("Genesis 1:1-2");
-  expect(label?.shadowRoot?.querySelector("a")).toBeNull();
+  expect(header?.textContent).toContain("Genesis 1:1-2");
+  expect(header?.querySelector("sefaria-ref-label, a")).toBeNull();
   expect(fetchMock).not.toHaveBeenCalled();
 });
 
@@ -610,9 +617,9 @@ test("renders the header and empty message for an empty card", async () => {
     ],
   });
 
-  const label = host.shadowRoot?.querySelector("sefaria-ref-label");
-  await label?.updateComplete;
-  expect(label?.shadowRoot?.textContent).toContain("Genesis 1:1-2");
+  expect(
+    host.shadowRoot?.querySelector('header [lang="en"]')?.textContent,
+  ).toBe("Genesis 1:1-2");
   expect(
     host.shadowRoot?.querySelector('[role="status"]')?.textContent?.trim(),
   ).toBe("No primary. No translation.");

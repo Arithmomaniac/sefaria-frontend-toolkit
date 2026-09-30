@@ -4,7 +4,7 @@
 
 ## Objective
 
-Choose one of the six current elements and render either supplied raw data or a standalone reference.
+Choose one of the five current elements and render either supplied raw data or a standalone reference.
 
 ## Prerequisites
 
@@ -31,7 +31,7 @@ card.addEventListener("sefaria-source-select", (event) => {
 });
 ```
 
-The root import registers all six elements. The element owns standalone acquisition and private preparation. Do not assign a client, URL, `fetch`, or prepared rendering object.
+The root import registers all five elements. The element owns standalone acquisition and private preparation. Do not assign a client, URL, `fetch`, or prepared rendering object.
 
 Use attributes for scalar inputs such as `sref`, `layout`, and `vocalization-mode`. Properties carry rich objects and arrays, so assign raw `data`, tagged `acquisition`, selected positions, and anchors through JavaScript properties instead.
 
@@ -47,7 +47,7 @@ After the element is connected, it reports loading through its read-only status 
 
 The editor below demonstrates the zero-request supplied-data path:
 
-<PlaygroundEmbed project="ref-label" title="Edit a supplied-data reference label" />
+<PlaygroundEmbed project="text-segment" title="Edit a supplied-data text segment" />
 
 ## Who owns what
 
@@ -65,7 +65,7 @@ Change the editor's HTML, CSS, and JavaScript, then choose **Run**. Confirm that
 
 ## Source and run links
 
-- Full editor: <SiteLink to="/examples/playground/index.html?project=ref-label">reference-label project</SiteLink>
+- Full editor: <SiteLink to="/examples/playground/index.html?project=text-segment">text-segment project</SiteLink>
 - Generated element metadata: [Custom elements](../reference/custom-elements.md)
 
 ## Next step

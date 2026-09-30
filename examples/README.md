@@ -10,7 +10,6 @@ The [authored component workbench](explorer/authored.html) renders supplied raw 
 
 | Component | Public subpath | Retained scenarios | Example deep link |
 | --- | --- | --- | --- |
-| Reference label | `@arithmomaniac/sefaria-web-components/ref-label` | resolved, loading, unresolvable, HTTP error | [HTTP error](explorer/authored.html?component=ref-label&scenario=error) |
 | Text segment | `@arithmomaniac/sefaria-web-components/text-segment` | populated, loading, empty, error, markup and footnotes | [Populated text](explorer/authored.html?component=text-segment&scenario=data) |
 | Bilingual segment | `@arithmomaniac/sefaria-web-components/bilingual-segment` | populated, loading, partial, empty, error | [One-sided partial data](explorer/authored.html?component=bilingual-segment&scenario=partial) |
 | Source card | `@arithmomaniac/sefaria-web-components/source-card` | one item, range, hidden addresses, one-sided, loading, empty, error, selection | [Range with diagnostics](explorer/authored.html?component=source-card&scenario=many-items&diagnostics=1) |
@@ -25,7 +24,6 @@ The [component playground](playground/index.html?project=source-card) uses one r
 
 | Project ID | Demonstrated local behavior |
 | --- | --- |
-| `ref-label` | Switch between a validated resolved reference and an unresolved state. |
 | `text-segment` | Select the exact Hebrew or English edition from the supplied response. |
 | `bilingual-segment` | Change side order while retaining payload-owned language roles and directions. |
 | `source-card` | Select a source row and change vocalization without requesting replacement data. |
@@ -42,7 +40,6 @@ The [component explorer](explorer/README.md) keeps live actions separate from su
 | --- | --- | --- |
 | [Text segment](explorer/text-segment.html) | Hebrew, English with footnotes, retained markup, absent language, and wrong granularity | `@arithmomaniac/sefaria-web-components/text-segment` |
 | [Bilingual segment](explorer/bilingual-segment.html) | Exact editions, missing translation, ranges, layout, side order, and displayed languages | `@arithmomaniac/sefaria-web-components/bilingual-segment` |
-| [Reference label](explorer/ref-label.html) | Segment, range, spanning range, commentary, unresolvable references, link and language controls | `@arithmomaniac/sefaria-web-components/ref-label` |
 | [Source card](explorer/source-card.html) | Bounded live source loading, ranges, side selection, layout, and order | `@arithmomaniac/sefaria-web-components/source-card` |
 | [Connections reader](explorer/connections.html) | Source and connection selection, category/page projection, previews, cancellation, visible errors, and exact request counts | `@arithmomaniac/sefaria-web-components/source-card` and `@arithmomaniac/sefaria-web-components/connections-panel` |
 

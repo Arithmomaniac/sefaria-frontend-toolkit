@@ -22,7 +22,7 @@ describe("library package foundations", () => {
     [
       "packages/web-components/package.json",
       "@arithmomaniac/sefaria-web-components",
-      9,
+      8,
       ["dist", "!dist/*.tsbuildinfo", "README.md", "custom-elements.json"],
     ],
   ] as const;
@@ -105,7 +105,6 @@ describe("library package foundations", () => {
       "dev:bilingual-segment",
       "dev:connections",
       "dev:source-card",
-      "dev:ref-label",
       "dev:text-segment",
     ]) {
       expect(rootManifest.scripts?.[scriptName]).toContain(

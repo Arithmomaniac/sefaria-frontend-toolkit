@@ -2,7 +2,7 @@
 
 # How declarative components obtain and render data
 
-**Current:** all six public elements support standalone `sref`. The five ordinary elements also accept authoritative component-specific raw `data`; Reader accepts transactional raw seeds. Elements own validation, acquisition selection, cancellation, stale-result suppression, private preparation, and rendering.
+**Current:** all five public elements support standalone `sref`. The four ordinary elements also accept authoritative component-specific raw `data`; Reader accepts transactional raw seeds. Elements own validation, acquisition selection, cancellation, stale-result suppression, private preparation, and rendering.
 
 ## Start with supplied data
 

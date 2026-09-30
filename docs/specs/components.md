@@ -4,7 +4,7 @@
 
 ## Status
 
-The declarative standalone-loading cutover is implemented. All six public elements accept `sref`. Text Segment, Bilingual Segment, Reference Label, Source Card, and Connections Panel also accept component-specific raw `data`. Reader accepts raw transactional seeds rather than an ordinary persistent data override.
+The declarative standalone-loading cutover is implemented. All five public elements accept `sref`. Text Segment, Bilingual Segment, Source Card, and Connections Panel also accept component-specific raw `data`. Reader accepts raw transactional seeds rather than an ordinary persistent data override.
 
 Unrelated future component slices remain planned where identified in [Development](../development.md).
 
@@ -74,7 +74,7 @@ Preferred success, strict editions, and defaults use one outer text request. Mis
 
 These counts describe uninterrupted operations. Disconnection may abort an in-flight request; reconnecting unchanged inputs resumes that request with a new signal, without repeating the completed preferred-language phase. Reader retains its in-flight target qualification while context is interrupted. This operation-local progress is discarded on supersession or completion, not stored as a second response cache.
 
-Connections Panel keeps API-provided links previews without per-link edition acquisition. Reference Label retains `label-language`. No Popup language inputs are added.
+Connections Panel keeps API-provided links previews without per-link edition acquisition. No Popup language inputs are added.
 
 Each element accepts an optional tagged `SefariaAcquisition`:
 
@@ -94,7 +94,7 @@ Current validation, projection, acquisition, network, and abort failures become 
 
 ## Public and private API
 
-The root entry registers all six elements. The DOM-free `./acquisition` entry exposes acquisition configuration and types. Component subpaths expose component-specific raw request/selection types. `./reader` exposes shared raw source qualification, browser data-source construction, resolved-source records, and raw seed types. `./reader-session` remains a supported advanced DOM-free semantic/raw facade.
+The root entry registers all five elements. The DOM-free `./acquisition` entry exposes acquisition configuration and types. Component subpaths expose component-specific raw request/selection types. `./reader` exposes shared raw source qualification, browser data-source construction, resolved-source records, and raw seed types. `./reader-session` remains a supported advanced DOM-free semantic/raw facade.
 
 Prepared rendering types and protocols are private. `./bindings` and `./reader-controller` are retired and absent from supported exports. Elements expose no arbitrary `fetch`, base URL, untyped host, public prepared model, or request-capable child protocol.
 
@@ -134,13 +134,11 @@ Renders one selected version, direction, safe markup, and footnotes. `vocalizati
 
 Resolves primary and translation roles independently from payload evidence. `contentLanguage`, `layout`, `sideOrder`, and `vocalizationMode` are presentation-only. One missing side is partial; two missing sides are empty.
 
-### Reference Label
-
-Resolves canonical English/Hebrew labels and a canonical URL. `labelLanguage` and `linked` are presentation properties. Unresolvable input remains an explicit outcome.
-
 ### Source Card
 
-Owns one bounded text collection, heading, aligned role pairs, attribution, positional identity, and optional selection. Scalar, range, spanning, and nested non-spanning responses share one element. `sefaria-source-select` reports the canonical target and original position.
+Owns one bounded text collection, heading, aligned role pairs, attribution, positional identity, and optional selection. Scalar, range, spanning, and nested non-spanning responses share one element. `sefaria-source-select` reports the canonical target and original position. The heading renders the payload's canonical English `ref` and Hebrew `heRef` through a private template with `lang` and `dir` on each part; it makes no request beyond the card's own text request and exposes no nested element, link, or event.
+
+The former alpha Reference Label element (`<sefaria-ref-label>`, the `./ref-label` subpath, `sefaria-ref-label-error`, and the `resolveReference` acquisition capability member) is removed. Hosts that need a citation link write an ordinary anchor to `https://www.sefaria.org/<url_ref>`; hosts that need text with its heading use Source Card.
 
 ### Connections Panel
 
@@ -163,7 +161,7 @@ Elements use open shadow roots, real interactive controls, visible focus, access
 Required tests cover:
 
 - supplied-data zero-I/O and invalid-data supersession
-- standalone loading for all six elements
+- standalone loading for all five elements
 - shared versus explicit acquisition
 - original failure causes and no unhandled rejections
 - stale completion suppression

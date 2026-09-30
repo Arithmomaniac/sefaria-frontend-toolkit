@@ -98,7 +98,7 @@ Several Core endpoints can return an HTTP 200 JSON error object for an invalid r
 
 The reference endpoint also has a distinct HTTP 200 `{ "is_ref": false }` outcome. The reference-label element prepares that as empty state, while its documented HTTP 404 outcome is an error state.
 
-See [Core endpoint implementation map](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/evidence.md#core-endpoint-implementation-map), [Success and failure semantics](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/client.md#success-and-failure-semantics), and [Reference label contract](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/components.md#reference-label-contract-current).
+See [Core endpoint implementation map](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/evidence.md#core-endpoint-implementation-map) and [Success and failure semantics](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/docs/specs/client.md#success-and-failure-semantics).
 
 ### Return formats can remove information
 
