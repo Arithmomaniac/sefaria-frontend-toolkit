@@ -37,11 +37,13 @@ Data and text tool pages show every snippet with `<CodeLanguageToggle :snippet>`
 - Prefer our own Concepts or Reference page. Link to its final route, even if the page is only a "Coming soon" stub.
 - Link externally only for general web technology that we don't own, and then only to MDN or the relevant official documentation.
 
-## Shared guidance ("All components" badge)
+## Shared guidance
 
-- When a task page first states a rule that applies to every component, such as styling tokens, mark that item with `<Badge type="tip" text="All components" />` at its start. Mark each item, not a whole block.
-- Keep the component's own task in the narrative. Add one "Learn more" link to the page that owns the full rules.
-- Later pages link to the owner page. They don't repeat the items.
+- When a task page first teaches a rule that applies more widely, give the minimum the example needs, then one plain scope sentence per group, such as "These styling rules apply to every toolkit component:". Put local exceptions outside the group. Don't mark a whole concern as universal if only some rules are shared.
+- Don't use a badge for scope by default. A badge is allowed only in a mixed list, where each item's scope differs, and the scope must also be stated in prose.
+- End with one Learn-more link to the owner page's section. The owner page must stand alone, so a reader who lands there first can finish.
+- Later pages may give a one-sentence reminder when an example needs it, then link to the owner. They don't copy tables or full rules.
+- Keep request counts next to each operation.
 - Put rules for one component's attributes, which interrupt the narrative, in a `::: info` box with a short title, as bullets.
 - Leave a blank line before a closing `:::`. Otherwise Prettier joins it to the line above and the box swallows the rest of the page. A site test checks this.
 

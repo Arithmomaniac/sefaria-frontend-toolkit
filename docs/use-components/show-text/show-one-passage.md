@@ -33,9 +33,11 @@ Set `--sefaria-*` CSS custom properties, such as `--sefaria-fg` for text color a
 
 <LiveEditor :code="textSegmentStyling" title="Style a passage">A containing <code>div</code> sets a warm background, brown text, serif fonts, and a larger font scale. The element's own box gets padding, a rounded corner, and an accent border. Italic text passes in from the page.</LiveEditor>
 
-- <Badge type="tip" text="All components" /> The same `--sefaria-*` properties style every component. Set them once on `:root` to style the whole page.
-- <Badge type="tip" text="All components" /> Your page's CSS selectors can't reach inside a component.
-- <Badge type="tip" text="All components" /> Changing styles doesn't load the text again.
+These styling rules apply to every toolkit component:
+
+- The same `--sefaria-*` properties style every component. Set them once on `:root` to style the whole page.
+- Your page's CSS selectors can't reach inside a component.
+- Changing styles doesn't load the text again.
 
 <span class="learn-more__label">Learn more:</span> [Match your site's look](/across-components/match-your-sites-look.md) for every property, dark mode, and why selectors can't reach inside. {.learn-more}
 

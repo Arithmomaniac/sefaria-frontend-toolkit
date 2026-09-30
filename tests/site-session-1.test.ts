@@ -153,7 +153,9 @@ describe.each(Object.entries(showTextPages))(
 
 it("teaches shared styling and dark-mode setup on the passage page", () => {
   const page = read(showTextPages["sefaria-text-segment"].file);
-  expect(page).toContain('<Badge type="tip" text="All components" />');
+  expect(page).toContain(
+    "These styling rules apply to every toolkit component",
+  );
   expect(page).toContain("--sefaria-font-scale");
   expect(page).toContain("(/across-components/match-your-sites-look.md)");
   expect(read("docs/across-components/match-your-sites-look.md")).toContain(
