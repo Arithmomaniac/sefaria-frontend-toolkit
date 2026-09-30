@@ -71,9 +71,21 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Preferred translation family, falling back only when unavailable.",
+              "description": "Preferred translation family.",
               "default": "undefined",
               "attribute": "translation-language"
+            },
+            {
+              "kind": "field",
+              "name": "translationFallback",
+              "privacy": "public",
+              "type": {
+                "text": "\"default\" | \"none\""
+              },
+              "description": "Missing preferred-translation policy.",
+              "default": "\"none\"",
+              "attribute": "translation-fallback",
+              "reflects": true
             },
             {
               "kind": "field",
@@ -153,9 +165,18 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Preferred translation family, falling back only when unavailable.",
+              "description": "Preferred translation family.",
               "default": "undefined",
               "fieldName": "translationLanguage"
+            },
+            {
+              "name": "translation-fallback",
+              "type": {
+                "text": "\"default\" | \"none\""
+              },
+              "description": "Missing preferred-translation policy.",
+              "default": "\"none\"",
+              "fieldName": "translationFallback"
             },
             {
               "name": "primary-version-title",
@@ -729,6 +750,18 @@
             },
             {
               "kind": "field",
+              "name": "translationFallback",
+              "privacy": "public",
+              "type": {
+                "text": "\"default\" | \"none\""
+              },
+              "description": "Missing preferred-translation policy.",
+              "default": "\"default\"",
+              "attribute": "translation-fallback",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "primaryVersionTitle",
               "privacy": "public",
               "type": {
@@ -991,6 +1024,15 @@
               "description": "Preferred family used for root and navigated translations.",
               "default": "undefined",
               "fieldName": "translationLanguage"
+            },
+            {
+              "name": "translation-fallback",
+              "type": {
+                "text": "\"default\" | \"none\""
+              },
+              "description": "Missing preferred-translation policy.",
+              "default": "\"default\"",
+              "fieldName": "translationFallback"
             },
             {
               "name": "primary-version-title",
@@ -1271,9 +1313,21 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Preferred translation family, falling back only when unavailable.",
+              "description": "Preferred translation family.",
               "default": "undefined",
               "attribute": "translation-language"
+            },
+            {
+              "kind": "field",
+              "name": "translationFallback",
+              "privacy": "public",
+              "type": {
+                "text": "\"default\" | \"none\""
+              },
+              "description": "Missing preferred-translation policy.",
+              "default": "\"default\"",
+              "attribute": "translation-fallback",
+              "reflects": true
             },
             {
               "kind": "field",
@@ -1412,9 +1466,18 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Preferred translation family, falling back only when unavailable.",
+              "description": "Preferred translation family.",
               "default": "undefined",
               "fieldName": "translationLanguage"
+            },
+            {
+              "name": "translation-fallback",
+              "type": {
+                "text": "\"default\" | \"none\""
+              },
+              "description": "Missing preferred-translation policy.",
+              "default": "\"default\"",
+              "fieldName": "translationFallback"
             },
             {
               "name": "primary-version-title",
@@ -1685,6 +1748,18 @@
             },
             {
               "kind": "field",
+              "name": "translationFallback",
+              "privacy": "public",
+              "type": {
+                "text": "\"default\" | \"none\""
+              },
+              "description": "Missing preferred-translation policy.",
+              "default": "\"none\"",
+              "attribute": "translation-fallback",
+              "reflects": true
+            },
+            {
+              "kind": "field",
               "name": "vocalizationMode",
               "privacy": "public",
               "type": {
@@ -1740,6 +1815,15 @@
               "description": "Preferred translation family, mutually exclusive with a strict version language.",
               "default": "undefined",
               "fieldName": "translationLanguage"
+            },
+            {
+              "name": "translation-fallback",
+              "type": {
+                "text": "\"default\" | \"none\""
+              },
+              "description": "Missing preferred-translation policy.",
+              "default": "\"none\"",
+              "fieldName": "translationFallback"
             },
             {
               "name": "version-language",

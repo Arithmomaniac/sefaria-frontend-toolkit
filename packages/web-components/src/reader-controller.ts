@@ -33,11 +33,14 @@ import {
 import { serializeSourceCardSelectors } from "./source-card-request.js";
 import {
   acquireSelectedText,
+  normalizeTranslationFallback,
   normalizeTranslationLanguage,
   type SelectedTextProgress,
+  type TranslationFallback,
 } from "./translation-selection.js";
 import type {
   SourceCardDataViewModel,
+  SourceCardEmptyViewModel,
   SourceCardNavigation,
   SourceCardRequest,
 } from "./source-card.js";
@@ -315,10 +318,10 @@ export interface ReaderResolvedSource {
   readonly content: ReaderSourceContent;
   /** Stable raw corrected-payload record for advanced consumers. */
   readonly record: ReaderSourceRecord;
-  /** Exact selected source position. */
-  readonly selectedPosition: readonly number[];
-  /** Exact canonical selected reference. */
-  readonly selectedRef: string;
+  /** Exact selected source position, absent when the source has no renderable selectable text. */
+  readonly selectedPosition?: readonly number[];
+  /** Exact canonical selected reference, absent when the source has no renderable selectable text. */
+  readonly selectedRef?: string;
 }
 
 interface ActiveOperation {
@@ -339,6 +342,7 @@ export function createSefariaReaderDataSource(
         request.tref,
         serializeSourceCardSelectors(request),
         request.translationLanguage,
+        request.translationFallback ?? "default",
         signal,
         progress,
       );
@@ -390,6 +394,7 @@ export function createCapabilityReaderDataSource(
         request.tref,
         serializeSourceCardSelectors(request),
         request.translationLanguage,
+        request.translationFallback ?? "default",
         signal,
         progress,
       );
@@ -506,42 +511,51 @@ export function createReaderEntrySeedFromRawData(
     );
     source = createReaderSourceContent(payload, request);
     const navigable = requireNavigable(source, request.tref);
-    const available = requireAvailable(navigable.navigation, request.tref);
-    const candidates =
-      requestedSelectedRef === undefined
-        ? navigable.viewModel.items.filter((item) => item.ref === request.tref)
-        : navigable.viewModel.items.filter(
-            (item) => item.ref === requestedSelectedRef,
-          );
-    if (candidates.length > 1) {
-      throw new ReaderControllerError(
-        "invalid-selection",
-        `Reader selected reference matched ${candidates.length} source items.`,
-      );
-    }
-    let selected = candidates[0];
-    if (selected === undefined && requestedSelectedRef === undefined) {
-      const firstCandidates = navigable.viewModel.items.filter(
-        (item) => item.ref === available.firstRef,
-      );
-      if (firstCandidates.length !== 1) {
+    if (navigable.viewModel.state === "data") {
+      const available = requireAvailable(navigable.navigation, request.tref);
+      const candidates =
+        requestedSelectedRef === undefined
+          ? navigable.viewModel.items.filter(
+              (item) => item.ref === request.tref,
+            )
+          : navigable.viewModel.items.filter(
+              (item) => item.ref === requestedSelectedRef,
+            );
+      if (candidates.length > 1) {
         throw new ReaderControllerError(
           "invalid-selection",
-          `Reader first target ${available.firstRef} must match exactly one source item.`,
+          `Reader selected reference matched ${candidates.length} source items.`,
         );
       }
-      selected = firstCandidates[0];
-    }
-    if (selected?.ref === undefined) {
+      let selected = candidates[0];
+      if (selected === undefined && requestedSelectedRef === undefined) {
+        const firstCandidates = navigable.viewModel.items.filter(
+          (item) => item.ref === available.firstRef,
+        );
+        if (firstCandidates.length !== 1) {
+          throw new ReaderControllerError(
+            "invalid-selection",
+            `Reader first target ${available.firstRef} must match exactly one source item.`,
+          );
+        }
+        selected = firstCandidates[0];
+      }
+      if (selected?.ref === undefined) {
+        throw new ReaderControllerError(
+          "invalid-selection",
+          `${
+            requestedSelectedRef ?? request.tref
+          } must match exactly one canonical source item.`,
+        );
+      }
+      selectedRef = selected.ref;
+      selectedPosition = selected.position;
+    } else if (requestedSelectedRef !== undefined) {
       throw new ReaderControllerError(
         "invalid-selection",
-        `${
-          requestedSelectedRef ?? request.tref
-        } must match exactly one canonical source item.`,
+        `${requestedSelectedRef} cannot select an empty source.`,
       );
     }
-    selectedRef = selected.ref;
-    selectedPosition = selected.position;
   } else if (requestedSelectedRef !== undefined) {
     throw new TypeError(
       "/selectedRef requires source data for exact selection.",
@@ -591,7 +605,10 @@ export function createReaderEntrySeedFromRawData(
     },
     ...(selectedRef === undefined ? {} : { selectedRef }),
     ...(source === undefined ? {} : { sourceRequest: source.request }),
-    continueConnections: source !== undefined && connections === undefined,
+    continueConnections:
+      selectedRef !== undefined &&
+      source !== undefined &&
+      connections === undefined,
   });
 }
 
@@ -626,7 +643,9 @@ export async function loadReaderControllerProgressively(
   const controller = new ReaderControllerImpl(
     {
       source: destination.content,
-      selectedPosition: destination.selectedPosition,
+      ...(destination.selectedPosition === undefined
+        ? {}
+        : { selectedPosition: destination.selectedPosition }),
       ...(options.presentation === undefined
         ? {}
         : { presentation: options.presentation }),
@@ -636,6 +655,7 @@ export async function loadReaderControllerProgressively(
   );
   onSource(controller);
   try {
+    if (destination.selectedRef === undefined) return controller;
     await controller.loadInitialConnections(
       {
         tref: destination.selectedRef,
@@ -671,6 +691,8 @@ export async function loadReaderController(
 export interface ReaderControllerSeedOptions extends ReaderSessionOptions {
   /** Preferred family for navigation when the current entry has no source request. */
   readonly translationLanguage?: string;
+  /** Missing preferred-translation policy for navigation when the current entry has no source request. */
+  readonly translationFallback?: TranslationFallback;
 }
 
 /** Creates a zero-request controller from already admitted reader content. */
@@ -699,6 +721,7 @@ class ReaderControllerImpl implements ReaderController {
   #resumeSourceProgress: ReaderSourceProgress | undefined;
   #pendingSourceRequest: SourceCardRequest | undefined;
   readonly #seedTranslationLanguage: string | undefined;
+  readonly #seedTranslationFallback: TranslationFallback | undefined;
 
   constructor(
     seed: ReaderEntrySeed,
@@ -712,6 +735,10 @@ class ReaderControllerImpl implements ReaderController {
       options.translationLanguage === undefined
         ? undefined
         : normalizeTranslationLanguage(options.translationLanguage);
+    this.#seedTranslationFallback =
+      options.translationFallback === undefined
+        ? undefined
+        : normalizeTranslationFallback(options.translationFallback);
     this.#reader = createReaderViewModel(this.#session.view);
     this.#snapshot = this.createSnapshot();
   }
@@ -782,7 +809,9 @@ class ReaderControllerImpl implements ReaderController {
       if (!this.isActive(active)) return;
       const replaced = this.#session.replaceRoot({
         source: destination.content,
-        selectedPosition: destination.selectedPosition,
+        ...(destination.selectedPosition === undefined
+          ? {}
+          : { selectedPosition: destination.selectedPosition }),
         ...(options.presentation === undefined
           ? {}
           : { presentation: options.presentation }),
@@ -794,15 +823,17 @@ class ReaderControllerImpl implements ReaderController {
       }
       this.#task = { state: "idle" };
       this.publish();
-      await this.loadConnections(
-        this.#session.view.currentEntryId,
-        normalizeConnectionsRequest({
-          tref: destination.selectedRef,
-          withText: options.connections?.withText !== false,
-        }),
-        options.connections?.projection ?? {},
-        active,
-      );
+      if (destination.selectedRef !== undefined) {
+        await this.loadConnections(
+          this.#session.view.currentEntryId,
+          normalizeConnectionsRequest({
+            tref: destination.selectedRef,
+            withText: options.connections?.withText !== false,
+          }),
+          options.connections?.projection ?? {},
+          active,
+        );
+      }
     } catch (error) {
       if (!this.isActive(active)) return;
       this.failTask(classifySourceError(error), errorMessage(error), error);
@@ -839,9 +870,14 @@ class ReaderControllerImpl implements ReaderController {
       source === undefined
         ? this.#seedTranslationLanguage
         : source.request.translationLanguage;
+    const translationFallback =
+      source === undefined
+        ? this.#seedTranslationFallback
+        : source.request.translationFallback;
     const targetRequest = normalizeSourceRequest({
       tref: action.targetRef,
       ...(translationLanguage === undefined ? {} : { translationLanguage }),
+      ...(translationFallback === undefined ? {} : { translationFallback }),
     });
     const active = this.startPhysicalOperation();
     this.#pendingSourceRequest = targetRequest;
@@ -883,7 +919,9 @@ class ReaderControllerImpl implements ReaderController {
         sourceOperationId,
         {
           source: destination.content,
-          selectedPosition: destination.selectedPosition,
+          ...(destination.selectedPosition === undefined
+            ? {}
+            : { selectedPosition: destination.selectedPosition }),
           presentation: this.#session.view.current.presentation,
         },
       );
@@ -896,15 +934,17 @@ class ReaderControllerImpl implements ReaderController {
       this.#operationId = undefined;
       this.#task = { state: "idle" };
       this.publish();
-      await this.loadConnections(
-        this.#session.view.currentEntryId,
-        normalizeConnectionsRequest({
-          tref: destination.selectedRef,
-          withText: true,
-        }),
-        {},
-        active,
-      );
+      if (destination.selectedRef !== undefined) {
+        await this.loadConnections(
+          this.#session.view.currentEntryId,
+          normalizeConnectionsRequest({
+            tref: destination.selectedRef,
+            withText: true,
+          }),
+          {},
+          active,
+        );
+      }
     } catch (error) {
       if (!this.isActive(active)) return;
       this.cancelSessionOperation();
@@ -1304,9 +1344,11 @@ export async function resolveReaderSource(
   requireMatchingRequest(target.request, request);
   const targetData = requireNavigable(target, request.tref);
   progress.targetContent = target;
-  let selectedRef = targetData.viewModel.items.find(
-    (item) => item.ref === request.tref,
-  )?.ref;
+  let selectedRef =
+    targetData.viewModel.state === "data"
+      ? targetData.viewModel.items.find((item) => item.ref === request.tref)
+          ?.ref
+      : undefined;
   if (
     selectedRef === undefined &&
     targetData.navigation.state === "available"
@@ -1341,6 +1383,12 @@ export async function resolveReaderSource(
   const available = requireAvailable(navigation, request.tref);
   const viewModel = requireNavigable(content, request.tref).viewModel;
   selectedRef ??= available.firstRef;
+  if (viewModel.state === "empty") {
+    return {
+      content,
+      record: getReaderSourceRecord(content),
+    };
+  }
   const selected = viewModel.items.find((item) => item.ref === selectedRef);
   if (!selected) {
     throw new ReaderControllerError(
@@ -1360,14 +1408,17 @@ function requireNavigable(
   content: ReaderSourceContent,
   label: string,
 ): {
-  readonly viewModel: SourceCardDataViewModel;
+  readonly viewModel: SourceCardDataViewModel | SourceCardEmptyViewModel;
   readonly navigation: Exclude<
     SourceCardNavigation,
     { readonly state: "unavailable" }
   >;
 } {
   const viewModel = content.viewModel;
-  if (viewModel.state !== "data" || !viewModel.navigation) {
+  if (
+    (viewModel.state !== "data" && viewModel.state !== "empty") ||
+    !viewModel.navigation
+  ) {
     throw new ReaderControllerError(
       "source-unavailable",
       `${label} did not produce selectable source data.`,
@@ -1422,6 +1473,13 @@ function normalizeSourceRequest(request: SourceCardRequest): SourceCardRequest {
       : {
           translationLanguage: normalizeTranslationLanguage(
             request.translationLanguage,
+          ),
+        }),
+    ...(request.translationFallback === undefined
+      ? {}
+      : {
+          translationFallback: normalizeTranslationFallback(
+            request.translationFallback,
           ),
         }),
     ...(request.primary === undefined
@@ -1506,6 +1564,16 @@ function parseSourceRequest(value: unknown, path: string): SourceCardRequest {
           translationLanguage: rawNonblankString(
             input.translationLanguage,
             `${path}/translationLanguage`,
+          ),
+        }),
+    ...(input.translationFallback === undefined
+      ? {}
+      : {
+          translationFallback: normalizeTranslationFallback(
+            rawNonblankString(
+              input.translationFallback,
+              `${path}/translationFallback`,
+            ),
           ),
         }),
     ...(input.primary === undefined

@@ -21,6 +21,25 @@ export function normalizeTranslationLanguage(value: string): string {
   return language;
 }
 
+/** Missing-translation fallback policy for preferred-language selection. */
+export type TranslationFallback = "default" | "none";
+
+/** Validates the public missing-translation fallback policy. */
+export function normalizeTranslationFallback(
+  value: string,
+): TranslationFallback {
+  const fallback = value.trim().toLowerCase();
+  if (fallback !== "default" && fallback !== "none") {
+    throw new TypeError('Translation fallback must be "default" or "none".');
+  }
+  return fallback;
+}
+
+/** Message shown when a preferred translation family is unavailable by choice. */
+export function noTranslationLanguageMessage(language: string): string {
+  return `No ${normalizeTranslationLanguage(language)} text.`;
+}
+
 /** Selects a preferred captured edition without acquiring missing coverage. */
 export function preferredTranslation(
   payload: CoreV3TextsResponse,
@@ -103,6 +122,7 @@ export async function acquireSelectedText(
   sref: string,
   versions: readonly string[],
   translationLanguage: string | undefined,
+  translationFallback: TranslationFallback = "default",
   signal: AbortSignal,
   progress: SelectedTextProgress = { fallback: false },
 ): Promise<SelectedTextResponse> {
@@ -119,6 +139,7 @@ export async function acquireSelectedText(
     first.status === 200 &&
     family !== undefined &&
     versions.includes(family) &&
+    translationFallback === "default" &&
     needsTranslationFallback(first.payload, family)
   ) {
     progress.fallback = true;
@@ -130,7 +151,8 @@ export async function acquireSelectedText(
     versions.includes(family) &&
     !first.payload.versions.some(
       (version) => version.languageFamilyName.toLowerCase() === family,
-    )
+    ) &&
+    !needsTranslationFallback(first.payload, family)
   ) {
     throw new TypeError(
       "/versions: the requested language is absent without a matching missing-language warning.",

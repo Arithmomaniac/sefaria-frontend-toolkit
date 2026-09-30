@@ -29,6 +29,7 @@ import {
 import { assertVocalizationMode } from "./vocalization-display.js";
 import {
   acquireSelectedText,
+  normalizeTranslationFallback,
   type SelectedTextProgress,
 } from "./translation-selection.js";
 
@@ -52,6 +53,12 @@ export class SefariaBilingualSegment extends SefariaElement {
       type: String,
       attribute: "translation-language",
       converter: optionalStringConverter,
+    },
+    translationFallback: {
+      type: String,
+      attribute: "translation-fallback",
+      reflect: true,
+      useDefault: true,
     },
     primaryVersionTitle: {
       type: String,
@@ -104,8 +111,10 @@ export class SefariaBilingualSegment extends SefariaElement {
   declare primaryVersionTitle: string | undefined;
   /** Optional exact edition title for the translation role. */
   declare translationVersionTitle: string | undefined;
-  /** Preferred translation family, falling back only when unavailable. */
+  /** Preferred translation family. */
   declare translationLanguage: string | undefined;
+  /** Missing preferred-translation policy. */
+  declare translationFallback: "default" | "none";
 
   /** Sides the host wants displayed. */
   declare contentLanguage: BilingualSegmentContentLanguage;
@@ -141,6 +150,7 @@ export class SefariaBilingualSegment extends SefariaElement {
     this.primaryVersionTitle = undefined;
     this.translationVersionTitle = undefined;
     this.translationLanguage = undefined;
+    this.translationFallback = "none";
     this.contentLanguage = "both";
     this.layout = "auto";
     this.sideOrder = "primary-first";
@@ -183,6 +193,7 @@ export class SefariaBilingualSegment extends SefariaElement {
       changed.has("acquisition") ||
       changed.has("primaryVersionTitle") ||
       changed.has("translationLanguage") ||
+      changed.has("translationFallback") ||
       changed.has("translationVersionTitle")
     ) {
       this.#interruptedProgress = undefined;
@@ -286,6 +297,7 @@ export class SefariaBilingualSegment extends SefariaElement {
         sref,
         versions,
         request.translationLanguage,
+        request.translationFallback ?? "none",
         active.controller.signal,
         active.progress,
       );
@@ -351,6 +363,9 @@ export class SefariaBilingualSegment extends SefariaElement {
       ...(this.translationLanguage === undefined
         ? {}
         : { translationLanguage: this.translationLanguage }),
+      translationFallback: normalizeTranslationFallback(
+        this.translationFallback,
+      ),
       ...(this.primaryVersionTitle === undefined
         ? {}
         : { primary: { versionTitle: this.primaryVersionTitle } }),
