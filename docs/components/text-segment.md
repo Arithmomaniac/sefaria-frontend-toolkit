@@ -8,6 +8,8 @@ Use `<sefaria-text-segment>` for one selected text edition. Assign component-spe
 
 Choose this surface when the surrounding layout already owns the reference heading, attribution, and controls.
 
+Text Segment has a transparent background by default, so the passage reads as text on your page. To tint it, set `--sefaria-surface` on the element or an ancestor.
+
 ## Try it
 
 <PlaygroundEmbed project="text-segment" title="Edit the text-segment example" />

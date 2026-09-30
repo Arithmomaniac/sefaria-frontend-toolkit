@@ -71,6 +71,8 @@ export class SefariaTextSegment extends SefariaElement {
     ...SefariaElement.styles,
     css`
       :host {
+        /* A lone passage reads as page text unless the host sets a surface. */
+        background: var(--sefaria-surface, transparent);
         max-width: 100%;
         min-width: 0;
       }

@@ -225,3 +225,5 @@ None.
 | `--sefaria-font-english` | `Georgia, "Times New Roman", serif` | English body font stack. |
 | `--sefaria-font-label-hebrew` | `"Noto Sans Hebrew", system-ui, sans-serif` | Hebrew label font stack. |
 | `--sefaria-font-label-english` | `system-ui, sans-serif` | English label font stack. |
+
+Exception: `<sefaria-text-segment>` defaults to a transparent background. It uses `--sefaria-surface` only when the host sets it on the element or an ancestor.

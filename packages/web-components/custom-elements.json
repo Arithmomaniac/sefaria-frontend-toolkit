@@ -1780,8 +1780,8 @@
           "cssProperties": [
             {
               "name": "--sefaria-surface",
-              "description": "Primary surface color.",
-              "default": "light-dark(#fffdf8, #2b2e2a)"
+              "description": "Primary surface color. Text Segment is transparent unless this is set.",
+              "default": "transparent"
             },
             {
               "name": "--sefaria-surface-muted",
