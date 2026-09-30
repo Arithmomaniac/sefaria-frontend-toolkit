@@ -53,6 +53,7 @@ import "@arithmomaniac/sefaria-web-components";
 
 ## Choose what to show next
 
-- [Just the citation](/use-components/show-text/label-a-citation.md)
 - [One text](/use-components/show-text/show-one-passage.md)
 - [Hebrew and translation](/use-components/show-text/hebrew-and-translation.md)
+
+To cite a source without quoting it, use a plain link to Sefaria, such as `<a href="https://www.sefaria.org/Micah.6.8">Micah 6:8</a>`.

@@ -144,10 +144,6 @@ export default withMermaid(
                 text: "Show text",
                 items: [
                   {
-                    text: "Label a citation",
-                    link: "/use-components/show-text/label-a-citation",
-                  },
-                  {
                     text: "Show one passage",
                     link: "/use-components/show-text/show-one-passage",
                   },

@@ -329,7 +329,6 @@ describe("B22 Start with an AI assistant", () => {
     for (const link of [
       "/llms.txt",
       "/use-components/start-here.md",
-      "/use-components/show-text/label-a-citation.md",
       "/use-components/show-text/show-one-passage.md",
       "/use-components/show-text/hebrew-and-translation.md",
       "/use-components/show-an-attributed-passage.md",

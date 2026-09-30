@@ -41,10 +41,6 @@ describe("LiveEditor", () => {
 });
 
 const showTextPages = {
-  "sefaria-ref-label": {
-    file: "docs/use-components/show-text/label-a-citation.md",
-    attributes: ["sref", "label-language", "linked"],
-  },
   "sefaria-text-segment": {
     file: "docs/use-components/show-text/show-one-passage.md",
     attributes: [
@@ -155,8 +151,8 @@ describe.each(Object.entries(showTextPages))(
   },
 );
 
-it("teaches shared styling and dark-mode setup on the label page", () => {
-  const page = read(showTextPages["sefaria-ref-label"].file);
+it("teaches shared styling and dark-mode setup on the passage page", () => {
+  const page = read(showTextPages["sefaria-text-segment"].file);
   expect(page).toContain("color-scheme: light dark");
   expect(page).toContain("--sefaria-font-scale");
   expect(page).toContain("(/across-components/match-your-sites-look.md)");
@@ -380,4 +376,17 @@ describe("Across components pages", () => {
       expect(page).not.toMatch(/^stub: true$/m);
     }
   });
+});
+
+it("removes the Reference Label page and routes citations to a plain link", () => {
+  expect(() =>
+    read("docs/use-components/show-text/label-a-citation.md"),
+  ).toThrow();
+  expect(read("docs/.vitepress/config.ts")).not.toContain("label-a-citation");
+  const quickstart = read("docs/use-components/start-here.md");
+  expect(quickstart).not.toContain("label-a-citation");
+  expect(quickstart).toContain('<a href="https://www.sefaria.org/Micah.6.8">');
+  expect(read("docs/across-components/match-your-sites-look.md")).toContain(
+    "(/use-components/show-text/show-one-passage.md#match-your-sites-colors-and-fonts)",
+  );
 });

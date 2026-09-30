@@ -487,7 +487,7 @@ try {
       0,
       "acknowledgement is Home-only",
     );
-    await assertText(page.locator("body"), "Just the citation");
+    await assertText(page.locator("body"), "use a plain link to Sefaria");
     await assertText(
       page.locator("body"),
       "The alpha address always loads the newest build.",
