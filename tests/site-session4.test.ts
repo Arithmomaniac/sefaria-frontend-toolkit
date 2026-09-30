@@ -108,17 +108,15 @@ describe("C1 How the toolkit works", () => {
     expect(section(markdown, "without-components")).toContain("normalizeText");
   });
 
-  it("states the no-duplicate-request principle and the supplied-data rules", async () => {
+  it("explains composed elements without request-count framing", async () => {
     const markdown = await page();
-    expect(markdown).toMatch(
-      /children[^.]*(?:never fetch|no requests? of their own)/i,
+    expect(markdown).toMatch(/composed/i);
+    expect(markdown).toMatch(/Source Card[\s\S]{0,200}Reader/);
+    expect(markdown).not.toMatch(
+      /request count|no requests? of their own|never fetch/i,
     );
-    expect(markdown).not.toMatch(/Source Card[^.]*one[^.]*request/i);
-    expect(markdown).not.toMatch(/\bthree requests\b/i);
-    expect(markdown).toContain(
-      "(/use-components/show-an-attributed-passage.md",
-    );
-    expect(markdown).toContain("(/use-components/add-the-complete-reader.md");
+    expect(markdown).toContain("[Lit](https://lit.dev)");
+    expect(markdown).toMatch(/```mermaid\s+flowchart TD/);
     expect(markdown).toMatch(
       /no requests?|zero requests?|doesn't make a request|makes no request/i,
     );

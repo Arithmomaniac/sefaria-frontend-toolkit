@@ -10,21 +10,17 @@ description: "Follows one Source Card tag from your page to the screen: where it
 The easiest way to see how the toolkit fits together is to follow one tag from your page to the screen. This page follows `<sefaria-source-card sref="Micah 6:8">` and explains, at each step, why the toolkit behaves as it does.
 
 ```mermaid
-flowchart LR
-  A["You add a tag"] --> B{"Supplied data?"}
-  B -->|"yes"| E["Prepare text (text tools)"]
-  B -->|"no: load by sref"| L{"Loaded through"}
-  L -->|"client (Sefaria)"| E
-  L -->|"host capability"| E
-  E --> G["Show it and report back (status, events)"]
-  UI["Your own UI"] -.-> CL["Client"]
-  UI -.-> TT["Text tools"]
-  TT -.-> R["Your renderer (your own status)"]
+flowchart TD
+  A["You add a tag"] --> B{"Data supplied?"}
+  B -->|"yes"| PREP["Prepare text"]
+  B -->|"no"| LOAD["Load by sref"]
+  LOAD --> PREP
+  PREP --> SHOW["Show and report"]
 ```
 
 ## You add a tag
 
-You put the tag on your page. Behind it sit three packages. The client (`@arithmomaniac/sefaria-client`) fetches from Sefaria's API and checks each JSON response against a schema. The text tools (`@arithmomaniac/sefaria-text-transform`) clean text strings and know nothing about the client. The components (`@arithmomaniac/sefaria-web-components`) use both.
+You put the tag on your page. Behind it sit three packages. The client (`@arithmomaniac/sefaria-client`) fetches from Sefaria's API and checks each JSON response against a schema. The text tools (`@arithmomaniac/sefaria-text-transform`) clean text strings and know nothing about the client. The components (`@arithmomaniac/sefaria-web-components`) use both. The elements are standard web components built with [Lit](https://lit.dev).
 
 Importing the script or the package registers the elements but makes no request of its own. Any tag already on the page with an `sref` then loads as usual. The shared default client is created lazily, the first time an element needs it. Nothing renders on the server. The components run in the browser.
 
@@ -48,9 +44,9 @@ When the text comes from `sref`, the element has to ask Sefaria for it.
 
 ## Asking Sefaria
 
-The rule is the same everywhere: a parent fetches once and passes the data to its children. The children never fetch on their own, so the Source Card's child pieces add no requests of their own.
+Two elements are composed of other elements. The Source Card shows a Reference Label, and the Reader shows a Source Card and a Connections Panel. A composed element fetches the text once and hands it to the elements inside it. Nesting them doesn't cost extra loading.
 
-Each component's page gives its exact request count. See [Show an attributed passage](/use-components/show-an-attributed-passage.md) and [Add the complete Reader](/use-components/add-the-complete-reader.md). For how the client handles requests, including its cache, see [The client and Sefaria's API](/concepts/the-client-and-sefarias-api.md).
+The other elements load their own data when you use them on their own. Those are the Reference Label, Text Segment, Bilingual Segment, and Connections Panel. For how the client handles requests, including its cache, see [The client and Sefaria's API](/concepts/the-client-and-sefarias-api.md).
 
 Once the response arrives, the text still needs preparing.
 
