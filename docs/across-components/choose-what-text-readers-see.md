@@ -14,9 +14,7 @@ import textChoiceControls from "../../examples/site-snippets/text-choice-control
 
 This page puts the content choices for [Text Segment](/use-components/show-text/show-one-passage.md), [Bilingual Segment](/use-components/show-text/hebrew-and-translation.md), and [Source Card](/use-components/show-an-attributed-passage.md) side by side. Each choice is an HTML attribute, a setting you write inside the tag. You should already have one of those components working. If you don't have one, start with [Put your first source on a page](/use-components/start-here.md).
 
-<LiveEditor :code="textChoiceControls" title="Change the choices on a Source Card" />
-
-Change the menus to see which choices make a request. Vocalization and sides redraw without a request. Choosing French makes one new request.
+<LiveEditor :code="textChoiceControls" title="Change the choices on a Source Card">Change the menus. Vocalization and sides redraw without a request. Choosing a translation language makes a new request, or two if Sefaria falls back.</LiveEditor>
 
 ## The choices at a glance
 
