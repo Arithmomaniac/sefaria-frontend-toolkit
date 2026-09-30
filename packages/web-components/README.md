@@ -80,7 +80,7 @@ Reader owns source and links acquisition, cancellation, semantic history, Back, 
 | Reader | Same as Bilingual Segment | Same as Bilingual Segment; exact titles apply only to the root and its context |
 | Connections Panel | Existing link previews | No independent preview language or edition requests |
 
-`content-language` only changes visible sides; it does not change requests. `side-order` and `layout` still control arrangement. The four text-owning elements display actual edition/language attribution and accept `hide-attributions`.
+`content-language` only changes visible sides; it does not change requests. `side-order` and `layout` still control arrangement. Source Card and Reader display actual edition/language attribution and accept `hide-attributions`; Text Segment and Bilingual Segment display no attribution and accept no such property.
 
 For a strict French edition, add its exact title:
 
