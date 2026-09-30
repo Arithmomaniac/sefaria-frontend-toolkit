@@ -22,7 +22,7 @@ Check `status` first. Then use the event for the cause.
 
 The element fires `sefaria-<component>-error`, for example `sefaria-source-card-error`, when a live request or its preparation is rejected. The event's `detail` is `{ error, sref }`.
 
-For the five elements other than the Reader, a documented 400 or 404 answer and invalid supplied data show an error without that event. The Reader does fire `sefaria-reader-error` when it rejects a seed you supplied and when its first (root) load fails. See [When there's nothing to show](/use-components/add-the-complete-reader.md#when-there-s-nothing-to-show).
+For the four elements other than the Reader, a documented 400 or 404 answer and invalid supplied data show an error without that event. The Reader does fire `sefaria-reader-error` when it rejects a seed you supplied and when its first (root) load fails. See [When there's nothing to show](/use-components/add-the-complete-reader.md#when-there-s-nothing-to-show).
 
 There is no generic ready event, so read `status`.
 
