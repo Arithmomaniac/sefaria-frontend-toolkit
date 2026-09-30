@@ -312,7 +312,19 @@ async function buildCustomElementsManifest() {
       declaration.events = eventCatalog[declaration.tagName];
       declaration.slots ??= [];
       declaration.cssParts ??= [];
-      declaration.cssProperties = cssPropertyCatalog;
+      declaration.cssProperties =
+        declaration.tagName === "sefaria-text-segment"
+          ? cssPropertyCatalog.map((entry) =>
+              entry.name === "--sefaria-surface"
+                ? {
+                    ...entry,
+                    description:
+                      "Primary surface color. Text Segment is transparent unless this is set.",
+                    default: "transparent",
+                  }
+                : entry,
+            )
+          : cssPropertyCatalog;
     }
     modules.push(
       normalizeModulePaths({
@@ -453,6 +465,10 @@ function renderCustomElementsMarkdown(manifest) {
       `| \`${entry.name}\` | \`${entry.default}\` | ${entry.description} |`,
     );
   }
+  lines.push(
+    "",
+    "Exception: `<sefaria-text-segment>` defaults to a transparent background. It uses `--sefaria-surface` only when the host sets it on the element or an ancestor.",
+  );
   return `${lines.join("\n")}\n`;
 }
 
