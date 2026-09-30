@@ -44,9 +44,9 @@ When the text comes from `sref`, the element has to ask Sefaria for it.
 
 ## Asking Sefaria
 
-Two elements are composed of other elements. The Source Card shows a Reference Label, and the Reader shows a Source Card and a Connections Panel. A composed element fetches the text once and hands it to the elements inside it. Nesting them doesn't cost extra loading.
+Two elements are composed of other elements. The Source Card shows a heading and draws its text with Text Segments inside it, and the Reader shows a Source Card and a Connections Panel. A composed element fetches the text once and hands it to the elements inside it. Nesting them doesn't cost extra loading.
 
-The other elements load their own data when you use them on their own. Those are the Reference Label, Text Segment, Bilingual Segment, and Connections Panel. For how the client handles requests, including its cache, see [The client and Sefaria's API](/concepts/the-client-and-sefarias-api.md).
+The other elements load their own data when you use them on their own. Those are the Text Segment, Bilingual Segment, and Connections Panel. For how the client handles requests, including its cache, see [The client and Sefaria's API](/concepts/the-client-and-sefarias-api.md).
 
 Once the response arrives, the text still needs preparing.
 
