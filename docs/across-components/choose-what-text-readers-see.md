@@ -24,7 +24,7 @@ Three terms matter throughout:
 
 A request is one call from the page to Sefaria. A dash in the tables means the component has no such attribute. The Reader also has attributes that aren't about text choice.
 
-Each choice is an HTML attribute. You write it inside the tag. Every component takes sref.
+Each choice is an HTML attribute. You write it inside the tag.
 
 ## Two kinds of changes
 
