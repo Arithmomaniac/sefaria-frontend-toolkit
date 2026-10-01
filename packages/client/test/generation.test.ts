@@ -24,6 +24,7 @@ import {
   loadOverlayInputs,
   sha256,
   validateOpenApi30NullSemantics,
+  validateOverlayDocument,
   validatePreconditions,
   verifyChecksum,
   type JsonObject,
@@ -209,6 +210,47 @@ describe("OpenAPI generation", () => {
     }
   });
 
+  it("rejects overlay guards without non-empty titles and descriptions", () => {
+    const testOverlay: OverlayDocument = {
+      overlay: "1.1.0",
+      info: { title: "test", version: "1" },
+      extends: "./upstream.json",
+      "x-sefaria-guards": [
+        {
+          id: "missing-title",
+          title: "",
+          description: "Describes the correction.",
+          preconditions: [{ target: "$.target", expected: { absent: true } }],
+        },
+      ],
+      actions: [
+        {
+          "x-action-id": "update",
+          "x-correction-id": "missing-title",
+          target: "$.target",
+          update: true,
+        },
+      ],
+    };
+
+    expect(() => validateOverlayDocument(testOverlay)).toThrow(
+      /Overlay guard missing-title title/,
+    );
+    expect(() =>
+      validateOverlayDocument({
+        ...testOverlay,
+        "x-sefaria-guards": [
+          {
+            id: "missing-title",
+            title: "Test correction",
+            description: "",
+            preconditions: [{ target: "$.target", expected: { absent: true } }],
+          },
+        ],
+      }),
+    ).toThrow(/Overlay guard missing-title description/);
+  });
+
   it("rejects OpenAPI 3.0 nullable schemas without an explicit type", () => {
     expect(() =>
       validateOpenApi30NullSemantics({
@@ -254,6 +296,8 @@ describe("OpenAPI generation", () => {
       "x-sefaria-guards": [
         {
           id: "test",
+          title: "Test correction",
+          description: "Describes the test correction.",
           preconditions: [
             {
               target: "$.target",

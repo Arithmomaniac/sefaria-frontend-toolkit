@@ -1,6 +1,7 @@
 {
   "name": "@arithmomaniac/sefaria-text-transform",
   "version": "0.0.0",
+  "description": "Pure Sefaria text normalization, vocalization, footnote, and preview utilities.",
   "private": true,
   "type": "module",
   "license": "GPL-3.0-only",

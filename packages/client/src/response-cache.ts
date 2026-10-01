@@ -9,13 +9,13 @@ export const DEFAULT_SEFARIA_CACHE_MAX_ENTRIES = 100;
 /** Default maximum decoded response-body bytes retained per client. */
 export const DEFAULT_SEFARIA_CACHE_MAX_BYTES = 10 * 1024 * 1024;
 
-/** Limits for one client's in-memory response cache. */
+/** Limits for one client's bounded in-memory response cache. */
 export interface SefariaCacheOptions {
-  /** Time-to-live in milliseconds. Defaults to five minutes. */
+  /** Positive finite time-to-live in milliseconds for an admitted response. Defaults to five minutes. */
   readonly ttlMs?: number;
-  /** Maximum number of retained responses. Defaults to 100. */
+  /** Positive integer maximum number of admitted responses retained by one client. Defaults to 100. */
   readonly maxEntries?: number;
-  /** Maximum decoded response-body bytes. Defaults to 10 MiB. */
+  /** Positive integer maximum decoded response-body bytes retained by one client. Defaults to 10 MiB. */
   readonly maxBytes?: number;
 }
 
