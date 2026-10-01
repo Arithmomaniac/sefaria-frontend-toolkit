@@ -28,7 +28,7 @@ Use the CDN route if you want no install step. Use the package route if your app
 
 ### No install
 
-Import the files straight from the CDN. This needs no token. It works in a browser page with `<script type="module">`, in Deno, and anywhere else that imports from URLs. The Run buttons on this page use exactly these files.
+Import the client and the text tools straight from the CDN. Each has its own file, and this needs no token. It works in a browser page with `<script type="module">`, in Deno, and anywhere else that imports from URLs. The Run buttons on this page use exactly these files.
 
 ```html
 <script type="module">
@@ -40,7 +40,7 @@ Import the files straight from the CDN. This needs no token. It works in a brows
 </script>
 ```
 
-These files are ES modules, so import them. A plain script tag without `type="module"` won't work. Each import takes named functions, or use `import * as client from "…"` to take a whole file. [The three files](/help/install-and-status.md#the-three-files) gives the full picture.
+Both files are ES modules, so import them. A plain script tag without `type="module"` won't work. Each import takes named functions, or use `import * as client from "…"` to take a whole file. The components have a third file of their own. [Install and status](/help/install-and-status.md#the-three-files) compares all three.
 
 The `alpha` address serves the newest build, and it changes without notice. [Install and status](/help/install-and-status.md) shows how to find hosted versions.
 
