@@ -111,3 +111,13 @@ Example pages embed the complete first-party example apps, such as `/examples/li
 - Keep Mermaid edge labels to one or two words, such as Yes or No. Longer edge labels wrap and get clipped. Put detail in the node text or in the prose.
 
 - Install order: component pages put the script tag first, then the package. Data and text tools pages put the packages first, then the CDN import. Help › Install and status lists hosted files first, then packages, and its route paragraph uses the same order.
+
+## API entries
+
+`<ApiEntry>` is one property, event, or style setting in the generated components reference (`docs/reference/components.md`, written by `scripts/reference/components.ts`). Don't write it by hand; change the generator.
+
+- Props: `id` (the anchor), `name` (shown in code), `fields` (an array of `{ label, value, code? }`), and `level` (heading level, default 4). The default slot holds the description, so Markdown there works. Leave a blank line between the tag and the description.
+- It renders an anchored heading and a `<dl>` of `<dt>`/`<dd>` fields. The structure is the same at every width. A container query on the entry sets the layout: fields sit side by side, then stack below 560px of entry width. `code` values wrap with `overflow-wrap: anywhere`.
+- The generator escapes attribute values for Vue (`&`, `<`, `>`, `"`). `fields` is JSON in a `:fields` binding.
+- Anchors: elements keep `#<tag>`, `#events` and `#style-settings`. Properties use `<tag>-<attribute or property>` (for example `sefaria-source-card-translation-fallback`), events use `event-<event name>`, and style settings use `style-sefaria-<name>`.
+- `scripts/test-site.mjs` checks the page for horizontal overflow at 390px and for fields sharing a row at 1200px.

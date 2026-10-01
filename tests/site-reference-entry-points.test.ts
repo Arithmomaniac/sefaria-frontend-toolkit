@@ -217,6 +217,7 @@ describe("R1 components reference", () => {
     const declarations = manifest.modules.flatMap((m) => m.declarations);
     expect(declarations).toHaveLength(5);
     expect(page).toContain('<a id="events"></a>');
+    expect(page).not.toContain("| Property | Attribute |");
     for (const declaration of declarations) {
       const start = page.indexOf(`<a id="${declaration.tagName}"></a>`);
       expect(start).toBeGreaterThan(-1);
@@ -224,31 +225,34 @@ describe("R1 components reference", () => {
       expect(section).toContain("### Attributes and properties");
       expect(section).toContain("### Data");
       expect(section).toContain("### Empty state");
-      expect(section).toContain("| `sref` | `sref` |");
+      expect(section).toContain(
+        `<ApiEntry id="${declaration.tagName}-sref" name="sref"`,
+      );
       for (const event of declaration.events) {
-        expect(page).toContain(`\`${event.name}\``);
+        expect(page).toContain(`id="event-${event.name}" name="${event.name}"`);
       }
     }
     for (const property of declarations[0]!.cssProperties) {
-      expect(page).toContain(`\`${property.name}\``);
+      expect(page).toContain(`name="${property.name}"`);
     }
     expect(page).toContain('import "@arithmomaniac/sefaria-web-components";');
     expect(page).toContain(
-      '| <a id="sefaria-reader-back"></a>`sefaria-reader-back` | Requests navigation to the previous entry. Call `preventDefault()` to stop the Reader from going back. | `originEntryId`, the entry the Reader was showing | Yes |',
+      '<ApiEntry id="event-sefaria-reader-back" name="sefaria-reader-back"',
+    );
+    expect(page).toContain(
+      "Requests navigation to the previous entry. Call `preventDefault()` to stop the Reader from going back.",
     );
     expect(page).toMatch(
-      /\| <a id="sefaria-reader-error"><\/a>`sefaria-reader-error` \|.*\| No \|/u,
+      /id="event-sefaria-reader-error"[^\n]*Cancelable[^\n]*No/u,
     );
-    expect(page).not.toContain("| Element | Event | Description | Detail |");
-    expect(page).toContain("Read-only. Loading state");
+    expect(page).toMatch(/name="status"[^\n]*Read-only/u);
     expect(page).not.toContain("Read-only. Read-only");
     expect(page).not.toMatch(/`sefaria-sefaria`|bilingual-pair/u);
     expect(page).toMatch(
-      /\| `--sefaria-font-scale` \|[^\n]*`sefaria-reader`[^\n]*`sefaria-text-segment` \|/u,
+      /id="style-sefaria-font-scale"[^\n]*Used by[^\n]*sefaria-reader[^\n]*sefaria-text-segment/u,
     );
     expect(page).toContain("### CSS parts\n\nCSS parts: none.");
-    expect(page).toContain("| Property | Default | Description | Used by |");
-    expect(page).toContain("| `--sefaria-shadow` |");
+    expect(page).toContain('name="--sefaria-shadow"');
   });
 
   it("marks exactly the style tokens no component reads as reserved", async () => {
@@ -265,14 +269,24 @@ describe("R1 components reference", () => {
         )
         .map((file) => read(`${directory}/${file}`)),
     );
-    const rows = [...page.matchAll(/^\| `(--sefaria-[a-z-]+)` \|.*$/gmu)];
+    const rows = [
+      ...page.matchAll(
+        /<ApiEntry id="style-[^"]*" name="(--sefaria-[a-z-]+)" :fields="([^"]*)">\n\n([^\n]*)/gu,
+      ),
+    ];
     expect(rows.length).toBeGreaterThan(0);
     const reserved: string[] = [];
-    for (const [row, name] of rows) {
+    for (const [, name, fieldsJson, description] of rows) {
       const alias = name!.replace("--sefaria-", "--_sefaria-");
       const used = sources.some((source) => source.includes(`var(${alias}`));
-      const usedByCell = row.split("|").at(-2)?.trim();
-      expect(row.includes(RESERVED), name).toBe(!used);
+      const fields = JSON.parse(fieldsJson!.replaceAll("&quot;", '"')) as {
+        label: string;
+        value: string;
+      }[];
+      const usedByCell = fields.find(
+        (field) => field.label === "Used by",
+      )?.value;
+      expect(description!.includes(RESERVED), name).toBe(!used);
       if (used) {
         expect(usedByCell, name).not.toBe("—");
       } else {

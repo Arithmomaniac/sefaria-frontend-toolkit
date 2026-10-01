@@ -41,18 +41,65 @@ The `alpha` script-tag address serves the newest script release that is still ac
 
 Set an attribute in HTML or a property in JavaScript. If a property has no attribute, set it in JavaScript.
 
-| Property | Attribute | Type | Default | Description |
-| --- | --- | --- | --- | --- |
-| `sref` | `sref` | `string` | `""` | The Sefaria reference to load when `data` isn't set. |
-| `data` | — | `unknown \| undefined` | `undefined` | Sefaria API response data to render. When it's set, the element doesn't fetch anything. |
-| `source` | — | `SefariaDataSource \| undefined` | `undefined` | Where this element gets its data, instead of the shared data source. |
-| `versionLanguage` | `version-language` | `string \| undefined` | `undefined` | Language of the edition to show, instead of the primary edition. |
-| `versionTitle` | `version-title` | `string \| undefined` | `undefined` | `version-title` alone chooses another edition in the original language. To choose a translation by title, also set `translation-language`. |
-| `translationLanguage` | `translation-language` | `string \| undefined` | `undefined` | Preferred translation language. Can't be combined with `versionLanguage`. |
-| `translationFallback` | `translation-fallback` | `"default" \| "none"` | `"none"` | What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". |
-| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep. `none` removes both. |
-| `selectedVersion` | — | `TextSegmentSelectedVersionInfo \| undefined` | — | Read-only. Details of the edition currently shown. |
-| `status` | — | `SefariaElementStatus` | — | Read-only. Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
+<ApiEntry id="sefaria-text-segment-sref" name="sref" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;sref&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;\&quot;&quot;,&quot;code&quot;:true}]">
+
+The Sefaria reference to load when `data` isn't set.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-text-segment-data" name="data" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;unknown | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Sefaria API response data to render. When it's set, the element doesn't fetch anything.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-text-segment-source" name="source" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;SefariaDataSource | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Where this element gets its data, instead of the shared data source.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-text-segment-version-language" name="versionLanguage" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;version-language&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Language of the edition to show, instead of the primary edition.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-text-segment-version-title" name="versionTitle" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;version-title&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+`version-title` alone chooses another edition in the original language. To choose a translation by title, also set `translation-language`.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-text-segment-translation-language" name="translationLanguage" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;translation-language&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Preferred translation language. Can't be combined with `versionLanguage`.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-text-segment-translation-fallback" name="translationFallback" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;translation-fallback&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;\&quot;default\&quot; | \&quot;none\&quot;&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;none\&quot;&quot;,&quot;code&quot;:true}]">
+
+What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.".
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-text-segment-vocalization-mode" name="vocalizationMode" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;vocalization-mode&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;VocalizationMode&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;taamim_and_nikkud\&quot;&quot;,&quot;code&quot;:true}]">
+
+How much Hebrew vowel and cantillation marking to keep. `none` removes both.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-text-segment-selectedVersion" name="selectedVersion" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;TextSegmentSelectedVersionInfo | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;—&quot;,&quot;code&quot;:false},{&quot;label&quot;:&quot;Access&quot;,&quot;value&quot;:&quot;Read-only&quot;}]">
+
+Details of the edition currently shown.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-text-segment-status" name="status" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;SefariaElementStatus&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;—&quot;,&quot;code&quot;:false},{&quot;label&quot;:&quot;Access&quot;,&quot;value&quot;:&quot;Read-only&quot;}]">
+
+Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`.
+
+</ApiEntry>
 
 ### Data
 
@@ -64,9 +111,11 @@ The element shows its empty state when the chosen edition has no text. The messa
 
 ### Events
 
-| Event | Description | Detail | Cancelable |
-| --- | --- | --- | --- |
-| <a id="sefaria-text-segment-error"></a>`sefaria-text-segment-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No |
+<ApiEntry id="event-sefaria-text-segment-error" name="sefaria-text-segment-error" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;error is the original failure. sref is the reference that was loading.&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;No&quot;}]">
+
+Reports a failure while loading or validating data from `sref`.
+
+</ApiEntry>
 
 ### CSS parts
 
@@ -82,20 +131,77 @@ CSS parts: none.
 
 Set an attribute in HTML or a property in JavaScript. If a property has no attribute, set it in JavaScript.
 
-| Property | Attribute | Type | Default | Description |
-| --- | --- | --- | --- | --- |
-| `sref` | `sref` | `string` | `""` | The Sefaria reference to load when `data` isn't set. |
-| `data` | — | `unknown \| undefined` | `undefined` | Sefaria API response data to render. When it's set, the element doesn't fetch anything. |
-| `source` | — | `SefariaDataSource \| undefined` | `undefined` | Where this element gets its data, instead of the shared data source. |
-| `primaryVersionTitle` | `primary-version-title` | `string \| undefined` | `undefined` | Exact title of the edition to show as the primary text. |
-| `translationVersionTitle` | `translation-version-title` | `string \| undefined` | `undefined` | Exact title of the edition to show as the translation. |
-| `translationLanguage` | `translation-language` | `string \| undefined` | `undefined` | Preferred translation language. `translationFallback` controls what happens when Sefaria has none. |
-| `translationFallback` | `translation-fallback` | `"default" \| "none"` | `"none"` | What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". |
-| `contentLanguage` | `content-language` | `BilingualSegmentContentLanguage` | `"both"` | Which text to show: `primary`, `translation` or `both`. |
-| `layout` | `layout` | `BilingualSegmentLayout` | `"auto"` | How the two texts are arranged: `auto`, `stacked` or `side-by-side`. |
-| `sideOrder` | `side-order` | `BilingualSegmentSideOrder` | `"primary-first"` | Which text comes first side by side: `primary-first` or `translation-first`. |
-| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep. `none` removes both. |
-| `status` | — | `SefariaElementStatus` | — | Read-only. Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
+<ApiEntry id="sefaria-bilingual-segment-sref" name="sref" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;sref&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;\&quot;&quot;,&quot;code&quot;:true}]">
+
+The Sefaria reference to load when `data` isn't set.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-bilingual-segment-data" name="data" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;unknown | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Sefaria API response data to render. When it's set, the element doesn't fetch anything.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-bilingual-segment-source" name="source" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;SefariaDataSource | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Where this element gets its data, instead of the shared data source.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-bilingual-segment-primary-version-title" name="primaryVersionTitle" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;primary-version-title&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Exact title of the edition to show as the primary text.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-bilingual-segment-translation-version-title" name="translationVersionTitle" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;translation-version-title&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Exact title of the edition to show as the translation.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-bilingual-segment-translation-language" name="translationLanguage" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;translation-language&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Preferred translation language. `translationFallback` controls what happens when Sefaria has none.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-bilingual-segment-translation-fallback" name="translationFallback" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;translation-fallback&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;\&quot;default\&quot; | \&quot;none\&quot;&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;none\&quot;&quot;,&quot;code&quot;:true}]">
+
+What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.".
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-bilingual-segment-content-language" name="contentLanguage" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;content-language&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;BilingualSegmentContentLanguage&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;both\&quot;&quot;,&quot;code&quot;:true}]">
+
+Which text to show: `primary`, `translation` or `both`.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-bilingual-segment-layout" name="layout" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;layout&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;BilingualSegmentLayout&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;auto\&quot;&quot;,&quot;code&quot;:true}]">
+
+How the two texts are arranged: `auto`, `stacked` or `side-by-side`.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-bilingual-segment-side-order" name="sideOrder" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;side-order&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;BilingualSegmentSideOrder&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;primary-first\&quot;&quot;,&quot;code&quot;:true}]">
+
+Which text comes first side by side: `primary-first` or `translation-first`.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-bilingual-segment-vocalization-mode" name="vocalizationMode" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;vocalization-mode&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;VocalizationMode&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;taamim_and_nikkud\&quot;&quot;,&quot;code&quot;:true}]">
+
+How much Hebrew vowel and cantillation marking to keep. `none` removes both.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-bilingual-segment-status" name="status" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;SefariaElementStatus&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;—&quot;,&quot;code&quot;:false},{&quot;label&quot;:&quot;Access&quot;,&quot;value&quot;:&quot;Read-only&quot;}]">
+
+Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`.
+
+</ApiEntry>
 
 ### Data
 
@@ -107,9 +213,11 @@ The element shows its empty state when neither side has text. Each missing side 
 
 ### Events
 
-| Event | Description | Detail | Cancelable |
-| --- | --- | --- | --- |
-| <a id="sefaria-bilingual-segment-error"></a>`sefaria-bilingual-segment-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No |
+<ApiEntry id="event-sefaria-bilingual-segment-error" name="sefaria-bilingual-segment-error" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;error is the original failure. sref is the reference that was loading.&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;No&quot;}]">
+
+Reports a failure while loading or validating data from `sref`.
+
+</ApiEntry>
 
 ### CSS parts
 
@@ -125,24 +233,101 @@ CSS parts: none.
 
 Set an attribute in HTML or a property in JavaScript. If a property has no attribute, set it in JavaScript.
 
-| Property | Attribute | Type | Default | Description |
-| --- | --- | --- | --- | --- |
-| `sref` | `sref` | `string` | `""` | The Sefaria reference to load when `data` isn't set. |
-| `data` | — | `unknown \| undefined` | `undefined` | Sefaria API response data to render. When it's set, the element doesn't fetch anything. |
-| `source` | — | `SefariaDataSource \| undefined` | `undefined` | Where this element gets its data, instead of the shared data source. |
-| `primaryVersionTitle` | `primary-version-title` | `string \| undefined` | `undefined` | Exact title of the edition to show as the primary text. |
-| `translationVersionTitle` | `translation-version-title` | `string \| undefined` | `undefined` | Exact title of the edition to show as the translation. |
-| `translationLanguage` | `translation-language` | `string \| undefined` | `undefined` | Preferred translation language. `translationFallback` controls what happens when Sefaria has none. |
-| `translationFallback` | `translation-fallback` | `"default" \| "none"` | `"default"` | What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". |
-| `contentLanguage` | `content-language` | `BilingualPairContentLanguage` | `"both"` | Which text to show: `primary`, `translation` or `both`. |
-| `layout` | `layout` | `BilingualPairLayout` | `"auto"` | How each pair of texts is arranged: `auto`, `stacked` or `side-by-side`. |
-| `sideOrder` | `side-order` | `BilingualPairSideOrder` | `"primary-first"` | Which text comes first side by side: `primary-first` or `translation-first`. |
-| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep. `none` removes both. |
-| `showAddressLabels` | — | `boolean` | `true` | Whether small reference labels are shown beside the texts. |
-| `selectable` | `selectable` | `boolean` | `false` | Lets readers select the verses that have their own reference. |
-| `selectedPosition` | — | `readonly number[] \| undefined` | `undefined` | Position of the selected verse, as an array of numbers rather than a reference. |
-| `hideAttributions` | `hide-attributions` | `boolean` | `false` | Hides the edition attribution. |
-| `status` | — | `SefariaElementStatus` | — | Read-only. Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
+<ApiEntry id="sefaria-source-card-sref" name="sref" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;sref&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;\&quot;&quot;,&quot;code&quot;:true}]">
+
+The Sefaria reference to load when `data` isn't set.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-source-card-data" name="data" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;unknown | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Sefaria API response data to render. When it's set, the element doesn't fetch anything.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-source-card-source" name="source" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;SefariaDataSource | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Where this element gets its data, instead of the shared data source.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-source-card-primary-version-title" name="primaryVersionTitle" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;primary-version-title&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Exact title of the edition to show as the primary text.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-source-card-translation-version-title" name="translationVersionTitle" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;translation-version-title&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Exact title of the edition to show as the translation.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-source-card-translation-language" name="translationLanguage" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;translation-language&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Preferred translation language. `translationFallback` controls what happens when Sefaria has none.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-source-card-translation-fallback" name="translationFallback" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;translation-fallback&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;\&quot;default\&quot; | \&quot;none\&quot;&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;default\&quot;&quot;,&quot;code&quot;:true}]">
+
+What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.".
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-source-card-content-language" name="contentLanguage" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;content-language&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;BilingualPairContentLanguage&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;both\&quot;&quot;,&quot;code&quot;:true}]">
+
+Which text to show: `primary`, `translation` or `both`.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-source-card-layout" name="layout" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;layout&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;BilingualPairLayout&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;auto\&quot;&quot;,&quot;code&quot;:true}]">
+
+How each pair of texts is arranged: `auto`, `stacked` or `side-by-side`.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-source-card-side-order" name="sideOrder" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;side-order&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;BilingualPairSideOrder&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;primary-first\&quot;&quot;,&quot;code&quot;:true}]">
+
+Which text comes first side by side: `primary-first` or `translation-first`.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-source-card-vocalization-mode" name="vocalizationMode" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;vocalization-mode&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;VocalizationMode&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;taamim_and_nikkud\&quot;&quot;,&quot;code&quot;:true}]">
+
+How much Hebrew vowel and cantillation marking to keep. `none` removes both.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-source-card-showAddressLabels" name="showAddressLabels" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;boolean&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;true&quot;,&quot;code&quot;:true}]">
+
+Whether small reference labels are shown beside the texts.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-source-card-selectable" name="selectable" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;selectable&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;boolean&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;false&quot;,&quot;code&quot;:true}]">
+
+Lets readers select the verses that have their own reference.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-source-card-selectedPosition" name="selectedPosition" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;readonly number[] | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Position of the selected verse, as an array of numbers rather than a reference.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-source-card-hide-attributions" name="hideAttributions" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;hide-attributions&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;boolean&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;false&quot;,&quot;code&quot;:true}]">
+
+Hides the edition attribution.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-source-card-status" name="status" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;SefariaElementStatus&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;—&quot;,&quot;code&quot;:false},{&quot;label&quot;:&quot;Access&quot;,&quot;value&quot;:&quot;Read-only&quot;}]">
+
+Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`.
+
+</ApiEntry>
 
 ### Data
 
@@ -154,10 +339,17 @@ The element shows its empty state when the response has no text for either side.
 
 ### Events
 
-| Event | Description | Detail | Cancelable |
-| --- | --- | --- | --- |
-| <a id="sefaria-source-select"></a>`sefaria-source-select` | Reports that a reader selected one item in the source card. | `position` is the selected segment's position as an array of numbers. `ref` is its reference. | No |
-| <a id="sefaria-source-card-error"></a>`sefaria-source-card-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No |
+<ApiEntry id="event-sefaria-source-select" name="sefaria-source-select" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;position is the selected segment's position as an array of numbers. ref is its reference.&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;No&quot;}]">
+
+Reports that a reader selected one item in the source card.
+
+</ApiEntry>
+
+<ApiEntry id="event-sefaria-source-card-error" name="sefaria-source-card-error" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;error is the original failure. sref is the reference that was loading.&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;No&quot;}]">
+
+Reports a failure while loading or validating data from `sref`.
+
+</ApiEntry>
 
 ### CSS parts
 
@@ -173,16 +365,53 @@ CSS parts: none.
 
 Set an attribute in HTML or a property in JavaScript. If a property has no attribute, set it in JavaScript.
 
-| Property | Attribute | Type | Default | Description |
-| --- | --- | --- | --- | --- |
-| `sref` | `sref` | `string` | `""` | The Sefaria reference to load when `data` isn't set. |
-| `source` | — | `SefariaDataSource \| undefined` | `undefined` | Where this element gets its data, instead of the shared data source. |
-| `withText` | `with-text` | `boolean` | `true` | Whether the links include the connected texts. |
-| `category` | `category` | `string \| undefined` | `undefined` | Category of the loaded links to show. |
-| `page` | `page` | `number` | `0` | Zero-based page of the loaded links to show. |
-| `showPreviews` | `show-previews` | `boolean` | `true` | Shows or hides the text previews already loaded, without fetching more. |
-| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep in previews. `none` removes both. |
-| `status` | — | `SefariaElementStatus` | — | Read-only. Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
+<ApiEntry id="sefaria-connections-panel-sref" name="sref" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;sref&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;\&quot;&quot;,&quot;code&quot;:true}]">
+
+The Sefaria reference to load when `data` isn't set.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-connections-panel-source" name="source" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;SefariaDataSource | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Where this element gets its data, instead of the shared data source.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-connections-panel-with-text" name="withText" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;with-text&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;boolean&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;true&quot;,&quot;code&quot;:true}]">
+
+Whether the links include the connected texts.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-connections-panel-category" name="category" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;category&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Category of the loaded links to show.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-connections-panel-page" name="page" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;page&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;number&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;0&quot;,&quot;code&quot;:true}]">
+
+Zero-based page of the loaded links to show.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-connections-panel-show-previews" name="showPreviews" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;show-previews&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;boolean&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;true&quot;,&quot;code&quot;:true}]">
+
+Shows or hides the text previews already loaded, without fetching more.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-connections-panel-vocalization-mode" name="vocalizationMode" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;vocalization-mode&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;VocalizationMode&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;taamim_and_nikkud\&quot;&quot;,&quot;code&quot;:true}]">
+
+How much Hebrew vowel and cantillation marking to keep in previews. `none` removes both.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-connections-panel-status" name="status" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;SefariaElementStatus&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;—&quot;,&quot;code&quot;:false},{&quot;label&quot;:&quot;Access&quot;,&quot;value&quot;:&quot;Read-only&quot;}]">
+
+Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`.
+
+</ApiEntry>
 
 ### Data
 
@@ -194,13 +423,35 @@ The element shows its empty state when no text connections remain after the elem
 
 ### Events
 
-| Event | Description | Detail | Cancelable |
-| --- | --- | --- | --- |
-| <a id="sefaria-connections-category-change"></a>`sefaria-connections-category-change` | Asks to show a different connection category. Call `preventDefault()` to stop the panel from switching to that category and returning to the first page. | `category` is the chosen category's ID, or `null` for all categories. | Yes |
-| <a id="sefaria-connections-preview-request"></a>`sefaria-connections-preview-request` | Requests connection previews. The element loads them unless a listener cancels the event. Call `preventDefault()` to stop the panel from loading previews itself. If you don't call it, a panel that loads from `sref` requests the connections again with their text. | No fields. | Yes |
-| <a id="sefaria-connections-page-change"></a>`sefaria-connections-page-change` | Asks to show a different page of connections. Call `preventDefault()` to stop the panel from changing page. | `page` is the zero-based page number. | Yes |
-| <a id="sefaria-connection-select"></a>`sefaria-connection-select` | Reports that a reader selected one connected reference. Call `preventDefault()` to do nothing. The panel has no default action for this event. | `id` is the connection's ID. `targetRef` is the connected text's reference. | Yes |
-| <a id="sefaria-connections-panel-error"></a>`sefaria-connections-panel-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No |
+<ApiEntry id="event-sefaria-connections-category-change" name="sefaria-connections-category-change" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;category is the chosen category's ID, or null for all categories.&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;Yes&quot;}]">
+
+Asks to show a different connection category. Call `preventDefault()` to stop the panel from switching to that category and returning to the first page.
+
+</ApiEntry>
+
+<ApiEntry id="event-sefaria-connections-preview-request" name="sefaria-connections-preview-request" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;No fields.&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;Yes&quot;}]">
+
+Requests connection previews. The element loads them unless a listener cancels the event. Call `preventDefault()` to stop the panel from loading previews itself. If you don't call it, a panel that loads from `sref` requests the connections again with their text.
+
+</ApiEntry>
+
+<ApiEntry id="event-sefaria-connections-page-change" name="sefaria-connections-page-change" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;page is the zero-based page number.&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;Yes&quot;}]">
+
+Asks to show a different page of connections. Call `preventDefault()` to stop the panel from changing page.
+
+</ApiEntry>
+
+<ApiEntry id="event-sefaria-connection-select" name="sefaria-connection-select" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;id is the connection's ID. targetRef is the connected text's reference.&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;Yes&quot;}]">
+
+Reports that a reader selected one connected reference. Call `preventDefault()` to do nothing. The panel has no default action for this event.
+
+</ApiEntry>
+
+<ApiEntry id="event-sefaria-connections-panel-error" name="sefaria-connections-panel-error" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;error is the original failure. sref is the reference that was loading.&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;No&quot;}]">
+
+Reports a failure while loading or validating data from `sref`.
+
+</ApiEntry>
 
 ### CSS parts
 
@@ -216,29 +467,131 @@ CSS parts: none.
 
 Set an attribute in HTML or a property in JavaScript. If a property has no attribute, set it in JavaScript.
 
-| Property | Attribute | Type | Default | Description |
-| --- | --- | --- | --- | --- |
-| `sref` | `sref` | `string` | `""` | The reference the Reader starts from. Navigating inside the Reader doesn't change it. |
-| `source` | — | `SefariaDataSource \| undefined` | `undefined` | Where this element gets its data, instead of the shared data source. |
-| `translationLanguage` | `translation-language` | `string \| undefined` | `undefined` | Preferred translation language, for the starting text and texts you navigate to. |
-| `translationFallback` | `translation-fallback` | `"default" \| "none"` | `"default"` | What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". |
-| `primaryVersionTitle` | `primary-version-title` | `string \| undefined` | `undefined` | Exact title of the primary edition for the starting reference. |
-| `translationVersionTitle` | `translation-version-title` | `string \| undefined` | `undefined` | Exact title of the translation edition for the starting reference. |
-| `hideAttributions` | `hide-attributions` | `boolean` | `false` | Hides the edition attribution on the source card. |
-| `activePane` | `active-pane` | `ReaderPane` | `"source"` | Which pane the compact layout shows: `source` or `connections`. |
-| `chatExport` | `chat-export` | `boolean` | `false` | Shows a button that sends the selected reference to your page's chat, when one is selected. |
-| `contentLanguage` | `content-language` | `BilingualPairContentLanguage` | `"both"` | Which text the source card shows: `primary`, `translation` or `both`. |
-| `layout` | `layout` | `BilingualPairLayout` | `"auto"` | How the source card arranges its two texts: `auto`, `stacked` or `side-by-side`. |
-| `sideOrder` | `side-order` | `BilingualPairSideOrder` | `"primary-first"` | Which text comes first side by side: `primary-first` or `translation-first`. |
-| `showConnectionPreviews` | `show-connection-previews` | `boolean` | `true` | Whether connection previews are shown. |
-| `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep. `none` removes both. |
-| `status` | — | `SefariaElementStatus` | — | Read-only. Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
-| `currentEntryId` | — | `string \| undefined` | — | Read-only. The ID of the current history entry. |
-| `selectedRef` | — | `string \| undefined` | — | Read-only. The selected reference, when there is one. |
-| `rootLoading` | — | `boolean` | — | Read-only. Whether the starting text is still loading. |
-| `readerError` | — | `string \| undefined` | — | Read-only. The error message, when the latest action failed. |
-| `canGoBack` | — | `boolean` | — | Read-only. Whether Back can return to an earlier entry. |
-| `historyTruncated` | — | `boolean` | — | Read-only. Whether older history entries were dropped to stay within the history limit. |
+<ApiEntry id="sefaria-reader-sref" name="sref" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;sref&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;\&quot;&quot;,&quot;code&quot;:true}]">
+
+The reference the Reader starts from. Navigating inside the Reader doesn't change it.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-source" name="source" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;SefariaDataSource | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Where this element gets its data, instead of the shared data source.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-translation-language" name="translationLanguage" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;translation-language&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Preferred translation language, for the starting text and texts you navigate to.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-translation-fallback" name="translationFallback" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;translation-fallback&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;\&quot;default\&quot; | \&quot;none\&quot;&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;default\&quot;&quot;,&quot;code&quot;:true}]">
+
+What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.".
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-primary-version-title" name="primaryVersionTitle" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;primary-version-title&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Exact title of the primary edition for the starting reference.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-translation-version-title" name="translationVersionTitle" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;translation-version-title&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+
+Exact title of the translation edition for the starting reference.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-hide-attributions" name="hideAttributions" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;hide-attributions&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;boolean&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;false&quot;,&quot;code&quot;:true}]">
+
+Hides the edition attribution on the source card.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-active-pane" name="activePane" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;active-pane&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;ReaderPane&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;source\&quot;&quot;,&quot;code&quot;:true}]">
+
+Which pane the compact layout shows: `source` or `connections`.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-chat-export" name="chatExport" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;chat-export&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;boolean&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;false&quot;,&quot;code&quot;:true}]">
+
+Shows a button that sends the selected reference to your page's chat, when one is selected.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-content-language" name="contentLanguage" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;content-language&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;BilingualPairContentLanguage&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;both\&quot;&quot;,&quot;code&quot;:true}]">
+
+Which text the source card shows: `primary`, `translation` or `both`.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-layout" name="layout" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;layout&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;BilingualPairLayout&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;auto\&quot;&quot;,&quot;code&quot;:true}]">
+
+How the source card arranges its two texts: `auto`, `stacked` or `side-by-side`.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-side-order" name="sideOrder" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;side-order&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;BilingualPairSideOrder&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;primary-first\&quot;&quot;,&quot;code&quot;:true}]">
+
+Which text comes first side by side: `primary-first` or `translation-first`.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-show-connection-previews" name="showConnectionPreviews" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;show-connection-previews&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;boolean&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;true&quot;,&quot;code&quot;:true}]">
+
+Whether connection previews are shown.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-vocalization-mode" name="vocalizationMode" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;vocalization-mode&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;VocalizationMode&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;taamim_and_nikkud\&quot;&quot;,&quot;code&quot;:true}]">
+
+How much Hebrew vowel and cantillation marking to keep. `none` removes both.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-status" name="status" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;SefariaElementStatus&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;—&quot;,&quot;code&quot;:false},{&quot;label&quot;:&quot;Access&quot;,&quot;value&quot;:&quot;Read-only&quot;}]">
+
+Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-currentEntryId" name="currentEntryId" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;—&quot;,&quot;code&quot;:false},{&quot;label&quot;:&quot;Access&quot;,&quot;value&quot;:&quot;Read-only&quot;}]">
+
+The ID of the current history entry.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-selectedRef" name="selectedRef" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;—&quot;,&quot;code&quot;:false},{&quot;label&quot;:&quot;Access&quot;,&quot;value&quot;:&quot;Read-only&quot;}]">
+
+The selected reference, when there is one.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-rootLoading" name="rootLoading" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;boolean&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;—&quot;,&quot;code&quot;:false},{&quot;label&quot;:&quot;Access&quot;,&quot;value&quot;:&quot;Read-only&quot;}]">
+
+Whether the starting text is still loading.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-readerError" name="readerError" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;—&quot;,&quot;code&quot;:false},{&quot;label&quot;:&quot;Access&quot;,&quot;value&quot;:&quot;Read-only&quot;}]">
+
+The error message, when the latest action failed.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-canGoBack" name="canGoBack" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;boolean&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;—&quot;,&quot;code&quot;:false},{&quot;label&quot;:&quot;Access&quot;,&quot;value&quot;:&quot;Read-only&quot;}]">
+
+Whether Back can return to an earlier entry.
+
+</ApiEntry>
+
+<ApiEntry id="sefaria-reader-historyTruncated" name="historyTruncated" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;None. Set it in JavaScript.&quot;},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;boolean&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;—&quot;,&quot;code&quot;:false},{&quot;label&quot;:&quot;Access&quot;,&quot;value&quot;:&quot;Read-only&quot;}]">
+
+Whether older history entries were dropped to stay within the history limit.
+
+</ApiEntry>
 
 ### Data
 
@@ -250,18 +603,65 @@ A Reader that has never had `sref` is blank. Its status is `empty`. A missing pa
 
 ### Events
 
-| Event | Description | Detail | Cancelable |
-| --- | --- | --- | --- |
-| <a id="sefaria-reader-back"></a>`sefaria-reader-back` | Requests navigation to the previous entry. Call `preventDefault()` to stop the Reader from going back. | `originEntryId`, the entry the Reader was showing | Yes |
-| <a id="sefaria-reader-history-activate"></a>`sefaria-reader-history-activate` | Asks to return to one saved history entry. Call `preventDefault()` to stop the Reader from returning to that entry. | `originEntryId` is the entry the Reader was showing. `entryId` is the history entry chosen. `label` is its label. | Yes |
-| <a id="sefaria-reader-pane-change"></a>`sefaria-reader-pane-change` | Asks to show a different pane in the compact layout. Call `preventDefault()` to stop the Reader from switching pane. | `originEntryId` is the entry the Reader was showing. `pane` is `"source"` or `"connections"`. | Yes |
-| <a id="sefaria-reader-chat-export"></a>`sefaria-reader-chat-export` | Asks your page to send a reference to chat. Call `preventDefault()` to do nothing. The Reader has no default action. Your page handles the export. | `originEntryId` is the entry the Reader was showing. `targetRef` is the reference to send. | Yes |
-| <a id="sefaria-reader-source-select"></a>`sefaria-reader-source-select` | Reports that a reader selected one item in the source card. Call `preventDefault()` to stop the Reader from selecting that segment. | `originEntryId` is the entry the Reader was showing. `position` and `ref` are the same as in `sefaria-source-select`. | Yes |
-| <a id="sefaria-reader-connections-category-change"></a>`sefaria-reader-connections-category-change` | Asks to show a different connection category. Call `preventDefault()` to stop the Reader from switching category. | `originEntryId` is the entry the Reader was showing. `category` is the same as in `sefaria-connections-category-change`. | Yes |
-| <a id="sefaria-reader-connections-page-change"></a>`sefaria-reader-connections-page-change` | Asks to show a different connection page. Call `preventDefault()` to stop the Reader from changing page. | `originEntryId` is the entry the Reader was showing. `page` is the same as in `sefaria-connections-page-change`. | Yes |
-| <a id="sefaria-reader-connection-select"></a>`sefaria-reader-connection-select` | Reports that a reader selected one connected reference. Call `preventDefault()` to stop the Reader from opening the connected text. | `originEntryId` is the entry the Reader was showing. `id` and `targetRef` are the same as in `sefaria-connection-select`. | Yes |
-| <a id="sefaria-reader-connections-preview-request"></a>`sefaria-reader-connections-preview-request` | Requests connection previews. The element loads them unless a listener cancels the event. Call `preventDefault()` to stop the Reader from loading previews. | `originEntryId` | Yes |
-| <a id="sefaria-reader-error"></a>`sefaria-reader-error` | Reports a loading failure or a rejection of the starting data. | `error` is the original failure. `sref` is the Reader's requested reference. It can be empty when the failure came from supplied `data`. | No |
+<ApiEntry id="event-sefaria-reader-back" name="sefaria-reader-back" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;originEntryId, the entry the Reader was showing&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;Yes&quot;}]">
+
+Requests navigation to the previous entry. Call `preventDefault()` to stop the Reader from going back.
+
+</ApiEntry>
+
+<ApiEntry id="event-sefaria-reader-history-activate" name="sefaria-reader-history-activate" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;originEntryId is the entry the Reader was showing. entryId is the history entry chosen. label is its label.&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;Yes&quot;}]">
+
+Asks to return to one saved history entry. Call `preventDefault()` to stop the Reader from returning to that entry.
+
+</ApiEntry>
+
+<ApiEntry id="event-sefaria-reader-pane-change" name="sefaria-reader-pane-change" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;originEntryId is the entry the Reader was showing. pane is \&quot;source\&quot; or \&quot;connections\&quot;.&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;Yes&quot;}]">
+
+Asks to show a different pane in the compact layout. Call `preventDefault()` to stop the Reader from switching pane.
+
+</ApiEntry>
+
+<ApiEntry id="event-sefaria-reader-chat-export" name="sefaria-reader-chat-export" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;originEntryId is the entry the Reader was showing. targetRef is the reference to send.&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;Yes&quot;}]">
+
+Asks your page to send a reference to chat. Call `preventDefault()` to do nothing. The Reader has no default action. Your page handles the export.
+
+</ApiEntry>
+
+<ApiEntry id="event-sefaria-reader-source-select" name="sefaria-reader-source-select" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;originEntryId is the entry the Reader was showing. position and ref are the same as in sefaria-source-select.&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;Yes&quot;}]">
+
+Reports that a reader selected one item in the source card. Call `preventDefault()` to stop the Reader from selecting that segment.
+
+</ApiEntry>
+
+<ApiEntry id="event-sefaria-reader-connections-category-change" name="sefaria-reader-connections-category-change" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;originEntryId is the entry the Reader was showing. category is the same as in sefaria-connections-category-change.&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;Yes&quot;}]">
+
+Asks to show a different connection category. Call `preventDefault()` to stop the Reader from switching category.
+
+</ApiEntry>
+
+<ApiEntry id="event-sefaria-reader-connections-page-change" name="sefaria-reader-connections-page-change" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;originEntryId is the entry the Reader was showing. page is the same as in sefaria-connections-page-change.&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;Yes&quot;}]">
+
+Asks to show a different connection page. Call `preventDefault()` to stop the Reader from changing page.
+
+</ApiEntry>
+
+<ApiEntry id="event-sefaria-reader-connection-select" name="sefaria-reader-connection-select" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;originEntryId is the entry the Reader was showing. id and targetRef are the same as in sefaria-connection-select.&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;Yes&quot;}]">
+
+Reports that a reader selected one connected reference. Call `preventDefault()` to stop the Reader from opening the connected text.
+
+</ApiEntry>
+
+<ApiEntry id="event-sefaria-reader-connections-preview-request" name="sefaria-reader-connections-preview-request" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;originEntryId&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;Yes&quot;}]">
+
+Requests connection previews. The element loads them unless a listener cancels the event. Call `preventDefault()` to stop the Reader from loading previews.
+
+</ApiEntry>
+
+<ApiEntry id="event-sefaria-reader-error" name="sefaria-reader-error" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;error is the original failure. sref is the Reader's requested reference. It can be empty when the failure came from supplied data.&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;No&quot;}]">
+
+Reports a loading failure or a rejection of the starting data.
+
+</ApiEntry>
 
 ### Slots
 
@@ -296,23 +696,110 @@ Invalid supplied `data` puts an element into its error state. The Reader reports
 
 The elements share these CSS custom properties. Not every element uses every one. Set them on the element or on any ancestor. [Match your site's look](/across-components/match-your-sites-look.md) shows how.
 
-| Property | Default | Description | Used by |
-| --- | --- | --- | --- |
-| `--sefaria-surface` | `transparent` | Primary surface color. Text Segment is transparent unless this is set. | `sefaria-bilingual-segment`, `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card`, `sefaria-text-segment` |
-| `--sefaria-surface-muted` | `light-dark(#f5f1e8, #222521)` | Muted surface color. | `sefaria-reader`, `sefaria-source-card` |
-| `--sefaria-fg` | `light-dark(#25231f, #f1eee7)` | Primary foreground color. | `sefaria-bilingual-segment`, `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card`, `sefaria-text-segment` |
-| `--sefaria-fg-muted` | `light-dark(#6d675d, #bdb7ac)` | Muted foreground color. | `sefaria-bilingual-segment`, `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card`, `sefaria-text-segment` |
-| `--sefaria-border` | `light-dark(#d7cfc1, #555b53)` | Standard border color. | `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card` |
-| `--sefaria-border-strong` | `light-dark(#aaa094, #73796f)` | Reserved. No component uses it yet. Strong border color. | — |
-| `--sefaria-accent` | `light-dark(#8e2449, #ff93b4)` | Accent and focus color. | `sefaria-reader`, `sefaria-source-card` |
-| `--sefaria-accent-soft` | `light-dark(rgb(142 36 73 / 10%), rgb(255 147 180 / 14%))` | Reserved. No component uses it yet. Translucent accent surface. | — |
-| `--sefaria-danger` | `light-dark(#9c1c1c, #ffaaa4)` | Reserved. No component uses it yet. Error foreground color. | — |
-| `--sefaria-link` | `light-dark(#8e2449, #ff93b4)` | Link foreground color. | `sefaria-reader`, `sefaria-source-card` |
-| `--sefaria-shadow` | `0 1rem 3rem rgb(0 0 0 / 28%)` | Reserved. No component uses it yet. Elevated-surface shadow. | — |
-| `--sefaria-panel-radius` | `0.75rem` | Panel corner radius. | `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card` |
-| `--sefaria-control-radius` | `0.3rem` | Control corner radius. | `sefaria-connections-panel`, `sefaria-source-card` |
-| `--sefaria-font-scale` | `1` | Component font-size multiplier. | `sefaria-bilingual-segment`, `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card`, `sefaria-text-segment` |
-| `--sefaria-font-hebrew` | `"Noto Serif Hebrew", "SBL Hebrew", "Times New Roman", serif` | Hebrew body font stack. | `sefaria-connections-panel`, `sefaria-source-card`, `sefaria-text-segment` |
-| `--sefaria-font-english` | `Georgia, "Times New Roman", serif` | English body font stack. | `sefaria-bilingual-segment`, `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card`, `sefaria-text-segment` |
-| `--sefaria-font-label-hebrew` | `"Noto Sans Hebrew", system-ui, sans-serif` | Reserved. No component uses it yet. Hebrew label font stack. | — |
-| `--sefaria-font-label-english` | `system-ui, sans-serif` | English label font stack. | `sefaria-reader` |
+<ApiEntry id="style-sefaria-surface" name="--sefaria-surface" :fields="[{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;transparent&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Used by&quot;,&quot;value&quot;:&quot;sefaria-bilingual-segment, sefaria-connections-panel, sefaria-reader, sefaria-source-card, sefaria-text-segment&quot;,&quot;code&quot;:true}]">
+
+Primary surface color. Text Segment is transparent unless this is set.
+
+</ApiEntry>
+
+<ApiEntry id="style-sefaria-surface-muted" name="--sefaria-surface-muted" :fields="[{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;light-dark(#f5f1e8, #222521)&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Used by&quot;,&quot;value&quot;:&quot;sefaria-reader, sefaria-source-card&quot;,&quot;code&quot;:true}]">
+
+Muted surface color.
+
+</ApiEntry>
+
+<ApiEntry id="style-sefaria-fg" name="--sefaria-fg" :fields="[{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;light-dark(#25231f, #f1eee7)&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Used by&quot;,&quot;value&quot;:&quot;sefaria-bilingual-segment, sefaria-connections-panel, sefaria-reader, sefaria-source-card, sefaria-text-segment&quot;,&quot;code&quot;:true}]">
+
+Primary foreground color.
+
+</ApiEntry>
+
+<ApiEntry id="style-sefaria-fg-muted" name="--sefaria-fg-muted" :fields="[{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;light-dark(#6d675d, #bdb7ac)&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Used by&quot;,&quot;value&quot;:&quot;sefaria-bilingual-segment, sefaria-connections-panel, sefaria-reader, sefaria-source-card, sefaria-text-segment&quot;,&quot;code&quot;:true}]">
+
+Muted foreground color.
+
+</ApiEntry>
+
+<ApiEntry id="style-sefaria-border" name="--sefaria-border" :fields="[{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;light-dark(#d7cfc1, #555b53)&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Used by&quot;,&quot;value&quot;:&quot;sefaria-connections-panel, sefaria-reader, sefaria-source-card&quot;,&quot;code&quot;:true}]">
+
+Standard border color.
+
+</ApiEntry>
+
+<ApiEntry id="style-sefaria-border-strong" name="--sefaria-border-strong" :fields="[{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;light-dark(#aaa094, #73796f)&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Used by&quot;,&quot;value&quot;:&quot;—&quot;,&quot;code&quot;:false}]">
+
+Reserved. No component uses it yet. Strong border color.
+
+</ApiEntry>
+
+<ApiEntry id="style-sefaria-accent" name="--sefaria-accent" :fields="[{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;light-dark(#8e2449, #ff93b4)&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Used by&quot;,&quot;value&quot;:&quot;sefaria-reader, sefaria-source-card&quot;,&quot;code&quot;:true}]">
+
+Accent and focus color.
+
+</ApiEntry>
+
+<ApiEntry id="style-sefaria-accent-soft" name="--sefaria-accent-soft" :fields="[{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;light-dark(rgb(142 36 73 / 10%), rgb(255 147 180 / 14%))&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Used by&quot;,&quot;value&quot;:&quot;—&quot;,&quot;code&quot;:false}]">
+
+Reserved. No component uses it yet. Translucent accent surface.
+
+</ApiEntry>
+
+<ApiEntry id="style-sefaria-danger" name="--sefaria-danger" :fields="[{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;light-dark(#9c1c1c, #ffaaa4)&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Used by&quot;,&quot;value&quot;:&quot;—&quot;,&quot;code&quot;:false}]">
+
+Reserved. No component uses it yet. Error foreground color.
+
+</ApiEntry>
+
+<ApiEntry id="style-sefaria-link" name="--sefaria-link" :fields="[{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;light-dark(#8e2449, #ff93b4)&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Used by&quot;,&quot;value&quot;:&quot;sefaria-reader, sefaria-source-card&quot;,&quot;code&quot;:true}]">
+
+Link foreground color.
+
+</ApiEntry>
+
+<ApiEntry id="style-sefaria-shadow" name="--sefaria-shadow" :fields="[{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;0 1rem 3rem rgb(0 0 0 / 28%)&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Used by&quot;,&quot;value&quot;:&quot;—&quot;,&quot;code&quot;:false}]">
+
+Reserved. No component uses it yet. Elevated-surface shadow.
+
+</ApiEntry>
+
+<ApiEntry id="style-sefaria-panel-radius" name="--sefaria-panel-radius" :fields="[{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;0.75rem&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Used by&quot;,&quot;value&quot;:&quot;sefaria-connections-panel, sefaria-reader, sefaria-source-card&quot;,&quot;code&quot;:true}]">
+
+Panel corner radius.
+
+</ApiEntry>
+
+<ApiEntry id="style-sefaria-control-radius" name="--sefaria-control-radius" :fields="[{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;0.3rem&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Used by&quot;,&quot;value&quot;:&quot;sefaria-connections-panel, sefaria-source-card&quot;,&quot;code&quot;:true}]">
+
+Control corner radius.
+
+</ApiEntry>
+
+<ApiEntry id="style-sefaria-font-scale" name="--sefaria-font-scale" :fields="[{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;1&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Used by&quot;,&quot;value&quot;:&quot;sefaria-bilingual-segment, sefaria-connections-panel, sefaria-reader, sefaria-source-card, sefaria-text-segment&quot;,&quot;code&quot;:true}]">
+
+Component font-size multiplier.
+
+</ApiEntry>
+
+<ApiEntry id="style-sefaria-font-hebrew" name="--sefaria-font-hebrew" :fields="[{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;Noto Serif Hebrew\&quot;, \&quot;SBL Hebrew\&quot;, \&quot;Times New Roman\&quot;, serif&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Used by&quot;,&quot;value&quot;:&quot;sefaria-connections-panel, sefaria-source-card, sefaria-text-segment&quot;,&quot;code&quot;:true}]">
+
+Hebrew body font stack.
+
+</ApiEntry>
+
+<ApiEntry id="style-sefaria-font-english" name="--sefaria-font-english" :fields="[{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;Georgia, \&quot;Times New Roman\&quot;, serif&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Used by&quot;,&quot;value&quot;:&quot;sefaria-bilingual-segment, sefaria-connections-panel, sefaria-reader, sefaria-source-card, sefaria-text-segment&quot;,&quot;code&quot;:true}]">
+
+English body font stack.
+
+</ApiEntry>
+
+<ApiEntry id="style-sefaria-font-label-hebrew" name="--sefaria-font-label-hebrew" :fields="[{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;Noto Sans Hebrew\&quot;, system-ui, sans-serif&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Used by&quot;,&quot;value&quot;:&quot;—&quot;,&quot;code&quot;:false}]">
+
+Reserved. No component uses it yet. Hebrew label font stack.
+
+</ApiEntry>
+
+<ApiEntry id="style-sefaria-font-label-english" name="--sefaria-font-label-english" :fields="[{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;system-ui, sans-serif&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Used by&quot;,&quot;value&quot;:&quot;sefaria-reader&quot;,&quot;code&quot;:true}]">
+
+English label font stack.
+
+</ApiEntry>

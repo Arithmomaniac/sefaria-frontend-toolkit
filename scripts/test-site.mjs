@@ -620,6 +620,35 @@ try {
     await assertNoCodeOverflow(dataToolsPage, "data tools start here at 390px");
     await dataToolsPage.close();
     // --- end data and text tools ---
+
+    const referencePage = await browser.newPage();
+    await referencePage.setViewportSize({ width: 390, height: 844 });
+    await referencePage.goto(siteRouteUrl("/reference/components.html"), {
+      waitUntil: "networkidle",
+    });
+    const referenceOverflow = await referencePage.evaluate(() => {
+      const doc = globalThis.document.querySelector(".vp-doc");
+      return doc.scrollWidth - doc.clientWidth;
+    });
+    await assertEqual(
+      referenceOverflow <= 0,
+      true,
+      "R1 horizontal overflow at 390px",
+    );
+    await referencePage.setViewportSize({ width: 1200, height: 900 });
+    const fieldTops = await referencePage
+      .locator(".api-entry")
+      .first()
+      .locator("dl > div")
+      .evaluateAll((items) =>
+        items.map((item) => Math.round(item.getBoundingClientRect().top)),
+      );
+    await assertEqual(
+      fieldTops.length > 1 && new Set(fieldTops).size === 1,
+      true,
+      "R1 entry fields share a row at 1200px",
+    );
+    await referencePage.close();
   } finally {
     await browser.close();
   }

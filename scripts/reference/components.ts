@@ -49,6 +49,36 @@ const cell = (value: string) =>
   value.replaceAll("|", "\\|").replaceAll(/\s+/gu, " ").trim();
 const code = (value: string) => `\`${cell(value)}\``;
 
+const flat = (value: string) => value.replaceAll(/\s+/gu, " ").trim();
+const attr = (value: string) =>
+  value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+
+interface EntryField {
+  readonly label: string;
+  readonly value: string;
+  readonly code?: boolean;
+}
+
+function apiEntry(
+  id: string,
+  name: string,
+  fields: readonly EntryField[],
+  description: string,
+): string[] {
+  return [
+    `<ApiEntry id="${attr(id)}" name="${attr(name)}" :fields="${attr(JSON.stringify(fields))}">`,
+    "",
+    flat(description),
+    "",
+    "</ApiEntry>",
+    "",
+  ];
+}
+
 export const RESERVED = "Reserved. No component uses it yet.";
 
 /**
@@ -195,13 +225,31 @@ export async function renderComponentsReference(): Promise<string> {
       "",
       "Set an attribute in HTML or a property in JavaScript. If a property has no attribute, set it in JavaScript.",
       "",
-      "| Property | Attribute | Type | Default | Description |",
-      "| --- | --- | --- | --- | --- |",
-      ...fields.map(
-        (member) =>
-          `| ${code(member.name)} | ${member.attribute ? code(member.attribute) : "—"} | ${code(member.type?.text ?? "unknown")} | ${member.default ? code(member.default) : "—"} | ${cell(`${member.readonly ? "Read-only. " : ""}${member.description ?? ""}`)} |`,
+      ...fields.flatMap((member) =>
+        apiEntry(
+          `${declaration.tagName}-${member.attribute ?? member.name}`,
+          member.name,
+          [
+            member.attribute
+              ? { label: "Attribute", value: member.attribute, code: true }
+              : { label: "Attribute", value: "None. Set it in JavaScript." },
+            {
+              label: "Type",
+              value: member.type?.text ?? "unknown",
+              code: true,
+            },
+            {
+              label: "Default",
+              value: member.default ?? "—",
+              code: Boolean(member.default),
+            },
+            ...(member.readonly
+              ? [{ label: "Access", value: "Read-only" }]
+              : []),
+          ],
+          member.description ?? "",
+        ),
       ),
-      "",
       "### Data",
       "",
       declaration.data ??
@@ -216,19 +264,23 @@ export async function renderComponentsReference(): Promise<string> {
     lines.push(
       "### Events",
       "",
-      events.length === 0
-        ? "None."
-        : "| Event | Description | Detail | Cancelable |",
+      events.length === 0 ? "None." : "",
       ...(events.length === 0
-        ? []
-        : [
-            "| --- | --- | --- | --- |",
-            ...events.map(
-              (event) =>
-                `| <a id="${event.name}"></a>${code(event.name)} | ${cell(event.description ?? "")} | ${cell(event.detail ?? "")} | ${event.cancelable ? "Yes" : "No"} |`,
+        ? [""]
+        : events.flatMap((event) =>
+            apiEntry(
+              `event-${event.name}`,
+              event.name,
+              [
+                {
+                  label: "Detail",
+                  value: flat(event.detail ?? "").replaceAll("`", ""),
+                },
+                { label: "Cancelable", value: event.cancelable ? "Yes" : "No" },
+              ],
+              event.description ?? "",
             ),
-          ]),
-      "",
+          )),
     );
     if (declaration.slots.length > 0) {
       lines.push(
@@ -280,11 +332,20 @@ export async function renderComponentsReference(): Promise<string> {
     "",
     "The elements share these CSS custom properties. Not every element uses every one. Set them on the element or on any ancestor. [Match your site's look](/across-components/match-your-sites-look.md) shows how.",
     "",
-    "| Property | Default | Description | Used by |",
-    "| --- | --- | --- | --- |",
-    ...declarations[0]!.cssProperties.map(
-      (property) =>
-        `| ${code(property.name)} | ${code(property.default ?? "")} | ${reserved.has(property.name) ? `${RESERVED} ` : ""}${cell(property.description ?? "")} | ${usedBy.get(property.name)!.map(code).join(", ") || "—"} |`,
+    ...declarations[0]!.cssProperties.flatMap((property) =>
+      apiEntry(
+        `style-${property.name.replace(/^--/u, "")}`,
+        property.name,
+        [
+          { label: "Default", value: property.default ?? "", code: true },
+          {
+            label: "Used by",
+            value: usedBy.get(property.name)!.join(", ") || "—",
+            code: usedBy.get(property.name)!.length > 0,
+          },
+        ],
+        `${reserved.has(property.name) ? `${RESERVED} ` : ""}${property.description ?? ""}`,
+      ),
     ),
   );
   return renderPage({
