@@ -23,6 +23,7 @@ import {
 } from "./translation-selection.js";
 import { bindReaderController } from "./bindings.js";
 import {
+  connectionSelectionLabels,
   getPreparedState,
   getPreparedStatus,
   prepared,
@@ -1068,6 +1069,7 @@ export class SefariaReader extends SefariaElement {
     }
     return html`<sefaria-source-card
       ${prepared(source.viewModel)}
+      ${connectionSelectionLabels()}
       .selectedPosition=${source.selectedPosition}
       .contentLanguage=${this.contentLanguage}
       .layout=${this.layout}

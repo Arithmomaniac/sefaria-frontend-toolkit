@@ -21,7 +21,11 @@ import {
   type BilingualPairSideOrder,
 } from "./bilingual-pair.js";
 import { validateSuppliedComponentData } from "./component-controller.js";
-import { getPreparedState, setPreparedState } from "./prepared-state.js";
+import {
+  getPreparedState,
+  setPreparedState,
+  usesConnectionSelectionLabels,
+} from "./prepared-state.js";
 import {
   SefariaElement,
   type SefariaElementStatus,
@@ -687,7 +691,7 @@ export class SefariaSourceCard extends SefariaElement {
             item.position,
             item.ref!,
             "segment-select-control",
-            "Show connections",
+            usesConnectionSelectionLabels(this) ? "Show connections" : "Select",
           )
         : nothing;
 
@@ -740,7 +744,11 @@ export class SefariaSourceCard extends SefariaElement {
       type="button"
       class=${className}
       title=${ref}
-      aria-label=${`Show connections for ${ref}`}
+      aria-label=${
+        usesConnectionSelectionLabels(this)
+          ? `Show connections for ${ref}`
+          : `Select ${ref}`
+      }
       aria-pressed=${
         this.selectedPosition !== undefined &&
         positionKey(position) === positionKey(this.selectedPosition)
