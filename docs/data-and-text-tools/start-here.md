@@ -32,11 +32,11 @@ Each example below is a complete ES module. Save the JavaScript version as a fil
 
 <CodeLanguageToggle :snippet="snippets['client-first-success']" />
 
-**The request.** `createSefariaClient()` makes a client for `https://www.sefaria.org`. `text.getV3Texts` is the generated function for Sefaria's texts API (v3). With no `version` option, Sefaria returns the edition marked primary (`isPrimary`). Here that is the Hebrew Masoretic text.
+`createSefariaClient()` makes a client for `https://www.sefaria.org`. `text.getV3Texts` is the generated function for Sefaria's texts API (v3). With no `version` option, Sefaria returns the edition marked primary (`isPrimary`). Here that is the Hebrew Masoretic text.
 
-**Success.** The result has `data`. The first part prints `Micah 6:8 · he · Miqra according to the Masorah`.
+On success, the result has `data`, and the first part prints `Micah 6:8 · he · Miqra according to the Masorah`.
 
-**Failure.** When Sefaria answers with a documented HTTP error, such as 404 for an unknown reference, the result has `error` with the documented error body. Then `data` is undefined. If a response doesn't match the API description, the call throws a `SefariaContractError` instead of returning data. Network failures also throw. They are not turned into empty data.
+When Sefaria answers with a documented HTTP error, such as 404 for an unknown reference, the result has `error` with the documented error body. Then `data` is undefined. If a response doesn't match the API description, the call throws a `SefariaContractError` instead of returning data. Network failures also throw. They are not turned into empty data.
 
 The second part checks JSON you got another way, such as from storage or a file. `validateExternalResponse` returns `{ valid, issues }` and does not throw. It prints `Invalid at /isSpanning: Invalid input: expected boolean, received string`. Each issue's `instancePath` is a JSON Pointer into the checked value. It points to the place in the data. It doesn't say how to fix it.
 
