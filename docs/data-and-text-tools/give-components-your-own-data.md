@@ -26,7 +26,7 @@ flowchart TD
   Q1("Is it a Text Segment, Bilingual Segment, or Source Card?") -->|Yes| Q2("Do you already have the response?")
   Q2 -->|Yes| A1["Set its data property"]
   Q2 -->|No| A3["Choose its data source"]
-  Q1 -->|"No: Reader or Connections Panel"| A3
+  Q1 -->|No| A3
 ```
 
 A response you already have can be one you saved, fetched on your server, received from an MCP tool, or exported. To choose a data source, see [Control loading](#control-loading).

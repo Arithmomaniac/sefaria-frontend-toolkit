@@ -107,3 +107,6 @@ Example pages embed the complete first-party example apps, such as `/examples/li
 - A custom loader is the object that supplies `getText`, `getLinks`, or both. In code it is `{ kind: "custom", loader }`.
 - Map a term to its identifier once per page, at first use. Then use the term alone. Don't use "acquisition" or "capability" in prose.
 - When the library renames these identifiers, update the code spans and the mapping sentences. The prose terms stay the same.
+
+- Keep Mermaid edge labels to one or two words, such as Yes or No. Longer edge labels wrap and get clipped. Put detail in the node text or in the prose.
+
