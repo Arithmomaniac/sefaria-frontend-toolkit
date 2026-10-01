@@ -135,7 +135,7 @@ Recognized structural attributes are `data-sefaria-note`, `data-sefaria-end-foot
 normalizeText(
   'See <a data-ref="Micah 6:8" href="/Micah.6.8">Micah</a><script>x()</script>',
 ).bodyHtml;
-// '<span data-sefaria-ref="Micah 6:8">Micah</span>'
+// 'See <span data-sefaria-ref="Micah 6:8">Micah</span>'
 ```
 
 ##### Throws

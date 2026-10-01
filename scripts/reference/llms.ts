@@ -107,6 +107,7 @@ async function describe(route: string): Promise<string> {
 interface CustomElementsManifest {
   readonly modules: readonly {
     readonly declarations: readonly {
+      readonly tagName?: string;
       readonly cssProperties?: readonly { readonly name: string }[];
       readonly cssParts?: readonly { readonly name: string }[];
       readonly attributes?: readonly {
