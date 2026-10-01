@@ -29,9 +29,10 @@ The card fetches the text from Sefaria when it appears on the page. While it wai
 
 ## Script tag or package
 
-Use the script tag if your page has no build step, or if you're editing a field in a content management system. It's also the quickest way to try the toolkit. Use the package if your app already has a build step. The package lets you import the component, bundle it with your code, and let your framework control when it loads.
+- **Script tag:** one self-contained file, no build step, no token. Use it if your page has no build step, or if you're editing a field in a content management system. It's also the quickest way to try the toolkit.
+- **Package:** for apps with a build step. It's on GitHub Packages and needs an access token. See [Install and status](/help/install-and-status.md). You import the component, bundle it with your code, and let your framework control when it loads.
 
-The script tag needs `type="module"`, because a plain script doesn't work. The components file is self-contained, and the client and text tools have their own files. See [The three files](/help/install-and-status.md#the-three-files).
+Load the script tag with `type="module"`. Need the client or text tools without UI? See [Hosted files](/help/install-and-status.md#hosted-files).
 
 ::: code-group
 

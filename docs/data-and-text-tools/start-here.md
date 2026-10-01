@@ -28,7 +28,7 @@ Use the CDN route if you want no install step. Use the package route if your app
 
 ### No install
 
-Import the client and the text tools straight from the CDN. Each has its own file, and this needs no token. It works in a browser page with `<script type="module">`, in Deno, and anywhere else that imports from URLs. The Run buttons on this page use exactly these files.
+Import the client and the text tools straight from the CDN. The client and the text tools are two ES-module files. Load them with `type="module"` or `import`. This needs no token. It works in a browser page, in Deno, and anywhere else that imports from URLs.
 
 ```html
 <script type="module">
@@ -40,15 +40,15 @@ Import the client and the text tools straight from the CDN. Each has its own fil
 </script>
 ```
 
-Both files are ES modules, so import them. A plain script tag without `type="module"` won't work. Each import takes named functions, or use `import * as client from "…"` to take a whole file. The components have a third file of their own. [Install and status](/help/install-and-status.md#the-three-files) compares all three.
+Import named functions, or use `import * as client from "…"` to take a whole file. A plain script tag without `type="module"` won't work.
 
-The `alpha` address serves the newest build, and it changes without notice. [Install and status](/help/install-and-status.md) shows how to find hosted versions.
+The `alpha` address serves the newest build, and it changes without notice. To pin a version, see [Install and status](/help/install-and-status.md#hosted-files). That page also lists the components' third file.
 
 ### Packages
 
 Install `@arithmomaniac/sefaria-client`, `@arithmomaniac/sefaria-text-transform`, or both. They are on GitHub Packages, which needs an access token before you can install. [Install and status](/help/install-and-status.md) shows how to set up the token and gives the exact install command for the current version. The packages need Node.js 22.12 or later.
 
-The examples below import the package names. With the CDN route, use the JavaScript version and replace each package name with its CDN address. To try an example without either route, press **Run**.
+The examples below import the package names. With the CDN route, use the JavaScript tab of each example and replace each package name with its CDN address. To try an example without either route, press **Run**. The Run buttons on this page use exactly the CDN files.
 
 ## Fetch one checked response
 

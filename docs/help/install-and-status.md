@@ -13,14 +13,23 @@ You can add the toolkit to a page with one script tag, or install it as npm pack
 
 ## Choose a route
 
-| Route | Choose it when |
-| --- | --- |
-| Script tag | You have a plain HTML page and want the components, client, or text tools without a build step. |
-| Packages | You have a build tool, a framework, or code that calls the client or text tools. |
+Choose the [hosted files](#hosted-files) when you have a plain HTML page and want the components, client, or text tools without a build step. Choose the [packages](#packages) when you have a build tool, a framework, or code that calls the client or text tools.
 
-## Script tag
+## Hosted files
 
-Add the newest build to your page:
+The CDN serves three ES-module files from one folder. Choose by goal.
+
+| File | How to load it | What you get |
+| --- | --- | --- |
+| `sefaria-elements.js` | `<script type="module" src="…">` | Loading it registers all five tags. It also exports the element classes and `configureSefariaDataSource`. |
+| `sefaria-client.js` | `import { createSefariaClient, text, validateExternalResponse } from "…"` | Named client functions. It registers nothing. |
+| `sefaria-text-transform.js` | `import { normalizeText, applyVocalization, applyVocalizationToHtml, createTextPreview } from "…"` | Named text functions. It registers nothing. |
+
+All three are ES modules and none sets a global. A plain `<script>` without `type="module"` does not work. Use `<script type="module">` or `import`. No token is needed.
+
+### Load the files
+
+To show components, add the elements file:
 
 ```html
 <script
@@ -29,7 +38,22 @@ Add the newest build to your page:
 ></script>
 ```
 
-The `alpha` address serves the newest build, and it changes without notice. To stay on one build, use a pinned version address instead:
+To call the client or text tools, import them:
+
+```js
+import { createSefariaClient } from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-client.js";
+import { normalizeText } from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-text-transform.js";
+```
+
+To take everything from one file, use `import * as client from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-client.js"`.
+
+Components need only `sefaria-elements.js`. It bundles its own copy of the client and text code. If your page also imports the client or text files directly, that shared code downloads twice.
+
+To use the client and text files, see [Data and text tools: start here](/data-and-text-tools/start-here.md).
+
+### Newest or pinned version
+
+The `alpha` address serves the newest build, and it changes without notice. To stay on one build, swap `alpha` for a version number in any of the three files. For example:
 
 ```html
 <script
@@ -42,29 +66,6 @@ To find versions, open [the list of hosted versions](https://arithmomaniac.githu
 
 Pinned addresses stay available while their version is active. A version can be retired without notice.
 
-### The three files
-
-The same address folder serves three separate files. All three are ES modules. None sets a global, so a plain `<script>` without `type="module"` does not work. Use `<script type="module">` or `import`. No token is needed.
-
-| File | How to load it | What you get |
-| --- | --- | --- |
-| `sefaria-elements.js` | `<script type="module" src="…">` | Loading it registers all five tags. It also exports the element classes and `configureSefariaDataSource`. |
-| `sefaria-client.js` | `import { createSefariaClient, text, validateExternalResponse } from "…"` | Named client functions. It registers nothing. |
-| `sefaria-text-transform.js` | `import { normalizeText, applyVocalization, applyVocalizationToHtml, createTextPreview } from "…"` | Named text functions. It registers nothing. |
-
-For example:
-
-```js
-import { createSefariaClient } from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-client.js";
-import { normalizeText } from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-text-transform.js";
-```
-
-To take everything from one file, use `import * as client from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-client.js"`.
-
-There is no combined file. The components file includes its own copy of the client and text tools code. Components need only that one file. A page that also calls the client or text tools directly loads those files too. That code downloads twice.
-
-Pinning works the same way. Swap `alpha` for a version number. To use these files, see [Data and text tools: start here](/data-and-text-tools/start-here.md).
-
 ## Packages
 
 The toolkit has three packages: `@arithmomaniac/sefaria-client`, `@arithmomaniac/sefaria-text-transform`, and `@arithmomaniac/sefaria-web-components`. They are published to GitHub Packages as prereleases. They are not published on npmjs.com.
@@ -76,14 +77,14 @@ GitHub Packages asks for a token, even for public packages. Create a personal ac
 //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
 ```
 
-Install an exact version. Copy the newest version number from the [package page on GitHub](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/pkgs/npm/sefaria-web-components). All three packages share the same version. Leave out the packages you don't need.
+Install an exact version. Copy the newest version number from the [package page on GitHub](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/pkgs/npm/sefaria-web-components). All three packages share the same version. Leave out the packages you don't need. Yarn and pnpm work too, with their usual install commands.
 
 ```sh
 version="0.0.0-alpha.<run-id>.<run-attempt>"
-pnpm add "@arithmomaniac/sefaria-client@$version" "@arithmomaniac/sefaria-text-transform@$version" "@arithmomaniac/sefaria-web-components@$version"
+npm install "@arithmomaniac/sefaria-client@$version" "@arithmomaniac/sefaria-text-transform@$version" "@arithmomaniac/sefaria-web-components@$version"
 ```
 
-The packages also carry an `alpha` tag that follows the newest build. An exact version pins the toolkit release. Commit your lockfile and install with a frozen lockfile to fix the other dependencies too. The toolkit's own install check uses pnpm with this `.npmrc`. For other package managers, see their documentation, such as [Yarn's `npmScopes` setting](https://yarnpkg.com/configuration/yarnrc#npmScopes). Types are included; no `@types` package is needed.
+The packages also carry an `alpha` tag that follows the newest build. An exact version pins the toolkit release. Commit your lockfile and install from it to fix the other dependencies too. For example, run `npm ci`. Yarn and pnpm read the same `.npmrc` scope line. Yarn can also use its own setting, [`npmScopes`](https://yarnpkg.com/configuration/yarnrc#npmScopes). Types are included, so no `@types` package is needed.
 
 If you get a 401, 403, or `E404` error, check:
 
@@ -98,13 +99,9 @@ For import paths, see [Package imports and exports](/reference/package-imports-a
 
 The components need a browser. The client and text tools run in JavaScript runtimes. In other languages, call [Sefaria's API](https://developers.sefaria.org) directly.
 
-| Runtime | Coverage | Notes |
-| --- | --- | --- |
-| Browsers (components) | Tested in CI | Chromium, Firefox, and WebKit for the script tag. |
-| Node.js | Tested in CI | Client and text tools. CI runs Node 22 on Ubuntu and Windows. The minimum is 22.12. |
-| Deno | Not tested in CI | The code uses standard `fetch` and needs no DOM, but it hasn't been verified here. |
-| Bun | Not tested in CI | The code uses standard `fetch` and needs no DOM, but it hasn't been verified here. |
-| Cloudflare Workers and other edge runtimes | Not tested in CI | The code uses standard `fetch` and needs no DOM, but it hasn't been verified here. |
+CI tests the components in Chromium, Firefox, and WebKit with the script tag. CI tests the client and text tools in Node.js 22 on Ubuntu and Windows. The minimum is Node.js 22.12.
+
+Deno, Bun, and edge runtimes such as Cloudflare Workers are not tested in CI. The code uses standard `fetch` and needs no DOM, so any modern runtime with ES modules and `fetch` should work.
 
 ## What alpha means
 
