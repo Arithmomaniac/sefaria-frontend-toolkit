@@ -690,3 +690,12 @@ pre.site-code {
   vertical-align: middle;
   transform: none;
 }
+
+/* Mermaid edge labels blend into the page instead of sitting on a grey box. */
+.vp-doc .mermaid .edgeLabel,
+.vp-doc .mermaid .edgeLabel p,
+.vp-doc .mermaid .edgeLabel rect,
+.vp-doc .mermaid .labelBkg {
+  background-color: var(--vp-c-bg) !important;
+  fill: var(--vp-c-bg) !important;
+}
