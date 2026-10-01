@@ -6,6 +6,7 @@ info:
 extends: ./upstream.json
 x-sefaria-guards:
   - id: shared-version-metadata
+    evidence: https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/sefaria/model/text.py#L1990-L2017
     preconditions:
       - target: $.components.schemas.CoreVersionMetadata
         expected:
@@ -13,7 +14,10 @@ x-sefaria-guards:
       - target: $.components.schemas.versionData
         expected:
           sha256: 30674c1ce884bdf3345cacb7bdfe8d6e5a1ab2e5c851196ec60d35b61120ca07
+    title: Shared version metadata
+    description: The pinned description defines version metadata twice, in `VersionJSON` and `versionData`. The correction points both at one shared `CoreVersionMetadata` schema. The v3 text schemas extend that schema with extra fields and requirements.
   - id: shared-sheet-topic
+    evidence: https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/sourcesheets/views.py#L626-L639
     preconditions:
       - target: $.components.schemas.CoreSheetTopic
         expected:
@@ -24,7 +28,10 @@ x-sefaria-guards:
       - target: $.components.schemas.UserSheetTagJSON
         expected:
           sha256: c57345df724703e5a5c75b12a3cf9246825fcbbe7d5c48bb5755fe99d9598647
+    title: Shared sheet topic shape
+    description: The pinned description defines sheet topics and user sheet tags as separate schemas, `SheetTopicJSON` and `UserSheetTagJSON`. The correction points both at one shared `CoreSheetTopic` schema. User sheet tags also keep an optional integer `count`.
   - id: sheet-summary-contract
+    evidence: https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/sourcesheets/views.py#L930-L964
     preconditions:
       - target: $.components.schemas.SheetsJSON.properties.id
         expected:
@@ -41,7 +48,10 @@ x-sefaria-guards:
       - target: $.components.schemas.AllSheetsJSON.properties.sheets.items.properties.published
         expected:
           sha256: 5d0406f84838048b615f31b06397846a692780b987c84a765dfcb35f10a47ca4
+    title: Sheet summary fields
+    description: The pinned description already gave the sheet `id` a string type and `via` a nullable string. It also gave the display options and `date-time` formats. The correction changes `id` to an integer or a string. It changes `via` to a nullable integer and revises the option value types. It also allows an empty array for `options`. It removes the `date-time` formats from `created` and `published`.
   - id: manuscripts-content-type
+    evidence: https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/reader/views.py#L5392-L5396
     preconditions:
       - target: $.paths['/api/manuscripts/{tref}'].get.responses['200'].content['Manuscript JSON']
         expected:
@@ -49,7 +59,10 @@ x-sefaria-guards:
       - target: $.paths['/api/manuscripts/{tref}'].get.responses['200'].content['application/json']
         expected:
           absent: true
+    title: Manuscripts response media type
+    description: For `GET /api/manuscripts/{tref}`, the published description files the 200 response under a media-type key named `Manuscript JSON`. The correction moves that schema under `application/json`. It treats that as the type the route serves.
   - id: versions-contract
+    evidence: https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/reader/views.py#L2657-L2664
     preconditions:
       - target: $.paths['/api/texts/versions/{index}']
         expected:
@@ -87,7 +100,10 @@ x-sefaria-guards:
       - target: $.components.schemas.VersionJSON.properties.status.nullable
         expected:
           absent: true
+    title: Text versions endpoint
+    description: The published description names the path `/api/texts/versions/{index}`. Source review shows the pinned route and handler take a reference. The correction renames the path to `GET /api/texts/versions/{tref}`. The 200 response is a version list or a JSON error. Stored versions can have a null `versionSource` or `status`.
   - id: v3-text-contract
+    evidence: https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/api/views.py#L28-L88
     preconditions:
       - target: $.components.schemas.CoreErrorResponse
         expected:
@@ -135,7 +151,14 @@ x-sefaria-guards:
       - target: $.paths['/api/v3/texts/{tref}'].get.responses['404']
         expected:
           absent: true
+    title: Text (v3) response
+    description: |-
+      The published description for `GET /api/v3/texts/{tref}` already had a `warnings` array with unconstrained items. The correction adds a repeatable `version` selector and nested nullable text values. It also types and constrains `warnings`. It documents two error responses with the Core JSON error schema:
+
+      - 400: an invalid return format or a text adapter failure.
+      - 404: an invalid, empty, or unavailable reference.
   - id: ref-contract
+    evidence: https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/api/views.py#L91-L176
     preconditions:
       - target: $.paths['/api/ref/{tref}'].get.description
         expected:
@@ -180,7 +203,10 @@ x-sefaria-guards:
             properties:
               error:
                 type: string
+    title: Reference lookup response
+    description: The published description for `GET /api/ref/{tref}` does not fully cover the fields that depend on the node type. Its 404 has an incomplete inline error schema. The correction rewrites the description of those fields. It makes the 200 response a union of success and expected parse failure. It points the 404 at the Core JSON error schema.
   - id: calendar-parasha-error-contract
+    evidence: https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/reader/views.py#L2963-L2974
     preconditions:
       - target: $.components.schemas.CalendarParashaTopicJSON.required
         expected:
@@ -191,7 +217,10 @@ x-sefaria-guards:
       - target: $.paths['/api/calendars/topics/parasha'].get.responses['200'].content['application/json'].schema['$ref']
         expected:
           value: "#/components/schemas/CalendarParashaTopicJSON"
+    title: Calendar parasha response
+    description: The published description for `GET /api/calendars/topics/parasha` models every HTTP 200 response as successful calendar data. The correction requires the `ref` field on successful responses and makes the 200 response a union of successful calendar data and the Core JSON error schema.
   - id: index-contract
+    evidence: https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/reader/views.py#L2102-L2112
     preconditions:
       - target: $.paths['/api/v2/index/{title}'].get.parameters
         expected:
@@ -205,7 +234,10 @@ x-sefaria-guards:
       - target: $.paths['/api/v2/index/{title}'].get.responses['200'].content['application/json'].schema['$ref']
         expected:
           value: "#/components/schemas/IndexJSON"
+    title: Index response
+    description: The published description for `GET /api/v2/index/{title}` doesn't list the conditional query parameters, such as `content_counts`. The correction adds those parameters and the `firstSectionRef` and `relatedTopics` properties. It models the HTTP 200 response as a union of success and error.
   - id: shape-contract
+    evidence: https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/reader/views.py#L2245-L2374
     preconditions:
       - target: $.components.schemas.CoreShapeMetadata
         expected:
@@ -249,7 +281,10 @@ x-sefaria-guards:
       - target: $.paths['/api/shape/{title}'].get.responses['200'].content['application/json'].examples['Complex Text']['x-sefaria-original-value']
         expected:
           absent: true
+    title: Shape endpoint
+    description: For `GET /api/shape/{title}`, the published description gives a single-object schema with mixed property casing. It documents `depth` without deprecating it. Source review shows the handler does not use `depth`, so the correction removes it. The dependent-texts flag becomes the string values `"0"` and `"1"`. The response becomes a list-based union with an error variant. The examples become arrays.
   - id: links-contract
+    evidence: https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/reader/views.py#L2386-L2433
     preconditions:
       - target: $.components.schemas.CoreBilingualText
         expected:
@@ -281,7 +316,10 @@ x-sefaria-guards:
       - target: $.paths['/api/links/{tref}'].get.responses['400']
         expected:
           absent: true
+    title: Links response
+    description: The published description for `GET /api/links/{tref}` omits fields from the array items in the 200 response. It also omits the repeatable category filter. The correction adds link and sheet-link schemas and allows repeated category filters. It also documents an HTTP 400 error for whole-book references that request text.
   - id: linker-detection-contract
+    evidence: https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/sefaria/views.py#L514-L540
     preconditions:
       - target: $.paths['/api/find-refs'].post
         expected:
@@ -318,6 +356,8 @@ x-sefaria-guards:
       - target: $.components.schemas.CoreFindRefsResponse
         expected:
           absent: true
+    title: Citation detection (find-refs)
+    description: The published description for `POST /api/find-refs` already defined the request body, the 202 response, and the task states. The correction replaces the body schema, adds query options, and constrains `ready`. It removes the POST 200 entry, because the correction's notes say the pinned handler does not return one. It makes `result` an open JSON object with unknown-valued properties. Callers must validate the result for the specific task.
 actions:
   - x-action-id: sheet-summary-id-type-remove
     x-correction-id: sheet-summary-contract

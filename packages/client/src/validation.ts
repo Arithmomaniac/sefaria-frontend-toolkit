@@ -6,6 +6,8 @@ import {
 } from "./generated/response-contracts.gen.js";
 import { SefariaContractError, type ContractIssue } from "./contract-error.js";
 
+export type { GeneratedResponseContract } from "./generated/response-contracts.gen.js";
+
 /** Identifies one documented operation response by method, path, and status. */
 export interface ResponseSelector {
   /** HTTP method; matching is case-insensitive. */

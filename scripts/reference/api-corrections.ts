@@ -1,4 +1,3 @@
-import { readFile } from "node:fs/promises";
 import {
   applyFormalOverlay,
   collectApiOperations,
@@ -14,13 +13,6 @@ export const API_CORRECTIONS_PAGE = new URL(
   "../../docs/reference/api-corrections.md",
   import.meta.url,
 );
-const SUMMARIES = new URL("./api-corrections-summaries.json", import.meta.url);
-
-interface CorrectionSummary {
-  readonly title: string;
-  readonly summary: string;
-}
-
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
 
@@ -151,19 +143,8 @@ function describeAction(action: OverlayAction): string {
 
 export async function renderApiCorrections(): Promise<string> {
   const { source, upstreamBytes, overlay } = await loadCommittedInputs();
-  const summaries = JSON.parse(await readFile(SUMMARIES, "utf8")) as Record<
-    string,
-    CorrectionSummary
-  >;
   const guards = overlay["x-sefaria-guards"];
   const guardIds = guards.map((guard) => guard.id);
-  const missing = guardIds.filter((id) => !summaries[id]);
-  const unknown = Object.keys(summaries).filter((id) => !guardIds.includes(id));
-  if (missing.length > 0 || unknown.length > 0) {
-    throw new Error(
-      `api-corrections-summaries.json must describe every correction once. Missing: ${missing.join(", ") || "none"}. Unknown: ${unknown.join(", ") || "none"}.`,
-    );
-  }
 
   const upstream = JSON.parse(
     new TextDecoder().decode(upstreamBytes),
@@ -237,24 +218,27 @@ export async function renderApiCorrections(): Promise<string> {
       "",
     );
     for (const id of correctionsByEndpoint.get(key)!) {
-      lines.push(`- [${summaries[id]!.title}](#${id})`);
+      lines.push(
+        `- [${guards.find((guard) => guard.id === id)!.title}](#${id})`,
+      );
     }
     lines.push("");
   }
   lines.push("## Corrections", "");
   for (const guard of guards) {
-    const summary = summaries[guard.id]!;
     const endpoints = [...endpointsByCorrection.get(guard.id)!].sort(byPath);
     lines.push(
       `<a id="${guard.id}"></a>`,
       "",
-      `### ${summary.title}`,
+      `### ${guard.title}`,
       "",
       `Correction ID: ${code(guard.id)}`,
       "",
-      summary.summary,
+      guard.description,
       "",
       `Endpoints: ${endpoints.map(code).join(", ")}.`,
+      "",
+      `Evidence: [Sefaria source](${guard.evidence}).`,
       "",
       "Source checks:",
       "",

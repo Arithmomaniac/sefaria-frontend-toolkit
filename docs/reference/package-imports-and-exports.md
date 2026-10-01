@@ -13,7 +13,7 @@ import ReleaseStamp from "./ReleaseStamp.vue";
 
 # Package imports and exports
 
-The toolkit has 3 packages. This page lists each package's import paths and the names each path exports. It's generated from the packages' export maps and built type declarations, through `packages/public-exports.json`.
+The toolkit has 3 packages. This page lists each package's import paths and the names each path exports. It's generated from the packages' export maps and type declarations.
 
 Each package ships its own TypeScript types. To choose between the script tag and the packages, or to install a package, see [Install and status](/help/install-and-status.md).
 
@@ -21,7 +21,7 @@ Each package ships its own TypeScript types. To choose between the script tag an
 
 This page documents the code on the `main` branch, which `alpha` builds are published from. <ReleaseStamp />
 
-The `alpha` script-tag address serves the newest script release that is still active. Compare the stamp above with the version in the [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/index.html). Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can still include the removed Popup and Reference Label elements. It can also lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
+The `alpha` script-tag address serves the newest script release that is still active. Compare the stamp above with the version in the [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/index.html). Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since.
 
 <a id="register-the-elements"></a>
 
@@ -33,25 +33,27 @@ Import the web components package root once to register all the elements:
 import "@arithmomaniac/sefaria-web-components";
 ```
 
-The element subpaths, such as `@arithmomaniac/sefaria-web-components/source-card`, don't register their element. They export types, plus a few helpers for the Connections Panel and Reader. Import them alongside the package root, not instead of it.
+Only the package root registers elements. Element subpaths such as `@arithmomaniac/sefaria-web-components/source-card`, `@arithmomaniac/sefaria-web-components/data-source`, and `@arithmomaniac/sefaria-web-components/reader-session` export types and helpers. Import them alongside the package root, not instead of it.
+
+The client package root re-exports the generated namespaces, contracts, schemas, validators, errors, validation helpers, and client factory. Import `createSefariaClient` from `@arithmomaniac/sefaria-client` or `@arithmomaniac/sefaria-client/client`. Import focused error and validation helpers from `@arithmomaniac/sefaria-client/errors` and `@arithmomaniac/sefaria-client/validation`.
 
 ## `@arithmomaniac/sefaria-client`
 
-Fetches Sefaria API responses and checks them against the corrected API description. [Reference](/reference/client.md).
+A small client for Sefaria's API that checks every JSON response against Sefaria's corrected API description. Package manifest version: `0.0.0`. [Reference](/reference/client.md).
 
 | Import path | Exports |
 | --- | --- |
-| `@arithmomaniac/sefaria-client` | 582 names, including the generated types, schemas and validators listed in the [client reference](/reference/client.md) |
+| `@arithmomaniac/sefaria-client` | 585 names; see the [client reference](/reference/client.md) |
 | `@arithmomaniac/sefaria-client/client` | `SefariaCacheOptions`, `SefariaClient`, `SefariaClientOptions`, `createSefariaClient`, `requireSefariaClient` |
-| `@arithmomaniac/sefaria-client/contracts` | 313 names, including the generated types, schemas and validators listed in the [client reference](/reference/client.md) |
+| `@arithmomaniac/sefaria-client/contracts` | 313 names; see the [client reference](/reference/client.md) |
 | `@arithmomaniac/sefaria-client/errors` | `ContractIssue`, `SefariaContractError`, `SefariaContractErrorOptions` |
-| `@arithmomaniac/sefaria-client/schemas` | 181 names, including the generated types, schemas and validators listed in the [client reference](/reference/client.md) |
-| `@arithmomaniac/sefaria-client/validation` | `ResponseSelector`, `ResponseValidationContext`, `ResponseValidatorLookup`, `ValidationResult`, `getResponseContract`, `getResponseValidator`, `validateExternalResponse`, `validateResponse` |
-| `@arithmomaniac/sefaria-client/validators` | 65 names, including the generated types, schemas and validators listed in the [client reference](/reference/client.md) |
+| `@arithmomaniac/sefaria-client/schemas` | 181 names; see the [client reference](/reference/client.md) |
+| `@arithmomaniac/sefaria-client/validation` | `GeneratedResponseContract`, `ResponseSelector`, `ResponseValidationContext`, `ResponseValidatorLookup`, `ValidationResult`, `getResponseContract`, `getResponseValidator`, `validateExternalResponse`, `validateResponse` |
+| `@arithmomaniac/sefaria-client/validators` | 65 names; see the [client reference](/reference/client.md) |
 
 ## `@arithmomaniac/sefaria-text-transform`
 
-Makes Sefaria's text HTML safe to display and prepares it for display. [Reference](/reference/text-transform.md).
+Tools that clean Sefaria's text markup, separate footnotes and set Hebrew vowel marks, in the browser or in Node. Package manifest version: `0.0.0`. [Reference](/reference/text-transform.md).
 
 | Import path | Exports |
 | --- | --- |
@@ -59,18 +61,18 @@ Makes Sefaria's text HTML safe to display and prepares it for display. [Referenc
 
 ## `@arithmomaniac/sefaria-web-components`
 
-The Sefaria elements, such as Source Card and Reader. [Reference](/reference/components.md).
+Web components that show Sefaria texts, translations and connections on any web page. Package manifest version: `0.0.0`. [Reference](/reference/components.md).
 
 | Import path | Exports |
 | --- | --- |
 | `@arithmomaniac/sefaria-web-components` | `BilingualPairContentLanguage`, `BilingualPairLayout`, `BilingualPairSide`, `BilingualPairSideOrder`, `BilingualSegmentContentLanguage`, `BilingualSegmentEditionSelection`, `BilingualSegmentLayout`, `BilingualSegmentRequest`, `BilingualSegmentSide`, `BilingualSegmentSideOrder`, `CONNECTIONS_PAGE_SIZE`, `ConnectionsProjection`, `ConnectionsRequest`, `ReaderPane`, `SefariaBilingualSegment`, `SefariaConnectionsPanel`, `SefariaDataLoader`, `SefariaDataLoaderResponse`, `SefariaDataSource`, `SefariaElement`, `SefariaElementStatus`, `SefariaLinksLoadRequest`, `SefariaReader`, `SefariaSourceCard`, `SefariaTextLoadRequest`, `SefariaTextSegment`, `SourceCardRequest`, `TextSegmentReferenceData`, `TextSegmentRequest`, `TextSegmentSelectedData`, `TextSegmentSelectedVersion`, `TextSegmentSelectedVersionInfo`, `TextSegmentVersionMetadata`, `TextSegmentVersionSelection`, `configureSefariaDataSource`, `sefariaTokenDefaults` |
 | `@arithmomaniac/sefaria-web-components/data-source` | `SefariaDataLoader`, `SefariaDataLoaderResponse`, `SefariaDataSource`, `SefariaLinksLoadRequest`, `SefariaTextLoadRequest`, `configureSefariaDataSource` |
-| `@arithmomaniac/sefaria-web-components/bilingual-segment` (doesn't register the element) | `BilingualSegmentEditionSelection`, `BilingualSegmentRequest`, `BilingualSegmentSide` |
-| `@arithmomaniac/sefaria-web-components/connections-panel` (doesn't register the element) | `CONNECTIONS_PAGE_SIZE`, `ConnectionsProjection`, `ConnectionsRequest` |
-| `@arithmomaniac/sefaria-web-components/reader` (doesn't register the element) | `ReaderPane`, `ReaderRecordLoader`, `ReaderResolvedSource`, `createSefariaReaderRecordLoader`, `resolveReaderSource` |
+| `@arithmomaniac/sefaria-web-components/bilingual-segment` | `BilingualSegmentEditionSelection`, `BilingualSegmentRequest`, `BilingualSegmentSide` |
+| `@arithmomaniac/sefaria-web-components/connections-panel` | `CONNECTIONS_PAGE_SIZE`, `ConnectionsProjection`, `ConnectionsRequest` |
+| `@arithmomaniac/sefaria-web-components/reader` | `ReaderPane`, `ReaderRecordLoader`, `ReaderResolvedSource`, `createSefariaReaderRecordLoader`, `resolveReaderSource` |
 | `@arithmomaniac/sefaria-web-components/reader-session` | `ReaderBreadcrumb`, `ReaderConnectionsRecord`, `ReaderEntryInfo`, `ReaderOperationHandle`, `ReaderPinHandle`, `ReaderPresentation`, `ReaderPresentationPatch`, `ReaderSession`, `ReaderSessionConnectionsSeed`, `ReaderSessionOptions`, `ReaderSessionSeed`, `ReaderSessionSourceSeed`, `ReaderSessionState`, `ReaderSourceRecord`, `ReaderTransition`, `ReaderTransitionRejection`, `createReaderSession` |
-| `@arithmomaniac/sefaria-web-components/source-card` (doesn't register the element) | `SourceCardRequest` |
-| `@arithmomaniac/sefaria-web-components/text-segment` (doesn't register the element) | `TextSegmentReferenceData`, `TextSegmentRequest`, `TextSegmentSelectedData`, `TextSegmentSelectedVersion`, `TextSegmentSelectedVersionInfo`, `TextSegmentVersionMetadata`, `TextSegmentVersionSelection` |
+| `@arithmomaniac/sefaria-web-components/source-card` | `SourceCardRequest` |
+| `@arithmomaniac/sefaria-web-components/text-segment` | `TextSegmentReferenceData`, `TextSegmentRequest`, `TextSegmentSelectedData`, `TextSegmentSelectedVersion`, `TextSegmentSelectedVersionInfo`, `TextSegmentVersionMetadata`, `TextSegmentVersionSelection` |
 
 ## Where to go next
 

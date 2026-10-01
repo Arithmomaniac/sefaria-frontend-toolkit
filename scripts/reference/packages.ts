@@ -22,43 +22,56 @@ interface Inventory {
   }[];
 }
 
-const PACKAGE_NOTES: Record<string, { summary: string; reference: string }> = {
-  "@arithmomaniac/sefaria-client": {
-    summary:
-      "Fetches Sefaria API responses and checks them against the corrected API description.",
-    reference: "/reference/client.md",
-  },
-  "@arithmomaniac/sefaria-text-transform": {
-    summary:
-      "Makes Sefaria's text HTML safe to display and prepares it for display.",
-    reference: "/reference/text-transform.md",
-  },
-  "@arithmomaniac/sefaria-web-components": {
-    summary: "The Sefaria elements, such as Source Card and Reader.",
-    reference: "/reference/components.md",
-  },
+const PACKAGE_REFERENCES: Record<string, string> = {
+  "@arithmomaniac/sefaria-client": "/reference/client.md",
+  "@arithmomaniac/sefaria-text-transform": "/reference/text-transform.md",
+  "@arithmomaniac/sefaria-web-components": "/reference/components.md",
 };
 
-const ELEMENT_SUBPATHS = new Set([
-  "./bilingual-segment",
-  "./connections-panel",
-  "./reader",
-  "./source-card",
-  "./text-segment",
-]);
+interface PackageManifest {
+  readonly description?: string;
+  readonly version?: string;
+  readonly exports?: Record<string, unknown>;
+}
+
+async function packageManifest(name: string): Promise<PackageManifest> {
+  const directory = name.slice("@arithmomaniac/sefaria-".length);
+  return JSON.parse(
+    await readFile(
+      new URL(`../../packages/${directory}/package.json`, import.meta.url),
+      "utf8",
+    ),
+  ) as PackageManifest;
+}
 
 const importPath = (name: string, subpath: string) =>
   subpath === "." ? name : `${name}/${subpath.slice(2)}`;
 
 export async function renderPackagesReference(): Promise<string> {
   const inventory = JSON.parse(await readFile(INVENTORY, "utf8")) as Inventory;
+  const manifests = new Map(
+    await Promise.all(
+      inventory.packages.map(
+        async (entry) =>
+          [entry.name, await packageManifest(entry.name)] as const,
+      ),
+    ),
+  );
   const names = inventory.packages.map((entry) => entry.name);
-  const unknown = names.filter((name) => !PACKAGE_NOTES[name]);
+  const unknown = names.filter((name) => !PACKAGE_REFERENCES[name]);
   if (unknown.length > 0) {
     throw new Error(`Describe these packages: ${unknown.join(", ")}.`);
   }
+  const missingDescriptions = [...manifests]
+    .filter(([, manifest]) => !manifest.description?.trim())
+    .map(([name]) => name);
+  if (missingDescriptions.length > 0) {
+    throw new Error(
+      `Add package.json descriptions for: ${missingDescriptions.join(", ")}.`,
+    );
+  }
   const lines: string[] = [
-    `The toolkit has ${inventory.packages.length} packages. This page lists each package's import paths and the names each path exports. It's generated from the packages' export maps and built type declarations, through \`packages/public-exports.json\`.`,
+    `The toolkit has ${inventory.packages.length} packages. This page lists each package's import paths and the names each path exports. It's generated from the packages' export maps and type declarations.`,
     "",
     "Each package ships its own TypeScript types. To choose between the script tag and the packages, or to install a package, see [Install and status](/help/install-and-status.md).",
     "",
@@ -74,32 +87,29 @@ export async function renderPackagesReference(): Promise<string> {
     'import "@arithmomaniac/sefaria-web-components";',
     "```",
     "",
-    "The element subpaths, such as `@arithmomaniac/sefaria-web-components/source-card`, don't register their element. They export types, plus a few helpers for the Connections Panel and Reader. Import them alongside the package root, not instead of it.",
+    "Only the package root registers elements. Element subpaths such as `@arithmomaniac/sefaria-web-components/source-card`, `@arithmomaniac/sefaria-web-components/data-source`, and `@arithmomaniac/sefaria-web-components/reader-session` export types and helpers. Import them alongside the package root, not instead of it.",
+    "",
+    "The client package root re-exports the generated namespaces, contracts, schemas, validators, errors, validation helpers, and client factory. Import `createSefariaClient` from `@arithmomaniac/sefaria-client` or `@arithmomaniac/sefaria-client/client`. Import focused error and validation helpers from `@arithmomaniac/sefaria-client/errors` and `@arithmomaniac/sefaria-client/validation`.",
     "",
   ];
   for (const entry of inventory.packages) {
-    const note = PACKAGE_NOTES[entry.name]!;
+    const manifest = manifests.get(entry.name)!;
     lines.push(
       `## \`${entry.name}\``,
       "",
-      `${note.summary} [Reference](${note.reference}).`,
+      `${manifest.description} Package manifest version: \`${manifest.version ?? "unknown"}\`. [Reference](${PACKAGE_REFERENCES[entry.name]}).`,
       "",
       "| Import path | Exports |",
       "| --- | --- |",
     );
     for (const item of entry.exports) {
-      const typesOnly =
-        entry.name === "@arithmomaniac/sefaria-web-components" &&
-        ELEMENT_SUBPATHS.has(item.subpath)
-          ? " (doesn't register the element)"
-          : "";
       const declarations =
         entry.name === "@arithmomaniac/sefaria-client" &&
         item.declarations.length > 40
-          ? `${item.declarations.length} names, including the generated types, schemas and validators listed in the [client reference](/reference/client.md)`
+          ? `${item.declarations.length} names; see the [client reference](/reference/client.md)`
           : item.declarations.map((name) => `\`${name}\``).join(", ");
       lines.push(
-        `| \`${importPath(entry.name, item.subpath)}\`${typesOnly} | ${declarations} |`,
+        `| \`${importPath(entry.name, item.subpath)}\` | ${declarations} |`,
       );
     }
     lines.push("");

@@ -78,6 +78,12 @@ export interface OverlayPrecondition {
 export interface OverlayGuard {
   /** The correction identifier shared with its overlay actions. */
   readonly id: string;
+  /** Human-readable correction title shown in generated references. */
+  readonly title: string;
+  /** Human-readable correction description shown in generated references. */
+  readonly description: string;
+  /** Commit-pinned Sefaria source URL that backs this correction. */
+  readonly evidence: string;
   /** The checks that must pass before the correction can run. */
   readonly preconditions: readonly OverlayPrecondition[];
 }
@@ -413,6 +419,18 @@ export function validateOverlayDocument(overlay: OverlayDocument): void {
   const guardsById = new Map<string, OverlayGuard>();
   for (const guard of overlay["x-sefaria-guards"]) {
     assertString(guard.id, "Overlay guard ID");
+    assertString(guard.title, `Overlay guard ${guard.id} title`);
+    assertString(guard.description, `Overlay guard ${guard.id} description`);
+    assertString(guard.evidence, `Overlay guard ${guard.id} evidence`);
+    if (
+      !/^https:\/\/github\.com\/Sefaria\/Sefaria-Project\/blob\/[0-9a-f]{40}\//u.test(
+        guard.evidence,
+      )
+    ) {
+      throw new Error(
+        `Overlay guard ${guard.id} evidence must be a commit-pinned Sefaria source URL.`,
+      );
+    }
     if (guardsById.has(guard.id)) {
       throw new Error(`Duplicate OpenAPI guard ID: ${guard.id}.`);
     }
