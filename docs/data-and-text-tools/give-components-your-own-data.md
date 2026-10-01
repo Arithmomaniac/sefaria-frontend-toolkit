@@ -15,10 +15,15 @@ Components normally load their text from Sefaria. If you already hold the respon
 
 Only three elements accept `data`. The Reader and the Connections Panel don't, because they change as the reader navigates.
 
-| You have… | Use… |
-| --- | --- |
-| A response you saved, fetched on your server, received from an MCP tool, or exported, for a Text Segment, Bilingual Segment, or Source Card | The element's `data` property |
-| Control where a component gets its data, such as local data for a Reader or Connections Panel | Its data source (advanced), described in [Control loading](#control-loading) |
+```mermaid
+flowchart TD
+  Q1("Is it a Text Segment, Bilingual Segment, or Source Card?") -->|Yes| Q2("Do you already have the response?")
+  Q2 -->|Yes| A1["Set its data property"]
+  Q2 -->|No| A3["Choose its data source"]
+  Q1 -->|"No: Reader or Connections Panel"| A3
+```
+
+A response you already have can be one you saved, fetched on your server, received from an MCP tool, or exported. To choose a data source, see [Control loading](#control-loading).
 
 Both cases start from corrected API-shaped JSON. That is the JSON body Sefaria's API returns, in the shape the toolkit's corrected API description expects.
 
