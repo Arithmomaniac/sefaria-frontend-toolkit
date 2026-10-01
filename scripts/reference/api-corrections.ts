@@ -238,6 +238,8 @@ export async function renderApiCorrections(): Promise<string> {
       "",
       `Endpoints: ${endpoints.map(code).join(", ")}.`,
       "",
+      `Evidence: [Sefaria source](${guard.evidence}).`,
+      "",
       "Source checks:",
       "",
       ...guard.preconditions.map(

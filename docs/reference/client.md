@@ -19,15 +19,15 @@ This page describes how to create a client with `@arithmomaniac/sefaria-client` 
 
 This page documents the code on the `main` branch, which `alpha` builds are published from. <ReleaseStamp />
 
-The `alpha` script-tag address serves the newest script release that is still active. The site doesn't compare it with the commit used to build this page, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
+The `alpha` script-tag address serves the newest script release that is still active. Compare the stamp above with the version in the [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/index.html). Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since.
 
 ## Client, options, errors and validation
 
 These names are written by hand. Import them from the package root. You can also import some from subpaths:
 
-- `SefariaCacheOptions`, `SefariaClient`, `SefariaClientOptions`, `createSefariaClient`, `requireSefariaClient` from `/client`.
-- `ContractIssue`, `SefariaContractError`, `SefariaContractErrorOptions` from `/errors`.
-- `ResponseSelector`, `ResponseValidationContext`, `ResponseValidatorLookup`, `ValidationResult`, `getResponseContract`, `getResponseValidator`, `validateExternalResponse`, `validateResponse` from `/validation`.
+- `SefariaCacheOptions`, `SefariaClient`, `SefariaClientOptions`, `createSefariaClient`, `requireSefariaClient` from `@arithmomaniac/sefaria-client/client`.
+- `ContractIssue`, `SefariaContractError`, `SefariaContractErrorOptions` from `@arithmomaniac/sefaria-client/errors`.
+- `GeneratedResponseContract`, `ResponseSelector`, `ResponseValidationContext`, `ResponseValidatorLookup`, `ValidationResult`, `getResponseContract`, `getResponseValidator`, `validateExternalResponse`, `validateResponse` from `@arithmomaniac/sefaria-client/validation`.
 
 ### Functions
 
@@ -69,7 +69,29 @@ Returns the generated contract matching an exact method, path, and status.
 
 ##### Returns
 
-`GeneratedResponseContract` \| `undefined`
+[`GeneratedResponseContract`](#generatedresponsecontract) \| `undefined`
+
+---
+
+#### getResponseValidator()
+
+```ts
+function getResponseValidator(
+  contract,
+): ZodType<unknown, unknown, $ZodTypeInternals<unknown, unknown>> | undefined;
+```
+
+Returns the Zod schema attached to a generated response contract.
+
+##### Parameters
+
+| Parameter  | Type                                                      |
+| ---------- | --------------------------------------------------------- |
+| `contract` | [`GeneratedResponseContract`](#generatedresponsecontract) |
+
+##### Returns
+
+\| `ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\> \| `undefined`
 
 ---
 
@@ -87,7 +109,7 @@ Validates externally supplied JSON without throwing or requiring a Response.
 | --- | --- | --- |
 | `selector` | [`ResponseSelector`](#responseselector) | — |
 | `value` | `unknown` | — |
-| `lookup` | `ResponseValidatorLookup` | `getResponseValidator` |
+| `lookup` | [`ResponseValidatorLookup`](#responsevalidatorlookup) | `getResponseValidator` |
 
 ##### Returns
 
@@ -140,32 +162,17 @@ Error.constructor;
 
 ### Interfaces
 
-#### ContractIssue
+#### SefariaClientOptions
 
-One structured response-contract mismatch.
-
-##### Properties
-
-| Property | Modifier | Type | Description |
-| --- | --- | --- | --- |
-| <a id="property-instancepath"></a> `instancePath` | `readonly` | `string` | JSON Pointer into the received response value. |
-| <a id="property-keyword"></a> `keyword` | `readonly` | `string` | Validator keyword or synthetic contract failure category. |
-| <a id="property-message-1"></a> `message?` | `readonly` | `string` | Human-readable diagnostic supplied by the validator. |
-| <a id="property-schemapath"></a> `schemaPath` | `readonly` | `string` | JSON Pointer identifying the generated schema location. |
-
----
-
-#### ResponseSelector
-
-Identifies one documented operation response by method, path, and status.
+Configuration used to create an isolated Sefaria API client.
 
 ##### Properties
 
 | Property | Modifier | Type | Description |
 | --- | --- | --- | --- |
-| <a id="property-method-1"></a> `method` | `readonly` | `string` | HTTP method; matching is case-insensitive. |
-| <a id="property-path-1"></a> `path` | `readonly` | `string` | Generated OpenAPI path template rather than a concrete request URL. |
-| <a id="property-status-1"></a> `status` | `readonly` | `number` | HTTP response status code. |
+| <a id="property-baseurl"></a> `baseUrl?` | `readonly` | `string` | API origin. Defaults to `https://www.sefaria.org`. |
+| <a id="property-cache"></a> `cache?` | `readonly` | `false` \| [`SefariaCacheOptions`](#sefariacacheoptions) | Bounded per-client response caching. Enabled with defaults when omitted. |
+| <a id="property-fetch"></a> `fetch?` | `readonly` | (`input`, `init?`) => `Promise`\<`Response`\> | Fetch implementation used for requests, testing, or host integration. |
 
 ---
 
@@ -193,22 +200,56 @@ Branded client accepted by the generated Sefaria SDK operations.
 | --- | --- | --- | --- |
 | <a id="property-sefariaclientbrand"></a> `[sefariaClientBrand]` | `readonly` | `true` | Compile-time brand preventing accidental structural substitutes. |
 | <a id="property-clearcache"></a> `clearCache` | `readonly` | () => `void` | Removes all responses retained by this client. |
-| <a id="property-get"></a> `get` | `readonly` | \<`TData`, `TError`, `ThrowOnError`\>(`options`) => `RequestResult`\<`TData`, `TError`, `ThrowOnError`, `"fields"`\> | Performs a validated GET request using fields-style responses. Documented HTTP error statuses resolve as typed error payloads. Contract mismatches reject with `SefariaContractError`; network failures and aborts reject with the original error. |
-| <a id="property-post"></a> `post` | `readonly` | \<`TData`, `TError`, `ThrowOnError`\>(`options`) => `RequestResult`\<`TData`, `TError`, `ThrowOnError`, `"fields"`\> | Performs a validated POST request using fields-style responses. Documented HTTP error statuses resolve as typed error payloads. Contract mismatches reject with `SefariaContractError`; network failures and aborts reject with the original error. |
+| <a id="property-get"></a> `get` | `readonly` | \<`TData`, `TError`, `ThrowOnError`\>(`options`) => `RequestResult`\<`TData`, `TError`, `ThrowOnError`, `"fields"`\> | Performs a validated GET request using fields-style responses. A fields-style result exposes the response payload on `data`, a documented error payload on `error`, and the original Fetch `Response` metadata on `response`. Documented HTTP error statuses resolve as typed error payloads. Contract mismatches reject with `SefariaContractError`; network failures and aborts reject with the original error. |
+| <a id="property-post"></a> `post` | `readonly` | \<`TData`, `TError`, `ThrowOnError`\>(`options`) => `RequestResult`\<`TData`, `TError`, `ThrowOnError`, `"fields"`\> | Performs a validated POST request using fields-style responses. A fields-style result exposes the response payload on `data`, a documented error payload on `error`, and the original Fetch `Response` metadata on `response`. Documented HTTP error statuses resolve as typed error payloads. Contract mismatches reject with `SefariaContractError`; network failures and aborts reject with the original error. |
 
 ---
 
-#### SefariaClientOptions
+#### ContractIssue
 
-Configuration used to create an isolated Sefaria API client.
+One structured response-contract mismatch.
 
 ##### Properties
 
 | Property | Modifier | Type | Description |
 | --- | --- | --- | --- |
-| <a id="property-baseurl"></a> `baseUrl?` | `readonly` | `string` | API origin. Defaults to `https://www.sefaria.org`. |
-| <a id="property-cache"></a> `cache?` | `readonly` | `false` \| [`SefariaCacheOptions`](#sefariacacheoptions) | Bounded per-client response caching. Enabled with defaults when omitted. |
-| <a id="property-fetch"></a> `fetch?` | `readonly` | (`input`, `init?`) => `Promise`\<`Response`\> | Fetch implementation used for requests, testing, or host integration. |
+| <a id="property-instancepath"></a> `instancePath` | `readonly` | `string` | JSON Pointer into the received response value. |
+| <a id="property-keyword"></a> `keyword` | `readonly` | `string` | Validator keyword or synthetic contract failure category. |
+| <a id="property-message-1"></a> `message?` | `readonly` | `string` | Human-readable diagnostic supplied by the validator. |
+| <a id="property-schemapath"></a> `schemaPath` | `readonly` | `string` | JSON Pointer identifying the generated schema location. |
+
+---
+
+#### GeneratedResponseContract
+
+##### Properties
+
+| Property | Modifier | Type |
+| --- | --- | --- |
+| <a id="property-bodytype"></a> `bodyType` | `readonly` | `"blob"` \| `"json"` |
+| <a id="property-contenttypes"></a> `contentTypes` | `readonly` | readonly `string`[] |
+| <a id="property-functionname"></a> `functionName` | `readonly` | `string` |
+| <a id="property-method-1"></a> `method` | `readonly` | `"GET"` \| `"POST"` |
+| <a id="property-operationid-1"></a> `operationId` | `readonly` | `string` |
+| <a id="property-path-1"></a> `path` | `readonly` | `string` |
+| <a id="property-schema"></a> `schema?` | `readonly` | `ZodType`\<`unknown`, `unknown`, `$ZodTypeInternals`\<`unknown`, `unknown`\>\> |
+| <a id="property-schemapath-1"></a> `schemaPath` | `readonly` | `string` |
+| <a id="property-status-1"></a> `status` | `readonly` | `number` |
+| <a id="property-validatorname"></a> `validatorName?` | `readonly` | `string` |
+
+---
+
+#### ResponseSelector
+
+Identifies one documented operation response by method, path, and status.
+
+##### Properties
+
+| Property | Modifier | Type | Description |
+| --- | --- | --- | --- |
+| <a id="property-method-2"></a> `method` | `readonly` | `string` | HTTP method; matching is case-insensitive. |
+| <a id="property-path-2"></a> `path` | `readonly` | `string` | Generated OpenAPI path template rather than a concrete request URL. |
+| <a id="property-status-2"></a> `status` | `readonly` | `number` | HTTP response status code. |
 
 ---
 
@@ -221,13 +262,33 @@ Complete context retained by [SefariaContractError](#sefariacontracterror).
 | Property | Modifier | Type | Description |
 | --- | --- | --- | --- |
 | <a id="property-issues-1"></a> `issues` | `readonly` | readonly [`ContractIssue`](#contractissue)[] | Structured validation failures. |
-| <a id="property-method-2"></a> `method` | `readonly` | `string` | HTTP method from the generated operation contract. |
-| <a id="property-operationid-1"></a> `operationId` | `readonly` | `string` | Generated OpenAPI operation identifier. |
-| <a id="property-path-2"></a> `path` | `readonly` | `string` | Generated operation path template. |
+| <a id="property-method-3"></a> `method` | `readonly` | `string` | HTTP method from the generated operation contract. |
+| <a id="property-operationid-2"></a> `operationId` | `readonly` | `string` | Generated OpenAPI operation identifier. |
+| <a id="property-path-3"></a> `path` | `readonly` | `string` | Generated operation path template. |
 | <a id="property-response-1"></a> `response` | `readonly` | `Response` | Original response, preserved for headers and transport metadata. |
-| <a id="property-status-2"></a> `status` | `readonly` | `number` | Received HTTP status code. |
+| <a id="property-status-3"></a> `status` | `readonly` | `number` | Received HTTP status code. |
 
 ### Type Aliases
+
+#### ResponseValidatorLookup
+
+```ts
+type ResponseValidatorLookup = (contract) => ZodType | undefined;
+```
+
+Resolves the runtime schema used for one generated response contract.
+
+##### Parameters
+
+| Parameter  | Type                                                      |
+| ---------- | --------------------------------------------------------- |
+| `contract` | [`GeneratedResponseContract`](#generatedresponsecontract) |
+
+##### Returns
+
+`ZodType` \| `undefined`
+
+---
 
 #### ValidationResult
 

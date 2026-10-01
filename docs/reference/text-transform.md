@@ -19,7 +19,7 @@ This page lists the names exported by `@arithmomaniac/sefaria-text-transform` an
 
 This page documents the code on the `main` branch, which `alpha` builds are published from. <ReleaseStamp />
 
-The `alpha` script-tag address serves the newest script release that is still active. The site doesn't compare it with the commit used to build this page, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
+The `alpha` script-tag address serves the newest script release that is still active. Compare the stamp above with the version in the [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/index.html). Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since.
 
 ## Functions and types
 
@@ -110,7 +110,7 @@ function normalizeText(html, options?): NormalizedText;
 
 Converts untrusted Sefaria text markup into safe, directly renderable HTML.
 
-The operation parses once, removes unsupported attributes, emits no link or resource-loading attributes, and extracts footnotes into result-local records. Options can narrow but never widen the fixed output grammar.
+The operation parses once, removes unsupported attributes, emits no URLs, and extracts footnotes into result-local records. Options can narrow but never widen the fixed output grammar.
 
 ##### Parameters
 
@@ -144,7 +144,7 @@ When commentary reference input is invalid.
 
 ##### Throws
 
-When projected output exceeds the documented bound.
+When projected output exceeds `max(65_536, html.length * 8)` UTF-16 code units.
 
 ### Interfaces
 

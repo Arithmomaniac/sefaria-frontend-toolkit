@@ -46,6 +46,32 @@ function dropInheritedRows(markdown: string): string {
   return output.join("\n");
 }
 
+function reorderPreferred(
+  markdown: string,
+  preferredOrder: readonly string[],
+): string {
+  if (preferredOrder.length === 0) return markdown;
+  return markdown
+    .split(/\n(?=## )/u)
+    .map((section) => {
+      const blocks = section.split(/\n(?=### )/u);
+      const heading = blocks.shift() ?? "";
+      const byName = new Map<string, string>();
+      const remaining: string[] = [];
+      for (const block of blocks) {
+        const name = /^### ([^(\n]+)(?:\(\))?/u.exec(block)?.[1]?.trim();
+        if (name && preferredOrder.includes(name)) byName.set(name, block);
+        else remaining.push(block);
+      }
+      return [
+        heading,
+        ...preferredOrder.flatMap((name) => byName.get(name) ?? []),
+        ...remaining,
+      ].join("\n");
+    })
+    .join("\n");
+}
+
 /**
  * Renders one TypeDoc entry point to Markdown and returns its body with
  * headings demoted so that the top level becomes `headingLevel`.
@@ -54,6 +80,7 @@ export async function renderTypeDoc(
   entry: string,
   name: string,
   headingLevel = 3,
+  preferredOrder: readonly string[] = [],
 ): Promise<string> {
   const out = await mkdtemp(path.join(tmpdir(), "reference-typedoc-"));
   try {
@@ -105,8 +132,11 @@ export async function renderTypeDoc(
       part.startsWith("## Functions"),
     );
     const rest = sections.filter((part) => !part.startsWith("## Functions"));
-    return [...functions, ...rest]
-      .join("\n")
+    const ordered = reorderPreferred(
+      [...functions, ...rest].join("\n"),
+      preferredOrder,
+    );
+    return ordered
       .split("\n")
       .map((line) =>
         /^#{1,5} /u.test(line) ? `${"#".repeat(shift)}${line}` : line,

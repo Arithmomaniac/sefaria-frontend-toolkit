@@ -164,7 +164,12 @@ describe("EP7 llms.txt", () => {
       );
     }
     expect(text).toContain('import "@arithmomaniac/sefaria-web-components";');
-    expect(text).toMatch(/Keep attribution/u);
+    expect(text).toContain(
+      "For an attributed passage, including a bilingual one, use Source Card.",
+    );
+    expect(text).toContain(
+      "Text Segment and Bilingual Segment show no attribution.",
+    );
     expect(text).not.toMatch(/components don.t show licenses/u);
     expect(text).toContain("Licenses reported");
     expect(text).toMatch(/`content-language` defaults to `both`/u);
@@ -390,8 +395,11 @@ it("uses package.json descriptions as package summaries", async () => {
     const manifest = JSON.parse(await read(manifestPath)) as {
       name: string;
       description: string;
+      version: string;
     };
-    expect(page).toContain(`${manifest.description} [Reference](`);
+    expect(page).toContain(
+      `${manifest.description} Package manifest version: \`${manifest.version}\`. [Reference](`,
+    );
   }
 });
 

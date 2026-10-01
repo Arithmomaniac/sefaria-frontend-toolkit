@@ -58,7 +58,8 @@ async function clientSubpathBullets(): Promise<string[]> {
     .filter((entry) => entry.subpath !== "." && entry.declarations.length <= 10)
     .map(
       (entry) =>
-        `- ${entry.declarations.map((name) => `\`${name}\``).join(", ")} from \`${entry.subpath.replace("./", "/")}\`.`,
+        `- ${entry.declarations.map((name) => `\`${name}\``).join(", ")} from ` +
+        `\`@arithmomaniac/sefaria-client${entry.subpath === "." ? "" : `/${entry.subpath.slice(2)}`}\`.`,
     );
 }
 
@@ -150,7 +151,12 @@ async function namespaceTables(): Promise<{
 
 export async function renderClientReference(): Promise<string> {
   const [surface, tables, subpathBullets] = await Promise.all([
-    renderTypeDoc("client.ts", "@arithmomaniac/sefaria-client", 3),
+    renderTypeDoc("client.ts", "@arithmomaniac/sefaria-client", 3, [
+      "createSefariaClient",
+      "SefariaClientOptions",
+      "SefariaCacheOptions",
+      "SefariaClient",
+    ]),
     namespaceTables(),
     clientSubpathBullets(),
   ]);

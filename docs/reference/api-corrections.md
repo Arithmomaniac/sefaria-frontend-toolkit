@@ -19,7 +19,7 @@ The toolkit generates the client from Sefaria's published API description, an Op
 
 This page documents the code on the `main` branch, which `alpha` builds are published from. <ReleaseStamp />
 
-The `alpha` script-tag address serves the newest script release that is still active. The site doesn't compare it with the commit used to build this page, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
+The `alpha` script-tag address serves the newest script release that is still active. Compare the stamp above with the version in the [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/index.html). Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since.
 
 ## The pinned source
 
@@ -174,6 +174,8 @@ The pinned description defines version metadata twice, in `VersionJSON` and `ver
 
 Endpoints: `GET /api/texts/random`, `GET /api/texts/versions/{tref}`, `GET /api/texts/{tref}`, `GET /api/v3/texts/{tref}`.
 
+Evidence: [Sefaria source](https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/sefaria/model/text.py#L1990-L2017).
+
 Source checks:
 
 - `$.components.schemas.CoreVersionMetadata` is absent.
@@ -236,6 +238,8 @@ Correction ID: `shared-sheet-topic`
 The pinned description defines sheet topics and user sheet tags as separate schemas, `SheetTopicJSON` and `UserSheetTagJSON`. The correction points both at one shared `CoreSheetTopic` schema. User sheet tags also keep an optional integer `count`.
 
 Endpoints: `GET /api/related/{tref}`, `GET /api/sheets/ref/{ref}`, `GET /api/sheets/tag-list/user/{user_id}`, `GET /api/sheets/user/{user_id}`, `GET /api/sheets/user/{user_id}/{sort_by}/{limiter}/{offset}`.
+
+Evidence: [Sefaria source](https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/sourcesheets/views.py#L626-L639).
 
 Source checks:
 
@@ -308,6 +312,8 @@ Correction ID: `sheet-summary-contract`
 The pinned description already gave the sheet `id` a string type and `via` a nullable string. It also gave the display options and `date-time` formats. The correction changes `id` to an integer or a string. It changes `via` to a nullable integer and revises the option value types. It also allows an empty array for `options`. It removes the `date-time` formats from `created` and `published`.
 
 Endpoints: `GET /api/related/{tref}`, `GET /api/sheets/all-sheets/{limiter}/{offset}`, `GET /api/sheets/ref/{ref}`, `GET /api/sheets/user/{user_id}`, `GET /api/sheets/user/{user_id}/{sort_by}/{limiter}/{offset}`.
+
+Evidence: [Sefaria source](https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/sourcesheets/views.py#L930-L964).
 
 Source checks:
 
@@ -461,6 +467,8 @@ For `GET /api/manuscripts/{tref}`, the published description files the 200 respo
 
 Endpoints: `GET /api/manuscripts/{tref}`.
 
+Evidence: [Sefaria source](https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/reader/views.py#L5392-L5396).
+
 Source checks:
 
 - `$.paths['/api/manuscripts/{tref}'].get.responses['200'].content['Manuscript JSON']` is unchanged (SHA-256 starting `434d5e06ff93`).
@@ -494,6 +502,8 @@ Correction ID: `versions-contract`
 The published description names the path `/api/texts/versions/{index}`. Source review shows the pinned route and handler take a reference. The correction renames the path to `GET /api/texts/versions/{tref}`. The 200 response is a version list or a JSON error. Stored versions can have a null `versionSource` or `status`.
 
 Endpoints: `GET /api/texts/random`, `GET /api/texts/versions/{tref}`, `GET /api/texts/{tref}`, `GET /api/v3/texts/{tref}`.
+
+Evidence: [Sefaria source](https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/reader/views.py#L2657-L2664).
 
 Source checks:
 
@@ -602,6 +612,8 @@ The published description for `GET /api/v3/texts/{tref}` already had a `warnings
 - 404: an invalid, empty, or unavailable reference.
 
 Endpoints: `GET /api/calendars/topics/parasha`, `GET /api/links/{tref}`, `GET /api/ref/{tref}`, `GET /api/shape/{title}`, `GET /api/texts/versions/{tref}`, `GET /api/v2/index/{title}`, `GET /api/v3/texts/{tref}`.
+
+Evidence: [Sefaria source](https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/api/views.py#L28-L88).
 
 Source checks:
 
@@ -1076,6 +1088,8 @@ The published description for `GET /api/ref/{tref}` does not fully cover the fie
 
 Endpoints: `GET /api/ref/{tref}`.
 
+Evidence: [Sefaria source](https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/api/views.py#L91-L176).
+
 Source checks:
 
 - `$.paths['/api/ref/{tref}'].get.description` equals ``"Validates a text reference (`tref`) and returns structured metadata about it.\n\nThe response varies based on the `node_type` of the referenced text:\n\n- **JaggedArrayNode**: Standard text nodes (e.g. biblical chapters/verses, Talmud pages). Returns `depth`, `address_types`, `section_names`, and positional indexes/labels.\n- **SchemaNode**: Nodes with named children (e.g. a commentary with an introduction and main text). Returns `children` list.\n- **DictionaryEntryNode**: Individual dictionary entries. Returns `lexicon_name` and `headword`, plus the JaggedArrayNode fields.\n- **DictionaryNode**: Dictionary root nodes. Returns `lexicon_name`.\n- **SheetNode**: User-created source sheets. Returns `sheet_id`.\n\nIf the node has a default child (a child node that represents the primary content), the response includes a `default_child_node` object with the child's `node_type`, `node_index`, and optionally `depth`, `address_types` and `sectionNames` (for JaggedArrayNode children) or `lexicon_name` (for DictionaryNode parents).\n\nAll types include `navigation_refs` with `shortest_path_to_root` (array of ancestor refs from immediate parent to book level) and `first_available_section_ref`. Segment-level refs also get `prev_segment_ref`/`next_segment_ref`, and section-level refs get `prev_section_ref`/`next_section_ref`."``.
@@ -1313,6 +1327,8 @@ The published description for `GET /api/calendars/topics/parasha` models every H
 
 Endpoints: `GET /api/calendars/topics/parasha`.
 
+Evidence: [Sefaria source](https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/reader/views.py#L2963-L2974).
+
 Source checks:
 
 - `$.components.schemas.CalendarParashaTopicJSON.required` is absent.
@@ -1370,6 +1386,8 @@ Correction ID: `index-contract`
 The published description for `GET /api/v2/index/{title}` doesn't list the conditional query parameters, such as `content_counts`. The correction adds those parameters and the `firstSectionRef` and `relatedTopics` properties. It models the HTTP 200 response as a union of success and error.
 
 Endpoints: `GET /api/index/{title}`, `GET /api/v2/index/{title}`.
+
+Evidence: [Sefaria source](https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/reader/views.py#L2102-L2112).
 
 Source checks:
 
@@ -1468,6 +1486,8 @@ Correction ID: `shape-contract`
 For `GET /api/shape/{title}`, the published description gives a single-object schema with mixed property casing. It documents `depth` without deprecating it. Source review shows the handler does not use `depth`, so the correction removes it. The dependent-texts flag becomes the string values `"0"` and `"1"`. The response becomes a list-based union with an error variant. The examples become arrays.
 
 Endpoints: `GET /api/shape/{title}`.
+
+Evidence: [Sefaria source](https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/reader/views.py#L2245-L2374).
 
 Source checks:
 
@@ -1682,6 +1702,8 @@ Correction ID: `links-contract`
 The published description for `GET /api/links/{tref}` omits fields from the array items in the 200 response. It also omits the repeatable category filter. The correction adds link and sheet-link schemas and allows repeated category filters. It also documents an HTTP 400 error for whole-book references that request text.
 
 Endpoints: `GET /api/links/{tref}`.
+
+Evidence: [Sefaria source](https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/reader/views.py#L2386-L2433).
 
 Source checks:
 
@@ -1969,6 +1991,8 @@ Correction ID: `linker-detection-contract`
 The published description for `POST /api/find-refs` already defined the request body, the 202 response, and the task states. The correction replaces the body schema, adds query options, and constrains `ready`. It removes the POST 200 entry, because the correction's notes say the pinned handler does not return one. It makes `result` an open JSON object with unknown-valued properties. Callers must validate the result for the specific task.
 
 Endpoints: `GET /api/async/{task_id}`, `POST /api/find-refs`.
+
+Evidence: [Sefaria source](https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/sefaria/views.py#L514-L540).
 
 Source checks:
 

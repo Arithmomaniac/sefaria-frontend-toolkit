@@ -13,7 +13,10 @@ export {
 } from "../../../packages/client/src/contract-error.js";
 export {
   getResponseContract,
+  getResponseValidator,
   validateExternalResponse,
+  type GeneratedResponseContract,
   type ResponseSelector,
+  type ResponseValidatorLookup,
   type ValidationResult,
 } from "../../../packages/client/src/validation.js";

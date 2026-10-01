@@ -49,6 +49,10 @@ export interface SefariaClient {
   /**
    * Performs a validated GET request using fields-style responses.
    *
+   * A fields-style result exposes the response payload on `data`, a documented
+   * error payload on `error`, and the original Fetch `Response` metadata on
+   * `response`.
+   *
    * Documented HTTP error statuses resolve as typed error payloads. Contract
    * mismatches reject with `SefariaContractError`; network failures and aborts
    * reject with the original error.
@@ -62,6 +66,10 @@ export interface SefariaClient {
   ) => RequestResult<TData, TError, ThrowOnError, "fields">;
   /**
    * Performs a validated POST request using fields-style responses.
+   *
+   * A fields-style result exposes the response payload on `data`, a documented
+   * error payload on `error`, and the original Fetch `Response` metadata on
+   * `response`.
    *
    * Documented HTTP error statuses resolve as typed error payloads. Contract
    * mismatches reject with `SefariaContractError`; network failures and aborts

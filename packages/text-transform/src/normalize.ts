@@ -194,9 +194,9 @@ const MAM_VALUES = new Map([
 /**
  * Converts untrusted Sefaria text markup into safe, directly renderable HTML.
  *
- * The operation parses once, removes unsupported attributes, emits no link or
- * resource-loading attributes, and extracts footnotes into result-local
- * records. Options can narrow but never widen the fixed output grammar.
+ * The operation parses once, removes unsupported attributes, emits no URLs,
+ * and extracts footnotes into result-local records. Options can narrow but
+ * never widen the fixed output grammar.
  *
  * @remarks
  * Output keeps only these ordinary inline tags without attributes: `b`,
@@ -223,7 +223,7 @@ const MAM_VALUES = new Map([
  * ```
  *
  * @throws {TypeError} When commentary reference input is invalid.
- * @throws {RangeError} When projected output exceeds the documented bound.
+ * @throws {RangeError} When projected output exceeds `max(65_536, html.length * 8)` UTF-16 code units.
  * @see [Text normalization](../IMPLEMENTATION.md#text-normalization)
  */
 export function normalizeText(
