@@ -223,7 +223,7 @@ const MAM_VALUES = new Map([
  * ```
  *
  * @throws {TypeError} When commentary reference input is invalid.
- * @throws {RangeError} When projected output exceeds the documented bound.
+ * @throws {RangeError} When projected output exceeds `max(65_536, html.length * 8)` UTF-16 code units.
  * @see [Text normalization](../README.md#text-normalization)
  */
 export function normalizeText(
