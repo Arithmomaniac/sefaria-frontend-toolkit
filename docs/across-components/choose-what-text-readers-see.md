@@ -24,7 +24,7 @@ Three terms matter throughout:
 
 A request is one call from the page to Sefaria. A dash in the tables means the component has no such attribute. The Reader also has attributes that aren't about text choice.
 
-Each choice is an HTML attribute. You write it inside the tag.
+Each choice is an HTML attribute. You write it inside the tag. Every component takes sref.
 
 ## Two kinds of changes
 
@@ -84,7 +84,9 @@ These choices change what the component requests.
   </tbody>
 </table>
 
-Every component takes `sref`. For the segments and Source Card, a fresh load makes one request. It makes two if the translation language is missing and `translation-fallback` is `default`. The Reader also loads the surrounding section and its links. Supplied data makes no request for the non-Reader elements. A Reader seed with only source data still makes one links request. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md).
+For the segments and Source Card, a fresh load makes one request. It makes two if the translation language is missing and `translation-fallback` is `default`. The Reader also loads the surrounding section and its links.
+
+Supplied data makes no request for the non-Reader elements. A Reader seed with only source data still makes one links request. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md).
 
 ### Choose a translation language
 
