@@ -28,7 +28,15 @@ export async function testScriptSource(directory) {
       "utf8",
     ),
   );
-  const moduleBytes = await readFile(path.join(directory, manifest.entry));
+  const entries = Object.keys(manifest.entries ?? { [manifest.entry]: {} });
+  const moduleBytes = Object.fromEntries(
+    await Promise.all(
+      entries.map(async (name) => [
+        name,
+        await readFile(path.join(directory, name)),
+      ]),
+    ),
+  );
   const linksFixture = JSON.parse(
     await readFile(
       path.join(
@@ -44,12 +52,12 @@ export async function testScriptSource(directory) {
   );
   const assets = createServer((request, response) => {
     const pathname = new URL(request.url, "http://localhost").pathname;
-    if (
-      !["", "/sefaria-frontend-toolkit"].some(
-        (base) =>
-          pathname === `${base}/cdn/${manifest.version}/${manifest.entry}`,
-      )
-    ) {
+    const name = entries.find((entry) =>
+      ["", "/sefaria-frontend-toolkit"].some(
+        (base) => pathname === `${base}/cdn/${manifest.version}/${entry}`,
+      ),
+    );
+    if (!name) {
       response.writeHead(404).end();
       return;
     }
@@ -58,11 +66,17 @@ export async function testScriptSource(directory) {
         "content-type": "text/javascript",
         "access-control-allow-origin": "*",
       })
-      .end(moduleBytes);
+      .end(moduleBytes[name]);
   });
   const host = createServer((request, response) => {
     const parameters = new URL(request.url, "http://localhost").searchParams;
     const scenario = parameters.get("scenario");
+    if (scenario === "modules") {
+      response
+        .writeHead(200, { "content-type": "text/html" })
+        .end("<!doctype html><html><body></body></html>");
+      return;
+    }
     const sref =
       parameters.get("scenario") === "supplied"
         ? ""
@@ -82,6 +96,13 @@ export async function testScriptSource(directory) {
     for (const engine of [chromium, firefox, webkit]) {
       const browser = await engine.launch();
       try {
+        await testDataModules(browser, {
+          assetOrigin,
+          hostOrigin,
+          manifest,
+          entries,
+          fixture,
+        });
         for (const base of ["", "/sefaria-frontend-toolkit"]) {
           let liveText;
           for (const scenario of [
@@ -301,6 +322,109 @@ export async function testScriptSource(directory) {
       new Promise((resolve) => assets.close(resolve)),
       new Promise((resolve) => host.close(resolve)),
     ]);
+  }
+}
+
+const dataModules = {
+  "sefaria-client.js": [
+    "createSefariaClient",
+    "text",
+    "validateExternalResponse",
+  ],
+  "sefaria-text-transform.js": ["normalizeText", "applyVocalization"],
+};
+
+async function testDataModules(
+  browser,
+  { assetOrigin, hostOrigin, manifest, entries, fixture },
+) {
+  assert.deepEqual(
+    Object.keys(dataModules).filter((name) => !entries.includes(name)),
+    [],
+    "Manifest must list the client and text-transform modules.",
+  );
+  const base = `${assetOrigin}/cdn/${manifest.version}`;
+  const srcdoc = `<!doctype html><script type="module">
+    const report = (value) => parent.postMessage(value, "*");
+    try {
+      const client = await import(${JSON.stringify(`${base}/sefaria-client.js`)});
+      const transform = await import(${JSON.stringify(`${base}/sefaria-text-transform.js`)});
+      const response = await client.text.getV3Texts({ client: client.createSefariaClient(), path: { tref: "Micah 6:8" } });
+      report({
+        origin: String(self.origin),
+        client: Object.keys(client).sort(),
+        transform: Object.keys(transform).sort(),
+        ref: response.data?.ref ?? null,
+        normalized: typeof transform.normalizeText("<b>a</b>"),
+      });
+    } catch (error) {
+      report({ error: String(error && error.stack || error) });
+    }
+  </script>`;
+  const context = await browser.newContext();
+  try {
+    const page = await context.newPage();
+    const errors = [];
+    const origins = [];
+    page.on("pageerror", (error) => errors.push(error.message));
+    await context.route("**/*", async (route) => {
+      const requested = new URL(route.request().url());
+      if ([assetOrigin, hostOrigin].includes(requested.origin)) {
+        await route.continue();
+        return;
+      }
+      if (
+        requested.origin === "https://www.sefaria.org" &&
+        requested.pathname.startsWith("/api/v3/texts/")
+      ) {
+        origins.push(await route.request().headerValue("origin"));
+        await route.fulfill({
+          json: fixture,
+          headers: { "access-control-allow-origin": "*" },
+        });
+        return;
+      }
+      errors.push(`Unexpected request: ${requested.href}`);
+      await route.abort();
+    });
+    await page.goto(`${hostOrigin}/?scenario=modules`);
+    const result = await page.evaluate(
+      (document) =>
+        new Promise((resolve, reject) => {
+          const timer = globalThis.setTimeout(
+            () => reject(new Error("Sandboxed module timed out.")),
+            30_000,
+          );
+          globalThis.addEventListener("message", (event) => {
+            globalThis.clearTimeout(timer);
+            resolve(event.data);
+          });
+          const frame = globalThis.document.createElement("iframe");
+          frame.setAttribute("sandbox", "allow-scripts");
+          frame.srcdoc = document;
+          globalThis.document.body.append(frame);
+        }),
+      srcdoc,
+    );
+    assert.equal(result.error, undefined, result.error);
+    assert.equal(result.origin, "null");
+    for (const name of dataModules["sefaria-client.js"])
+      assert.ok(result.client.includes(name), `sefaria-client.js ${name}`);
+    for (const name of dataModules["sefaria-text-transform.js"])
+      assert.ok(
+        result.transform.includes(name),
+        `sefaria-text-transform.js ${name}`,
+      );
+    assert.equal(result.ref, fixture.ref);
+    assert.equal(result.normalized, "object");
+    assert.deepEqual(origins, ["null"]);
+    assert.deepEqual(errors, []);
+  } catch (error) {
+    throw new Error(`${browser.browserType().name()} data modules failed.`, {
+      cause: error,
+    });
+  } finally {
+    await context.close();
   }
 }
 

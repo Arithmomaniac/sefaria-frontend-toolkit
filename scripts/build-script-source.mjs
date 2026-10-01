@@ -23,8 +23,19 @@ import { isMainModule } from "./check.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 export const SCRIPT_ENTRY = "sefaria-elements.js";
-export const SCRIPT_FILES = [
+export const SCRIPT_ENTRIES = {
+  [SCRIPT_ENTRY]: path.join("web-components", "dist", "index.js"),
+  "sefaria-client.js": path.join("client", "dist", "index.js"),
+  "sefaria-text-transform.js": path.join("text-transform", "dist", "index.js"),
+};
+const LEGACY_SCRIPT_FILES = [
   SCRIPT_ENTRY,
+  "LICENSE.txt",
+  "THIRD-PARTY-NOTICES.txt",
+  "source.tar.gz",
+];
+export const SCRIPT_FILES = [
+  ...Object.keys(SCRIPT_ENTRIES),
   "LICENSE.txt",
   "THIRD-PARTY-NOTICES.txt",
   "source.tar.gz",
@@ -36,7 +47,10 @@ export const measure = (bytes) => ({
   gzip: gzipSync(bytes, { level: 9 }).length,
 });
 
-export async function bundleElements({ split = false } = {}) {
+export async function bundleElements({
+  split = false,
+  entry = SCRIPT_ENTRY,
+} = {}) {
   const directory = path.join(root, "packages", "web-components", "dist");
   const output = await build({
     configFile: false,
@@ -59,11 +73,11 @@ export async function bundleElements({ split = false } = {}) {
                 path.join(directory, `${name}-element.js`),
               ]),
             )
-          : { elements: path.join(directory, "index.js") },
+          : { entry: path.join(root, "packages", SCRIPT_ENTRIES[entry]) },
         preserveEntrySignatures: "strict",
         output: {
           format: "es",
-          entryFileNames: split ? "[name].js" : SCRIPT_ENTRY,
+          entryFileNames: split ? "[name].js" : entry,
           chunkFileNames: "shared-[hash].js",
           banner:
             "/*! GPL-3.0-only. See LICENSE.txt, THIRD-PARTY-NOTICES.txt and source.tar.gz beside this file. */",
@@ -143,8 +157,15 @@ export async function buildScriptSource({
     throw new Error("Invalid script version.");
   if (!/^[a-f0-9]{40}$/u.test(sourceSha))
     throw new Error("Invalid source SHA.");
-  const chunks = await bundleElements();
-  const dependencies = await dependencyRoots(chunks);
+  const bundles = Object.fromEntries(
+    await Promise.all(
+      Object.keys(SCRIPT_ENTRIES).map(async (entry) => [
+        entry,
+        (await bundleElements({ entry }))[0],
+      ]),
+    ),
+  );
+  const dependencies = await dependencyRoots(Object.values(bundles));
   await mkdir(destination, { recursive: true });
   const source = await mkdtemp(path.join(tmpdir(), "sefaria-script-source-"));
   try {
@@ -214,7 +235,8 @@ export async function buildScriptSource({
       },
       ["SOURCE.txt", "toolkit", "dependencies"],
     );
-    await writeFile(path.join(destination, SCRIPT_ENTRY), chunks[0].code);
+    for (const [entry, chunk] of Object.entries(bundles))
+      await writeFile(path.join(destination, entry), chunk.code);
     await cp(path.join(root, "LICENSE"), path.join(destination, "LICENSE.txt"));
     await writeFile(
       path.join(destination, "THIRD-PARTY-NOTICES.txt"),
@@ -229,11 +251,17 @@ export async function buildScriptSource({
       ),
     );
     const manifest = {
-      schemaVersion: 1,
+      schemaVersion: 2,
       version,
       sourceSha,
       entry: SCRIPT_ENTRY,
-      size: measure(chunks[0].code),
+      size: measure(bundles[SCRIPT_ENTRY].code),
+      entries: Object.fromEntries(
+        Object.entries(bundles).map(([entry, chunk]) => [
+          entry,
+          { size: measure(chunk.code) },
+        ]),
+      ),
       gzipLevel: 9,
       dependencies: dependencies.map(({ manifest: dependency }) => ({
         name: dependency.name,
@@ -277,54 +305,78 @@ export async function buildScriptSource({
   }
 }
 
-export async function verifyScriptSource(directory) {
-  const manifest = z
-    .strictObject({
-      schemaVersion: z.literal(1),
-      version: z
-        .string()
-        .regex(/^(?:local|0\.0\.0-alpha\.[1-9]\d*\.[1-9]\d*)$/u),
-      sourceSha: z.string().regex(/^[a-f0-9]{40}$/u),
-      entry: z.literal(SCRIPT_ENTRY),
-      size: z.strictObject({
-        raw: z.number().int().positive(),
-        gzip: z.number().int().positive(),
+const sizeSchema = z.strictObject({
+  raw: z.number().int().positive(),
+  gzip: z.number().int().positive(),
+});
+const hashes = (names) =>
+  z.strictObject(
+    Object.fromEntries(
+      names.map((name) => [name, z.string().regex(/^[a-f0-9]{64}$/u)]),
+    ),
+  );
+const manifestBase = {
+  version: z.string().regex(/^(?:local|0\.0\.0-alpha\.[1-9]\d*\.[1-9]\d*)$/u),
+  sourceSha: z.string().regex(/^[a-f0-9]{40}$/u),
+  entry: z.literal(SCRIPT_ENTRY),
+  size: sizeSchema,
+  gzipLevel: z.literal(9),
+  dependencies: z
+    .array(
+      z.strictObject({
+        name: z.string().min(1),
+        version: z.string().min(1),
+        license: z.string().min(1),
       }),
-      gzipLevel: z.literal(9),
-      dependencies: z
-        .array(
-          z.strictObject({
-            name: z.string().min(1),
-            version: z.string().min(1),
-            license: z.string().min(1),
-          }),
-        )
-        .min(1),
-      files: z.strictObject(
-        Object.fromEntries(
-          SCRIPT_FILES.map((name) => [
-            name,
-            z.string().regex(/^[a-f0-9]{64}$/u),
-          ]),
-        ),
+    )
+    .min(1),
+};
+const manifestSchema = z.discriminatedUnion("schemaVersion", [
+  z.strictObject({
+    schemaVersion: z.literal(1),
+    ...manifestBase,
+    files: hashes(LEGACY_SCRIPT_FILES),
+  }),
+  z.strictObject({
+    schemaVersion: z.literal(2),
+    ...manifestBase,
+    entries: z.strictObject(
+      Object.fromEntries(
+        Object.keys(SCRIPT_ENTRIES).map((name) => [
+          name,
+          z.strictObject({ size: sizeSchema }),
+        ]),
       ),
-    })
-    .parse(
-      JSON.parse(await readFile(path.join(directory, "manifest.json"), "utf8")),
-    );
-  for (const name of SCRIPT_FILES) {
+    ),
+    files: hashes(SCRIPT_FILES),
+  }),
+]);
+
+/** Files carried by a manifest; retained schema 1 releases are elements-only. */
+export const manifestFiles = (manifest) =>
+  manifest.schemaVersion === 1 ? LEGACY_SCRIPT_FILES : SCRIPT_FILES;
+
+export async function verifyScriptSource(directory) {
+  const manifest = manifestSchema.parse(
+    JSON.parse(await readFile(path.join(directory, "manifest.json"), "utf8")),
+  );
+  for (const name of manifestFiles(manifest)) {
     if (
       sha256(await readFile(path.join(directory, name))) !==
       manifest.files[name]
     )
       throw new Error(`Script hash mismatch: ${name}.`);
   }
-  const size = measure(await readFile(path.join(directory, SCRIPT_ENTRY)));
+  const sizes = manifest.entries ?? { [SCRIPT_ENTRY]: { size: manifest.size } };
   if (
-    manifest.gzipLevel !== 9 ||
-    JSON.stringify(size) !== JSON.stringify(manifest.size)
+    JSON.stringify(sizes[SCRIPT_ENTRY].size) !== JSON.stringify(manifest.size)
   )
     throw new Error("Script size mismatch.");
+  for (const [name, { size: expected }] of Object.entries(sizes)) {
+    const size = measure(await readFile(path.join(directory, name)));
+    if (JSON.stringify(size) !== JSON.stringify(expected))
+      throw new Error(`Script size mismatch: ${name}.`);
+  }
   return manifest;
 }
 
@@ -333,5 +385,5 @@ if (isMainModule(import.meta.url, process.argv[1])) {
     version: process.env.SCRIPT_VERSION ?? "local",
     compare: process.argv.includes("--compare"),
   });
-  process.stdout.write(`${JSON.stringify(manifest.size)}\n`);
+  process.stdout.write(`${JSON.stringify(manifest.entries)}\n`);
 }

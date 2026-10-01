@@ -54,6 +54,8 @@ export const EXAMPLE_BUILDS = [
 
 export const SITE_REQUIRED_FILES = [
   "cdn/local/sefaria-elements.js",
+  "cdn/local/sefaria-client.js",
+  "cdn/local/sefaria-text-transform.js",
   "cdn/local/manifest.json",
   "cdn/local/LICENSE.txt",
   "cdn/local/THIRD-PARTY-NOTICES.txt",

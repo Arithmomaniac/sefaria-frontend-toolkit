@@ -83,6 +83,10 @@ describe("documentation site build plan", () => {
 
   it("requires real pages rather than accepting an HTML fallback", () => {
     expect(SITE_REQUIRED_FILES).not.toContain("README.html");
+    expect(SITE_REQUIRED_FILES).toContain("cdn/local/sefaria-client.js");
+    expect(SITE_REQUIRED_FILES).toContain(
+      "cdn/local/sefaria-text-transform.js",
+    );
     expect(SITE_REQUIRED_FILES).toContain("examples/explorer/authored.html");
     expect(SITE_REQUIRED_FILES).toContain("examples/playground/index.html");
     expect(SITE_REQUIRED_FILES).toContain("examples/reader/controlled.html");

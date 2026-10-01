@@ -30,6 +30,31 @@ The pinned path is `https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn
 <sefaria-source-card sref="Micah 6:8"></sefaria-source-card>
 ```
 
+### Data and text-tool modules
+
+**Implementation status:** local build and deterministic qualification are implemented, but no release containing these files has been hosted yet. Builds also produce two self-contained, minified ES modules beside `sefaria-elements.js`. Each one re-exports one package root API.
+
+| File                        | Package root                            |
+| --------------------------- | --------------------------------------- |
+| `sefaria-client.js`         | `@arithmomaniac/sefaria-client`         |
+| `sefaria-text-transform.js` | `@arithmomaniac/sefaria-text-transform` |
+
+Each file name is the unscoped package name. `sefaria-elements.js` is named for the elements it registers. These modules have no side effects, so they are named for the package API they expose. They add no acquisition, retry, caching, or transport policy beyond the package root. They run without an import map. Like the elements module, they also run inside an opaque-origin sandboxed `srcdoc` iframe, where Sefaria requests carry `Origin: null`.
+
+```js
+import {
+  createSefariaClient,
+  text,
+  validateExternalResponse,
+} from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-client.js";
+import {
+  normalizeText,
+  applyVocalization,
+} from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-text-transform.js";
+```
+
+A module instance is independent: a client module and the elements module do not share a client, cache, or default acquisition. All three modules in a release share one license, notice, source archive, and manifest. Releases retained from before this change keep their elements-only file set.
+
 Each newly published, fully verified synchronized package release automatically receives a script release with the same version and source commit. Partial package publication must not advertise a script release. The package producer's run ID and attempt own the version; a Pages redeployment does not create a version. Historical package releases are not automatically backfilled.
 
 Repeated loading must not throw, including separate evaluations of identical module bytes. Existing definitions win. Loading multiple versions does not replace registered elements, and configuring one module instance does not configure another; mixing versions and their exports is not a supported composition strategy.
@@ -50,7 +75,7 @@ Names and URLs may change. The existing Pages location remains the host for reta
 
 ### License, source, and size
 
-Each release includes the toolkit's GPL-3.0-only license, full required third-party license notices derived from the actual bundled dependency graph, corresponding-source access, and a manifest identifying its exact source commit, dependency versions, and file hashes. Missing license or source evidence blocks publication. Retirement of script serving does not waive applicable source-distribution obligations.
+Each release includes the toolkit's GPL-3.0-only license, full required third-party license notices derived from the actual bundled dependency graph, corresponding-source access, and a manifest identifying its exact source commit, dependency versions, and file hashes. Notices cover the union of dependencies bundled by every module. Manifest schema version 2 lists every module with its own measured size. Restoration still accepts the schema version 1, elements-only manifests of retained releases. Missing license or source evidence blocks publication. Retirement of script serving does not waive applicable source-distribution obligations.
 
 The build records raw bytes and gzip bytes with fixed compression settings. Measurement is over the final minified module and is checked against its bytes; it is not a claim about the encoding served by Pages. The initial delivery also records an all-elements versus per-element/shared-chunk comparison, including the complete Source Card dependency closure.
 
@@ -58,7 +83,7 @@ The build records raw bytes and gzip bytes with fixed compression settings. Meas
 
 Required deterministic acceptance uses the actual production artifact on a separate-origin plain HTML host. Only Sefaria HTTP responses may be intercepted with corrected fixtures; custom acquisition, import maps, source aliases, or development transforms cannot substitute for the script path.
 
-Acceptance proves standalone Micah 6:8 rendering, all five registrations and absence of Popup and Reference Label in new builds, duplicate evaluation, exact outer/child request counts, supplied-data behavior, visible validation failure, cross-deploy byte identity, explicit retirement, fail-closed archive restoration, and independently recomputed sizes. Local checks stay offline and cannot publish their fixture version.
+Acceptance proves standalone Micah 6:8 rendering, all five registrations and absence of Popup and Reference Label in new builds, duplicate evaluation, exact outer/child request counts, supplied-data behavior, visible validation failure, cross-deploy byte identity, explicit retirement, fail-closed archive restoration, and independently recomputed sizes. For the data and text-tool modules, acceptance proves that each module has no unresolved static or dynamic module specifiers. It also proves that each module imports inside a `sandbox="allow-scripts"` `srcdoc` iframe and exposes its package-root exports. It proves that a client request from that iframe carries `Origin: null`. Local checks stay offline and cannot publish their fixture version.
 
 Hosted delivery additionally requires anonymous loading from the actual Pages URL, correct JavaScript MIME and CORS, matching package identity, accessible notices/source, and preservation of an older active pin after a later deployment. Local workflow tests alone do not establish hosted availability.
 
