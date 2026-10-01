@@ -66,3 +66,31 @@ class PreparedStateDirective extends Directive {
 
 /** Supplies package-private prepared state to a composed child element. */
 export const prepared = directive(PreparedStateDirective);
+
+const connectionSelectionHosts = new WeakSet<object>();
+
+/** Reports whether a composing parent asked for connection-oriented selection labels. */
+export function usesConnectionSelectionLabels(target: object): boolean {
+  return connectionSelectionHosts.has(target);
+}
+
+class ConnectionSelectionLabelsDirective extends Directive {
+  render() {
+    return nothing;
+  }
+
+  override update(part: Parameters<Directive["update"]>[0]) {
+    const element = (part as ElementPart).element as HTMLElement &
+      PreparedStateHost;
+    if (!connectionSelectionHosts.has(element)) {
+      connectionSelectionHosts.add(element);
+      element.requestUpdate();
+    }
+    return nothing;
+  }
+}
+
+/** Marks a composed child whose selection loads connections in its parent. */
+export const connectionSelectionLabels = directive(
+  ConnectionSelectionLabelsDirective,
+);

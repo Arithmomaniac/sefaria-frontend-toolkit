@@ -453,7 +453,7 @@ async function interactWithProject(page, project) {
       break;
     case "source-card":
       await frame
-        .getByRole("button", { name: "Show connections for Micah 6:8" })
+        .getByRole("button", { name: "Select Micah 6:8" })
         .first()
         .click();
       await frame.getByText(/Selected Micah 6:8 at position/u).waitFor();
@@ -505,7 +505,7 @@ async function qualifyRepresentativeEditing(page, name) {
   await page.getByRole("button", { name: "Run" }).click();
   await previewFrame(page)
     .getByRole("button", {
-      name: "Show connections for Micah 6:8",
+      name: "Select Micah 6:8",
     })
     .first()
     .press("Enter");

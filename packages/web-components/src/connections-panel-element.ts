@@ -296,8 +296,8 @@ export class SefariaConnectionsPanel extends SefariaElement {
           ? nothing
           : preview.state === "available"
             ? html`
-                ${preview.english ? html`<div class="preview english" lang="en" dir="ltr">${unsafeHTML(this.#safeHtml(preview.english.html))}</div>` : html`<p>No English-channel text.</p>`}
-                ${preview.hebrew ? html`<div class="preview hebrew" lang="he" dir="rtl">${unsafeHTML(this.#safeHtml(preview.hebrew.html))}</div>` : html`<p>No Hebrew-channel text.</p>`}
+                ${preview.english ? html`<div class="preview english" lang="en" dir="ltr">${unsafeHTML(this.#safeHtml(preview.english.html))}</div>` : html`<p>No English text.</p>`}
+                ${preview.hebrew ? html`<div class="preview hebrew" lang="he" dir="rtl">${unsafeHTML(this.#safeHtml(preview.hebrew.html))}</div>` : html`<p>No Hebrew text.</p>`}
                 ${preview.english?.truncated || preview.hebrew?.truncated ? html`<p>Preview shortened. Open the connection to read more.</p>` : nothing}
                 ${entry.editions.length ? html`<p class="metadata">Editions reported for this connection: ${entry.editions.join("; ")}</p>` : nothing}
                 ${entry.licenses.length ? html`<p class="metadata">Licenses reported: ${entry.licenses.join("; ")}</p>` : nothing}
@@ -505,7 +505,7 @@ export class SefariaConnectionsPanel extends SefariaElement {
         message:
           error instanceof Error
             ? error.message
-            : "Connections projection failed.",
+            : "Connections could not be displayed.",
       });
     }
   }

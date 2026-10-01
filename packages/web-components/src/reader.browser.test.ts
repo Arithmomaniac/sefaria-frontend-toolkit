@@ -253,6 +253,41 @@ test("applies documented part styles and inherited tokens without exposing child
   expect(sourceCard.getAttribute("exportparts")).toBeNull();
 });
 
+test("labels its inner source selection as showing connections", async () => {
+  const text = {
+    state: "data",
+    ref: "Micah 6:8",
+    heRef: "מיכה ו׳:ח׳",
+    language: "en",
+    actualLanguage: "en",
+    direction: "ltr",
+    bodyHtml: "Do justice.",
+    notes: [],
+  } as const;
+  const element = await mount({
+    ...paired,
+    source: {
+      viewModel: {
+        ...source,
+        items: [
+          {
+            ...source.items[0],
+            pair: { state: "data", primary: text, translation: text },
+          },
+        ],
+      },
+      selectedPosition: [0],
+    },
+  } as ReaderViewModel);
+  const sourceCard = element.shadowRoot!.querySelector("sefaria-source-card")!;
+  await sourceCard.updateComplete;
+  const labels = [
+    ...sourceCard.shadowRoot!.querySelectorAll("button[aria-pressed]"),
+  ].map((button) => button.getAttribute("aria-label"));
+  expect(labels.length).toBeGreaterThan(0);
+  expect(new Set(labels)).toEqual(new Set(["Show connections for Micah 6:8"]));
+});
+
 test("renders paired state and forwards each child action once with origin identity", async () => {
   const fetch = vi.fn();
   vi.stubGlobal("fetch", fetch);

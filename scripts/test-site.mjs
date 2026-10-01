@@ -814,7 +814,7 @@ try {
     );
     await initialCard
       .getByRole("button", {
-        name: "Show connections for Micah 6:8",
+        name: "Select Micah 6:8",
       })
       .first()
       .click();
@@ -884,7 +884,7 @@ try {
     );
     await alpineCard
       .getByRole("button", {
-        name: "Show connections for Micah 6:8",
+        name: "Select Micah 6:8",
       })
       .first()
       .click();
