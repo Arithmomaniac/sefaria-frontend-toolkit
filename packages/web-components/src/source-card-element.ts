@@ -43,7 +43,16 @@ import {
   type SelectedTextProgress,
 } from "./translation-selection.js";
 
-/** Custom element that renders supplied or acquired source-card data. */
+/**
+ * Shows a passage as a card. The card has a heading, the text in the primary edition, a translation, and the title of each edition shown. When an edition's source is a valid http(s) address, the title links to it. Any other source appears as plain text.
+ *
+ * @data `data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
+ * @empty The element shows its empty state when the response has no text for either side. The card keeps its heading and edition details. It shows why each side is missing, such as `No primary text is available.`
+ * @fires sefaria-source-select - Reports that a reader selected one item in the source card.
+ * @eventDetail sefaria-source-select - `position` is the selected segment's position as an array of numbers. `ref` is its reference.
+ * @fires sefaria-source-card-error - Reports a failure while loading or validating data from `sref`.
+ * @eventDetail sefaria-source-card-error - `error` is the original failure. `sref` is the reference that was loading.
+ */
 export class SefariaSourceCard extends SefariaElement {
   /** Lit property metadata for declarative data and presentation state. */
   static override properties = {

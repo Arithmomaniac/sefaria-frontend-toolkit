@@ -17,7 +17,20 @@ describe("generated public metadata", () => {
         path: string;
         declarations?: Array<{
           tagName?: string;
-          events?: Array<{ name: string }>;
+          description?: string;
+          events?: Array<{
+            name: string;
+            description?: string;
+            detail?: string;
+            cancelable?: boolean;
+          }>;
+          members?: Array<{
+            name: string;
+            readonly?: boolean;
+            description?: string;
+          }>;
+          data?: string;
+          empty?: string;
           slots?: unknown[];
           cssParts?: unknown[];
           cssProperties?: Array<{ name: string }>;
@@ -76,6 +89,93 @@ describe("generated public metadata", () => {
       }
       expect(element.cssProperties?.length).toBeGreaterThan(10);
     }
+  });
+
+  it("publishes element reference text from source JSDoc", async () => {
+    const manifest = JSON.parse(
+      await readFile(
+        path.join(repository, "packages/web-components/custom-elements.json"),
+        "utf8",
+      ),
+    ) as {
+      modules: Array<{
+        declarations?: Array<{
+          tagName?: string;
+          description?: string;
+          events?: Array<{
+            name: string;
+            description?: string;
+            detail?: string;
+            cancelable?: boolean;
+          }>;
+          members?: Array<{
+            name: string;
+            readonly?: boolean;
+            description?: string;
+          }>;
+          data?: string;
+          empty?: string;
+        }>;
+      }>;
+    };
+    const byTag = new Map(
+      manifest.modules
+        .flatMap((module) => module.declarations ?? [])
+        .filter((declaration) => declaration.tagName !== undefined)
+        .map((declaration) => [declaration.tagName!, declaration]),
+    );
+
+    expect(byTag.get("sefaria-text-segment")?.description).toBe(
+      "Shows the text of one passage in one selected edition.",
+    );
+    expect(byTag.get("sefaria-text-segment")?.data).toContain(
+      "`data` takes the body of a successful `GET /api/v3/texts/{tref}` response",
+    );
+    expect(byTag.get("sefaria-reader")?.data).toBeUndefined();
+    expect(byTag.get("sefaria-reader")?.empty).toContain(
+      "A Reader that has never had `sref` is blank.",
+    );
+
+    const readerBack = byTag
+      .get("sefaria-reader")
+      ?.events?.find((event) => event.name === "sefaria-reader-back");
+    expect(readerBack).toMatchObject({
+      description:
+        "Requests navigation to the previous entry. Call `preventDefault()` to stop the Reader from going back.",
+      detail: "`originEntryId`, the entry the Reader was showing",
+      cancelable: true,
+    });
+    expect(
+      byTag
+        .get("sefaria-text-segment")
+        ?.events?.find((event) => event.name === "sefaria-text-segment-error"),
+    ).toMatchObject({
+      description:
+        "Reports a failure while loading or validating data from `sref`.",
+      detail:
+        "`error` is the original failure. `sref` is the reference that was loading.",
+      cancelable: false,
+    });
+    expect(
+      byTag
+        .get("sefaria-text-segment")
+        ?.members?.find((member) => member.name === "selectedVersion"),
+    ).toMatchObject({ readonly: true });
+    expect(
+      byTag
+        .get("sefaria-reader")
+        ?.members?.filter((member) => member.readonly)
+        .map((member) => member.name)
+        .sort(),
+    ).toEqual([
+      "canGoBack",
+      "currentEntryId",
+      "historyTruncated",
+      "readerError",
+      "rootLoading",
+      "selectedRef",
+      "status",
+    ]);
   });
 
   it("publishes declaration-derived inventory for   all 16 supported subpaths", async () => {

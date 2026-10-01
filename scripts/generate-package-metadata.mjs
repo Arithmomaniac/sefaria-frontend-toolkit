@@ -20,92 +20,6 @@ const generatedFiles = {
   exports: path.join(repository, "packages", "public-exports.json"),
 };
 
-const eventCatalog = {
-  "sefaria-bilingual-segment": [
-    event(
-      "sefaria-bilingual-segment-error",
-      "Reports a failure while loading or validating data from `sref`.",
-    ),
-  ],
-  "sefaria-connections-panel": [
-    event(
-      "sefaria-connections-category-change",
-      "Asks to show a different connection category.",
-    ),
-    event(
-      "sefaria-connections-preview-request",
-      "Requests connection previews. The element loads them unless a listener cancels the event.",
-    ),
-    event(
-      "sefaria-connections-page-change",
-      "Asks to show a different page of connections.",
-    ),
-    event(
-      "sefaria-connection-select",
-      "Reports that a reader selected one connected reference.",
-    ),
-    event(
-      "sefaria-connections-panel-error",
-      "Reports a failure while loading or validating data from `sref`.",
-    ),
-  ],
-  "sefaria-reader": [
-    event("sefaria-reader-back", "Requests navigation to the previous entry."),
-    event(
-      "sefaria-reader-history-activate",
-      "Asks to return to one saved history entry.",
-    ),
-    event(
-      "sefaria-reader-pane-change",
-      "Asks to show a different pane in the compact layout.",
-    ),
-    event(
-      "sefaria-reader-chat-export",
-      "Asks your page to send a reference to chat.",
-    ),
-    event(
-      "sefaria-reader-source-select",
-      "Reports that a reader selected one item in the source card.",
-    ),
-    event(
-      "sefaria-reader-connections-category-change",
-      "Asks to show a different connection category.",
-    ),
-    event(
-      "sefaria-reader-connections-page-change",
-      "Asks to show a different connection page.",
-    ),
-    event(
-      "sefaria-reader-connection-select",
-      "Reports that a reader selected one connected reference.",
-    ),
-    event(
-      "sefaria-reader-connections-preview-request",
-      "Requests connection previews. The element loads them unless a listener cancels the event.",
-    ),
-    event(
-      "sefaria-reader-error",
-      "Reports a loading failure or a rejection of the starting data.",
-    ),
-  ],
-  "sefaria-source-card": [
-    event(
-      "sefaria-source-select",
-      "Reports that a reader selected one item in the source card.",
-    ),
-    event(
-      "sefaria-source-card-error",
-      "Reports a failure while loading or validating data from `sref`.",
-    ),
-  ],
-  "sefaria-text-segment": [
-    event(
-      "sefaria-text-segment-error",
-      "Reports a failure while loading or validating data from `sref`.",
-    ),
-  ],
-};
-
 const cssPropertyCatalog = [
   cssProperty(
     "--sefaria-surface",
@@ -207,7 +121,7 @@ await emit(
 );
 
 process.stdout.write(
-  `Public metadata: ${Object.keys(eventCatalog).length} elements, ${publicExports.packages.reduce((count, packageEntry) => count + packageEntry.exports.length, 0)} package exports\n`,
+  `Public metadata: ${customElements.modules.flatMap((module) => module.declarations).length} elements, ${publicExports.packages.reduce((count, packageEntry) => count + packageEntry.exports.length, 0)} package exports\n`,
 );
 
 async function runAnalyzer() {
@@ -244,13 +158,6 @@ async function buildCustomElementsManifest() {
       sourceEvents.add(match[1]);
     }
   }
-  const documentedEvents = new Set(
-    Object.values(eventCatalog)
-      .flat()
-      .map((entry) => entry.name),
-  );
-  assertSameSet("custom-element events", sourceEvents, documentedEvents);
-
   const tokenSource = await readFile(
     path.join(webComponentsDirectory, "src", "tokens.ts"),
     "utf8",
@@ -274,6 +181,7 @@ async function buildCustomElementsManifest() {
     if (declarations.length === 0) continue;
     const source = await readFile(path.join(repository, module.path), "utf8");
     for (const declaration of declarations) {
+      const reference = parseElementReference(source, declaration);
       verifyElementTemplateContract({
         declaration,
         sourcePath: module.path,
@@ -283,7 +191,16 @@ async function buildCustomElementsManifest() {
         (member) =>
           member.privacy !== "private" && !member.name?.startsWith("#"),
       );
-      declaration.events = eventCatalog[declaration.tagName];
+      declaration.description = reference.description;
+      if (reference.data !== undefined) declaration.data = reference.data;
+      declaration.empty = reference.empty;
+      declaration.events = reference.events.map((entry) => ({
+        name: entry.name,
+        description: entry.description,
+        detail: entry.detail,
+        cancelable: isCancelableEvent(source, entry.name),
+        type: { text: "CustomEvent" },
+      }));
       declaration.slots ??= [];
       declaration.cssParts ??= [];
       declaration.cssProperties =
@@ -313,8 +230,22 @@ async function buildCustomElementsManifest() {
   assertSameSet(
     "registered element tags",
     new Set(tags),
-    new Set(Object.keys(eventCatalog)),
+    new Set([
+      "sefaria-bilingual-segment",
+      "sefaria-connections-panel",
+      "sefaria-reader",
+      "sefaria-source-card",
+      "sefaria-text-segment",
+    ]),
   );
+  const documentedEvents = new Set(
+    modules.flatMap((module) =>
+      module.declarations.flatMap((declaration) =>
+        declaration.events.map((event) => event.name),
+      ),
+    ),
+  );
+  assertSameSet("custom-element events", sourceEvents, documentedEvents);
   return { schemaVersion: "1.0.0", readme: "", modules };
 }
 
@@ -384,12 +315,111 @@ function normalizeModulePaths(value) {
     .replace(/\.ts$/u, ".js");
 }
 
-function event(name, description) {
-  return { name, description, type: { text: "CustomEvent" } };
-}
-
 function cssProperty(name, description, defaultValue) {
   return { name, description, default: defaultValue };
+}
+
+function parseElementReference(source, declaration) {
+  const className = declaration.name;
+  const classStart = source.search(
+    new RegExp(`export\\s+class\\s+${className}\\b`, "u"),
+  );
+  if (classStart === -1) {
+    throw new Error(`${declaration.tagName} must have class JSDoc.`);
+  }
+  const prefix = source.slice(0, classStart);
+  const comments = [...prefix.matchAll(/\/\*\*([\s\S]*?)\*\//gu)];
+  const comment = comments.at(-1);
+  if (!comment) {
+    throw new Error(`${declaration.tagName} must have class JSDoc.`);
+  }
+  const lines = comment[1]
+    .split(/\r?\n/u)
+    .map((line) => line.replace(/^\s*\*\s?/u, "").trimEnd());
+  const description = [];
+  const events = new Map();
+  let data;
+  let empty;
+  for (const line of lines) {
+    if (line.startsWith("@")) {
+      const tag = /^@(\S+)\s+([\s\S]*)$/u.exec(line);
+      if (!tag) continue;
+      const [, name, value] = tag;
+      if (name === "fires") {
+        const parsed = parseNamedText(value, `${declaration.tagName} @fires`);
+        events.set(parsed.name, { ...events.get(parsed.name), ...parsed });
+      } else if (name === "eventDetail") {
+        const parsed = parseNamedText(
+          value,
+          `${declaration.tagName} @eventDetail`,
+        );
+        events.set(parsed.name, {
+          ...events.get(parsed.name),
+          name: parsed.name,
+          detail: parsed.text,
+        });
+      } else if (name === "data") {
+        data = value.trim();
+      } else if (name === "empty") {
+        empty = value.trim();
+      }
+      continue;
+    }
+    if (line.length > 0) description.push(line);
+  }
+  const missing = [];
+  if (description.join(" ").trim().length === 0) missing.push("summary");
+  if (empty === undefined) missing.push("@empty");
+  for (const [name, event] of events) {
+    if (!event.text) missing.push(`@fires ${name}`);
+    if (!event.detail) missing.push(`@eventDetail ${name}`);
+  }
+  if (events.size === 0) missing.push("@fires");
+  if (
+    [
+      "sefaria-text-segment",
+      "sefaria-bilingual-segment",
+      "sefaria-source-card",
+    ].includes(declaration.tagName) &&
+    data === undefined
+  ) {
+    missing.push("@data");
+  }
+  if (missing.length > 0) {
+    throw new Error(`${declaration.tagName} missing ${missing.join(", ")}.`);
+  }
+  return {
+    description: description.join(" ").trim(),
+    data,
+    empty,
+    events: [...events.values()].map((event) => ({
+      name: event.name,
+      description: event.text,
+      detail: event.detail,
+    })),
+  };
+}
+
+function parseNamedText(value, context) {
+  const parsed = /^(\S+)\s+-\s+(.+)$/u.exec(value.trim());
+  if (!parsed) throw new Error(`${context} must use "name - text".`);
+  return { name: parsed[1], text: parsed[2] };
+}
+
+function isCancelableEvent(source, name) {
+  const viaEmit = source.includes(`#emit("${name}"`);
+  const emitCancelable = /#emit\(name: string[\s\S]*?cancelable: true/u.test(
+    source,
+  );
+  const directStart = source.indexOf(`new CustomEvent("${name}"`);
+  const directEnd =
+    directStart === -1 ? -1 : source.indexOf("}),", directStart);
+  const direct =
+    directStart !== -1 &&
+    /cancelable:\s*true/u.test(
+      source.slice(directStart, directEnd === -1 ? source.length : directEnd),
+    );
+  return direct || (viaEmit && emitCancelable);
 }
 
 function assertSameSet(label, actual, expected) {
