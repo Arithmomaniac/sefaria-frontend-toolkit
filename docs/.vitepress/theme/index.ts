@@ -25,10 +25,6 @@ export default {
           : null,
       "home-hero-after": () =>
         frontmatter.value.heroExample ? h(HeroExample) : null,
-      "doc-before": () =>
-        frontmatter.value.humanReviewed === false
-          ? h(HumanReviewWarning)
-          : null,
       "layout-bottom": () => [
         frontmatter.value.acknowledgement
           ? h(
@@ -45,6 +41,7 @@ export default {
     app.component("ApiEntry", ApiEntry);
     app.component("CodeLanguageToggle", CodeLanguageToggle);
     app.component("HeroExample", HeroExample);
+    app.component("HumanReviewWarning", HumanReviewWarning);
     app.component("LandingPreview", LandingPreview);
     app.component("PlaygroundEmbed", PlaygroundEmbed);
     app.component("SourceCardSnippet", SourceCardSnippet);

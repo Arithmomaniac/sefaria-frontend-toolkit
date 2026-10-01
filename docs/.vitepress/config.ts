@@ -119,6 +119,16 @@ export default withMermaid(
     },
     markdown: {
       config(markdown) {
+        markdown.core.ruler.push("human-review-warning", (state) => {
+          if (state.env.frontmatter?.humanReviewed !== false) return;
+          const index = state.tokens.findIndex(
+            (token) => token.type === "heading_close" && token.tag === "h1",
+          );
+          if (index === -1) return;
+          const box = new state.Token("html_block", "", 0);
+          box.content = "<HumanReviewWarning />\n";
+          state.tokens.splice(index + 1, 0, box);
+        });
         markdown.core.ruler.after(
           "block",
           "remove-leading-provenance-block",

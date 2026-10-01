@@ -700,19 +700,6 @@ pre.site-code {
   fill: var(--vp-c-bg) !important;
 }
 
-/* doc-before renders above the Markdown H1, so reorder the box beneath it. */
-.content-container:has(> .human-review-warning) {
-  display: flex;
-  flex-direction: column;
-}
-.content-container:has(> .human-review-warning) > .main,
-.content-container:has(> .human-review-warning) > .main > .vp-doc {
-  display: contents;
-}
-.content-container:has(> .human-review-warning) h1 {
-  order: -2;
-}
 .human-review-warning {
-  order: -1;
   margin-top: 0;
 }

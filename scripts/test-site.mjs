@@ -72,6 +72,11 @@ try {
     if (!flaggedHtml.includes("human-review-warning")) {
       throw new Error("A flagged page is missing the human-review warning");
     }
+    if (
+      flaggedHtml.indexOf("<h1") > flaggedHtml.indexOf("human-review-warning")
+    ) {
+      throw new Error("The human-review warning must follow the H1");
+    }
     const approvedHtml = await builtHtml(
       "use-components/add-the-complete-reader.html",
     );
