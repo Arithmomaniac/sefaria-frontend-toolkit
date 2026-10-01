@@ -11,7 +11,14 @@ import { data as snippets } from "./snippets.data.ts";
 
 # Fetch data or clean text
 
-This flow uses two independent packages from the toolkit. The client fetches from Sefaria's API and checks each JSON response against the corrected API description. The text tools turn Sefaria's HTML into safe HTML, keep footnotes separate, and choose which vowel and cantillation marks to show. Use the client when you don't have the data yet. Use the text tools when you already hold Sefaria HTML. Use both when you fetch and then display. Neither needs a browser or a DOM, so they run on a server. Want ready-made UI? [Use components](/use-components/start-here.md).
+This flow uses two independent packages from the toolkit:
+
+- **The client** fetches from Sefaria's API and checks each JSON response against the corrected API description. Use it when you don't have the data yet.
+- **The text tools** turn Sefaria's HTML into safe HTML, keep footnotes separate, and choose which vowel and cantillation marks to show. Use them when you already hold Sefaria HTML.
+
+Use both when you fetch and then display. Neither needs a browser or a DOM, so they run on a server.
+
+Want ready-made UI? [Use components](/use-components/start-here.md).
 
 ## Install
 
@@ -25,9 +32,11 @@ Each example below is a complete ES module. Save the JavaScript version as a fil
 
 <CodeLanguageToggle :snippet="snippets['client-first-success']" />
 
-The first part prints `Micah 6:8 · he · Miqra according to the Masorah`. `createSefariaClient()` makes a client for `https://www.sefaria.org`. `text.getV3Texts` is the generated function for Sefaria's texts API (v3). With no `version` option, Sefaria returns the edition marked primary (`isPrimary`). Here that is the Hebrew Masoretic text.
+**The request.** `createSefariaClient()` makes a client for `https://www.sefaria.org`. `text.getV3Texts` is the generated function for Sefaria's texts API (v3). With no `version` option, Sefaria returns the edition marked primary (`isPrimary`). Here that is the Hebrew Masoretic text.
 
-The result has `data` on success. When Sefaria answers with a documented HTTP error, such as 404 for an unknown reference, the result has `error` with the documented error body. Then `data` is undefined. If a response doesn't match the API description, the call throws a `SefariaContractError` instead of returning data. Network failures also throw. They are not turned into empty data.
+**Success.** The result has `data`. The first part prints `Micah 6:8 · he · Miqra according to the Masorah`.
+
+**Failure.** When Sefaria answers with a documented HTTP error, such as 404 for an unknown reference, the result has `error` with the documented error body. Then `data` is undefined. If a response doesn't match the API description, the call throws a `SefariaContractError` instead of returning data. Network failures also throw. They are not turned into empty data.
 
 The second part checks JSON you got another way, such as from storage or a file. `validateExternalResponse` returns `{ valid, issues }` and does not throw. It prints `Invalid at /isSpanning: Invalid input: expected boolean, received string`. Each issue's `instancePath` is a JSON Pointer into the checked value. It points to the place in the data. It doesn't say how to fix it.
 
