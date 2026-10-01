@@ -2,7 +2,7 @@
 
 # How declarative components obtain and render data
 
-**Current:** all five public elements support standalone `sref`. The four ordinary elements also accept authoritative component-specific raw `data`; Reader accepts transactional raw seeds. Elements own validation, acquisition selection, cancellation, stale-result suppression, private preparation, and rendering.
+**Current:** all five public elements support standalone `sref`. Only Text Segment, Bilingual Segment, and Source Card accept authoritative component-specific raw `data`; Reader and Connections Panel use tagged acquisition capabilities for local payloads. Elements own validation, acquisition selection, cancellation, stale-result suppression, private preparation, and rendering.
 
 ## Start with supplied data
 
@@ -84,7 +84,7 @@ Current failures are reflected in the element's read-only `status` and documente
 
 ## Reader is specialized
 
-Reader `sref` identifies the requested root. Raw source/connections seeds initialize or transactionally replace the Reader instead of remaining an ordinary authoritative `data` override. Public read-only diagnostics expose semantic state such as `selectedRef`, `currentEntryId`, `rootLoading`, and `readerError`.
+Reader `sref` identifies the requested root. Local corrected payloads initialize or replace Reader state through a tagged acquisition capability instead of an ordinary authoritative `data` override. Public read-only diagnostics expose semantic state such as `selectedRef`, `currentEntryId`, `rootLoading`, and `readerError`.
 
 Advanced spatial hosts can use the supported `reader-session` facade for history, pins, budgets, `entryInfo`, stable `ReaderSourceRecord`/`ReaderConnectionsRecord` values, and raw transitions. The `reader` subpath supplies shared raw source qualification. Neither subpath exposes private prepared rendering or content.
 

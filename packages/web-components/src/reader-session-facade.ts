@@ -3,10 +3,6 @@ import type {
   ConnectionsRequest,
 } from "./connections-panel.js";
 import {
-  createReaderEntrySeedFromRawData,
-  type ReaderAdmittedRawSeed,
-} from "./reader-controller.js";
-import {
   admitReaderConnectionsRecord,
   admitReaderSourceRecord,
 } from "./reader-record-admission.js";
@@ -25,7 +21,6 @@ import {
   type ReaderTransition as InternalReaderTransition,
   type ReaderTransitionRejection,
 } from "./reader-session.js";
-import type { ReaderRawSeedData } from "./reader.js";
 import type { SourceCardRequest } from "./source-card.js";
 
 /** One raw source record and exact selected position admitted into a session. */
@@ -121,7 +116,7 @@ export interface ReaderSession {
   /** Commits a qualified raw source seed for an eligible operation. */
   completeSourceNavigation(
     operationId: string,
-    seed: ReaderSessionSeed | ReaderRawSeedData,
+    seed: ReaderSessionSeed,
   ): ReaderTransition;
   /** Begins host-owned connections work for one retained entry. */
   beginConnections(
@@ -155,7 +150,7 @@ export interface ReaderSession {
     patch: ReaderPresentationPatch,
   ): ReaderTransition;
   /** Replaces all semantic history with one raw-record root. */
-  replaceRoot(seed: ReaderSessionSeed | ReaderRawSeedData): ReaderTransition;
+  replaceRoot(seed: ReaderSessionSeed): ReaderTransition;
   /** Removes the current entry and restores its retained predecessor. */
   back(): ReaderTransition;
   /** Activates an earlier breadcrumb and discards later entries. */
@@ -168,9 +163,9 @@ export interface ReaderSession {
 
 const facades = new WeakMap<InternalReaderSession, ReaderSession>();
 
-/** Creates a supported semantic Reader session from raw records or raw seed data. */
+/** Creates a supported semantic Reader session from admitted raw records. */
 export function createReaderSession(
-  seed: ReaderSessionSeed | ReaderRawSeedData,
+  seed: ReaderSessionSeed,
   options: ReaderSessionOptions = {},
 ): ReaderSession {
   return facade(createInternalReaderSession(internalSeed(seed), options));
@@ -251,12 +246,7 @@ function transition<T>(
       });
 }
 
-function internalSeed(
-  seed: ReaderSessionSeed | ReaderRawSeedData,
-): InternalReaderEntrySeed {
-  if (!isSessionSeed(seed)) {
-    return rawSeed(seed).seed;
-  }
+function internalSeed(seed: ReaderSessionSeed): InternalReaderEntrySeed {
   const source =
     seed.source === undefined
       ? undefined
@@ -275,21 +265,6 @@ function internalSeed(
       ? {}
       : { presentation: seed.presentation }),
   };
-}
-
-function rawSeed(seed: ReaderRawSeedData): ReaderAdmittedRawSeed {
-  return createReaderEntrySeedFromRawData(seed);
-}
-
-function isSessionSeed(
-  seed: ReaderSessionSeed | ReaderRawSeedData,
-): seed is ReaderSessionSeed {
-  const source = seed.source;
-  const connections = seed.connections;
-  return (
-    (source !== undefined && "record" in source) ||
-    (connections !== undefined && "record" in connections)
-  );
 }
 
 export type {

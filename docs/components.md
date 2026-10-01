@@ -2,7 +2,7 @@
 
 # Components
 
-The toolkit provides five declarative UI components. All five accept `sref` for standalone loading. The four ordinary elements also accept component-specific raw `data`; Reader accepts transactional raw seeds.
+The toolkit provides five declarative UI components. All five accept `sref` for standalone loading. Only Text Segment, Bilingual Segment, and Source Card accept component-specific raw `data`; mutable Reader and Connections Panel flows use tagged acquisition capabilities.
 
 > Choose the smallest component that completes the task. Use Reader when users need navigation.
 
@@ -29,7 +29,7 @@ Elements expose public read-only status and component-specific diagnostics/event
 
 ## Start with the complete Reader
 
-`<sefaria-reader>` combines text, connections, responsive panes, semantic history, and navigation. Assign the `sref` attribute for the ordinary path. Advanced spatial or MCP hosts can use property-only raw seeds, tagged acquisition, and `reader-session` semantic records without constructing public prepared models.
+`<sefaria-reader>` combines text, connections, responsive panes, semantic history, and navigation. Assign the `sref` attribute for the ordinary path. Advanced spatial or MCP hosts can use tagged local-data acquisition and `reader-session` semantic records without constructing public prepared models.
 
 <SiteLink to="/examples/playground/index.html?project=reader">Edit the Reader supplied-data project</SiteLink>.
 

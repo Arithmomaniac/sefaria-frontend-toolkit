@@ -10,6 +10,7 @@ import "@arithmomaniac/sefaria-web-components";
 import type {
   SefariaConnectionsPanel,
   SefariaSourceCard,
+  SefariaAcquisition,
 } from "@arithmomaniac/sefaria-web-components";
 import { setOptionalElementAttribute } from "../../../../demos/live-demo-core.js";
 
@@ -37,7 +38,7 @@ export function startConnectionsDemo(
 ): ConnectionsDemo {
   const form = requireElement<HTMLFormElement>(root, "#reader-form");
   const tref = requireInput(form, "tref");
-  const reader = requireElement<SefariaSourceCard>(root, "#reader");
+  const sourceReader = requireElement<SefariaSourceCard>(root, "#reader");
   const connections = requireElement<SefariaConnectionsPanel>(
     root,
     "#connections",
@@ -79,7 +80,7 @@ export function startConnectionsDemo(
       }
     | undefined;
 
-  reader.setAttribute("selectable", "");
+  sourceReader.setAttribute("selectable", "");
   const sourceAcquisition = {
     kind: "capability" as const,
     capability: {
@@ -117,7 +118,7 @@ export function startConnectionsDemo(
     },
   };
   sourceProbe.acquisition = sourceAcquisition;
-  connections.acquisition = {
+  const connectionsAcquisition: SefariaAcquisition = {
     kind: "capability",
     capability: {
       getLinks: async (request, signal) => {
@@ -147,6 +148,7 @@ export function startConnectionsDemo(
       },
     },
   };
+  connections.acquisition = connectionsAcquisition;
   connections.showPreviews = showPreviews.checked;
 
   const updateCounts = (): void => {
@@ -190,7 +192,10 @@ export function startConnectionsDemo(
     connections.withText = retained.withText;
     setOptionalElementAttribute(connections, "category", category);
     connections.setAttribute("page", String(page));
-    connections.data = retained.payload;
+    connections.acquisition = retainedLinksAcquisition(
+      retained,
+      connectionsAcquisition,
+    );
   };
   const loadLinks = async (
     ref: string,
@@ -211,7 +216,7 @@ export function startConnectionsDemo(
             category: connections.category,
             page: connections.page,
           };
-    connections.data = undefined;
+    connections.acquisition = connectionsAcquisition;
     connections.removeAttribute("category");
     connections.setAttribute("page", "0");
     if (connections.sref === ref && connections.withText === withText) {
@@ -322,7 +327,7 @@ export function startConnectionsDemo(
         connections.setAttribute("sref", "");
         await linksOutcome;
         if (expectedOperation === operation) {
-          connections.data = undefined;
+          connections.acquisition = connectionsAcquisition;
           connections.setAttribute("sref", "");
           status.textContent = `${normalizedTarget} could not be opened.`;
           showError(error);
@@ -342,7 +347,7 @@ export function startConnectionsDemo(
         connections.setAttribute("sref", "");
         await linksOutcome;
         if (expectedOperation === operation) {
-          connections.data = undefined;
+          connections.acquisition = connectionsAcquisition;
           connections.setAttribute("sref", "");
           status.textContent = `${normalizedTarget} could not be opened.`;
           showError(error);
@@ -350,14 +355,14 @@ export function startConnectionsDemo(
         return;
       }
 
-      reader.setAttribute("sref", contextual.ref);
-      reader.data = contextual;
-      reader.selectedPosition = selectedPosition;
-      await reader.updateComplete;
+      sourceReader.setAttribute("sref", contextual.ref);
+      sourceReader.data = contextual;
+      sourceReader.selectedPosition = selectedPosition;
+      await sourceReader.updateComplete;
       committedSection = contextual.ref;
       status.textContent = `Showing ${committedSection}; loading connections for ${resolvedFirstRef}.`;
       if (revealSelection) {
-        await reader.revealSelection();
+        await sourceReader.revealSelection();
       }
       if (expectedOperation === operation) {
         const outcome = await linksOutcome;
@@ -395,7 +400,7 @@ export function startConnectionsDemo(
     controller = currentController;
     const expectedOperation = ++operation;
     clearError();
-    reader.selectedPosition = detail.position;
+    sourceReader.selectedPosition = detail.position;
     status.textContent = `Loading connections for ${detail.ref}.`;
     void loadLinks(
       detail.ref,
@@ -432,37 +437,37 @@ export function startConnectionsDemo(
     void navigate(detail.targetRef);
   };
   const onDisplayChange = (): void => {
-    reader.setAttribute(
+    sourceReader.setAttribute(
       "content-language",
       contentLanguage.value === "primary" ||
         contentLanguage.value === "translation"
         ? contentLanguage.value
         : "both",
     );
-    reader.setAttribute(
+    sourceReader.setAttribute(
       "layout",
       layout.value === "stacked" || layout.value === "side-by-side"
         ? layout.value
         : "auto",
     );
-    reader.setAttribute(
+    sourceReader.setAttribute(
       "side-order",
       sideOrder.value === "translation-first"
         ? "translation-first"
         : "primary-first",
     );
-    reader.showAddressLabels = showAddressLabels.checked;
+    sourceReader.showAddressLabels = showAddressLabels.checked;
     connections.showPreviews = showPreviews.checked;
     const mode =
       vocalizationMode.value === "nikkud" || vocalizationMode.value === "none"
         ? vocalizationMode.value
         : "taamim_and_nikkud";
-    reader.setAttribute("vocalization-mode", mode);
+    sourceReader.setAttribute("vocalization-mode", mode);
     connections.setAttribute("vocalization-mode", mode);
   };
 
   form.addEventListener("submit", onSubmit);
-  reader.addEventListener("sefaria-source-select", onSourceSelect);
+  sourceReader.addEventListener("sefaria-source-select", onSourceSelect);
   connections.addEventListener("sefaria-connection-select", onConnectionSelect);
   connections.addEventListener(
     "sefaria-connections-panel-error",
@@ -493,7 +498,7 @@ export function startConnectionsDemo(
       connections.setAttribute("sref", "");
       sourceProbe.remove();
       form.removeEventListener("submit", onSubmit);
-      reader.removeEventListener("sefaria-source-select", onSourceSelect);
+      sourceReader.removeEventListener("sefaria-source-select", onSourceSelect);
       connections.removeEventListener(
         "sefaria-connections-preview-request",
         onPreviewRequest,
@@ -616,6 +621,32 @@ function requireInput(form: HTMLFormElement, name: string): HTMLInputElement {
     throw new Error(`The ${name} input is missing.`);
   }
   return input;
+}
+
+function retainedLinksAcquisition(
+  retained: RetainedLinks,
+  fallback: SefariaAcquisition,
+): SefariaAcquisition {
+  return {
+    kind: "capability",
+    capability: {
+      getLinks: async (request, signal) => {
+        if (
+          request.sref === retained.sref &&
+          request.withText === retained.withText
+        ) {
+          return { payload: retained.payload, status: 200 };
+        }
+        if (
+          fallback.kind !== "capability" ||
+          fallback.capability.getLinks === undefined
+        ) {
+          throw new Error(`No retained links payload covers ${request.sref}.`);
+        }
+        return await fallback.capability.getLinks(request, signal);
+      },
+    },
+  };
 }
 
 function requireElement<T extends Element>(

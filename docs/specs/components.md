@@ -4,7 +4,7 @@
 
 ## Status
 
-The declarative standalone-loading cutover is implemented. All five public elements accept `sref`. Text Segment, Bilingual Segment, Source Card, and Connections Panel also accept component-specific raw `data`. Reader accepts raw transactional seeds rather than an ordinary persistent data override.
+The declarative standalone-loading cutover is implemented. All five public elements accept `sref`. Only Text Segment, Bilingual Segment, and Source Card accept component-specific raw `data`; supplied `data` is authoritative and makes zero requests, including validly empty or invalid data. Reader and Connections Panel do not accept `data`; hosts that need local payloads for mutable surfaces provide a tagged acquisition capability.
 
 Unrelated future component slices remain planned where identified in [Development](../development.md).
 
@@ -38,7 +38,7 @@ For the five non-Reader elements, `data !== undefined` selects supplied mode.
 
 Synchronous writes form one scheduled snapshot. Arrays and objects are replaced rather than mutated in place.
 
-Reader `sref` is the requested root, not the current navigation position. Reader raw source/connections seeds initialize or transactionally replace state. Equal root reassignment is a no-op.
+Reader `sref` is the requested root, not the current navigation position. Local Reader data is supplied through `acquisition={kind: "capability", capability}` where the capability implements `getText` and `getLinks` for supported refs from a local map and fails or delegates for unsupported refs. Equal root reassignment is a no-op.
 
 ## Raw supplied-data forms
 
@@ -66,9 +66,9 @@ Selection uses language-family and role evidence, not response position or the l
 
 Show actual edition titles and the actual edition's language-family name. Source Card and Reader label each displayed edition with one language name only, the canonical `languageFamilyName` also used by `translation-language` and `version-language` (for example `(hebrew)`), and never append the `actualLanguage` code. Source Card and Reader attribute once per displayed side; standalone Text Segment and Bilingual Segment display no attribution and accept no attribution-hiding property. Parent-owned child rendering suppresses repeated attribution privately. A fallback explanation identifies the unavailable preferred family and actual selected language for Source Card and Reader; standalone Text Segment and Bilingual Segment carry no such notice, since they no longer render selected-edition metadata. Never label a French record English merely because its legacy `language` field is `en`.
 
-Reader propagates the preferred family and fallback setting to navigated sources and contextual expansion. Root exact titles apply to that root and its context, not unrelated connection targets. Acquisition selectors and fallback mode participate in request identity, seed admission, retained-source reuse, cancellation, and transactional root replacement. A conflicting supplied seed remains an explicit admission failure, not permission for acquisition.
+Reader propagates the preferred family and fallback setting to navigated sources and contextual expansion. Root exact titles apply to that root and its context, not unrelated connection targets. Acquisition selectors and fallback mode participate in request identity, retained-source reuse, cancellation, and transactional root replacement. A capability response that does not cover the requested operation remains an explicit acquisition failure, not permission for browser fallback.
 
-A connections-only Reader seed captures the element's preferred family for subsequent source navigation without acquiring source text during admission. Invalid selection attributes cancel pending source work before reporting the error, so an ignored-abort response cannot commit a superseded selection or erase that error.
+Invalid selection attributes cancel pending source work before reporting the error, so an ignored-abort response cannot commit a superseded selection or erase that error.
 
 Preferred success, strict editions, defaults, and missing-language selections with `translation-fallback="none"` use one outer text request. Missing-language fallback with `translation-fallback="default"` uses at most two, always with zero child requests. Reader's existing target-plus-context qualification may perform two such source operations. Presentation changes and unchanged completed reconnects add no requests. Fallback is component selection, not a client retry or acquisition-source fallback.
 
@@ -94,7 +94,7 @@ Current validation, projection, acquisition, network, and abort failures become 
 
 ## Public and private API
 
-The root entry registers all five elements. The DOM-free `./acquisition` entry exposes acquisition configuration and types. Component subpaths expose component-specific raw request/selection types. `./reader` exposes shared raw source qualification, browser data-source construction, resolved-source records, and raw seed types. `./reader-session` remains a supported advanced DOM-free semantic/raw facade.
+The root entry registers all five elements. The DOM-free `./acquisition` entry exposes acquisition configuration and types. Component subpaths expose component-specific raw request/selection types. `./reader` exposes shared raw source qualification, browser data-source construction, and resolved-source records. `./reader-session` remains a supported advanced DOM-free semantic/raw facade.
 
 Prepared rendering types and protocols are private. `./bindings` and `./reader-controller` are retired and absent from supported exports. Elements expose no arbitrary `fetch`, base URL, untyped host, public prepared model, or request-capable child protocol.
 
@@ -169,7 +169,7 @@ Required tests cover:
 - stale completion suppression
 - disconnect/reconnect behavior
 - supplied/acquired private-preparation equivalence
-- Reader raw seed admission and semantic/raw record boundaries
+- Reader capability admission and semantic/raw record boundaries
 - exact one-parent/zero-child request counts, including ten-child cases
 - generated metadata and supported-export staleness
 

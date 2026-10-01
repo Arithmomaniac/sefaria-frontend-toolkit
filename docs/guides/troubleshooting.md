@@ -25,7 +25,7 @@ Do not serialize raw data into an attribute or assign prepared rendering.
 
 ## The supplied Reader says a target is unavailable
 
-The supplied project has finite `Micah 6:8` coverage. Use the explicitly activated live Reader or provide a raw seed/host capability that covers the target. Do not fabricate empty content.
+The supplied project has finite `Micah 6:8` coverage. Use the explicitly activated live Reader or provide a host capability that covers the target. Do not fabricate empty content.
 
 ## The editor does not run after an edit
 

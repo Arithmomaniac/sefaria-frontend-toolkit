@@ -783,7 +783,7 @@ test("category and page changes reproject a captured response without I/O", asyn
   panel = document.querySelector<SefariaConnectionsPanel>(
     "sefaria-connections-panel",
   )!;
-  expect(panel.data).toBeDefined();
+  expect(panel.acquisition).toBeDefined();
   expect(panel.category).toBe("Commentary");
   expect(panel.page).toBe(2);
   demo.dispose();
