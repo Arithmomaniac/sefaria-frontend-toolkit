@@ -16,7 +16,7 @@ declare module "react" {
         ref?: Ref<SefariaSourceCard>;
         data?: SefariaSourceCard["data"];
         sref?: SefariaSourceCard["sref"];
-        source?: SefariaSourceCard["load"];
+        source?: SefariaSourceCard["source"];
         contentLanguage?: SefariaSourceCard["contentLanguage"];
         layout?: SefariaSourceCard["layout"];
         sideOrder?: SefariaSourceCard["sideOrder"];
