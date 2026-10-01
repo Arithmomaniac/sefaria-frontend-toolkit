@@ -1,6 +1,7 @@
 {
   "name": "@arithmomaniac/sefaria-client",
   "version": "0.0.0",
+  "description": "Source-backed Sefaria API client with generated contracts, validators, and bounded caching.",
   "private": true,
   "type": "module",
   "license": "GPL-3.0-only",

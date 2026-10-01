@@ -27,21 +27,54 @@ export interface CommentaryReference {
 
 /** Feature-narrowing inputs for {@link normalizeText}. */
 export interface NormalizeTextOptions {
-  /** Retain recognized footnotes. Defaults to `true`. */
+  /**
+   * Retain recognized footnotes. Defaults to `true`.
+   *
+   * When enabled, footnote markers keep `data-sefaria-note` placeholders whose
+   * values are result-local note keys. End-of-text markers also keep
+   * `data-sefaria-end-footnote` when {@link allowInlineAnnotations} is enabled.
+   */
   readonly allowFootnotes?: boolean;
-  /** Retain commentary, overlay, and standalone annotation metadata. Defaults to `true`. */
+  /**
+   * Retain commentary, overlay, and standalone annotation metadata. Defaults to `true`.
+   *
+   * When enabled, end-of-text footnote markers keep `data-sefaria-end-footnote`
+   * when `allowFootnotes` is also enabled, commentary markers keep
+   * `data-sefaria-commentary-marker`, commentary anchors keep
+   * `data-sefaria-commentator`, `data-sefaria-label`,
+   * and `data-sefaria-order`; matching commentary references can add
+   * `data-sefaria-ref`. Overlay anchors keep `data-sefaria-overlay` plus
+   * `data-sefaria-value`. When disabled, those attributes and their empty
+   * anchor elements are dropped.
+   */
   readonly allowInlineAnnotations?: boolean;
-  /** Retain named-entity identity. Defaults to `true`. */
+  /**
+   * Retain named-entity identity as `data-sefaria-slug`. Defaults to `true`.
+   *
+   * When disabled, named-entity links are unwrapped and only their text remains.
+   */
   readonly allowNamedEntities?: boolean;
-  /** Retain explicit Sefaria reference identity. Defaults to `true`. */
+  /**
+   * Retain explicit Sefaria reference identity. Defaults to `true`.
+   *
+   * When enabled, reference links keep `data-sefaria-ref` and optional
+   * `data-sefaria-ven`, `data-sefaria-vhe`, and approved `dir`. When disabled,
+   * reference links are unwrapped and those attributes are dropped.
+   */
   readonly allowRefLinks?: boolean;
-  /** Optional exact commentary targets prepared from source-scoped link evidence. */
+  /**
+   * Optional exact commentary targets prepared from source-scoped link evidence.
+   *
+   * Matching entries add `data-sefaria-ref` to commentary anchors that are also
+   * retained by {@link allowInlineAnnotations}. The value is dropped when there
+   * is no exact, unique match.
+   */
   readonly commentaryReferences?: readonly CommentaryReference[];
 }
 
 /** One normalized footnote referenced by a local body placeholder. */
 export interface NormalizedFootnote {
-  /** Zero-based key local to one normalization result. */
+  /** Zero-based key local to one normalization result and used as the matching `data-sefaria-note` value. */
   readonly key: number;
   /** Independently safe, balanced marker HTML. */
   readonly markerHtml: string;
@@ -51,7 +84,7 @@ export interface NormalizedFootnote {
 
 /** Safe, deterministic HTML plus source-ordered footnotes. */
 export interface NormalizedText {
-  /** Complete safe body HTML with empty `data-sefaria-note` placeholders. */
+  /** Complete safe body HTML with empty `data-sefaria-note` placeholders whose values are note keys. */
   readonly bodyHtml: string;
   /** Source-ordered notes referenced by body or note-content placeholders. */
   readonly notes: readonly NormalizedFootnote[];
@@ -165,9 +198,33 @@ const MAM_VALUES = new Map([
  * and extracts footnotes into result-local records. Options can narrow but
  * never widen the fixed output grammar.
  *
+ * @remarks
+ * Output keeps only these ordinary inline tags without attributes: `b`,
+ * `strong`, `i`, `em`, `u`, `small`, `sup`, and `sub`. It keeps `br`, maps
+ * `big` to `<span style="font-size: larger;">`, converts `img` to its `alt`
+ * text, unwraps block elements with separators, and removes active content.
+ * Incoming style attributes are dropped. The fixed `font-size: larger;` style
+ * emitted for `big` is the only output style. The only ordinary attribute is
+ * `dir`, and only on `i` or generated `span` elements when the value is `ltr`,
+ * `rtl`, or `auto`.
+ *
+ * Recognized structural attributes are `data-sefaria-note`,
+ * `data-sefaria-end-footnote`, `data-sefaria-commentary-marker`,
+ * `data-sefaria-commentator`, `data-sefaria-label`, `data-sefaria-order`,
+ * `data-sefaria-overlay`, `data-sefaria-value`, `data-sefaria-ref`,
+ * `data-sefaria-ven`, `data-sefaria-vhe`, `data-sefaria-slug`, and
+ * `data-sefaria-mam`. Footnote placeholders use `data-sefaria-note` values that
+ * match note keys in {@link NormalizedText.notes}.
+ *
+ * @example
+ * ```ts
+ * normalizeText('See <a data-ref="Micah 6:8" href="/Micah.6.8">Micah</a><script>x()</script>').bodyHtml;
+ * // 'See <span data-sefaria-ref="Micah 6:8">Micah</span>'
+ * ```
+ *
  * @throws {TypeError} When commentary reference input is invalid.
- * @throws {RangeError} When projected output exceeds the documented bound.
- * @see [Text normalization](../README.md#text-normalization)
+ * @throws {RangeError} When projected output exceeds `max(65_536, html.length * 8)` UTF-16 code units.
+ * @see [Text normalization](../IMPLEMENTATION.md#text-normalization)
  */
 export function normalizeText(
   html: string,

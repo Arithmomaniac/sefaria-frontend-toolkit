@@ -103,7 +103,8 @@ function isFullRemovalExtra(character: string): boolean {
 /**
  * Applies vocalization only to text nodes in an already-sanitized HTML fragment.
  *
- * Markup and attribute values are preserved; this operation is not a sanitizer.
+ * Run {@link normalizeText} first. Markup and attribute values are preserved;
+ * this operation is not a sanitizer.
  *
  * @throws {TypeError} When a runtime mode or PASEQ value is unsupported.
  * @see [Vocalization](../README.md#vocalization)

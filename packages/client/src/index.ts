@@ -28,7 +28,10 @@ export * from "./generated/zod.gen.js";
 export * from "./generated/response-validators.gen.js";
 export {
   getResponseContract,
+  getResponseValidator,
   validateExternalResponse,
+  type GeneratedResponseContract,
   type ResponseSelector,
+  type ResponseValidatorLookup,
   type ValidationResult,
 } from "./validation.js";
