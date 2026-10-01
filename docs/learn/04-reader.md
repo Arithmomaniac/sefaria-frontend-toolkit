@@ -45,7 +45,7 @@ The supplied project remains finite. Covered Micah source and links data render 
 | Standalone Reader | Root workflow, acquisition, semantic history, navigation, loading, errors, and rendering | Activation, optional acquisition source, placement, and lifecycle |
 | Spatial composition | Reader session semantics and immutable raw records | Pane identity, placement, pins, pruning, timing, and unavailable-state policy |
 
-MCP is an advanced acquisition environment. The App supplies validated raw seeds or a host capability, and continuation remains host-proxied with no browser HTTP fallback.
+MCP is an advanced acquisition environment. The App supplies a validated local-data host capability, and continuation remains host-proxied with no browser HTTP fallback.
 
 ## Exercise
 

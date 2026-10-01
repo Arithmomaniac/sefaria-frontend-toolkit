@@ -115,7 +115,7 @@ Supplied data makes zero requests and must include the selected text or metadata
 | Register all elements | `@arithmomaniac/sefaria-web-components` |
 | Acquisition types/configuration | `@arithmomaniac/sefaria-web-components/acquisition` |
 | Component raw request/selection types | Component-specific subpath |
-| Shared raw Reader source qualification and raw seed types | `@arithmomaniac/sefaria-web-components/reader` |
+| Shared raw Reader source qualification | `@arithmomaniac/sefaria-web-components/reader` |
 | Advanced semantic/raw Reader facade: history, pins, budgets, entry info, records, and raw transitions | `@arithmomaniac/sefaria-web-components/reader-session` |
 
 `./reader-session` remains supported for advanced spatial hosts, and `./reader` supplies the shared DOM-free source-qualification boundary. Neither exposes prepared rendering content. `./bindings` and `./reader-controller` are retired. See [Render text](../../docs/guides/render-text.md), [Reader navigation](../../docs/guides/reader-navigation.md), and the [component specification](../../docs/specs/components.md).

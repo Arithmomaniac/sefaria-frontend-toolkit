@@ -53,7 +53,7 @@ The [documentation home](docs/README.md) indexes guides, specifications, generat
 2. `@arithmomaniac/sefaria-text-transform` performs pure sanitization, vocalization, and footnote work.
 3. All five public elements accept standalone `sref`; the four ordinary elements also accept authoritative component-specific raw `data`.
 4. Elements own acquisition selection, cancellation, lifecycle reconnect, private preparation, read-only status, error events, accessibility, and rendering.
-5. Reader raw seeds and `reader-session` semantic records support advanced session and MCP hosts without exposing public prepared rendering.
+5. Reader local-data capabilities and `reader-session` semantic records support advanced session and MCP hosts without exposing public prepared rendering.
 
 Maintained pages keep their explicit activation gates, so documentation arrival and deep links make no unsolicited Sefaria request. Composite parents prepare children from captured data: one parent request produces zero child requests.
 
@@ -66,7 +66,7 @@ Read [How declarative components obtain and render data](docs/guides/data-flow.m
 - `examples/explorer`: authored zero-request states plus explicit live component pages.
 - `examples/reader`: supported standalone Reader and a distinct advanced spatial composition.
 - `examples/linked-article`: progressively enhanced native citation links.
-- `examples/mcp-app`: compiled Node transports, AppBridge reference host, zero-request seeded first render, and a deterministic static fixture preview.
+- `examples/mcp-app`: compiled Node transports, AppBridge reference host, zero-request local-capability first render, and a deterministic static fixture preview.
 
 Run `pnpm build:site` and `pnpm preview:site` to inspect the clean production documentation artifact under `dist/site`. The guarded Pages workflow builds and tests the same artifact under the repository project path before deployment.
 

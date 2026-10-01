@@ -28,12 +28,7 @@ export type {
   BilingualSegmentSide,
 } from "./bilingual-segment.js";
 export { SefariaReader } from "./reader-element.js";
-export type {
-  ReaderPane,
-  ReaderRawConnectionsSeed,
-  ReaderRawSeedData,
-  ReaderRawSourceSeed,
-} from "./reader.js";
+export type { ReaderPane } from "./reader.js";
 export { SefariaSourceCard } from "./source-card-element.js";
 export { SefariaConnectionsPanel } from "./connections-panel-element.js";
 export {

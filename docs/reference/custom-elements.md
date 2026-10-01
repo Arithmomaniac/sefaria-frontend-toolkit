@@ -46,7 +46,6 @@ Category summaries and bounded connected-text details from supplied or acquired 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
 | `sref` | `sref` | `string` | `""` | Reference loaded when authoritative supplied data is absent. |
-| `data` | Property only | `unknown | undefined` | `undefined` | Authoritative corrected links response data. |
 | `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
 | `withText` | `with-text` | `boolean` | `true` | Whether acquired or supplied links include connected text. |
 | `category` | `category` | `string | undefined` | `undefined` | Exact category projected from the current captured response. |
@@ -82,7 +81,6 @@ Controlled or declarative reader surface for one semantic reader entry.
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
 | `sref` | `sref` | `string` | `""` | Requested external Reader root, separate from current navigation. |
-| `data` | Property only | `ReaderRawSeedData | undefined` | `undefined` | Transactional unknown raw Reader seed. |
 | `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
 | `translationLanguage` | `translation-language` | `string | undefined` | `undefined` | Preferred family used for root and navigated translations. |
 | `translationFallback` | `translation-fallback` | `"default" | "none"` | `"default"` | Missing preferred-translation policy. |

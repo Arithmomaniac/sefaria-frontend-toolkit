@@ -9,20 +9,26 @@ import linksPayload from "./links.js";
 const reader = requireElement("#reader");
 const vocalization = requireElement("#vocalization");
 const status = requireElement("#host-status");
+const fallbackOpen = requireElement("#fallback-open");
 const sourceRequest = Object.freeze({ tref: "Micah 6:8" });
 const linksRequest = Object.freeze({ tref: "Micah 6:8", withText: true });
 const source = zCoreV3TextsResponse.parse(sourcePayload);
+const localSource = {
+  ...source,
+  sectionRef: source.ref,
+  heSectionRef: source.heRef,
+};
 const links = zCoreLinkResponse.parse(linksPayload);
 reader.acquisition = {
   kind: "capability",
   capability: {
     getText: async (request) => {
       if (
-        request.sref === sourceRequest.tref &&
+        (request.sref === sourceRequest.tref || request.sref === "Micah 6") &&
         request.returnFormat === "default" &&
         request.versions.join(",") === "primary,translation"
       ) {
-        return { payload: source, status: 200 };
+        return { payload: localSource, status: 200 };
       }
       throw new Error(`This supplied project does not cover ${request.sref}.`);
     },
@@ -39,20 +45,7 @@ reader.acquisition = {
     },
   },
 };
-reader.data = {
-  source: {
-    payload: source,
-    status: 200,
-    effectiveRequest: sourceRequest,
-  },
-  connections: {
-    payload: links,
-    status: 200,
-    effectiveRequest: linksRequest,
-    projection: { category: "Quoting Commentary" },
-  },
-  selectedRef: "Micah 6:8",
-};
+reader.sref = sourceRequest.tref;
 reader.addEventListener("sefaria-reader-error", () => {
   if (reader.readerError !== undefined) {
     status.textContent = reader.readerError;
@@ -61,6 +54,11 @@ reader.addEventListener("sefaria-reader-error", () => {
       "This finite project covers Micah 6:8 source and connections only.";
   }
 });
+fallbackOpen.addEventListener("click", () => {
+  status.textContent =
+    "This supplied project does not cover additional navigation.";
+});
+
 vocalization.addEventListener("change", () => {
   reader.setAttribute("vocalization-mode", vocalization.value);
 });

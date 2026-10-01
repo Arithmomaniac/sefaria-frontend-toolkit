@@ -32,7 +32,7 @@ hero:
 
 Sefaria is a free digital library and data source for Jewish texts and translations. A direct API response is only the start of a product: an application still has to validate unknown JSON, prepare markup and footnotes, choose how to display Hebrew vocalization, project nested text into useful rendering data, and own any live request or navigation state.
 
-The toolkit separates those jobs so that a third party can adopt only the part it needs. `@arithmomaniac/sefaria-client` validates the supported transport responses. `@arithmomaniac/sefaria-text-transform` provides pure sanitization, vocalization, preview, and footnote operations. The Web Components package adds five declarative elements, tagged acquisition, raw Reader seeds, and semantic Reader-session records while keeping prepared rendering private.
+The toolkit separates those jobs so that a third party can adopt only the part it needs. `@arithmomaniac/sefaria-client` validates the supported transport responses. `@arithmomaniac/sefaria-text-transform` provides pure sanitization, vocalization, preview, and footnote operations. The Web Components package adds five declarative elements, tagged acquisition, local-data Reader capabilities, and semantic Reader-session records while keeping prepared rendering private.
 
 You can stop at any layer. A server, test, search index, AI integration, or custom renderer can use the client or text transforms without registering a custom element. A product that wants ready-made presentation can add one focused surface or the complete Reader.
 

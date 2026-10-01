@@ -108,7 +108,10 @@ try {
   const beforeTextResize = requests.length;
   await page.setViewportSize({ width: 480, height: 900 });
   result.geometry.push(await assertAppGeometry(page, app, "text seed narrow"));
-  assertNoRequestSince(beforeTextResize, "Text-seeded viewport resize");
+  assertNoRequestSince(
+    beforeTextResize,
+    "Text local-capability viewport resize",
+  );
   await page.setViewportSize({ width: 1_280, height: 900 });
   record("text seed and continuation", 0);
 
@@ -264,9 +267,12 @@ try {
   result.geometry.push(
     await assertAppGeometry(page, linksApp, "links seed narrow"),
   );
-  assertNoRequestSince(beforeLinksResize, "Links-seeded viewport resize");
+  assertNoRequestSince(
+    beforeLinksResize,
+    "Links local-capability viewport resize",
+  );
   await page.setViewportSize({ width: 1_280, height: 900 });
-  record("links seed without continuation", beforeLinksSeed);
+  record("links local capability without continuation", beforeLinksSeed);
 
   const artifacts = path.resolve(".artifacts", "mcp-app");
   await mkdir(artifacts, { recursive: true });
@@ -316,7 +322,12 @@ async function verifyCompiledStdio(): Promise<void> {
 async function waitForAppFrame(page: Page): Promise<Frame> {
   for (let attempt = 0; attempt < 100; attempt += 1) {
     for (const frame of page.frames()) {
-      if ((await frame.locator("sefaria-reader").count()) > 0) return frame;
+      if (
+        (await frame
+          .locator("sefaria-reader, sefaria-connections-panel")
+          .count()) > 0
+      )
+        return frame;
     }
     await page.waitForTimeout(50);
   }
@@ -354,23 +365,26 @@ async function assertAppGeometry(
     throw new Error(`${scenario} iframe geometry is unavailable.`);
   }
   const proxyViewportHeight = await proxy.evaluate(() => window.innerHeight);
-  const appMetrics = await app.locator("sefaria-reader").evaluate((reader) => {
-    const readerBounds = reader.getBoundingClientRect();
-    const heading = reader.shadowRoot?.querySelector(
-      '[data-current-heading="true"]',
-    );
-    const headingBounds = heading?.getBoundingClientRect();
-    return {
-      viewportWidth: window.innerWidth,
-      viewportHeight: window.innerHeight,
-      bodyHeight: document.body.scrollHeight,
-      readerHeight: readerBounds.height,
-      headingVisible:
-        headingBounds !== undefined &&
-        headingBounds.bottom > 0 &&
-        headingBounds.top < window.innerHeight,
-    };
-  });
+  const appMetrics = await app
+    .locator("sefaria-reader, sefaria-connections-panel")
+    .first()
+    .evaluate((element) => {
+      const bounds = element.getBoundingClientRect();
+      const heading = element.shadowRoot?.querySelector(
+        '[data-current-heading="true"], h2',
+      );
+      const headingBounds = heading?.getBoundingClientRect();
+      return {
+        viewportWidth: window.innerWidth,
+        viewportHeight: window.innerHeight,
+        bodyHeight: document.body.scrollHeight,
+        readerHeight: bounds.height,
+        headingVisible:
+          headingBounds !== undefined &&
+          headingBounds.bottom > 0 &&
+          headingBounds.top < window.innerHeight,
+      };
+    });
   const minimumUsefulHeight = Math.min(appMetrics.bodyHeight, 600);
   if (
     innerAppFrame.height < outerSandbox.height - 4 ||

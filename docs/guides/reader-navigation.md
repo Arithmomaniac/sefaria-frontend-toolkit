@@ -29,7 +29,7 @@ Read-only `status`, `rootLoading`, `selectedRef`, `currentEntryId`, and `readerE
 
 ## MCP path
 
-The server's initial corrected payload is unknown at the App boundary. The App validates it and constructs a raw Reader source or connections seed. The first render makes zero duplicate requests.
+The server's initial corrected payload is unknown at the App boundary. The App validates it and constructs a local-data acquisition capability. The first render makes zero duplicate network requests.
 
 Later Reader operations use a tagged host capability backed only by the MCP host's server-tool bridge. Unsupported or failed operations never fall through to direct Sefaria HTTP. `ui/message` remains a separate explicit chat-export action.
 

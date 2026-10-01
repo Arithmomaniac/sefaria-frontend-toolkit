@@ -10,7 +10,7 @@ The documentation site, supplied-data editor, standalone and spatial website Rea
 
 Integrations consume built artifacts and public package contracts. They own host input, explicit activation policy, external unknown-JSON validation, optional acquisition creation, placement, and application-specific coordination.
 
-An integration assigns component-specific raw `data`, a Reader raw seed, or `sref`. It may assign only the documented tagged acquisition choice. It must not give an element arbitrary `fetch`, a base URL, an untyped host, unknown JSON, or public prepared rendering.
+An integration assigns component-specific raw `data`, a tagged acquisition capability, or `sref`. It may assign only the documented tagged acquisition choice. It must not give an element arbitrary `fetch`, a base URL, an untyped host, unknown JSON, or public prepared rendering.
 
 Unknown server, fixture, stored, user, or MCP JSON passes a public corrected client schema or generated validator before element admission. Validation failures report structured paths.
 
@@ -24,7 +24,7 @@ Transport semantics remain unchanged: documented HTTP payloads retain their type
 
 ## Supplied-data editor
 
-The editor exposes five maintained projects. Each validates fixed corrected payloads and assigns raw component data or Reader seeds. It does not retain public controllers, bindings, prepared models, a fetch broker, runtime package installation, CDN loading, service workers, or a live-data fallback.
+The editor exposes five maintained projects. Each validates fixed corrected payloads and assigns raw component data or local-data acquisition capabilities. It does not retain public controllers, bindings, prepared models, a fetch broker, runtime package installation, CDN loading, service workers, or a live-data fallback.
 
 The trusted host owns project selection, editor state, source links, bounded diagnostics, and preview replacement. Edited code runs only in the opaque sandboxed frame under the existing CSP and finite source/asset/message limits.
 
@@ -56,9 +56,9 @@ The spatial host uses semantic `ReaderEntryInfo` and immutable raw `ReaderSource
 
 ## MCP App
 
-MCP `structuredContent` carries a corrected API payload. Namespaced metadata carries only the operation identity, documented status, and exact request needed to select the validator and construct a raw Reader seed.
+MCP `structuredContent` carries a corrected API payload. Namespaced metadata carries only the operation identity, documented status, and exact request needed to select the validator and serve a local-data capability.
 
-The first App render validates the unknown boundary and supplies the raw seed, making zero duplicate requests. Later Reader work uses a tagged host capability whose only transport is a supported host-proxied tool call. The App and elements never fall back to direct Sefaria HTTP.
+The first App render validates the unknown boundary and supplies a local-data capability, making zero duplicate requests. Later Reader work uses a tagged host capability whose only transport is a supported host-proxied tool call. The App and elements never fall back to direct Sefaria HTTP.
 
 The Node tools remain stateless. Reader semantic history and raw records remain in the App/session. `ui/message` is reserved for the separate explicit chat-export action; it is not Reader data transport.
 
@@ -84,7 +84,7 @@ Examples document `translation-language` separately from presentation-only `cont
 
 The MCP demonstration's existing default-only text adapter remains an explicit host limitation for non-default selectors. Unsupported selection must fail visibly without direct browser HTTP or substituted default success. Extending that demonstration's tool contract is separate from the component capability's support for serialized v3 selectors.
 
-If an integration already owns corrected data, it supplies raw data or a Reader seed. A parent element or session privately prepares child content from that capture. It must not assign child `sref`.
+If an integration already owns corrected data, it supplies raw data for immutable elements or a local-data capability for mutable elements. A parent element or session privately prepares child content from that capture. It must not assign child `sref`.
 
 Ten child renderings from one parent response require one outer request and zero child requests.
 

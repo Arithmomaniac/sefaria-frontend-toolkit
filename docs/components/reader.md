@@ -2,7 +2,7 @@
 
 # Reader
 
-Use `<sefaria-reader>` for source text, connections, responsive panes, semantic history, and host-owned actions. Assign `sref` for the ordinary standalone path. Reader raw seeds initialize or transactionally replace state.
+Use `<sefaria-reader>` for source text, connections, responsive panes, semantic history, and host-owned actions. Assign `sref` for the ordinary standalone path. Reader local-data capabilities initialize or transactionally replace state.
 
 ## Try it
 

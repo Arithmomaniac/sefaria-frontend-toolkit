@@ -56,18 +56,6 @@ const conflictingLinks = [
   linksPayload[0],
   { ...linksPayload[0], category: "Conflicting category" },
 ];
-const readerSourceSeed = {
-  payload: sourceSection,
-  status: 200 as const,
-  effectiveRequest: { tref: "Genesis 1" },
-};
-const readerConnectionsSeed = {
-  payload: linksPayload,
-  status: 200 as const,
-  effectiveRequest: { tref: "Genesis 1:2", withText: true },
-  projection: { category: "Commentary" },
-};
-
 const componentDetails = {
   "text-segment": {
     label: "Text segment",
@@ -505,12 +493,9 @@ class SefariaDevelopmentStatus extends SefariaElement {
                       ${this.#scenarioLink("connections-panel", id)}
                       <sefaria-connections-panel
                         sref="Genesis 1:2"
-                        .data=${connectionsData(id)}
                         category=${ifDefined(connectionsCategory(id))}
                         .withText=${id !== "metadata-only"}
-                        .acquisition=${
-                          id === "loading" ? pendingAcquisition : undefined
-                        }
+                        .acquisition=${connectionsAcquisition(id)}
                         @sefaria-connection-select=${this.#logEvent}
                         @sefaria-connections-category-change=${this.#logEvent}
                         @sefaria-connections-page-change=${this.#logEvent}
@@ -552,8 +537,8 @@ class SefariaDevelopmentStatus extends SefariaElement {
                               ${readerUnavailableMessage(id)}
                             </p>`
                           : html`<sefaria-reader
-                              .data=${readerData(id)}
-                              .acquisition=${{ kind: "disabled" }}
+                              sref="Genesis 1:2"
+                              .acquisition=${readerAcquisition(id)}
                               active-pane=${activePane}
                               ?chat-export=${chatExport}
                               @sefaria-reader-back=${this.#logEvent}
@@ -765,33 +750,50 @@ function connectionsCategory(id: string): string | undefined {
   return id === "details" || id === "metadata-only" ? "Commentary" : undefined;
 }
 
-const readerSeeds = {
-  paired: {
-    source: readerSourceSeed,
-    connections: readerConnectionsSeed,
-    selectedRef: "Genesis 1:2",
-  },
-  "source-only": {
-    source: readerSourceSeed,
-    selectedRef: "Genesis 1:2",
-  },
-  "connections-only": {
-    connections: readerConnectionsSeed,
-  },
-} as const;
+function connectionsAcquisition(id: string) {
+  const data = connectionsData(id);
+  if (id === "loading") return pendingAcquisition;
+  return {
+    kind: "capability" as const,
+    capability: {
+      getLinks: async () => ({ payload: data, status: 200 as const }),
+    },
+  };
+}
 
 function readerData(id: string): unknown {
-  return readerSeeds[id as keyof typeof readerSeeds];
+  return id === "connections-loading" ||
+    id === "connections-unavailable" ||
+    id === "truncated-history"
+    ? undefined
+    : true;
+}
+
+function readerAcquisition(id: string) {
+  if (id === "loading") return pendingAcquisition;
+  return {
+    kind: "capability" as const,
+    capability: {
+      getText: async (request: { readonly sref: string }) => ({
+        payload: request.sref === "Genesis 1" ? sourceSection : sourceTarget,
+        status: 200 as const,
+      }),
+      getLinks: async () => ({
+        payload: id === "source-only" ? [] : linksPayload,
+        status: 200 as const,
+      }),
+    },
+  };
 }
 
 function readerUnavailableMessage(id: string): string {
   switch (id) {
     case "connections-loading":
-      return "Connections loading is a transient Reader workflow state and cannot be authored from one raw seed.";
+      return "Connections loading is a transient Reader workflow state and must be authored through live Reader state rather than public data.";
     case "connections-unavailable":
-      return "Interrupted connections require a live Reader transition and cannot be authored from one raw seed.";
+      return "Interrupted connections require a live Reader transition and must be authored through live Reader state rather than public data.";
     case "truncated-history":
-      return "Truncated retained history requires multiple admitted Reader entries and cannot be authored from one raw seed.";
+      return "Truncated retained history requires multiple admitted Reader entries and must be authored through live Reader state rather than public data.";
     default:
       return "This Reader state requires a live transition.";
   }

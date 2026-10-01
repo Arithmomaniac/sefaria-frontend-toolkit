@@ -376,16 +376,6 @@
             },
             {
               "kind": "field",
-              "name": "data",
-              "privacy": "public",
-              "type": {
-                "text": "unknown | undefined"
-              },
-              "description": "Authoritative corrected links response data.",
-              "default": "undefined"
-            },
-            {
-              "kind": "field",
               "name": "acquisition",
               "privacy": "public",
               "type": {
@@ -716,16 +706,6 @@
               "description": "Requested external Reader root, separate from current navigation.",
               "default": "\"\"",
               "attribute": "sref"
-            },
-            {
-              "kind": "field",
-              "name": "data",
-              "privacy": "public",
-              "type": {
-                "text": "ReaderRawSeedData | undefined"
-              },
-              "description": "Transactional unknown raw Reader seed.",
-              "default": "undefined"
             },
             {
               "kind": "field",
