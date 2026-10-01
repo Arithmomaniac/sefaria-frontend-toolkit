@@ -8,7 +8,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Custom element that renders supplied or acquired bilingual-segment data.",
+          "description": "Shows one passage in its primary edition, together with a translation. The primary edition is the one marked `isPrimary`.",
           "name": "SefariaBilingualSegment",
           "members": [
             {
@@ -137,7 +137,7 @@
               "type": {
                 "text": "SefariaElementStatus"
               },
-              "description": "Read-only loading state: `\"empty\"`, `\"loading\"`, `\"ready\"` or `\"error\"`.",
+              "description": "Loading state: `\"empty\"`, `\"loading\"`, `\"ready\"` or `\"error\"`.",
               "readonly": true
             }
           ],
@@ -145,6 +145,8 @@
             {
               "name": "sefaria-bilingual-segment-error",
               "description": "Reports a failure while loading or validating data from `sref`.",
+              "detail": "`error` is the original failure. `sref` is the reference that was loading.",
+              "cancelable": false,
               "type": {
                 "text": "CustomEvent"
               }
@@ -239,6 +241,8 @@
           },
           "tagName": "sefaria-bilingual-segment",
           "customElement": true,
+          "data": "`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.",
+          "empty": "The element shows its empty state when neither side has text. Each missing side has its own message, such as `No primary text is available.` or `No translation text is available.` The element can show the response's warning for that side instead. When only one side is missing, you see the other side's text and the missing side's message. `contentLanguage` filters which sides are shown.",
           "slots": [],
           "cssParts": [],
           "cssProperties": [
@@ -360,7 +364,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Category summaries and bounded connected-text details from supplied or acquired data.",
+          "description": "Lists the commentaries and other texts that Sefaria connects to a reference. It groups them by category.",
           "name": "SefariaConnectionsPanel",
           "members": [
             {
@@ -445,35 +449,43 @@
               "type": {
                 "text": "SefariaElementStatus"
               },
-              "description": "Read-only loading state: `\"empty\"`, `\"loading\"`, `\"ready\"` or `\"error\"`.",
+              "description": "Loading state: `\"empty\"`, `\"loading\"`, `\"ready\"` or `\"error\"`.",
               "readonly": true
             }
           ],
           "events": [
             {
               "name": "sefaria-connections-category-change",
-              "description": "Asks to show a different connection category.",
+              "description": "Asks to show a different connection category. Call `preventDefault()` to stop the panel from switching to that category and returning to the first page.",
+              "detail": "`category` is the chosen category's ID, or `null` for all categories.",
+              "cancelable": true,
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-connections-preview-request",
-              "description": "Requests connection previews. The element loads them unless a listener cancels the event.",
+              "description": "Requests connection previews. The element loads them unless a listener cancels the event. Call `preventDefault()` to stop the panel from loading previews itself. If you don't call it, a panel that loads from `sref` requests the connections again with their text.",
+              "detail": "No fields.",
+              "cancelable": true,
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-connections-page-change",
-              "description": "Asks to show a different page of connections.",
+              "description": "Asks to show a different page of connections. Call `preventDefault()` to stop the panel from changing page.",
+              "detail": "`page` is the zero-based page number.",
+              "cancelable": true,
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-connection-select",
-              "description": "Reports that a reader selected one connected reference.",
+              "description": "Reports that a reader selected one connected reference. Call `preventDefault()` to do nothing. The panel has no default action for this event.",
+              "detail": "`id` is the connection's ID. `targetRef` is the connected text's reference.",
+              "cancelable": true,
               "type": {
                 "text": "CustomEvent"
               }
@@ -481,6 +493,8 @@
             {
               "name": "sefaria-connections-panel-error",
               "description": "Reports a failure while loading or validating data from `sref`.",
+              "detail": "`error` is the original failure. `sref` is the reference that was loading.",
+              "cancelable": false,
               "type": {
                 "text": "CustomEvent"
               }
@@ -548,6 +562,7 @@
           },
           "tagName": "sefaria-connections-panel",
           "customElement": true,
+          "empty": "The element shows its empty state when no text connections remain after the element leaves out sheet links. A response with only sheets is empty too. The message is `No text connections were returned.`",
           "slots": [],
           "cssParts": [],
           "cssProperties": [
@@ -669,7 +684,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Controlled or declarative reader surface for one semantic reader entry.",
+          "description": "Shows a passage with its connected texts. Readers can move between them.",
           "name": "SefariaReader",
           "cssParts": [
             {
@@ -856,7 +871,7 @@
               "type": {
                 "text": "SefariaElementStatus"
               },
-              "description": "Read-only loading state: `\"empty\"`, `\"loading\"`, `\"ready\"` or `\"error\"`.",
+              "description": "Loading state: `\"empty\"`, `\"loading\"`, `\"ready\"` or `\"error\"`.",
               "readonly": true
             },
             {
@@ -917,63 +932,81 @@
           "events": [
             {
               "name": "sefaria-reader-back",
-              "description": "Requests navigation to the previous entry.",
+              "description": "Requests navigation to the previous entry. Call `preventDefault()` to stop the Reader from going back.",
+              "detail": "`originEntryId`, the entry the Reader was showing",
+              "cancelable": true,
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-reader-history-activate",
-              "description": "Asks to return to one saved history entry.",
+              "description": "Asks to return to one saved history entry. Call `preventDefault()` to stop the Reader from returning to that entry.",
+              "detail": "`originEntryId` is the entry the Reader was showing. `entryId` is the history entry chosen. `label` is its label.",
+              "cancelable": true,
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-reader-pane-change",
-              "description": "Asks to show a different pane in the compact layout.",
+              "description": "Asks to show a different pane in the compact layout. Call `preventDefault()` to stop the Reader from switching pane.",
+              "detail": "`originEntryId` is the entry the Reader was showing. `pane` is `\"source\"` or `\"connections\"`.",
+              "cancelable": true,
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-reader-chat-export",
-              "description": "Asks your page to send a reference to chat.",
+              "description": "Asks your page to send a reference to chat. Call `preventDefault()` to do nothing. The Reader has no default action. Your page handles the export.",
+              "detail": "`originEntryId` is the entry the Reader was showing. `targetRef` is the reference to send.",
+              "cancelable": true,
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-reader-source-select",
-              "description": "Reports that a reader selected one item in the source card.",
+              "description": "Reports that a reader selected one item in the source card. Call `preventDefault()` to stop the Reader from selecting that segment.",
+              "detail": "`originEntryId` is the entry the Reader was showing. `position` and `ref` are the same as in `sefaria-source-select`.",
+              "cancelable": true,
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-reader-connections-category-change",
-              "description": "Asks to show a different connection category.",
+              "description": "Asks to show a different connection category. Call `preventDefault()` to stop the Reader from switching category.",
+              "detail": "`originEntryId` is the entry the Reader was showing. `category` is the same as in `sefaria-connections-category-change`.",
+              "cancelable": true,
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-reader-connections-page-change",
-              "description": "Asks to show a different connection page.",
+              "description": "Asks to show a different connection page. Call `preventDefault()` to stop the Reader from changing page.",
+              "detail": "`originEntryId` is the entry the Reader was showing. `page` is the same as in `sefaria-connections-page-change`.",
+              "cancelable": true,
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-reader-connection-select",
-              "description": "Reports that a reader selected one connected reference.",
+              "description": "Reports that a reader selected one connected reference. Call `preventDefault()` to stop the Reader from opening the connected text.",
+              "detail": "`originEntryId` is the entry the Reader was showing. `id` and `targetRef` are the same as in `sefaria-connection-select`.",
+              "cancelable": true,
               "type": {
                 "text": "CustomEvent"
               }
             },
             {
               "name": "sefaria-reader-connections-preview-request",
-              "description": "Requests connection previews. The element loads them unless a listener cancels the event.",
+              "description": "Requests connection previews. The element loads them unless a listener cancels the event. Call `preventDefault()` to stop the Reader from loading previews.",
+              "detail": "`originEntryId`",
+              "cancelable": true,
               "type": {
                 "text": "CustomEvent"
               }
@@ -981,6 +1014,8 @@
             {
               "name": "sefaria-reader-error",
               "description": "Reports a loading failure or a rejection of the starting data.",
+              "detail": "`error` is the original failure. `sref` is the Reader's requested reference. It can be empty when the failure came from supplied `data`.",
+              "cancelable": false,
               "type": {
                 "text": "CustomEvent"
               }
@@ -1111,6 +1146,7 @@
           },
           "tagName": "sefaria-reader",
           "customElement": true,
+          "empty": "A Reader that has never had `sref` is blank. Its status is `empty`. A missing pane shows `Source text is not available for this entry.` or `Connections are not available for this entry.` The Reader reports a passage with no text as a source failure, not as an empty Source Card. A valid links response with no text connections shows the Connections Panel's empty message.",
           "cssProperties": [
             {
               "name": "--sefaria-surface",
@@ -1230,7 +1266,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Custom element that renders supplied or acquired source-card data.",
+          "description": "Shows a passage as a card. The card has a heading, the text in the primary edition, a translation, and the title of each edition shown. When an edition's source is a valid http(s) address, the title links to it. Any other source appears as plain text.",
           "name": "SefariaSourceCard",
           "members": [
             {
@@ -1401,7 +1437,7 @@
               "type": {
                 "text": "SefariaElementStatus"
               },
-              "description": "Read-only loading state: `\"empty\"`, `\"loading\"`, `\"ready\"` or `\"error\"`.",
+              "description": "Loading state: `\"empty\"`, `\"loading\"`, `\"ready\"` or `\"error\"`.",
               "readonly": true
             },
             {
@@ -1419,6 +1455,8 @@
             {
               "name": "sefaria-source-select",
               "description": "Reports that a reader selected one item in the source card.",
+              "detail": "`position` is the selected segment's position as an array of numbers. `ref` is its reference.",
+              "cancelable": false,
               "type": {
                 "text": "CustomEvent"
               }
@@ -1426,6 +1464,8 @@
             {
               "name": "sefaria-source-card-error",
               "description": "Reports a failure while loading or validating data from `sref`.",
+              "detail": "`error` is the original failure. `sref` is the reference that was loading.",
+              "cancelable": false,
               "type": {
                 "text": "CustomEvent"
               }
@@ -1538,6 +1578,8 @@
           },
           "tagName": "sefaria-source-card",
           "customElement": true,
+          "data": "`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.",
+          "empty": "The element shows its empty state when the response has no text for either side. The card keeps its heading and edition details. It shows why each side is missing, such as `No primary text is available.`",
           "slots": [],
           "cssParts": [],
           "cssProperties": [
@@ -1659,7 +1701,7 @@
       "declarations": [
         {
           "kind": "class",
-          "description": "Custom element that renders supplied or acquired text-segment data.",
+          "description": "Shows the text of one passage in one selected edition.",
           "name": "SefariaTextSegment",
           "members": [
             {
@@ -1764,7 +1806,7 @@
               "type": {
                 "text": "SefariaElementStatus"
               },
-              "description": "Read-only loading state: `\"empty\"`, `\"loading\"`, `\"ready\"` or `\"error\"`.",
+              "description": "Loading state: `\"empty\"`, `\"loading\"`, `\"ready\"` or `\"error\"`.",
               "readonly": true
             }
           ],
@@ -1772,6 +1814,8 @@
             {
               "name": "sefaria-text-segment-error",
               "description": "Reports a failure while loading or validating data from `sref`.",
+              "detail": "`error` is the original failure. `sref` is the reference that was loading.",
+              "cancelable": false,
               "type": {
                 "text": "CustomEvent"
               }
@@ -1839,6 +1883,8 @@
           },
           "tagName": "sefaria-text-segment",
           "customElement": true,
+          "data": "`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. It also accepts a `TextSegmentSelectedData` object with `kind: \"selected\"`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.",
+          "empty": "The element shows its empty state when the chosen edition has no text. The message depends on how the edition was chosen. If the default primary edition is missing, you see `No primary text is available.` If an edition you selected has no text, you can see a message that names that edition. On some paths, the element shows the response's warning instead.",
           "slots": [],
           "cssParts": [],
           "cssProperties": [

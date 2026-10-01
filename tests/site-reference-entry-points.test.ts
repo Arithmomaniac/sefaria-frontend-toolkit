@@ -23,6 +23,8 @@ const RELEASE_SENTENCE =
 // TypeDoc starts a TypeScript 6 program in a child process.
 const TYPEDOC_TIMEOUT = 120_000;
 const OLDER_PINS = /Older pinned script-tag versions keep their own behavior/u;
+const SCRIPT_INDEX =
+  "Compare the stamp above with the version in the [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/index.html).";
 
 const SITE_URL = "https://arithmomaniac.github.io/sefaria-frontend-toolkit";
 const ROUTES = {
@@ -232,9 +234,21 @@ describe("R1 components reference", () => {
     }
     expect(page).toContain('import "@arithmomaniac/sefaria-web-components";');
     expect(page).toContain(
-      "| Reader | `sefaria-reader-back` | Requests navigation to the previous entry. | `originEntryId`, the entry the Reader was showing | Yes |",
+      '| <a id="sefaria-reader-back"></a>`sefaria-reader-back` | Requests navigation to the previous entry. Call `preventDefault()` to stop the Reader from going back. | `originEntryId`, the entry the Reader was showing | Yes |',
     );
-    expect(page).toMatch(/\| Reader \| `sefaria-reader-error` \|.*\| No \|/u);
+    expect(page).toMatch(
+      /\| <a id="sefaria-reader-error"><\/a>`sefaria-reader-error` \|.*\| No \|/u,
+    );
+    expect(page).not.toContain("| Element | Event | Description | Detail |");
+    expect(page).toContain("Read-only. Loading state");
+    expect(page).not.toContain("Read-only. Read-only");
+    expect(page).not.toMatch(/`sefaria-sefaria`|bilingual-pair/u);
+    expect(page).toMatch(
+      /\| `--sefaria-font-scale` \|[^\n]*`sefaria-reader`[^\n]*`sefaria-text-segment` \|/u,
+    );
+    expect(page).toContain("### CSS parts\n\nCSS parts: none.");
+    expect(page).toContain("| Property | Default | Description | Used by |");
+    expect(page).toContain("| `--sefaria-shadow` |");
   });
 
   it("marks exactly the style tokens no component reads as reserved", async () => {
@@ -257,7 +271,13 @@ describe("R1 components reference", () => {
     for (const [row, name] of rows) {
       const alias = name!.replace("--sefaria-", "--_sefaria-");
       const used = sources.some((source) => source.includes(`var(${alias}`));
+      const usedByCell = row.split("|").at(-2)?.trim();
       expect(row.includes(RESERVED), name).toBe(!used);
+      if (used) {
+        expect(usedByCell, name).not.toBe("—");
+      } else {
+        expect(usedByCell, name).toBe("—");
+      }
       if (!used) reserved.push(name!);
     }
     expect(reserved.sort()).toEqual([
@@ -276,6 +296,10 @@ describe("R4 package imports and exports", () => {
     expect(page).toBe(await renderPackagesReference());
     expect(page).toMatch(RELEASE_SENTENCE);
     expect(page).toMatch(OLDER_PINS);
+    expect(page).toContain(SCRIPT_INDEX);
+    expect(page).not.toContain(
+      "The site doesn't compare it with the commit used to build this page, so the two can differ",
+    );
   });
 
   it("lists every import path, links the versions index and doesn't repeat it", async () => {

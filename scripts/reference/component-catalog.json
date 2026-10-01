@@ -1,37 +1,22 @@
 {
   "sefaria-text-segment": {
     "name": "Text Segment",
-    "howTo": "/use-components/show-text/show-one-passage.md",
-    "summary": "Shows the text of one passage in one selected edition.",
-    "data": "`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. It also accepts a `TextSegmentSelectedData` object with `kind: \"selected\"`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.",
-    "empty": "The element shows its empty state when the chosen edition has no text. The message depends on how the edition was chosen. If the default primary edition is missing, you see `No primary text is available.` If an edition you selected has no text, you can see a message that names that edition. On some paths, the element shows the response's warning instead."
+    "howTo": "/use-components/show-text/show-one-passage.md"
   },
   "sefaria-bilingual-segment": {
     "name": "Bilingual Segment",
-    "howTo": "/use-components/show-text/hebrew-and-translation.md",
-    "summary": "Shows one passage in its primary edition, together with a translation. The primary edition is the one marked `isPrimary`.",
-    "data": "`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.",
-    "empty": "The element shows its empty state when neither side has text. Each missing side has its own message, such as `No primary text is available.` or `No translation text is available.` The element can show the response's warning for that side instead. When only one side is missing, you see the other side's text and the missing side's message. `contentLanguage` filters which sides are shown."
+    "howTo": "/use-components/show-text/hebrew-and-translation.md"
   },
   "sefaria-source-card": {
     "name": "Source Card",
-    "howTo": "/use-components/show-an-attributed-passage.md",
-    "summary": "Shows a passage as a card. The card has a heading, the text in the primary edition, a translation, and the title of each edition shown. When an edition's source is a valid http(s) address, the title links to it. Any other source appears as plain text.",
-    "data": "`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.",
-    "empty": "The element shows its empty state when the response has no text for either side. The card keeps its heading and edition details. It shows why each side is missing, such as `No primary text is available.`"
+    "howTo": "/use-components/show-an-attributed-passage.md"
   },
   "sefaria-connections-panel": {
     "name": "Connections Panel",
-    "howTo": "/use-components/show-commentary-and-connected-texts.md",
-    "summary": "Lists the commentaries and other texts that Sefaria connects to a reference. It groups them by category.",
-    "data": "It has no `data` property. To give it local data, set `source` to `{ kind: \"custom\", loader }`, where the custom loader's `getText` and `getLinks` functions answer from your data. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md#control-loading).",
-    "empty": "The element shows its empty state when no text connections remain after the element leaves out sheet links. A response with only sheets is empty too. The message is `No text connections were returned.`"
+    "howTo": "/use-components/show-commentary-and-connected-texts.md"
   },
   "sefaria-reader": {
     "name": "Reader",
-    "howTo": "/use-components/add-the-complete-reader.md",
-    "summary": "Shows a passage with its connected texts. Readers can move between them.",
-    "data": "It has no `data` property. To give it local data, set `source` to `{ kind: \"custom\", loader }`, where the custom loader's `getText` and `getLinks` functions answer from your data. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md#control-loading).",
-    "empty": "A Reader that has never had `sref` is blank. Its status is `empty`. A missing pane shows `Source text is not available for this entry.` or `Connections are not available for this entry.` The Reader reports a passage with no text as a source failure, not as an empty Source Card. A valid links response with no text connections shows the Connections Panel's empty message."
+    "howTo": "/use-components/add-the-complete-reader.md"
   }
 }

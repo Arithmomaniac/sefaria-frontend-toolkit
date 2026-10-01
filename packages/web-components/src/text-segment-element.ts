@@ -38,7 +38,14 @@ import {
 
 const NOTE_PLACEHOLDER_PATTERN = /<span data-sefaria-note="(\d+)"><\/span>/gu;
 
-/** Custom element that renders supplied or acquired text-segment data. */
+/**
+ * Shows the text of one passage in one selected edition.
+ *
+ * @data `data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. It also accepts a `TextSegmentSelectedData` object with `kind: "selected"`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
+ * @empty The element shows its empty state when the chosen edition has no text. The message depends on how the edition was chosen. If the default primary edition is missing, you see `No primary text is available.` If an edition you selected has no text, you can see a message that names that edition. On some paths, the element shows the response's warning instead.
+ * @fires sefaria-text-segment-error - Reports a failure while loading or validating data from `sref`.
+ * @eventDetail sefaria-text-segment-error - `error` is the original failure. `sref` is the reference that was loading.
+ */
 export class SefariaTextSegment extends SefariaElement {
   /** Lit property metadata for declarative data and presentation state. */
   static override properties = {
@@ -194,7 +201,7 @@ export class SefariaTextSegment extends SefariaElement {
       : undefined;
   }
 
-  /** Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
+  /** Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
   get status(): SefariaElementStatus {
     return this.#statusOverride ?? statusOf(this.#viewModel);
   }

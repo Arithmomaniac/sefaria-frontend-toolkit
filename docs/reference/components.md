@@ -21,7 +21,7 @@ The elements are registered when you load the script tag or when you import the 
 
 This page documents the code on the `main` branch, which `alpha` builds are published from. <ReleaseStamp />
 
-The `alpha` script-tag address serves the newest script release that is still active. The site doesn't compare it with the commit used to build this page, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can still include the removed Popup and Reference Label elements. It can also lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
+The `alpha` script-tag address serves the newest script release that is still active. Compare the stamp above with the version in the [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/index.html). Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can still include the removed Popup and Reference Label elements. It can also lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
 
 ## Elements
 
@@ -51,8 +51,8 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | `translationLanguage` | `translation-language` | `string \| undefined` | `undefined` | Preferred translation language. Can't be combined with `versionLanguage`. |
 | `translationFallback` | `translation-fallback` | `"default" \| "none"` | `"none"` | What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". |
 | `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep. `none` removes both. |
-| `selectedVersion` | — | `TextSegmentSelectedVersionInfo \| undefined` | — | Details of the edition currently shown. |
-| `status` | — | `SefariaElementStatus` | — | Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
+| `selectedVersion` | — | `TextSegmentSelectedVersionInfo \| undefined` | — | Read-only. Details of the edition currently shown. |
+| `status` | — | `SefariaElementStatus` | — | Read-only. Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
 
 ### Data
 
@@ -64,7 +64,13 @@ The element shows its empty state when the chosen edition has no text. The messa
 
 ### Events
 
-`sefaria-text-segment-error`. See [Events](#events).
+| Event | Description | Detail | Cancelable |
+| --- | --- | --- | --- |
+| <a id="sefaria-text-segment-error"></a>`sefaria-text-segment-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No |
+
+### CSS parts
+
+CSS parts: none.
 
 <a id="sefaria-bilingual-segment"></a>
 
@@ -89,7 +95,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | `layout` | `layout` | `BilingualSegmentLayout` | `"auto"` | How the two texts are arranged: `auto`, `stacked` or `side-by-side`. |
 | `sideOrder` | `side-order` | `BilingualSegmentSideOrder` | `"primary-first"` | Which text comes first side by side: `primary-first` or `translation-first`. |
 | `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep. `none` removes both. |
-| `status` | — | `SefariaElementStatus` | — | Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
+| `status` | — | `SefariaElementStatus` | — | Read-only. Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
 
 ### Data
 
@@ -101,7 +107,13 @@ The element shows its empty state when neither side has text. Each missing side 
 
 ### Events
 
-`sefaria-bilingual-segment-error`. See [Events](#events).
+| Event | Description | Detail | Cancelable |
+| --- | --- | --- | --- |
+| <a id="sefaria-bilingual-segment-error"></a>`sefaria-bilingual-segment-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No |
+
+### CSS parts
+
+CSS parts: none.
 
 <a id="sefaria-source-card"></a>
 
@@ -130,7 +142,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | `selectable` | `selectable` | `boolean` | `false` | Lets readers select the verses that have their own reference. |
 | `selectedPosition` | — | `readonly number[] \| undefined` | `undefined` | Position of the selected verse, as an array of numbers rather than a reference. |
 | `hideAttributions` | `hide-attributions` | `boolean` | `false` | Hides the edition attribution. |
-| `status` | — | `SefariaElementStatus` | — | Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
+| `status` | — | `SefariaElementStatus` | — | Read-only. Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
 
 ### Data
 
@@ -142,7 +154,14 @@ The element shows its empty state when the response has no text for either side.
 
 ### Events
 
-`sefaria-source-select`, `sefaria-source-card-error`. See [Events](#events).
+| Event | Description | Detail | Cancelable |
+| --- | --- | --- | --- |
+| <a id="sefaria-source-select"></a>`sefaria-source-select` | Reports that a reader selected one item in the source card. | `position` is the selected segment's position as an array of numbers. `ref` is its reference. | No |
+| <a id="sefaria-source-card-error"></a>`sefaria-source-card-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No |
+
+### CSS parts
+
+CSS parts: none.
 
 <a id="sefaria-connections-panel"></a>
 
@@ -163,7 +182,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | `page` | `page` | `number` | `0` | Zero-based page of the loaded links to show. |
 | `showPreviews` | `show-previews` | `boolean` | `true` | Shows or hides the text previews already loaded, without fetching more. |
 | `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep in previews. `none` removes both. |
-| `status` | — | `SefariaElementStatus` | — | Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
+| `status` | — | `SefariaElementStatus` | — | Read-only. Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
 
 ### Data
 
@@ -175,7 +194,17 @@ The element shows its empty state when no text connections remain after the elem
 
 ### Events
 
-`sefaria-connections-category-change`, `sefaria-connections-preview-request`, `sefaria-connections-page-change`, `sefaria-connection-select`, `sefaria-connections-panel-error`. See [Events](#events).
+| Event | Description | Detail | Cancelable |
+| --- | --- | --- | --- |
+| <a id="sefaria-connections-category-change"></a>`sefaria-connections-category-change` | Asks to show a different connection category. Call `preventDefault()` to stop the panel from switching to that category and returning to the first page. | `category` is the chosen category's ID, or `null` for all categories. | Yes |
+| <a id="sefaria-connections-preview-request"></a>`sefaria-connections-preview-request` | Requests connection previews. The element loads them unless a listener cancels the event. Call `preventDefault()` to stop the panel from loading previews itself. If you don't call it, a panel that loads from `sref` requests the connections again with their text. | No fields. | Yes |
+| <a id="sefaria-connections-page-change"></a>`sefaria-connections-page-change` | Asks to show a different page of connections. Call `preventDefault()` to stop the panel from changing page. | `page` is the zero-based page number. | Yes |
+| <a id="sefaria-connection-select"></a>`sefaria-connection-select` | Reports that a reader selected one connected reference. Call `preventDefault()` to do nothing. The panel has no default action for this event. | `id` is the connection's ID. `targetRef` is the connected text's reference. | Yes |
+| <a id="sefaria-connections-panel-error"></a>`sefaria-connections-panel-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No |
+
+### CSS parts
+
+CSS parts: none.
 
 <a id="sefaria-reader"></a>
 
@@ -203,13 +232,13 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | `sideOrder` | `side-order` | `BilingualPairSideOrder` | `"primary-first"` | Which text comes first side by side: `primary-first` or `translation-first`. |
 | `showConnectionPreviews` | `show-connection-previews` | `boolean` | `true` | Whether connection previews are shown. |
 | `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep. `none` removes both. |
-| `status` | — | `SefariaElementStatus` | — | Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
-| `currentEntryId` | — | `string \| undefined` | — | The ID of the current history entry. |
-| `selectedRef` | — | `string \| undefined` | — | The selected reference, when there is one. |
-| `rootLoading` | — | `boolean` | — | Whether the starting text is still loading. |
-| `readerError` | — | `string \| undefined` | — | The error message, when the latest action failed. |
-| `canGoBack` | — | `boolean` | — | Whether Back can return to an earlier entry. |
-| `historyTruncated` | — | `boolean` | — | Whether older history entries were dropped to stay within the history limit. |
+| `status` | — | `SefariaElementStatus` | — | Read-only. Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
+| `currentEntryId` | — | `string \| undefined` | — | Read-only. The ID of the current history entry. |
+| `selectedRef` | — | `string \| undefined` | — | Read-only. The selected reference, when there is one. |
+| `rootLoading` | — | `boolean` | — | Read-only. Whether the starting text is still loading. |
+| `readerError` | — | `string \| undefined` | — | Read-only. The error message, when the latest action failed. |
+| `canGoBack` | — | `boolean` | — | Read-only. Whether Back can return to an earlier entry. |
+| `historyTruncated` | — | `boolean` | — | Read-only. Whether older history entries were dropped to stay within the history limit. |
 
 ### Data
 
@@ -221,7 +250,18 @@ A Reader that has never had `sref` is blank. Its status is `empty`. A missing pa
 
 ### Events
 
-`sefaria-reader-back`, `sefaria-reader-history-activate`, `sefaria-reader-pane-change`, `sefaria-reader-chat-export`, `sefaria-reader-source-select`, `sefaria-reader-connections-category-change`, `sefaria-reader-connections-page-change`, `sefaria-reader-connection-select`, `sefaria-reader-connections-preview-request`, `sefaria-reader-error`. See [Events](#events).
+| Event | Description | Detail | Cancelable |
+| --- | --- | --- | --- |
+| <a id="sefaria-reader-back"></a>`sefaria-reader-back` | Requests navigation to the previous entry. Call `preventDefault()` to stop the Reader from going back. | `originEntryId`, the entry the Reader was showing | Yes |
+| <a id="sefaria-reader-history-activate"></a>`sefaria-reader-history-activate` | Asks to return to one saved history entry. Call `preventDefault()` to stop the Reader from returning to that entry. | `originEntryId` is the entry the Reader was showing. `entryId` is the history entry chosen. `label` is its label. | Yes |
+| <a id="sefaria-reader-pane-change"></a>`sefaria-reader-pane-change` | Asks to show a different pane in the compact layout. Call `preventDefault()` to stop the Reader from switching pane. | `originEntryId` is the entry the Reader was showing. `pane` is `"source"` or `"connections"`. | Yes |
+| <a id="sefaria-reader-chat-export"></a>`sefaria-reader-chat-export` | Asks your page to send a reference to chat. Call `preventDefault()` to do nothing. The Reader has no default action. Your page handles the export. | `originEntryId` is the entry the Reader was showing. `targetRef` is the reference to send. | Yes |
+| <a id="sefaria-reader-source-select"></a>`sefaria-reader-source-select` | Reports that a reader selected one item in the source card. Call `preventDefault()` to stop the Reader from selecting that segment. | `originEntryId` is the entry the Reader was showing. `position` and `ref` are the same as in `sefaria-source-select`. | Yes |
+| <a id="sefaria-reader-connections-category-change"></a>`sefaria-reader-connections-category-change` | Asks to show a different connection category. Call `preventDefault()` to stop the Reader from switching category. | `originEntryId` is the entry the Reader was showing. `category` is the same as in `sefaria-connections-category-change`. | Yes |
+| <a id="sefaria-reader-connections-page-change"></a>`sefaria-reader-connections-page-change` | Asks to show a different connection page. Call `preventDefault()` to stop the Reader from changing page. | `originEntryId` is the entry the Reader was showing. `page` is the same as in `sefaria-connections-page-change`. | Yes |
+| <a id="sefaria-reader-connection-select"></a>`sefaria-reader-connection-select` | Reports that a reader selected one connected reference. Call `preventDefault()` to stop the Reader from opening the connected text. | `originEntryId` is the entry the Reader was showing. `id` and `targetRef` are the same as in `sefaria-connection-select`. | Yes |
+| <a id="sefaria-reader-connections-preview-request"></a>`sefaria-reader-connections-preview-request` | Requests connection previews. The element loads them unless a listener cancels the event. Call `preventDefault()` to stop the Reader from loading previews. | `originEntryId` | Yes |
+| <a id="sefaria-reader-error"></a>`sefaria-reader-error` | Reports a loading failure or a rejection of the starting data. | `error` is the original failure. `sref` is the Reader's requested reference. It can be empty when the failure came from supplied `data`. | No |
 
 ### Slots
 
@@ -250,51 +290,29 @@ Invalid supplied `data` puts an element into its error state. The Reader reports
 
 [Make components respond to each other](/across-components/make-components-respond-to-each-other.md) shows how to use them.
 
-| Element | Event | Description | Detail | Cancelable | What `preventDefault()` does |
-| --- | --- | --- | --- | --- | --- |
-| Text Segment | `sefaria-text-segment-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No | — |
-| Bilingual Segment | `sefaria-bilingual-segment-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No | — |
-| Source Card | `sefaria-source-select` | Reports that a reader selected one item in the source card. | `position` is the selected segment's position as an array of numbers. `ref` is its reference. | No | — |
-| Source Card | `sefaria-source-card-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No | — |
-| Connections Panel | `sefaria-connections-category-change` | Asks to show a different connection category. | `category` is the chosen category's ID, or `null` for all categories. | Yes | Stops the panel from switching to that category and returning to the first page. |
-| Connections Panel | `sefaria-connections-preview-request` | Requests connection previews. The element loads them unless a listener cancels the event. | No fields. | Yes | Stops the panel from loading previews itself. If you don't call it, a panel that loads from `sref` requests the connections again with their text. |
-| Connections Panel | `sefaria-connections-page-change` | Asks to show a different page of connections. | `page` is the zero-based page number. | Yes | Stops the panel from changing page. |
-| Connections Panel | `sefaria-connection-select` | Reports that a reader selected one connected reference. | `id` is the connection's ID. `targetRef` is the connected text's reference. | Yes | Nothing. The panel has no default action for this event. |
-| Connections Panel | `sefaria-connections-panel-error` | Reports a failure while loading or validating data from `sref`. | `error` is the original failure. `sref` is the reference that was loading. | No | — |
-| Reader | `sefaria-reader-back` | Requests navigation to the previous entry. | `originEntryId`, the entry the Reader was showing | Yes | Stops the Reader from going back. |
-| Reader | `sefaria-reader-history-activate` | Asks to return to one saved history entry. | `originEntryId` is the entry the Reader was showing. `entryId` is the history entry chosen. `label` is its label. | Yes | Stops the Reader from returning to that entry. |
-| Reader | `sefaria-reader-pane-change` | Asks to show a different pane in the compact layout. | `originEntryId` is the entry the Reader was showing. `pane` is `"source"` or `"connections"`. | Yes | Stops the Reader from switching pane. |
-| Reader | `sefaria-reader-chat-export` | Asks your page to send a reference to chat. | `originEntryId` is the entry the Reader was showing. `targetRef` is the reference to send. | Yes | Nothing. The Reader has no default action. Your page handles the export. |
-| Reader | `sefaria-reader-source-select` | Reports that a reader selected one item in the source card. | `originEntryId` is the entry the Reader was showing. `position` and `ref` are the same as in `sefaria-source-select`. | Yes | Stops the Reader from selecting that segment. |
-| Reader | `sefaria-reader-connections-category-change` | Asks to show a different connection category. | `originEntryId` is the entry the Reader was showing. `category` is the same as in `sefaria-connections-category-change`. | Yes | Stops the Reader from switching category. |
-| Reader | `sefaria-reader-connections-page-change` | Asks to show a different connection page. | `originEntryId` is the entry the Reader was showing. `page` is the same as in `sefaria-connections-page-change`. | Yes | Stops the Reader from changing page. |
-| Reader | `sefaria-reader-connection-select` | Reports that a reader selected one connected reference. | `originEntryId` is the entry the Reader was showing. `id` and `targetRef` are the same as in `sefaria-connection-select`. | Yes | Stops the Reader from opening the connected text. |
-| Reader | `sefaria-reader-connections-preview-request` | Requests connection previews. The element loads them unless a listener cancels the event. | `originEntryId` | Yes | Stops the Reader from loading previews. |
-| Reader | `sefaria-reader-error` | Reports a loading failure or a rejection of the starting data. | `error` is the original failure. `sref` is the Reader's requested reference. It can be empty when the failure came from supplied `data`. | No | — |
-
 <a id="style-settings"></a>
 
 ## Style settings
 
 The elements share these CSS custom properties. Not every element uses every one. Set them on the element or on any ancestor. [Match your site's look](/across-components/match-your-sites-look.md) shows how.
 
-| Property | Default | Description |
-| --- | --- | --- |
-| `--sefaria-surface` | `transparent` | Primary surface color. Text Segment is transparent unless this is set. |
-| `--sefaria-surface-muted` | `light-dark(#f5f1e8, #222521)` | Muted surface color. |
-| `--sefaria-fg` | `light-dark(#25231f, #f1eee7)` | Primary foreground color. |
-| `--sefaria-fg-muted` | `light-dark(#6d675d, #bdb7ac)` | Muted foreground color. |
-| `--sefaria-border` | `light-dark(#d7cfc1, #555b53)` | Standard border color. |
-| `--sefaria-border-strong` | `light-dark(#aaa094, #73796f)` | Reserved. No component uses it yet. Strong border color. |
-| `--sefaria-accent` | `light-dark(#8e2449, #ff93b4)` | Accent and focus color. |
-| `--sefaria-accent-soft` | `light-dark(rgb(142 36 73 / 10%), rgb(255 147 180 / 14%))` | Reserved. No component uses it yet. Translucent accent surface. |
-| `--sefaria-danger` | `light-dark(#9c1c1c, #ffaaa4)` | Reserved. No component uses it yet. Error foreground color. |
-| `--sefaria-link` | `light-dark(#8e2449, #ff93b4)` | Link foreground color. |
-| `--sefaria-shadow` | `0 1rem 3rem rgb(0 0 0 / 28%)` | Reserved. No component uses it yet. Elevated-surface shadow. |
-| `--sefaria-panel-radius` | `0.75rem` | Panel corner radius. |
-| `--sefaria-control-radius` | `0.3rem` | Control corner radius. |
-| `--sefaria-font-scale` | `1` | Component font-size multiplier. |
-| `--sefaria-font-hebrew` | `"Noto Serif Hebrew", "SBL Hebrew", "Times New Roman", serif` | Hebrew body font stack. |
-| `--sefaria-font-english` | `Georgia, "Times New Roman", serif` | English body font stack. |
-| `--sefaria-font-label-hebrew` | `"Noto Sans Hebrew", system-ui, sans-serif` | Reserved. No component uses it yet. Hebrew label font stack. |
-| `--sefaria-font-label-english` | `system-ui, sans-serif` | English label font stack. |
+| Property | Default | Description | Used by |
+| --- | --- | --- | --- |
+| `--sefaria-surface` | `transparent` | Primary surface color. Text Segment is transparent unless this is set. | `sefaria-bilingual-segment`, `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card`, `sefaria-text-segment` |
+| `--sefaria-surface-muted` | `light-dark(#f5f1e8, #222521)` | Muted surface color. | `sefaria-reader`, `sefaria-source-card` |
+| `--sefaria-fg` | `light-dark(#25231f, #f1eee7)` | Primary foreground color. | `sefaria-bilingual-segment`, `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card`, `sefaria-text-segment` |
+| `--sefaria-fg-muted` | `light-dark(#6d675d, #bdb7ac)` | Muted foreground color. | `sefaria-bilingual-segment`, `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card`, `sefaria-text-segment` |
+| `--sefaria-border` | `light-dark(#d7cfc1, #555b53)` | Standard border color. | `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card` |
+| `--sefaria-border-strong` | `light-dark(#aaa094, #73796f)` | Reserved. No component uses it yet. Strong border color. | — |
+| `--sefaria-accent` | `light-dark(#8e2449, #ff93b4)` | Accent and focus color. | `sefaria-reader`, `sefaria-source-card` |
+| `--sefaria-accent-soft` | `light-dark(rgb(142 36 73 / 10%), rgb(255 147 180 / 14%))` | Reserved. No component uses it yet. Translucent accent surface. | — |
+| `--sefaria-danger` | `light-dark(#9c1c1c, #ffaaa4)` | Reserved. No component uses it yet. Error foreground color. | — |
+| `--sefaria-link` | `light-dark(#8e2449, #ff93b4)` | Link foreground color. | `sefaria-reader`, `sefaria-source-card` |
+| `--sefaria-shadow` | `0 1rem 3rem rgb(0 0 0 / 28%)` | Reserved. No component uses it yet. Elevated-surface shadow. | — |
+| `--sefaria-panel-radius` | `0.75rem` | Panel corner radius. | `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card` |
+| `--sefaria-control-radius` | `0.3rem` | Control corner radius. | `sefaria-connections-panel`, `sefaria-source-card` |
+| `--sefaria-font-scale` | `1` | Component font-size multiplier. | `sefaria-bilingual-segment`, `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card`, `sefaria-text-segment` |
+| `--sefaria-font-hebrew` | `"Noto Serif Hebrew", "SBL Hebrew", "Times New Roman", serif` | Hebrew body font stack. | `sefaria-connections-panel`, `sefaria-source-card`, `sefaria-text-segment` |
+| `--sefaria-font-english` | `Georgia, "Times New Roman", serif` | English body font stack. | `sefaria-bilingual-segment`, `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card`, `sefaria-text-segment` |
+| `--sefaria-font-label-hebrew` | `"Noto Sans Hebrew", system-ui, sans-serif` | Reserved. No component uses it yet. Hebrew label font stack. | — |
+| `--sefaria-font-label-english` | `system-ui, sans-serif` | English label font stack. | `sefaria-reader` |

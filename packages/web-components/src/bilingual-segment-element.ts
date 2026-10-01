@@ -42,7 +42,14 @@ export type BilingualSegmentLayout = BilingualPairLayout;
 /** Which role occupies the first side-by-side track. */
 export type BilingualSegmentSideOrder = BilingualPairSideOrder;
 
-/** Custom element that renders supplied or acquired bilingual-segment data. */
+/**
+ * Shows one passage in its primary edition, together with a translation. The primary edition is the one marked `isPrimary`.
+ *
+ * @data `data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
+ * @empty The element shows its empty state when neither side has text. Each missing side has its own message, such as `No primary text is available.` or `No translation text is available.` The element can show the response's warning for that side instead. When only one side is missing, you see the other side's text and the missing side's message. `contentLanguage` filters which sides are shown.
+ * @fires sefaria-bilingual-segment-error - Reports a failure while loading or validating data from `sref`.
+ * @eventDetail sefaria-bilingual-segment-error - `error` is the original failure. `sref` is the reference that was loading.
+ */
 export class SefariaBilingualSegment extends SefariaElement {
   /** Lit property metadata for declarative data and presentation state. */
   static override properties = {
@@ -181,7 +188,7 @@ export class SefariaBilingualSegment extends SefariaElement {
     super.disconnectedCallback();
   }
 
-  /** Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
+  /** Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
   get status(): SefariaElementStatus {
     return this.#statusOverride ?? statusOf(this.#viewModel);
   }

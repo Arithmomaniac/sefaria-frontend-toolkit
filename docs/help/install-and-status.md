@@ -84,7 +84,7 @@ version="0.0.0-alpha.<run-id>.<run-attempt>"
 npm install "@arithmomaniac/sefaria-client@$version" "@arithmomaniac/sefaria-text-transform@$version" "@arithmomaniac/sefaria-web-components@$version"
 ```
 
-The packages also carry an `alpha` tag that follows the newest build. An exact version pins the toolkit release. Commit your lockfile and install from it to fix the other dependencies too. For example, run `npm ci`. Yarn and pnpm read the same `.npmrc` scope line. Yarn can also use its own setting, [`npmScopes`](https://yarnpkg.com/configuration/yarnrc#npmScopes). Types are included, so no `@types` package is needed.
+The packages also carry an `alpha` tag that follows the newest build. An exact version pins the toolkit release. Commit your lockfile and install from it to fix the other dependencies too. For example, run `npm ci`. Yarn and pnpm read the same `.npmrc` scope line. Yarn can also use its own setting, [`npmScopes`](https://yarnpkg.com/configuration/yarnrc#npmScopes). Types are included; no `@types` package is needed.
 
 If you get a 401, 403, or `E404` error, check:
 
@@ -99,9 +99,11 @@ For import paths, see [Package imports and exports](/reference/package-imports-a
 
 The components need a browser. The client and text tools run in JavaScript runtimes. In other languages, call [Sefaria's API](https://developers.sefaria.org) directly.
 
-CI tests the components in Chromium, Firefox, and WebKit with the script tag. CI tests the client and text tools in Node.js 22 on Ubuntu and Windows. The minimum is Node.js 22.12.
-
-Deno, Bun, and edge runtimes such as Cloudflare Workers are not tested in CI. The code uses standard `fetch` and needs no DOM, so any modern runtime with ES modules and `fetch` should work.
+| Runtime | Coverage | Notes |
+| --- | --- | --- |
+| Chromium, Firefox, and WebKit | Tested in CI | Component tests run with the script tag. |
+| Node.js 22 | Tested in CI | Client and text-tool tests run on Ubuntu and Windows. The minimum is Node.js 22.12. |
+| Deno, Bun, and edge runtimes | Not tested in CI | The code uses standard `fetch` and needs no DOM, so any modern runtime with ES modules and `fetch` should work. |
 
 ## What alpha means
 
