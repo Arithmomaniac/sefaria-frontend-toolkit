@@ -1,7 +1,7 @@
 {
   "name": "@arithmomaniac/sefaria-web-components",
   "version": "0.0.0",
-  "description": "Web components that show Sefaria texts, translations and connections on any web page.",
+  "description": "Declarative Sefaria web components backed by corrected client payloads and safe text transforms.",
   "private": true,
   "type": "module",
   "license": "GPL-3.0-only",

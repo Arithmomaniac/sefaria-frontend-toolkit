@@ -1,7 +1,7 @@
 {
   "name": "@arithmomaniac/sefaria-client",
   "version": "0.0.0",
-  "description": "A small client for Sefaria's API that checks every JSON response against Sefaria's corrected API description.",
+  "description": "Source-backed Sefaria API client with generated contracts, validators, and bounded caching.",
   "private": true,
   "type": "module",
   "license": "GPL-3.0-only",

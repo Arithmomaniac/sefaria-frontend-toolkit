@@ -39,7 +39,7 @@ The client package root re-exports the generated namespaces, contracts, schemas,
 
 ## `@arithmomaniac/sefaria-client`
 
-A small client for Sefaria's API that checks every JSON response against Sefaria's corrected API description. Package manifest version: `0.0.0`. [Reference](/reference/client.md).
+Source-backed Sefaria API client with generated contracts, validators, and bounded caching. Package manifest version: `0.0.0`. [Reference](/reference/client.md).
 
 | Import path | Exports |
 | --- | --- |
@@ -53,7 +53,7 @@ A small client for Sefaria's API that checks every JSON response against Sefaria
 
 ## `@arithmomaniac/sefaria-text-transform`
 
-Tools that clean Sefaria's text markup, separate footnotes and set Hebrew vowel marks, in the browser or in Node. Package manifest version: `0.0.0`. [Reference](/reference/text-transform.md).
+Pure Sefaria text normalization, vocalization, footnote, and preview utilities. Package manifest version: `0.0.0`. [Reference](/reference/text-transform.md).
 
 | Import path | Exports |
 | --- | --- |
@@ -61,7 +61,7 @@ Tools that clean Sefaria's text markup, separate footnotes and set Hebrew vowel 
 
 ## `@arithmomaniac/sefaria-web-components`
 
-Web components that show Sefaria texts, translations and connections on any web page. Package manifest version: `0.0.0`. [Reference](/reference/components.md).
+Declarative Sefaria web components backed by corrected client payloads and safe text transforms. Package manifest version: `0.0.0`. [Reference](/reference/components.md).
 
 | Import path | Exports |
 | --- | --- |

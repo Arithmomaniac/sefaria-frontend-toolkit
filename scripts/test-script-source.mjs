@@ -457,12 +457,12 @@ async function exerciseInteractions(page, scenario, requests) {
     const card = page.locator("sefaria-source-card");
     const first = card
       .getByRole("button", {
-        name: "Show connections for Micah 6:7",
+        name: "Select Micah 6:7",
       })
       .first();
     const second = card
       .getByRole("button", {
-        name: "Show connections for Micah 6:8",
+        name: "Select Micah 6:8",
       })
       .first();
     await first.press("Enter");

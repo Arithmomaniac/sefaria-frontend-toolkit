@@ -1,7 +1,7 @@
 {
   "name": "@arithmomaniac/sefaria-text-transform",
   "version": "0.0.0",
-  "description": "Tools that clean Sefaria's text markup, separate footnotes and set Hebrew vowel marks, in the browser or in Node.",
+  "description": "Pure Sefaria text normalization, vocalization, footnote, and preview utilities.",
   "private": true,
   "type": "module",
   "license": "GPL-3.0-only",

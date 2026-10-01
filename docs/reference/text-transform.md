@@ -61,7 +61,7 @@ function applyVocalizationToHtml(html, mode, options?): string;
 
 Applies vocalization only to text nodes in an already-sanitized HTML fragment.
 
-Run [normalizeText](#normalizetext) first. Markup and attribute values are preserved. This operation is not a sanitizer.
+Run [normalizeText](#normalizetext) first. Markup and attribute values are preserved; this operation is not a sanitizer.
 
 ##### Parameters
 

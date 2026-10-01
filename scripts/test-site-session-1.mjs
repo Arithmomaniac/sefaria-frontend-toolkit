@@ -546,7 +546,7 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
     );
     await selectFrame
       .locator("sefaria-source-card")
-      .getByRole("button", { name: "Show connections for Micah 6:7" })
+      .getByRole("button", { name: "Select Micah 6:7" })
       .first()
       .click();
     await selectFrame
@@ -556,7 +556,7 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
     expectEqual(
       await selectFrame
         .locator("sefaria-source-card")
-        .getByRole("button", { name: "Show connections for Micah 6:7" })
+        .getByRole("button", { name: "Select Micah 6:7" })
         .first()
         .getAttribute("aria-pressed"),
       "true",
@@ -823,7 +823,7 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
     expectEqual(coordRequests.length, 2, "coordination fresh load");
     await coordFrame
       .locator("sefaria-source-card")
-      .getByRole("button", { name: "Show connections for Micah 6:7" })
+      .getByRole("button", { name: "Select Micah 6:7" })
       .first()
       .click();
     await coordFrame.waitForFunction(

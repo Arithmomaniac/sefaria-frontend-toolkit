@@ -1,6 +1,7 @@
 import { html } from "lit";
 import { render } from "vitest-browser-lit";
 import { afterEach, expect, test, vi } from "vitest";
+import { userEvent } from "vitest/browser";
 import "./connections-panel-element.js";
 import type { SefariaConnectionsPanel } from "./connections-panel-element.js";
 import type { ConnectionsViewModel } from "./connections-panel.js";
@@ -92,6 +93,47 @@ test("category and page buttons emit semantic events without mutating the model"
   expect(page.mock.calls[0]?.[0].detail).toEqual({ page: 1 });
   expect(category.mock.calls[0]?.[0].detail).toEqual({ category: null });
   expect(getPreparedState<ConnectionsViewModel>(element)).toBe(data);
+});
+
+test("missing preview sides use plain reader-facing wording", async () => {
+  const ready = data as Extract<ConnectionsViewModel, { state: "data" }>;
+  const entry = ready.entries[0]!;
+  const element = await mount({
+    ...ready,
+    entries: [
+      {
+        ...entry,
+        preview: { state: "available", english: null, hebrew: null },
+      },
+    ],
+  } as ConnectionsViewModel);
+  const text = element.shadowRoot!.textContent!;
+  expect(text).toContain("No English text.");
+  expect(text).toContain("No Hebrew text.");
+  expect(text).not.toContain("channel");
+});
+
+test("a mouse-clicked category button keeps focus without the keyboard ring", async () => {
+  const element = await mount({ ...data, category: null });
+  element.addEventListener("sefaria-connections-category-change", (event) => {
+    setPreparedState(element, {
+      ...data,
+      category: (event as CustomEvent<{ category: string | null }>).detail
+        .category,
+    });
+  });
+  const find = () =>
+    [...element.shadowRoot!.querySelectorAll("nav button")].find((button) =>
+      button.textContent?.includes("Commentary"),
+    ) as HTMLButtonElement;
+  const before = find();
+  await userEvent.click(before);
+  await element.updateComplete;
+  const after = find();
+  expect(after).toBe(before);
+  expect(after.getAttribute("aria-pressed")).toBe("true");
+  expect(element.shadowRoot?.activeElement).toBe(after);
+  expect(after.matches(":focus-visible")).toBe(false);
 });
 
 test("inherits panel and control shape tokens from the host", async () => {

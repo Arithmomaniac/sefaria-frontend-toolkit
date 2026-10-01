@@ -47,9 +47,7 @@ test("assigns declarative data and source, receives selection, and loads only on
   expect(fetch).not.toHaveBeenCalled();
 
   card.shadowRoot
-    ?.querySelector<HTMLButtonElement>(
-      'button[aria-label="Show connections for Micah 6:8"]',
-    )
+    ?.querySelector<HTMLButtonElement>('button[aria-label="Select Micah 6:8"]')
     ?.click();
   await waitForAlpine();
   expect(root.querySelector("#selected-ref")?.textContent).toContain(

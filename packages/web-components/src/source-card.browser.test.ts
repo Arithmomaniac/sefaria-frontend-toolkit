@@ -120,9 +120,7 @@ test("selection is opt-in, controlled and composed without requesting", async ()
     '[aria-pressed="true"]',
   );
   expect(button?.textContent?.trim()).toBe("ב׳");
-  expect(button?.getAttribute("aria-label")).toBe(
-    "Show connections for Genesis 1:2",
-  );
+  expect(button?.getAttribute("aria-label")).toBe("Select Genesis 1:2");
   expect(host.shadowRoot?.activeElement).toBe(button);
   button?.click();
   expect(selection.mock.calls[0]?.[0].detail).toEqual({

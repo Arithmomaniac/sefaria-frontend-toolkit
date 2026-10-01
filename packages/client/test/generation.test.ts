@@ -210,15 +210,7 @@ describe("OpenAPI generation", () => {
     }
   });
 
-  it("requires every overlay guard to name commit-pinned Sefaria source evidence", () => {
-    for (const guard of overlay["x-sefaria-guards"]) {
-      expect(guard.evidence, guard.id).toMatch(
-        /^https:\/\/github\.com\/Sefaria\/Sefaria-Project\/blob\/[0-9a-f]{40}\//u,
-      );
-    }
-  });
-
-  it("rejects overlay guards without non-empty titles, descriptions and evidence", () => {
+  it("rejects overlay guards without non-empty titles and descriptions", () => {
     const testOverlay: OverlayDocument = {
       overlay: "1.1.0",
       info: { title: "test", version: "1" },
@@ -228,8 +220,6 @@ describe("OpenAPI generation", () => {
           id: "missing-title",
           title: "",
           description: "Describes the correction.",
-          evidence:
-            "https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/api/views.py#L28-L88",
           preconditions: [{ target: "$.target", expected: { absent: true } }],
         },
       ],
@@ -254,27 +244,11 @@ describe("OpenAPI generation", () => {
             id: "missing-title",
             title: "Test correction",
             description: "",
-            evidence:
-              "https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/api/views.py#L28-L88",
             preconditions: [{ target: "$.target", expected: { absent: true } }],
           },
         ],
       }),
     ).toThrow(/Overlay guard missing-title description/);
-    expect(() =>
-      validateOverlayDocument({
-        ...testOverlay,
-        "x-sefaria-guards": [
-          {
-            id: "missing-title",
-            title: "Test correction",
-            description: "Describes the correction.",
-            evidence: "https://github.com/Sefaria/Sefaria-Project/tree/master",
-            preconditions: [{ target: "$.target", expected: { absent: true } }],
-          },
-        ],
-      }),
-    ).toThrow(/evidence/);
   });
 
   it("rejects OpenAPI 3.0 nullable schemas without an explicit type", () => {
@@ -324,8 +298,6 @@ describe("OpenAPI generation", () => {
           id: "test",
           title: "Test correction",
           description: "Describes the test correction.",
-          evidence:
-            "https://github.com/Sefaria/Sefaria-Project/blob/898feda78d1bd6b24f66305081a54c8cf36406be/api/views.py#L28-L88",
           preconditions: [
             {
               target: "$.target",

@@ -612,7 +612,7 @@ async function smokeReactChromium() {
         if (!card) throw new Error("Packed React source card is missing.");
         await card.updateComplete;
         const button = card.shadowRoot?.querySelector(
-          'button[aria-label="Show connections for Micah 6:8"]',
+          'button[aria-label="Select Micah 6:8"]',
         );
         if (!(button instanceof globalThis.HTMLButtonElement)) {
           throw new Error("Packed React selection control is missing.");
@@ -778,7 +778,7 @@ async function smokeAlpineChromium() {
         if (!element) throw new Error("Packed Alpine source card is missing.");
         await element.updateComplete;
         const button = element.shadowRoot?.querySelector(
-          'button[aria-label="Show connections for Micah 6:8"]',
+          'button[aria-label="Select Micah 6:8"]',
         );
         if (!(button instanceof globalThis.HTMLButtonElement)) {
           throw new Error("Packed Alpine selection control is missing.");
