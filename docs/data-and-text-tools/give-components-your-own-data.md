@@ -16,8 +16,8 @@ Components normally load their text from Sefaria. If you already hold the respon
 | You have… | Use… |
 | --- | --- |
 | A response you saved, fetched on your server, received from an MCP tool, or exported | The element's `data` property |
-| A route to Sefaria that your host controls | The element's `acquisition` property |
-| Only part of a Reader's data | A Reader seed, described below |
+| A route to Sefaria that your host controls | The element's `acquisition` property (advanced) |
+| Only part of a Reader's data | A Reader seed, described in the advanced section below (advanced) |
 
 Both cases start from corrected API-shaped JSON. That is the JSON body Sefaria's API returns, in the shape the toolkit's corrected API description expects.
 
@@ -50,7 +50,11 @@ Supplied data also follows the element's `translation-fallback` setting. It defa
 
 To see the failure in your own code as well, read [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md).
 
-## Start the Reader from a seed
+## Advanced: control loading
+
+Most pages don't need this section.
+
+### Start the Reader from a seed
 
 The Reader (`sefaria-reader`) is different. A seed is a starting point, not full data. Assign a `ReaderRawSeedData` object to `data`. It needs `source` or `connections`. The [Components reference](/reference/components.md) lists its fields.
 
@@ -60,7 +64,7 @@ The Reader shows what the seed contains. A seed with `source` but no `connection
 
 In this example, the source-only seed makes one links request and doesn't request the source text again.
 
-## Route loading through your host
+### Route loading through your host
 
 To control where an element loads from, set its `acquisition` property to one of three choices:
 
@@ -76,7 +80,7 @@ A capability is an object with either or both of two async functions, `getText` 
 
 If an element needs a function your capability doesn't have, the load fails with an error. With `disabled`, any load the element attempts fails with "Standalone Sefaria acquisition is disabled." That includes the connections a source-only Reader seed would load. If a later load fails, an element that already showed text keeps it. Its `status` becomes `error`, and its error event fires. [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md) shows how to read both.
 
-### Example: a Reader inside AI chat
+#### Example: a Reader inside AI chat
 
 The MCP App example is an app shown inside an AI chat. It passes `createMcpReaderAcquisition(host)` to the Reader:
 

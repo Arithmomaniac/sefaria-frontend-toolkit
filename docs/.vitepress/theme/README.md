@@ -47,6 +47,13 @@ Data and text tool pages show every snippet with `<CodeLanguageToggle :snippet>`
 - Put rules for one component's attributes, which interrupt the narrative, in a `::: info` box with a short title, as bullets.
 - Leave a blank line before a closing `:::`. Otherwise Prettier joins it to the line above and the box swallows the rest of the page. A site test checks this.
 
+## Advanced material
+
+- When a how-to page has material most readers don't need, group it at the end under an H2 that starts "Advanced:". Add one sentence saying most pages don't need it.
+- Mark advanced options in summary tables with "(advanced)".
+- Use heading words, not badges.
+- Basic material must not depend on the advanced section.
+
 ## Planned pages
 
 - Link planned pages at their final routes. Give each unbuilt destination a stub with `stub: true`, a title, one or two sentences on what it will cover, a "Coming soon" note, and a link back to Home.
