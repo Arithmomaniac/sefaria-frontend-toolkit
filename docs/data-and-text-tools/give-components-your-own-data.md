@@ -13,7 +13,13 @@ import { data as snippets } from "./snippets.data.ts";
 
 Components normally load their text from Sefaria. If you already hold the response, or you want your own server to stand between the page and Sefaria, you can change that. There are two cases. With `data`, the element makes no request at all. With a data source, it still loads, and navigates in the Reader, but from the place you choose.
 
-Only three elements accept `data`. The Reader and the Connections Panel don't, because they change as the reader navigates.
+Three elements accept `data`, because their content doesn't change. Valid `data` is authoritative and makes no requests:
+
+- Text Segment (`sefaria-text-segment`)
+- Bilingual Segment (`sefaria-bilingual-segment`)
+- Source Card (`sefaria-source-card`)
+
+The Reader and the Connections Panel don't accept `data`, because they change as the reader navigates.
 
 ```mermaid
 flowchart TD
@@ -38,12 +44,6 @@ The example sets `data` even when the check fails, so the card shows its own err
 <CodeLanguageToggle :snippet="snippets['supplied-source-card-data']" />
 
 The Source Card expects the texts API response, because that is the request it would have made. The [Components reference](/reference/components.md) lists the shape each element expects.
-
-Three elements accept `data`, because their content doesn't change. Valid `data` is authoritative and makes no requests:
-
-- Text Segment (`sefaria-text-segment`)
-- Bilingual Segment (`sefaria-bilingual-segment`)
-- Source Card (`sefaria-source-card`)
 
 When `data` is set, it wins over `sref`. In the example above, the only request the page makes is the one to your own `/data/micah-6-8.json`.
 
