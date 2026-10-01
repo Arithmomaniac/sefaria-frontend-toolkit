@@ -203,7 +203,7 @@ const MAM_VALUES = new Map([
  * `strong`, `i`, `em`, `u`, `small`, `sup`, and `sub`. It keeps `br`, maps
  * `big` to `<span style="font-size: larger;">`, converts `img` to its `alt`
  * text, unwraps block elements with separators, and removes active content.
- * Incoming style attributes are dropped; the fixed `font-size: larger;` style
+ * Incoming style attributes are dropped. The fixed `font-size: larger;` style
  * emitted for `big` is the only output style. The only ordinary attribute is
  * `dir`, and only on `i` or generated `span` elements when the value is `ltr`,
  * `rtl`, or `auto`.
