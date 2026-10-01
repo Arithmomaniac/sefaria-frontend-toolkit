@@ -1,11 +1,21 @@
-import { spawnSync } from "node:child_process";
-import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { execFile } from "node:child_process";
+import {
+  cp,
+  mkdir,
+  mkdtemp,
+  readdir,
+  readFile,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import process from "node:process";
 import { pathToFileURL } from "node:url";
+import { promisify } from "node:util";
 
 const repository = path.resolve(import.meta.dirname, "..");
+const execFileAsync = promisify(execFile);
 
 export async function rehearseChangesets({
   temporaryDirectory = tmpdir(),
@@ -51,16 +61,18 @@ export async function rehearseChangesets({
       });
     }
 
-    run(fixture, "git", ["init", "--initial-branch", "fixture"]);
-    run(fixture, "git", ["config", "user.name", "Changesets Rehearsal"]);
-    run(fixture, "git", [
+    await run(fixture, "git", ["init", "--initial-branch", "fixture"]);
+    await run(fixture, "git", ["config", "user.name", "Changesets Rehearsal"]);
+    await run(fixture, "git", [
       "config",
       "user.email",
       "changesets-rehearsal@example.invalid",
     ]);
-    run(fixture, "git", ["add", "."]);
-    run(fixture, "git", ["commit", "-m", "fixture baseline"]);
-    const baseline = capture(fixture, "git", ["rev-parse", "HEAD"]).trim();
+    await run(fixture, "git", ["add", "."]);
+    await run(fixture, "git", ["commit", "-m", "fixture baseline"]);
+    const baseline = (
+      await capture(fixture, "git", ["rev-parse", "HEAD"])
+    ).trim();
 
     await writeChangeset(
       fixture,
@@ -68,8 +80,8 @@ export async function rehearseChangesets({
       "@arithmomaniac/sefaria-client",
       "Exercise first alpha.",
     );
-    runChangesets(fixture, ["pre", "enter", "alpha"]);
-    runChangesets(fixture, ["version"]);
+    await runChangesets(fixture, ["pre", "enter", "alpha"]);
+    await runChangesets(fixture, ["version"]);
     const firstVersions = await readVersions(fixture);
     assertSynchronized(firstVersions);
     if (!/^\d+\.\d+\.\d+-alpha\.0$/u.test(firstVersions[0])) {
@@ -84,7 +96,7 @@ export async function rehearseChangesets({
       "@arithmomaniac/sefaria-text-transform",
       "Exercise subsequent alpha.",
     );
-    runChangesets(fixture, ["version"]);
+    await runChangesets(fixture, ["version"]);
     const secondVersions = await readVersions(fixture);
     assertSynchronized(secondVersions);
     if (!/^\d+\.\d+\.\d+-alpha\.1$/u.test(secondVersions[0])) {
@@ -125,10 +137,12 @@ export async function rehearseChangesets({
         );
       }
     }
-    if (capture(fixture, "git", ["rev-parse", "HEAD"]).trim() !== baseline) {
+    if (
+      (await capture(fixture, "git", ["rev-parse", "HEAD"])).trim() !== baseline
+    ) {
       throw new Error("Changesets created an automatic commit.");
     }
-    if (capture(fixture, "git", ["tag", "--list"]).trim() !== "") {
+    if ((await capture(fixture, "git", ["tag", "--list"])).trim() !== "") {
       throw new Error("Changesets created a tag during local versioning.");
     }
 
@@ -142,6 +156,38 @@ export async function rehearseChangesets({
     return result;
   } finally {
     await rm(fixture, { force: true, recursive: true });
+  }
+}
+
+export async function rehearseConcurrentChangesets({
+  temporaryDirectory = tmpdir(),
+} = {}) {
+  const sharedDirectory = await mkdtemp(
+    path.join(temporaryDirectory, "sefaria-changesets-concurrency-test-"),
+  );
+  try {
+    const results = await Promise.all([
+      rehearseChangesets({ temporaryDirectory: sharedDirectory }),
+      rehearseChangesets({ temporaryDirectory: sharedDirectory }),
+    ]);
+    for (const result of results) {
+      if (
+        result.firstVersion !== "0.1.1-alpha.0" ||
+        result.secondVersion !== "0.1.1-alpha.1"
+      ) {
+        throw new Error(
+          `Unexpected Changesets rehearsal versions: ${result.firstVersion} -> ${result.secondVersion}.`,
+        );
+      }
+    }
+    const remaining = await readdir(sharedDirectory);
+    if (remaining.length > 0) {
+      throw new Error(
+        `Changesets rehearsal leaked fixtures: ${remaining.join(", ")}.`,
+      );
+    }
+  } finally {
+    await rm(sharedDirectory, { force: true, recursive: true });
   }
 }
 
@@ -170,7 +216,7 @@ function assertSynchronized(versions) {
   }
 }
 
-function runChangesets(fixture, args) {
+async function runChangesets(fixture, args) {
   const binary = path.join(
     repository,
     "node_modules",
@@ -178,10 +224,10 @@ function runChangesets(fixture, args) {
     "cli",
     "bin.js",
   );
-  run(fixture, process.execPath, [binary, ...args]);
+  await run(fixture, process.execPath, [binary, ...args]);
 }
 
-function run(fixture, command, args) {
+async function run(fixture, command, args) {
   const windowsCommand =
     process.platform === "win32" && command.endsWith(".cmd");
   const executable = windowsCommand
@@ -190,31 +236,40 @@ function run(fixture, command, args) {
   const executableArgs = windowsCommand
     ? ["/d", "/s", "/c", `${command} ${args.join(" ")}`]
     : args;
-  const result = spawnSync(executable, executableArgs, {
-    windowsHide: true,
-    cwd: fixture,
-    env: { ...process.env, INIT_CWD: fixture },
-    stdio: "inherit",
-  });
-  if (result.status !== 0) {
+  try {
+    await execFileAsync(executable, executableArgs, {
+      windowsHide: true,
+      cwd: fixture,
+      env: { ...process.env, INIT_CWD: fixture },
+    });
+  } catch (error) {
     throw new Error(
-      `${command} ${args.join(" ")} exited with ${result.status}.`,
+      `${command} ${args.join(" ")} exited with ${exitCode(error)}.`,
+      { cause: error },
     );
   }
 }
 
-function capture(fixture, command, args) {
-  const result = spawnSync(command, args, {
-    windowsHide: true,
-    cwd: fixture,
-    encoding: "utf8",
-  });
-  if (result.status !== 0) {
+async function capture(fixture, command, args) {
+  try {
+    const result = await execFileAsync(command, args, {
+      windowsHide: true,
+      cwd: fixture,
+      encoding: "utf8",
+    });
+    return result.stdout;
+  } catch (error) {
     throw new Error(
-      `${command} ${args.join(" ")} exited with ${result.status}.`,
+      `${command} ${args.join(" ")} exited with ${exitCode(error)}.`,
+      { cause: error },
     );
   }
-  return result.stdout;
+}
+
+function exitCode(error) {
+  return typeof error === "object" && error !== null && "code" in error
+    ? error.code
+    : "unknown";
 }
 
 async function writeJson(fixture, relativePath, value) {
@@ -231,7 +286,7 @@ if (
   process.argv[1] !== undefined &&
   import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href
 ) {
-  await rehearseChangesets({
+  await rehearseConcurrentChangesets({
     temporaryDirectory:
       process.env.SEFARIA_REHEARSAL_TEMP_DIRECTORY ?? tmpdir(),
   });
