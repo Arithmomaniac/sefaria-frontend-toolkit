@@ -376,16 +376,6 @@
             },
             {
               "kind": "field",
-              "name": "data",
-              "privacy": "public",
-              "type": {
-                "text": "unknown | undefined"
-              },
-              "description": "Sefaria links response data to render. When it's set, the element doesn't fetch anything.",
-              "default": "undefined"
-            },
-            {
-              "kind": "field",
               "name": "acquisition",
               "privacy": "public",
               "type": {
@@ -716,16 +706,6 @@
               "description": "The reference the Reader starts from. Navigating inside the Reader doesn't change it.",
               "default": "\"\"",
               "attribute": "sref"
-            },
-            {
-              "kind": "field",
-              "name": "data",
-              "privacy": "public",
-              "type": {
-                "text": "ReaderRawSeedData | undefined"
-              },
-              "description": "Starting data for the Reader, which it accepts or rejects as a whole.",
-              "default": "undefined"
             },
             {
               "kind": "field",

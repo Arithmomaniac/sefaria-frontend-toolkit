@@ -157,7 +157,6 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
 | `sref` | `sref` | `string` | `""` | The Sefaria reference to load when `data` isn't set. |
-| `data` | — | `unknown \| undefined` | `undefined` | Sefaria links response data to render. When it's set, the element doesn't fetch anything. |
 | `acquisition` | — | `SefariaAcquisition \| undefined` | `undefined` | Chooses how this element fetches data, instead of the default. |
 | `withText` | `with-text` | `boolean` | `true` | Whether the links include the connected texts. |
 | `category` | `category` | `string \| undefined` | `undefined` | Category of the loaded links to show. |
@@ -191,7 +190,6 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
 | `sref` | `sref` | `string` | `""` | The reference the Reader starts from. Navigating inside the Reader doesn't change it. |
-| `data` | — | `ReaderRawSeedData \| undefined` | `undefined` | Starting data for the Reader, which it accepts or rejects as a whole. |
 | `acquisition` | — | `SefariaAcquisition \| undefined` | `undefined` | Chooses how this element fetches data, instead of the default. |
 | `translationLanguage` | `translation-language` | `string \| undefined` | `undefined` | Preferred translation language, for the starting text and texts you navigate to. |
 | `translationFallback` | `translation-fallback` | `"default" \| "none"` | `"default"` | What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". |

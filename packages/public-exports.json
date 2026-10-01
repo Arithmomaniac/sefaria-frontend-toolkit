@@ -1258,9 +1258,6 @@
             "ConnectionsProjection",
             "ConnectionsRequest",
             "ReaderPane",
-            "ReaderRawConnectionsSeed",
-            "ReaderRawSeedData",
-            "ReaderRawSourceSeed",
             "SefariaAcquisition",
             "SefariaAcquisitionCapability",
             "SefariaAcquisitionResponse",
@@ -1325,9 +1322,6 @@
           "declarations": [
             "ReaderDataSource",
             "ReaderPane",
-            "ReaderRawConnectionsSeed",
-            "ReaderRawSeedData",
-            "ReaderRawSourceSeed",
             "ReaderResolvedSource",
             "createSefariaReaderDataSource",
             "resolveReaderSource"

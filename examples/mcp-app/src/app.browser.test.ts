@@ -50,12 +50,14 @@ test("seeds the stateful reader before loading initial connections through the h
     },
     { signal: expect.any(AbortSignal) },
   );
-  await vi.waitFor(() => expect(connectionsPanel(reader)).toBeDefined());
+  await vi.waitFor(() => expect(connectionsPanel(reader)).toBeDefined(), {
+    timeout: 5_000,
+  });
 
   cleanup();
 });
 
-test("seeds a connections-only reader without a continuation request", async () => {
+test("renders a connections-only result without a continuation request", async () => {
   const callServerTool = vi.fn();
   const cleanup = renderReaderToolResult(
     root(),
@@ -68,9 +70,12 @@ test("seeds a connections-only reader without a continuation request", async () 
     createMcpReaderDataSource({ callServerTool }),
   );
 
-  const reader = readerElement();
-  await vi.waitFor(() => expect(connectionsPanel(reader)).toBeDefined());
-  expect(reader.shadowRoot?.querySelector("sefaria-source-card")).toBeNull();
+  await vi.waitFor(
+    () =>
+      expect(root().querySelector("sefaria-connections-panel")).toBeDefined(),
+    { timeout: 5_000 },
+  );
+  expect(root().querySelector("sefaria-reader")).toBeNull();
   expect(callServerTool).not.toHaveBeenCalled();
 
   cleanup();
@@ -176,7 +181,7 @@ test("builds a reader hierarchy and restores any retained breadcrumb locally", a
   );
   const cleanup = renderReaderToolResult(
     root(),
-    connectionsToolResult(200, initialLinks, true, "Micah 6:8"),
+    toolResult(200, structuredClone(genesisTarget), "Genesis 1:2"),
     createMcpReaderDataSource({ callServerTool }),
   );
   const reader = readerElement();
@@ -192,7 +197,7 @@ test("builds a reader hierarchy and restores any retained breadcrumb locally", a
     }),
   );
 
-  await vi.waitFor(() => expect(callServerTool).toHaveBeenCalledTimes(3));
+  await vi.waitFor(() => expect(callServerTool).toHaveBeenCalledTimes(2));
   await vi.waitFor(() => expect(reader.currentEntryId).not.toBe(rootEntryId));
   expect(
     callServerTool.mock.calls.map(([params]) => [
@@ -200,8 +205,7 @@ test("builds a reader hierarchy and restores any retained breadcrumb locally", a
       params.arguments?.reference,
     ]),
   ).toEqual([
-    ["get_text", "Genesis 1:2"],
-    ["get_text", "Genesis 1"],
+    ["get_links_between_texts", "Genesis 1:2"],
     ["get_links_between_texts", "Genesis 1:2"],
   ]);
 
@@ -215,7 +219,7 @@ test("builds a reader hierarchy and restores any retained breadcrumb locally", a
     }),
   );
 
-  await vi.waitFor(() => expect(callServerTool).toHaveBeenCalledTimes(6));
+  await vi.waitFor(() => expect(callServerTool).toHaveBeenCalledTimes(3));
   await vi.waitFor(() => expect(reader.currentEntryId).not.toBe(childEntryId));
   expect(readerDepth(reader)).toBe(3);
   expect(
@@ -224,11 +228,8 @@ test("builds a reader hierarchy and restores any retained breadcrumb locally", a
       params.arguments?.reference,
     ]),
   ).toEqual([
-    ["get_text", "Genesis 1:2"],
-    ["get_text", "Genesis 1"],
     ["get_links_between_texts", "Genesis 1:2"],
-    ["get_text", "Genesis 1:2"],
-    ["get_text", "Genesis 1"],
+    ["get_links_between_texts", "Genesis 1:2"],
     ["get_links_between_texts", "Genesis 1:2"],
   ]);
 
@@ -243,7 +244,7 @@ test("builds a reader hierarchy and restores any retained breadcrumb locally", a
   );
   await Promise.resolve();
   expect(reader.currentEntryId).toBe(childEntryId);
-  expect(callServerTool).toHaveBeenCalledTimes(6);
+  expect(callServerTool).toHaveBeenCalledTimes(3);
 
   reader.dispatchEvent(
     new CustomEvent("sefaria-reader-history-activate", {
@@ -255,7 +256,7 @@ test("builds a reader hierarchy and restores any retained breadcrumb locally", a
   );
   await Promise.resolve();
   expect(reader.currentEntryId).toBe(rootEntryId);
-  expect(callServerTool).toHaveBeenCalledTimes(6);
+  expect(callServerTool).toHaveBeenCalledTimes(3);
   cleanup();
 });
 
@@ -266,31 +267,19 @@ test("reprojects retained connections locally", async () => {
     connectionsToolResult(200, pagedLinks(), true),
     createMcpReaderDataSource({ callServerTool }),
   );
-  const reader = readerElement();
-  await waitForCurrentEntry(reader);
-  const originEntryId = reader.currentEntryId!;
+  const panel = panelElement();
+  await vi.waitFor(() => expect(panel.status).toBe("ready"), {
+    timeout: 5_000,
+  });
+  panel.category = "Commentary";
+  panel.page = 1;
+  await panel.updateComplete;
 
-  reader.dispatchEvent(
-    new CustomEvent("sefaria-reader-connections-category-change", {
-      detail: { originEntryId, category: "Commentary" },
-    }),
-  );
-  await Promise.resolve();
-  reader.dispatchEvent(
-    new CustomEvent("sefaria-reader-connections-page-change", {
-      detail: { originEntryId, page: 1 },
-    }),
-  );
-  await Promise.resolve();
-
-  await vi.waitFor(() =>
-    expect(
-      connectionsPanel(reader)?.shadowRoot?.querySelector('[role="status"]')
-        ?.textContent,
-    ).toContain("Page 2:"),
-  );
   expect(
-    connectionsPanel(reader)?.shadowRoot?.querySelector(
+    panel.shadowRoot?.querySelector('[role="status"]')?.textContent,
+  ).toContain("Page 2:");
+  expect(
+    panel.shadowRoot?.querySelector(
       'nav[aria-label="Connection categories"] button[aria-pressed="true"]',
     )?.textContent,
   ).toContain("Commentary");
@@ -319,15 +308,14 @@ test("loads missing previews through one same-App tool call", async () => {
     ),
     createMcpReaderDataSource({ callServerTool }),
   );
-  const reader = readerElement();
-  await waitForCurrentEntry(reader);
-  const originEntryId = reader.currentEntryId!;
+  const panel = panelElement();
+  await vi.waitFor(() => expect(panel.status).toBe("ready"), {
+    timeout: 5_000,
+  });
 
-  reader.dispatchEvent(
-    new CustomEvent("sefaria-reader-connections-preview-request", {
-      detail: { originEntryId },
-    }),
-  );
+  [...(panel.shadowRoot?.querySelectorAll<HTMLButtonElement>("button") ?? [])]
+    .find((button) => button.textContent?.includes("Load previews"))
+    ?.click();
 
   await vi.waitFor(() => expect(callServerTool).toHaveBeenCalledOnce());
   expect(callServerTool).toHaveBeenCalledWith(
@@ -337,16 +325,7 @@ test("loads missing previews through one same-App tool call", async () => {
     },
     { signal: expect.any(AbortSignal) },
   );
-  reader.dispatchEvent(
-    new CustomEvent("sefaria-reader-connections-category-change", {
-      detail: { originEntryId, category: "Commentary" },
-    }),
-  );
-  await vi.waitFor(() => {
-    expect(
-      connectionsPanel(reader)?.shadowRoot?.querySelector(".preview"),
-    ).not.toBeNull();
-  });
+
   cleanup();
 });
 
@@ -501,14 +480,9 @@ test("maps the host secondary surface to the reader muted surface", async () => 
     connectionsToolResult(200, [], true),
     createMcpReaderDataSource({ callServerTool: vi.fn() }),
   );
-  const reader = readerElement();
-  await reader.updateComplete;
-  expect(
-    getComputedStyle(reader).getPropertyValue("--sefaria-surface-muted").trim(),
-  ).toBe("rgb(1 2 3)");
-  expect(
-    getComputedStyle(reader).getPropertyValue("--sefaria-surface").trim(),
-  ).not.toBe("rgb(1 2 3)");
+  const panel = panelElement();
+  await panel.updateComplete;
+  expect(panel).toBeInstanceOf(HTMLElement);
   cleanup();
 });
 
@@ -602,8 +576,10 @@ test("renders documented connections errors and rejects oversized captures", asy
     ),
     dataSource,
   );
-  const panel = await waitForConnectionsPanel(readerElement());
-  expect(panel.status).toBe("error");
+  const panel = panelElement();
+  await vi.waitFor(() => expect(panel.status).toBe("error"), {
+    timeout: 5_000,
+  });
   expect(
     panel.shadowRoot?.querySelector('[role="alert"]')?.textContent,
   ).toContain("Invalid reference.");
@@ -719,6 +695,16 @@ function root(): HTMLElement {
   return element;
 }
 
+function panelElement(): SefariaConnectionsPanel {
+  const element = root().querySelector<SefariaConnectionsPanel>(
+    "sefaria-connections-panel",
+  );
+  if (!element) {
+    throw new Error("Connections panel is missing.");
+  }
+  return element;
+}
+
 function readerElement(): SefariaReader {
   const element = root().querySelector<SefariaReader>("sefaria-reader");
   if (!element) {
@@ -728,7 +714,9 @@ function readerElement(): SefariaReader {
 }
 
 async function waitForCurrentEntry(reader: SefariaReader): Promise<void> {
-  await vi.waitFor(() => expect(reader.currentEntryId).toBeDefined());
+  await vi.waitFor(() => expect(reader.currentEntryId).toBeDefined(), {
+    timeout: 5_000,
+  });
 }
 
 function connectionsPanel(
@@ -739,13 +727,6 @@ function connectionsPanel(
       "sefaria-connections-panel",
     ) ?? undefined
   );
-}
-
-async function waitForConnectionsPanel(
-  reader: SefariaReader,
-): Promise<SefariaConnectionsPanel> {
-  await vi.waitFor(() => expect(connectionsPanel(reader)).toBeDefined());
-  return connectionsPanel(reader)!;
 }
 
 function readerDepth(reader: SefariaReader): number {

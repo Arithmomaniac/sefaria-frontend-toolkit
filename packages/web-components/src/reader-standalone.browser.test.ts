@@ -10,7 +10,6 @@ import type { ReaderViewModel } from "./reader.js";
 import micahFixture from "../../../examples/react-vite/src/micah-6-8.json";
 import type { SefariaAcquisition } from "./acquisition.js";
 import { SefariaReader } from "./reader-element.js";
-import type { ReaderRawSeedData } from "./reader.js";
 
 const micahTarget = zCoreV3TextsResponse.parse(
   micahFixture,
@@ -83,21 +82,57 @@ function connectionsState(element: SefariaReader): string | undefined {
     : connections?.state;
 }
 
-function rawSourceSeed(): NonNullable<ReaderRawSeedData["source"]> {
-  return {
-    payload: micahContext(),
-    status: 200,
-    effectiveRequest: { tref: "Micah 6" },
-  };
-}
+test("Reader does not expose public data", () => {
+  const element = new SefariaReader();
+  expect("data" in element).toBe(false);
+});
 
-function rawConnectionsSeed(): NonNullable<ReaderRawSeedData["connections"]> {
-  return {
-    payload: [],
-    status: 200,
-    effectiveRequest: { tref: "Micah 6:8", withText: true },
+test("Reader local-data capability serves a supported root without network", async () => {
+  const fetchSpy = vi.spyOn(globalThis, "fetch");
+  const calls: string[] = [];
+  const element = new SefariaReader();
+  element.sref = "Micah 6";
+  element.acquisition = {
+    kind: "capability",
+    capability: {
+      getText: async (request) => {
+        calls.push(`text:${request.sref}`);
+        if (request.sref !== "Micah 6")
+          throw new Error(`Unsupported ${request.sref}.`);
+        return { payload: micahContext(), status: 200 };
+      },
+      getLinks: async (request) => {
+        calls.push(`links:${request.sref}`);
+        if (request.sref !== "Micah 6:1")
+          throw new Error(`Unsupported ${request.sref}.`);
+        return { payload: [], status: 200 };
+      },
+    },
   };
-}
+  document.body.append(element);
+  await vi.waitFor(() => expect(element.status).toBe("ready"));
+  expect(calls).toEqual(["text:Micah 6", "links:Micah 6:1"]);
+  expect(fetchSpy).not.toHaveBeenCalled();
+});
+
+test("Reader local-data capability reports unsupported roots without browser fallback", async () => {
+  const fetchSpy = vi.spyOn(globalThis, "fetch");
+  const element = new SefariaReader();
+  element.sref = "Micah 7";
+  element.acquisition = {
+    kind: "capability",
+    capability: {
+      getText: async (request) => {
+        throw new Error(`Unsupported local ref ${request.sref}.`);
+      },
+      getLinks: async () => ({ payload: [], status: 200 }),
+    },
+  };
+  document.body.append(element);
+  await vi.waitFor(() => expect(element.status).toBe("error"));
+  expect(element.readerError).toContain("Unsupported local ref Micah 7");
+  expect(fetchSpy).not.toHaveBeenCalled();
+});
 
 test("Reader forwards language and root editions and replaces an unchanged root after preference changes", async () => {
   const requests: string[][] = [];
@@ -220,82 +255,6 @@ test.each([false, true])(
     expect(element.status).toBe("error");
   },
 );
-
-test("connections-only Reader seed carries the element's translation preference into navigation", async () => {
-  const selected: string[][] = [];
-  const element = new SefariaReader();
-  element.data = { connections: rawConnectionsSeed() };
-  element.translationLanguage = "french";
-  element.acquisition = {
-    kind: "capability",
-    capability: {
-      getText: async (request) => {
-        selected.push([...request.versions]);
-        const payload = micahContext();
-        payload.versions[1]!.languageFamilyName = "french";
-        payload.versions[1]!.actualLanguage = "fr";
-        return { payload, status: 200 };
-      },
-      getLinks: async () => ({ payload: [], status: 200 }),
-    },
-  };
-  document.body.append(element);
-  await vi.waitFor(() => expect(element.status).toBe("ready"));
-  expect(selected).toHaveLength(0);
-  element.dispatchEvent(
-    new CustomEvent("sefaria-reader-connection-select", {
-      detail: { originEntryId: element.currentEntryId, targetRef: "Micah 6" },
-    }),
-  );
-  await vi.waitFor(() => expect(selected).toHaveLength(1));
-  expect(selected[0]).toEqual(["primary", "french"]);
-  await vi.waitFor(() => expect(element.status).toBe("ready"));
-});
-
-test("seeded Reader reconnects only its interrupted default-translation request", async () => {
-  const requests: string[][] = [];
-  const element = new SefariaReader();
-  element.data = { connections: rawConnectionsSeed() };
-  element.translationLanguage = "french";
-  element.acquisition = {
-    kind: "capability",
-    capability: {
-      getText: async (request) => {
-        requests.push([...request.versions]);
-        const payload = micahContext();
-        if (requests.length === 1) {
-          payload.versions = payload.versions.filter(
-            (version) => version.isPrimary,
-          );
-          payload.warnings = [
-            { french: { warning_code: 102, message: "Synthetic absence." } },
-          ];
-          return { payload, status: 200 };
-        }
-        if (requests.length === 2) return await new Promise(() => undefined);
-        return { payload, status: 200 };
-      },
-      getLinks: async () => ({ payload: [], status: 200 }),
-    },
-  };
-  document.body.append(element);
-  await vi.waitFor(() => expect(element.status).toBe("ready"));
-  element.dispatchEvent(
-    new CustomEvent("sefaria-reader-connection-select", {
-      detail: { originEntryId: element.currentEntryId, targetRef: "Micah 6" },
-    }),
-  );
-  await vi.waitFor(() => expect(requests).toHaveLength(2));
-  element.remove();
-  document.body.append(element);
-  await vi.waitFor(() => expect(requests).toHaveLength(3));
-  expect(requests).toEqual([
-    ["primary", "french"],
-    ["primary", "translation"],
-    ["primary", "translation"],
-  ]);
-  await vi.waitFor(() => expect(element.status).toBe("ready"));
-});
 
 test("Reader bounds target/context fallback to four text requests and one links request", async () => {
   const requests: { sref: string; versions: readonly string[] }[] = [];
@@ -822,107 +781,6 @@ test("navigates and returns Back with zero additional capability calls", async (
   expect(getLinks).toHaveBeenCalledTimes(linksCalls);
 });
 
-test("admits source and links raw data transactionally with zero requests", async () => {
-  const getText = vi.fn(async () => ({
-    payload: micahTarget,
-    status: 200,
-  }));
-  const getLinks = vi.fn(async () => ({ payload: [], status: 200 }));
-  const data: ReaderRawSeedData = {
-    source: rawSourceSeed(),
-    connections: rawConnectionsSeed(),
-    selectedRef: "Micah 6:8",
-    presentation: { layout: "stacked" },
-  };
-  const element = new SefariaReader();
-  element.data = data;
-  element.acquisition = {
-    kind: "capability",
-    capability: { getText, getLinks },
-  };
-  document.body.append(element);
-
-  await vi.waitFor(() => {
-    expect(
-      getPreparedState<ReaderViewModel>(element)?.selectedTarget?.ref,
-    ).toBe("Micah 6:8");
-  });
-  expect(element.layout).toBe("stacked");
-  expect(getText).not.toHaveBeenCalled();
-  expect(getLinks).not.toHaveBeenCalled();
-
-  element.requestUpdate();
-  await element.updateComplete;
-  expect(getText).not.toHaveBeenCalled();
-  expect(getLinks).not.toHaveBeenCalled();
-});
-
-test("supplied data supersedes an ignored-abort initial load", async () => {
-  let resolveText!: (value: {
-    readonly payload: CoreV3TextsResponse;
-    readonly status: 200;
-  }) => void;
-  const getText = vi.fn(
-    async () =>
-      await new Promise<{
-        readonly payload: CoreV3TextsResponse;
-        readonly status: 200;
-      }>((resolve) => {
-        resolveText = resolve;
-      }),
-  );
-  const getLinks = vi.fn(async () => ({ payload: [], status: 200 }));
-  const element = new SefariaReader();
-  element.sref = "Micah 6:7";
-  element.acquisition = {
-    kind: "capability",
-    capability: { getText, getLinks },
-  };
-  document.body.append(element);
-  await vi.waitFor(() => {
-    expect(getText).toHaveBeenCalledTimes(1);
-  });
-  expect(element.rootLoading).toBe(true);
-
-  element.data = {
-    source: rawSourceSeed(),
-    connections: rawConnectionsSeed(),
-    selectedRef: "Micah 6:8",
-  };
-  await vi.waitFor(() => {
-    expect(element.selectedRef).toBe("Micah 6:8");
-  });
-  expect(element.rootLoading).toBe(false);
-
-  resolveText({ payload: micahVerse(7), status: 200 });
-  await new Promise((resolve) => setTimeout(resolve));
-  await element.updateComplete;
-  expect(element.selectedRef).toBe("Micah 6:8");
-  expect(getLinks).not.toHaveBeenCalled();
-});
-
-test("invalid authoritative data never falls through after another input changes", async () => {
-  const getText = vi.fn(async () => ({
-    payload: micahTarget,
-    status: 200,
-  }));
-  const element = new SefariaReader();
-  element.sref = "Micah 6:8";
-  element.data = { source: { payload: {}, status: 200 } } as never;
-  document.body.append(element);
-  await vi.waitFor(() => {
-    expect(element.status).toBe("error");
-  });
-
-  element.acquisition = {
-    kind: "capability",
-    capability: { getText },
-  };
-  await element.updateComplete;
-  expect(element.status).toBe("error");
-  expect(getText).not.toHaveBeenCalled();
-});
-
 test("preserves host presentation through loading and navigation", async () => {
   const getText = vi.fn(async ({ sref }: { readonly sref: string }) => ({
     payload:
@@ -1041,124 +899,4 @@ test("preserves presentation changes made during initial and replacement root lo
   });
   expect(element.vocalizationMode).toBe("nikkud");
   expect(element.layout).toBe("side-by-side");
-});
-
-test("continues a source-only seed with one links call and never duplicates source I/O", async () => {
-  const getText = vi.fn(async ({ sref }: { readonly sref: string }) => ({
-    payload: sref === "Micah 6" ? micahContext() : micahVerse(7),
-    status: 200,
-  }));
-  const getLinks = vi.fn(async () => ({ payload: [], status: 200 }));
-  const data: ReaderRawSeedData = {
-    source: rawSourceSeed(),
-    selectedRef: "Micah 6:8",
-  };
-  const element = new SefariaReader();
-  element.data = data;
-  element.acquisition = {
-    kind: "capability",
-    capability: { getText, getLinks },
-  };
-  document.body.append(element);
-
-  await vi.waitFor(() => {
-    expect(getLinks).toHaveBeenCalledTimes(1);
-    expect(connectionsState(element)).not.toBe("loading");
-  });
-  expect(getText).not.toHaveBeenCalled();
-
-  element.data = undefined;
-  element.sref = "Micah 6:7";
-  await vi.waitFor(() => {
-    expect(
-      getPreparedState<ReaderViewModel>(element)?.selectedTarget?.ref,
-    ).toBe("Micah 6:7");
-  });
-  expect(getText).not.toHaveBeenCalled();
-  expect(getLinks).toHaveBeenCalledTimes(2);
-});
-
-test("keeps an unchanged raw seed when sref changes while connected", async () => {
-  const getLinks = vi.fn(async () => ({ payload: [], status: 200 }));
-  const element = new SefariaReader();
-  element.data = { source: rawSourceSeed(), selectedRef: "Micah 6:8" };
-  element.acquisition = {
-    kind: "capability",
-    capability: { getLinks },
-  };
-  document.body.append(element);
-  await vi.waitFor(() => expect(element.status).toBe("ready"));
-  expect(getLinks).toHaveBeenCalledTimes(1);
-
-  element.sref = "Micah 7:1";
-  await element.updateComplete;
-  expect(element.status).toBe("ready");
-  expect(element.selectedRef).toBe("Micah 6:8");
-  expect(getLinks).toHaveBeenCalledTimes(1);
-});
-
-test("admits a links-only seed without continuation", async () => {
-  const getText = vi.fn(async () => ({
-    payload: micahTarget,
-    status: 200,
-  }));
-  const getLinks = vi.fn(async () => ({ payload: [], status: 200 }));
-  const element = new SefariaReader();
-  element.data = { connections: rawConnectionsSeed() };
-  element.acquisition = {
-    kind: "capability",
-    capability: { getText, getLinks },
-  };
-  document.body.append(element);
-
-  await vi.waitFor(() => {
-    expect(getPreparedState<ReaderViewModel>(element)?.connections?.state).toBe(
-      "component",
-    );
-  });
-  expect(getPreparedState<ReaderViewModel>(element)?.source).toBeUndefined();
-  expect(getText).not.toHaveBeenCalled();
-  expect(getLinks).not.toHaveBeenCalled();
-});
-
-test("invalid or conflicting raw data cannot replace committed content", async () => {
-  const element = new SefariaReader();
-  element.data = {
-    source: rawSourceSeed(),
-    connections: rawConnectionsSeed(),
-    selectedRef: "Micah 6:8",
-  };
-  document.body.append(element);
-  await vi.waitFor(() => {
-    expect(
-      getPreparedState<ReaderViewModel>(element)?.selectedTarget?.ref,
-    ).toBe("Micah 6:8");
-  });
-  const committed = getPreparedState<ReaderViewModel>(element);
-
-  element.data = {
-    source: {
-      payload: { versions: [{ text: 42 }] },
-      status: 200,
-      effectiveRequest: { tref: "Micah 6" },
-    },
-    selectedRef: "Micah 6:8",
-  };
-  await vi.waitFor(() => {
-    expect(element.status).toBe("error");
-    expect(element.shadowRoot?.textContent).toContain("versions");
-  });
-  expect(getPreparedState<ReaderViewModel>(element)).toBe(committed);
-
-  element.sref = "Micah 7:1";
-  element.data = {
-    source: rawSourceSeed(),
-    connections: rawConnectionsSeed(),
-    selectedRef: "Micah 6:8",
-  };
-  await vi.waitFor(() => {
-    expect(element.status).toBe("error");
-    expect(element.shadowRoot?.textContent).toContain("conflicts with sref");
-  });
-  expect(getPreparedState<ReaderViewModel>(element)).toBe(committed);
 });

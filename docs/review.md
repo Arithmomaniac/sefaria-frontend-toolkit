@@ -270,7 +270,7 @@ Review the initial and expanded corrections for:
 - [ ] Invalid metadata stops before payload validation.
 - [ ] The App validates the unknown payload with the generated TypeScript validator.
 - [ ] The App reports structured paths for invalid payloads.
-- [ ] The App supplies a validated raw Reader seed or tagged host capability.
+- [ ] The App supplies a validated tagged host capability.
 - [ ] The Reader uses the same private preparation as browser-client mode.
 - [ ] The first render makes zero requests.
 - [ ] Later Reader acquisition uses host-proxied tools only and never falls back to direct HTTP.

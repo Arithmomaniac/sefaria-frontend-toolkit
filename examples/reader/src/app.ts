@@ -306,7 +306,14 @@ export function startReaderWorkspace(
     ) as SefariaConnectionsPanel;
     const record = session?.connectionsRecord(entry.entryId);
     if (record !== undefined) {
-      connections.data = record.payload;
+      connections.acquisition = {
+        kind: "capability",
+        capability: {
+          getLinks: async () => ({ payload: record.payload, status: 200 }),
+        },
+      };
+      connections.sref = record.effectiveRequest.tref;
+      connections.withText = record.effectiveRequest.withText !== false;
     }
     const projection = record?.projection;
     if (projection?.category === undefined) {

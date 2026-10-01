@@ -29,7 +29,6 @@ export class SefariaConnectionsPanel extends SefariaElement {
   /** Declarative data, request selection, and presentation properties. */
   static override properties = {
     sref: { type: String, useDefault: true },
-    data: { attribute: false },
     acquisition: { attribute: false },
     withText: { type: Boolean, attribute: "with-text" },
     category: { type: String, converter: optionalStringConverter },
@@ -112,8 +111,6 @@ export class SefariaConnectionsPanel extends SefariaElement {
   ];
   /** The Sefaria reference to load when `data` isn't set. */
   declare sref: string;
-  /** Sefaria links response data to render. When it's set, the element doesn't fetch anything. */
-  declare data: unknown | undefined;
   /** Chooses how this element fetches data, instead of the default. */
   declare acquisition: SefariaAcquisition | undefined;
   /** Whether the links include the connected texts. */
@@ -153,7 +150,6 @@ export class SefariaConnectionsPanel extends SefariaElement {
   constructor() {
     super();
     this.sref = "";
-    this.data = undefined;
     this.acquisition = undefined;
     this.withText = true;
     this.category = undefined;
@@ -193,7 +189,6 @@ export class SefariaConnectionsPanel extends SefariaElement {
   protected override willUpdate(changed: PropertyValues<this>): void {
     if (
       changed.has("sref") ||
-      changed.has("data") ||
       changed.has("acquisition") ||
       changed.has("withText")
     ) {
@@ -351,7 +346,6 @@ export class SefariaConnectionsPanel extends SefariaElement {
         this.page = (detail as { readonly page: number }).page;
       } else if (
         name === "sefaria-connections-preview-request" &&
-        this.data === undefined &&
         capture.request.withText === false
       ) {
         this.withText = true;
@@ -362,31 +356,6 @@ export class SefariaConnectionsPanel extends SefariaElement {
   #reconcile(): void {
     if (!this.isConnected) {
       this.#resumeOnConnect = true;
-      return;
-    }
-    if (this.data !== undefined) {
-      this.#declarativeActive = true;
-      this.#cancelActive("Superseded by supplied connections data.");
-      try {
-        const suppliedReference = suppliedConnectionsReference(
-          this.data,
-          this.sref,
-        );
-        this.#captureAndProject(this.data, 200, {
-          tref: suppliedReference,
-          withText: this.withText,
-        });
-      } catch (error) {
-        this.#capture = undefined;
-        this.#commit({
-          state: "error",
-          errorKind: "validation",
-          message:
-            error instanceof Error
-              ? error.message
-              : "Supplied connections data is invalid.",
-        });
-      }
       return;
     }
 
@@ -593,23 +562,6 @@ function statusOf(
   if (viewModel === undefined) return "empty";
   if (viewModel.state === "data") return "ready";
   return viewModel.state;
-}
-
-function suppliedConnectionsReference(data: unknown, sref: string): string {
-  const requested = sref.trim();
-  if (requested.length > 0) return requested;
-  if (Array.isArray(data)) {
-    const anchorRef = data.find(
-      (entry): entry is { readonly anchorRef: string } =>
-        typeof entry === "object" &&
-        entry !== null &&
-        "anchorRef" in entry &&
-        typeof entry.anchorRef === "string" &&
-        entry.anchorRef.trim().length > 0,
-    )?.anchorRef;
-    if (anchorRef !== undefined) return anchorRef;
-  }
-  return "Supplied connections";
 }
 
 if (!customElements.get("sefaria-connections-panel")) {

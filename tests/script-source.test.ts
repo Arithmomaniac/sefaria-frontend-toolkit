@@ -2,6 +2,7 @@ import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
+import { parseAst } from "vite";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import {
@@ -58,6 +59,109 @@ describe("production script source", () => {
     ).toContain("GNU GENERAL PUBLIC LICENSE");
   });
 
+  it("emits self-contained client and text-transform modules in the manifest", async () => {
+    const manifest = await verifyScriptSource(directory);
+    expect(manifest.schemaVersion).toBe(2);
+    expect(Object.keys(manifest.entries)).toEqual([
+      "sefaria-elements.js",
+      "sefaria-client.js",
+      "sefaria-text-transform.js",
+    ]);
+    for (const name of Object.keys(manifest.entries)) {
+      const bytes = await readFile(path.join(directory, name));
+      expect(manifest.files[name]).toBe(sha256(bytes));
+      expect(manifest.entries[name].size).toEqual(measure(bytes));
+      const specifiers: string[] = [];
+      const visit = (node: unknown): void => {
+        if (!node || typeof node !== "object") return;
+        const record = node as Record<string, unknown>;
+        if (
+          [
+            "ImportDeclaration",
+            "ExportAllDeclaration",
+            "ExportNamedDeclaration",
+            "ImportExpression",
+          ].includes(record.type as string) &&
+          record.source
+        ) {
+          const source = record.source as { value?: unknown };
+          specifiers.push(String(source.value ?? "<dynamic>"));
+        }
+        for (const value of Object.values(record)) {
+          if (Array.isArray(value)) value.forEach(visit);
+          else visit(value);
+        }
+      };
+      visit(parseAst(bytes.toString("utf8")));
+      expect(specifiers, name).toEqual([]);
+    }
+  });
+
+  it("rejects a changed client module", async () => {
+    const entry = path.join(directory, "sefaria-client.js");
+    const original = await readFile(entry);
+    try {
+      await writeFile(entry, Buffer.concat([original, Buffer.from("\n")]));
+      await expect(verifyScriptSource(directory)).rejects.toThrow(
+        "sefaria-client.js",
+      );
+    } finally {
+      await writeFile(entry, original);
+    }
+  });
+
+  it("still verifies and restores retained elements-only schema 1 releases", async () => {
+    const temporary = await mkdtemp(path.join(tmpdir(), "sefaria-v1-"));
+    try {
+      const candidate = path.join(temporary, "release");
+      await cp(directory, candidate, { recursive: true });
+      const current = await verifyScriptSource(candidate);
+      for (const name of ["sefaria-client.js", "sefaria-text-transform.js"])
+        await rm(path.join(candidate, name));
+      const { entries: _entries, ...rest } = current;
+      const files = { ...current.files };
+      delete files["sefaria-client.js"];
+      delete files["sefaria-text-transform.js"];
+      await writeFile(
+        path.join(candidate, "manifest.json"),
+        JSON.stringify({
+          ...rest,
+          schemaVersion: 1,
+          version: "0.0.0-alpha.7.1",
+          files,
+        }),
+      );
+      expect((await verifyScriptSource(candidate)).schemaVersion).toBe(1);
+      const archive = await packArtifact(
+        candidate,
+        path.join(temporary, "v1.tar.gz"),
+      );
+      const catalog = admitRelease(
+        { schemaVersion: 1, releases: [] },
+        {
+          version: "0.0.0-alpha.7.1",
+          sourceSha: current.sourceSha,
+          runId: "7",
+          runNumber: "7",
+          runAttempt: "1",
+          assetId: 7,
+          archiveHash: sha256(archive),
+          state: "active",
+        },
+      );
+      await assembleScripts({
+        catalog,
+        destination: path.join(temporary, "cdn"),
+        download: async () => archive,
+      });
+      await expect(
+        readFile(path.join(temporary, "cdn", "alpha", "sefaria-client.js")),
+      ).rejects.toThrow();
+    } finally {
+      await rm(temporary, { recursive: true, force: true });
+    }
+  }, 120_000);
+
   it("rejects a changed module instead of accepting stale hashes and size", async () => {
     const entry = path.join(directory, "sefaria-elements.js");
     const original = await readFile(entry);
@@ -95,6 +199,8 @@ describe("production script source", () => {
         await writeFile(entry, bytes);
         manifest.files[manifest.entry] = sha256(bytes);
         manifest.size = measure(bytes);
+        if (manifest.entries)
+          manifest.entries[manifest.entry].size = manifest.size;
         await writeFile(
           path.join(candidate, "manifest.json"),
           JSON.stringify(manifest),

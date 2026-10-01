@@ -178,7 +178,7 @@ It must not assign child `sref` or trigger child acquisition. Ten child renderin
 
 ## MCP boundary
 
-MCP `structuredContent` carries a corrected API payload. Namespaced tool-result metadata carries the exact request reference and documented response status so the App can select the generated schema and construct a raw Reader seed. The metadata carries no duplicated payload fields or prepared rendering state. The MCP server role owns Sefaria requests whether a Node transport or the trusted browser-embedded reference host executes it; the sandboxed App and elements never fall back to direct Sefaria HTTP.
+MCP `structuredContent` carries a corrected API payload. Namespaced tool-result metadata carries the exact request reference and documented response status so the App can select the generated schema and serve a local-data capability. The metadata carries no duplicated payload fields or prepared rendering state. The MCP server role owns Sefaria requests whether a Node transport or the trusted browser-embedded reference host executes it; the sandboxed App and elements never fall back to direct Sefaria HTTP.
 
 ## Failure contracts
 
@@ -204,7 +204,7 @@ MCP `structuredContent` carries a corrected API payload. Namespaced tool-result 
 
 The linked-article demonstration consumes public contracts and built artifacts. Its article author supplies ordinary Sefaria anchors. The page owns eligible activation, a native modal dialog containing Source Card, card `sref` assignment/clearing, focus return, visible host limitations, and cleanup. It does not extract article text, submit citation detection, poll tasks, bulk preload, or rewrite the host DOM.
 
-The MCP App validates its namespaced request/status metadata and corrected API-shaped JSON before raw seed admission. The generated find-refs and async-task operations remain available transport operations, not an active automatic-Linker workflow in this repository.
+The MCP App validates its namespaced request/status metadata and corrected API-shaped JSON before local capability admission. The generated find-refs and async-task operations remain available transport operations, not an active automatic-Linker workflow in this repository.
 
 See the [integration specification](specs/integrations.md).
 

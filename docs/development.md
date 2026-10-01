@@ -40,7 +40,7 @@ For reader-oriented explanations, use the friendly guides rather than the archiv
 | --- | --- |
 | `packages/client` | Delivers all 60 operations in the pinned OpenAPI through 11 tag namespaces, committed corrected TypeScript contracts, reusable transport schemas, Zod validators, JSON and PNG response handling, and a status-aware fetch client with a bounded default-on per-client response cache. The corrected OpenAPI document is temporary generation output. A weekly workflow reports upstream OpenAPI drift in one issue and can hand it to a Copilot triage agent that proposes a draft refresh. |
 | `packages/text-transform` | Delivers DOM-free sanitization, Hebrew vocalization modes, structured footnote extraction, and bounded connected-text previews. |
-| `packages/web-components` | Delivers five declarative elements with standalone `sref`, authoritative raw `data` for four ordinary elements, Reader raw transactional seeds, tagged acquisition, read-only status and diagnostics, lifecycle reconnect, error events, private preparation, shared raw Reader source qualification, and the supported advanced DOM-free Reader semantic/raw facade. |
+| `packages/web-components` | Delivers five declarative elements with standalone `sref`, authoritative raw `data` for Text Segment, Bilingual Segment, and Source Card, local-data capabilities for mutable Reader and Connections Panel flows, tagged acquisition, read-only status and diagnostics, lifecycle reconnect, error events, private preparation, shared raw Reader source qualification, and the supported advanced DOM-free Reader semantic/raw facade. |
 | `examples/explorer` | Provides one developer surface for supplied-data authored states and click-to-start live pages for text segments, bilingual segments, source cards, and contextual connections. Opening a live route makes no Sefaria request before activation. |
 | `examples/reader` | Demonstrates a regular website host with viewport-height spatial panes over the lower-level reader session and shared browser data source, plus an interactive host that assigns explicit acquisition and `sref` to the supported `<sefaria-reader>` component. |
 | `examples/vanilla-vite` | Exercises installed public client, Source Card raw-data, acquisition, and custom-element registration paths with a validated supplied `Micah 6:8` response followed by an explicit live request. |
@@ -135,7 +135,7 @@ pnpm build:script-source --compare
 pnpm test:script-source dist/script-source
 ```
 
-The first command writes `dist/script-source/sefaria-elements.js`, licenses, a corresponding-source archive, a hashed manifest, and a comparison report. The second exercises that exact production artifact from a separate-origin plain HTML page in Chromium, Firefox, and WebKit. `pnpm check` stages the same artifact at `dist/site/cdn/local` and runs the smoke there. `local` is a fixture identity, never a publishable version; Pages restoration replaces the complete local `cdn` directory before upload.
+The first command writes `dist/script-source/sefaria-elements.js`, `sefaria-client.js`, `sefaria-text-transform.js`, licenses, a corresponding-source archive, a hashed manifest, and a comparison report. The second exercises that exact production artifact from a separate-origin plain HTML page in Chromium, Firefox, and WebKit. `pnpm check` stages the same artifact at `dist/site/cdn/local` and runs the smoke there. `local` is a fixture identity, never a publishable version; Pages restoration replaces the complete local `cdn` directory before upload.
 
 The script smoke also drives real keyboard and pointer interactions at root and project URL bases: Source Card selection events received by ordinary host JavaScript, selected-state feedback, reversible language/vocalization controls, Reader commentary navigation and Back, narrow-screen pane switching, and no Popup registration or export. The production-site gate separately exercises the linked article's host dialog, Escape/button close, and originating-link focus return in all three browsers. It checks exact request counts after those actions. The pages import only the production bundle; Sefaria HTTP responses use the same bounded fixtures as site acceptance. This proves local interaction behavior, not the live Pages URL or upstream availability.
 
@@ -447,7 +447,7 @@ VS Code reads the checked-in `.vscode/mcp.json`. It starts the compiled Node std
 
 The resource URI is `ui://sefaria/source-card.html`. Its MIME type is `text/html;profile=mcp-app`.
 
-The server request is live. The App's seeded first render makes no duplicate request, and repository tests mock the server transport so `pnpm check` remains offline.
+The server request is live. The App's local-capability first render makes no duplicate request, and repository tests mock the server transport so `pnpm check` remains offline.
 
 Build and stage the App before opening the workspace in VS Code:
 

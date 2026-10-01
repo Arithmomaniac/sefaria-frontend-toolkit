@@ -4,10 +4,20 @@ import links from "./links.js";
 const panel = requireElement("#connections");
 const previews = requireElement("#previews");
 const selection = requireElement("#selection");
-panel.setAttribute("sref", "Micah 6:8");
+panel.acquisition = {
+  kind: "capability",
+  capability: {
+    getLinks: async (request) => {
+      if (request.sref === "Micah 6:8" && request.withText) {
+        return { payload: links, status: 200 };
+      }
+      throw new Error(`This supplied project does not cover ${request.sref}.`);
+    },
+  },
+};
 panel.setAttribute("with-text", "");
 panel.setAttribute("category", "Quoting Commentary");
-panel.data = links;
+panel.setAttribute("sref", "Micah 6:8");
 panel.setAttribute("show-previews", "");
 
 previews.addEventListener("change", () => {

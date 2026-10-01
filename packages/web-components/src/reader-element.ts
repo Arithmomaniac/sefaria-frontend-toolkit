@@ -31,12 +31,9 @@ import {
 import "./connections-panel-element.js";
 import {
   createCapabilityReaderDataSource,
-  createReaderController,
-  createReaderEntrySeedFromRawData,
   createSefariaReaderDataSource,
   loadReaderControllerProgressively,
   type ReaderController,
-  type ReaderControllerDataSource,
   type ReaderControllerSuspension,
   type ReaderSourceProgress,
 } from "./reader-controller.js";
@@ -46,11 +43,7 @@ import {
   SefariaElement,
   type SefariaElementStatus,
 } from "./sefaria-element.js";
-import type {
-  ReaderPane,
-  ReaderRawSeedData,
-  ReaderViewModel,
-} from "./reader.js";
+import type { ReaderPane, ReaderViewModel } from "./reader.js";
 import { assertVocalizationMode } from "./vocalization-display.js";
 
 interface SourceSelectDetail {
@@ -84,7 +77,6 @@ export class SefariaReader extends SefariaElement {
   /** Lit property metadata for host-supplied rendering and interaction state. */
   static override properties = {
     sref: { type: String, useDefault: true },
-    data: { attribute: false },
     acquisition: { attribute: false },
     translationLanguage: {
       type: String,
@@ -424,8 +416,6 @@ export class SefariaReader extends SefariaElement {
 
   /** The reference the Reader starts from. Navigating inside the Reader doesn't change it. */
   declare sref: string;
-  /** Starting data for the Reader, which it accepts or rejects as a whole. */
-  declare data: ReaderRawSeedData | undefined;
   /** Chooses how this element fetches data, instead of the default. */
   declare acquisition: SefariaAcquisition | undefined;
   /** Preferred translation language, for the starting text and texts you navigate to. */
@@ -474,7 +464,6 @@ export class SefariaReader extends SefariaElement {
   #disconnectedInputs:
     | {
         readonly sref: string;
-        readonly data: ReaderRawSeedData | undefined;
         readonly acquisition: SefariaAcquisition | undefined;
         readonly translationLanguage: string | undefined;
         readonly translationFallback: "default" | "none";
@@ -485,8 +474,6 @@ export class SefariaReader extends SefariaElement {
   #reconcileOnConnect = false;
   #srefChangedOnConnect = false;
   #declarativeActive = false;
-  #processedData: ReaderRawSeedData | undefined;
-  #seedCommitted = false;
   #readerError: string | undefined;
   #rootLoading = false;
   #renderedEntryId: string | undefined;
@@ -494,7 +481,6 @@ export class SefariaReader extends SefariaElement {
   constructor() {
     super();
     this.sref = "";
-    this.data = undefined;
     this.acquisition = undefined;
     this.translationLanguage = undefined;
     this.translationFallback = "default";
@@ -518,7 +504,6 @@ export class SefariaReader extends SefariaElement {
       this.#srefChangedOnConnect = this.sref !== disconnectedInputs.sref;
       this.#reconcileOnConnect =
         this.#srefChangedOnConnect ||
-        this.data !== disconnectedInputs.data ||
         this.acquisition !== disconnectedInputs.acquisition ||
         this.translationLanguage !== disconnectedInputs.translationLanguage ||
         this.translationFallback !== disconnectedInputs.translationFallback ||
@@ -534,10 +519,9 @@ export class SefariaReader extends SefariaElement {
     queueMicrotask(() => {
       if (!this.isConnected) return;
       if (this.#reconcileOnConnect) {
-        const srefChanged = this.#srefChangedOnConnect;
         this.#reconcileOnConnect = false;
         this.#srefChangedOnConnect = false;
-        this.#reconcile(true, srefChanged, srefChanged);
+        this.#reconcile(true);
         return;
       }
       if (this.#suspension !== undefined && this.#controller !== undefined) {
@@ -552,14 +536,13 @@ export class SefariaReader extends SefariaElement {
         this.#reconcile(true);
         return;
       }
-      this.#reconcile(false, false);
+      this.#reconcile(false);
     });
   }
 
   override disconnectedCallback(): void {
     this.#disconnectedInputs = {
       sref: this.sref,
-      data: this.data,
       acquisition: this.acquisition,
       translationLanguage: this.translationLanguage,
       translationFallback: this.translationFallback,
@@ -625,23 +608,15 @@ export class SefariaReader extends SefariaElement {
       changed.has("translationFallback") ||
       changed.has("primaryVersionTitle") ||
       changed.has("translationVersionTitle");
-    if (
-      changed.has("sref") ||
-      changed.has("data") ||
-      changed.has("acquisition") ||
-      selectionChanged
-    ) {
+    if (changed.has("sref") || changed.has("acquisition") || selectionChanged) {
       this.#interruptedSourceProgress = undefined;
       const reconcileOnConnect = this.isConnected && this.#reconcileOnConnect;
-      const srefChangedOnConnect = this.#srefChangedOnConnect;
       if (reconcileOnConnect) {
         this.#reconcileOnConnect = false;
         this.#srefChangedOnConnect = false;
       }
       this.#reconcile(
         changed.has("acquisition") || reconcileOnConnect || selectionChanged,
-        changed.has("sref") || (reconcileOnConnect && srefChangedOnConnect),
-        (reconcileOnConnect && srefChangedOnConnect) || selectionChanged,
       );
       return;
     }
@@ -820,23 +795,10 @@ export class SefariaReader extends SefariaElement {
     this.#renderedEntryId = currentEntryId;
   }
 
-  #reconcile(
-    force: boolean,
-    srefChanged = false,
-    revalidateData = false,
-  ): void {
+  #reconcile(force: boolean): void {
     if (!this.isConnected) return;
     const requestedRoot = this.sref.trim();
-    if (this.data !== undefined) {
-      if (this.data !== this.#processedData || revalidateData) {
-        this.#processedData = this.data;
-        this.#transactData(this.data, requestedRoot, srefChanged);
-      }
-      return;
-    }
-    this.#processedData = undefined;
     if (requestedRoot.length === 0) {
-      if (this.#seedCommitted) return;
       if (this.#declarativeActive) this.#clearDeclarativeState();
       return;
     }
@@ -867,7 +829,6 @@ export class SefariaReader extends SefariaElement {
       return;
     }
     this.#declarativeActive = true;
-    this.#seedCommitted = false;
     this.#setReaderError(undefined);
     this.#requestedRoot = requestedRoot;
     const acquisition = resolveSefariaAcquisition(this.acquisition);
@@ -935,114 +896,6 @@ export class SefariaReader extends SefariaElement {
         this.#setRootLoading(false);
         this.#publishError(error, requestedRoot);
       });
-  }
-
-  #transactData(
-    data: ReaderRawSeedData,
-    requestedRoot: string,
-    srefChanged: boolean,
-  ): void {
-    const initial = this.#initial;
-    this.#initial = undefined;
-    initial?.controller.abort(
-      new DOMException("Superseded by supplied Reader data.", "AbortError"),
-    );
-    this.#setRootLoading(false);
-    try {
-      const translationLanguage =
-        this.translationLanguage === undefined
-          ? undefined
-          : normalizeTranslationLanguage(this.translationLanguage);
-      const translationFallback = normalizeTranslationFallback(
-        this.translationFallback,
-      );
-      const admitted = createReaderEntrySeedFromRawData(data);
-      const sourceRequest = admitted.sourceRequest;
-      if (
-        sourceRequest !== undefined &&
-        ((translationLanguage !== undefined &&
-          translationLanguage !== sourceRequest.translationLanguage) ||
-          translationFallback !==
-            (sourceRequest.translationFallback ?? "default") ||
-          (this.primaryVersionTitle !== undefined &&
-            this.primaryVersionTitle !== sourceRequest.primary?.versionTitle) ||
-          (this.translationVersionTitle !== undefined &&
-            this.translationVersionTitle !==
-              sourceRequest.translation?.versionTitle))
-      ) {
-        throw new TypeError(
-          "Reader selection attributes conflict with the supplied source request.",
-        );
-      }
-      if (
-        srefChanged &&
-        requestedRoot.length > 0 &&
-        admitted.sourceRequest !== undefined &&
-        admitted.sourceRequest.tref !== requestedRoot
-      ) {
-        throw new TypeError(
-          `Reader data source request ${admitted.sourceRequest.tref} conflicts with sref ${requestedRoot}.`,
-        );
-      }
-      const controller = createReaderController(
-        {
-          ...admitted.seed,
-          presentation: {
-            ...this.#presentation(),
-            ...admitted.seed.presentation,
-          },
-        },
-        this.#createLazyDataSource(),
-        {
-          ...(translationLanguage === undefined ? {} : { translationLanguage }),
-          translationFallback,
-        },
-      );
-      this.#declarativeActive = true;
-      this.#seedCommitted = true;
-      this.#setReaderError(undefined);
-      this.#requestedRoot = requestedRoot || admitted.sourceRequest?.tref || "";
-      this.#acquisitionOverride = this.acquisition;
-      this.#attachController(controller);
-      if (admitted.continueConnections) {
-        const selectedRef = admitted.selectedRef;
-        if (selectedRef === undefined) {
-          throw new Error(
-            "Reader source seed did not establish a selected reference.",
-          );
-        }
-        void controller.loadInitialConnections(
-          { tref: selectedRef, withText: true },
-          {},
-          new AbortController().signal,
-        );
-      }
-    } catch (error) {
-      this.#publishError(error, requestedRoot);
-    }
-  }
-
-  #createLazyDataSource(): ReaderControllerDataSource {
-    return {
-      loadSource: async (request, signal, progress) =>
-        await this.#resolveDataSource().loadSource(request, signal, progress),
-      loadConnections: async (request, projection, signal) =>
-        await this.#resolveDataSource().loadConnections(
-          request,
-          projection,
-          signal,
-        ),
-    };
-  }
-
-  #resolveDataSource(): ReaderControllerDataSource {
-    const acquisition = resolveSefariaAcquisition(this.acquisition);
-    if (acquisition.kind === "disabled") {
-      throw new Error("Standalone Sefaria acquisition is disabled.");
-    }
-    return acquisition.kind === "client"
-      ? createSefariaReaderDataSource(acquisition.client)
-      : createCapabilityReaderDataSource(acquisition.capability);
   }
 
   async #replaceRoot(sref: string): Promise<void> {
@@ -1179,8 +1032,6 @@ export class SefariaReader extends SefariaElement {
     this.#resumeInitial = false;
     this.#rootPresentation = undefined;
     this.#declarativeActive = false;
-    this.#processedData = undefined;
-    this.#seedCommitted = false;
     this.#setReaderError(undefined);
     this.#setRootLoading(false);
     setPreparedState(this, undefined);

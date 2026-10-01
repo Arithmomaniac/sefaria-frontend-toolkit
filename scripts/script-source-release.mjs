@@ -19,6 +19,7 @@ import { z } from "zod";
 
 import {
   SCRIPT_FILES,
+  manifestFiles,
   sha256,
   verifyScriptSource,
 } from "./build-script-source.mjs";
@@ -53,7 +54,10 @@ const catalogSchema = z
       catalog.releases.length,
     { path: ["releases"], message: "Duplicate version." },
   );
-const archiveFiles = [...SCRIPT_FILES, "manifest.json"];
+const archiveInventories = [
+  manifestFiles({ schemaVersion: 1 }),
+  SCRIPT_FILES,
+].map((files) => JSON.stringify([...files, "manifest.json"].sort()));
 const catalogBranch = "script-distribution";
 const maxArchiveBytes = 64 * 1024 * 1024;
 
@@ -97,7 +101,7 @@ export function retireRelease(input, version) {
 }
 
 export async function packArtifact(directory, filename) {
-  await verifyScriptSource(directory);
+  const manifest = await verifyScriptSource(directory);
   await create(
     {
       cwd: directory,
@@ -106,7 +110,7 @@ export async function packArtifact(directory, filename) {
       portable: true,
       mtime: new Date(0),
     },
-    archiveFiles,
+    [...manifestFiles(manifest), "manifest.json"],
   );
   return readFile(filename);
 }
@@ -130,8 +134,9 @@ export async function unpackArtifact(bytes, record, destination) {
     });
     if (
       entries.some((entry) => entry.type !== "File") ||
-      JSON.stringify(entries.map((entry) => entry.name).sort()) !==
-        JSON.stringify([...archiveFiles].sort())
+      !archiveInventories.includes(
+        JSON.stringify(entries.map((entry) => entry.name).sort()),
+      )
     ) {
       throw new Error(`Unsafe archive inventory: ${record.version}.`);
     }
