@@ -25,7 +25,7 @@ type Token =
   | { kind: "break" };
 
 /**
- * Sanitizes a preview and bounds rendered graphemes across inline node boundaries.
+ * Accepts raw HTML, normalizes it, and bounds rendered graphemes across inline node boundaries.
  * Footnotes, annotations, and link interaction are omitted from this compact view.
  */
 export function createTextPreview(

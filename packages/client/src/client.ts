@@ -46,7 +46,13 @@ export interface SefariaClient {
   readonly [sefariaClientBrand]: true;
   /** Removes all responses retained by this client. */
   readonly clearCache: () => void;
-  /** Performs a validated GET request using fields-style responses. */
+  /**
+   * Performs a validated GET request using fields-style responses.
+   *
+   * Documented HTTP error statuses resolve as typed error payloads. Contract
+   * mismatches reject with `SefariaContractError`; network failures and aborts
+   * reject with the original error.
+   */
   readonly get: <
     TData = unknown,
     TError = unknown,
@@ -54,7 +60,13 @@ export interface SefariaClient {
   >(
     options: SefariaGetOptions<ThrowOnError>,
   ) => RequestResult<TData, TError, ThrowOnError, "fields">;
-  /** Performs a validated POST request using fields-style responses. */
+  /**
+   * Performs a validated POST request using fields-style responses.
+   *
+   * Documented HTTP error statuses resolve as typed error payloads. Contract
+   * mismatches reject with `SefariaContractError`; network failures and aborts
+   * reject with the original error.
+   */
   readonly post: <
     TData = unknown,
     TError = unknown,
@@ -64,7 +76,14 @@ export interface SefariaClient {
   ) => RequestResult<TData, TError, ThrowOnError, "fields">;
 }
 
-/** Creates a frozen generated-SDK client with status-aware response validation. */
+/**
+ * Creates a frozen generated-SDK client with status-aware response validation.
+ *
+ * Documented HTTP error statuses resolve through the generated typed error
+ * payloads. A response that violates the generated contract rejects with
+ * `SefariaContractError`. Fetch network failures and aborts reject with the
+ * original error.
+ */
 export function createSefariaClient(
   options: SefariaClientOptions = {},
 ): SefariaClient {

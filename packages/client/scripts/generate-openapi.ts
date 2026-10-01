@@ -78,6 +78,10 @@ export interface OverlayPrecondition {
 export interface OverlayGuard {
   /** The correction identifier shared with its overlay actions. */
   readonly id: string;
+  /** Human-readable correction title shown in generated references. */
+  readonly title: string;
+  /** Human-readable correction description shown in generated references. */
+  readonly description: string;
   /** The checks that must pass before the correction can run. */
   readonly preconditions: readonly OverlayPrecondition[];
 }
@@ -413,6 +417,8 @@ export function validateOverlayDocument(overlay: OverlayDocument): void {
   const guardsById = new Map<string, OverlayGuard>();
   for (const guard of overlay["x-sefaria-guards"]) {
     assertString(guard.id, "Overlay guard ID");
+    assertString(guard.title, `Overlay guard ${guard.id} title`);
+    assertString(guard.description, `Overlay guard ${guard.id} description`);
     if (guardsById.has(guard.id)) {
       throw new Error(`Duplicate OpenAPI guard ID: ${guard.id}.`);
     }
