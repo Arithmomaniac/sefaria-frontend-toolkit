@@ -91,7 +91,7 @@ Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`,
 | Situation | What readers see | `status` | Error event |
 | --- | --- | --- | --- |
 | Loading, including a new location | A loading message. What's already open stays visible. | `loading` | No |
-| The reference you set can't be opened: Sefaria is unreachable or it isn't a reference | An alert with the error message | `error` | `sefaria-reader-error` |
+| The reference you set can't be opened: Sefaria can't be reached, or it isn't a reference | An alert with the error message | `error` | `sefaria-reader-error` |
 | Opening a connection fails, or only the connections fail | An error message. The text stays. | `error` when opening a connection fails, `ready` when only connections fail | No |
 | Nothing set yet: no `sref` | Nothing | `empty` | No |
 

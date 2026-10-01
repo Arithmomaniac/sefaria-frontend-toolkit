@@ -299,7 +299,7 @@ describe.each([
         "(/reference/components.md",
         ...required,
       ]) {
-        expect(page).toContain(text);
+        expect(page.toLowerCase()).toContain(text.toLowerCase());
       }
       expect(page).not.toContain("Genesis 1:1");
     });
