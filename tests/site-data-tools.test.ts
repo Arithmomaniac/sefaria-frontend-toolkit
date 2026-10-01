@@ -199,7 +199,7 @@ describe("B11 first successes", () => {
 async function pageOutputAfter(page: string, snippet: string) {
   const markdown = await readFile(path.join(root, "docs", page), "utf8");
   const start = markdown.indexOf(`snippets['${snippet}']`);
-  const block = /```text\n([\s\S]*?)\n```/.exec(markdown.slice(start));
+  const block = /```(?:text|html)\n([\s\S]*?)\n```/.exec(markdown.slice(start));
   return block?.[1]?.split("\n");
 }
 

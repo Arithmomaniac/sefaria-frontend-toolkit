@@ -49,9 +49,9 @@ Data and text tool pages show every snippet with `<CodeLanguageToggle :snippet>`
 
 ## Advanced material
 
-- When a how-to page has material most readers don't need, group it at the end under an H2 that starts "Advanced:". Add one sentence saying most pages don't need it.
+- When a how-to page has material most readers don't need, group it at the end under an H2 and mark it with `<Badge type="info" text="Advanced" />` after the heading text. Keep a one-sentence note under the heading that most pages don't need it, because the badge alone may not survive Markdown export.
 - Mark advanced options in summary tables with "(advanced)".
-- Use heading words, not badges.
+- This is the one sanctioned use of badges for marking content type. Scope still uses plain sentences.
 - Basic material must not depend on the advanced section.
 
 ## Planned pages

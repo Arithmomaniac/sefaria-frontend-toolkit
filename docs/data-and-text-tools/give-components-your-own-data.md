@@ -17,7 +17,7 @@ Components normally load their text from Sefaria. If you already hold the respon
 | --- | --- |
 | A response you saved, fetched on your server, received from an MCP tool, or exported | The element's `data` property |
 | A route to Sefaria that your host controls | The element's `acquisition` property (advanced) |
-| Only part of a Reader's data | A Reader seed, described in the advanced section below (advanced) |
+| Only part of a Reader's data | A Reader seed, described in [Control loading](#control-loading) (advanced) |
 
 Both cases start from corrected API-shaped JSON. That is the JSON body Sefaria's API returns, in the shape the toolkit's corrected API description expects.
 
@@ -50,7 +50,7 @@ Supplied data also follows the element's `translation-fallback` setting. It defa
 
 To see the failure in your own code as well, read [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md).
 
-## Advanced: control loading
+## Control loading <Badge type="info" text="Advanced" />
 
 Most pages don't need this section.
 

@@ -62,7 +62,7 @@ Use `applyVocalization` for plain text and `applyVocalizationToHtml` for HTML. T
 
 <CodeLanguageToggle :snippet="snippets['prepare-stored-text']" />
 
-```text
+```html
 taamim_and_nikkud: הִגִּ֥יד לְךָ֛ אָדָ֖ם מַה־טּ֑וֹב וְהַצְנֵ֥עַ לֶ֖כֶת עִם־אֱלֹהֶֽיךָ׃ <span data-sefaria-mam="setumah">{ס}</span>
 nikkud: הִגִּיד לְךָ אָדָם מַה־טּוֹב וְהַצְנֵעַ לֶכֶת עִם־אֱלֹהֶיךָ׃ <span data-sefaria-mam="setumah">{ס}</span>
 none: הגיד לך אדם מה־טוב והצנע לכת עם־אלהיך <span data-sefaria-mam="setumah">{ס}</span>
