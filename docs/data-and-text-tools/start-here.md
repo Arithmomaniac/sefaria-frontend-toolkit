@@ -1,6 +1,6 @@
 ---
 title: "Use the data and text tools › Start here"
-description: "Fetch a checked Sefaria response, clean Sefaria's HTML text, or do both in Node.js, with runnable examples for Micah 6:8."
+description: "Fetch a checked Sefaria response, clean Sefaria's HTML text, or do both, with runnable examples for Micah 6:8."
 ---
 
 <script setup>
@@ -24,7 +24,7 @@ Want ready-made UI? [Use components](/use-components/start-here.md).
 
 <StatusNote />
 
-Use the CDN route if you want no install step. Use the package route if your app already has a build step. These steps need Node.js 22.12 or later for the package route.
+Use the CDN route if you want no install step. Use the package route if your app already has a build step.
 
 ### No install
 
@@ -44,9 +44,9 @@ The `alpha` address serves the newest build, and it changes without notice. [Ins
 
 ### Packages
 
-Install `@arithmomaniac/sefaria-client`, `@arithmomaniac/sefaria-text-transform`, or both. They are on GitHub Packages, which needs an access token before you can install. [Install and status](/help/install-and-status.md) shows how to set up the token and gives the exact install command for the current version.
+Install `@arithmomaniac/sefaria-client`, `@arithmomaniac/sefaria-text-transform`, or both. They are on GitHub Packages, which needs an access token before you can install. [Install and status](/help/install-and-status.md) shows how to set up the token and gives the exact install command for the current version. The packages need Node.js 22.12 or later.
 
-The examples below import the package names. With the CDN route, replace the package name in the import with the CDN URL. Each example below is a complete ES module. Save the JavaScript version as a file such as `fetch.mjs` and run `node fetch.mjs`. For the TypeScript version, save it as `fetch.ts` and use your usual TypeScript tooling. Node.js 22.18 and later can also run it directly with `node fetch.ts`.
+The examples below import the package names. With the CDN route, use the JavaScript version and replace each package name with its CDN address. To try an example without either route, press **Run**.
 
 ## Fetch one checked response
 
@@ -57,6 +57,8 @@ The examples below import the package names. With the CDN route, replace the pac
 On success, the result has `data`, and the first part prints `Micah 6:8 · he · Miqra according to the Masorah`.
 
 When Sefaria answers with a documented HTTP error, such as 404 for an unknown reference, the result has `error` with the documented error body. Then `data` is undefined. If a response doesn't match the API description, the call throws a `SefariaContractError` instead of returning data. Network failures also throw. They are not turned into empty data.
+
+### Check JSON you got another way
 
 The second part checks JSON you got another way, such as from storage or a file. `validateExternalResponse` returns `{ valid, issues }` and does not throw. It prints `Invalid at /isSpanning: Invalid input: expected boolean, received string`. Each issue's `instancePath` is a JSON Pointer into the checked value. It points to the place in the data. It doesn't say how to fix it.
 
