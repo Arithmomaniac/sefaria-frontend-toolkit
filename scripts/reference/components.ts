@@ -65,15 +65,25 @@ export async function reservedTokens(
 export async function tokenUsers(
   names: readonly string[],
 ): Promise<ReadonlyMap<string, readonly string[]>> {
-  const files = (await readdir(ELEMENT_SOURCES)).filter(
-    (file) =>
-      file.endsWith(".ts") && !file.includes(".test.") && file !== "tokens.ts",
+  const read = (file: string) =>
+    readFile(new URL(file, ELEMENT_SOURCES), "utf8");
+  const files = (await readdir(ELEMENT_SOURCES)).filter((file) =>
+    file.endsWith("-element.ts"),
   );
+  // An element's styles include shared styles from the local modules it imports.
   const sources = await Promise.all(
-    files.map(async (file) => ({
-      file,
-      source: await readFile(new URL(file, ELEMENT_SOURCES), "utf8"),
-    })),
+    files
+      .filter((file) => file !== "sefaria-element.ts")
+      .map(async (file) => {
+        const own = await read(file);
+        const imports = [...own.matchAll(/from\s+"\.\/([^"]+)\.js"/gu)]
+          .map((match) => `${match[1]}.ts`)
+          .filter((name) => name !== "tokens.ts");
+        const imported = await Promise.all(
+          imports.map((name) => read(name).catch(() => "")),
+        );
+        return { file, source: [own, ...imported].join("\n") };
+      }),
   );
   return new Map(
     names.map((name) => {

@@ -584,7 +584,7 @@ export class SefariaReader extends SefariaElement {
     super.disconnectedCallback();
   }
 
-  /** Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
+  /** Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
   get status(): SefariaElementStatus {
     const preparedStatus = getPreparedStatus(this);
     if (preparedStatus !== undefined) return preparedStatus;

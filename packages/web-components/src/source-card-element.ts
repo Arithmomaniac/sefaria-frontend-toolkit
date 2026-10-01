@@ -416,7 +416,7 @@ export class SefariaSourceCard extends SefariaElement {
     super.disconnectedCallback();
   }
 
-  /** Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
+  /** Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
   get status(): SefariaElementStatus {
     return this.#statusOverride ?? statusOf(this.#viewModel);
   }

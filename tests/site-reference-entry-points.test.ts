@@ -240,7 +240,12 @@ describe("R1 components reference", () => {
       /\| <a id="sefaria-reader-error"><\/a>`sefaria-reader-error` \|.*\| No \|/u,
     );
     expect(page).not.toContain("| Element | Event | Description | Detail |");
-    expect(page).toContain("Read-only. Read-only loading state");
+    expect(page).toContain("Read-only. Loading state");
+    expect(page).not.toContain("Read-only. Read-only");
+    expect(page).not.toMatch(/`sefaria-sefaria`|bilingual-pair/u);
+    expect(page).toMatch(
+      /\| `--sefaria-font-scale` \|[^\n]*`sefaria-reader`[^\n]*`sefaria-text-segment` \|/u,
+    );
     expect(page).toContain("### CSS parts\n\nCSS parts: none.");
     expect(page).toContain("| Property | Default | Description | Used by |");
     expect(page).toContain("| `--sefaria-shadow` |");

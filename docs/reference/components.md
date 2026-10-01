@@ -52,7 +52,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | `translationFallback` | `translation-fallback` | `"default" \| "none"` | `"none"` | What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". |
 | `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep. `none` removes both. |
 | `selectedVersion` | — | `TextSegmentSelectedVersionInfo \| undefined` | — | Read-only. Details of the edition currently shown. |
-| `status` | — | `SefariaElementStatus` | — | Read-only. Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
+| `status` | — | `SefariaElementStatus` | — | Read-only. Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
 
 ### Data
 
@@ -95,7 +95,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | `layout` | `layout` | `BilingualSegmentLayout` | `"auto"` | How the two texts are arranged: `auto`, `stacked` or `side-by-side`. |
 | `sideOrder` | `side-order` | `BilingualSegmentSideOrder` | `"primary-first"` | Which text comes first side by side: `primary-first` or `translation-first`. |
 | `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep. `none` removes both. |
-| `status` | — | `SefariaElementStatus` | — | Read-only. Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
+| `status` | — | `SefariaElementStatus` | — | Read-only. Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
 
 ### Data
 
@@ -142,7 +142,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | `selectable` | `selectable` | `boolean` | `false` | Lets readers select the verses that have their own reference. |
 | `selectedPosition` | — | `readonly number[] \| undefined` | `undefined` | Position of the selected verse, as an array of numbers rather than a reference. |
 | `hideAttributions` | `hide-attributions` | `boolean` | `false` | Hides the edition attribution. |
-| `status` | — | `SefariaElementStatus` | — | Read-only. Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
+| `status` | — | `SefariaElementStatus` | — | Read-only. Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
 
 ### Data
 
@@ -182,7 +182,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | `page` | `page` | `number` | `0` | Zero-based page of the loaded links to show. |
 | `showPreviews` | `show-previews` | `boolean` | `true` | Shows or hides the text previews already loaded, without fetching more. |
 | `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep in previews. `none` removes both. |
-| `status` | — | `SefariaElementStatus` | — | Read-only. Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
+| `status` | — | `SefariaElementStatus` | — | Read-only. Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
 
 ### Data
 
@@ -232,7 +232,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | `sideOrder` | `side-order` | `BilingualPairSideOrder` | `"primary-first"` | Which text comes first side by side: `primary-first` or `translation-first`. |
 | `showConnectionPreviews` | `show-connection-previews` | `boolean` | `true` | Whether connection previews are shown. |
 | `vocalizationMode` | `vocalization-mode` | `VocalizationMode` | `"taamim_and_nikkud"` | How much Hebrew vowel and cantillation marking to keep. `none` removes both. |
-| `status` | — | `SefariaElementStatus` | — | Read-only. Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
+| `status` | — | `SefariaElementStatus` | — | Read-only. Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. |
 | `currentEntryId` | — | `string \| undefined` | — | Read-only. The ID of the current history entry. |
 | `selectedRef` | — | `string \| undefined` | — | Read-only. The selected reference, when there is one. |
 | `rootLoading` | — | `boolean` | — | Read-only. Whether the starting text is still loading. |
@@ -298,10 +298,10 @@ The elements share these CSS custom properties. Not every element uses every one
 
 | Property | Default | Description | Used by |
 | --- | --- | --- | --- |
-| `--sefaria-surface` | `transparent` | Primary surface color. Text Segment is transparent unless this is set. | `sefaria-reader`, `sefaria-sefaria` |
+| `--sefaria-surface` | `transparent` | Primary surface color. Text Segment is transparent unless this is set. | `sefaria-bilingual-segment`, `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card`, `sefaria-text-segment` |
 | `--sefaria-surface-muted` | `light-dark(#f5f1e8, #222521)` | Muted surface color. | `sefaria-reader`, `sefaria-source-card` |
-| `--sefaria-fg` | `light-dark(#25231f, #f1eee7)` | Primary foreground color. | `sefaria-reader`, `sefaria-sefaria` |
-| `--sefaria-fg-muted` | `light-dark(#6d675d, #bdb7ac)` | Muted foreground color. | `sefaria-bilingual-pair.ts`, `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card`, `sefaria-text-segment` |
+| `--sefaria-fg` | `light-dark(#25231f, #f1eee7)` | Primary foreground color. | `sefaria-bilingual-segment`, `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card`, `sefaria-text-segment` |
+| `--sefaria-fg-muted` | `light-dark(#6d675d, #bdb7ac)` | Muted foreground color. | `sefaria-bilingual-segment`, `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card`, `sefaria-text-segment` |
 | `--sefaria-border` | `light-dark(#d7cfc1, #555b53)` | Standard border color. | `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card` |
 | `--sefaria-border-strong` | `light-dark(#aaa094, #73796f)` | Reserved. No component uses it yet. Strong border color. | — |
 | `--sefaria-accent` | `light-dark(#8e2449, #ff93b4)` | Accent and focus color. | `sefaria-reader`, `sefaria-source-card` |
@@ -311,8 +311,8 @@ The elements share these CSS custom properties. Not every element uses every one
 | `--sefaria-shadow` | `0 1rem 3rem rgb(0 0 0 / 28%)` | Reserved. No component uses it yet. Elevated-surface shadow. | — |
 | `--sefaria-panel-radius` | `0.75rem` | Panel corner radius. | `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card` |
 | `--sefaria-control-radius` | `0.3rem` | Control corner radius. | `sefaria-connections-panel`, `sefaria-source-card` |
-| `--sefaria-font-scale` | `1` | Component font-size multiplier. | `sefaria-sefaria` |
+| `--sefaria-font-scale` | `1` | Component font-size multiplier. | `sefaria-bilingual-segment`, `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card`, `sefaria-text-segment` |
 | `--sefaria-font-hebrew` | `"Noto Serif Hebrew", "SBL Hebrew", "Times New Roman", serif` | Hebrew body font stack. | `sefaria-connections-panel`, `sefaria-source-card`, `sefaria-text-segment` |
-| `--sefaria-font-english` | `Georgia, "Times New Roman", serif` | English body font stack. | `sefaria-connections-panel`, `sefaria-reader`, `sefaria-sefaria`, `sefaria-source-card`, `sefaria-text-segment` |
+| `--sefaria-font-english` | `Georgia, "Times New Roman", serif` | English body font stack. | `sefaria-bilingual-segment`, `sefaria-connections-panel`, `sefaria-reader`, `sefaria-source-card`, `sefaria-text-segment` |
 | `--sefaria-font-label-hebrew` | `"Noto Sans Hebrew", system-ui, sans-serif` | Reserved. No component uses it yet. Hebrew label font stack. | — |
 | `--sefaria-font-label-english` | `system-ui, sans-serif` | English label font stack. | `sefaria-reader` |

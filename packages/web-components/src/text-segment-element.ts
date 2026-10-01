@@ -201,7 +201,7 @@ export class SefariaTextSegment extends SefariaElement {
       : undefined;
   }
 
-  /** Read-only loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
+  /** Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
   get status(): SefariaElementStatus {
     return this.#statusOverride ?? statusOf(this.#viewModel);
   }
