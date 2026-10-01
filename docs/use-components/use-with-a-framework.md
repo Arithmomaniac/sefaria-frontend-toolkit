@@ -31,15 +31,30 @@ Element subpaths such as `/source-card` don't register their element. They expor
 
 ## Attributes and properties
 
-Strings and booleans can be attributes: `sref`, `selectable`, `layout`, `content-language`, `translation-language`, `vocalization-mode`, and similar settings. Objects and arrays can't be attributes. `data`, the data source (the `source` property), and `selectedPosition` are JavaScript properties only. `status` is a read-only property.
+Strings and booleans can be attributes. Objects and arrays can't, so you set them as JavaScript properties. These are the ones this example needs:
+
+| Name | Kind | Meaning |
+| --- | --- | --- |
+| `sref` | Attribute | The reference to load, such as `Micah 6:6-8`. |
+| `selectable` | Attribute | Lets readers select a verse. |
+| `selectedPosition` | Property only | Marks the selected verse. Set it to the position from the select event. |
+| `data` | Property only | Your own data, so the card makes no request. |
+| `status` | Property, read only | The current state: `empty`, `loading`, `ready`, or `error`. |
 
 React 19 sets a prop as a property when the element has one with that name, so the React file passes `selectedPosition` as a prop. Alpine binds attributes, so the Alpine file sets the property with `x-effect="$el.selectedPosition = ..."`.
+
+<span class="learn-more__label">Learn more:</span> [Reference › Components](/reference/components.md#sefaria-source-card) {.learn-more}
 
 ## The same handler in three places
 
 Each Source Card is selectable. On `sefaria-source-select`, the handler keeps `event.detail`, which is `{ position, ref }`. It sets the card's `selectedPosition` to that position and shows `You selected Micah 6:7 (position 1).`
 
-Custom events bubble and cross the component boundary, so you listen for them the usual way for your framework.
+Custom events bubble and cross the component boundary, so you listen for them the usual way for your framework. Source Card fires two events:
+
+- `sefaria-source-select`: a reader selected a verse. The detail is `{ position, ref }`.
+- `sefaria-source-card-error`: loading from `sref` failed. The detail is `{ error, sref }`.
+
+<span class="learn-more__label">Learn more:</span> [Component events](/reference/components.md#sefaria-source-card) {.learn-more}
 
 ### Plain JavaScript
 
@@ -67,53 +82,20 @@ This example is the tested file `examples/alpine-vite/src/site-source-card.html`
 
 ## Requests
 
-A fresh load of each example makes one request, in any of the three frameworks. Re-rendering with the same values makes no request. Changing `sref`, the data source, or the edition and language choices loads again. If you supplied `data`, the card instead redraws from your data with no request. Display settings such as `layout` and `content-language` never load again.
+A fresh load of each example makes one request. Re-rendering with the same values makes no request. Changing `sref`, the data source, or the edition and language choices loads again. If you supplied `data`, the card instead redraws from your data with no request. Display settings such as `layout` and `content-language` never load again.
 
 ## Loading, failure and empty states
 
-Every component reports `status`: `empty`, `loading`, `ready`, or `error`. In a framework, read `status` from a ref or the element. Listen for the error event the same way as the select event. For Source Card it is `sefaria-source-card-error`, with detail `{ error, sref }`.
+Read `status` from a ref or the element. Listen for the error event the same way as the select event. For Source Card it is `sefaria-source-card-error`, with detail `{ error, sref }`.
 
 | Situation | What readers see | `status` | Error event |
 | --- | --- | --- | --- |
 | Waiting for Sefaria | A loading message | `loading` | No |
-| Sefaria can't be reached | An error message as an alert | `error` | `sefaria-source-card-error` |
+| Sefaria can't be reached | An error message as an alert. A card that already showed text keeps it. | `error` | `sefaria-source-card-error` |
 | Sefaria says the text isn't a reference | Sefaria's message | `error` | No |
 | No `sref` and no `data` | Nothing | `empty` | No |
 
-A failed load keeps the text already showing. Full detail is in [Source Card empty states](/reference/components.md#sefaria-source-card). <span class="learn-more__label">Learn more:</span> [addEventListener (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) {.learn-more}
-
-### React
-
-This example is the tested file `examples/react-vite/src/site-source-card.tsx`. It runs in the repository's tests, not on this page. In React 19, the handler is the prop `onsefaria-source-select`, with the event name in lowercase after `on`.
-
-<CodeBlock :code="react.trim()" lang="ts" label="examples/react-vite/src/site-source-card.tsx" />
-
-With TypeScript, declare the element's JSX props once. The example project does this in `examples/react-vite/src/custom-elements.d.ts`.
-
-### Alpine
-
-This example is the tested file `examples/alpine-vite/src/site-source-card.html`. It runs in the repository's tests, not on this page. Alpine listens with `@sefaria-source-select="..."`.
-
-<CodeBlock :code="alpine.trim()" lang="html" label="examples/alpine-vite/src/site-source-card.html" />
-
-## Requests
-
-A fresh load of each example makes one request, in any of the three frameworks. Re-rendering with the same values makes no request. Changing `sref`, the data source, or the edition and language choices loads again. If you supplied `data`, the card instead redraws from your data with no request. Display settings such as `layout` and `content-language` never load again.
-
-## Loading, failure and empty states
-
-Every component reports `status`: `empty`, `loading`, `ready`, or `error`. In a framework, read `status` from a ref or the element. Listen for the error event the same way as the select event. For Source Card it is `sefaria-source-card-error`, with detail `{ error, sref }`.
-
-| Situation | What readers see | `status` | Error event |
-| --- | --- | --- | --- |
-| Waiting for Sefaria | `Loading Micah 6:6-8.` | `loading` | No |
-| Sefaria can't be reached | On a first load, the error message as an alert. If the card already showed text, it keeps that text. | `error` | `sefaria-source-card-error` |
-| Sefaria says the text isn't a reference | Sefaria's message, such as `Could not find title in reference: Not a book 3.4` | `error` | No |
-| No `sref` and no `data` | Nothing | `empty` | No |
-
-Details are in [Show an attributed passage](/use-components/show-an-attributed-passage.md).
-
-<span class="learn-more__label">Learn more:</span> [Troubleshoot a page](/help/troubleshoot-a-page.md) · [Component events](/reference/components.md#events) {.learn-more}
+<span class="learn-more__label">Learn more:</span> [Source Card empty states](/reference/components.md#sefaria-source-card) · [Troubleshoot a page](/help/troubleshoot-a-page.md) {.learn-more}
 
 ## Use your own data
 

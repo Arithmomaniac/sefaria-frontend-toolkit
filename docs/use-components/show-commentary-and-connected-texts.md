@@ -48,9 +48,10 @@ The panel changes its own category and page when a reader clicks. You can also s
 | `page` | The page number, counting from 0. The default is 0. |
 | `show-previews` | Shows preview text. On by default. |
 | `with-text` | Asks Sefaria to include the connected texts' words for previews. On by default. |
-| `vocalization-mode` | `taamim_and_nikkud` (default), `nikkud`, or `none`. See [Show one passage](/use-components/show-text/show-one-passage.md). |
 
 `with-text` and `show-previews` default to on, so the attribute can't turn them off. Set the JavaScript property instead: `panel.withText = false` or `panel.showPreviews = false`. If `withText` is false and previews are shown, the panel shows `Preview text was not requested.` and a `Load previews` button.
+
+For every attribute, see [Reference › Components](/reference/components.md#sefaria-connections-panel).
 
 ## React to what readers do
 
@@ -64,7 +65,7 @@ The panel fires five events. They bubble and cross the component boundary, so yo
 | [`sefaria-connection-select`](/reference/components.md#sefaria-connections-panel) | `{ id, targetRef }` | A reader opens one connection. |
 | [`sefaria-connections-panel-error`](/reference/components.md#sefaria-connections-panel) | `{ error, sref }` | Loading or checking data from `sref` failed. |
 
-You can cancel the category, page, and preview events. Calling `event.preventDefault()` stops the panel from acting itself, so your page can take over. The example logs each event. Choose a category and open a connection. To try paging, choose a category with more than 20 connections, such as `Quoting Commentary (47)`, then choose More. Choose Overview to return to the summary.
+You can cancel the category, page, and preview events. Calling `event.preventDefault()` stops the panel from acting itself, so your page can take over. For every event, see [Reference › Components](/reference/components.md#events). The example logs each event. Choose a category and open a connection. To try paging, choose a category with more than 20 connections, such as `Quoting Commentary (47)`, then choose More. Choose Overview to return to the summary.
 
 <LiveEditor :code="connectionsPanelEvents" title="Log the panel's events" />
 
@@ -75,8 +76,6 @@ You can cancel the category, page, and preview events. Calling `event.preventDef
 A fresh load makes one request, to Sefaria's links endpoint. Changing `category`, `page`, or `show-previews` makes no request, because the panel reuses the data it already loaded. Changing `with-text` or `sref` loads again. If you loaded without text, choosing `Load previews` makes one more request. With supplied data, the panel makes none.
 
 ## When there's nothing to show
-
-Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. Here is what each situation looks like:
 
 Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. Here is what each situation looks like:
 

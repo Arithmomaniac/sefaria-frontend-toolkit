@@ -213,7 +213,7 @@ describe("Use with a framework page", () => {
 
   it("covers zero states, status, the error event, and required links", () => {
     for (const text of [
-      "Loading Micah 6:6-8.",
+      "a loading message",
       "can't be reached",
       "isn't a reference",
       "No `sref` and no `data`",
@@ -227,7 +227,7 @@ describe("Use with a framework page", () => {
       "(/reference/components.md)",
       "(/help/install-and-status.md)",
     ]) {
-      expect(page).toContain(text);
+      expect(page.toLowerCase()).toContain(text.toLowerCase());
     }
   });
 });

@@ -2,7 +2,9 @@
   type="module"
   src="https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
 ></script>
-<sefaria-source-card sref="Micah 6:6-8" selectable></sefaria-source-card>
+<div style="max-height: 16rem; overflow: auto">
+  <sefaria-source-card sref="Micah 6:6-8" selectable></sefaria-source-card>
+</div>
 <p id="selection">Select a verse number.</p>
 <script type="module">
   const card = document.querySelector("sefaria-source-card");

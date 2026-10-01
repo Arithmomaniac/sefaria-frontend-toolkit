@@ -263,6 +263,18 @@ describe("C4 Sefaria's own texts and tools", () => {
   const page = () =>
     read("docs", "concepts", "sefarias-own-texts-and-tools.md");
 
+  it("explains fallback and attribution once, linking B20 for per-component rules", async () => {
+    const markdown = await page();
+    expect(markdown).toContain("`translation-fallback`");
+    expect(markdown).not.toContain("defaults to one");
+    expect(markdown).not.toContain("Only Source Card and Reader");
+    expect(markdown).toContain("/use-components/show-an-attributed-passage.md");
+    expect(markdown).toContain(
+      "/across-components/choose-what-text-readers-see.md",
+    );
+    // eslint-disable-next-line no-control-regex
+    expect(markdown).not.toMatch(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/);
+  });
   it("is a written concept page with no status note or steps", async () => {
     const markdown = await page();
     expectWritten(markdown);

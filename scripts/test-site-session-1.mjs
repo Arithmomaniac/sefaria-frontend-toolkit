@@ -647,6 +647,22 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
       ]),
       "Reader fresh-load requests",
     );
+    const readerBox = await readerFrame.evaluate(() => {
+      const reader = globalThis.document.querySelector("sefaria-reader");
+      const scrollers = [
+        ...reader.shadowRoot.querySelectorAll(".panes, .pane"),
+      ].filter(
+        (el) =>
+          globalThis.getComputedStyle(el).overflowY === "auto" &&
+          el.scrollHeight > el.clientHeight,
+      );
+      return {
+        host: reader.getBoundingClientRect().height,
+        scrollers: scrollers.length,
+      };
+    });
+    expectEqual(readerBox.host, 28 * 16, "Reader keeps its fixed 28rem height");
+    expectEqual(readerBox.scrollers > 0, true, "Reader panes scroll inside");
     await readerFrame.locator("#bookmark").click();
     await readerFrame
       .locator("#message")

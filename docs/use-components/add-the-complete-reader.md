@@ -1,6 +1,6 @@
 ---
 title: "Use components › Add the complete Reader"
-description: "Add the complete Reader, a finished reading surface with text, connections, history and a Back button, and add your own toolbar button."
+description: "Add the complete Reader, a finished reading surface with text, connections, history and a Back button, and add your own toolbar actions."
 ---
 
 > Created/edited by GitHub Copilot; pending human review.
@@ -21,11 +21,11 @@ The Reader puts a Source Card and a Connections Panel side by side, and adds nav
 - **Text** is a [Source Card](/use-components/show-an-attributed-passage.md) without its header. It shows the surrounding section with the requested verse selected. For Micah 6:8, that is the chapter Micah 6 with verse 8 selected.
 - **Connections** is a [Connections Panel](/use-components/show-commentary-and-connected-texts.md).
 
-## Add the Reader and a toolbar button
+## Add the Reader and your own toolbar actions
 
-The example opens `Micah 6:8` and adds a Bookmark button inside the Reader. To try changes, choose Edit, change the code, and choose Run.
+The example opens `Micah 6:8` and adds a Bookmark button inside the Reader. A CSS rule gives the Reader a fixed height of `28rem`, so its text and connections panes scroll inside it. To try changes, choose Edit, change the code, and choose Run.
 
-Put your own button inside the Reader with `slot="toolbar-actions"`. In its click handler, read `reader.selectedRef`, the reference of the selected item. It is `Micah 6:8` after loading and `Micah 6:7` after a reader selects that verse. In the example, choosing Bookmark shows `Bookmarked Micah 6:8.` The click makes no request.
+The Reader has one slot, `toolbar-actions`. Elements you put in it appear after the Reader's own toolbar controls. Usually that is a button, but a link or a small menu works too. In the click handler of the example button, read `reader.selectedRef`, the reference of the selected item. It is `Micah 6:8` after loading and `Micah 6:7` after a reader selects that verse. In the example, choosing Bookmark shows `Bookmarked Micah 6:8.` The click makes no request.
 
 <LiveEditor :code="reader" title="Reader with a Bookmark button" />
 
@@ -38,7 +38,7 @@ Beyond the two parts, the Reader adds:
 - **Verse selection.** Selecting a verse loads that verse's connections.
 - **Opening connections.** Choosing a connection opens that text as a new history entry.
 - **History.** Back and the breadcrumbs return to earlier entries.
-- **A toolbar.** Add your own buttons with slot="toolbar-actions".
+- **A toolbar.** Add your own actions with `slot="toolbar-actions"`.
 - **Shared choices.** One data source and one set of text choices carry across navigation.
 - **State and events.** Reader-level state and events, such as selectedRef.
 - **A narrow layout.** At 40rem wide or less, a Text/Connections switch shows one pane at a time.
@@ -55,11 +55,11 @@ The Reader's interaction events tell your page what happened. They are cancelabl
 - `active-pane`: which pane shows on a narrow Reader, `source` (the default) or `connections`.
 - `primary-version-title` and `translation-version-title` choose editions for the reference you open and its section. When a reader opens a connection, `translation-language` carries over. Those exact edition titles don't.
 - `layout`, `content-language`, `side-order`, `vocalization-mode`, `translation-language`, `translation-fallback`, and `hide-attributions` are text attributes. The Reader passes them to the Source Card inside it. See [Show Hebrew and translation together](/use-components/show-text/hebrew-and-translation.md) for what they do. Here `layout` arranges Hebrew and translation inside the text, not the Reader's panes.
-- `translation-fallback`: the Reader's default is `default`. See [Choose what text readers see](/across-components/choose-what-text-readers-see.md) for the shared choices.
-- `show-connection-previews`: shows connection preview text. This option is on by default. To turn it off, set `reader.showConnectionPreviews = false`. The attribute can't turn it off.
-- `chat-export`: shows a `Send … to chat` button when a selected text is open. The button fires `sefaria-reader-chat-export`. Your page does the sending.
+- `translation-fallback`: the Reader's default is `default`. See [Choose what text readers see](/across-components/choose-what-text-readers-see.md) for the choices.
 
 Read-only properties include `status`, `selectedRef`, `canGoBack`, and `currentEntryId`.
+
+For every attribute, see [Reference › Components](/reference/components.md#sefaria-reader).
 
 ## Events
 
@@ -76,7 +76,7 @@ For every Reader event, see [Reference › Components](/reference/components.md#
 
 ## How many requests it makes
 
-Unlike the smaller components, the Reader makes several requests.
+The Reader makes several requests.
 
 - A fresh load of `Micah 6:8` makes three: the verse's text, its chapter's text, and its connections.
 - If your preferred translation language isn't available and `translation-fallback` is `default`, a load can make up to four text requests plus one connections request. With `none`, there is no fallback text request, so a load stays at three.

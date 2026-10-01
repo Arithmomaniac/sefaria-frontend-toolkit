@@ -41,11 +41,10 @@ Set these attributes on the element. Add them one at a time and choose Run to se
 | `translation-fallback` | `none`, `default` | What happens when Sefaria has no text in your preferred language. See [Preferred language or exact edition](#preferred-language-or-exact-edition). | Yes. Changing it starts a new request. `default` can add a second request when the language is missing. |
 | `primary-version-title` | An exact edition title | The exact primary edition. It never falls back. | Yes |
 | `translation-version-title` | An exact edition title | The exact translation edition. It never falls back. | Yes |
-| `vocalization-mode` | `taamim_and_nikkud`, `nikkud`, `none` | Hebrew marks on each side. `nikkud` removes cantillation. `none` also removes vowel points. Both also remove a few other marks. See [Change vowels and cantillation](/data-and-text-tools/clean-up-stored-sefaria-text.md#change-vowels-and-cantillation). | No |
 
-For the styling settings that every component shares, see [Show one passage](/use-components/show-text/show-one-passage.md#match-your-sites-colors-and-fonts).
+For every attribute, including `vocalization-mode`, see [Reference › Components](/reference/components.md#sefaria-bilingual-segment). For the styling settings that every component shares, see [Show one passage](/use-components/show-text/show-one-passage.md#match-your-sites-colors-and-fonts).
 
-The first element below reads side by side with the translation first, in an exact JPS 1917 edition, with vowel points but no cantillation. The second stacks the sides and asks for a French translation.
+The first element below reads side by side with the translation first, in an exact JPS 1917 edition, with vowel points but no cantillation (`vocalization-mode="nikkud"`). The second stacks the sides and asks for a French translation.
 
 <LiveEditor :code="bilingualChoices" title="Layout, order, editions and language" />
 
@@ -78,11 +77,15 @@ A side with no text shows a short note, such as `No translation text is availabl
 | One side has no text, so it shows a short note and the other side still shows | `ready` | No |
 | No `sref` and no `data`, or neither side has text | `empty` | No |
 
-A failed load keeps the text already showing. For all the empty states, see [Bilingual Segment](/reference/components.md#sefaria-bilingual-segment). Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. When Sefaria can't be reached, `status` is `error` and the error event fires, whether or not text was already showing. The event bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. It reports failed loading only. It doesn't report Sefaria's handled messages or invalid supplied `data`.
+A failed load keeps the text already showing. Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. When Sefaria can't be reached, `status` is `error` and the error event fires, whether or not text was already showing. The event bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. It reports failed loading only. It doesn't report Sefaria's handled messages or invalid supplied `data`.
+
+For every event, see [Reference › Components](/reference/components.md#events).
 
 The example has a good reference, a text that isn't a reference, and an empty element. Choose **Show each status** to log each one's status.
 
 <LiveEditor :code="bilingualStates" title="Read status and listen for errors" />
+
+For all the empty states, see [Bilingual Segment](/reference/components.md#sefaria-bilingual-segment).
 
 <span class="learn-more__label">Learn more:</span> [Troubleshoot a page](/help/troubleshoot-a-page.md) · [Component events](/reference/components.md#events) {.learn-more}
 

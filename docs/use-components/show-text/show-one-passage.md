@@ -56,6 +56,8 @@ These styling rules apply to every toolkit component:
 - An exact title never falls back.
 - You can't combine `translation-language` and `version-language`. If you do, the element shows the error `translation-language and version-language cannot be combined.`
 
+For every attribute, see [Reference › Components](/reference/components.md#sefaria-text-segment).
+
 :::
 
 <LiveEditor :code="textSegmentEdition" title="A language, then an exact edition">The first segment asks for French by <code>translation-language</code>. The second asks for an exact English edition by <code>version-language</code> and <code>version-title</code>.</LiveEditor>
@@ -64,7 +66,7 @@ These styling rules apply to every toolkit component:
 
 If Sefaria reports that it has no text in your `translation-language`, the segment shows a short status message, such as `No french text.`. Screen readers announce it. By default (`translation-fallback="none"`), the segment makes one request. Its `status` is `empty`, and there is no error or error event.
 
-To show Sefaria's default translation instead, set `translation-fallback="default"`. The segment makes one more request and shows that translation with no notice. That translation isn't always English. [Source Card](/use-components/show-an-attributed-passage.md) tells readers about the change.
+To show Sefaria's default translation instead, set `translation-fallback="default"`. The segment makes one more request and shows that translation with no notice. That translation isn't always English.
 
 <LiveEditor :code="textSegmentFallback" title="No fallback, then the default translation">Both ask for French on <code>Berakhot 2a:1</code>. The first uses the default <code>none</code> and shows the notice. The second sets <code>translation-fallback="default"</code> and shows Sefaria's default translation.</LiveEditor>
 
@@ -91,11 +93,13 @@ With `translation-fallback="default"` and a missing language, the segment makes 
 | Sefaria says the text isn't a reference, or the supplied `data` is invalid | An error message | `error` | No |
 | No text in your `translation-language`, or no `sref` and no `data` | A status message, or nothing | `empty` | No |
 
-Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. The error event fires only when Sefaria can't be reached. It bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. Invalid `data` doesn't fall back to `sref`. See [every empty state](/reference/components.md#sefaria-text-segment).
+Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. The error event fires only when Sefaria can't be reached. It bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. Invalid `data` doesn't fall back to `sref`.
+
+For every empty state, see [Reference › Components](/reference/components.md#sefaria-text-segment). For every event, see [Reference › Components](/reference/components.md#events).
 
 <LiveEditor :code="textSegmentStates" title="Read status and listen for errors">A good reference, a text that isn't a reference, and an empty element. Choose <strong>Show each status</strong> to log each one's status.</LiveEditor>
 
-<span class="learn-more__label">Learn more:</span> [Troubleshoot a page](/help/troubleshoot-a-page.md) · [Component events](/reference/components.md#events) {.learn-more}
+<span class="learn-more__label">Learn more:</span> [Troubleshoot a page](/help/troubleshoot-a-page.md) {.learn-more}
 
 ## Use your own data
 

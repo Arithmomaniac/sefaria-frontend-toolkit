@@ -86,7 +86,7 @@ There is no generic ready event, so read `status`.
 - Source Card and Reader default to `default`. They load Sefaria's default translation, which isn't always English. They show a notice that names the missing language and the language shown. For example, the notice for French says "french is unavailable" and then names english. This costs one extra request.
 - Set `translation-fallback="default"` on a segment to show the fallback text. The segments show no notice.
 
-No element falls back for an existing empty edition, a failed request, or an exact ersion-title.
+No element falls back for an existing empty edition, a failed request, or an exact `version-title`.
 
 **Fix:** pick a language or edition that the reference has. See [Choose what text readers see](/across-components/choose-what-text-readers-see.md).
 

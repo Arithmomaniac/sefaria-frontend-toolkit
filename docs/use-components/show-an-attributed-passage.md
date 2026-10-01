@@ -23,7 +23,13 @@ Set `sref` to a reference such as `Micah 6:6-8` or `Micah 6:8`. The card shows:
 - The passage's primary edition and a translation for each verse. A range such as `Micah 6:6-8` shows each verse as its own item.
 - Attribution for the editions shown.
 
-The card takes the same text settings as Bilingual Segment: `translation-language`, `primary-version-title`, `translation-version-title`, `content-language`, `layout`, `side-order`, and `vocalization-mode`. It also takes `translation-fallback`, which is `default` or `none`. The default differs: it is `default` on Source Card but `none` on Bilingual Segment. Source Card alone has `hide-attributions`, which hides the attribution. Bilingual Segment has no such attribute. The shared attributes mean the same thing here. See [Show Hebrew and translation together](/use-components/show-text/hebrew-and-translation.md).
+The card takes the same text settings as Bilingual Segment, such as `layout`. See [Show Hebrew and translation together](/use-components/show-text/hebrew-and-translation.md). Three attributes matter most here:
+
+- `translation-language` picks the translation language.
+- `translation-fallback` is `default` or `none`. It is `default` on Source Card. The card then asks for Sefaria's default translation when yours is missing.
+- `hide-attributions` hides the attribution and the fallback note.
+
+For every attribute, see [Reference › Components](/reference/components.md#sefaria-source-card).
 
 ## Read the attribution
 
@@ -42,6 +48,8 @@ A selection fires `sefaria-source-select`. It bubbles and crosses the component 
 Your page controls the selection. The card doesn't highlight a verse by itself. To highlight it, set the card's `selectedPosition` property to `event.detail.position`. The verse's button then gets `aria-pressed="true"` and the verse gets an outline. Setting `selectedPosition` doesn't fire the event again. The event also works with supplied data and makes no request.
 
 The card adds selection buttons only when it can work out each verse's own reference. Some passages, such as ones that span chapters, still show but without selection buttons.
+
+The example caps the card's height with `max-height` and `overflow: auto`, so a tall passage scrolls inside its box. Selection still works while you scroll.
 
 To try changes, choose **Edit**, change the code, and choose **Run**.
 
@@ -65,11 +73,11 @@ The card's `status` property is `empty`, `loading`, `ready`, or `error`. Here is
 | The translation is missing and the fallback is off | The text, with a "no text" note on the translation side | `ready` | No |
 | No `sref` and no `data` | Nothing | `empty` | No |
 
-A failed load keeps the text already showing. For every situation, see [the Source Card entry in the reference](/reference/components.md#sefaria-source-card). Read `status` from the element in JavaScript. To react to a failed load, listen for `sefaria-source-card-error`. It bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. Invalid supplied `data` also shows an error and sets `status` to `error`. The card doesn't fall back to `sref` and doesn't send the event.
+A failed load keeps the text already showing. For every situation, see [the Source Card entry in the reference](/reference/components.md#sefaria-source-card). Read `status` from the element in JavaScript. To react to a failed load, listen for `sefaria-source-card-error`. It bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. For every event, see [Reference › Components](/reference/components.md#events). Invalid supplied `data` also shows an error and sets `status` to `error`. The card doesn't fall back to `sref` and doesn't send the event.
 
 <LiveEditor :code="sourceCardStates" title="Read status and listen for errors">The example has a valid reference, a text that isn't a reference, and an empty card. Choose <strong>Show each status</strong> to log each one's status.</LiveEditor>
 
-<span class="learn-more__label">Learn more:</span> [Troubleshoot a page](/help/troubleshoot-a-page.md) · [Component events](/reference/components.md#events) {.learn-more}
+<span class="learn-more__label">Learn more:</span> [Troubleshoot a page](/help/troubleshoot-a-page.md) {.learn-more}
 
 ## Use your own data
 
