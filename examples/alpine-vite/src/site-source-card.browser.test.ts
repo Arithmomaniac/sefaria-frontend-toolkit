@@ -34,7 +34,7 @@ test("the site's Alpine snippet loads one card and receives a verse selection", 
   await card.updateComplete;
   card
     .shadowRoot!.querySelector<HTMLButtonElement>(
-      'button[aria-label="Show connections for Micah 6:7"]',
+      'button[aria-label="Select Micah 6:7"]',
     )!
     .click();
 

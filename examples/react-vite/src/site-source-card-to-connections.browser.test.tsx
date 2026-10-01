@@ -55,7 +55,7 @@ test("selecting a verse points the panel at it with one links request", async ()
   await act(async () =>
     card
       .shadowRoot!.querySelector<HTMLButtonElement>(
-        'button[aria-label="Show connections for Micah 6:7"]',
+        'button[aria-label="Select Micah 6:7"]',
       )!
       .click(),
   );

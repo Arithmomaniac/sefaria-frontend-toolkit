@@ -36,7 +36,7 @@ test("the site's React snippet loads one card and receives a verse selection", a
 
   await card.updateComplete;
   const button = card.shadowRoot!.querySelector<HTMLButtonElement>(
-    'button[aria-label="Show connections for Micah 6:7"]',
+    'button[aria-label="Select Micah 6:7"]',
   )!;
   await act(async () => button.click());
 

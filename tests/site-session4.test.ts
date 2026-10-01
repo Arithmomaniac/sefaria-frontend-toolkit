@@ -32,26 +32,17 @@ describe("B14 Install and status", () => {
     expectWritten(markdown);
     expect(markdown).toContain("<StatusNote />");
     expect(markdown).toContain(
-      "Types are included; no `@types` package is needed.",
+      "Types are included, so no `@types` package is needed.",
     );
   });
 
-  it("has a runtimes table that says how each runtime is covered", async () => {
+  it("says how each runtime is covered", async () => {
     const markdown = await page();
-    const lines = markdown.split("\n");
-    const header = lines.findIndex((line) => /^\|\s*Runtime\s*\|/.test(line));
-    expect(header).toBeGreaterThanOrEqual(0);
-    const end = lines.findIndex(
-      (line, i) => i > header && !line.startsWith("|"),
+    expect(markdown).toContain("## Runtimes");
+    expect(markdown).toContain("The components need a browser.");
+    expect(markdown).toMatch(
+      /Deno, Bun, and edge runtimes[^\n]*not tested in CI/,
     );
-    const table = lines.slice(header, end < 0 ? undefined : end);
-    expect(table.length).toBeGreaterThanOrEqual(4);
-    expect(table[0]).toMatch(/Runtime/i);
-    for (const row of table.slice(2)) {
-      expect(row).toMatch(
-        /^\|[^|]+\|\s*(?:Tested in CI|Not tested in CI)\s*\|/,
-      );
-    }
   });
 
   it("states GPL-3.0-only, matching every package manifest", async () => {
