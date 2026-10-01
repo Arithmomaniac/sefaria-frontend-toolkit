@@ -25,12 +25,7 @@ This page covers errors in your own code. If a component on a visible page shows
 
 <CodeLanguageToggle :snippet="snippets['client-errors']" />
 
-```text
-Sefaria error 404: Could not find title in reference
-Unexpected response shape: {"operationId":"get-v3-texts","method":"GET","path":"/api/v3/texts/{tref}","status":200,"issues":[{"instancePath":"","keyword":"content-type","message":"Expected application/json, received text/html."}]}
-Request failed: TypeError: fetch failed
-Request failed: AbortError: Reader left the page
-```
+After you press Run, you see four lines. The first reports a Sefaria 404 error. The second shows the details of a contract error. The last two report a network failure and a cancellation.
 
 The demo passes stand-in `fetch` functions to `createSefariaClient({ fetch })`. Each case then happens on demand, without the network. In real code, use `createSefariaClient()`.
 
@@ -56,7 +51,7 @@ The demo passes stand-in `fetch` functions to `createSefariaClient({ fetch })`. 
 
 Each entry in `issues` has these fields:
 
-- `instancePath`: a JSON Pointer to the place in the response that doesn't match. An empty string means the whole response, as in the content-type issue above.
+- `instancePath`: a JSON Pointer to the place in the response that doesn't match. An empty string means the whole response, as in the contract error the demo prints.
 - `schemaPath`: which response schema in the API description was used. It isn't the exact rule that failed.
 - `keyword`: the kind of mismatch, such as `invalid_type`, `content-type`, or `undocumented-status`.
 - `message`: a readable explanation. It is optional in the type, but the client fills it in.

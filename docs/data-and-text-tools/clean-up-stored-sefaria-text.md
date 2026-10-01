@@ -32,7 +32,7 @@ You clean stored Sefaria text in two steps. First, `normalizeText` changes the m
 
 <CodeLanguageToggle :snippet="snippets['text-markup-before-after']" />
 
-The table is the output of this program.
+The snippet above runs each input through `normalizeText`. The table shows the results.
 
 What each kind of input becomes:
 
@@ -62,14 +62,7 @@ Use `applyVocalization` for plain text and `applyVocalizationToHtml` for HTML. T
 
 <CodeLanguageToggle :snippet="snippets['prepare-stored-text']" />
 
-<!-- prettier-ignore -->
-```html
-taamim_and_nikkud: הִגִּ֥יד לְךָ֛ אָדָ֖ם מַה־טּ֑וֹב וְהַצְנֵ֥עַ לֶ֖כֶת עִם־אֱלֹהֶֽיךָ׃ <span data-sefaria-mam="setumah">{ס}</span>
-nikkud: הִגִּיד לְךָ אָדָם מַה־טּוֹב וְהַצְנֵעַ לֶכֶת עִם־אֱלֹהֶיךָ׃ <span data-sefaria-mam="setumah">{ס}</span>
-none: הגיד לך אדם מה־טוב והצנע לכת עם־אלהיך <span data-sefaria-mam="setumah">{ס}</span>
-after-space: אָדָם מַה־טּוֹב׀
-always: אָדָם  מַה־טּוֹב
-```
+After you press Run, it prints one line per mode: the full marks, then vowels only, then neither. Two more lines show the two PASEQ settings. The Masoretic marker in each of the first three lines becomes a data-sefaria-mam span.
 
 To build your own display step, follow `prepareForDisplay`:
 
@@ -77,7 +70,7 @@ To build your own display step, follow `prepareForDisplay`:
 2. Vocalize the resulting `bodyHtml`.
 3. Vocalize each note's `markerHtml` and `contentHtml` so the footnotes match the body.
 
-It returns the safe HTML, the footnotes, and the mode you chose. The last two lines show the PASEQ modes. `after-space` drops the PASEQ after the space. `always` also drops the one attached to the last word. This leaves two spaces between the words.
+It returns the safe HTML, the footnotes, and the mode you chose. In the PASEQ lines, `after-space` drops the PASEQ that follows a space. `always` also drops the one attached to the last word. This leaves two spaces between the words.
 
 `applyVocalizationToHtml` is not a sanitizer. Given unsafe HTML, it keeps the unsafe tags and attributes. Run `normalizeText` first.
 

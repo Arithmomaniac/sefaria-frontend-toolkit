@@ -48,17 +48,11 @@ Validating isn't cleaning. The check protects your code from a wrong response sh
 
 <CodeLanguageToggle :snippet="snippets['text-transform-first-success']" />
 
-This makes no network request. It prints two lines:
+This makes no network request. It prints two lines: the normalized HTML, then the same HTML with the cantillation marks removed.
 
-<!-- prettier-ignore -->
-```html
-הִגִּ֥יד לְךָ֛ אָדָ֖ם מַה־טּ֑וֹב <span data-sefaria-mam="setumah">{ס}</span>
-הִגִּיד לְךָ אָדָם מַה־טּוֹב <span data-sefaria-mam="setumah">{ס}</span>
-```
+The first line shows what `normalizeText` did. It is the sanitizer. It removed the `onclick` attribute and turned Sefaria's `mam-spi-samekh` class into `data-sefaria-mam="setumah"`, a marker for a closed paragraph break in the Masoretic text. It returns `bodyHtml` and `notes`. The `notes` field holds footnotes kept separately.
 
-`normalizeText` is the sanitizer. It removed the `onclick` attribute and turned Sefaria's `mam-spi-samekh` class into `data-sefaria-mam="setumah"`, a marker for a closed paragraph break in the Masoretic text. It returns `bodyHtml` and `notes`. The `notes` field holds footnotes kept separately.
-
-`applyVocalizationToHtml(html, "nikkud")` removes the cantillation marks (taamim) and keeps the vowel points (nikkud), as the second line shows. It changes only text, not markup. Normalize first, then vocalize, because the vocalization helper does not make HTML safe. The other modes are `taamim_and_nikkud` and `none`. [Clean up stored Sefaria text](/data-and-text-tools/clean-up-stored-sefaria-text.md) lists exactly which marks each mode removes.
+`applyVocalizationToHtml(html, "nikkud")` removes the cantillation marks (taamim) and keeps the vowel points (nikkud), as the second line shows. The vowel points are still there. It changes only text, not markup. Normalize first, then vocalize, because the vocalization helper does not make HTML safe. The other modes are `taamim_and_nikkud` and `none`. [Clean up stored Sefaria text](/data-and-text-tools/clean-up-stored-sefaria-text.md) lists exactly which marks each mode removes.
 
 <span class="learn-more__label">Learn more:</span> [Clean up stored Sefaria text](/data-and-text-tools/clean-up-stored-sefaria-text.md) · [Clean text and safety](/concepts/clean-text-and-safety.md) {.learn-more}
 
@@ -66,14 +60,7 @@ This makes no network request. It prints two lines:
 
 <CodeLanguageToggle :snippet="snippets['client-and-text-first-success']" />
 
-This asks for `version: ["translation"]`, which returns Sefaria's default translation. That isn't always English. For Micah 6:8 today it is "THE JPS TANAKH: Gender-Sensitive Edition". The output is:
-
-<!-- prettier-ignore -->
-```html
-THE JPS TANAKH: Gender-Sensitive Edition:
-“You have been told, O mortal, what is good,<br>And what  G<small>OD</small> requires of you:<br>Only to do justice<br>And to love goodness,<br>And to walk modestly with your God;<span data-sefaria-note="0"></span>
-1 footnote(s) kept separately.
-```
+This asks for `version: ["translation"]`, which returns Sefaria's default translation. That isn't always English. For Micah 6:8 today it is "THE JPS TANAKH: Gender-Sensitive Edition". After you press Run, it prints the edition title, then the cleaned translation text, then a line saying `1 footnote(s) kept separately.`
 
 Sefaria's poetry `<span class="...">` wrappers are gone. Ordinary formatting such as `<small>` and `<br>` stays. The footnote marker became an empty `<span data-sefaria-note="0">` placeholder. Its content is in `notes[0]`. The example handles one verse. For a range of verses, Sefaria sends `text` as a list, so the example skips any `text` that isn't a string.
 
