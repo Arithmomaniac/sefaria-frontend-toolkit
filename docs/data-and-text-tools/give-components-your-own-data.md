@@ -26,7 +26,9 @@ Both cases start from corrected API-shaped JSON. That is the JSON body Sefaria's
 
 Check unknown JSON before you pass it on. `validateExternalResponse` from `@arithmomaniac/sefaria-client` returns `{ valid, issues }`. Each issue has an `instancePath` that points to the place in the response where the problem is.
 
-Then set `data` on the Text Segment, Bilingual Segment, or Source Card. The example sets it even when the check fails, so the card shows its own error instead of staying blank. You can skip the assignment instead. `data` is a JavaScript property, not an HTML attribute, so set it from script. Import elements from the package root, which registers them.
+Then set `data` on the Text Segment, Bilingual Segment, or Source Card. `data` is a JavaScript property, not an HTML attribute, so set it from script. Import elements from the package root, which registers them.
+
+The example sets `data` even when the check fails, so the card shows its own error instead of staying blank. You can skip the assignment instead.
 
 <CodeLanguageToggle :snippet="snippets['supplied-source-card-data']" />
 
@@ -51,8 +53,6 @@ Supplied data also follows the element's `translation-fallback` setting. It defa
 To see the failure in your own code as well, read [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md).
 
 ## Control loading <Badge type="info" text="Advanced" />
-
-Most pages don't need this section.
 
 ### Choose a data source
 

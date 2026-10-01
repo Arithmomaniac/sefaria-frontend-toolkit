@@ -678,3 +678,15 @@ pre.site-code {
   font-variant: small-caps;
   letter-spacing: 0.02em;
 }
+
+/* The Advanced badge on an H2 reads as part of the heading, not a grey tag. */
+.vp-doc h2 .VPBadge.info {
+  margin-inline-start: 0.5rem;
+  border-color: transparent;
+  color: var(--vp-c-brand-1);
+  background-color: var(--vp-c-brand-soft);
+  font-size: 0.75rem;
+  line-height: 1.6;
+  vertical-align: middle;
+  transform: none;
+}
