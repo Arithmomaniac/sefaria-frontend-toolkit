@@ -1,6 +1,7 @@
 ---
 title: "Help › Troubleshoot a page"
 description: "Match what you see on the page to its cause and fix, or get support."
+humanReviewed: false
 ---
 
 > Created/edited by GitHub Copilot; pending human review.

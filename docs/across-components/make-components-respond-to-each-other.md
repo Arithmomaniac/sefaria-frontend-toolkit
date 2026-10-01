@@ -1,6 +1,7 @@
 ---
 title: "Across components › Make components respond to each other"
 description: "Link two components so that selecting a verse in a Source Card updates a Connections Panel, using a state value in React or event listeners in plain JavaScript."
+humanReviewed: false
 ---
 
 > Created/edited by GitHub Copilot; pending human review.

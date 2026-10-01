@@ -1,6 +1,7 @@
 ---
 title: "Use components › Show commentary and connected texts"
 description: "Show a text's commentaries and other connected texts in a Connections Panel, group them by category, and react when a reader chooses one."
+humanReviewed: false
 ---
 
 > Created/edited by GitHub Copilot; pending human review.

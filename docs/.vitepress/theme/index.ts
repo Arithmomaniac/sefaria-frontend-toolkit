@@ -6,6 +6,7 @@ import ApiEntry from "./ApiEntry.vue";
 import CodeLanguageToggle from "./CodeLanguageToggle.vue";
 import DocumentationDisclosure from "./DocumentationDisclosure.vue";
 import HeroExample from "./HeroExample.vue";
+import HumanReviewWarning from "./HumanReviewWarning.vue";
 import LandingPreview from "./LandingPreview.vue";
 import PlaygroundEmbed from "./PlaygroundEmbed.vue";
 import SourceCardSnippet from "./SourceCardSnippet.vue";
@@ -24,6 +25,10 @@ export default {
           : null,
       "home-hero-after": () =>
         frontmatter.value.heroExample ? h(HeroExample) : null,
+      "doc-before": () =>
+        frontmatter.value.humanReviewed === false
+          ? h(HumanReviewWarning)
+          : null,
       "layout-bottom": () => [
         frontmatter.value.acknowledgement
           ? h(

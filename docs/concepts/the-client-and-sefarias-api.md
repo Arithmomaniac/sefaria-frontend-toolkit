@@ -1,6 +1,7 @@
 ---
 title: "Concepts › The client and Sefaria's API"
 description: "How the toolkit's client is generated from a pinned copy of Sefaria's API description, what it corrects and checks, and how its short-lived cache and drift check work."
+humanReviewed: false
 ---
 
 > Created/edited by GitHub Copilot; pending human review.

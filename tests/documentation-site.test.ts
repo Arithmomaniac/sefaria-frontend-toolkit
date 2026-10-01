@@ -153,6 +153,44 @@ describe("documentation site", () => {
     expect(config).not.toContain("reference/documentation-map");
   });
 
+  it("reaches every public page from the top navigation or a sidebar", async () => {
+    const config = await readFile(
+      path.join(root, "docs", ".vitepress", "config.ts"),
+      "utf8",
+    );
+    const linked = new Set(
+      [...config.matchAll(/link: "(\/[^"]*)"/g)].map((match) =>
+        match[1]!.replace(/\.md$/, ""),
+      ),
+    );
+    const sections = [
+      "use-components",
+      "data-and-text-tools",
+      "across-components",
+      "concepts",
+      "help",
+      "examples",
+      "reference",
+    ];
+    const missing: string[] = [];
+    for (const section of sections) {
+      const entries = await readdir(path.join(root, "docs", section), {
+        recursive: true,
+      });
+      for (const entry of entries.filter((name) => name.endsWith(".md"))) {
+        const route = `/${section}/${entry.replaceAll("\\", "/").replace(/\.md$/, "")}`;
+        if (!linked.has(route)) {
+          missing.push(route);
+        }
+      }
+    }
+    expect(missing).toEqual([]);
+    for (const text of ["Concepts", "Help"]) {
+      expect(config).toContain(`{ text: "${text}", link:`);
+    }
+    expect(config).toContain('"/across-components/": useComponentsSidebar');
+  });
+
   it("preserves highlighted HTML source text by default", () => {
     const source =
       '<sefaria-source-card sref="Micah 6:8"></sefaria-source-card>';
@@ -174,5 +212,51 @@ describe("documentation site", () => {
         );
       }
     }
+  });
+
+  it("flags exactly the unreviewed pages", async () => {
+    const flagged: string[] = [];
+    const walk = async (dir: string): Promise<void> => {
+      for (const entry of await readdir(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          if (entry.name !== "node_modules" && entry.name !== ".vitepress") {
+            await walk(full);
+          }
+        } else if (entry.name.endsWith(".md")) {
+          const front = /^---\r?\n([\s\S]*?)\r?\n---/u.exec(
+            await readFile(full, "utf8"),
+          )?.[1];
+          if (front && /^humanReviewed:\s*false\s*$/mu.test(front)) {
+            flagged.push(
+              path
+                .relative(path.join(root, "docs"), full)
+                .replaceAll("\\", "/"),
+            );
+          }
+        }
+      }
+    };
+    await walk(path.join(root, "docs"));
+    expect(flagged.sort()).toEqual(
+      [
+        "use-components/show-an-attributed-passage.md",
+        "use-components/use-with-a-framework.md",
+        "use-components/show-commentary-and-connected-texts.md",
+        "help/troubleshoot-a-page.md",
+        "across-components/match-your-sites-look.md",
+        "across-components/make-components-respond-to-each-other.md",
+        "use-components/start-with-an-ai-assistant.md",
+        "data-and-text-tools/handle-errors-in-your-code.md",
+        "data-and-text-tools/clean-up-stored-sefaria-text.md",
+        "concepts/the-client-and-sefarias-api.md",
+        "concepts/clean-text-and-safety.md",
+        "concepts/sefarias-own-texts-and-tools.md",
+        "examples/composed-multi-pane-reader.md",
+        "examples/linked-article.md",
+        "examples/reader-inside-ai-chat.md",
+        "examples/this-weeks-portion.md",
+      ].sort(),
+    );
   });
 });

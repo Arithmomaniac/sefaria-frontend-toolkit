@@ -1,6 +1,7 @@
 ---
 title: "Use components › Start with an AI assistant"
 description: "Give your AI coding assistant a copyable prompt so it builds a page with the toolkit's components, then check the result against a short list."
+humanReviewed: false
 ---
 
 > Created/edited by GitHub Copilot; pending human review.

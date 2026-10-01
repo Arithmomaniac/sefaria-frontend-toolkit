@@ -1,6 +1,7 @@
 ---
 title: "Concepts › Sefaria's own texts and tools"
 description: "Learn what Sefaria means by a reference and an edition, how the toolkit picks a translation, and when Sefaria's own API, Linker, MCP servers, source sheets, or data exports fit better."
+humanReviewed: false
 ---
 
 > Created/edited by GitHub Copilot; pending human review.

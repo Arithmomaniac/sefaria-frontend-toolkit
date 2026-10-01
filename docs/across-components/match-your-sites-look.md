@@ -1,6 +1,7 @@
 ---
 title: "Across components › Match your site's look"
 description: "Set colors, fonts, corner rounding, text size, and light or dark mode for every toolkit component at once, using shared --sefaria-* CSS properties."
+humanReviewed: false
 ---
 
 > Created/edited by GitHub Copilot; pending human review.

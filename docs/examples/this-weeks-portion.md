@@ -1,6 +1,7 @@
 ---
 title: "Examples › This week's portion"
 description: "A complete app that asks Sefaria's calendar for this week's Torah portion and shows it on a Source Card, with no reference to edit by hand."
+humanReviewed: false
 ---
 
 > Created/edited by GitHub Copilot; pending human review.

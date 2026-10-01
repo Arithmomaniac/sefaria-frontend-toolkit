@@ -1,6 +1,7 @@
 ---
 title: "Examples › Reader inside AI chat"
 description: "Show the Sefaria Reader inside an AI chat answer as an MCP App, with navigation that goes through the chat host instead of the browser."
+humanReviewed: false
 ---
 
 > Created/edited by GitHub Copilot; pending human review.

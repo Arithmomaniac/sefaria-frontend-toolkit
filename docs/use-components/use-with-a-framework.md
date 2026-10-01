@@ -1,6 +1,7 @@
 ---
 title: "Use components › Use with a framework"
 description: "Use the same Source Card and selection handler in plain JavaScript, React, or Alpine: which values are attributes, which are properties, and how to listen for events."
+humanReviewed: false
 ---
 
 > Created/edited by GitHub Copilot; pending human review.

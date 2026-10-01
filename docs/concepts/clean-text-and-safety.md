@@ -1,6 +1,7 @@
 ---
 title: "Concepts › Clean text and safety"
 description: "Explains why Sefaria's text needs cleaning before it goes on a page, what normalizeText makes safe, why the vocalization helpers don't, and what your site still owns."
+humanReviewed: false
 ---
 
 > Created/edited by GitHub Copilot; pending human review.

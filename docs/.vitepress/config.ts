@@ -21,6 +21,64 @@ const apiLinkCatalog = JSON.parse(
   readonly href: string;
   readonly page: string;
 }[];
+const useComponentsSidebar = [
+  {
+    text: "Use components",
+    items: [
+      { text: "Start here", link: "/use-components/start-here" },
+      {
+        text: "Start with an AI assistant",
+        link: "/use-components/start-with-an-ai-assistant",
+      },
+      {
+        text: "Show text",
+        items: [
+          {
+            text: "Show one passage",
+            link: "/use-components/show-text/show-one-passage",
+          },
+          {
+            text: "Show Hebrew and translation together",
+            link: "/use-components/show-text/hebrew-and-translation",
+          },
+        ],
+      },
+      {
+        text: "Show an attributed passage",
+        link: "/use-components/show-an-attributed-passage",
+      },
+      {
+        text: "Use with a framework",
+        link: "/use-components/use-with-a-framework",
+      },
+      {
+        text: "Show commentary and connected texts",
+        link: "/use-components/show-commentary-and-connected-texts",
+      },
+      {
+        text: "Add the complete Reader",
+        link: "/use-components/add-the-complete-reader",
+      },
+    ],
+  },
+  {
+    text: "Across components",
+    items: [
+      {
+        text: "Match your site's look",
+        link: "/across-components/match-your-sites-look",
+      },
+      {
+        text: "Choose what text readers see",
+        link: "/across-components/choose-what-text-readers-see",
+      },
+      {
+        text: "Make components respond to each other",
+        link: "/across-components/make-components-respond-to-each-other",
+      },
+    ],
+  },
+];
 export default withMermaid(
   defineConfig({
     base: siteBasePath,
@@ -124,54 +182,13 @@ export default withMermaid(
           text: "Use data and text tools",
           link: "/data-and-text-tools/start-here.md",
         },
-        {
-          text: "Examples",
-          link: "/examples/composed-multi-pane-reader",
-        },
+        { text: "Concepts", link: "/concepts/how-the-toolkit-works" },
         { text: "Reference", link: "/reference/components" },
+        { text: "Examples", link: "/examples/composed-multi-pane-reader" },
+        { text: "Help", link: "/help/install-and-status" },
       ],
       sidebar: {
-        "/use-components/": [
-          {
-            text: "Use components",
-            items: [
-              { text: "Start here", link: "/use-components/start-here" },
-              {
-                text: "Start with an AI assistant",
-                link: "/use-components/start-with-an-ai-assistant",
-              },
-              {
-                text: "Show text",
-                items: [
-                  {
-                    text: "Show one passage",
-                    link: "/use-components/show-text/show-one-passage",
-                  },
-                  {
-                    text: "Show Hebrew and translation together",
-                    link: "/use-components/show-text/hebrew-and-translation",
-                  },
-                ],
-              },
-              {
-                text: "Show an attributed passage",
-                link: "/use-components/show-an-attributed-passage",
-              },
-              {
-                text: "Use with a framework",
-                link: "/use-components/use-with-a-framework",
-              },
-              {
-                text: "Show commentary and connected texts",
-                link: "/use-components/show-commentary-and-connected-texts",
-              },
-              {
-                text: "Add the complete Reader",
-                link: "/use-components/add-the-complete-reader",
-              },
-            ],
-          },
-        ],
+        "/use-components/": useComponentsSidebar,
         "/data-and-text-tools/": [
           {
             text: "Use the data and text tools",
@@ -192,25 +209,7 @@ export default withMermaid(
             ],
           },
         ],
-        "/across-components/": [
-          {
-            text: "Across components",
-            items: [
-              {
-                text: "Match your site's look",
-                link: "/across-components/match-your-sites-look",
-              },
-              {
-                text: "Choose what text readers see",
-                link: "/across-components/choose-what-text-readers-see",
-              },
-              {
-                text: "Make components respond to each other",
-                link: "/across-components/make-components-respond-to-each-other",
-              },
-            ],
-          },
-        ],
+        "/across-components/": useComponentsSidebar,
         "/concepts/": [
           {
             text: "Concepts",

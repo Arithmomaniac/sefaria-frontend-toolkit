@@ -123,3 +123,7 @@ Example pages embed the complete first-party example apps, such as `/examples/li
 - The generator escapes attribute values for Vue (`&`, `<`, `>`, `"`). `fields` is JSON in a `:fields` binding.
 - Anchors: elements keep `#<tag>`, `#events` and `#style-settings`. Properties use `<tag>-<attribute or property>` (for example `sefaria-source-card-translation-fallback`), events use `event-<event name>`, and style settings use `style-sefaria-<name>`.
 - `scripts/test-site.mjs` checks the page for horizontal overflow at 390px and for fields sharing a row at 1200px.
+
+## Human-review warning
+
+A page with `humanReviewed: false` in its front matter shows a warning box under its title (`HumanReviewWarning.vue`, in the `doc-before` slot). It appears in the built HTML. Remove the flag once the maintainer signs off the page. Don't add review notes to the page text.

@@ -64,6 +64,21 @@ try {
       }
     }
 
+    const builtHtml = (route) =>
+      readFile(path.join(root, "dist", "site", route), "utf8");
+    const flaggedHtml = await builtHtml(
+      "use-components/show-an-attributed-passage.html",
+    );
+    if (!flaggedHtml.includes("human-review-warning")) {
+      throw new Error("A flagged page is missing the human-review warning");
+    }
+    const approvedHtml = await builtHtml(
+      "use-components/add-the-complete-reader.html",
+    );
+    if (approvedHtml.includes("human-review-warning")) {
+      throw new Error("An approved page shows the human-review warning");
+    }
+
     const page = await browser.newPage({
       viewport: { width: 1280, height: 900 },
     });

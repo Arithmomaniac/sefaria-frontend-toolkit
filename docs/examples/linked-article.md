@@ -1,6 +1,7 @@
 ---
 title: "Examples › Linked article"
 description: "A complete app that previews a cited Sefaria source in a dialog when a reader clicks a link in your article, without leaving the page."
+humanReviewed: false
 ---
 
 > Created/edited by GitHub Copilot; pending human review.

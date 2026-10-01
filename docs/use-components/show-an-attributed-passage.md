@@ -1,6 +1,7 @@
 ---
 title: "Use components › Show an attributed passage and let readers select it"
 description: "Show a passage in a Source Card with its heading, both languages and attribution, and react when a reader selects a verse."
+humanReviewed: false
 ---
 
 > Created/edited by GitHub Copilot; pending human review.

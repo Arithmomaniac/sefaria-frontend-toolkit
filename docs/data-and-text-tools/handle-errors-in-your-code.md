@@ -1,6 +1,7 @@
 ---
 title: "Use the data and text tools › Handle errors in your code"
 description: "Tell apart documented Sefaria errors, contract errors, and network or cancellation failures in your own code, and decide what to retry and what to report."
+humanReviewed: false
 ---
 
 <script setup>

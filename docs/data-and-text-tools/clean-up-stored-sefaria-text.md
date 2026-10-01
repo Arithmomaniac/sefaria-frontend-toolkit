@@ -1,6 +1,7 @@
 ---
 title: "Use the data and text tools › Clean up stored Sefaria text"
 description: "See what normalizeText and the vocalization helpers change in stored Sefaria text, then combine them to prepare safe HTML, footnotes, and a chosen vowel level."
+humanReviewed: false
 ---
 
 <script setup>

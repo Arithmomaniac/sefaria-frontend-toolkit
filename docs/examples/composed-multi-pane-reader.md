@@ -1,6 +1,7 @@
 ---
 title: "Examples › Composed multi-pane Reader"
 description: "An advanced example that puts several passages and their connections side by side by building on the Reader session instead of the complete Reader."
+humanReviewed: false
 ---
 
 > Created/edited by GitHub Copilot; pending human review.
