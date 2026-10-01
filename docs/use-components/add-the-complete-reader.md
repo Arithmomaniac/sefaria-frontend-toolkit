@@ -70,7 +70,7 @@ These events bubble and cross the component boundary. The `detail` of an interac
 | `sefaria-reader-source-select` | A reader selected a verse. Cancel it with `preventDefault()` to keep the Reader from selecting that verse. | `{ originEntryId, position, ref }` |
 | `sefaria-reader-connection-select` | A reader opened a connection. Cancel it with `preventDefault()` to keep the Reader from opening that text. | `{ originEntryId, id, targetRef }` |
 | `sefaria-reader-back` | A reader asked to go back to the previous entry. Cancel it with `preventDefault()` to stay on the current entry. | `{ originEntryId }` |
-| `sefaria-reader-error` | Loading failed or the starting data was rejected. Show a message or log it. | `{ error, sref }` only |
+| `sefaria-reader-error` | The reference you set could not be opened. Show a message or log it. | `{ error, sref }` only |
 
 For every Reader event, see [Reference › Components](/reference/components.md#sefaria-reader).
 
@@ -90,18 +90,14 @@ Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`,
 
 | Situation | What readers see | `status` | Error event |
 | --- | --- | --- | --- |
-| Loading the text for the first time | `Opening Reader...` | `loading` | No |
-| Loading the text for a new location | `Opening a new Reader location...`, with the current entry still visible | `loading` | No |
-| Text shown, connections still loading | The text, with the Connections pane loading | `ready` | No |
-| Sefaria can't be reached when opening the reference you set | An alert with the error message. An entry that's already open stays. | `error` | `sefaria-reader-error` |
-| Sefaria says the reference you set isn't a reference | An alert with Sefaria's message. An entry that's already open stays. | `error` | `sefaria-reader-error` |
-| Opening a connection fails | An error message. The current entry stays. | `error` | No |
-| Only the connections request fails | An alert in the Connections pane. The text stays. | `ready` | No |
+| Loading, including a new location | A loading message. What's already open stays visible. | `loading` | No |
+| The reference you set can't be opened: Sefaria is unreachable or it isn't a reference | An alert with the error message | `error` | `sefaria-reader-error` |
+| Opening a connection fails, or only the connections fail | An error message. The text stays. | `error` when opening a connection fails, `ready` when only connections fail | No |
 | Nothing set yet: no `sref` | Nothing | `empty` | No |
 
-Once the Reader has shown content, removing `sref` doesn't clear it. To react to a failed load of the reference you set, listen for `sefaria-reader-error`. It bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`.
+A failure in one pane leaves the other pane and any open entry showing. Once the Reader has shown content, removing `sref` doesn't clear it. To react to a failed load of the reference you set, listen for `sefaria-reader-error`. It bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`.
 
-<span class="learn-more__label">Learn more:</span> [Troubleshoot a page](/help/troubleshoot-a-page.md) · [Component events](/reference/components.md#events) {.learn-more}
+<span class="learn-more__label">Learn more:</span> [Troubleshoot a page](/help/troubleshoot-a-page.md) · [Component events](/reference/components.md#events) · [Reader empty-state detail](/reference/components.md#sefaria-reader) {.learn-more}
 
 ## Use your own data
 

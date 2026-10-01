@@ -86,13 +86,12 @@ With `translation-fallback="default"` and a missing language, the segment makes 
 
 | Situation | What readers see | `status` | Error event |
 | --- | --- | --- | --- |
-| Waiting for Sefaria | `Loading Micah 6:8.` | `loading` | No |
-| Sefaria can't be reached | On a first load, the error message as an alert. If the element already showed text, it keeps that text. | `error` | `sefaria-text-segment-error` |
-| Sefaria says the text isn't a reference | Sefaria's own message, such as `Could not find title in reference: Not a book 3.4` | `error` | No |
-| Sefaria has no text in your `translation-language` (default `translation-fallback="none"`) | A status message, such as `No french text.` | `empty` | No |
-| No `sref` and no `data` | Nothing | `empty` | No |
+| Waiting for Sefaria | A loading message | `loading` | No |
+| Sefaria can't be reached | On a first load, the error message as an alert. A failed load keeps the text already showing. | `error` | `sefaria-text-segment-error` |
+| Sefaria says the text isn't a reference, or the supplied `data` is invalid | An error message | `error` | No |
+| No text in your `translation-language`, or no `sref` and no `data` | A status message, or nothing | `empty` | No |
 
-Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. When Sefaria can't be reached, `status` is `error` and the error event fires, whether or not text was already showing. The error event bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. If the supplied `data` is invalid, the segment shows an error and sends no event. It doesn't fall back to `sref`.
+Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. The error event fires only when Sefaria can't be reached. It bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. Invalid `data` doesn't fall back to `sref`. See [every empty state](/reference/components.md#sefaria-text-segment).
 
 <LiveEditor :code="textSegmentStates" title="Read status and listen for errors">A good reference, a text that isn't a reference, and an empty element. Choose <strong>Show each status</strong> to log each one's status.</LiveEditor>
 

@@ -48,6 +48,7 @@ Data and text tool pages show every snippet with `<CodeLanguageToggle :snippet>`
 - Keep request counts next to each operation.
 - List only the events readers most likely need on a how-to page, each with a one-line description. Link to the components reference for the full list.
 - Put rules for one component's attributes, which interrupt the narrative, in a `::: info` box with a short title, as bullets.
+- On a how-to page, a "nothing to show" or zero-state table shows only what a reader acts on: loading, the main failures that fire the error event, a partial failure if the component has one, and nothing set. Show the `status` value and whether the error event fires. Merge rows that behave the same. Describe interface text, such as a loading message, instead of quoting it. End with a link to the element's empty-state detail at `/reference/components.md#<tag>`.
 - Leave a blank line before a closing `:::`. Otherwise Prettier joins it to the line above and the box swallows the rest of the page. A site test checks this.
 
 ## Advanced material

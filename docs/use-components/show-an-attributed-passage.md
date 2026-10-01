@@ -17,7 +17,7 @@ The Source Card, `<sefaria-source-card>`, shows a whole passage in one block: a 
 
 ## What the card shows
 
-Set `sref` to a reference such as `Micah 6:6-8`. The card shows:
+Set `sref` to a reference such as `Micah 6:6-8` or `Micah 6:8`. The card shows:
 
 - A heading with the reference in English and Hebrew. The heading isn't a link.
 - The passage's primary edition and a translation for each verse. A range such as `Micah 6:6-8` shows each verse as its own item.
@@ -59,12 +59,13 @@ The card's `status` property is `empty`, `loading`, `ready`, or `error`. Here is
 
 | Situation | What readers see | `status` | Error event |
 | --- | --- | --- | --- |
-| Waiting for Sefaria | `Loading Micah 6:8.` | `loading` | No |
-| Sefaria can't be reached | On a first load, the error message as an alert. If the card already showed text, it keeps that text. | `error` | `sefaria-source-card-error` |
-| Sefaria says the text isn't a reference | Sefaria's message, such as `Could not find title in reference: Not a book 3.4` | `error` | No |
+| Waiting for Sefaria | A loading message | `loading` | No |
+| Sefaria can't be reached | An error message | `error` | `sefaria-source-card-error` |
+| Sefaria says the text isn't a reference | Sefaria's own message | `error` | No |
+| The translation is missing and the fallback is off | The text, with a "no text" note on the translation side | `ready` | No |
 | No `sref` and no `data` | Nothing | `empty` | No |
 
-Read `status` from the element in JavaScript. To react to a failed load, listen for `sefaria-source-card-error`. It bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. Invalid supplied `data` also shows an error and sets `status` to `error`. The card doesn't fall back to `sref` and doesn't send the event.
+A failed load keeps the text already showing. For every situation, see [the Source Card entry in the reference](/reference/components.md#sefaria-source-card). Read `status` from the element in JavaScript. To react to a failed load, listen for `sefaria-source-card-error`. It bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. Invalid supplied `data` also shows an error and sets `status` to `error`. The card doesn't fall back to `sref` and doesn't send the event.
 
 <LiveEditor :code="sourceCardStates" title="Read status and listen for errors">The example has a valid reference, a text that isn't a reference, and an empty card. Choose <strong>Show each status</strong> to log each one's status.</LiveEditor>
 

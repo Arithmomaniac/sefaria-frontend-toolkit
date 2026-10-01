@@ -70,17 +70,15 @@ A side with no text shows a short note, such as `No translation text is availabl
 
 ## When there's nothing to show
 
-| Situation | What readers see | `status` | Error event |
-| --- | --- | --- | --- |
-| Waiting for Sefaria | `Loading Micah 6:8.` | `loading` | No |
-| Sefaria can't be reached | On a first load, the error message as an alert. If the element already showed text, it keeps that text. | `error` | `sefaria-bilingual-segment-error` |
-| Sefaria says the text isn't a reference | Sefaria's message, such as `Could not find title in reference: Not a book 3.4` | `error` | No |
-| No `sref` and no `data` | Nothing | `empty` | No |
-| Neither side has text | The notes for the missing sides | `empty` | No |
-| Preferred language missing, with `translation-fallback="none"` | The primary side, and `No french text.` on the translation side | `ready`, or `empty` if neither side has text | No |
-| Invalid supplied `data` | An error message, with no fallback to a request | `error` | No |
+| Situation | `status` | Error event |
+| --- | --- | --- |
+| Waiting for Sefaria. A loading message shows | `loading` | No |
+| Sefaria can't be reached | `error` | Yes, `sefaria-bilingual-segment-error` |
+| Sefaria says the text isn't a reference, or supplied `data` is invalid | `error` | No |
+| One side has no text, so it shows a short note and the other side still shows | `ready` | No |
+| No `sref` and no `data`, or neither side has text | `empty` | No |
 
-Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. When Sefaria can't be reached, `status` is `error` and the error event fires, whether or not text was already showing. The event bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. It reports failed loading only. It doesn't report Sefaria's handled messages or invalid supplied `data`.
+A failed load keeps the text already showing. For all the empty states, see [Bilingual Segment](/reference/components.md#sefaria-bilingual-segment). Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. When Sefaria can't be reached, `status` is `error` and the error event fires, whether or not text was already showing. The event bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. It reports failed loading only. It doesn't report Sefaria's handled messages or invalid supplied `data`.
 
 The example has a good reference, a text that isn't a reference, and an empty element. Choose **Show each status** to log each one's status.
 

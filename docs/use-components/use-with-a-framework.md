@@ -75,6 +75,37 @@ Every component reports `status`: `empty`, `loading`, `ready`, or `error`. In a 
 
 | Situation | What readers see | `status` | Error event |
 | --- | --- | --- | --- |
+| Waiting for Sefaria | A loading message | `loading` | No |
+| Sefaria can't be reached | An error message as an alert | `error` | `sefaria-source-card-error` |
+| Sefaria says the text isn't a reference | Sefaria's message | `error` | No |
+| No `sref` and no `data` | Nothing | `empty` | No |
+
+A failed load keeps the text already showing. Full detail is in [Source Card empty states](/reference/components.md#sefaria-source-card). <span class="learn-more__label">Learn more:</span> [addEventListener (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/EventTarget/addEventListener) {.learn-more}
+
+### React
+
+This example is the tested file `examples/react-vite/src/site-source-card.tsx`. It runs in the repository's tests, not on this page. In React 19, the handler is the prop `onsefaria-source-select`, with the event name in lowercase after `on`.
+
+<CodeBlock :code="react.trim()" lang="ts" label="examples/react-vite/src/site-source-card.tsx" />
+
+With TypeScript, declare the element's JSX props once. The example project does this in `examples/react-vite/src/custom-elements.d.ts`.
+
+### Alpine
+
+This example is the tested file `examples/alpine-vite/src/site-source-card.html`. It runs in the repository's tests, not on this page. Alpine listens with `@sefaria-source-select="..."`.
+
+<CodeBlock :code="alpine.trim()" lang="html" label="examples/alpine-vite/src/site-source-card.html" />
+
+## Requests
+
+A fresh load of each example makes one request, in any of the three frameworks. Re-rendering with the same values makes no request. Changing `sref`, the data source, or the edition and language choices loads again. If you supplied `data`, the card instead redraws from your data with no request. Display settings such as `layout` and `content-language` never load again.
+
+## Loading, failure and empty states
+
+Every component reports `status`: `empty`, `loading`, `ready`, or `error`. In a framework, read `status` from a ref or the element. Listen for the error event the same way as the select event. For Source Card it is `sefaria-source-card-error`, with detail `{ error, sref }`.
+
+| Situation | What readers see | `status` | Error event |
+| --- | --- | --- | --- |
 | Waiting for Sefaria | `Loading Micah 6:6-8.` | `loading` | No |
 | Sefaria can't be reached | On a first load, the error message as an alert. If the card already showed text, it keeps that text. | `error` | `sefaria-source-card-error` |
 | Sefaria says the text isn't a reference | Sefaria's message, such as `Could not find title in reference: Not a book 3.4` | `error` | No |

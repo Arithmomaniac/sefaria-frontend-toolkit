@@ -56,17 +56,15 @@ The panel changes its own category and page when a reader clicks. You can also s
 
 The panel fires five events. They bubble and cross the component boundary, so you can listen on the panel or on a parent.
 
-| Event | `event.detail` | When |
+| Event | `event.detail` | When it fires |
 | --- | --- | --- |
-| `sefaria-connections-category-change` | `{ category }` | A category is chosen. `category` is `null` for Overview. |
-| `sefaria-connections-page-change` | `{ page }` | The page changes. |
-| `sefaria-connections-preview-request` | `{}` | A reader chooses `Load previews`. |
-| `sefaria-connection-select` | `{ id, targetRef }` | A reader opens a connection. |
-| `sefaria-connections-panel-error` | `{ error, sref }` | Loading connections failed. |
+| [`sefaria-connections-category-change`](/reference/components.md#sefaria-connections-panel) | `{ category }` | A reader chooses a category. `category` is `null` for Overview. |
+| [`sefaria-connections-page-change`](/reference/components.md#sefaria-connections-panel) | `{ page }` | A reader asks for another page. `page` counts from 0. |
+| [`sefaria-connections-preview-request`](/reference/components.md#sefaria-connections-panel) | `{}` | A reader chooses `Load previews`. |
+| [`sefaria-connection-select`](/reference/components.md#sefaria-connections-panel) | `{ id, targetRef }` | A reader opens one connection. |
+| [`sefaria-connections-panel-error`](/reference/components.md#sefaria-connections-panel) | `{ error, sref }` | Loading or checking data from `sref` failed. |
 
-You can cancel the category and page events. Calling `event.preventDefault()` on one stops the panel from changing itself, so your page can take over.
-
-The example logs each event. Choose a category and open a connection. To try paging, choose a category with more than 20 connections, such as `Quoting Commentary (47)`, then choose More. Choose Overview to return to the summary.
+You can cancel the category, page, and preview events. Calling `event.preventDefault()` stops the panel from acting itself, so your page can take over. The example logs each event. Choose a category and open a connection. To try paging, choose a category with more than 20 connections, such as `Quoting Commentary (47)`, then choose More. Choose Overview to return to the summary.
 
 <LiveEditor :code="connectionsPanelEvents" title="Log the panel's events" />
 
@@ -80,16 +78,18 @@ A fresh load makes one request, to Sefaria's links endpoint. Changing `category`
 
 Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. Here is what each situation looks like:
 
-| Situation | What readers see | `status` | Error event |
-| --- | --- | --- | --- |
-| Waiting for Sefaria | `Loading connections for Micah 6:8.` | `loading` | No |
-| Sefaria can't be reached | On a first load, the error message as an alert. If the panel already showed connections, it keeps them. | `error` | `sefaria-connections-panel-error` |
-| Sefaria says the text isn't a reference | Sefaria's message, such as `Could not find title in reference: Not a book 3.4` | `error` | No |
-| No `sref` and no `data` | Nothing | `empty` | No |
+Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`. Here is what each situation looks like:
 
-If Sefaria returns no connections, the panel shows `No text connections were returned.` Invalid supplied `data` also shows an error and sets `status` to `error`. The panel doesn't fall back to `sref` and doesn't send the event.
+| Situation | `status` | Error event |
+| --- | --- | --- |
+| Waiting for Sefaria, with a loading message | `loading` | No |
+| Sefaria can't be reached | `error` | `sefaria-connections-panel-error` |
+| Sefaria says the text isn't a reference, with Sefaria's message | `error` | No |
+| Invalid supplied `data`, with an error | `error` | No |
+| No `sref` and no `data`, nothing shown | `empty` | No |
+| Sefaria returns no text connections, with a message | `empty` | No |
 
-The example has a good reference, a text that isn't a reference, and an empty panel. Choose **Show each status** to log each one's status.
+A failed load keeps the connections already showing. The panel doesn't fall back to `sref` when `data` is invalid. See [the full empty-state detail](/reference/components.md#sefaria-connections-panel). The example has a good reference, a text that isn't a reference, and an empty panel. Choose **Show each status** to log each one's status.
 
 <LiveEditor :code="connectionsPanelStates" title="Read status and listen for errors" />
 

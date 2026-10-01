@@ -112,10 +112,10 @@ describe.each(Object.entries(showTextPages))(
 
     it("covers the four zero states, status, and the error event", () => {
       for (const state of [
-        /Loading Micah 6:8\./,
+        /Loading Micah 6:8\.|a loading message/i,
         /can't be reached/,
         /isn't a reference/,
-        /No `sref` and no `data`/,
+        /no `sref` and no `data`/i,
       ]) {
         expect(page).toMatch(state);
       }
@@ -236,7 +236,7 @@ describe.each([
   {
     file: "docs/use-components/show-commentary-and-connected-texts.md",
     tag: "sefaria-connections-panel",
-    loading: "Loading connections for Micah 6:8.",
+    loading: "a loading message",
     errorEvent: "sefaria-connections-panel-error",
     required: [
       "`with-text`",
@@ -252,7 +252,7 @@ describe.each([
   {
     file: "docs/use-components/add-the-complete-reader.md",
     tag: "sefaria-reader",
-    loading: "Opening Reader...",
+    loading: "a loading message",
     errorEvent: "sefaria-reader-error",
     listedEvents: [
       "sefaria-reader-source-select",
