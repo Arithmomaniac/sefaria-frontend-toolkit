@@ -109,3 +109,5 @@ Example pages embed the complete first-party example apps, such as `/examples/li
 - When the library renames these identifiers, update the code spans and the mapping sentences. The prose terms stay the same.
 
 - Keep Mermaid edge labels to one or two words, such as Yes or No. Longer edge labels wrap and get clipped. Put detail in the node text or in the prose.
+
+- Install order: component pages put the script tag first, then the package. Data and text tools pages put the packages first, then the CDN import. Help › Install and status lists hosted files first, then packages, and its route paragraph uses the same order.
