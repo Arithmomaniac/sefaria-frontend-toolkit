@@ -98,3 +98,10 @@ Example pages embed the complete first-party example apps, such as `/examples/li
 - These frames are same-origin and first-party. They are **not** script-isolated: code in the frame can reach the parent page. Don't describe them as isolated.
 - The relaxed sandbox is only for built example apps that the repository owns. Never use it for code that readers can edit; `LiveEditor` keeps its `allow-scripts`-only sandbox.
 - `tests/site-session4.test.ts` checks that only the example pages use `allow-same-origin`.
+
+## Data-source terms
+
+- Call what the `acquisition` property sets a **data source**. The three choices are a **toolkit client**, a **custom loader**, and **loading disabled**.
+- A custom loader is the object that supplies `getText`, `getLinks`, or both. In code it is `{ kind: "capability", capability }`.
+- Map a term to its identifier once per page, at first use. Then use the term alone. Don't use "acquisition" or "capability" in prose.
+- When the library renames these identifiers, update the code spans and the mapping sentences. The prose terms stay the same.

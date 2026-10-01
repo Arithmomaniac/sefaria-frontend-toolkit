@@ -121,7 +121,7 @@ describe("C1 How the toolkit works", () => {
       /no requests?|zero requests?|doesn't make a request|makes no request/i,
     );
     expect(markdown).toMatch(/invalid[\s\S]{0,200}error/i);
-    expect(markdown).toMatch(/Reader[\s\S]{0,300}acquisition capability/);
+    expect(markdown).toMatch(/Reader[\s\S]{0,300}custom loader/);
   });
 
   it("tells one story and leaves styling to its owner page", async () => {

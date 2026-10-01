@@ -31,7 +31,7 @@ Element subpaths such as `/source-card` don't register their element. They expor
 
 ## Attributes and properties
 
-Strings and booleans can be attributes: `sref`, `selectable`, `layout`, `content-language`, `translation-language`, `vocalization-mode`, and similar settings. Objects and arrays can't be attributes. `data`, `acquisition`, and `selectedPosition` are JavaScript properties only. `status` is a read-only property.
+Strings and booleans can be attributes: `sref`, `selectable`, `layout`, `content-language`, `translation-language`, `vocalization-mode`, and similar settings. Objects and arrays can't be attributes. `data`, the data source (the `acquisition` property), and `selectedPosition` are JavaScript properties only. `status` is a read-only property.
 
 React 19 sets a prop as a property when the element has one with that name, so the React file passes `selectedPosition` as a prop. Alpine binds attributes, so the Alpine file sets the property with `x-effect="$el.selectedPosition = ..."`.
 
@@ -67,7 +67,7 @@ This example is the tested file `examples/alpine-vite/src/site-source-card.html`
 
 ## Requests
 
-A fresh load of each example makes one request, in any of the three frameworks. Re-rendering with the same values makes no request. Changing `sref`, `acquisition`, or the edition and language choices loads again. If you supplied `data`, the card instead redraws from your data with no request. Display settings such as `layout` and `content-language` never load again.
+A fresh load of each example makes one request, in any of the three frameworks. Re-rendering with the same values makes no request. Changing `sref`, the data source, or the edition and language choices loads again. If you supplied `data`, the card instead redraws from your data with no request. Display settings such as `layout` and `content-language` never load again.
 
 ## Loading, failure and empty states
 

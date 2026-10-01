@@ -39,13 +39,13 @@ The result's metadata (`_meta`) records the operation, status and effective requ
 
 ### The first answer
 
-The App gives the Reader an `sref` and an `acquisition` of kind `capability`. It does not assign Reader data. The App checks the first tool result. Then it serves the passage text from that result, with no extra request.
+The App gives the Reader an `sref` and a data source (the `acquisition` property) that is a custom loader (`kind: "capability"`). It does not assign Reader data. The App checks the first tool result. Then it serves the passage text from that result, with no extra request.
 
 The first connections come from the host. For a text result, the Reader makes one `get_links_between_texts` call through the chat host. A connections-only result shows its own connections with no follow-up request.
 
 ### Later navigation
 
-When you open a passage the App has not captured, the Reader needs new data. Going back to retained history stays local. Regrouping connections it already has also stays local. For anything else, the capability's `getText` and `getLinks` functions call the same server tools. They use `callServerTool` through the chat host.
+When you open a passage the App has not captured, the Reader needs new data. Going back to retained history stays local. Regrouping connections it already has also stays local. For anything else, the custom loader's `getText` and `getLinks` functions call the same server tools. They use `callServerTool` through the chat host.
 
 <<< ../../examples/mcp-app/src/app.ts#reader-acquisition{ts}
 
@@ -53,7 +53,7 @@ The App itself doesn't contact Sefaria. The example's tests check that a text re
 
 ### Toolkit and chat host
 
-The toolkit supplies the Reader, the acquisition adapter pattern and the example server. The chat host runs the tools, shows the App and decides when to call tools.
+The toolkit supplies the Reader, the custom loader pattern and the example server. The chat host runs the tools, shows the App and decides when to call tools.
 
 This example supports only Sefaria's default primary edition and its default translation.
 

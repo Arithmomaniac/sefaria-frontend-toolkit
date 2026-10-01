@@ -11,15 +11,14 @@ import { data as snippets } from "./snippets.data.ts";
 
 # Give components your own data
 
-Components normally load their text from Sefaria. If you already hold the response, or you want your own server to stand between the page and Sefaria, you can change that. There are two cases. With `data`, the element makes no request at all. With `acquisition`, it still loads, and navigates in the Reader, but through your route.
+Components normally load their text from Sefaria. If you already hold the response, or you want your own server to stand between the page and Sefaria, you can change that. There are two cases. With `data`, the element makes no request at all. With a data source, it still loads, and navigates in the Reader, but from the place you choose.
 
 Only three elements accept `data`. The Reader and the Connections Panel don't, because they change as the reader navigates.
 
 | You have… | Use… |
 | --- | --- |
 | A response you saved, fetched on your server, received from an MCP tool, or exported, for a Text Segment, Bilingual Segment, or Source Card | The element's `data` property |
-| A route to Sefaria that your host controls | The element's `acquisition` property (advanced) |
-| Local data for a Reader or Connections Panel | A capability, described in [Serve local data to a Reader](#serve-local-data-to-a-reader) (advanced) |
+| Control where a component gets its data, such as local data for a Reader or Connections Panel | Its data source (advanced), described in [Control loading](#control-loading) |
 
 Both cases start from corrected API-shaped JSON. That is the JSON body Sefaria's API returns, in the shape the toolkit's corrected API description expects.
 
@@ -45,7 +44,7 @@ What happens with data that isn't usable:
 
 - **Invalid data.** The element shows its error state and drops any content it showed before. It cancels any load in progress and doesn't fall back to loading `sref`.
 - **Valid but empty data.** It is still authoritative. The element shows its empty state and doesn't load `sref`.
-- **Data set back to `undefined`.** A connected element with a non-blank `sref` loads from it again, through its acquisition choice.
+- **Data set back to `undefined`.** A connected element with a non-blank `sref` loads from it again, through its data source.
 
 Supplied data also follows the element's `translation-fallback` setting. It defaults to `none` on Text Segment and Bilingual Segment, and to `default` on Source Card. If the data lacks the translation language you asked for, the element shows the same "No french text." state as a live load would. It never requests the default translation. The [Components reference](/reference/components.md) describes each element's states.
 
@@ -55,40 +54,44 @@ To see the failure in your own code as well, read [Handle errors in your code](/
 
 Most pages don't need this section.
 
-### Route loading through your host
+### Choose a data source
 
-To control where an element loads from, set its `acquisition` property to one of three choices:
+Choose where the component gets its data: use a toolkit client, provide a custom loader, or disable loading. A custom loader supplies `getText`, `getLinks`, or both, using local data or your own service.
 
-- `{ kind: "client", client }`: use a client you created with `createSefariaClient`, with that client's cache settings.
-- `{ kind: "capability", capability }`: use your own functions.
-- `{ kind: "disabled" }`: don't load anything.
+In code, the data source is the `acquisition` property. A custom loader is `{ kind: "capability", capability: { getText, getLinks } }`.
 
-To set the shared default instead, call `configureSefariaAcquisition(choice)`. Elements with their own `acquisition` ignore it. You can call it again until the first element uses the shared default. After that, it throws.
+The three choices are:
 
-With `capability` or `disabled`, the element never falls back to requesting Sefaria from the browser.
+- **Toolkit client**, `{ kind: "client", client }`. Use a client you created with `createSefariaClient`, with that client's cache settings.
+- **Custom loader**, `{ kind: "capability", capability }`. Use your own functions.
+- **Loading disabled**, `{ kind: "disabled" }`. Don't load anything.
 
-A capability is an object with either or both of two async functions, `getText` and `getLinks`. Each takes a request and an `AbortSignal`, and returns `{ payload, status }`. The component validates the payload. The type names are in [Package imports and exports](/reference/package-imports-and-exports.md).
+To set the shared data source instead, call `configureSefariaAcquisition(choice)`. Elements with their own `acquisition` ignore it. You can call it again until the first element uses the shared data source. After that, it throws.
 
-If an element needs a function your capability doesn't have, the load fails with an error. With `disabled`, any load the element attempts fails with "Standalone Sefaria acquisition is disabled." That includes the text a Reader asks for. If a later load fails, an element that already showed text keeps it. Its `status` becomes `error`, and its error event fires. [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md) shows how to read both.
+With a custom loader or loading disabled, the element never falls back to requesting Sefaria from the browser.
 
-### Serve local data to a Reader
+A custom loader is an object with either or both of two async functions, `getText` and `getLinks`. Its type is `SefariaAcquisitionCapability`. Each function takes a request and an `AbortSignal`, and returns `{ payload, status }`. The component validates the payload. The type names are in [Package imports and exports](/reference/package-imports-and-exports.md).
 
-The Reader and the Connections Panel have no `data` property. To show data you already hold, give them a capability with `acquisition`. The capability answers from your local data for the references it has. For any other reference, it throws a clear error or hands the request to another source.
+If an element needs a function your custom loader doesn't have, the load fails with an error. With loading disabled, any load the element attempts fails with "Standalone Sefaria acquisition is disabled." That includes the text a Reader asks for. If a later load fails, an element that already showed text keeps it. Its `status` becomes `error`, and its error event fires. [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md) shows how to read both.
+
+### Serve local data with a custom loader
+
+The Reader and the Connections Panel have no `data` property. To show data you already hold, give them a custom loader through `acquisition`. The custom loader answers from your local data for the references it has. For any other reference, it throws a clear error or hands the request to another source.
 
 The Reader asks for the text of its root reference. It may also ask for the surrounding section, and for links. Serve each reference you want it to show. Each response is checked like any other payload.
 
 <CodeLanguageToggle :snippet="snippets['local-reader-capability']" />
 
-This example serves only `Micah 6:8`. The Reader loads without any request to Sefaria. The only request is your own `/data/micah-6-8.json`. Navigating to another reference fails with the error the capability throws.
+This example serves only `Micah 6:8`. The Reader loads without any request to Sefaria. The only request is your own `/data/micah-6-8.json`. Navigating to another reference fails with the error the custom loader throws.
 
 #### Example: a Reader inside AI chat
 
-The MCP App example is an app shown inside an AI chat. It passes `createMcpReaderAcquisition(host)` to the Reader:
+The MCP App example is an app shown inside an AI chat. It passes `createMcpReaderAcquisition(host)`, a custom loader, to the Reader:
 
 <CodeLanguageToggle :snippet="snippets['mcp-reader-acquisition']" />
 
 `getText` calls the MCP server tool `get_text`. `getLinks` calls `get_links_between_texts`. Both go through `host.callServerTool` and pass the signal along, so the host learns when work is cancelled. The code checks each tool result with `admitSourceResponse` or `admitConnectionsResponse` before returning it.
 
-This capability supports only the Reader's default selectors, the primary edition plus the translation, and it throws for others. It provides both functions. This Reader loads and navigates through the host tools and makes no direct browser requests to Sefaria. See [Reader inside AI chat](/examples/reader-inside-ai-chat.md).
+This custom loader supports only the Reader's default selectors, the primary edition plus the translation, and it throws for others. It provides both functions. This Reader loads and navigates through the host tools and makes no direct browser requests to Sefaria. See [Reader inside AI chat](/examples/reader-inside-ai-chat.md).
 
 <span class="learn-more__label">Learn more:</span> [How the toolkit works](/concepts/how-the-toolkit-works.md) · [Client reference](/reference/client.md) {.learn-more}

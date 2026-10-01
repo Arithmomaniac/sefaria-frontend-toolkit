@@ -105,7 +105,7 @@ Once the Reader has shown content, removing `sref` doesn't clear it. To react to
 
 ## Use your own data
 
-The Reader has no `data` property. If your host already has text or links, give the Reader an acquisition capability with `getText` and `getLinks`. See [Control loading](/data-and-text-tools/give-components-your-own-data.md#control-loading).
+The Reader has no `data` property. If your host already has text or links, give the Reader a custom loader (`kind: "capability"`) with `getText` and `getLinks`. See [Control loading](/data-and-text-tools/give-components-your-own-data.md#control-loading).
 
 ## When to compose instead
 
