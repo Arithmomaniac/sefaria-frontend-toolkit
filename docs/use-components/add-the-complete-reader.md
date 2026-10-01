@@ -12,14 +12,14 @@ import reader from "../../examples/site-snippets/reader.html?raw";
 
 # Add the complete Reader
 
-The Reader, `<sefaria-reader>`, is the recommended choice when you want a finished reading surface instead of assembling one from parts. Give it a reference and it shows the text, the connections, a Back button, and a history trail (breadcrumbs).
+The Reader, `<sefaria-reader>`, is the recommended choice when you want a finished reading surface instead of assembling one from parts. It's a composition of two components, a Source Card and a Connections Panel, plus navigation. Give it a reference and it shows the text, the connections, a Back button, and a history trail (breadcrumbs).
 
 ## What the Reader shows
 
-The Reader has two panes:
+The Reader puts a Source Card and a Connections Panel side by side, and adds navigation.
 
-- **Text** shows the passage in its chapter. For a reference that Sefaria loads, the Text pane opens the surrounding section and selects the matching item. For `Micah 6:8`, that is the chapter `Micah 6` with verse 8 selected.
-- **Connections** is the same connections panel described in [Show commentary and connected texts](/use-components/show-commentary-and-connected-texts.md).
+- **Text** is a [Source Card](/use-components/show-an-attributed-passage.md) without its header. It shows the surrounding section with the requested verse selected. For Micah 6:8, that is the chapter Micah 6 with verse 8 selected.
+- **Connections** is a [Connections Panel](/use-components/show-commentary-and-connected-texts.md).
 
 ## Add the Reader and a toolbar button
 
@@ -31,12 +31,17 @@ Put your own button inside the Reader with `slot="toolbar-actions"`. In its clic
 
 <span class="learn-more__label">Learn more:</span> [Make components respond to each other](/across-components/make-components-respond-to-each-other.md) · [Reference › Components](/reference/components.md) {.learn-more}
 
-## What the Reader does by itself
+## What the Reader adds
 
-- Selecting a verse loads that verse's connections.
-- Choosing a connection opens that text as a new history entry.
-- Back returns to the previous entry.
-- On a narrow Reader (40rem wide or less), a Text/Connections switch shows one pane at a time. A wider Reader shows both panes side by side.
+Beyond the two parts, the Reader adds:
+
+- **Verse selection.** Selecting a verse loads that verse's connections.
+- **Opening connections.** Choosing a connection opens that text as a new history entry.
+- **History.** Back and the breadcrumbs return to earlier entries.
+- **A toolbar.** Add your own buttons with slot="toolbar-actions".
+- **Shared choices.** One data source and one set of text choices carry across navigation.
+- **State and events.** Reader-level state and events, such as selectedRef.
+- **A narrow layout.** At 40rem wide or less, a Text/Connections switch shows one pane at a time.
 
 ## What your page does
 
@@ -49,9 +54,8 @@ The Reader's interaction events tell your page what happened. They are cancelabl
 - `sref`: the reference to open.
 - `active-pane`: which pane shows on a narrow Reader, `source` (the default) or `connections`.
 - `primary-version-title` and `translation-version-title` choose editions for the reference you open and its section. When a reader opens a connection, `translation-language` carries over. Those exact edition titles don't.
-- `layout`, `content-language`, `side-order`, `vocalization-mode`, and `translation-language` mean the same as in [Show Hebrew and translation together](/use-components/show-text/hebrew-and-translation.md). Here `layout` arranges Hebrew and translation inside the text, not the Reader's panes.
-- `translation-fallback`: `default` or `none`. The Reader's default is `default`. Bilingual Segment defaults to `none`. See [Choose what text readers see](/across-components/choose-what-text-readers-see.md) for the shared choices.
-- `hide-attributions`: hides the edition attribution on each displayed side. Bilingual Segment has no such attribute.
+- `layout`, `content-language`, `side-order`, `vocalization-mode`, `translation-language`, `translation-fallback`, and `hide-attributions` are text attributes. The Reader passes them to the Source Card inside it. See [Show Hebrew and translation together](/use-components/show-text/hebrew-and-translation.md) for what they do. Here `layout` arranges Hebrew and translation inside the text, not the Reader's panes.
+- `translation-fallback`: the Reader's default is `default`. See [Choose what text readers see](/across-components/choose-what-text-readers-see.md) for the shared choices.
 - `show-connection-previews`: shows connection preview text. This option is on by default. To turn it off, set `reader.showConnectionPreviews = false`. The attribute can't turn it off.
 - `chat-export`: shows a `Send … to chat` button when a selected text is open. The button fires `sefaria-reader-chat-export`. Your page does the sending.
 
@@ -61,18 +65,14 @@ Read-only properties include `status`, `selectedRef`, `canGoBack`, and `currentE
 
 These events bubble and cross the component boundary. The `detail` of an interaction event includes `originEntryId`, the history entry where it happened.
 
-| Event | Details (interaction events also include `originEntryId`) |
-| --- | --- |
-| `sefaria-reader-back` | None |
-| `sefaria-reader-history-activate` | `{ entryId, label }` |
-| `sefaria-reader-pane-change` | `{ pane }` |
-| `sefaria-reader-chat-export` | `{ targetRef }` |
-| `sefaria-reader-source-select` | `{ position, ref }` |
-| `sefaria-reader-connections-category-change` | `{ category }` |
-| `sefaria-reader-connections-page-change` | `{ page }` |
-| `sefaria-reader-connection-select` | `{ id, targetRef }` |
-| `sefaria-reader-connections-preview-request` | None |
-| `sefaria-reader-error` | `{ error, sref }` only |
+| Event | When it fires | `detail` |
+| --- | --- | --- |
+| `sefaria-reader-source-select` | A reader selected a verse. Cancel it with `preventDefault()` to keep the Reader from selecting that verse. | `{ originEntryId, position, ref }` |
+| `sefaria-reader-connection-select` | A reader opened a connection. Cancel it with `preventDefault()` to keep the Reader from opening that text. | `{ originEntryId, id, targetRef }` |
+| `sefaria-reader-back` | A reader asked to go back to the previous entry. Cancel it with `preventDefault()` to stay on the current entry. | `{ originEntryId }` |
+| `sefaria-reader-error` | Loading failed or the starting data was rejected. Show a message or log it. | `{ error, sref }` only |
+
+For every Reader event, see [Reference › Components](/reference/components.md#sefaria-reader).
 
 ## How many requests it makes
 
@@ -109,7 +109,7 @@ The Reader has no `data` property. If your host already has text or links, give 
 
 ## When to compose instead
 
-Use the complete Reader when you want built-in navigation and history in one surface. To get your own pane layout, several synchronized text panes, or your own navigation controls, compose individual components instead. See the [Composed multi-pane Reader](/examples/composed-multi-pane-reader.md) example.
+Use the complete Reader when you want its Source Card, Connections Panel, and built-in navigation and history in one surface. To get your own pane layout, several synchronized text panes, or your own navigation controls, compose individual components instead. See the [Composed multi-pane Reader](/examples/composed-multi-pane-reader.md) example.
 
 ## Next steps
 

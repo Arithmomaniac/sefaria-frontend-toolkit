@@ -254,6 +254,12 @@ describe.each([
     tag: "sefaria-reader",
     loading: "Opening Reader...",
     errorEvent: "sefaria-reader-error",
+    listedEvents: [
+      "sefaria-reader-source-select",
+      "sefaria-reader-connection-select",
+      "sefaria-reader-back",
+      "sefaria-reader-error",
+    ],
     required: [
       "`active-pane`",
       "`layout`",
@@ -263,37 +269,42 @@ describe.each([
       "(/concepts/how-the-toolkit-works.md)",
     ],
   },
-])("$tag page", ({ file, tag, loading, errorEvent, required }) => {
-  const page = read(file);
+])(
+  "$tag page",
+  ({ file, tag, loading, errorEvent, required, listedEvents }) => {
+    const page = read(file);
 
-  it("is written and lists every generated event", () => {
-    expect(page).not.toMatch(/^stub: true$/m);
-    expect(page).not.toContain("<StatusNote");
-    for (const event of declaration(tag).events!.map((entry) => entry.name)) {
-      expect(page).toContain(`\`${event}\``);
-    }
-    expect(page).toContain(`\`${errorEvent}\``);
-  });
+    it("is written and lists the events readers most need", () => {
+      expect(page).not.toMatch(/^stub: true$/m);
+      expect(page).not.toContain("<StatusNote");
+      const generated = declaration(tag).events!.map((entry) => entry.name);
+      for (const event of listedEvents ?? generated) {
+        expect(generated).toContain(event);
+        expect(page).toContain(`\`${event}\``);
+      }
+      expect(page).toContain(`\`${errorEvent}\``);
+    });
 
-  it("covers zero states, status, links, and the brief's questions", () => {
-    for (const text of [
-      loading,
-      "can't be reached",
-      "isn't a reference",
-      "`empty`",
-      "`loading`",
-      "`ready`",
-      "`error`",
-      "(/help/troubleshoot-a-page.md)",
-      "(/data-and-text-tools/give-components-your-own-data.md",
-      "(/reference/components.md",
-      ...required,
-    ]) {
-      expect(page).toContain(text);
-    }
-    expect(page).not.toContain("Genesis 1:1");
-  });
-});
+    it("covers zero states, status, links, and the brief's questions", () => {
+      for (const text of [
+        loading,
+        "can't be reached",
+        "isn't a reference",
+        "`empty`",
+        "`loading`",
+        "`ready`",
+        "`error`",
+        "(/help/troubleshoot-a-page.md)",
+        "(/data-and-text-tools/give-components-your-own-data.md",
+        "(/reference/components.md",
+        ...required,
+      ]) {
+        expect(page).toContain(text);
+      }
+      expect(page).not.toContain("Genesis 1:1");
+    });
+  },
+);
 
 describe("Across components pages", () => {
   const look = read("docs/across-components/match-your-sites-look.md");

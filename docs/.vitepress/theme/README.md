@@ -46,6 +46,7 @@ Data and text tool pages show every snippet with `<CodeLanguageToggle :snippet>`
 - End with one Learn-more link to the owner page's section. The owner page must stand alone, so a reader who lands there first can finish.
 - Later pages may give a one-sentence reminder when an example needs it, then link to the owner. They don't copy tables or full rules.
 - Keep request counts next to each operation.
+- List only the events readers most likely need on a how-to page, each with a one-line description. Link to the components reference for the full list.
 - Put rules for one component's attributes, which interrupt the narrative, in a `::: info` box with a short title, as bullets.
 - Leave a blank line before a closing `:::`. Otherwise Prettier joins it to the line above and the box swallows the rest of the page. A site test checks this.
 
