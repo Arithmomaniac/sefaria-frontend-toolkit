@@ -24,9 +24,29 @@ Want ready-made UI? [Use components](/use-components/start-here.md).
 
 <StatusNote />
 
-Install `@arithmomaniac/sefaria-client`, `@arithmomaniac/sefaria-text-transform`, or both. They are on GitHub Packages, which needs an access token before you can install. [Install and status](/help/install-and-status.md) shows how to set up the token and gives the exact install command for the current version. These steps need Node.js 22.12 or later.
+Use the CDN route if you want no install step. Use the package route if your app already has a build step. These steps need Node.js 22.12 or later for the package route.
 
-Each example below is a complete ES module. Save the JavaScript version as a file such as `fetch.mjs` and run `node fetch.mjs`. For the TypeScript version, save it as `fetch.ts` and use your usual TypeScript tooling. Node.js 22.18 and later can also run it directly with `node fetch.ts`.
+### No install
+
+Import the files straight from the CDN. This needs no token. It works in a browser page with `<script type="module">`, in Deno, and anywhere else that imports from URLs. The Run buttons on this page use exactly these files.
+
+```html
+<script type="module">
+  import {
+    createSefariaClient,
+    text,
+  } from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-client.js";
+  import { normalizeText } from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-text-transform.js";
+</script>
+```
+
+The `alpha` address serves the newest build, and it changes without notice. [Install and status](/help/install-and-status.md) shows how to find hosted versions.
+
+### Packages
+
+Install `@arithmomaniac/sefaria-client`, `@arithmomaniac/sefaria-text-transform`, or both. They are on GitHub Packages, which needs an access token before you can install. [Install and status](/help/install-and-status.md) shows how to set up the token and gives the exact install command for the current version.
+
+The examples below import the package names. With the CDN route, replace the package name in the import with the CDN URL. Each example below is a complete ES module. Save the JavaScript version as a file such as `fetch.mjs` and run `node fetch.mjs`. For the TypeScript version, save it as `fetch.ts` and use your usual TypeScript tooling. Node.js 22.18 and later can also run it directly with `node fetch.ts`.
 
 ## Fetch one checked response
 

@@ -32,7 +32,7 @@ The pinned path is `https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn
 
 ### Data and text-tool modules
 
-**Implementation status:** local build and deterministic qualification are implemented, but no release containing these files has been hosted yet. Builds also produce two self-contained, minified ES modules beside `sefaria-elements.js`. Each one re-exports one package root API.
+**Implementation status:** local build, deterministic qualification, and hosting are implemented. The `alpha` channel and releases since PR #47 serve all three modules. Older pinned releases serve only `sefaria-elements.js`. Builds produce two self-contained, minified ES modules beside `sefaria-elements.js`. Each one re-exports one package root API.
 
 | File                        | Package root                            |
 | --------------------------- | --------------------------------------- |

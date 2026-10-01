@@ -15,7 +15,7 @@ You can add the toolkit to a page with one script tag, or install it as npm pack
 
 | Route | Choose it when |
 | --- | --- |
-| Script tag | You have a plain HTML page and want the components without a build step. |
+| Script tag | You have a plain HTML page and want the components, client, or text tools without a build step. |
 | Packages | You have a build tool, a framework, or code that calls the client or text tools. |
 
 ## Script tag
@@ -41,6 +41,17 @@ The `alpha` address serves the newest build, and it changes without notice. To s
 To find versions, open [the list of hosted versions](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/index.html). It shows which versions are active and which version the `alpha` address serves right now. Programs can read the same list as JSON from [catalog.json](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/catalog.json).
 
 Pinned addresses stay available while their version is active. A version can be retired without notice, so check the list when you update your page.
+
+### Client and text tools
+
+The same address folder also serves the client and the text tools as ES modules. No token is needed. Import them in a module script:
+
+```js
+import { createSefariaClient } from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-client.js";
+import { normalizeText } from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-text-transform.js";
+```
+
+Pinning works the same way. Swap lpha for a version number. Older versions only have sefaria-elements.js, so check that the version you pick serves these files. Each module is independent. It does not share a client or cache with the elements module. To use them, see [Data and text tools: start here](/data-and-text-tools/start-here.md).
 
 ## Packages
 
