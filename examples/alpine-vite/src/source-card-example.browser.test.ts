@@ -25,7 +25,7 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-test("assigns declarative data and acquisition, receives selection, and loads only on submit", async () => {
+test("assigns declarative data and source, receives selection, and loads only on submit", async () => {
   const fetch = vi.fn(createMicahFixtureFetch(fixture));
   provider = () => createAlpineSourceCardExample(fixtureClient(fetch));
   root = mountExample();
@@ -34,9 +34,7 @@ test("assigns declarative data and acquisition, receives selection, and loads on
   expect(fetch).not.toHaveBeenCalled();
   expect(card.data).toEqual(fixture);
   expect(card.sref).toBe("");
-  expect(card.acquisition).toEqual(
-    expect.objectContaining({ kind: "capability" }),
-  );
+  expect(card.source).toEqual(expect.objectContaining({ kind: "custom" }));
 
   setSelect(root, "#layout", "stacked");
   setSelect(root, "#side-order", "translation-first");
@@ -76,7 +74,7 @@ test("assigns declarative data and acquisition, receives selection, and loads on
   );
 });
 
-test("lets the element report acquisition errors without a duplicate Alpine alert", async () => {
+test("lets the element report source errors without a duplicate Alpine alert", async () => {
   const error = new Error("Network unavailable.");
   const fetch = vi.fn(async () => {
     throw error;

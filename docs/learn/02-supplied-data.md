@@ -35,7 +35,7 @@ card.setAttribute("selectable", "");
 
 ## Expected result
 
-The element validates the component-specific raw input, privately prepares it, and renders the text and attribution. Defined `data` is authoritative and suppresses `sref`, including valid empty data. Invalid supplied data also suppresses acquisition and becomes an accessible validation failure.
+The element validates the component-specific raw input, privately prepares it, and renders the text and attribution. Defined `data` is authoritative and suppresses `sref`, including valid empty data. Invalid supplied data also suppresses source and becomes an accessible validation failure.
 
 ## Who owns what
 

@@ -9,15 +9,15 @@ applyTo: "examples/mcp-app/**,examples/linked-article/**,docs/specs/integrations
 
 - Integrate through built artifacts and public contracts.
 - Do not copy the Sefaria Web application, mobile application, Linker, or MCP server.
-- Let integrations own host input, activation policy, optional client or capability creation, and application-specific coordination.
+- Let integrations own host input, activation policy, optional client or loader creation, and application-specific coordination.
 - Prefer direct `sref` or validated raw `data` assignment to public elements.
 - Do not construct or pass public prepared rendering models.
 - Put a corrected API payload in MCP `structuredContent`; when MCP requires an object root for an array-shaped endpoint response, wrap the unchanged payload in the smallest specified integration envelope.
 - Validate unknown MCP or server JSON with a public corrected `@arithmomaniac/sefaria-client` schema or generated validator.
 - Report structured JSON paths before projection.
-- Feed validated server-provided data through the same element-owned private preparation used after acquisition.
+- Feed validated server-provided data through the same element-owned private preparation used after source.
 - Make the first MCP render use zero requests.
-- Keep MCP continuation acquisition host-proxied. Do not let the App or element fall back to direct Sefaria HTTP.
+- Keep MCP continuation source host-proxied. Do not let the App or element fall back to direct Sefaria HTTP.
 - Do not add component HTML server rendering or hydration.
 - Replace an alternate private wire format atomically.
 - Do not add a dual-reader compatibility path.

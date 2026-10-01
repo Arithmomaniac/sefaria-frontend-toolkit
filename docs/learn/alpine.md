@@ -8,14 +8,14 @@ Render supplied Source Card data first, switch to standalone `sref` after explic
 
 ## Try it
 
-Keep scalar inputs as Alpine host state. Assign the rich supplied payload and acquisition source as properties during attachment:
+Keep scalar inputs as Alpine host state. Assign the rich supplied payload and data source as properties during attachment:
 
 ```ts
 return {
   sref: "",
   attach(element: SefariaSourceCard) {
     element.data = suppliedPayload;
-    element.acquisition = { kind: "client", client };
+    element.source = { kind: "client", client };
   },
   load(element: SefariaSourceCard) {
     const next = this.tref.trim();
@@ -27,7 +27,7 @@ return {
   destroy(element: SefariaSourceCard) {
     element.data = undefined;
     this.sref = "";
-    element.acquisition = { kind: "disabled" };
+    element.source = { kind: "disabled" };
   },
 };
 ```
@@ -48,9 +48,9 @@ return {
 
 ## Expected result
 
-Supplied `Micah 6:8` data renders with zero requests. Form submission clears authoritative data and updates the `sref` attribute. The element owns acquisition and lifecycle; Alpine owns draft input, presentation, host status, and event handling.
+Supplied `Micah 6:8` data renders with zero requests. Form submission clears authoritative data and updates the `sref` attribute. The element owns source and lifecycle; Alpine owns draft input, presentation, host status, and event handling.
 
-Changing scalar presentation attributes makes zero requests. The small property effect exists only for the array-valued `selectedPosition`; destroy cleanup clears property-only inputs and disables acquisition.
+Changing scalar presentation attributes makes zero requests. The small property effect exists only for the array-valued `selectedPosition`; destroy cleanup clears property-only inputs and disables source.
 
 <iframe class="example-frame" title="Alpine custom-element integration" src="../examples/alpine/index.html"></iframe>
 
@@ -60,7 +60,7 @@ Changing scalar presentation attributes makes zero requests. The small property 
 
 ## Who owns what
 
-Alpine owns form state, activation, presentation, selection, and host status. The element owns acquisition, lifecycle, private preparation, and rendering.
+Alpine owns form state, activation, presentation, selection, and host status. The element owns source, lifecycle, private preparation, and rendering.
 
 ## Exercise
 

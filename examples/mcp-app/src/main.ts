@@ -8,7 +8,7 @@ import {
 
 import {
   createConnectionsInteraction,
-  createMcpReaderDataSource,
+  createMcpReaderSource,
   renderReaderToolResult,
   renderStatus,
   waitForMcpConnection,
@@ -46,7 +46,7 @@ if (search.has("standalone")) {
 } else {
   const app = new App({ name: "Sefaria MCP App", version: "0.0.0" });
   let disposeResult = (): void => {};
-  const dataSource = createMcpReaderDataSource({
+  const source = createMcpReaderSource({
     callServerTool: async (params, options) => {
       await waitForMcpConnection(connected, options?.signal);
       if (app.getHostCapabilities()?.serverTools === undefined) {
@@ -61,12 +61,7 @@ if (search.has("standalone")) {
 
   app.ontoolresult = (result) => {
     disposeResult();
-    disposeResult = renderReaderToolResult(
-      root,
-      result,
-      dataSource,
-      interaction,
-    );
+    disposeResult = renderReaderToolResult(root, result, source, interaction);
   };
   app.ontoolcancelled = () => {
     disposeResult();

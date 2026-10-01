@@ -1258,17 +1258,17 @@
             "ConnectionsProjection",
             "ConnectionsRequest",
             "ReaderPane",
-            "SefariaAcquisition",
-            "SefariaAcquisitionCapability",
-            "SefariaAcquisitionResponse",
             "SefariaBilingualSegment",
             "SefariaConnectionsPanel",
+            "SefariaDataLoader",
+            "SefariaDataLoaderResponse",
+            "SefariaDataSource",
             "SefariaElement",
             "SefariaElementStatus",
-            "SefariaLinksAcquisitionRequest",
+            "SefariaLinksLoadRequest",
             "SefariaReader",
             "SefariaSourceCard",
-            "SefariaTextAcquisitionRequest",
+            "SefariaTextLoadRequest",
             "SefariaTextSegment",
             "SourceCardRequest",
             "TextSegmentReferenceData",
@@ -1278,21 +1278,21 @@
             "TextSegmentSelectedVersionInfo",
             "TextSegmentVersionMetadata",
             "TextSegmentVersionSelection",
-            "configureSefariaAcquisition",
+            "configureSefariaDataSource",
             "sefariaTokenDefaults"
           ]
         },
         {
-          "subpath": "./acquisition",
-          "types": "./dist/acquisition.d.ts",
-          "import": "./dist/acquisition.js",
+          "subpath": "./data-source",
+          "types": "./dist/data-source.d.ts",
+          "import": "./dist/data-source.js",
           "declarations": [
-            "SefariaAcquisition",
-            "SefariaAcquisitionCapability",
-            "SefariaAcquisitionResponse",
-            "SefariaLinksAcquisitionRequest",
-            "SefariaTextAcquisitionRequest",
-            "configureSefariaAcquisition"
+            "SefariaDataLoader",
+            "SefariaDataLoaderResponse",
+            "SefariaDataSource",
+            "SefariaLinksLoadRequest",
+            "SefariaTextLoadRequest",
+            "configureSefariaDataSource"
           ]
         },
         {
@@ -1320,10 +1320,10 @@
           "types": "./dist/reader-public.d.ts",
           "import": "./dist/reader-public.js",
           "declarations": [
-            "ReaderDataSource",
             "ReaderPane",
+            "ReaderRecordLoader",
             "ReaderResolvedSource",
-            "createSefariaReaderDataSource",
+            "createSefariaReaderRecordLoader",
             "resolveReaderSource"
           ]
         },

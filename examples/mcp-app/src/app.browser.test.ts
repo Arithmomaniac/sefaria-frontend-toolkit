@@ -11,7 +11,7 @@ import genesisTarget from "../../../packages/client/test/fixtures/v3-connections
 import { v3SourceBackedPayload } from "../../../tests/compatibility/src/v3-source-backed.fixture.js";
 import {
   createConnectionsInteraction,
-  createMcpReaderDataSource,
+  createMcpReaderSource,
   renderReaderToolResult,
   waitForMcpConnection,
 } from "./app.js";
@@ -29,7 +29,7 @@ test("seeds the stateful reader before loading initial connections through the h
   const cleanup = renderReaderToolResult(
     root(),
     toolResult(200, structuredClone(v3SourceBackedPayload)),
-    createMcpReaderDataSource({ callServerTool }),
+    createMcpReaderSource({ callServerTool }),
   );
 
   const reader = readerElement();
@@ -67,7 +67,7 @@ test("renders a connections-only result without a continuation request", async (
       true,
       "Micah 6:8",
     ),
-    createMcpReaderDataSource({ callServerTool }),
+    createMcpReaderSource({ callServerTool }),
   );
 
   await vi.waitFor(
@@ -85,13 +85,13 @@ test("calls the named-host source tool with default selectors and preserves abor
   const callServerTool = vi
     .fn()
     .mockResolvedValue(toolResult(200, structuredClone(v3SourceBackedPayload)));
-  const acquisition = createMcpReaderDataSource({ callServerTool });
+  const source = createMcpReaderSource({ callServerTool });
   const controller = new AbortController();
 
-  if (acquisition.kind !== "capability" || !acquisition.capability.getText) {
-    throw new Error("MCP text capability is missing.");
+  if (source.kind !== "custom" || !source.loader.getText) {
+    throw new Error("MCP text loader is missing.");
   }
-  const content = await acquisition.capability.getText(
+  const content = await source.loader.getText(
     {
       sref: "Genesis 1:1",
       versions: ["primary", "translation"],
@@ -136,13 +136,13 @@ test("rejects a host result whose effective connections request does not match",
   const callServerTool = vi
     .fn()
     .mockResolvedValue(connectionsToolResult(200, [], true, "Micah 6:8"));
-  const acquisition = createMcpReaderDataSource({ callServerTool });
+  const source = createMcpReaderSource({ callServerTool });
 
-  if (acquisition.kind !== "capability" || !acquisition.capability.getLinks) {
-    throw new Error("MCP links capability is missing.");
+  if (source.kind !== "custom" || !source.loader.getLinks) {
+    throw new Error("MCP links loader is missing.");
   }
   await expect(
-    acquisition.capability.getLinks(
+    source.loader.getLinks(
       { sref: "Genesis 1:1", withText: true },
       new AbortController().signal,
     ),
@@ -182,7 +182,7 @@ test("builds a reader hierarchy and restores any retained breadcrumb locally", a
   const cleanup = renderReaderToolResult(
     root(),
     toolResult(200, structuredClone(genesisTarget), "Genesis 1:2"),
-    createMcpReaderDataSource({ callServerTool }),
+    createMcpReaderSource({ callServerTool }),
   );
   const reader = readerElement();
   await waitForCurrentEntry(reader);
@@ -265,7 +265,7 @@ test("reprojects retained connections locally", async () => {
   const cleanup = renderReaderToolResult(
     root(),
     connectionsToolResult(200, pagedLinks(), true),
-    createMcpReaderDataSource({ callServerTool }),
+    createMcpReaderSource({ callServerTool }),
   );
   const panel = panelElement();
   await vi.waitFor(() => expect(panel.status).toBe("ready"), {
@@ -306,7 +306,7 @@ test("loads missing previews through one same-App tool call", async () => {
       false,
       "Micah 6:8",
     ),
-    createMcpReaderDataSource({ callServerTool }),
+    createMcpReaderSource({ callServerTool }),
   );
   const panel = panelElement();
   await vi.waitFor(() => expect(panel.status).toBe("ready"), {
@@ -337,7 +337,7 @@ test("surfaces a host tool failure as unavailable reader connections", async () 
   const cleanup = renderReaderToolResult(
     root(),
     toolResult(200, structuredClone(v3SourceBackedPayload)),
-    createMcpReaderDataSource({ callServerTool }),
+    createMcpReaderSource({ callServerTool }),
   );
   const reader = readerElement();
 
@@ -363,7 +363,7 @@ test("aborts a pending host continuation when the App result is disposed", async
   const cleanup = renderReaderToolResult(
     root(),
     toolResult(200, structuredClone(v3SourceBackedPayload)),
-    createMcpReaderDataSource({ callServerTool }),
+    createMcpReaderSource({ callServerTool }),
   );
 
   await vi.waitFor(() => expect(signal).toBeDefined());
@@ -380,7 +380,7 @@ test("keeps explicit chat export separate from reader data calls", async () => {
   const cleanup = renderReaderToolResult(
     root(),
     toolResult(200, structuredClone(v3SourceBackedPayload)),
-    createMcpReaderDataSource({ callServerTool }),
+    createMcpReaderSource({ callServerTool }),
     { sendMessage },
   );
   const reader = readerElement();
@@ -418,7 +418,7 @@ test("does not retry rejected, concurrent, or stale chat exports", async () => {
   const cleanup = renderReaderToolResult(
     root(),
     toolResult(200, structuredClone(v3SourceBackedPayload)),
-    createMcpReaderDataSource({ callServerTool }),
+    createMcpReaderSource({ callServerTool }),
     { sendMessage },
   );
   const reader = readerElement();
@@ -478,7 +478,7 @@ test("maps the host secondary surface to the reader muted surface", async () => 
   const cleanup = renderReaderToolResult(
     root(),
     connectionsToolResult(200, [], true),
-    createMcpReaderDataSource({ callServerTool: vi.fn() }),
+    createMcpReaderSource({ callServerTool: vi.fn() }),
   );
   const panel = panelElement();
   await panel.updateComplete;
@@ -490,7 +490,7 @@ test("reports structured paths for invalid corrected payloads", () => {
   renderReaderToolResult(
     root(),
     toolResult(200, { versions: "wrong" }),
-    createMcpReaderDataSource({ callServerTool: vi.fn() }),
+    createMcpReaderSource({ callServerTool: vi.fn() }),
   );
 
   expect(root().querySelector('[role="alert"]')?.textContent).toContain(
@@ -503,7 +503,7 @@ test("renders a documented source 404 without constructing a reader", () => {
   renderReaderToolResult(
     root(),
     toolResult(404, { error: "Unknown reference." }),
-    createMcpReaderDataSource({ callServerTool: vi.fn() }),
+    createMcpReaderSource({ callServerTool: vi.fn() }),
   );
 
   expect(root().querySelector('[role="alert"]')?.textContent).toBe(
@@ -527,7 +527,7 @@ test("rejects malformed result metadata before payload validation", () => {
         },
       },
     },
-    createMcpReaderDataSource({ callServerTool: vi.fn() }),
+    createMcpReaderSource({ callServerTool: vi.fn() }),
   );
 
   expect(root().querySelector('[role="alert"]')?.textContent).toContain(
@@ -543,7 +543,7 @@ test("preserves a tool failure message without requiring App metadata", () => {
       content: [{ type: "text", text: "Sefaria is temporarily unavailable." }],
       isError: true,
     },
-    createMcpReaderDataSource({ callServerTool: vi.fn() }),
+    createMcpReaderSource({ callServerTool: vi.fn() }),
   );
 
   expect(root().querySelector('[role="alert"]')?.textContent).toBe(
@@ -552,7 +552,7 @@ test("preserves a tool failure message without requiring App metadata", () => {
   expect(root().querySelector("sefaria-reader")).toBeNull();
 });
 
-test("adapts the MCP Apps message wire request without capability gating", async () => {
+test("adapts the MCP Apps message wire request without loader gating", async () => {
   const sendMessage = vi.fn().mockResolvedValue({});
   const interaction = createConnectionsInteraction({
     sendMessage,
@@ -566,7 +566,7 @@ test("adapts the MCP Apps message wire request without capability gating", async
 });
 
 test("renders documented connections errors and rejects oversized captures", async () => {
-  const dataSource = createMcpReaderDataSource({ callServerTool: vi.fn() });
+  const source = createMcpReaderSource({ callServerTool: vi.fn() });
   const cleanup = renderReaderToolResult(
     root(),
     connectionsToolResult(
@@ -574,7 +574,7 @@ test("renders documented connections errors and rejects oversized captures", asy
       { error: "Invalid reference.", ref: "Missing 1:1" },
       false,
     ),
-    dataSource,
+    source,
   );
   const panel = panelElement();
   await vi.waitFor(() => expect(panel.status).toBe("error"), {
@@ -592,7 +592,7 @@ test("renders documented connections errors and rejects oversized captures", asy
       Array.from({ length: 10_001 }, () => null),
       false,
     ),
-    dataSource,
+    source,
   );
   expect(root().querySelector('[role="alert"]')?.textContent).toContain(
     "10000",
@@ -601,7 +601,7 @@ test("renders documented connections errors and rejects oversized captures", asy
 });
 
 test("prefixes connections validation paths and rejects ambiguous metadata", () => {
-  const dataSource = createMcpReaderDataSource({ callServerTool: vi.fn() });
+  const source = createMcpReaderSource({ callServerTool: vi.fn() });
   const invalidLinks = structuredClone(capturedLinks) as unknown as Array<
     Record<string, unknown>
   >;
@@ -609,7 +609,7 @@ test("prefixes connections validation paths and rejects ambiguous metadata", () 
   renderReaderToolResult(
     root(),
     connectionsToolResult(200, invalidLinks, true),
-    dataSource,
+    source,
   );
   expect(root().querySelector('[role="alert"]')?.textContent).toContain(
     "/structuredContent/payload",
@@ -624,7 +624,7 @@ test("prefixes connections validation paths and rejects ambiguous metadata", () 
         ...toolResult(200, structuredClone(v3SourceBackedPayload))._meta,
       },
     },
-    dataSource,
+    source,
   );
   expect(root().querySelector('[role="alert"]')?.textContent).toContain(
     "exactly one",

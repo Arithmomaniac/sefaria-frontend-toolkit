@@ -98,7 +98,7 @@ const RETIRED = new Map([
   ],
   [
     "packages/components/src/ref-label.test.ts",
-    "Reference Label preparation and its /api/ref acquisition were removed; Source Card renders its heading from its own v3 text payload.",
+    "Reference Label preparation and its /api/ref source were removed; Source Card renders its heading from its own v3 text payload.",
   ],
   [
     "demos/explorer/src/ref-label/app.browser.test.ts",

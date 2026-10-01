@@ -57,7 +57,7 @@ test("serves both tools and the packaged App resource through the base SDK", asy
   await server.close();
 });
 
-test("keeps omitted with_text capability defaults isolated by HTTP session", async () => {
+test("keeps omitted with_text loader defaults isolated by HTTP session", async () => {
   const requests: string[] = [];
   const server = await startMcpHttpServer({
     appHtml: async () => "<!doctype html>",

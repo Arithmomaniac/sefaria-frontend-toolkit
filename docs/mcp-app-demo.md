@@ -10,7 +10,7 @@ The host calls `get_text`. The MCP server role fetches one corrected Sefaria v3 
 
 ## Continuation
 
-The Reader receives a tagged host acquisition capability. Source and links operations call only the originating MCP server through the host's supported `serverTools` bridge. The App and Reader never fall back to direct Sefaria HTTP.
+The Reader receives a tagged host data loader. Source and links operations call only the originating MCP server through the host's supported `serverTools` bridge. The App and Reader never fall back to direct Sefaria HTTP.
 
 Category changes, paging, Back, and breadcrumbs covered by retained raw records remain local. Connection navigation uses bounded host-proxied `get_text` and `get_links_between_texts` calls. Explicit chat export uses `ui/message` separately from Reader data transport.
 

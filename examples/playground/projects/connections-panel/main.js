@@ -4,9 +4,9 @@ import links from "./links.js";
 const panel = requireElement("#connections");
 const previews = requireElement("#previews");
 const selection = requireElement("#selection");
-panel.acquisition = {
-  kind: "capability",
-  capability: {
+panel.source = {
+  kind: "custom",
+  loader: {
     getLinks: async (request) => {
       if (request.sref === "Micah 6:8" && request.withText) {
         return { payload: links, status: 200 };

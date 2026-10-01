@@ -10,7 +10,7 @@ import type {
   SefariaSourceCard,
 } from "@arithmomaniac/sefaria-web-components";
 import {
-  createSefariaReaderDataSource,
+  createSefariaReaderRecordLoader,
   resolveReaderSource,
 } from "@arithmomaniac/sefaria-web-components/reader";
 import {
@@ -85,7 +85,7 @@ export function startReaderWorkspace(
   const status = requireElement<HTMLElement>(root, "#status");
   const hostError = requireElement<HTMLElement>(root, "#host-error");
   const workspace = requireElement<HTMLElement>(root, "#workspace");
-  const dataSource = createSefariaReaderDataSource(client);
+  const dataSource = createSefariaReaderRecordLoader(client);
 
   let session: ReaderSession | undefined;
   let spatial: WorkspaceState | undefined;
@@ -304,9 +304,9 @@ export function startReaderWorkspace(
     ) as SefariaConnectionsPanel;
     const record = session?.connectionsRecord(entry.entryId);
     if (record !== undefined) {
-      connections.acquisition = {
-        kind: "capability",
-        capability: {
+      connections.source = {
+        kind: "custom",
+        loader: {
           getLinks: async () => ({ payload: record.payload, status: 200 }),
         },
       };

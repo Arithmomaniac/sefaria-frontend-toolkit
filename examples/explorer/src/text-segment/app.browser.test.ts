@@ -9,7 +9,7 @@ beforeEach(() => {
   document.body.innerHTML = '<div id="live-demo-root"></div>';
 });
 
-test("loads a preset through explicit acquisition with declarative version inputs", async () => {
+test("loads a preset through explicit source with declarative version inputs", async () => {
   const fetch = vi.fn<typeof globalThis.fetch>(async () =>
     Response.json(textFixture),
   );
@@ -54,7 +54,7 @@ test("renders controls and waits for activation before requesting", () => {
   expect(fetch).not.toHaveBeenCalled();
 });
 
-test("reports acquisition failure and restores the committed result", async () => {
+test("reports source failure and restores the committed result", async () => {
   let fail = false;
   const fetch = vi.fn<typeof globalThis.fetch>(async () => {
     if (fail) throw new Error("Network unavailable");

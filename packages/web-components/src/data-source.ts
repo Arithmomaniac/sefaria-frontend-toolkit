@@ -1,9 +1,9 @@
 import type { SefariaClient } from "@arithmomaniac/sefaria-client";
 
-import { setPendingSefariaAcquisition } from "./acquisition-state.js";
+import { setPendingSefariaDataSource } from "./data-source-state.js";
 
-/** Corrected operation result returned by a host acquisition capability. */
-export interface SefariaAcquisitionResponse {
+/** Corrected operation result returned by a host data loader. */
+export interface SefariaDataLoaderResponse {
   /** Unknown corrected payload validated by the receiving component. */
   readonly payload: unknown;
   /** Documented HTTP-equivalent response status. */
@@ -11,7 +11,7 @@ export interface SefariaAcquisitionResponse {
 }
 
 /** Text operation requested by a standalone component. */
-export interface SefariaTextAcquisitionRequest {
+export interface SefariaTextLoadRequest {
   /** Public Sefaria reference. */
   readonly sref: string;
   /** Serialized v3 version selectors. */
@@ -21,30 +21,30 @@ export interface SefariaTextAcquisitionRequest {
 }
 
 /** Links operation requested by a standalone component. */
-export interface SefariaLinksAcquisitionRequest {
+export interface SefariaLinksLoadRequest {
   /** Public Sefaria reference. */
   readonly sref: string;
   /** Whether connected text is required. */
   readonly withText: boolean;
 }
 
-/** Structural host acquisition capability for environments such as MCP Apps. */
-export interface SefariaAcquisitionCapability {
+/** Structural host data loader for environments such as MCP Apps. */
+export interface SefariaDataLoader {
   /** Performs a v3 text operation when supported by the host. */
   readonly getText?: (
-    request: SefariaTextAcquisitionRequest,
+    request: SefariaTextLoadRequest,
     signal: AbortSignal,
-  ) => Promise<SefariaAcquisitionResponse>;
+  ) => Promise<SefariaDataLoaderResponse>;
 
   /** Performs a links operation when supported by the host. */
   readonly getLinks?: (
-    request: SefariaLinksAcquisitionRequest,
+    request: SefariaLinksLoadRequest,
     signal: AbortSignal,
-  ) => Promise<SefariaAcquisitionResponse>;
+  ) => Promise<SefariaDataLoaderResponse>;
 }
 
-/** Explicit acquisition source selected by configuration or one element. */
-export type SefariaAcquisition =
+/** Explicit data source selected by configuration or one element. */
+export type SefariaDataSource =
   | {
       /** Uses an existing branded toolkit client and its per-client cache. */
       readonly kind: "client";
@@ -52,23 +52,21 @@ export type SefariaAcquisition =
       readonly client: SefariaClient;
     }
   | {
-      /** Uses a structural host capability without browser fallback. */
-      readonly kind: "capability";
-      /** Host-provided operation capability. */
-      readonly capability: SefariaAcquisitionCapability;
+      /** Uses a structural host loader without browser fallback. */
+      readonly kind: "custom";
+      /** Host-provided operation loader. */
+      readonly loader: SefariaDataLoader;
     }
   | {
-      /** Disables standalone acquisition without browser fallback. */
+      /** Disables standalone loading without browser fallback. */
       readonly kind: "disabled";
     };
 
 /**
- * Replaces the pending module-local shared acquisition choice.
+ * Replaces the pending module-local shared data source choice.
  *
  * @throws {Error} After the first element realizes the shared choice.
  */
-export function configureSefariaAcquisition(
-  acquisition: SefariaAcquisition,
-): void {
-  setPendingSefariaAcquisition(acquisition);
+export function configureSefariaDataSource(source: SefariaDataSource): void {
+  setPendingSefariaDataSource(source);
 }

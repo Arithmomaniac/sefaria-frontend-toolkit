@@ -8,7 +8,7 @@ import { afterEach, expect, test, vi } from "vitest";
 import { getPreparedState } from "./prepared-state.js";
 import type { ReaderViewModel } from "./reader.js";
 import micahFixture from "../../../examples/react-vite/src/micah-6-8.json";
-import type { SefariaAcquisition } from "./acquisition.js";
+import type { SefariaDataSource } from "./data-source.js";
 import { SefariaReader } from "./reader-element.js";
 
 const micahTarget = zCoreV3TextsResponse.parse(
@@ -87,14 +87,14 @@ test("Reader does not expose public data", () => {
   expect("data" in element).toBe(false);
 });
 
-test("Reader local-data capability serves a supported root without network", async () => {
+test("Reader local-data loader serves a supported root without network", async () => {
   const fetchSpy = vi.spyOn(globalThis, "fetch");
   const calls: string[] = [];
   const element = new SefariaReader();
   element.sref = "Micah 6";
-  element.acquisition = {
-    kind: "capability",
-    capability: {
+  element.source = {
+    kind: "custom",
+    loader: {
       getText: async (request) => {
         calls.push(`text:${request.sref}`);
         if (request.sref !== "Micah 6")
@@ -115,13 +115,13 @@ test("Reader local-data capability serves a supported root without network", asy
   expect(fetchSpy).not.toHaveBeenCalled();
 });
 
-test("Reader local-data capability reports unsupported roots without browser fallback", async () => {
+test("Reader local-data loader reports unsupported roots without browser fallback", async () => {
   const fetchSpy = vi.spyOn(globalThis, "fetch");
   const element = new SefariaReader();
   element.sref = "Micah 7";
-  element.acquisition = {
-    kind: "capability",
-    capability: {
+  element.source = {
+    kind: "custom",
+    loader: {
       getText: async (request) => {
         throw new Error(`Unsupported local ref ${request.sref}.`);
       },
@@ -140,9 +140,9 @@ test("Reader forwards language and root editions and replaces an unchanged root 
   element.setAttribute("translation-language", "french");
   element.setAttribute("primary-version-title", "Deterministic example Hebrew");
   element.setAttribute("sref", "Micah 6");
-  element.acquisition = {
-    kind: "capability",
-    capability: {
+  element.source = {
+    kind: "custom",
+    loader: {
       getText: async (request) => {
         requests.push([...request.versions]);
         const payload = micahContext();
@@ -184,9 +184,9 @@ test("Reader keeps its committed root when a new language fails or is invalid", 
   });
   const element = new SefariaReader();
   element.sref = "Micah 6";
-  element.acquisition = {
-    kind: "capability",
-    capability: {
+  element.source = {
+    kind: "custom",
+    loader: {
       getText,
       getLinks: async () => ({ payload: [], status: 200 }),
     },
@@ -218,9 +218,9 @@ test.each([false, true])(
     const element = new SefariaReader();
     element.sref = "Micah 6";
     if (!committed) element.translationLanguage = "french";
-    element.acquisition = {
-      kind: "capability",
-      capability: {
+    element.source = {
+      kind: "custom",
+      loader: {
         getText: async (_request, signal) => {
           count += 1;
           if (committed && count === 1)
@@ -262,9 +262,9 @@ test("Reader bounds target/context fallback to four text requests and one links 
   const element = new SefariaReader();
   element.sref = "Micah 6:8";
   element.translationLanguage = "french";
-  element.acquisition = {
-    kind: "capability",
-    capability: {
+  element.source = {
+    kind: "custom",
+    loader: {
       getText: async (request) => {
         requests.push({ sref: request.sref, versions: request.versions });
         const payload =
@@ -307,9 +307,9 @@ test("Reader disables fallback and propagates the policy to navigated sources", 
   element.sref = "Micah 6:8";
   element.translationLanguage = "french";
   element.translationFallback = "none";
-  element.acquisition = {
-    kind: "capability",
-    capability: {
+  element.source = {
+    kind: "custom",
+    loader: {
       getText: async (request) => {
         requests.push({ sref: request.sref, versions: request.versions });
         const payload =
@@ -358,9 +358,9 @@ test("Reader preserves its language and interrupted fallback across reconnect", 
   const element = new SefariaReader();
   element.sref = "Micah 6";
   element.translationLanguage = "french";
-  element.acquisition = {
-    kind: "capability",
-    capability: {
+  element.source = {
+    kind: "custom",
+    loader: {
       getText: async (request) => {
         requests.push([...request.versions]);
         const payload = micahContext();
@@ -421,7 +421,7 @@ test("loads Micah 6:8 progressively through an explicit client and preserves a f
   });
   const element = new SefariaReader();
   element.sref = "Micah 6:8";
-  element.acquisition = {
+  element.source = {
     kind: "client",
     client: createSefariaClient({ cache: false, fetch: fetchMock }),
   };
@@ -497,9 +497,9 @@ test("reports the original failure when a Reader root replacement fails", async 
   const getLinks = vi.fn(async () => ({ payload: [], status: 200 }));
   const element = new SefariaReader();
   element.sref = "Micah 6:8";
-  element.acquisition = {
-    kind: "capability",
-    capability: { getText, getLinks },
+  element.source = {
+    kind: "custom",
+    loader: { getText, getLinks },
   };
   document.body.append(element);
   await vi.waitFor(() => expect(element.status).toBe("ready"));
@@ -533,9 +533,9 @@ test("reports a root failure after resuming an interrupted replacement", async (
   const getLinks = vi.fn(async () => ({ payload: [], status: 200 }));
   const element = new SefariaReader();
   element.sref = "Micah 6:8";
-  element.acquisition = {
-    kind: "capability",
-    capability: { getText, getLinks },
+  element.source = {
+    kind: "custom",
+    loader: { getText, getLinks },
   };
   document.body.append(element);
   await vi.waitFor(() => expect(element.status).toBe("ready"));
@@ -553,16 +553,13 @@ test("reports a root failure after resuming an interrupted replacement", async (
   expect(errors).toEqual([failure]);
 });
 
-test("resumes only interrupted links after reconnect through a host capability", async () => {
+test("resumes only interrupted links after reconnect through a host loader", async () => {
   const linkResolvers: Array<
     (value: { payload: unknown; status: number }) => void
   > = [];
   const getText = vi.fn<
     NonNullable<
-      Extract<
-        SefariaAcquisition,
-        { kind: "capability" }
-      >["capability"]["getText"]
+      Extract<SefariaDataSource, { kind: "custom" }>["loader"]["getText"]
     >
   >(async ({ sref }) => ({
     payload: sref === "Micah 6" ? micahContext() : micahTarget,
@@ -570,10 +567,7 @@ test("resumes only interrupted links after reconnect through a host capability",
   }));
   const getLinks = vi.fn<
     NonNullable<
-      Extract<
-        SefariaAcquisition,
-        { kind: "capability" }
-      >["capability"]["getLinks"]
+      Extract<SefariaDataSource, { kind: "custom" }>["loader"]["getLinks"]
     >
   >(
     async () =>
@@ -583,9 +577,9 @@ test("resumes only interrupted links after reconnect through a host capability",
   );
   const element = new SefariaReader();
   element.sref = "Micah 6:8";
-  element.acquisition = {
-    kind: "capability",
-    capability: { getText, getLinks },
+  element.source = {
+    kind: "custom",
+    loader: { getText, getLinks },
   };
   document.body.append(element);
 
@@ -630,9 +624,9 @@ test("reconciles a changed root instead of resuming disconnected links", async (
   );
   const element = new SefariaReader();
   element.sref = "Micah 6:8";
-  element.acquisition = {
-    kind: "capability",
-    capability: { getText, getLinks },
+  element.source = {
+    kind: "custom",
+    loader: { getText, getLinks },
   };
   document.body.append(element);
   await vi.waitFor(() => expect(getLinks).toHaveBeenCalledTimes(1));
@@ -648,7 +642,7 @@ test("reconciles a changed root instead of resuming disconnected links", async (
   });
 });
 
-test("honors an acquisition change made while disconnected after a completed load", async () => {
+test("honors an source change made while disconnected after a completed load", async () => {
   const oldGetText = vi.fn(async ({ sref }: { readonly sref: string }) => ({
     payload: sref === "Micah 6" ? micahContext() : micahTarget,
     status: 200,
@@ -661,17 +655,17 @@ test("honors an acquisition change made while disconnected after a completed loa
   const newGetLinks = vi.fn(async () => ({ payload: [], status: 200 }));
   const element = new SefariaReader();
   element.sref = "Micah 6:8";
-  element.acquisition = {
-    kind: "capability",
-    capability: { getText: oldGetText, getLinks: oldGetLinks },
+  element.source = {
+    kind: "custom",
+    loader: { getText: oldGetText, getLinks: oldGetLinks },
   };
   document.body.append(element);
   await vi.waitFor(() => expect(element.status).toBe("ready"));
 
   element.remove();
-  element.acquisition = {
-    kind: "capability",
-    capability: { getText: newGetText, getLinks: newGetLinks },
+  element.source = {
+    kind: "custom",
+    loader: { getText: newGetText, getLinks: newGetLinks },
   };
   await element.updateComplete;
   document.body.append(element);
@@ -680,7 +674,7 @@ test("honors an acquisition change made while disconnected after a completed loa
   expect(oldGetText).toHaveBeenCalledTimes(2);
 });
 
-test("disabling acquisition stops the previous Reader controller", async () => {
+test("disabling source stops the previous Reader controller", async () => {
   const getText = vi.fn(async ({ sref }: { readonly sref: string }) => ({
     payload: sref === "Micah 6" ? micahContext() : micahTarget,
     status: 200,
@@ -688,14 +682,14 @@ test("disabling acquisition stops the previous Reader controller", async () => {
   const getLinks = vi.fn(async () => ({ payload: [], status: 200 }));
   const element = new SefariaReader();
   element.sref = "Micah 6:8";
-  element.acquisition = {
-    kind: "capability",
-    capability: { getText, getLinks },
+  element.source = {
+    kind: "custom",
+    loader: { getText, getLinks },
   };
   document.body.append(element);
   await vi.waitFor(() => expect(element.status).toBe("ready"));
 
-  element.acquisition = { kind: "disabled" };
+  element.source = { kind: "disabled" };
   await vi.waitFor(() => expect(element.status).toBe("error"));
   element.dispatchEvent(
     new CustomEvent("sefaria-reader-connection-select", {
@@ -711,13 +705,10 @@ test("disabling acquisition stops the previous Reader controller", async () => {
   expect(element.status).toBe("error");
 });
 
-test("navigates and returns Back with zero additional capability calls", async () => {
+test("navigates and returns Back with zero additional loader calls", async () => {
   const getText = vi.fn<
     NonNullable<
-      Extract<
-        SefariaAcquisition,
-        { kind: "capability" }
-      >["capability"]["getText"]
+      Extract<SefariaDataSource, { kind: "custom" }>["loader"]["getText"]
     >
   >(async ({ sref }) => ({
     payload:
@@ -730,17 +721,14 @@ test("navigates and returns Back with zero additional capability calls", async (
   }));
   const getLinks = vi.fn<
     NonNullable<
-      Extract<
-        SefariaAcquisition,
-        { kind: "capability" }
-      >["capability"]["getLinks"]
+      Extract<SefariaDataSource, { kind: "custom" }>["loader"]["getLinks"]
     >
   >(async () => ({ payload: [], status: 200 }));
   const element = new SefariaReader();
   element.sref = "Micah 6:8";
-  element.acquisition = {
-    kind: "capability",
-    capability: { getText, getLinks },
+  element.source = {
+    kind: "custom",
+    loader: { getText, getLinks },
   };
   document.body.append(element);
   await vi.waitFor(() => {
@@ -796,9 +784,9 @@ test("preserves host presentation through loading and navigation", async () => {
   element.sref = "Micah 6:8";
   element.vocalizationMode = "none";
   element.layout = "stacked";
-  element.acquisition = {
-    kind: "capability",
-    capability: { getText, getLinks },
+  element.source = {
+    kind: "custom",
+    loader: { getText, getLinks },
   };
   document.body.append(element);
   await vi.waitFor(() => {
@@ -867,9 +855,9 @@ test("preserves presentation changes made during initial and replacement root lo
   const getLinks = vi.fn(async () => ({ payload: [], status: 200 }));
   const element = new SefariaReader();
   element.sref = "Micah 6:8";
-  element.acquisition = {
-    kind: "capability",
-    capability: { getText, getLinks },
+  element.source = {
+    kind: "custom",
+    loader: { getText, getLinks },
   };
   document.body.append(element);
   await vi.waitFor(() => {

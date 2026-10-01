@@ -1,8 +1,8 @@
 import type {
-  SefariaAcquisition,
-  SefariaAcquisitionResponse,
+  SefariaDataSource,
+  SefariaDataLoaderResponse,
   SefariaSourceCard,
-  SefariaTextAcquisitionRequest,
+  SefariaTextLoadRequest,
 } from "@arithmomaniac/sefaria-web-components";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
@@ -12,9 +12,9 @@ import { startSourceCardLiveDemo } from "./app.js";
 import v3Fixture from "../../../../packages/client/test/fixtures/v3-text-spanning-2026-08-29.json" with { type: "json" };
 
 type SourceCardLoader = (
-  request: SefariaTextAcquisitionRequest,
+  request: SefariaTextLoadRequest,
   signal: AbortSignal,
-) => Promise<SefariaAcquisitionResponse>;
+) => Promise<SefariaDataLoaderResponse>;
 
 beforeEach(() => {
   document.body.innerHTML = `
@@ -47,7 +47,7 @@ test.each(["micahFrench", "berakhotDefault"] as const)(
   "language controls acquire and attribute %s only after activation",
   async (name) => {
     const loader = vi.fn<SourceCardLoader>(
-      async (): Promise<SefariaAcquisitionResponse> => ({
+      async (): Promise<SefariaDataLoaderResponse> => ({
         payload:
           name === "berakhotDefault" && loader.mock.calls.length === 1
             ? captures.berakhotMissingFrench.payload
@@ -55,10 +55,7 @@ test.each(["micahFrench", "berakhotDefault"] as const)(
         status: 200,
       }),
     );
-    const demo = startSourceCardLiveDemo(
-      document,
-      acquisitionFromLoader(loader),
-    );
+    const demo = startSourceCardLiveDemo(document, sourceFromLoader(loader));
     const input = document.querySelector<HTMLInputElement>(
       'input[name="translationLanguage"]',
     )!;
@@ -106,7 +103,7 @@ test("reuses the completed declarative request", async () => {
 
 test("loads a preset through declarative public inputs", async () => {
   const loader = vi.fn<SourceCardLoader>(async () => response("First"));
-  startSourceCardLiveDemo(document, acquisitionFromLoader(loader));
+  startSourceCardLiveDemo(document, sourceFromLoader(loader));
 
   document.querySelector<HTMLButtonElement>("[data-demo-request]")?.click();
   await vi.waitFor(() =>
@@ -125,7 +122,7 @@ test("loads a preset through declarative public inputs", async () => {
 
 test("applies display settings without requesting", () => {
   const loader = vi.fn<SourceCardLoader>(async () => response("First"));
-  startSourceCardLiveDemo(document, acquisitionFromLoader(loader));
+  startSourceCardLiveDemo(document, sourceFromLoader(loader));
   const form = document.querySelector<HTMLFormElement>("#display-form");
 
   selectValue(form, "contentLanguage", "primary");
@@ -141,7 +138,7 @@ test("applies display settings without requesting", () => {
 
 test("enables selection and reports the real component event", () => {
   const loader = vi.fn<SourceCardLoader>(async () => response("First"));
-  startSourceCardLiveDemo(document, acquisitionFromLoader(loader));
+  startSourceCardLiveDemo(document, sourceFromLoader(loader));
   const result = resultElement();
 
   expect(result.selectable).toBe(true);
@@ -160,11 +157,11 @@ test("restores committed content after a transport failure", async () => {
   let rejectSecond!: (reason: unknown) => void;
   const loader = vi.fn<SourceCardLoader>(async () => {
     if (loader.mock.calls.length === 1) return response("First");
-    return await new Promise<SefariaAcquisitionResponse>((_resolve, reject) => {
+    return await new Promise<SefariaDataLoaderResponse>((_resolve, reject) => {
       rejectSecond = reject;
     });
   });
-  const demo = startSourceCardLiveDemo(document, acquisitionFromLoader(loader));
+  const demo = startSourceCardLiveDemo(document, sourceFromLoader(loader));
 
   await demo.loadCurrentRequest();
   const committed = resultElement().shadowRoot?.textContent;
@@ -191,7 +188,7 @@ test("hides an initial loading placeholder after a transport failure", async () 
   const loader = vi.fn<SourceCardLoader>(async () => {
     throw new Error("Network unavailable.");
   });
-  const demo = startSourceCardLiveDemo(document, acquisitionFromLoader(loader));
+  const demo = startSourceCardLiveDemo(document, sourceFromLoader(loader));
 
   await demo.loadCurrentRequest();
 
@@ -205,12 +202,12 @@ test("hides an initial loading placeholder after a transport failure", async () 
 });
 
 test("aborts the old operation and ignores its stale result", async () => {
-  let resolveFirst!: (value: SefariaAcquisitionResponse) => void;
-  let resolveSecond!: (value: SefariaAcquisitionResponse) => void;
-  const first = new Promise<SefariaAcquisitionResponse>((resolve) => {
+  let resolveFirst!: (value: SefariaDataLoaderResponse) => void;
+  let resolveSecond!: (value: SefariaDataLoaderResponse) => void;
+  const first = new Promise<SefariaDataLoaderResponse>((resolve) => {
     resolveFirst = resolve;
   });
-  const second = new Promise<SefariaAcquisitionResponse>((resolve) => {
+  const second = new Promise<SefariaDataLoaderResponse>((resolve) => {
     resolveSecond = resolve;
   });
   const signals: AbortSignal[] = [];
@@ -218,7 +215,7 @@ test("aborts the old operation and ignores its stale result", async () => {
     signals.push(signal);
     return signals.length === 1 ? await first : await second;
   });
-  const demo = startSourceCardLiveDemo(document, acquisitionFromLoader(loader));
+  const demo = startSourceCardLiveDemo(document, sourceFromLoader(loader));
   const form = document.querySelector<HTMLFormElement>("#source-card-form");
   const tref = form?.elements.namedItem("tref");
   if (!(tref instanceof HTMLInputElement)) {
@@ -240,11 +237,11 @@ test("aborts the old operation and ignores its stale result", async () => {
   expect(renderedText()).not.toContain("First");
 });
 
-function acquisitionFromLoader(loader: SourceCardLoader): SefariaAcquisition {
-  return { kind: "capability", capability: { getText: loader } };
+function sourceFromLoader(loader: SourceCardLoader): SefariaDataSource {
+  return { kind: "custom", loader: { getText: loader } };
 }
 
-function response(label: string): SefariaAcquisitionResponse {
+function response(label: string): SefariaDataLoaderResponse {
   const payload = structuredClone(micahFixture);
   payload.versions[0]!.text = `${label} primary`;
   payload.versions[1]!.text = `${label} translation`;

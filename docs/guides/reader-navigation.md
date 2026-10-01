@@ -2,7 +2,7 @@
 
 # Reader navigation and host ownership
 
-The ordinary Reader is the declarative `<sefaria-reader>` element. It owns root acquisition, semantic history, Back, breadcrumbs, cancellation, private preparation, responsive panes, and error reporting. The host owns activation policy, the starting reference, optional acquisition, placement, and lifecycle.
+The ordinary Reader is the declarative `<sefaria-reader>` element. It owns root source, semantic history, Back, breadcrumbs, cancellation, private preparation, responsive panes, and error reporting. The host owns activation policy, the starting reference, optional source, placement, and lifecycle.
 
 ## Browser path
 
@@ -11,7 +11,7 @@ import { createSefariaClient } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 
 const reader = document.createElement("sefaria-reader");
-reader.acquisition = {
+reader.source = {
   kind: "client",
   client: createSefariaClient({ cache: false }),
 };
@@ -29,9 +29,9 @@ Read-only `status`, `rootLoading`, `selectedRef`, `currentEntryId`, and `readerE
 
 ## MCP path
 
-The server's initial corrected payload is unknown at the App boundary. The App validates it and constructs a local-data acquisition capability. The first render makes zero duplicate network requests.
+The server's initial corrected payload is unknown at the App boundary. The App validates it and constructs a local-data data loader. The first render makes zero duplicate network requests.
 
-Later Reader operations use a tagged host capability backed only by the MCP host's server-tool bridge. Unsupported or failed operations never fall through to direct Sefaria HTTP. `ui/message` remains a separate explicit chat-export action.
+Later Reader operations use a tagged host loader backed only by the MCP host's server-tool bridge. Unsupported or failed operations never fall through to direct Sefaria HTTP. `ui/message` remains a separate explicit chat-export action.
 
 ## Semantic history
 

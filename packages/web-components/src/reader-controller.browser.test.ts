@@ -17,7 +17,7 @@ import { bindReaderController } from "./bindings.js";
 import {
   createReaderController,
   type ReaderController,
-  type ReaderControllerDataSource,
+  type ReaderControllerRecordLoader,
 } from "./reader-controller.js";
 import "./reader-element.js";
 import type { SefariaReader } from "./reader-element.js";
@@ -155,7 +155,7 @@ test("binds pending root qualification without replacing committed Reader conten
       resolveSource = resolve;
     },
   );
-  const dataSource: ReaderControllerDataSource = {
+  const dataSource: ReaderControllerRecordLoader = {
     loadSource: vi.fn(async () => pendingSource),
     loadConnections: vi.fn(async (request, projection) =>
       createReaderConnectionsContent(links(request.tref), request, projection),
@@ -416,7 +416,7 @@ function connectionsContent(tref: string) {
 function fixtureDataSource(): {
   readonly loadSource: ReturnType<typeof vi.fn>;
   readonly loadConnections: ReturnType<typeof vi.fn>;
-} & ReaderControllerDataSource {
+} & ReaderControllerRecordLoader {
   return {
     loadSource: vi.fn(async (request) => sourceContent(request.tref)),
     loadConnections: vi.fn(async (request, projection) =>

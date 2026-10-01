@@ -3,7 +3,7 @@ import {
   type CoreV3TextsResponse,
   type CoreV3Version,
 } from "@arithmomaniac/sefaria-client";
-import type { SefariaAcquisition } from "./acquisition.js";
+import type { SefariaDataSource } from "./data-source.js";
 import { validateSuppliedComponentData } from "./component-controller.js";
 
 /** Normalizes one API language-family preference, not a language list or role. */
@@ -118,7 +118,7 @@ export interface SelectedTextProgress {
 
 /** Acquires text with at most one explicit missing-language fallback. */
 export async function acquireSelectedText(
-  acquisition: SefariaAcquisition,
+  source: SefariaDataSource,
   sref: string,
   versions: readonly string[],
   translationLanguage: string | undefined,
@@ -166,12 +166,12 @@ export async function acquireSelectedText(
     signal.throwIfAborted();
     let payload: unknown;
     let status: number;
-    if (acquisition.kind === "disabled") {
-      throw new Error("Standalone Sefaria acquisition is disabled.");
+    if (source.kind === "disabled") {
+      throw new Error("Sefaria data loading is disabled.");
     }
-    if (acquisition.kind === "client") {
+    if (source.kind === "client") {
       const result = await text.getV3Texts({
-        client: acquisition.client,
+        client: source.client,
         path: { tref: sref },
         query: { version: [...selectors], return_format: "default" },
         signal,
@@ -179,12 +179,10 @@ export async function acquireSelectedText(
       payload = result.data ?? result.error;
       status = result.response.status;
     } else {
-      if (acquisition.capability.getText === undefined) {
-        throw new Error(
-          "The selected acquisition source does not support text.",
-        );
+      if (source.loader.getText === undefined) {
+        throw new Error("The selected data source does not support text.");
       }
-      const result = await acquisition.capability.getText(
+      const result = await source.loader.getText(
         { sref, versions: selectors, returnFormat: "default" },
         signal,
       );

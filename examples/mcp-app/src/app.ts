@@ -3,7 +3,7 @@ import {
   validateExternalResponse,
 } from "@arithmomaniac/sefaria-client";
 import {
-  type SefariaAcquisition,
+  type SefariaDataSource,
   SefariaConnectionsPanel,
   SefariaReader,
 } from "@arithmomaniac/sefaria-web-components";
@@ -98,13 +98,13 @@ export async function waitForMcpConnection(
   signal?.throwIfAborted();
 }
 
-/** Creates a Reader acquisition capability backed only by host-proxied tools. */
-export function createMcpReaderAcquisition(
+/** Creates a Reader data loader backed only by host-proxied tools. */
+export function createMcpReaderSource(
   host: McpReaderToolHost,
-): SefariaAcquisition {
+): SefariaDataSource {
   return {
-    kind: "capability",
-    capability: {
+    kind: "custom",
+    loader: {
       getText: async (request, signal) => {
         requireSupportedTextRequest(request);
         const effectiveRequest = { tref: request.sref };
@@ -141,8 +141,8 @@ export function createMcpReaderAcquisition(
   };
 }
 
-function createLocalFirstMcpReaderAcquisition(
-  fallback: SefariaAcquisition,
+export function createLocalFirstMcpReaderSource(
+  fallback: SefariaDataSource,
   local: {
     readonly text?: readonly {
       readonly sref: string;
@@ -157,11 +157,11 @@ function createLocalFirstMcpReaderAcquisition(
       };
     };
   },
-): SefariaAcquisition {
-  if (fallback.kind !== "capability") return fallback;
+): SefariaDataSource {
+  if (fallback.kind !== "custom") return fallback;
   return {
-    kind: "capability",
-    capability: {
+    kind: "custom",
+    loader: {
       getText: async (request, signal) => {
         const localText = local.text?.find(
           (entry) => entry.sref === request.sref,
@@ -169,12 +169,10 @@ function createLocalFirstMcpReaderAcquisition(
         if (localText !== undefined) {
           return localText.response;
         }
-        if (fallback.capability.getText === undefined) {
-          throw new Error(
-            "The selected acquisition source does not support text.",
-          );
+        if (fallback.loader.getText === undefined) {
+          throw new Error("The selected data source does not support text.");
         }
-        return await fallback.capability.getText(request, signal);
+        return await fallback.loader.getText(request, signal);
       },
       getLinks: async (request, signal) => {
         if (
@@ -184,12 +182,10 @@ function createLocalFirstMcpReaderAcquisition(
         ) {
           return local.links.response;
         }
-        if (fallback.capability.getLinks === undefined) {
-          throw new Error(
-            "The selected acquisition source does not support links.",
-          );
+        if (fallback.loader.getLinks === undefined) {
+          throw new Error("The selected data source does not support links.");
         }
-        return await fallback.capability.getLinks(request, signal);
+        return await fallback.loader.getLinks(request, signal);
       },
     },
   };
@@ -217,13 +213,6 @@ function textEntriesForPayload(
   }));
 }
 
-/** @deprecated Use createMcpReaderAcquisition. */
-export function createMcpReaderDataSource(
-  host: McpReaderToolHost,
-): SefariaAcquisition {
-  return createMcpReaderAcquisition(host);
-}
-
 function requireSupportedTextRequest(request: {
   readonly versions: readonly string[];
   readonly returnFormat: string;
@@ -244,7 +233,7 @@ function requireSupportedTextRequest(request: {
 export function renderReaderToolResult(
   root: HTMLElement,
   result: ToolResultLike,
-  acquisition: SefariaAcquisition,
+  source: SefariaDataSource,
   interaction?: ConnectionsInteraction,
 ): () => void {
   if (result.isError === true) {
@@ -259,21 +248,24 @@ export function renderReaderToolResult(
   }
 
   let initialSref: string;
-  let initialAcquisition: SefariaAcquisition;
+  let initialSource: SefariaDataSource;
   try {
     if (metadata.data.kind === "source-card") {
       if (metadata.data.status !== 200) {
         renderSourceCardResult(root, result, metadata.data);
         return noCleanup;
       }
-      const source = admitSourceResponse(
+      const response = admitSourceResponse(
         result,
         metadata.data.request,
         metadata.data,
       );
       initialSref = metadata.data.request.tref;
-      initialAcquisition = createLocalFirstMcpReaderAcquisition(acquisition, {
-        text: textEntriesForPayload(metadata.data.request.tref, source.payload),
+      initialSource = createLocalFirstMcpReaderSource(source, {
+        text: textEntriesForPayload(
+          metadata.data.request.tref,
+          response.payload,
+        ),
       });
     } else {
       const connections = admitConnectionsResponse(
@@ -286,9 +278,9 @@ export function renderReaderToolResult(
       const section = document.createElement("section");
       const panel = new SefariaConnectionsPanel();
       panel.withText = withText;
-      panel.acquisition = {
-        kind: "capability",
-        capability: {
+      panel.source = {
+        kind: "custom",
+        loader: {
           getLinks: async (linksRequest, signal) => {
             if (
               linksRequest.sref === request.tref &&
@@ -300,13 +292,10 @@ export function renderReaderToolResult(
               };
             }
             if (
-              acquisition.kind === "capability" &&
-              acquisition.capability.getLinks !== undefined
+              source.kind === "custom" &&
+              source.loader.getLinks !== undefined
             ) {
-              return await acquisition.capability.getLinks(
-                linksRequest,
-                signal,
-              );
+              return await source.loader.getLinks(linksRequest, signal);
             }
             throw new Error(
               `The local MCP result does not cover ${linksRequest.sref}.`,
@@ -330,7 +319,7 @@ export function renderReaderToolResult(
 
   const section = document.createElement("section");
   const reader = new SefariaReader();
-  reader.acquisition = initialAcquisition;
+  reader.source = initialSource;
   reader.sref = initialSref;
   reader.toggleAttribute("chat-export", interaction !== undefined);
   const status = document.createElement("p");

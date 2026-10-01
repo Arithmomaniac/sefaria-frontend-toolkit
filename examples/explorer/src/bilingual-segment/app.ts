@@ -2,7 +2,7 @@ import { createSefariaClient } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 import type {
   BilingualSegmentRequest,
-  SefariaAcquisition,
+  SefariaDataSource,
   SefariaBilingualSegment,
 } from "@arithmomaniac/sefaria-web-components";
 import { setOptionalElementAttribute } from "../../../../demos/live-demo-core.js";
@@ -16,7 +16,7 @@ export interface BilingualSegmentLiveDemo {
 /** Connects the demo form, presets, and display controls to the production factory. */
 export function startBilingualSegmentLiveDemo(
   root: Document,
-  acquisition: SefariaAcquisition = {
+  source: SefariaDataSource = {
     kind: "client",
     client: createSefariaClient(),
   },
@@ -40,10 +40,10 @@ export function startBilingualSegmentLiveDemo(
     "#bilingual-result",
   );
   let activeLoad = 0;
-  let acquisitionError: unknown;
+  let sourceError: unknown;
   result.addEventListener("sefaria-bilingual-segment-error", (event) => {
-    acquisitionError = (event as CustomEvent<{ readonly error: unknown }>)
-      .detail.error;
+    sourceError = (event as CustomEvent<{ readonly error: unknown }>).detail
+      .error;
   });
 
   const applyDisplaySettings = (): void => {
@@ -73,8 +73,8 @@ export function startBilingualSegmentLiveDemo(
     hostError.hidden = true;
     hostError.textContent = "";
     submitButton.disabled = true;
-    acquisitionError = undefined;
-    result.acquisition = acquisition;
+    sourceError = undefined;
+    result.source = source;
     if (result.sref === request.tref) {
       result.setAttribute("sref", "");
       await result.updateComplete;
@@ -94,17 +94,17 @@ export function startBilingualSegmentLiveDemo(
     await waitForTerminalStatus(result, loadId, () => activeLoad);
     if (loadId !== activeLoad) return;
 
-    if (acquisitionError === undefined) {
+    if (sourceError === undefined) {
       requestState.dataset.state = result.status;
       requestState.textContent = `${formatRequest(request)} produced ${result.status}.`;
-    } else if (acquisitionError !== undefined) {
+    } else if (sourceError !== undefined) {
       requestState.dataset.state = "error";
       requestState.textContent = `${formatRequest(request)} could not complete.`;
       hostError.hidden = false;
       hostError.textContent =
-        acquisitionError instanceof Error
-          ? acquisitionError.message
-          : String(acquisitionError);
+        sourceError instanceof Error
+          ? sourceError.message
+          : String(sourceError);
     }
 
     submitButton.disabled = false;

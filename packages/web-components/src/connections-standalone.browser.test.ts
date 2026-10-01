@@ -56,7 +56,7 @@ test("explicit clients use getLinks with the default withText request", async ()
   );
   const connections = new SefariaConnectionsPanel();
   connections.sref = "Micah 6:8";
-  connections.acquisition = {
+  connections.source = {
     kind: "client",
     client: createSefariaClient({ cache: false, fetch: linksFetch }),
   };
@@ -80,7 +80,7 @@ test("explicit capabilities receive getLinks operations", async () => {
   const connections = new SefariaConnectionsPanel();
   connections.sref = "Micah 6:8";
   connections.withText = false;
-  connections.acquisition = { kind: "capability", capability: { getLinks } };
+  connections.source = { kind: "custom", loader: { getLinks } };
   document.body.append(connections);
 
   await settle();
@@ -98,9 +98,9 @@ test("invalid acquired data leaves the panel in an error state and publishes the
     connectionsErrors,
   );
   connections.sref = "Micah 6:8";
-  connections.acquisition = {
-    kind: "capability",
-    capability: {
+  connections.source = {
+    kind: "custom",
+    loader: {
       getLinks: async () => ({
         payload: [{ _id: 42 }],
         status: 200,
@@ -121,10 +121,10 @@ test("invalid acquired data leaves the panel in an error state and publishes the
   );
 });
 
-test("unsupported acquisition produces an explicit accessible error", async () => {
+test("unsupported source produces an explicit accessible error", async () => {
   const connections = new SefariaConnectionsPanel();
   connections.sref = "Micah 6:8";
-  connections.acquisition = { kind: "capability", capability: {} };
+  connections.source = { kind: "custom", loader: {} };
   document.body.append(connections);
 
   await settle();
@@ -140,7 +140,7 @@ test("network failures do not retry after reconnect", async () => {
   });
   const connections = new SefariaConnectionsPanel();
   connections.sref = "Micah 6:8";
-  connections.acquisition = {
+  connections.source = {
     kind: "client",
     client: createSefariaClient({ cache: false, fetch: linksFetch }),
   };

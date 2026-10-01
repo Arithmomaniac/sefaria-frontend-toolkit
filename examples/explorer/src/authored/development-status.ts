@@ -25,9 +25,9 @@ type Theme = "system" | "light" | "dark";
 const repositorySourceBase =
   "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/explorer/";
 
-const pendingAcquisition = {
-  kind: "capability" as const,
-  capability: {
+const pendingDataSource = {
+  kind: "custom" as const,
+  loader: {
     getText: async () => await new Promise<never>(() => undefined),
     getLinks: async () => await new Promise<never>(() => undefined),
   },
@@ -459,8 +459,8 @@ class SefariaDevelopmentStatus extends SefariaElement {
                         .showAddressLabels=${showAddressLabels}
                         .data=${sourceCardData(id)}
                         sref=${sourceCardSref(id)}
-                        .acquisition=${
-                          id === "loading" ? pendingAcquisition : undefined
+                        .source=${
+                          id === "loading" ? pendingDataSource : undefined
                         }
                         @sefaria-source-select=${this.#logEvent}
                       ></sefaria-source-card>
@@ -495,7 +495,7 @@ class SefariaDevelopmentStatus extends SefariaElement {
                         sref="Genesis 1:2"
                         category=${ifDefined(connectionsCategory(id))}
                         .withText=${id !== "metadata-only"}
-                        .acquisition=${connectionsAcquisition(id)}
+                        .source=${connectionsSource(id)}
                         @sefaria-connection-select=${this.#logEvent}
                         @sefaria-connections-category-change=${this.#logEvent}
                         @sefaria-connections-page-change=${this.#logEvent}
@@ -538,7 +538,7 @@ class SefariaDevelopmentStatus extends SefariaElement {
                             </p>`
                           : html`<sefaria-reader
                               sref="Genesis 1:2"
-                              .acquisition=${readerAcquisition(id)}
+                              .source=${readerSource(id)}
                               active-pane=${activePane}
                               ?chat-export=${chatExport}
                               @sefaria-reader-back=${this.#logEvent}
@@ -670,7 +670,7 @@ function renderTextSegment(id: string) {
   if (id === "loading") {
     return html`<sefaria-text-segment
       sref="Genesis 1:1"
-      .acquisition=${pendingAcquisition}
+      .source=${pendingDataSource}
     ></sefaria-text-segment>`;
   }
   return html`<sefaria-text-segment
@@ -695,7 +695,7 @@ function renderBilingualSegment(id: string) {
   if (id === "loading") {
     return html`<sefaria-bilingual-segment
       sref="Genesis 1:2"
-      .acquisition=${pendingAcquisition}
+      .source=${pendingDataSource}
     ></sefaria-bilingual-segment>`;
   }
   return html`<sefaria-bilingual-segment
@@ -750,12 +750,12 @@ function connectionsCategory(id: string): string | undefined {
   return id === "details" || id === "metadata-only" ? "Commentary" : undefined;
 }
 
-function connectionsAcquisition(id: string) {
+function connectionsSource(id: string) {
   const data = connectionsData(id);
-  if (id === "loading") return pendingAcquisition;
+  if (id === "loading") return pendingDataSource;
   return {
-    kind: "capability" as const,
-    capability: {
+    kind: "custom" as const,
+    loader: {
       getLinks: async () => ({ payload: data, status: 200 as const }),
     },
   };
@@ -769,11 +769,11 @@ function readerData(id: string): unknown {
     : true;
 }
 
-function readerAcquisition(id: string) {
-  if (id === "loading") return pendingAcquisition;
+function readerSource(id: string) {
+  if (id === "loading") return pendingDataSource;
   return {
-    kind: "capability" as const,
-    capability: {
+    kind: "custom" as const,
+    loader: {
       getText: async (request: { readonly sref: string }) => ({
         payload: request.sref === "Genesis 1" ? sourceSection : sourceTarget,
         status: 200 as const,

@@ -9,7 +9,7 @@ Render supplied Source Card data first, switch to standalone `sref` after explic
 ## Prerequisites
 
 - Import `@arithmomaniac/sefaria-web-components` before rendering the tag.
-- Include typed JSX declarations for `data`, `sref`, `acquisition`, presentation properties, and `onsefaria-source-select`.
+- Include typed JSX declarations for `data`, `sref`, `source`, presentation properties, and `onsefaria-source-select`.
 
 ## Try it
 
@@ -31,7 +31,7 @@ return (
   <sefaria-source-card
     data={data}
     sref={sref}
-    acquisition={acquisition}
+    source={source}
     contentLanguage={contentLanguage}
     layout={layout}
     sideOrder={sideOrder}
@@ -43,11 +43,11 @@ return (
 );
 ```
 
-Ordinary HTML and Alpine hosts should use attributes for scalar inputs and properties for rich values. React 19 is the framework-specific exception at the syntax boundary: JSX assigns registered custom-element inputs directly as properties, so scalar props, arrays, and raw data remain JavaScript values rather than string attributes. Keep a stable explicit acquisition object and stable element identity.
+Ordinary HTML and Alpine hosts should use attributes for scalar inputs and properties for rich values. React 19 is the framework-specific exception at the syntax boundary: JSX assigns registered custom-element inputs directly as properties, so scalar props, arrays, and raw data remain JavaScript values rather than string attributes. Keep a stable explicit source object and stable element identity.
 
 ## Expected result
 
-Validated supplied `Micah 6:8` data renders with zero live loads. Form submission is the only live activation. The element owns acquisition, cancellation, stale suppression, private preparation, status, and errors. React owns draft input, presentation, selected position, host readouts, and placement.
+Validated supplied `Micah 6:8` data renders with zero live loads. Form submission is the only live activation. The element owns source, cancellation, stale suppression, private preparation, status, and errors. React owns draft input, presentation, selected position, host readouts, and placement.
 
 Changing theme, width, visible sides, layout, side order, or vocalization performs zero requests. `sefaria-source-select` returns the canonical reference and position.
 
@@ -55,7 +55,7 @@ Changing theme, width, visible sides, layout, side order, or vocalization perfor
 
 ## Who owns what
 
-React owns draft input, activation, presentation, selection, and placement. The element owns acquisition, cancellation, private preparation, rendering, and events.
+React owns draft input, activation, presentation, selection, and placement. The element owns source, cancellation, private preparation, rendering, and events.
 
 ## Exercise
 

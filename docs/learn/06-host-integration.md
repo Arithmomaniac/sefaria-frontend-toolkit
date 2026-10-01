@@ -4,7 +4,7 @@
 
 ## Objective
 
-Apply the same activation, validation, raw-data admission, acquisition, and private-preparation boundaries in an ordinary authored page and in an MCP App.
+Apply the same activation, validation, raw-data admission, source, and private-preparation boundaries in an ordinary authored page and in an MCP App.
 
 An MCP App is an interactive web interface opened by an MCP host such as an AI client. The host provides data and tool calls; the App validates that data and renders the toolkit Reader without calling Sefaria directly.
 
@@ -24,9 +24,9 @@ An authored page keeps a native citation link and enhances it only after JavaScr
 </a>
 ```
 
-The page-owned enhancement opens a native modal dialog containing Source Card, assigns its `sref` attribute with an explicit client acquisition property, clears and disconnects it on close or destroy, and preserves native navigation for JavaScript-disabled and modifier-key use. <SiteLink to="/examples/linked-article/index.html">Open the hosted linked article</SiteLink>.
+The page-owned enhancement opens a native modal dialog containing Source Card, assigns its `sref` attribute with an explicit client source property, clears and disconnects it on close or destroy, and preserves native navigation for JavaScript-disabled and modifier-key use. <SiteLink to="/examples/linked-article/index.html">Open the hosted linked article</SiteLink>.
 
-The MCP App starts differently. In the browser demonstration, clicking **Start live demo** creates a real MCP client/server pair in the page. The server returns API data in the MCP result's `structuredContent` field. The App treats that field as unknown JSON, validates it, and constructs a local-data Reader capability. Opening the page makes zero Sefaria requests. The initial activated flow makes one text request followed by a links request, without loading the source twice. Later navigation asks the host to run the server tool; the App still does not request Sefaria directly.
+The MCP App starts differently. In the browser demonstration, clicking **Start live demo** creates a real MCP client/server pair in the page. The server returns API data in the MCP result's `structuredContent` field. The App treats that field as unknown JSON, validates it, and constructs a local-data Reader loader. Opening the page makes zero Sefaria requests. The initial activated flow makes one text request followed by a links request, without loading the source twice. Later navigation asks the host to run the server tool; the App still does not request Sefaria directly.
 
 <iframe class="example-frame mcp" title="Static live MCP App host" src="../examples/mcp-app/live.html"></iframe>
 
@@ -43,11 +43,11 @@ The linked article still navigates as ordinary HTML when enhancement is unavaila
 
 | Integration | Request owner | Rendering path |
 | --- | --- | --- |
-| Authored article | Page enhancement | Eligible activation -> host dialog -> Source Card `sref` attribute + explicit acquisition property -> private preparation |
-| Static MCP first render | Browser-embedded server after explicit activation | Corrected payload in `structuredContent` -> public schema -> local capability -> private Reader preparation |
-| Static MCP continuation | App through the browser host's server-tool bridge | In-memory MCP tool result -> validation -> tagged host capability -> Reader |
-| MCP first render | Node server before the tool result reaches the App | Unknown `structuredContent` -> public schema -> local capability -> private Reader preparation |
-| MCP continuation | App through the host's supported server-tool bridge | Host-proxied tool result -> validation -> tagged host capability -> Reader |
+| Authored article | Page enhancement | Eligible activation -> host dialog -> Source Card `sref` attribute + explicit source property -> private preparation |
+| Static MCP first render | Browser-embedded server after explicit activation | Corrected payload in `structuredContent` -> public schema -> local loader -> private Reader preparation |
+| Static MCP continuation | App through the browser host's server-tool bridge | In-memory MCP tool result -> validation -> tagged host loader -> Reader |
+| MCP first render | Node server before the tool result reaches the App | Unknown `structuredContent` -> public schema -> local loader -> private Reader preparation |
+| MCP continuation | App through the host's supported server-tool bridge | Host-proxied tool result -> validation -> tagged host loader -> Reader |
 
 The App does not call Sefaria directly. The browser demonstration proves the in-page interaction; it does not replace testing the Node server or a named MCP host.
 

@@ -31,14 +31,14 @@ card.addEventListener("sefaria-source-select", (event) => {
 });
 ```
 
-The root import registers all five elements. The element owns standalone acquisition and private preparation. Do not assign a client, URL, `fetch`, or prepared rendering object.
+The root import registers all five elements. The element owns standalone source and private preparation. Do not assign a client, URL, `fetch`, or prepared rendering object.
 
-Use attributes for scalar inputs such as `sref`, `layout`, and `vocalization-mode`. Properties carry rich objects and arrays, so assign raw `data`, tagged `acquisition`, selected positions, and anchors through JavaScript properties instead.
+Use attributes for scalar inputs such as `sref`, `layout`, and `vocalization-mode`. Properties carry rich objects and arrays, so assign raw `data`, tagged `source`, selected positions, and anchors through JavaScript properties instead.
 
-Use an explicit acquisition source only when the default browser client is not appropriate:
+Use an explicit data source only when the default browser client is not appropriate:
 
 ```ts
-card.acquisition = { kind: "client", client };
+card.source = { kind: "client", client };
 ```
 
 ## Expected result
@@ -54,10 +54,10 @@ The editor below demonstrates the zero-request supplied-data path:
 | Layer | Owns |
 | --- | --- |
 | Client | Transport validation and bounded per-client response cache |
-| Element | Input precedence, acquisition, cancellation, private preparation, rendering, and events |
-| Host | Activation policy, optional explicit acquisition, placement, and application behavior |
+| Element | Input precedence, source, cancellation, private preparation, rendering, and events |
+| Host | Activation policy, optional explicit source, placement, and application behavior |
 
-The complete flow is `sref or raw data -> element validation/acquisition -> private preparation -> Shadow DOM`. Read [How declarative components obtain and render data](../guides/data-flow.md).
+The complete flow is `sref or raw data -> element validation/source -> private preparation -> Shadow DOM`. Read [How declarative components obtain and render data](../guides/data-flow.md).
 
 ## Exercise
 

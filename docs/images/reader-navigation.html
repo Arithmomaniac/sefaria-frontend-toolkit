@@ -387,7 +387,7 @@
         makes at most two text operations and one links operation for that flow.
         Selecting another displayed segment needs only a links operation.
         Category/page changes project the current capture with zero requests;
-        preview acquisition is a separate explicit action. See the
+        preview source is a separate explicit action. See the
         <a href="../specs/integrations.md#standalone-connections-reader-current"
           >current interaction contract</a
         >.
@@ -667,14 +667,14 @@
             Browser coordinator
           </text>
           <text x="304" y="395" class="center">
-            Direct client capability + cancellation
+            Direct client loader + cancellation
           </text>
           <rect x="632" y="340" width="528" height="72" rx="8" class="blue" />
           <text x="896" y="369" class="heading center">
             MCP App coordinator
           </text>
           <text x="896" y="395" class="center">
-            Host capability + operation-scoped completion
+            Host loader + operation-scoped completion
           </text>
           <path
             d="M 304 412 V 450"
@@ -844,7 +844,7 @@
       <p>
         For a later interaction needing data, the planned integrated App
         coordinator must call a server tool through the MCP host. The exact
-        installed SDK capability and named-host permission path remain a
+        installed SDK loader and named-host permission path remain a
         qualification gate rather than an assumed
         <code>callServerTool</code> API. The server requests Sefaria, and the
         App validates the returned operation/status/request metadata and payload

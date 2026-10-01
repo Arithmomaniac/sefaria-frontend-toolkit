@@ -6,7 +6,7 @@ The linked-article example starts with ordinary Sefaria anchors and enhances onl
 
 The author supplies a native `href` and explicit `data-sefaria-ref`. JavaScript-disabled, modifier-key, alternate-target, download, and non-primary activation remain native.
 
-On eligible activation, the page opens the dialog and assigns Source Card `sref` with an explicit cache-disabled toolkit client acquisition source. Close or destroy clears the reference and removes the active card. Destroy restores any accessibility attributes the integration replaced.
+On eligible activation, the page opens the dialog and assigns Source Card `sref` with an explicit cache-disabled toolkit client data source. Close or destroy clears the reference and removes the active card. Destroy restores any accessibility attributes the integration replaced.
 
 Source Card owns loading, cancellation, stale-result suppression, private preparation, and `sefaria-source-card-error`. The page owns the dialog, Escape/button close, focus return to the originating link, explicit activation gate, and visible integration status. It uses ordinary Source Card content without a separate preview truncation rule.
 

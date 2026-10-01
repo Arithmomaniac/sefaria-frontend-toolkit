@@ -32,7 +32,9 @@ card.setAttribute("sref", "Micah 6:8");
 document.body.append(card);
 ```
 
-The undefined acquisition value lazily uses one shared toolkit client per loaded module instance. Assign `{ kind: "client", client }`, `{ kind: "capability", capability }`, or `{ kind: "disabled" }` for an explicit source. Explicit failure or unsupported operations never fall through to browser HTTP.
+The undefined source value lazily uses one shared toolkit client per loaded module instance. Assign `{ kind: "client", client }`, `{ kind: "custom", loader }`, or `{ kind: "disabled" }` for an explicit source. Explicit failure or unsupported operations never fall through to browser HTTP.
+
+Choose where the component gets its data: use a toolkit client, provide a custom loader, or disable loading. A custom loader supplies `getText`, `getLinks`, or both, using local data or your own service.
 
 ## Prebuilt Reader
 
@@ -41,7 +43,7 @@ import { createSefariaClient } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 
 const reader = document.createElement("sefaria-reader");
-reader.acquisition = {
+reader.source = {
   kind: "client",
   client: createSefariaClient(),
 };
@@ -49,7 +51,7 @@ reader.setAttribute("sref", "Micah 6:8");
 document.body.append(reader);
 ```
 
-Reader owns source and links acquisition, cancellation, semantic history, Back, breadcrumbs, private preparation, and errors. Raw seeds initialize or transactionally replace state. Read-only `status`, `rootLoading`, `selectedRef`, `currentEntryId`, and `readerError` expose semantic diagnostics.
+Reader owns source and links source, cancellation, semantic history, Back, breadcrumbs, private preparation, and errors. Raw seeds initialize or transactionally replace state. Read-only `status`, `rootLoading`, `selectedRef`, `currentEntryId`, and `readerError` expose semantic diagnostics.
 
 ## Languages and editions
 
@@ -72,7 +74,7 @@ Reader owns source and links acquisition, cancellation, semantic history, Back, 
 <sefaria-reader sref="Micah 6:8" translation-language="french"></sefaria-reader>
 ```
 
-| Element | Presentation language | Acquisition language and editions |
+| Element | Presentation language | DataSource language and editions |
 | --- | --- | --- |
 | Text Segment | One selected text | `translation-language` **or** strict `version-language`; optional `version-title` |
 | Bilingual Segment | `content-language`: `both`, `primary`, `translation` | `translation-language`, `primary-version-title`, `translation-version-title` |
@@ -113,7 +115,7 @@ Supplied data makes zero requests and must include the selected text or metadata
 | Goal | Entry point |
 | --- | --- |
 | Register all elements | `@arithmomaniac/sefaria-web-components` |
-| Acquisition types/configuration | `@arithmomaniac/sefaria-web-components/acquisition` |
+| DataSource types/configuration | `@arithmomaniac/sefaria-web-components/data-source` |
 | Component raw request/selection types | Component-specific subpath |
 | Shared raw Reader source qualification | `@arithmomaniac/sefaria-web-components/reader` |
 | Advanced semantic/raw Reader facade: history, pins, budgets, entry info, records, and raw transitions | `@arithmomaniac/sefaria-web-components/reader-session` |

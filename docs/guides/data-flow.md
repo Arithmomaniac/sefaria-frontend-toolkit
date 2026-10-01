@@ -2,7 +2,7 @@
 
 # How declarative components obtain and render data
 
-**Current:** all five public elements support standalone `sref`. Only Text Segment, Bilingual Segment, and Source Card accept authoritative component-specific raw `data`; Reader and Connections Panel use tagged acquisition capabilities for local payloads. Elements own validation, acquisition selection, cancellation, stale-result suppression, private preparation, and rendering.
+**Current:** all five public elements support standalone `sref`. Only Text Segment, Bilingual Segment, and Source Card accept authoritative component-specific raw `data`; Reader and Connections Panel use tagged source capabilities for local payloads. Elements own validation, source selection, cancellation, stale-result suppression, private preparation, and rendering.
 
 ## Start with supplied data
 
@@ -21,9 +21,9 @@ if (!card) throw new Error("The source card is missing.");
 card.data = zCoreV3TextsResponse.parse(received) as CoreV3TextsResponse;
 ```
 
-For the five non-Reader elements, defined `data` is authoritative. Valid, validly empty, and invalid supplied data all suppress `sref` acquisition. Invalid input replaces earlier content with a validation failure and does not fall through to the network. Clearing `data` lets a retained eligible `sref` run.
+For the five non-Reader elements, defined `data` is authoritative. Valid, validly empty, and invalid supplied data all suppress `sref` source. Invalid input replaces earlier content with a validation failure and does not fall through to the network. Clearing `data` lets a retained eligible `sref` run.
 
-Raw data is not render-ready state. Each element validates, selects, sanitizes, and prepares it into private state before rendering. The same private preparation is used after standalone acquisition.
+Raw data is not render-ready state. Each element validates, selects, sanitizes, and prepares it into private state before rendering. The same private preparation is used after standalone source.
 
 ## Then add standalone `sref`
 
@@ -37,7 +37,7 @@ card.data = undefined;
 card.setAttribute("sref", "Micah 6:8");
 ```
 
-The element selects either its explicit tagged `acquisition` source or the module-local lazy shared default. An explicit source can be an existing toolkit client, a structural host capability, or disabled. Explicit failure, disablement, or an unsupported operation never falls through to browser HTTP.
+The element selects either its explicit tagged `source` source or the module-local lazy shared default. An explicit source can be an existing toolkit client, a structural host loader, or disabled. Explicit failure, disablement, or an unsupported operation never falls through to browser HTTP.
 
 Maintained documentation and example pages still preserve their activation gates: opening a page or deep link does not assign a live `sref`. A button, form submission, authored citation activation, or other approved action does.
 
@@ -47,28 +47,28 @@ Maintained documentation and example pages still preserve their activation gates
 | --- | --- | --- |
 | `@arithmomaniac/sefaria-client` | Corrected operations, response validation, Fetch semantics, and the bounded per-client response cache | Component methods, retries, coalescing, or rendering |
 | Text transforms | Pure sanitization, vocalization, footnotes, and bounded previews | Requests or component lifecycle |
-| Public element | Input snapshot, acquisition choice, cancellation, stale suppression, private preparation, status, events, accessibility, and rendering | Arbitrary `fetch`, base URL, untyped host, retry, or public prepared state |
-| Host | Activation policy, supplied unknown-JSON validation, optional explicit acquisition, placement, and application-specific coordination | A second renderer or hidden fallback transport |
+| Public element | Input snapshot, data source choice, cancellation, stale suppression, private preparation, status, events, accessibility, and rendering | Arbitrary `fetch`, base URL, untyped host, retry, or public prepared state |
+| Host | Activation policy, supplied unknown-JSON validation, optional explicit source, placement, and application-specific coordination | A second renderer or hidden fallback transport |
 | Reader session | Supported advanced semantic/raw facade: history, pins, budgets, `entryInfo`, stable raw records, and raw transitions | Prepared rendering/content, DOM state, browser-default transport, or spatial pane placement |
 
-## Shared and explicit acquisition
+## Shared and explicit source
 
 ```ts
 import { createSefariaClient } from "@arithmomaniac/sefaria-client";
 import {
-  configureSefariaAcquisition,
-  type SefariaAcquisition,
-} from "@arithmomaniac/sefaria-web-components/acquisition";
+  configureSefariaDataSource,
+  type SefariaDataSource,
+} from "@arithmomaniac/sefaria-web-components/data-source";
 
-const acquisition: SefariaAcquisition = {
+const source: SefariaDataSource = {
   kind: "client",
   client: createSefariaClient(),
 };
 
-configureSefariaAcquisition(acquisition);
+configureSefariaDataSource(source);
 ```
 
-Configuration is allowed only before first shared use. Importing modules, supplied-data rendering, and explicit per-element acquisition do not realize the shared choice. The client cache remains the only response cache.
+Configuration is allowed only before first shared use. Importing modules, supplied-data rendering, and explicit per-element source do not realize the shared choice. The client cache remains the only response cache.
 
 ## One parent request, zero child requests
 
@@ -84,7 +84,7 @@ Current failures are reflected in the element's read-only `status` and documente
 
 ## Reader is specialized
 
-Reader `sref` identifies the requested root. Local corrected payloads initialize or replace Reader state through a tagged acquisition capability instead of an ordinary authoritative `data` override. Public read-only diagnostics expose semantic state such as `selectedRef`, `currentEntryId`, `rootLoading`, and `readerError`.
+Reader `sref` identifies the requested root. Local corrected payloads initialize or replace Reader state through a tagged data loader instead of an ordinary authoritative `data` override. Public read-only diagnostics expose semantic state such as `selectedRef`, `currentEntryId`, `rootLoading`, and `readerError`.
 
 Advanced spatial hosts can use the supported `reader-session` facade for history, pins, budgets, `entryInfo`, stable `ReaderSourceRecord`/`ReaderConnectionsRecord` values, and raw transitions. The `reader` subpath supplies shared raw source qualification. Neither subpath exposes private prepared rendering or content.
 
