@@ -323,6 +323,7 @@ The check fails for changed, missing, or unexpected generated files. `pnpm check
 
 If upstream content differs from an asserted old value, generation stops with an exact path:
 
+<!-- prettier-ignore -->
 ```html
 OpenAPI precondition mismatch for versions-contract at $.paths['/api/texts/versions/{index}']
 expected: SHA-256 <reviewed value>

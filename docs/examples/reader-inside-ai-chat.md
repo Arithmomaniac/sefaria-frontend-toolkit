@@ -39,19 +39,17 @@ The result's metadata (`_meta`) records the operation, status and effective requ
 
 ### The first answer
 
-The first answer carries the whole payload. The App checks the tool result and builds a seed from it. The App gives the seed to the Reader as `reader.data`. The seed avoids fetching the same text again.
+The App gives the Reader an `sref` and an `acquisition` of kind `capability`. It does not assign Reader data. The App checks the first tool result. Then it serves the passage text from that result, with no extra request.
 
-A text-only seed still loads the initial connections through one host tool call. A connections-only seed shows its supplied connections with no follow-up request.
-
-<<< ../../examples/mcp-app/src/app.ts#seed-reader{ts}
+The first connections come from the host. For a text result, the Reader makes one `get_links_between_texts` call through the chat host. A connections-only result shows its own connections with no follow-up request.
 
 ### Later navigation
 
-When you open a passage the Reader hasn't captured, it needs new data. Going back to retained history stays local. Regrouping connections it already has also stays local. The Reader receives an `acquisition` of kind `capability`. Its `getText` and `getLinks` functions call the same server tools through the chat host, using `callServerTool`.
+When you open a passage the App has not captured, the Reader needs new data. Going back to retained history stays local. Regrouping connections it already has also stays local. For anything else, the capability's `getText` and `getLinks` functions call the same server tools. They use `callServerTool` through the chat host.
 
 <<< ../../examples/mcp-app/src/app.ts#reader-acquisition{ts}
 
-The App itself doesn't contact Sefaria. The example's tests check that a Reader seeded from a source loads its initial connections through a host tool call, with no browser fetch. If the host can't call server tools, the App shows an error. Tool failures and invalid payloads show an alert.
+The App itself doesn't contact Sefaria. The example's tests check that a text result renders at once. They also check that its first connections load through one host tool call, with no browser fetch. If the host can't call server tools, the App shows an error. Tool failures and invalid payloads show an alert.
 
 ### Toolkit and chat host
 

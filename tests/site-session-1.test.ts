@@ -285,7 +285,7 @@ describe.each([
       "`ready`",
       "`error`",
       "(/help/troubleshoot-a-page.md)",
-      "(/data-and-text-tools/give-components-your-own-data.md)",
+      "(/data-and-text-tools/give-components-your-own-data.md",
       "(/reference/components.md",
       ...required,
     ]) {

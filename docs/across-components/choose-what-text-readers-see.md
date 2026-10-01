@@ -86,7 +86,7 @@ These choices change what the component requests.
 
 For the segments and Source Card, a fresh load makes one request. It makes two if the translation language is missing and `translation-fallback` is `default`. The Reader also loads the surrounding section and its links.
 
-Supplied data makes no request for the non-Reader elements. A Reader seed with only source data still makes one links request. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md).
+Supplied `data` on Text Segment, Bilingual Segment, or Source Card makes no request. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md).
 
 ### Choose a translation language
 

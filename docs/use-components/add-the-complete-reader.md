@@ -84,8 +84,6 @@ Unlike the smaller components, the Reader makes several requests.
 - Opening a connection makes up to three requests: its text, its section, and its connections. With a missing translation language and `translation-fallback="default"`, it can make up to five. With `none`, it stays at three.
 - Back makes none. Changing a connections category or page makes none.
 
-If you supply a source-only `data` seed, the Reader makes one connections request and doesn't reload the text.
-
 ## When there's nothing to show
 
 Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`, or `error`.
@@ -99,15 +97,15 @@ Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`,
 | Sefaria says the reference you set isn't a reference | An alert with Sefaria's message. An entry that's already open stays. | `error` | `sefaria-reader-error` |
 | Opening a connection fails | An error message. The current entry stays. | `error` | No |
 | Only the connections request fails | An alert in the Connections pane. The text stays. | `ready` | No |
-| Nothing set yet: no `sref`, no `data` | Nothing | `empty` | No |
+| Nothing set yet: no `sref` | Nothing | `empty` | No |
 
-Invalid supplied `data` shows an error without falling back to loading `sref`, and open content stays. Once the Reader has shown content, removing `sref` or `data` doesn't clear it. To react to a failed load of the reference you set, listen for `sefaria-reader-error`. It bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`.
+Once the Reader has shown content, removing `sref` doesn't clear it. To react to a failed load of the reference you set, listen for `sefaria-reader-error`. It bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`.
 
 <span class="learn-more__label">Learn more:</span> [Troubleshoot a page](/help/troubleshoot-a-page.md) · [Component events](/reference/components.md#events) {.learn-more}
 
 ## Use your own data
 
-Set `data` to a seed, for example text you already fetched. It isn't a finished rendering. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md).
+The Reader has no `data` property. If your host already has text or links, give the Reader an acquisition capability with `getText` and `getLinks`. See [Control loading](/data-and-text-tools/give-components-your-own-data.md#control-loading).
 
 ## When to compose instead
 

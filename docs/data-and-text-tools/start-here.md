@@ -50,6 +50,7 @@ Validating isn't cleaning. The check protects your code from a wrong response sh
 
 This makes no network request. It prints two lines:
 
+<!-- prettier-ignore -->
 ```html
 הִגִּ֥יד לְךָ֛ אָדָ֖ם מַה־טּ֑וֹב <span data-sefaria-mam="setumah">{ס}</span>
 הִגִּיד לְךָ אָדָם מַה־טּוֹב <span data-sefaria-mam="setumah">{ס}</span>
@@ -67,6 +68,7 @@ This makes no network request. It prints two lines:
 
 This asks for `version: ["translation"]`, which returns Sefaria's default translation. That isn't always English. For Micah 6:8 today it is "THE JPS TANAKH: Gender-Sensitive Edition". The output is:
 
+<!-- prettier-ignore -->
 ```html
 THE JPS TANAKH: Gender-Sensitive Edition:
 “You have been told, O mortal, what is good,<br>And what  G<small>OD</small> requires of you:<br>Only to do justice<br>And to love goodness,<br>And to walk modestly with your God;<span data-sefaria-note="0"></span>

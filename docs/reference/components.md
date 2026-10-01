@@ -167,7 +167,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 
 ### Data
 
-`data` takes the body of a `GET /api/links/{tref}` response, typed `CoreLinkResponse` from `@arithmomaniac/sefaria-client`. The element treats supplied data as a status 200 response, including when it is an API error object. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid.
+It has no `data` property. To give it local data, set `acquisition` to `{ kind: "capability", capability }`, where the capability's `getText` and `getLinks` functions answer from your data. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md#control-loading).
 
 ### Empty state
 
@@ -213,11 +213,11 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 
 ### Data
 
-`data` takes a `ReaderRawSeedData` object, exported as a type from `@arithmomaniac/sefaria-web-components/reader`. It needs at least one seed. `source` holds a status 200 `GET /api/v3/texts/{tref}` response and the request it answers. `connections` holds a `GET /api/links/{tref}` response, its status, and its request. It can also set `selectedRef` and `presentation`. The Reader accepts the whole value or none of it. A value it can't accept produces an error, not a request. A `source` seed without `connections` still leads to a links request.
+It has no `data` property. To give it local data, set `acquisition` to `{ kind: "capability", capability }`, where the capability's `getText` and `getLinks` functions answer from your data. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md#control-loading).
 
 ### Empty state
 
-A Reader that has never had `sref` or `data` is blank. Its status is `empty`. Clearing `data` later keeps the content the Reader already accepted. A missing pane shows `Source text is not available for this entry.` or `Connections are not available for this entry.` The Reader reports a passage with no text as a source failure, not as an empty Source Card. A valid links response with no text connections shows the Connections Panel's empty message.
+A Reader that has never had `sref` is blank. Its status is `empty`. A missing pane shows `Source text is not available for this entry.` or `Connections are not available for this entry.` The Reader reports a passage with no text as a source failure, not as an empty Source Card. A valid links response with no text connections shows the Connections Panel's empty message.
 
 ### Events
 

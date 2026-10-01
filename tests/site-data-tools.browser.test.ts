@@ -40,22 +40,15 @@ test("supplied Source Card data renders with zero Sefaria requests", async () =>
   vi.unstubAllGlobals();
 });
 
-test("a source-only Reader seed loads links once and no source text", async () => {
+test("a Reader served by a local capability makes no Sefaria requests", async () => {
   const requests = stubFetch();
   document.body.innerHTML = "<sefaria-reader></sefaria-reader>";
-  await import("../examples/site-snippets/supplied-reader-seed.ts");
+  await import("../examples/site-snippets/local-reader-capability.ts");
   const reader = document.querySelector("sefaria-reader") as SefariaReader;
-  await vi.waitFor(() =>
-    expect(requests.filter((url) => url.includes("/api/links/"))).toHaveLength(
-      1,
-    ),
-  );
-  await new Promise((resolve) => setTimeout(resolve, 50));
-  expect(requests.filter((url) => url.includes("/api/v3/texts/"))).toEqual([]);
-  expect(reader.status).not.toBe("error");
+  await vi.waitFor(() => expect(reader.status).toBe("ready"));
+  expect(requests).toEqual(["/data/micah-6-8.json"]);
   vi.unstubAllGlobals();
 });
-
 test("the MCP App Reader continues through host tools, never Sefaria", async () => {
   const requests = stubFetch();
   const callServerTool = vi.fn(async () => ({
@@ -66,17 +59,10 @@ test("the MCP App Reader continues through host tools, never Sefaria", async () 
   document.body.innerHTML = "<sefaria-reader></sefaria-reader>";
   const reader = document.querySelector("sefaria-reader") as SefariaReader;
   reader.acquisition = acquisition;
-  reader.data = {
-    source: {
-      payload: micah.payload,
-      status: 200,
-      effectiveRequest: { tref: "Micah 6:8" },
-    },
-    selectedRef: "Micah 6:8",
-  };
+  reader.sref = "Micah 6:8";
   await vi.waitFor(() => expect(callServerTool).toHaveBeenCalledOnce());
   expect(callServerTool.mock.calls[0]?.[0]).toMatchObject({
-    name: "get_links_between_texts",
+    name: "get_text",
     arguments: { reference: "Micah 6:8" },
   });
   expect(requests).toEqual([]);

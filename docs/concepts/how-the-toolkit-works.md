@@ -31,14 +31,14 @@ With the tag in place, the element needs text to show. The next step is where th
 The element has three possible sources:
 
 - live loading by `sref`, through the default client or a client you supply
-- `data` you supply
+- `data` you supply, on the Text Segment, Bilingual Segment, and Source Card only
 - a capability your host provides
 
 If you disable loading, the element makes no request. It shows an error only when it needed to load. Supplied data still renders, and a tag with no input stays empty.
 
-Supplied `data` wins over `sref`. You already have the text, so asking Sefaria again would waste a request and could disagree with what you gave. For the same reason, invalid `data` shows an error and does not fall back to `sref`. A silent fallback would hide your bug and show text you didn't choose.
+On those three elements, supplied `data` wins over `sref`. You already have the text, so asking Sefaria again would waste a request and could disagree with what you gave. For the same reason, invalid `data` shows an error and does not fall back to `sref`. A silent fallback would hide your bug and show text you didn't choose.
 
-The Reader also takes `data`, but its value is a seed, a starting point it continues from. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md) for supplying data, seeds and host capabilities, and [the Components reference](/reference/components.md) for exact property shapes.
+The Reader and Connections Panel don't take `data`. To give them local data, your host provides an acquisition capability. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md) for supplying data and host capabilities, and [the Components reference](/reference/components.md) for exact property shapes.
 
 When the text comes from `sref`, the element has to ask Sefaria for it.
 

@@ -121,7 +121,7 @@ describe("C1 How the toolkit works", () => {
       /no requests?|zero requests?|doesn't make a request|makes no request/i,
     );
     expect(markdown).toMatch(/invalid[\s\S]{0,200}error/i);
-    expect(markdown).toMatch(/Reader[\s\S]{0,300}seed/);
+    expect(markdown).toMatch(/Reader[\s\S]{0,300}acquisition capability/);
   });
 
   it("tells one story and leaves styling to its owner page", async () => {
@@ -389,10 +389,7 @@ describe.each([
     name: "E3 Reader inside AI chat",
     file: "reader-inside-ai-chat.md",
     route: "/examples/mcp-app/live.html",
-    regions: [
-      "examples/mcp-app/src/app.ts#seed-reader",
-      "examples/mcp-app/src/app.ts#reader-acquisition",
-    ],
+    regions: ["examples/mcp-app/src/app.ts#reader-acquisition"],
     links: [
       "/use-components/add-the-complete-reader.md",
       "/data-and-text-tools/give-components-your-own-data.md",
