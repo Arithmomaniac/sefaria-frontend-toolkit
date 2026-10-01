@@ -17,8 +17,9 @@ Components normally load their text from Sefaria. If you already hold the respon
 | --- | --- |
 | A response you saved, fetched on your server, received from an MCP tool, or exported | The element's `data` property |
 | A route to Sefaria that your host controls | The element's `acquisition` property |
+| Only part of a Reader's data | A Reader seed, described below |
 
-Both cases start from corrected API-shaped JSON. That is the JSON body Sefaria's API returns, in the shape the toolkit's corrected API description expects. The Reader wraps that JSON in a small seed object, described below.
+Both cases start from corrected API-shaped JSON. That is the JSON body Sefaria's API returns, in the shape the toolkit's corrected API description expects.
 
 ## Supply data once
 
@@ -49,14 +50,9 @@ Supplied data also follows the element's `translation-fallback` setting. It defa
 
 To see the failure in your own code as well, read [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md).
 
-## Start the Reader from your data
+## Start the Reader from a seed
 
-The Reader (`sefaria-reader`) is different. To start it from your data, build a starting seed of type `ReaderRawSeedData` and assign it to `data`. The seed isn't a complete rendering. Each field is optional, but a seed needs `source` or `connections`. Also, `selectedRef` must match an item in `source`:
-
-- `source`: `{ payload, status: 200, effectiveRequest: { tref } }`
-- `connections`
-- `selectedRef`
-- `presentation`
+The Reader (`sefaria-reader`) is different. A seed is a starting point, not full data. Assign a `ReaderRawSeedData` object to `data`. It needs `source` or `connections`. The [Components reference](/reference/components.md) lists its fields.
 
 The Reader shows what the seed contains. A seed with `source` but no `connections` loads the connections. A connections-only seed doesn't load source text. When the reader navigates, the Reader reuses text it already holds and requests only what it still needs. Going Back makes no requests.
 
@@ -76,14 +72,9 @@ To set the shared default instead, call `configureSefariaAcquisition(choice)`. E
 
 With `capability` or `disabled`, the element never falls back to requesting Sefaria from the browser.
 
-A capability is an object with either or both of two async functions:
+A capability is an object with either or both of two async functions, `getText` and `getLinks`. Each takes a request and an `AbortSignal`, and returns `{ payload, status }`. The component validates the payload. The type names are in [Package imports and exports](/reference/package-imports-and-exports.md).
 
-- `getText(request, signal)`
-- `getLinks(request, signal)`
-
-Each receives its request object and an `AbortSignal`. Each returns `{ payload, status }`. Here `payload` is the corrected API response body, and `status` is its HTTP status. The component validates the payload itself.
-
-If an element needs a function your capability doesn't have, the load fails with an error. With `disabled`, any load the element attempts fails with "Standalone Sefaria acquisition is disabled." That includes the connections a source-only Reader seed would load. After a failed load, an element reports the error and may keep content it already showed.
+If an element needs a function your capability doesn't have, the load fails with an error. With `disabled`, any load the element attempts fails with "Standalone Sefaria acquisition is disabled." That includes the connections a source-only Reader seed would load. If a later load fails, an element that already showed text keeps it. Its `status` becomes `error`, and its error event fires. [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md) shows how to read both.
 
 ### Example: a Reader inside AI chat
 

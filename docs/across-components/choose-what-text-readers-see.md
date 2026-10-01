@@ -14,10 +14,7 @@ import textChoiceControls from "../../examples/site-snippets/text-choice-control
 
 This page compares the content choices for [Text Segment](/use-components/show-text/show-one-passage.md), [Bilingual Segment](/use-components/show-text/hebrew-and-translation.md), [Source Card](/use-components/show-an-attributed-passage.md), and the Reader. It assumes that one of those components already works. If you don't, start with [Put your first source on a page](/use-components/start-here.md).
 
-Each choice is an HTML attribute. You write it inside the tag. Choices come in two kinds:
-
-- **Which text to load** is the language and edition. These change what the component requests, so a change makes a new request.
-- **How it's shown** is vocalization, sides, arrangement, and the edition credit. These redraw text the component already has and never make a request.
+## Terms
 
 Three terms matter throughout:
 
@@ -27,9 +24,12 @@ Three terms matter throughout:
 
 A request is one call from the page to Sefaria. A dash in the tables means the component has no such attribute. The Reader also has attributes that aren't about text choice.
 
-## Try them together
+Each choice is an HTML attribute. You write it inside the tag.
 
-<LiveEditor :code="textChoiceControls" title="Change the choices on a Source Card">Change the menus. Vocalization and sides redraw without a request. Choosing a translation language makes a new request, or two if Sefaria falls back.</LiveEditor>
+## Two kinds of changes
+
+- **Which text to load** is the language and edition. These change what the component requests, so a change makes a new request.
+- **How it's shown** is vocalization, sides, arrangement, and the edition credit. These redraw text the component already has and never make a request.
 
 ## Choose which text to load
 
@@ -49,8 +49,6 @@ flowchart TD
   Q4 -->|Yes| A5["Load Sefaria's default translation"]
   Q4 -->|No| A6["Show a status message"]
 ```
-
-- **Language could be the original:** `version-language` can't be combined with `translation-language`.
 
 These choices change what the component requests.
 
@@ -101,6 +99,11 @@ Not every text has every translation. Ask for `french` on `Berakhot 2a:1`. Sefar
 - **`default`** is the default for Source Card and Reader. The component makes one more request for Sefaria's default translation. That translation isn't always English. Source Card and Reader show a notice such as `french is unavailable; showing english.` For the text operation, a fresh load makes two requests. The Reader repeats this for its surrounding section and also requests links.
 - **`none`** is the default for Text Segment and Bilingual Segment. The component makes no second request. It shows the status message "No french text." This isn't an error. Text Segment is `empty`. Bilingual Segment and Source Card show the primary side with status `ready`.
 
+| With fallback | What readers see | Requests |
+| --- | --- | --- |
+| `default` | Sefaria's default translation, with a notice on Source Card and Reader | One more request |
+| `none` | The status message "No french text." | No second request |
+
 With `default`, Text Segment and Bilingual Segment show the fallback text without a notice.
 
 Only a bare language preference can fall back. An exact edition title never falls back, and an empty edition stays empty. In Bilingual Segment and Source Card, you can pin one side and give only a language for the translation. That translation can still fall back.
@@ -109,10 +112,16 @@ Only a bare language preference can fall back. An exact edition title never fall
 
 To avoid a fallback, pin one edition by its title. A title picks one edition, while a language picks any edition in that group.
 
+| Choice | Picks | Can include the original | Falls back |
+| --- | --- | --- | --- |
+| `translation-language` | A translation in that language | No | Depends on `translation-fallback` |
+| `version-language` | Any edition in that language | Yes | Never |
+| Title attributes | One edition | Depends on the title | Never |
+
 - Bilingual Segment and Source Card: `primary-version-title` pins the primary edition. `translation-version-title` pins the translation.
 - Text Segment: `version-title` alone chooses another edition in the original language, such as a different Hebrew edition. To choose a translation by title, also set `translation-language`.
 
-On Text Segment, `translation-language` and `version-language` are mutually exclusive. Pick one. `version-language` alone shows any edition in that language family, including the original, with no fallback. It doesn't pin one edition.
+On Text Segment, `translation-language` and `version-language` are mutually exclusive. Pick one. `version-language` alone doesn't pin one edition.
 
 ## Choose how it's shown
 
@@ -151,6 +160,8 @@ These choices redraw text that has already arrived.
   </tbody>
 </table>
 
+On the Reader, `hide-attributions` and the side attributes apply to its source card.
+
 Source Card also has `selectable`. Switching sides makes no request, because all three components with sides request both sides even when they show one. Source Card makes one text request for the whole card, however many verses it shows. It makes a second request only when the fallback applies.
 
 ### Set Hebrew vocalization
@@ -175,7 +186,11 @@ Sides and arrangement apply to Bilingual Segment, Source Card, and Reader.
 
 Two columns appear only when both sides show. `side-order` changes the visual order only in two-column layouts.
 
-### See which edition readers are shown
+## Try them together
+
+<LiveEditor :code="textChoiceControls" title="Change the choices on a Source Card">Change the menus. Vocalization and sides redraw without a request. Choosing a translation language makes a new request. It makes two if Sefaria falls back.</LiveEditor>
+
+## Edition credit and license
 
 Only Source Card and Reader name the edition. They show each edition's title and language. They link the title to its source when Sefaria gives a valid http(s) address. They don't show the license. Text Segment and Bilingual Segment show only the text.
 

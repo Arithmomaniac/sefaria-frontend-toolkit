@@ -11,13 +11,13 @@ import { data as snippets } from "./snippets.data.ts";
 
 # Fetch data or clean text
 
-This flow uses two independent packages from the toolkit. The client fetches from Sefaria's API and checks each JSON response against the corrected API description. The text tools turn Sefaria's HTML into safe HTML, keep footnotes separate, and choose which vowel and cantillation marks to show. Use either one alone, or both. Neither needs a browser or a DOM, so they run on a server.
+This flow uses two independent packages from the toolkit. The client fetches from Sefaria's API and checks each JSON response against the corrected API description. The text tools turn Sefaria's HTML into safe HTML, keep footnotes separate, and choose which vowel and cantillation marks to show. Use the client when you don't have the data yet. Use the text tools when you already hold Sefaria HTML. Use both when you fetch and then display. Neither needs a browser or a DOM, so they run on a server. Want ready-made UI? [Use components](/use-components/start-here.md).
 
 ## Install
 
 <StatusNote />
 
-Install `@arithmomaniac/sefaria-client`, `@arithmomaniac/sefaria-text-transform`, or both. They are on GitHub Packages, which needs an access token before you can install. [Install and status](/help/install-and-status.md) shows how to set up the token and gives the exact install command for the current version. These steps need Node.js 22.12 or later. That page also lists the other JavaScript runtimes the packages are meant for.
+Install `@arithmomaniac/sefaria-client`, `@arithmomaniac/sefaria-text-transform`, or both. They are on GitHub Packages, which needs an access token before you can install. [Install and status](/help/install-and-status.md) shows how to set up the token and gives the exact install command for the current version. These steps need Node.js 22.12 or later.
 
 Each example below is a complete ES module. Save the JavaScript version as a file such as `fetch.mjs` and run `node fetch.mjs`. For the TypeScript version, save it as `fetch.ts` and use your usual TypeScript tooling. Node.js 22.18 and later can also run it directly with `node fetch.ts`.
 
@@ -30,6 +30,8 @@ The first part prints `Micah 6:8 · he · Miqra according to the Masorah`. `crea
 The result has `data` on success. When Sefaria answers with a documented HTTP error, such as 404 for an unknown reference, the result has `error` with the documented error body. Then `data` is undefined. If a response doesn't match the API description, the call throws a `SefariaContractError` instead of returning data. Network failures also throw. They are not turned into empty data.
 
 The second part checks JSON you got another way, such as from storage or a file. `validateExternalResponse` returns `{ valid, issues }` and does not throw. It prints `Invalid at /isSpanning: Invalid input: expected boolean, received string`. Each issue's `instancePath` is a JSON Pointer into the checked value. It points to the place in the data. It doesn't say how to fix it.
+
+Validating isn't cleaning. The check protects your code from a wrong response shape. It doesn't make the text safe to display. See [Clean text and safety](/concepts/clean-text-and-safety.md).
 
 <span class="learn-more__label">Learn more:</span> [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md) · [The client and Sefaria's API](/concepts/the-client-and-sefarias-api.md) {.learn-more}
 
