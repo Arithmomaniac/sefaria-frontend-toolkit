@@ -7,7 +7,7 @@ description: "Put your first Sefaria source on a page with two lines of HTML, or
 
 # Put your first source on a page
 
-Copy the two lines below into any page that allows a script tag and custom HTML. The first line loads the toolkit's components. The second line shows `Micah 6:8` as a Source Card, a box that displays the text and says where it comes from.
+Copy the two lines below into any page that allows a script tag and custom HTML. The first line loads the toolkit's components as a module script. The second line shows `Micah 6:8` as a Source Card, a box that displays the text and says where it comes from.
 
 <StatusNote />
 
@@ -30,6 +30,8 @@ The card fetches the text from Sefaria when it appears on the page. While it wai
 ## Script tag or package
 
 Use the script tag if your page has no build step, or if you're editing a field in a content management system. It's also the quickest way to try the toolkit. Use the package if your app already has a build step. The package lets you import the component, bundle it with your code, and let your framework control when it loads.
+
+The script tag needs `type="module"`, because a plain script doesn't work. The components file is self-contained, and the client and text tools have their own files. See [The three files](/help/install-and-status.md#the-three-files).
 
 ::: code-group
 

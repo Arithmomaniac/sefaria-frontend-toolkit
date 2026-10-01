@@ -40,6 +40,8 @@ Import the files straight from the CDN. This needs no token. It works in a brows
 </script>
 ```
 
+These files are ES modules, so import them. A plain script tag without `type="module"` won't work. Each import takes named functions, or use `import * as client from "…"` to take a whole file. [The three files](/help/install-and-status.md#the-three-files) gives the full picture.
+
 The `alpha` address serves the newest build, and it changes without notice. [Install and status](/help/install-and-status.md) shows how to find hosted versions.
 
 ### Packages
