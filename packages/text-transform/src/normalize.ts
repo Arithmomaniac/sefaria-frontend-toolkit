@@ -38,10 +38,13 @@ export interface NormalizeTextOptions {
   /**
    * Retain commentary, overlay, and standalone annotation metadata. Defaults to `true`.
    *
-   * When enabled, commentary markers keep `data-sefaria-commentary-marker`,
-   * commentary anchors keep `data-sefaria-commentator`, `data-sefaria-label`,
-   * and `data-sefaria-order`, and overlay anchors keep `data-sefaria-overlay`
-   * plus `data-sefaria-value`. When disabled, those attributes and their empty
+   * When enabled, end-of-text footnote markers keep `data-sefaria-end-footnote`
+   * when `allowFootnotes` is also enabled, commentary markers keep
+   * `data-sefaria-commentary-marker`, commentary anchors keep
+   * `data-sefaria-commentator`, `data-sefaria-label`,
+   * and `data-sefaria-order`; matching commentary references can add
+   * `data-sefaria-ref`. Overlay anchors keep `data-sefaria-overlay` plus
+   * `data-sefaria-value`. When disabled, those attributes and their empty
    * anchor elements are dropped.
    */
   readonly allowInlineAnnotations?: boolean;
