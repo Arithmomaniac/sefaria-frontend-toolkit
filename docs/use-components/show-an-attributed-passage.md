@@ -37,7 +37,11 @@ Attribution appears once for the whole card, not once per verse. It has one line
 
 The card links the edition title to the edition's source only when Sefaria gives a valid http(s) address. The link opens in a new tab. Otherwise the title is plain text. The attribution doesn't show the license. For reuse rights, see [Choose what text readers see](/across-components/choose-what-text-readers-see.md).
 
-If Sefaria reports that your preferred translation language is missing for the passage, the card requests Sefaria's default translation once (the second request). That translation isn't always English. The card shows a note such as `french is unavailable; showing english.` An exact edition doesn't fall back. To turn the fallback off, set `translation-fallback="none"`. The card then makes one request. The translation side shows `No french text.`, the primary side still shows, and `status` is `ready` with no error. `hide-attributions` hides both the attribution lines and the fallback note.
+By default, if Sefaria reports that your preferred translation language is missing, the card makes one more request. It asks for Sefaria's default translation, which isn't always English. The card adds a note naming the missing language and the one shown. An exact edition never falls back.
+
+With `translation-fallback="none"`, the card makes one request. The translation side says the language is missing. The primary side still shows. `status` is `ready` with no error.
+
+`hide-attributions` hides the attribution lines and the fallback note.
 
 ## Let readers select a verse
 
@@ -45,15 +49,17 @@ Add the `selectable` attribute. Each selectable verse gets a number button besid
 
 A selection fires `sefaria-source-select`. It bubbles and crosses the component boundary, so you can listen on the card or on a parent. Its `event.detail` is `{ position, ref }`, for example `{ position: [1], ref: "Micah 6:7" }`. `position` is a list of numbers that locates the verse in the passage, counting from 0. For a range such as Micah 6:6-8 it is one number, so `[1]` is the second verse.
 
-Your page controls the selection. The card doesn't highlight a verse by itself. To highlight it, set the card's `selectedPosition` property to `event.detail.position`. The verse's button then gets `aria-pressed="true"` and the verse gets an outline. Setting `selectedPosition` doesn't fire the event again. The event also works with supplied data and makes no request.
+With `selectable`, each verse in the card is a button readers can choose. Choosing one fires `sefaria-source-select` with the verse's position and reference. The event also works with supplied data and makes no request.
 
-The card adds selection buttons only when it can work out each verse's own reference. Some passages, such as ones that span chapters, still show but without selection buttons.
+The card doesn't mark the choice itself. To show it, set `selectedPosition` to `event.detail.position`. The verse then appears selected, with an outline and `aria-pressed`. Setting it doesn't fire the event again.
+
+The example shows a **Cite** button for the selected verse. Choose a verse, then choose the button to see its citation. The card adds selection buttons only when it can work out each verse's own reference. Some passages, such as ones that span chapters, still show but without selection buttons.
 
 The example caps the card's height with `max-height` and `overflow: auto`, so a tall passage scrolls inside its box. Selection still works while you scroll.
 
 To try changes, choose **Edit**, change the code, and choose **Run**.
 
-<LiveEditor :code="sourceCardSelect" title="Select a verse">Selecting a verse in <code>Micah 6:6-8</code> shows the last choice.</LiveEditor>
+<LiveEditor :code="sourceCardSelect" title="Select a verse">Selecting a verse in <code>Micah 6:6-8</code> shows it and offers a button to cite it.</LiveEditor>
 
 <span class="learn-more__label">Learn more:</span> [Show commentary and connected texts](/use-components/show-commentary-and-connected-texts.md) · [Make components respond to each other](/across-components/make-components-respond-to-each-other.md) {.learn-more}
 
@@ -73,7 +79,13 @@ The card's `status` property is `empty`, `loading`, `ready`, or `error`. Here is
 | The translation is missing and the fallback is off | The text, with a "no text" note on the translation side | `ready` | No |
 | No `sref` and no `data` | Nothing | `empty` | No |
 
-A failed load keeps the text already showing. For every situation, see [the Source Card entry in the reference](/reference/components.md#sefaria-source-card). Read `status` from the element in JavaScript. To react to a failed load, listen for `sefaria-source-card-error`. It bubbles and crosses the component boundary. Its `event.detail` holds `{ error, sref }`. For every event, see [Reference › Components](/reference/components.md#events). Invalid supplied `data` also shows an error and sets `status` to `error`. The card doesn't fall back to `sref` and doesn't send the event.
+Read `status` from the element in JavaScript.
+
+To react to a failed load, listen for `sefaria-source-card-error`. Its `event.detail` holds `{ error, sref }`. A failed load keeps the text already showing.
+
+Invalid supplied `data` shows an error without falling back to `sref`. It doesn't send the event.
+
+For every situation and event, see [Reference › Components](/reference/components.md#sefaria-source-card).
 
 <LiveEditor :code="sourceCardStates" title="Read status and listen for errors">The example has a valid reference, a text that isn't a reference, and an empty card. Choose <strong>Show each status</strong> to log each one's status.</LiveEditor>
 

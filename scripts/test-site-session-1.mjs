@@ -617,6 +617,37 @@ async function runShowTextChecks({ root, siteBasePath, localScript }) {
       linksBefore,
       "category change and selection make no request",
     );
+    const panelFrame = await editorFrame(
+      connections.locator(".live-editor").first(),
+    );
+    await panelFrame
+      .locator("sefaria-connections-panel")
+      .getByRole("button", { name: /^Midrash/ })
+      .waitFor();
+    await panelFrame
+      .locator("sefaria-connections-panel")
+      .getByRole("button", { name: /^Midrash/ })
+      .click();
+    await panelFrame
+      .locator("sefaria-connections-panel")
+      .getByRole("button", { name: /in context$/ })
+      .first()
+      .waitFor();
+    const panelBox = await panelFrame.evaluate(() => {
+      const wrapper = globalThis.document.querySelector(
+        "sefaria-connections-panel",
+      ).parentElement;
+      return {
+        height: wrapper.getBoundingClientRect().height,
+        scrolls: wrapper.scrollHeight > wrapper.clientHeight,
+      };
+    });
+    expectEqual(
+      panelBox.height <= 28 * 16,
+      true,
+      "Connections example is capped",
+    );
+    expectEqual(panelBox.scrolls, true, "Connections example scrolls inside");
     await connections.close();
 
     // Reader: three requests on a fresh load; a toolbar button reads selectedRef.

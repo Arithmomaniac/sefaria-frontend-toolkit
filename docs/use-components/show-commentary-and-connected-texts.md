@@ -24,7 +24,7 @@ Set `sref` to a reference such as `Micah 6:8`. The panel shows:
 - An Overview button, plus one button per category with that category's count, such as `Commentary (16)` and `Midrash (19)`. `Commentary` comes first, then the rest in alphabetical order.
 - Overview text such as `194 text connections. Select a category.` Sheets aren't included.
 
-To try changes, choose Edit, change the code, and choose Run.
+To try changes, choose Edit, change the code, and choose Run. The example wraps the panel in a div that caps its height at 28rem and scrolls.
 
 <LiveEditor :code="connectionsPanel" title="Show connections" />
 
