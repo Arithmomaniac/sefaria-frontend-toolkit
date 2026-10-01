@@ -104,8 +104,21 @@ async function describe(route: string): Promise<string> {
 }
 
 /** Style settings that at least one component reads. */
-async function usableTokens(): Promise<readonly string[]> {
-  const manifest = JSON.parse(
+interface CustomElementsManifest {
+  readonly modules: readonly {
+    readonly declarations: readonly {
+      readonly cssProperties?: readonly { readonly name: string }[];
+      readonly cssParts?: readonly { readonly name: string }[];
+      readonly attributes?: readonly {
+        readonly name: string;
+        readonly default?: string;
+      }[];
+    }[];
+  }[];
+}
+
+async function customElementsManifest(): Promise<CustomElementsManifest> {
+  return JSON.parse(
     await readFile(
       new URL(
         "../../packages/web-components/custom-elements.json",
@@ -113,9 +126,12 @@ async function usableTokens(): Promise<readonly string[]> {
       ),
       "utf8",
     ),
-  ) as {
-    modules: { declarations: { cssProperties?: { name: string }[] }[] }[];
-  };
+  ) as CustomElementsManifest;
+}
+
+async function usableTokens(
+  manifest: CustomElementsManifest,
+): Promise<readonly string[]> {
   const names = (
     manifest.modules.flatMap((module) => module.declarations)[0]
       ?.cssProperties ?? []
@@ -124,9 +140,36 @@ async function usableTokens(): Promise<readonly string[]> {
   return names.filter((name) => !reserved.has(name));
 }
 
+function cssParts(manifest: CustomElementsManifest): readonly string[] {
+  return [
+    ...new Set(
+      manifest.modules
+        .flatMap((module) => module.declarations)
+        .flatMap((declaration) => declaration.cssParts ?? [])
+        .map((part) => part.name),
+    ),
+  ];
+}
+
+function contentLanguageDefault(manifest: CustomElementsManifest): string {
+  const attribute = manifest.modules
+    .flatMap((module) => module.declarations)
+    .flatMap((declaration) => declaration.attributes ?? [])
+    .find((candidate) => candidate.name === "content-language");
+  if (!attribute?.default) {
+    throw new Error(
+      "custom-elements.json does not document content-language default.",
+    );
+  }
+  return attribute.default.replace(/^"|"$/gu, "");
+}
+
 export async function renderLlmsTxt(): Promise<string> {
   const scriptTag = (await snippet("source-card-script-tag.html")).trim();
-  const tokens = await usableTokens();
+  const manifest = await customElementsManifest();
+  const tokens = await usableTokens(manifest);
+  const parts = cssParts(manifest);
+  const contentLanguage = contentLanguageDefault(manifest);
   const lines = [
     "# Sefaria Frontend Toolkit",
     "",
@@ -145,8 +188,8 @@ export async function renderLlmsTxt(): Promise<string> {
     `- To work with Sefaria's data in your own code, use \`@arithmomaniac/sefaria-client\` to fetch checked API responses and \`@arithmomaniac/sefaria-text-transform\` and its \`normalizeText\` function to make text HTML safe before you show it. Start at ${SITE}/data-and-text-tools/start-here.`,
     `- To install the npm packages, or to choose between them and the script tag, read ${SITE}/help/install-and-status. With a bundler, register every element once with \`import "@arithmomaniac/sefaria-web-components";\`. The element subpaths don't register their element.`,
     `- Keep attribution. Source Card shows each edition's title, linked to its source when the source is a valid http(s) address; don't hide it with \`hide-attributions\`, and don't copy text out of a component without its attribution. Only Source Card and Reader show edition attribution, with one language name; Text Segment and Bilingual Segment show none. Only Source Card links it, and none of them shows a license. Connections Panel previews, also inside the Reader, can show "Licenses reported" when Sefaria provides them. See ${SITE}/help/install-and-status.html#license-and-text-rights.`,
-    `- Source Card shows both the primary text and the translation by default (\`content-language\` defaults to \`both\`).`,
-    `- Style the elements with the \`--sefaria-*\` settings listed at ${SITE}/reference/components.html#style-settings: ${tokens.map((name) => `\`${name}\``).join(", ")}. Don't invent other names. You can also style an element's own box (\`display\`, \`margin\`, width), and the Reader exposes \`::part(toolbar)\`, \`::part(history)\`, \`::part(source-pane)\` and \`::part(connections-pane)\`. See ${SITE}/across-components/match-your-sites-look.html.`,
+    `- Source Card shows both the primary text and the translation by default (\`content-language\` defaults to \`${contentLanguage}\`).`,
+    `- Style the elements with the \`--sefaria-*\` settings listed at ${SITE}/reference/components.html#style-settings: ${tokens.map((name) => `\`${name}\``).join(", ")}. Don't invent other names. You can also style an element's own box (\`display\`, \`margin\`, width), and the Reader exposes ${parts.map((name) => `\`::part(${name})\``).join(", ")}. See ${SITE}/across-components/match-your-sites-look.html.`,
     `- If you're an assistant building a page for someone, also read ${SITE}/use-components/start-with-an-ai-assistant. Its prompt is at ${REPOSITORY}/blob/main/examples/site-snippets/ai-assistant-prompt.md.`,
     `- For exact element, function, type and import names, use the reference pages below instead of guessing.`,
     "",

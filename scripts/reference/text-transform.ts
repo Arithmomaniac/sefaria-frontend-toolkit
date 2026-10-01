@@ -51,6 +51,16 @@ function mapLiteral(
 export async function renderNormalizedOutput(): Promise<string> {
   const source = await readFile(NORMALIZE_SOURCE, "utf8");
   const catalog = JSON.parse(await readFile(CATALOG, "utf8")) as CatalogEntry[];
+  const optionDocs = new Map(
+    [
+      ...source.matchAll(
+        new RegExp(
+          String.raw`/\*\*([\s\S]*?)\*/[\r\n]+  readonly (\w+)[?:]`,
+          "gu",
+        ),
+      ),
+    ].map(([, doc, name]) => [name, doc] as const),
+  );
   const emitted = new Set(
     [...source.matchAll(/"(data-sefaria-[a-z-]+)"/gu)].map((m) => m[1]!),
   );
@@ -70,6 +80,14 @@ export async function renderNormalizedOutput(): Promise<string> {
       throw new Error(
         `The ${entry.attribute} example doesn't produce the attribute: ${output}`,
       );
+    }
+    for (const option of entry.option.matchAll(/`(\w+)`/gu)) {
+      const doc = optionDocs.get(option[1]!);
+      if (!doc?.includes(entry.attribute)) {
+        throw new Error(
+          `NormalizeTextOptions.${option[1]} must document ${entry.attribute}.`,
+        );
+      }
     }
     rows.push(
       `| \`${entry.attribute}\` | \`<${entry.element}>\` | ${cell(entry.meaning)} | ${cell(entry.option)} |`,
@@ -93,7 +111,7 @@ export async function renderNormalizedOutput(): Promise<string> {
     "",
     "## Normalized HTML output",
     "",
-    "`normalizeText` returns `bodyHtml` and footnote HTML with no links, no event handlers, no scripts and no attributes other than the ones listed here. Addresses can still appear as ordinary text or inside an attribute value, such as a reference. This section is generated from `normalize.ts`, and each example below is the function's real output.",
+    "`normalizeText` returns `bodyHtml` and footnote HTML with no links, no event handlers and no scripts. It emits only the attributes listed in this section, plus approved `dir` values and the fixed `style` value generated for `<big>`. Addresses can still appear as ordinary text or inside an attribute value, such as a reference. This section is generated from `normalize.ts`, and each example below is the function's real output.",
     "",
     "### Elements",
     "",

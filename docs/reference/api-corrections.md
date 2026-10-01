@@ -19,7 +19,7 @@ The toolkit generates the client from Sefaria's published API description, an Op
 
 This page documents the code on the `main` branch, which `alpha` builds are published from. <ReleaseStamp />
 
-The `alpha` script-tag address serves the newest script release that is still active. The site doesn't compare it with the commit used to build this page, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can still include the removed Popup and Reference Label elements. It can also lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
+The `alpha` script-tag address serves the newest script release that is still active. The site doesn't compare it with the commit used to build this page, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
 
 ## The pinned source
 
@@ -491,7 +491,7 @@ Source checks:
 
 Correction ID: `versions-contract`
 
-The published description names the path `/api/texts/versions/{index}`. According to the correction's notes, the pinned route and handler take a reference. The correction renames the path to `GET /api/texts/versions/{tref}`. The 200 response is a version list or a JSON error. Stored versions can have a null `versionSource` or `status`.
+The published description names the path `/api/texts/versions/{index}`. Source review shows the pinned route and handler take a reference. The correction renames the path to `GET /api/texts/versions/{tref}`. The 200 response is a version list or a JSON error. Stored versions can have a null `versionSource` or `status`.
 
 Endpoints: `GET /api/texts/random`, `GET /api/texts/versions/{tref}`, `GET /api/texts/{tref}`, `GET /api/v3/texts/{tref}`.
 
@@ -1465,7 +1465,7 @@ Source checks:
 
 Correction ID: `shape-contract`
 
-For `GET /api/shape/{title}`, the published description gives a single-object schema with mixed property casing. It documents `depth` without deprecating it. According to the correction's notes, the handler does not use `depth`, so the correction removes it. The dependent-texts flag becomes the string values `"0"` and `"1"`. The response becomes a list-based union with an error variant. The examples become arrays.
+For `GET /api/shape/{title}`, the published description gives a single-object schema with mixed property casing. It documents `depth` without deprecating it. Source review shows the handler does not use `depth`, so the correction removes it. The dependent-texts flag becomes the string values `"0"` and `"1"`. The response becomes a list-based union with an error variant. The examples become arrays.
 
 Endpoints: `GET /api/shape/{title}`.
 

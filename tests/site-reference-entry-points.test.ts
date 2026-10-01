@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import { loadOverlayInputs } from "../packages/client/scripts/generate-openapi.js";
@@ -380,6 +380,21 @@ describe("R3 text tools reference", () => {
   });
 });
 
+it("uses package.json descriptions as package summaries", async () => {
+  const page = await renderPackagesReference();
+  for (const manifestPath of [
+    "packages/client/package.json",
+    "packages/text-transform/package.json",
+    "packages/web-components/package.json",
+  ]) {
+    const manifest = JSON.parse(await read(manifestPath)) as {
+      name: string;
+      description: string;
+    };
+    expect(page).toContain(`${manifest.description} [Reference](`);
+  }
+});
+
 describe("R5 corrections to Sefaria's API", () => {
   it("is generated from the overlay and pinned source", async () => {
     expect(await read("docs/reference/api-corrections.md")).toBe(
@@ -410,6 +425,24 @@ describe("R5 corrections to Sefaria's API", () => {
       await read("packages/client/openapi/source.json"),
     ) as { commit: string };
     expect(page).toContain(source.commit);
+  });
+
+  it("uses overlay guard titles and descriptions without the old summaries file", async () => {
+    await expect(
+      access(
+        new URL(
+          "../scripts/reference/api-corrections-summaries.json",
+          import.meta.url,
+        ),
+      ),
+    ).rejects.toThrow();
+    const page = await read("docs/reference/api-corrections.md");
+    const { overlay } = await loadOverlayInputs();
+    const compactPage = page.replaceAll(/\s+/gu, " ");
+    for (const guard of overlay["x-sefaria-guards"]) {
+      expect(page).toContain(`### ${guard.title}`);
+      expect(compactPage).toContain(guard.description.replaceAll(/\s+/gu, " "));
+    }
   });
 
   it("follows a correction through later copies of the value it changed", async () => {

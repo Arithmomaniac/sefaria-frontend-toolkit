@@ -33,6 +33,35 @@ const pascal = (name: string) => name[0]!.toUpperCase() + name.slice(1);
 const cell = (value: string) =>
   value.replaceAll("|", "\\|").replaceAll(/\s+/gu, " ").trim();
 
+interface PublicExportsInventory {
+  readonly packages: readonly {
+    readonly name: string;
+    readonly exports: readonly {
+      readonly subpath: string;
+      readonly declarations: readonly string[];
+    }[];
+  }[];
+}
+
+async function clientSubpathBullets(): Promise<string[]> {
+  const inventory = JSON.parse(
+    await readFile(
+      new URL("../../packages/public-exports.json", import.meta.url),
+      "utf8",
+    ),
+  ) as PublicExportsInventory;
+  const client = inventory.packages.find(
+    (entry) => entry.name === "@arithmomaniac/sefaria-client",
+  );
+  if (!client) throw new Error("public-exports.json has no client package.");
+  return client.exports
+    .filter((entry) => entry.subpath !== "." && entry.declarations.length <= 10)
+    .map(
+      (entry) =>
+        `- ${entry.declarations.map((name) => `\`${name}\``).join(", ")} from \`${entry.subpath.replace("./", "/")}\`.`,
+    );
+}
+
 async function exportedTypeNames(): Promise<ReadonlySet<string>> {
   const sources = await Promise.all(
     ["contracts.gen.ts", "types.gen.ts"].map((file) =>
@@ -120,9 +149,10 @@ async function namespaceTables(): Promise<{
 }
 
 export async function renderClientReference(): Promise<string> {
-  const [surface, tables] = await Promise.all([
+  const [surface, tables, subpathBullets] = await Promise.all([
     renderTypeDoc("client.ts", "@arithmomaniac/sefaria-client", 3),
     namespaceTables(),
+    clientSubpathBullets(),
   ]);
   const body = [
     "This page describes how to create a client with `@arithmomaniac/sefaria-client` and set its options. It also describes the error for a response that doesn't match its contract, the validation helpers, and the generated API functions.",
@@ -133,9 +163,7 @@ export async function renderClientReference(): Promise<string> {
     "",
     "These names are written by hand. Import them from the package root. You can also import some from subpaths:",
     "",
-    "- `createSefariaClient`, `SefariaClient`, `SefariaClientOptions`, and `SefariaCacheOptions` from `@arithmomaniac/sefaria-client/client`.",
-    "- `SefariaContractError`, `SefariaContractErrorOptions`, and `ContractIssue` from `/errors`.",
-    "- The validation helpers from `/validation`.",
+    ...subpathBullets,
     "",
     surface,
     "",

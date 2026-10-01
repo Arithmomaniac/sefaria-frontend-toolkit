@@ -19,7 +19,7 @@ This page lists the names exported by `@arithmomaniac/sefaria-text-transform` an
 
 This page documents the code on the `main` branch, which `alpha` builds are published from. <ReleaseStamp />
 
-The `alpha` script-tag address serves the newest script release that is still active. The site doesn't compare it with the commit used to build this page, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can still include the removed Popup and Reference Label elements. It can also lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
+The `alpha` script-tag address serves the newest script release that is still active. The site doesn't compare it with the commit used to build this page, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
 
 ## Functions and types
 
@@ -61,7 +61,7 @@ function applyVocalizationToHtml(html, mode, options?): string;
 
 Applies vocalization only to text nodes in an already-sanitized HTML fragment.
 
-Markup and attribute values are preserved. This operation is not a sanitizer.
+Run [normalizeText](#normalizetext) first. Markup and attribute values are preserved. This operation is not a sanitizer.
 
 ##### Parameters
 
@@ -87,7 +87,7 @@ When a runtime mode or PASEQ value is unsupported.
 function createTextPreview(input, maximumGraphemes?): TextPreview;
 ```
 
-Sanitizes a preview and bounds rendered graphemes across inline node boundaries. Footnotes, annotations, and link interaction are omitted from this compact view.
+Accepts raw HTML, normalizes it, and bounds rendered graphemes across inline node boundaries. Footnotes, annotations, and link interaction are omitted from this compact view.
 
 ##### Parameters
 
@@ -123,6 +123,21 @@ The operation parses once, removes unsupported attributes, emits no link or reso
 
 [`NormalizedText`](#normalizedtext)
 
+##### Remarks
+
+Output keeps only these ordinary inline tags without attributes: `b`, `strong`, `i`, `em`, `u`, `small`, `sup`, and `sub`. It keeps `br`, maps `big` to `<span style="font-size: larger;">`, converts `img` to its `alt` text, unwraps block elements with separators, and removes active content. Incoming style attributes are dropped. The fixed `font-size: larger;` style emitted for `big` is the only output style. The only ordinary attribute is `dir`, and only on `i` or generated `span` elements when the value is `ltr`, `rtl`, or `auto`.
+
+Recognized structural attributes are `data-sefaria-note`, `data-sefaria-end-footnote`, `data-sefaria-commentary-marker`, `data-sefaria-commentator`, `data-sefaria-label`, `data-sefaria-order`, `data-sefaria-overlay`, `data-sefaria-value`, `data-sefaria-ref`, `data-sefaria-ven`, `data-sefaria-vhe`, `data-sefaria-slug`, and `data-sefaria-mam`. Footnote placeholders use `data-sefaria-note` values that match note keys in [NormalizedText.notes](#property-notes).
+
+##### Example
+
+```ts
+normalizeText(
+  'See <a data-ref="Micah 6:8" href="/Micah.6.8">Micah</a><script>x()</script>',
+).bodyHtml;
+// '<span data-sefaria-ref="Micah 6:8">Micah</span>'
+```
+
 ##### Throws
 
 When commentary reference input is invalid.
@@ -157,7 +172,7 @@ One normalized footnote referenced by a local body placeholder.
 | Property | Modifier | Type | Description |
 | --- | --- | --- | --- |
 | <a id="property-contenthtml"></a> `contentHtml` | `readonly` | `string` \| `null` | Independently safe, balanced body HTML, empty when present-empty, or `null` when missing. |
-| <a id="property-key"></a> `key` | `readonly` | `number` | Zero-based key local to one normalization result. |
+| <a id="property-key"></a> `key` | `readonly` | `number` | Zero-based key local to one normalization result and used as the matching `data-sefaria-note` value. |
 | <a id="property-markerhtml"></a> `markerHtml` | `readonly` | `string` | Independently safe, balanced marker HTML. |
 
 ---
@@ -170,7 +185,7 @@ Safe, deterministic HTML plus source-ordered footnotes.
 
 | Property | Modifier | Type | Description |
 | --- | --- | --- | --- |
-| <a id="property-bodyhtml"></a> `bodyHtml` | `readonly` | `string` | Complete safe body HTML with empty `data-sefaria-note` placeholders. |
+| <a id="property-bodyhtml"></a> `bodyHtml` | `readonly` | `string` | Complete safe body HTML with empty `data-sefaria-note` placeholders whose values are note keys. |
 | <a id="property-notes"></a> `notes` | `readonly` | readonly [`NormalizedFootnote`](#normalizedfootnote)[] | Source-ordered notes referenced by body or note-content placeholders. |
 
 ---
@@ -183,11 +198,11 @@ Feature-narrowing inputs for [normalizeText](#normalizetext).
 
 | Property | Modifier | Type | Description |
 | --- | --- | --- | --- |
-| <a id="property-allowfootnotes"></a> `allowFootnotes?` | `readonly` | `boolean` | Retain recognized footnotes. Defaults to `true`. |
-| <a id="property-allowinlineannotations"></a> `allowInlineAnnotations?` | `readonly` | `boolean` | Retain commentary, overlay, and standalone annotation metadata. Defaults to `true`. |
-| <a id="property-allownamedentities"></a> `allowNamedEntities?` | `readonly` | `boolean` | Retain named-entity identity. Defaults to `true`. |
-| <a id="property-allowreflinks"></a> `allowRefLinks?` | `readonly` | `boolean` | Retain explicit Sefaria reference identity. Defaults to `true`. |
-| <a id="property-commentaryreferences"></a> `commentaryReferences?` | `readonly` | readonly [`CommentaryReference`](#commentaryreference)[] | Optional exact commentary targets prepared from source-scoped link evidence. |
+| <a id="property-allowfootnotes"></a> `allowFootnotes?` | `readonly` | `boolean` | Retain recognized footnotes. Defaults to `true`. When enabled, footnote markers keep `data-sefaria-note` placeholders whose values are result-local note keys. End-of-text markers also keep `data-sefaria-end-footnote` when [allowInlineAnnotations](#property-allowinlineannotations) is enabled. |
+| <a id="property-allowinlineannotations"></a> `allowInlineAnnotations?` | `readonly` | `boolean` | Retain commentary, overlay, and standalone annotation metadata. Defaults to `true`. When enabled, end-of-text footnote markers keep `data-sefaria-end-footnote` when `allowFootnotes` is also enabled, commentary markers keep `data-sefaria-commentary-marker`, commentary anchors keep `data-sefaria-commentator`, `data-sefaria-label`, and `data-sefaria-order`; matching commentary references can add `data-sefaria-ref`. Overlay anchors keep `data-sefaria-overlay` plus `data-sefaria-value`. When disabled, those attributes and their empty anchor elements are dropped. |
+| <a id="property-allownamedentities"></a> `allowNamedEntities?` | `readonly` | `boolean` | Retain named-entity identity as `data-sefaria-slug`. Defaults to `true`. When disabled, named-entity links are unwrapped and only their text remains. |
+| <a id="property-allowreflinks"></a> `allowRefLinks?` | `readonly` | `boolean` | Retain explicit Sefaria reference identity. Defaults to `true`. When enabled, reference links keep `data-sefaria-ref` and optional `data-sefaria-ven`, `data-sefaria-vhe`, and approved `dir`. When disabled, reference links are unwrapped and those attributes are dropped. |
+| <a id="property-commentaryreferences"></a> `commentaryReferences?` | `readonly` | readonly [`CommentaryReference`](#commentaryreference)[] | Optional exact commentary targets prepared from source-scoped link evidence. Matching entries add `data-sefaria-ref` to commentary anchors that are also retained by [allowInlineAnnotations](#property-allowinlineannotations). The value is dropped when there is no exact, unique match. |
 
 ---
 
@@ -239,7 +254,7 @@ Supported Hebrew vocalization-preservation presets.
 
 ## Normalized HTML output
 
-`normalizeText` returns `bodyHtml` and footnote HTML with no links, no event handlers, no scripts and no attributes other than the ones listed here. Addresses can still appear as ordinary text or inside an attribute value, such as a reference. This section is generated from `normalize.ts`, and each example below is the function's real output.
+`normalizeText` returns `bodyHtml` and footnote HTML with no links, no event handlers and no scripts. It emits only the attributes listed in this section, plus approved `dir` values and the fixed `style` value generated for `<big>`. Addresses can still appear as ordinary text or inside an attribute value, such as a reference. This section is generated from `normalize.ts`, and each example below is the function's real output.
 
 ### Elements
 

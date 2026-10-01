@@ -19,15 +19,15 @@ This page describes how to create a client with `@arithmomaniac/sefaria-client` 
 
 This page documents the code on the `main` branch, which `alpha` builds are published from. <ReleaseStamp />
 
-The `alpha` script-tag address serves the newest script release that is still active. The site doesn't compare it with the commit used to build this page, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can still include the removed Popup and Reference Label elements. It can also lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
+The `alpha` script-tag address serves the newest script release that is still active. The site doesn't compare it with the commit used to build this page, so the two can differ. Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since. The [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/) lists the hosted versions.
 
 ## Client, options, errors and validation
 
 These names are written by hand. Import them from the package root. You can also import some from subpaths:
 
-- `createSefariaClient`, `SefariaClient`, `SefariaClientOptions`, and `SefariaCacheOptions` from `@arithmomaniac/sefaria-client/client`.
-- `SefariaContractError`, `SefariaContractErrorOptions`, and `ContractIssue` from `/errors`.
-- The validation helpers from `/validation`.
+- `SefariaCacheOptions`, `SefariaClient`, `SefariaClientOptions`, `createSefariaClient`, `requireSefariaClient` from `/client`.
+- `ContractIssue`, `SefariaContractError`, `SefariaContractErrorOptions` from `/errors`.
+- `ResponseSelector`, `ResponseValidationContext`, `ResponseValidatorLookup`, `ValidationResult`, `getResponseContract`, `getResponseValidator`, `validateExternalResponse`, `validateResponse` from `/validation`.
 
 ### Functions
 
@@ -38,6 +38,8 @@ function createSefariaClient(options?): SefariaClient;
 ```
 
 Creates a frozen generated-SDK client with status-aware response validation.
+
+Documented HTTP error statuses resolve through the generated typed error payloads. A response that violates the generated contract rejects with `SefariaContractError`. Fetch network failures and aborts reject with the original error.
 
 ##### Parameters
 
@@ -169,15 +171,15 @@ Identifies one documented operation response by method, path, and status.
 
 #### SefariaCacheOptions
 
-Limits for one client's in-memory response cache.
+Limits for one client's bounded in-memory response cache.
 
 ##### Properties
 
 | Property | Modifier | Type | Description |
 | --- | --- | --- | --- |
-| <a id="property-maxbytes"></a> `maxBytes?` | `readonly` | `number` | Maximum decoded response-body bytes. Defaults to 10 MiB. |
-| <a id="property-maxentries"></a> `maxEntries?` | `readonly` | `number` | Maximum number of retained responses. Defaults to 100. |
-| <a id="property-ttlms"></a> `ttlMs?` | `readonly` | `number` | Time-to-live in milliseconds. Defaults to five minutes. |
+| <a id="property-maxbytes"></a> `maxBytes?` | `readonly` | `number` | Positive integer maximum decoded response-body bytes retained by one client. Defaults to 10 MiB. |
+| <a id="property-maxentries"></a> `maxEntries?` | `readonly` | `number` | Positive integer maximum number of admitted responses retained by one client. Defaults to 100. |
+| <a id="property-ttlms"></a> `ttlMs?` | `readonly` | `number` | Positive finite time-to-live in milliseconds for an admitted response. Defaults to five minutes. |
 
 ---
 
@@ -191,8 +193,8 @@ Branded client accepted by the generated Sefaria SDK operations.
 | --- | --- | --- | --- |
 | <a id="property-sefariaclientbrand"></a> `[sefariaClientBrand]` | `readonly` | `true` | Compile-time brand preventing accidental structural substitutes. |
 | <a id="property-clearcache"></a> `clearCache` | `readonly` | () => `void` | Removes all responses retained by this client. |
-| <a id="property-get"></a> `get` | `readonly` | \<`TData`, `TError`, `ThrowOnError`\>(`options`) => `RequestResult`\<`TData`, `TError`, `ThrowOnError`, `"fields"`\> | Performs a validated GET request using fields-style responses. |
-| <a id="property-post"></a> `post` | `readonly` | \<`TData`, `TError`, `ThrowOnError`\>(`options`) => `RequestResult`\<`TData`, `TError`, `ThrowOnError`, `"fields"`\> | Performs a validated POST request using fields-style responses. |
+| <a id="property-get"></a> `get` | `readonly` | \<`TData`, `TError`, `ThrowOnError`\>(`options`) => `RequestResult`\<`TData`, `TError`, `ThrowOnError`, `"fields"`\> | Performs a validated GET request using fields-style responses. Documented HTTP error statuses resolve as typed error payloads. Contract mismatches reject with `SefariaContractError`; network failures and aborts reject with the original error. |
+| <a id="property-post"></a> `post` | `readonly` | \<`TData`, `TError`, `ThrowOnError`\>(`options`) => `RequestResult`\<`TData`, `TError`, `ThrowOnError`, `"fields"`\> | Performs a validated POST request using fields-style responses. Documented HTTP error statuses resolve as typed error payloads. Contract mismatches reject with `SefariaContractError`; network failures and aborts reject with the original error. |
 
 ---
 
