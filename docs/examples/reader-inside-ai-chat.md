@@ -39,7 +39,7 @@ The result's metadata (`_meta`) records the operation, status and effective requ
 
 ### The first answer
 
-The App gives the Reader an `sref` and a data source (the `acquisition` property) that is a custom loader (`kind: "capability"`). It does not assign Reader data. The App checks the first tool result. Then it serves the passage text from that result, with no extra request.
+The App gives the Reader an `sref` and a data source (the `source` property) that is a custom loader (`kind: "custom"`). It does not assign Reader data. The App checks the first tool result. Then it serves the passage text from that result, with no extra request.
 
 The first connections come from the host. For a text result, the Reader makes one `get_links_between_texts` call through the chat host. A connections-only result shows its own connections with no follow-up request.
 

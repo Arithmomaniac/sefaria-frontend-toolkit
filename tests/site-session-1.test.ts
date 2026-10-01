@@ -103,7 +103,7 @@ describe.each(Object.entries(showTextPages))(
       }
       const members = declaration(tag).members!.map((entry) => entry.name);
       expect(members).toEqual(
-        expect.arrayContaining(["data", "acquisition", "status"]),
+        expect.arrayContaining(["data", "source", "status"]),
       );
       expect(declaration(tag).events!.map((entry) => entry.name)).toContain(
         errorEvent,

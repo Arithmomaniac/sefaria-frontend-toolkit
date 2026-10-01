@@ -34,7 +34,7 @@ card.setAttribute("sref", "Micah 6:8");
 document.body.append(card);
 ```
 
-The undefined acquisition value lazily uses one shared toolkit client per loaded module instance. Assign `{ kind: "client", client }`, `{ kind: "capability", capability }`, or `{ kind: "disabled" }` for an explicit source. Explicit failure or unsupported operations never fall through to browser HTTP.
+The undefined `source` value lazily uses one shared toolkit client per loaded module instance. Assign `{ kind: "client", client }`, `{ kind: "custom", loader }`, or `{ kind: "disabled" }` for an explicit source. Explicit failure or unsupported operations never fall through to browser HTTP.
 
 ## Prebuilt Reader
 
@@ -43,7 +43,7 @@ import { createSefariaClient } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 
 const reader = document.createElement("sefaria-reader");
-reader.acquisition = {
+reader.source = {
   kind: "client",
   client: createSefariaClient(),
 };
@@ -115,7 +115,7 @@ Supplied data makes zero requests and must include the selected text or metadata
 | Goal | Entry point |
 | --- | --- |
 | Register all elements | `@arithmomaniac/sefaria-web-components` |
-| Acquisition types/configuration | `@arithmomaniac/sefaria-web-components/acquisition` |
+| Data-source types/configuration | `@arithmomaniac/sefaria-web-components/data-source` |
 | Component raw request/selection types | Component-specific subpath |
 | Shared raw Reader source qualification and raw seed types | `@arithmomaniac/sefaria-web-components/reader` |
 | Advanced semantic/raw Reader facade: history, pins, budgets, entry info, records, and raw transitions | `@arithmomaniac/sefaria-web-components/reader-session` |

@@ -58,35 +58,35 @@ To see the failure in your own code as well, read [Handle errors in your code](/
 
 Choose where the component gets its data: use a toolkit client, provide a custom loader, or disable loading. A custom loader supplies `getText`, `getLinks`, or both, using local data or your own service.
 
-In code, the data source is the `acquisition` property. A custom loader is `{ kind: "capability", capability: { getText, getLinks } }`.
+In code, the data source is the `source` property. A custom loader is `{ kind: "custom", loader: { getText, getLinks } }`.
 
 The three choices are:
 
 - **Toolkit client**, `{ kind: "client", client }`. Use a client you created with `createSefariaClient`, with that client's cache settings.
-- **Custom loader**, `{ kind: "capability", capability }`. Use your own functions.
+- **Custom loader**, `{ kind: "custom", loader }`. Use your own functions.
 - **Loading disabled**, `{ kind: "disabled" }`. Don't load anything.
 
-To set the shared data source instead, call `configureSefariaAcquisition(choice)`. Elements with their own `acquisition` ignore it. You can call it again until the first element uses the shared data source. After that, it throws.
+To set the shared data source instead, call `configureSefariaDataSource(choice)`. Elements with their own `source` ignore it. You can call it again until the first element uses the shared data source. After that, it throws.
 
 With a custom loader or loading disabled, the element never falls back to requesting Sefaria from the browser.
 
-A custom loader is an object with either or both of two async functions, `getText` and `getLinks`. Its type is `SefariaAcquisitionCapability`. Each function takes a request and an `AbortSignal`, and returns `{ payload, status }`. The component validates the payload. The type names are in [Package imports and exports](/reference/package-imports-and-exports.md).
+A custom loader is an object with either or both of two async functions, `getText` and `getLinks`. Its type is `SefariaDataLoader`. Each function takes a request and an `AbortSignal`, and returns `{ payload, status }`. The component validates the payload. The type names are in [Package imports and exports](/reference/package-imports-and-exports.md).
 
-If an element needs a function your custom loader doesn't have, the load fails with an error. With loading disabled, any load the element attempts fails with "Standalone Sefaria acquisition is disabled." That includes the text a Reader asks for. If a later load fails, an element that already showed text keeps it. Its `status` becomes `error`, and its error event fires. [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md) shows how to read both.
+If an element needs a function your custom loader doesn't have, the load fails with an error. With loading disabled, any load the element attempts fails with "Sefaria data loading is disabled." That includes the text a Reader asks for. If a later load fails, an element that already showed text keeps it. Its `status` becomes `error`, and its error event fires. [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md) shows how to read both.
 
 ### Serve local data with a custom loader
 
-The Reader and the Connections Panel have no `data` property. To show data you already hold, give them a custom loader through `acquisition`. The custom loader answers from your local data for the references it has. For any other reference, it throws a clear error or hands the request to another source.
+The Reader and the Connections Panel have no `data` property. To show data you already hold, give them a custom loader through `source`. The custom loader answers from your local data for the references it has. For any other reference, it throws a clear error or hands the request to another source.
 
 The Reader asks for the text of its root reference. It may also ask for the surrounding section, and for links. Serve each reference you want it to show. Each response is checked like any other payload.
 
-<CodeLanguageToggle :snippet="snippets['local-reader-capability']" />
+<CodeLanguageToggle :snippet="snippets['local-reader-loader']" />
 
 This example serves only `Micah 6:8`. The Reader loads without any request to Sefaria. The only request is your own `/data/micah-6-8.json`. Navigating to another reference fails with the error the custom loader throws.
 
 #### Example: a Reader inside AI chat
 
-The MCP App example is an app shown inside an AI chat. It passes `createMcpReaderAcquisition(host)`, a custom loader, to the Reader:
+The MCP App example is an app shown inside an AI chat. It passes `createMcpReaderSource(host)`, a custom loader, to the Reader:
 
 <CodeLanguageToggle :snippet="snippets['mcp-reader-acquisition']" />
 

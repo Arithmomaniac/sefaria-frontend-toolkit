@@ -6,7 +6,7 @@ import type {
 } from "@arithmomaniac/sefaria-web-components";
 
 import micah from "./site-fixtures/micah-6-8-2026-09-28.json";
-import { createMcpReaderAcquisition } from "../examples/mcp-app/src/app.js";
+import { createMcpReaderSource } from "../examples/mcp-app/src/app.js";
 
 function stubFetch() {
   const requests: string[] = [];
@@ -43,7 +43,7 @@ test("supplied Source Card data renders with zero Sefaria requests", async () =>
 test("a Reader served by a local capability makes no Sefaria requests", async () => {
   const requests = stubFetch();
   document.body.innerHTML = "<sefaria-reader></sefaria-reader>";
-  await import("../examples/site-snippets/local-reader-capability.ts");
+  await import("../examples/site-snippets/local-reader-loader.ts");
   const reader = document.querySelector("sefaria-reader") as SefariaReader;
   await vi.waitFor(() => expect(reader.status).toBe("ready"));
   expect(requests).toEqual(["/data/micah-6-8.json"]);
@@ -55,10 +55,10 @@ test("the MCP App Reader continues through host tools, never Sefaria", async () 
     content: [],
     isError: true,
   }));
-  const acquisition = createMcpReaderAcquisition({ callServerTool });
+  const source = createMcpReaderSource({ callServerTool });
   document.body.innerHTML = "<sefaria-reader></sefaria-reader>";
   const reader = document.querySelector("sefaria-reader") as SefariaReader;
-  reader.acquisition = acquisition;
+  reader.source = source;
   reader.sref = "Micah 6:8";
   await vi.waitFor(() => expect(callServerTool).toHaveBeenCalledOnce());
   expect(callServerTool.mock.calls[0]?.[0]).toMatchObject({

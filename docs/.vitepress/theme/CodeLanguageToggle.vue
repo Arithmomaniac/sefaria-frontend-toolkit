@@ -225,14 +225,21 @@ const label = computed(() =>
   border: 1px solid var(--vp-c-divider);
   border-radius: 8px;
   padding: 8px 12px;
-  background: var(--vp-c-bg-soft);
+  background: var(--vp-c-bg);
   font-family: var(--vp-font-family-mono);
   font-size: 13px;
   line-height: 1.6;
 }
 
+.code-language-toggle__frame {
+  display: none !important;
+}
+
 .code-language-toggle__console pre {
-  margin: 0;
+  margin: 0 !important;
+  padding: 0;
+  border: 0;
+  background: none;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }

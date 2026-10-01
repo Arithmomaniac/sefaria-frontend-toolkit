@@ -31,7 +31,7 @@ Element subpaths such as `/source-card` don't register their element. They expor
 
 ## Attributes and properties
 
-Strings and booleans can be attributes: `sref`, `selectable`, `layout`, `content-language`, `translation-language`, `vocalization-mode`, and similar settings. Objects and arrays can't be attributes. `data`, the data source (the `acquisition` property), and `selectedPosition` are JavaScript properties only. `status` is a read-only property.
+Strings and booleans can be attributes: `sref`, `selectable`, `layout`, `content-language`, `translation-language`, `vocalization-mode`, and similar settings. Objects and arrays can't be attributes. `data`, the data source (the `source` property), and `selectedPosition` are JavaScript properties only. `status` is a read-only property.
 
 React 19 sets a prop as a property when the element has one with that name, so the React file passes `selectedPosition` as a prop. Alpine binds attributes, so the Alpine file sets the property with `x-effect="$el.selectedPosition = ..."`.
 

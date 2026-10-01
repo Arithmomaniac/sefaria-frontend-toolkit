@@ -41,7 +41,7 @@ The app intercepts an ordinary click. An ordinary click means the primary button
 
 <<< ../../examples/linked-article/src/app.ts#open-preview{ts}
 
-The card gets its `sref` only at that moment, so nothing loads before a click. The app creates its own client with the cache off and passes it to the card as its data source (the `acquisition` property). The card makes one request, or two when a requested translation language is missing.
+The card gets its `sref` only at that moment, so nothing loads before a click. The app creates its own client with the cache off and passes it to the card as its data source (the `source` property). The card makes one request, or two when a requested translation language is missing.
 
 ### What readers get
 

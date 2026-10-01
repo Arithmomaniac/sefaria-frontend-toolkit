@@ -24,14 +24,14 @@
     "name": "Connections Panel",
     "howTo": "/use-components/show-commentary-and-connected-texts.md",
     "summary": "Lists the commentaries and other texts that Sefaria connects to a reference. It groups them by category.",
-    "data": "It has no `data` property. To give it local data, set `acquisition` to `{ kind: \"capability\", capability }`, where the capability's `getText` and `getLinks` functions answer from your data. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md#control-loading).",
+    "data": "It has no `data` property. To give it local data, set `source` to `{ kind: \"custom\", loader }`, where the custom loader's `getText` and `getLinks` functions answer from your data. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md#control-loading).",
     "empty": "The element shows its empty state when no text connections remain after the element leaves out sheet links. A response with only sheets is empty too. The message is `No text connections were returned.`"
   },
   "sefaria-reader": {
     "name": "Reader",
     "howTo": "/use-components/add-the-complete-reader.md",
     "summary": "Shows a passage with its connected texts. Readers can move between them.",
-    "data": "It has no `data` property. To give it local data, set `acquisition` to `{ kind: \"capability\", capability }`, where the capability's `getText` and `getLinks` functions answer from your data. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md#control-loading).",
+    "data": "It has no `data` property. To give it local data, set `source` to `{ kind: \"custom\", loader }`, where the custom loader's `getText` and `getLinks` functions answer from your data. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md#control-loading).",
     "empty": "A Reader that has never had `sref` is blank. Its status is `empty`. A missing pane shows `Source text is not available for this entry.` or `Connections are not available for this entry.` The Reader reports a passage with no text as a source failure, not as an empty Source Card. A valid links response with no text connections shows the Connections Panel's empty message."
   }
 }

@@ -27,7 +27,7 @@ import { createSefariaClient } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 
 const card = document.createElement("sefaria-source-card");
-card.acquisition = { kind: "client", client: createSefariaClient() };
+card.source = { kind: "client", client: createSefariaClient() };
 card.sref = "Micah 6:8";
 document.body.append(card);
 ```

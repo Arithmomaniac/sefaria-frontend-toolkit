@@ -167,7 +167,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 
 ### Data
 
-It has no `data` property. To give it local data, set `acquisition` to `{ kind: "capability", capability }`, where the capability's `getText` and `getLinks` functions answer from your data. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md#control-loading).
+It has no `data` property. To give it local data, set `source` to `{ kind: "custom", loader }`, where the custom loader's `getText` and `getLinks` functions answer from your data. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md#control-loading).
 
 ### Empty state
 
@@ -213,7 +213,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 
 ### Data
 
-It has no `data` property. To give it local data, set `acquisition` to `{ kind: "capability", capability }`, where the capability's `getText` and `getLinks` functions answer from your data. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md#control-loading).
+It has no `data` property. To give it local data, set `source` to `{ kind: "custom", loader }`, where the custom loader's `getText` and `getLinks` functions answer from your data. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md#control-loading).
 
 ### Empty state
 
