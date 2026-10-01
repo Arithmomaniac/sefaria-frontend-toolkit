@@ -3,8 +3,8 @@ import { css, html, nothing, type PropertyValues } from "lit";
 import { repeat } from "lit/directives/repeat.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
-import type { SefariaAcquisition } from "./acquisition.js";
-import { resolveSefariaAcquisition } from "./acquisition-state.js";
+import type { SefariaDataSource } from "./data-source.js";
+import { resolveSefariaDataSource } from "./data-source-state.js";
 import { optionalStringConverter } from "./attribute-converters.js";
 import { validateSuppliedComponentData } from "./component-controller.js";
 import { createConnectionsQuery } from "./connections-request.js";
@@ -29,7 +29,7 @@ export class SefariaConnectionsPanel extends SefariaElement {
   /** Declarative data, request selection, and presentation properties. */
   static override properties = {
     sref: { type: String, useDefault: true },
-    acquisition: { attribute: false },
+    source: { attribute: false },
     withText: { type: Boolean, attribute: "with-text" },
     category: { type: String, converter: optionalStringConverter },
     page: { type: Number, useDefault: true },
@@ -111,8 +111,8 @@ export class SefariaConnectionsPanel extends SefariaElement {
   ];
   /** Reference loaded when authoritative supplied data is absent. */
   declare sref: string;
-  /** Optional element-specific acquisition source. */
-  declare acquisition: SefariaAcquisition | undefined;
+  /** Optional element-specific data source. */
+  declare source: SefariaDataSource | undefined;
   /** Whether acquired or supplied links include connected text. */
   declare withText: boolean;
   /** Exact category projected from the current captured response. */
@@ -150,7 +150,7 @@ export class SefariaConnectionsPanel extends SefariaElement {
   constructor() {
     super();
     this.sref = "";
-    this.acquisition = undefined;
+    this.source = undefined;
     this.withText = true;
     this.category = undefined;
     this.page = 0;
@@ -189,7 +189,7 @@ export class SefariaConnectionsPanel extends SefariaElement {
   protected override willUpdate(changed: PropertyValues<this>): void {
     if (
       changed.has("sref") ||
-      changed.has("acquisition") ||
+      changed.has("source") ||
       changed.has("withText")
     ) {
       this.#resumeOnConnect = false;
@@ -391,20 +391,20 @@ export class SefariaConnectionsPanel extends SefariaElement {
     active: { readonly id: number; readonly controller: AbortController },
   ): Promise<void> {
     try {
-      const acquisition = resolveSefariaAcquisition(this.acquisition);
-      if (acquisition.kind === "disabled") {
-        throw new Error("Standalone Sefaria acquisition is disabled.");
+      const source = resolveSefariaDataSource(this.source);
+      if (source.kind === "disabled") {
+        throw new Error("Sefaria data loading is disabled.");
       }
       const response =
-        acquisition.kind === "client"
+        source.kind === "client"
           ? await this.#loadFromClient(
               request,
-              acquisition.client,
+              source.client,
               active.controller.signal,
             )
-          : await this.#loadFromCapability(
+          : await this.#loadFromDataLoader(
               request,
-              acquisition.capability,
+              source.loader,
               active.controller.signal,
             );
       if (this.#active !== active) return;
@@ -415,7 +415,7 @@ export class SefariaConnectionsPanel extends SefariaElement {
       if (this.#active !== active) return;
       this.#active = undefined;
       if (active.controller.signal.aborted) return;
-      this.#publishAcquisitionFailure(error, "Links acquisition failed.");
+      this.#publishDataSourceFailure(error, "Links loading failed.");
       this.dispatchEvent(
         new CustomEvent("sefaria-connections-panel-error", {
           bubbles: true,
@@ -428,7 +428,7 @@ export class SefariaConnectionsPanel extends SefariaElement {
 
   async #loadFromClient(
     request: ConnectionsRequest,
-    client: Extract<SefariaAcquisition, { kind: "client" }>["client"],
+    client: Extract<SefariaDataSource, { kind: "client" }>["client"],
     signal: AbortSignal,
   ): Promise<{ readonly payload: unknown; readonly status: number }> {
     const result = await related.getLinks({
@@ -446,20 +446,15 @@ export class SefariaConnectionsPanel extends SefariaElement {
     throw new Error("The links request returned no data or documented error.");
   }
 
-  async #loadFromCapability(
+  async #loadFromDataLoader(
     request: ConnectionsRequest,
-    capability: Extract<
-      SefariaAcquisition,
-      { kind: "capability" }
-    >["capability"],
+    loader: Extract<SefariaDataSource, { kind: "custom" }>["loader"],
     signal: AbortSignal,
   ): Promise<{ readonly payload: unknown; readonly status: number }> {
-    if (capability.getLinks === undefined) {
-      throw new Error(
-        "The selected acquisition source does not support links.",
-      );
+    if (loader.getLinks === undefined) {
+      throw new Error("The selected data source does not support links.");
     }
-    return await capability.getLinks(
+    return await loader.getLinks(
       {
         sref: request.tref,
         withText: request.withText !== false,
@@ -544,11 +539,11 @@ export class SefariaConnectionsPanel extends SefariaElement {
     this.#ownedViewModel = undefined;
   }
 
-  #publishAcquisitionFailure(error: unknown, fallback: string): void {
+  #publishDataSourceFailure(error: unknown, fallback: string): void {
     this.#statusOverride = "error";
     const viewModel = this.#committedViewModel ?? {
       state: "error",
-      errorKind: "acquisition",
+      errorKind: "load",
       message: error instanceof Error ? error.message : fallback,
     };
     this.#ownedViewModel = viewModel;

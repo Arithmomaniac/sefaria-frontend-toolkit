@@ -9,7 +9,10 @@ import {
   createReaderSourceContent,
   getReaderSourceRecord,
 } from "./reader-session.js";
-import { resolveReaderSource, type ReaderDataSource } from "./reader-facade.js";
+import {
+  resolveReaderSource,
+  type ReaderRecordLoader,
+} from "./reader-facade.js";
 
 function sourceRecord(tref: string) {
   if (!validateGetV3Texts200(v3SourceBackedPayload)) {
@@ -26,7 +29,7 @@ test("qualifies a stable raw source record without exposing prepared content", a
     records.push(record);
     return record;
   });
-  const dataSource: ReaderDataSource = {
+  const dataSource: ReaderRecordLoader = {
     loadSource,
     loadConnections: vi.fn(),
   };

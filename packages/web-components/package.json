@@ -26,9 +26,9 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
-    "./acquisition": {
-      "types": "./dist/acquisition.d.ts",
-      "import": "./dist/acquisition.js"
+    "./data-source": {
+      "types": "./dist/data-source.d.ts",
+      "import": "./dist/data-source.js"
     },
     "./bilingual-segment": {
       "types": "./dist/bilingual-segment-public.d.ts",

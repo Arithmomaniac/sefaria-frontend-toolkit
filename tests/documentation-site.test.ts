@@ -627,7 +627,7 @@ describe("documentation learning journey", () => {
     for (const sourceFragment of [
       "data={data}",
       "sref={sref}",
-      "acquisition={acquisition}",
+      "source={source}",
       "onsefaria-source-select={onSourceSelection}",
     ]) {
       expect(reactSource).toContain(sourceFragment);
@@ -651,11 +651,11 @@ describe("documentation learning journey", () => {
       ),
       "utf8",
     );
-    expect(alpineSource).toContain("element.acquisition = acquisition");
+    expect(alpineSource).toContain("element.source = source");
     expect(alpineSource).toContain("card.data = undefined");
     expect(alpineSource).toContain("this.sref = normalized");
     expect(alpineLesson).toContain(
-      'element.acquisition = { kind: "client", client }',
+      'element.source = { kind: "client", client }',
     );
     expect(alpineLesson).toContain("element.data = undefined");
     expect(alpineLesson).toContain("this.sref = next");

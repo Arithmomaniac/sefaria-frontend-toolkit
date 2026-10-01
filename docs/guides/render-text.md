@@ -38,9 +38,9 @@ card.setAttribute("sref", "Micah 6:8");
 
 The element validates and privately prepares both paths. Prepared HTML and child rendering state are not public inputs.
 
-## Choose an acquisition source
+## Choose an data source
 
-The undefined `acquisition` value uses the lazy shared default. Assign `{ kind: "client", client }`, `{ kind: "capability", capability }`, or `{ kind: "disabled" }` when the host needs an explicit choice. Explicit failure or unsupported operations do not fall through.
+The undefined `source` value uses the lazy shared default. Assign `{ kind: "client", client }`, `{ kind: "custom", loader }`, or `{ kind: "disabled" }` when the host needs an explicit choice. Explicit failure or unsupported operations do not fall through.
 
 ## Change presentation without refetching
 

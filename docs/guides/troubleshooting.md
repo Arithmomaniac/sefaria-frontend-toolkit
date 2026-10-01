@@ -14,18 +14,18 @@ Import `@arithmomaniac/sefaria-web-components` before creating the element. DOM-
 
 ## A property change has no effect
 
-Assign raw objects, arrays, and acquisition choices as JavaScript properties:
+Assign raw objects, arrays, and data source choices as JavaScript properties:
 
 ```ts
 card.data = validatedPayload;
-card.acquisition = { kind: "client", client };
+card.source = { kind: "client", client };
 ```
 
 Do not serialize raw data into an attribute or assign prepared rendering.
 
 ## The supplied Reader says a target is unavailable
 
-The supplied project has finite `Micah 6:8` coverage. Use the explicitly activated live Reader or provide a host capability that covers the target. Do not fabricate empty content.
+The supplied project has finite `Micah 6:8` coverage. Use the explicitly activated live Reader or provide a host loader that covers the target. Do not fabricate empty content.
 
 ## The editor does not run after an edit
 

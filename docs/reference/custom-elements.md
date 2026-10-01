@@ -12,7 +12,7 @@ Custom element that renders supplied or acquired bilingual-segment data.
 | --- | --- | --- | --- | --- |
 | `sref` | `sref` | `string` | `""` | Reference loaded when authoritative supplied data is absent. |
 | `data` | Property only | `unknown | undefined` | `undefined` | Authoritative corrected response-shaped data. |
-| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
+| `source` | Property only | `SefariaDataSource | undefined` | `undefined` | Optional element-specific data source. |
 | `primaryVersionTitle` | `primary-version-title` | `string | undefined` | `undefined` | Optional exact edition title for the primary role. |
 | `translationVersionTitle` | `translation-version-title` | `string | undefined` | `undefined` | Optional exact edition title for the translation role. |
 | `translationLanguage` | `translation-language` | `string | undefined` | `undefined` | Preferred translation family. |
@@ -46,7 +46,7 @@ Category summaries and bounded connected-text details from supplied or acquired 
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
 | `sref` | `sref` | `string` | `""` | Reference loaded when authoritative supplied data is absent. |
-| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
+| `source` | Property only | `SefariaDataSource | undefined` | `undefined` | Optional element-specific data source. |
 | `withText` | `with-text` | `boolean` | `true` | Whether acquired or supplied links include connected text. |
 | `category` | `category` | `string | undefined` | `undefined` | Exact category projected from the current captured response. |
 | `page` | `page` | `number` | `0` | Zero-based local page projected from the current captured response. |
@@ -81,7 +81,7 @@ Controlled or declarative reader surface for one semantic reader entry.
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
 | `sref` | `sref` | `string` | `""` | Requested external Reader root, separate from current navigation. |
-| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
+| `source` | Property only | `SefariaDataSource | undefined` | `undefined` | Optional element-specific data source. |
 | `translationLanguage` | `translation-language` | `string | undefined` | `undefined` | Preferred family used for root and navigated translations. |
 | `translationFallback` | `translation-fallback` | `"default" | "none"` | `"default"` | Missing preferred-translation policy. |
 | `primaryVersionTitle` | `primary-version-title` | `string | undefined` | `undefined` | Exact primary edition for the external root and its context. |
@@ -142,7 +142,7 @@ Custom element that renders supplied or acquired source-card data.
 | --- | --- | --- | --- | --- |
 | `sref` | `sref` | `string` | `""` | Reference loaded when authoritative supplied data is absent. |
 | `data` | Property only | `unknown | undefined` | `undefined` | Authoritative corrected response-shaped data. |
-| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
+| `source` | Property only | `SefariaDataSource | undefined` | `undefined` | Optional element-specific data source. |
 | `primaryVersionTitle` | `primary-version-title` | `string | undefined` | `undefined` | Optional exact edition title for the primary role. |
 | `translationVersionTitle` | `translation-version-title` | `string | undefined` | `undefined` | Optional exact edition title for the translation role. |
 | `translationLanguage` | `translation-language` | `string | undefined` | `undefined` | Preferred translation family. |
@@ -182,7 +182,7 @@ Custom element that renders supplied or acquired text-segment data.
 | --- | --- | --- | --- | --- |
 | `sref` | `sref` | `string` | `""` | Reference loaded when authoritative supplied data is absent. |
 | `data` | Property only | `unknown | undefined` | `undefined` | Authoritative corrected response-shaped data. |
-| `acquisition` | Property only | `SefariaAcquisition | undefined` | `undefined` | Optional element-specific acquisition source. |
+| `source` | Property only | `SefariaDataSource | undefined` | `undefined` | Optional element-specific data source. |
 | `versionLanguage` | `version-language` | `string | undefined` | `undefined` | Optional language-family selector overriding the primary default. |
 | `versionTitle` | `version-title` | `string | undefined` | `undefined` | Optional exact edition title paired with `versionLanguage`. |
 | `translationLanguage` | `translation-language` | `string | undefined` | `undefined` | Preferred translation family, mutually exclusive with a strict version language. |

@@ -6,7 +6,7 @@ import {
   zCoreV3TextsResponse,
 } from "@arithmomaniac/sefaria-client";
 import type {
-  SefariaAcquisition,
+  SefariaDataSource,
   SefariaSourceCard,
 } from "@arithmomaniac/sefaria-web-components";
 
@@ -59,7 +59,7 @@ export function createAlpineSourceCardExample(
   let host: AlpineSourceCardState | undefined;
   let selectedMetadataRef: string | undefined;
   let disposed = false;
-  const acquisition = createSourceCardAcquisition(client, (ref) => {
+  const source = createSourceCardSource(client, (ref) => {
     selectedMetadataRef = ref;
   });
 
@@ -84,7 +84,7 @@ export function createAlpineSourceCardExample(
       if (disposed || card !== undefined) return;
       card = element;
       host = reactiveState;
-      element.acquisition = acquisition;
+      element.source = source;
       element.setAttribute("sref", "");
       element.data = suppliedPayload;
       const synchronizeCommittedReference = (): void => {
@@ -145,7 +145,7 @@ export function createAlpineSourceCardExample(
         card.data = undefined;
         this.sref = "";
         card.setAttribute("sref", "");
-        card.acquisition = { kind: "disabled" };
+        card.source = { kind: "disabled" };
       }
       card = undefined;
       host = undefined;
@@ -155,13 +155,13 @@ export function createAlpineSourceCardExample(
   return state;
 }
 
-function createSourceCardAcquisition(
+function createSourceCardSource(
   client: SefariaClient,
   selectMetadata: (ref: string) => void,
-): SefariaAcquisition {
+): SefariaDataSource {
   return {
-    kind: "capability",
-    capability: {
+    kind: "custom",
+    loader: {
       getText: async (request, signal) => {
         const result = await text.getV3Texts({
           client,

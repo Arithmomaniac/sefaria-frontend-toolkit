@@ -108,10 +108,7 @@ try {
   const beforeTextResize = requests.length;
   await page.setViewportSize({ width: 480, height: 900 });
   result.geometry.push(await assertAppGeometry(page, app, "text seed narrow"));
-  assertNoRequestSince(
-    beforeTextResize,
-    "Text local-capability viewport resize",
-  );
+  assertNoRequestSince(beforeTextResize, "Text local-loader viewport resize");
   await page.setViewportSize({ width: 1_280, height: 900 });
   record("text seed and continuation", 0);
 
@@ -267,12 +264,9 @@ try {
   result.geometry.push(
     await assertAppGeometry(page, linksApp, "links seed narrow"),
   );
-  assertNoRequestSince(
-    beforeLinksResize,
-    "Links local-capability viewport resize",
-  );
+  assertNoRequestSince(beforeLinksResize, "Links local-loader viewport resize");
   await page.setViewportSize({ width: 1_280, height: 900 });
-  record("links local capability without continuation", beforeLinksSeed);
+  record("links local loader without continuation", beforeLinksSeed);
 
   const artifacts = path.resolve(".artifacts", "mcp-app");
   await mkdir(artifacts, { recursive: true });

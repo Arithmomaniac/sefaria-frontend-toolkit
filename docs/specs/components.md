@@ -4,7 +4,7 @@
 
 ## Status
 
-The declarative standalone-loading cutover is implemented. All five public elements accept `sref`. Only Text Segment, Bilingual Segment, and Source Card accept component-specific raw `data`; supplied `data` is authoritative and makes zero requests, including validly empty or invalid data. Reader and Connections Panel do not accept `data`; hosts that need local payloads for mutable surfaces provide a tagged acquisition capability.
+The declarative standalone-loading cutover is implemented. All five public elements accept `sref`. Only Text Segment, Bilingual Segment, and Source Card accept component-specific raw `data`; supplied `data` is authoritative and makes zero requests, including validly empty or invalid data. Reader and Connections Panel do not accept `data`; hosts that need local payloads for mutable surfaces provide a tagged data loader.
 
 Unrelated future component slices remain planned where identified in [Development](../development.md).
 
@@ -16,8 +16,8 @@ Each element owns one reactive input snapshot, validates authoritative supplied 
 flowchart LR
     SREF["sref + selection properties"] --> ELEMENT["Public element"]
     DATA["component-specific raw data"] --> ELEMENT
-    SOURCE["tagged acquisition"] --> ELEMENT
-    ELEMENT -->|"eligible operation"| TRANSPORT["toolkit client or host capability"]
+    SOURCE["tagged source"] --> ELEMENT
+    ELEMENT -->|"eligible operation"| TRANSPORT["toolkit client or host loader"]
     TRANSPORT --> PAYLOAD["corrected payload"]
     DATA --> PREP["private deterministic preparation"]
     PAYLOAD --> PREP
@@ -32,13 +32,13 @@ For the five non-Reader elements, `data !== undefined` selects supplied mode.
 
 - Valid data makes zero requests.
 - Valid empty data remains authoritative.
-- Invalid data supersedes pending acquisition, replaces prior content with an accessible validation failure, and never falls through to `sref`.
+- Invalid data supersedes pending source, replaces prior content with an accessible validation failure, and never falls through to `sref`.
 - Clearing `data` resumes a retained eligible `sref`.
 - Clearing `data` and `sref` in one synchronous update yields empty state.
 
 Synchronous writes form one scheduled snapshot. Arrays and objects are replaced rather than mutated in place.
 
-Reader `sref` is the requested root, not the current navigation position. Local Reader data is supplied through `acquisition={kind: "capability", capability}` where the capability implements `getText` and `getLinks` for supported refs from a local map and fails or delegates for unsupported refs. Equal root reassignment is a no-op.
+Reader `sref` is the requested root, not the current navigation position. Local Reader data is supplied through `source={kind: "custom", loader}` where the loader implements `getText` and `getLinks` for supported refs from a local map and fails or delegates for unsupported refs. Equal root reassignment is a no-op.
 
 ## Raw supplied-data forms
 
@@ -48,11 +48,13 @@ Text-bearing components accept response-shaped candidate collections and, where 
 
 Text Segment with only `sref` uses the v3 `version=primary` default. Explicit language-family or exact-version selection remains available and reprojects supplied candidate data with zero I/O.
 
-## Acquisition
+## DataSource
+
+Choose where the component gets its data: use a toolkit client, provide a custom loader, or disable loading. A custom loader supplies `getText`, `getLinks`, or both, using local data or your own service.
 
 ### Language and edition selection
 
-`content-language` selects visible sides, independently of acquisition. Text Segment, Bilingual Segment, Source Card, and Reader accept `translation-language`, a full English language-family name such as `french`, and `translation-fallback`, either `default` or `none`. Missing preferences retain the existing default selection. Blank preferences are invalid; family names are trimmed and lowercased before serialization. Invalid `translation-fallback` values use the same accessible invalid-input error path as an invalid language preference and cancel pending work. Text Segment and Bilingual Segment default `translation-fallback` to `none`; Source Card and Reader default it to `default`.
+`content-language` selects visible sides, independently of source. Text Segment, Bilingual Segment, Source Card, and Reader accept `translation-language`, a full English language-family name such as `french`, and `translation-fallback`, either `default` or `none`. Missing preferences retain the existing default selection. Blank preferences are invalid; family names are trimmed and lowercased before serialization. Invalid `translation-fallback` values use the same accessible invalid-input error path as an invalid language preference and cancel pending work. Text Segment and Bilingual Segment default `translation-fallback` to `none`; Source Card and Reader default it to `default`.
 
 Text Segment keeps strict `version-language` and `version-title` inputs. `translation-language` selects its preferred-translation mode and cannot be combined with `version-language`. A title without either language selects `primary|title`. Bilingual Segment, Source Card, and Reader use `primary-version-title` and `translation-version-title`. A translation title combined with a preferred family selects `family|title`; exact titles never silently fall back.
 
@@ -60,51 +62,51 @@ DOM-free Text Segment requests distinguish `version: { language }` from `version
 
 Request the preferred language directly: one `version=french` for Text Segment, or `version=primary&version=french` for bilingual content. With `translation-fallback="default"`, only a validated, matching missing-language warning with no contradictory returned candidate allows one further request for Sefaria's default `translation`. That default is not guaranteed to be English. The fallback request includes the primary selector again for bilingual content, so its response remains one complete corrected capture rather than a synthetic merge. With `translation-fallback="none"`, the same warning is a terminal no-translation selection: Text Segment becomes empty with the visible status message `No french text.`, while Bilingual Segment, Source Card, and Reader keep any renderable primary side and render `No french text.` in the translation side; if no side is renderable, they become empty with that message. This state is not an error, emits no error event, and does not use an alert. A present-but-empty preferred edition remains selected. HTTP, network, abort, validation, and projection failures do not trigger fallback.
 
-Missing-language means warning code 102 for the requested family. An acquired response omitting that family without the warning is an acquisition validation failure, not evidence to use an unrelated returned edition. If the default request reports no translation (warning 104), Text Segment is empty; bilingual content retains a renderable primary side and explicitly reports the absent translation. With neither side renderable, the result is empty.
+Missing-language means warning code 102 for the requested family. An acquired response omitting that family without the warning is an source validation failure, not evidence to use an unrelated returned edition. If the default request reports no translation (warning 104), Text Segment is empty; bilingual content retains a renderable primary side and explicitly reports the absent translation. With neither side renderable, the result is empty.
 
-Selection uses language-family and role evidence, not response position or the legacy `language` field. Supplied data always makes zero requests and applies the same `translation-fallback` rule. If availability metadata advertises a preferred edition whose text is not captured, report missing selection coverage instead of acquiring or substituting a default. With `translation-fallback="none"`, a supplied preferred response carrying warning 102, a candidate collection lacking the family, or a supplied final-fallback capture prepares the same `No french text.` state as acquisition. With `translation-fallback="default"`, a supplied final fallback capture and the same acquired capture produce equal private preparation.
+Selection uses language-family and role evidence, not response position or the legacy `language` field. Supplied data always makes zero requests and applies the same `translation-fallback` rule. If availability metadata advertises a preferred edition whose text is not captured, report missing selection coverage instead of acquiring or substituting a default. With `translation-fallback="none"`, a supplied preferred response carrying warning 102, a candidate collection lacking the family, or a supplied final-fallback capture prepares the same `No french text.` state as source. With `translation-fallback="default"`, a supplied final fallback capture and the same acquired capture produce equal private preparation.
 
 Show actual edition titles and the actual edition's language-family name. Source Card and Reader label each displayed edition with one language name only, the canonical `languageFamilyName` also used by `translation-language` and `version-language` (for example `(hebrew)`), and never append the `actualLanguage` code. Source Card and Reader attribute once per displayed side; standalone Text Segment and Bilingual Segment display no attribution and accept no attribution-hiding property. Parent-owned child rendering suppresses repeated attribution privately. A fallback explanation identifies the unavailable preferred family and actual selected language for Source Card and Reader; standalone Text Segment and Bilingual Segment carry no such notice, since they no longer render selected-edition metadata. Never label a French record English merely because its legacy `language` field is `en`.
 
-Reader propagates the preferred family and fallback setting to navigated sources and contextual expansion. Root exact titles apply to that root and its context, not unrelated connection targets. Acquisition selectors and fallback mode participate in request identity, retained-source reuse, cancellation, and transactional root replacement. A capability response that does not cover the requested operation remains an explicit acquisition failure, not permission for browser fallback.
+Reader propagates the preferred family and fallback setting to navigated sources and contextual expansion. Root exact titles apply to that root and its context, not unrelated connection targets. DataSource selectors and fallback mode participate in request identity, retained-source reuse, cancellation, and transactional root replacement. A loader response that does not cover the requested operation remains an explicit source failure, not permission for browser fallback.
 
 Invalid selection attributes cancel pending source work before reporting the error, so an ignored-abort response cannot commit a superseded selection or erase that error.
 
-Preferred success, strict editions, defaults, and missing-language selections with `translation-fallback="none"` use one outer text request. Missing-language fallback with `translation-fallback="default"` uses at most two, always with zero child requests. Reader's existing target-plus-context qualification may perform two such source operations. Presentation changes and unchanged completed reconnects add no requests. Fallback is component selection, not a client retry or acquisition-source fallback.
+Preferred success, strict editions, defaults, and missing-language selections with `translation-fallback="none"` use one outer text request. Missing-language fallback with `translation-fallback="default"` uses at most two, always with zero child requests. Reader's existing target-plus-context qualification may perform two such source operations. Presentation changes and unchanged completed reconnects add no requests. Fallback is component selection, not a client retry or source-source fallback.
 
 These counts describe uninterrupted operations. Disconnection may abort an in-flight request; reconnecting unchanged inputs resumes that request with a new signal, without repeating the completed preferred-language phase. Reader retains its in-flight target qualification while context is interrupted. This operation-local progress is discarded on supersession or completion, not stored as a second response cache.
 
-Connections Panel keeps API-provided links previews without per-link edition acquisition. No Popup language inputs are added.
+Connections Panel keeps API-provided links previews without per-link edition source. No Popup language inputs are added.
 
-Each element accepts an optional tagged `SefariaAcquisition`:
+Each element accepts an optional tagged `SefariaDataSource`:
 
 - `{ kind: "client", client }`
-- `{ kind: "capability", capability }`
+- `{ kind: "custom", loader }`
 - `{ kind: "disabled" }`
 
-An undefined value uses one lazy shared acquisition choice per loaded module instance. Import, supplied-data rendering, and explicit per-element acquisition do not realize it. `configureSefariaAcquisition` can replace the pending choice before first shared use; every later call fails, including an identical value.
+An undefined value uses one lazy shared data source choice per loaded module instance. Import, supplied-data rendering, and explicit per-element source do not realize it. `configureSefariaDataSource` can replace the pending choice before first shared use; every later call fails, including an identical value.
 
-Explicit failure, disablement, or an unsupported capability operation never falls through to browser HTTP. The client cache remains the only response cache. Elements add no retry, coalescing, persistence, stale fallback, or second cache.
+Explicit failure, disablement, or an unsupported loader operation never falls through to browser HTTP. The client cache remains the only response cache. Elements add no retry, coalescing, persistence, stale fallback, or second cache.
 
 ## Lifecycle and failures
 
-Detached elements start no acquisition. Disconnection aborts or invalidates active work while retaining committed content. Reconnection resumes only the still-eligible interrupted phase with a new operation identity. Reconnecting unchanged completed content makes zero requests. Ordinary network failure is not retried automatically.
+Detached elements start no source. Disconnection aborts or invalidates active work while retaining committed content. Reconnection resumes only the still-eligible interrupted phase with a new operation identity. Reconnecting unchanged completed content makes zero requests. Ordinary network failure is not retried automatically.
 
-Current validation, projection, acquisition, network, and abort failures become accessible element state and documented component-specific error events. Original causes and structured validation paths remain available where the event contract provides them. Superseded work publishes neither success nor failure and produces no unhandled rejection.
+Current validation, projection, source, network, and abort failures become accessible element state and documented component-specific error events. Original causes and structured validation paths remain available where the event contract provides them. Superseded work publishes neither success nor failure and produces no unhandled rejection.
 
 ## Public and private API
 
-The root entry registers all five elements. The DOM-free `./acquisition` entry exposes acquisition configuration and types. Component subpaths expose component-specific raw request/selection types. `./reader` exposes shared raw source qualification, browser data-source construction, and resolved-source records. `./reader-session` remains a supported advanced DOM-free semantic/raw facade.
+The root entry registers all five elements. The DOM-free `./data-source` entry exposes data-source configuration and types. Component subpaths expose component-specific raw request/selection types. `./reader` exposes shared raw source qualification, browser data-source construction, and resolved-source records. `./reader-session` remains a supported advanced DOM-free semantic/raw facade.
 
 Prepared rendering types and protocols are private. `./bindings` and `./reader-controller` are retired and absent from supported exports. Elements expose no arbitrary `fetch`, base URL, untyped host, public prepared model, or request-capable child protocol.
 
-Ordinary browser hosts use attributes for scalar public inputs, including `sref`, enum presentation choices, numbers, strings, and default-false boolean flags. A default-true boolean that must be set false remains a property exception because HTML boolean attributes cannot represent false by presence. Raw `data`, tagged `acquisition`, arrays and other rich values remain property-only. React 19 JSX may express both groups as props because React assigns registered custom-element properties directly.
+Ordinary browser hosts use attributes for scalar public inputs, including `sref`, enum presentation choices, numbers, strings, and default-false boolean flags. A default-true boolean that must be set false remains a property exception because HTML boolean attributes cannot represent false by presence. Raw `data`, tagged `source`, arrays and other rich values remain property-only. React 19 JSX may express both groups as props because React assigns registered custom-element properties directly.
 
 Public read-only `status` reports the element's current semantic state. Reader additionally exposes read-only `rootLoading`, `selectedRef`, `currentEntryId`, and `readerError`.
 
 ## Composition and action ownership
 
-A composite owns its outer request and privately prepares children from captured parent data. It does not assign child `sref` or trigger child acquisition.
+A composite owns its outer request and privately prepares children from captured parent data. It does not assign child `sref` or trigger child source.
 
 Ten child renderings from one captured response require one outer request and zero child requests.
 
@@ -120,7 +122,7 @@ Default retention is 20 entries and 20 MiB of aggregate uniquely retained correc
 
 ## Reader element
 
-Reader owns ordinary source and links acquisition, source qualification, semantic history, Back, breadcrumbs, local captured-links reprojection, responsive pane presentation, cancellation, stale suppression, private preparation, and error reporting.
+Reader owns ordinary source and links source, source qualification, semantic history, Back, breadcrumbs, local captured-links reprojection, responsive pane presentation, cancellation, stale suppression, private preparation, and error reporting.
 
 The `toolbar-actions` slot is additive. The public parts are `toolbar`, `history`, `source-pane`, and `connections-pane`; child parts are not forwarded.
 
@@ -138,7 +140,7 @@ Resolves primary and translation roles independently from payload evidence. `con
 
 Owns one bounded text collection, heading, aligned role pairs, attribution, positional identity, and optional selection. Scalar, range, spanning, and nested non-spanning responses share one element. `sefaria-source-select` reports the canonical target and original position. The heading renders the payload's canonical English `ref` and Hebrew `heRef` through a private template with `lang` and `dir` on each part; it makes no request beyond the card's own text request and exposes no nested element, link, or event.
 
-The former alpha Reference Label element (`<sefaria-ref-label>`, the `./ref-label` subpath, `sefaria-ref-label-error`, and the `resolveReference` acquisition capability member) is removed. Hosts that need a citation link write an ordinary anchor to `https://www.sefaria.org/<url_ref>`; hosts that need text with its heading use Source Card.
+The former alpha Reference Label element (`<sefaria-ref-label>`, the `./ref-label` subpath, `sefaria-ref-label-error`, and the `resolveReference` data loader member) is removed. Hosts that need a citation link write an ordinary anchor to `https://www.sefaria.org/<url_ref>`; hosts that need text with its heading use Source Card.
 
 ### Connections Panel
 
@@ -164,12 +166,12 @@ Required tests cover:
 
 - supplied-data zero-I/O and invalid-data supersession
 - standalone loading for all five elements
-- shared versus explicit acquisition
+- shared versus explicit source
 - original failure causes and no unhandled rejections
 - stale completion suppression
 - disconnect/reconnect behavior
 - supplied/acquired private-preparation equivalence
-- Reader capability admission and semantic/raw record boundaries
+- Reader loader admission and semantic/raw record boundaries
 - exact one-parent/zero-child request counts, including ten-child cases
 - generated metadata and supported-export staleness
 

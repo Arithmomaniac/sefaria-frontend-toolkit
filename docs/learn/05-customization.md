@@ -75,7 +75,7 @@ const normalized = normalizeText("<b>Justice</b>");
 console.log(client, normalized);
 ```
 
-The DOM-free `./acquisition`, `./reader`, and `./reader-session` subpaths expose acquisition, local-data acquisition, and semantic Reader record contracts without registering elements. Prepared component rendering remains private.
+The DOM-free `./data-source`, `./reader`, and `./reader-session` subpaths expose source, local-data source, and semantic Reader record contracts without registering elements. Prepared component rendering remains private.
 
 ## Expected result
 

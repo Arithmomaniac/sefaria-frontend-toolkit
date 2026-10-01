@@ -4,7 +4,7 @@ import {
 } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 import type {
-  SefariaAcquisition,
+  SefariaDataSource,
   SefariaSourceCard,
 } from "@arithmomaniac/sefaria-web-components";
 
@@ -20,7 +20,7 @@ export function startLinkedArticle(
   root: Document = document,
   client: SefariaClient = createSefariaClient({ cache: false }),
 ): LinkedArticleApp {
-  const acquisition: SefariaAcquisition = { kind: "client", client };
+  const source: SefariaDataSource = { kind: "client", client };
   const existingStatus = root.querySelector<HTMLElement>(STATUS_SELECTOR);
   const status = existingStatus ?? root.createElement("p");
   if (existingStatus === null) {
@@ -84,7 +84,7 @@ export function startLinkedArticle(
     closeButton.textContent = "Close source preview";
     closeButton.autofocus = true;
     const card = root.createElement("sefaria-source-card") as SefariaSourceCard;
-    card.acquisition = acquisition;
+    card.source = source;
     card.setAttribute("sref", tref);
     const events = new AbortController();
     const preview = {

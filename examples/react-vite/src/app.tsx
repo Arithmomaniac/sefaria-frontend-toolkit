@@ -7,7 +7,7 @@ import {
 } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 import type {
-  SefariaAcquisition,
+  SefariaDataSource,
   SefariaSourceCard,
 } from "@arithmomaniac/sefaria-web-components";
 import { useCallback, useRef, useState, type FormEvent } from "react";
@@ -41,8 +41,8 @@ export function ReactSourceCardExample({
   );
   const [sref, setSref] = useState("");
   const selectedMetadataRef = useRef<string | undefined>(undefined);
-  const [acquisition] = useState<SefariaAcquisition>(() =>
-    createSourceCardAcquisition(client, (ref) => {
+  const [source] = useState<SefariaDataSource>(() =>
+    createSourceCardSource(client, (ref) => {
       selectedMetadataRef.current = ref;
     }),
   );
@@ -141,8 +141,8 @@ export function ReactSourceCardExample({
         <p>
           Validated supplied data renders first. Submitting the form is the only
           live activation. React owns presentation properties and receives the
-          component&apos;s canonical selection event; the element owns
-          acquisition, cancellation, loading, and error presentation.
+          component&apos;s canonical selection event; the element owns source,
+          cancellation, loading, and error presentation.
         </p>
       </header>
 
@@ -284,7 +284,7 @@ export function ReactSourceCardExample({
           ref={setCard}
           data={data}
           sref={sref}
-          acquisition={acquisition}
+          source={source}
           contentLanguage={contentLanguage}
           layout={layout}
           sideOrder={sideOrder}
@@ -327,13 +327,13 @@ export function ReactSourceCardExample({
   );
 }
 
-function createSourceCardAcquisition(
+function createSourceCardSource(
   client: SefariaClient,
   selectMetadata: (ref: string) => void,
-): SefariaAcquisition {
+): SefariaDataSource {
   return {
-    kind: "capability",
-    capability: {
+    kind: "custom",
+    loader: {
       getText: async (request, signal) => {
         const result = await text.getV3Texts({
           client,

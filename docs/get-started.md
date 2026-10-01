@@ -21,7 +21,7 @@ The arrows show ways to combine layers, not mandatory steps. A server can stop a
 
 Headless means that no browser element is registered.
 
-A host is the application that owns the component. It decides when live loading is activated, where the element appears, and whether to supply explicit acquisition.
+A host is the application that owns the component. It decides when live loading is activated, where the element appears, and whether to supply explicit source.
 
 ## Use the client without components
 
@@ -65,7 +65,7 @@ The element path accepts corrected component-specific raw data and privately pre
 Use the [component catalog](components.md) when the product needs one text segment, bilingual segment, Source Card or Connections Panel.
 
 1. Assign validated component-specific raw `data` for zero-request rendering, or assign `sref` for standalone loading.
-2. Optionally assign a tagged client, host capability, or disabled acquisition choice.
+2. Optionally assign a tagged client, host loader, or disabled data source choice.
 3. Listen for semantic events and read public read-only status or diagnostics.
 
 The [supplied-data lesson](learn/02-supplied-data.md) teaches the zero-request path first. The [live-data lesson](learn/03-live-data.md) adds `sref` after an explicit activation.
@@ -75,7 +75,7 @@ The [supplied-data lesson](learn/02-supplied-data.md) teaches the zero-request p
 Use this path when users need bilingual text, connections, commentary navigation, and semantic history.
 
 1. Create and connect `<sefaria-reader>`.
-2. Assign an explicit acquisition source when the lazy browser default is not appropriate.
+2. Assign an explicit data source when the lazy browser default is not appropriate.
 3. Assign `sref` as an attribute after the host's activation gate.
 4. Observe read-only Reader status and semantic diagnostics.
 5. Clear inputs or remove the element during host teardown.

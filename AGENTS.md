@@ -65,9 +65,9 @@ High-risk changes include public API contracts, OpenAPI corrections, generated o
 
 - `@arithmomaniac/sefaria-client` owns the pinned OpenAPI input, checksum, guarded overlay, generated contracts, Zod schemas, validators, thin client, and its bounded per-client response cache.
 - `@arithmomaniac/sefaria-text-transform` owns pure sanitization, vocalization, and footnote operations.
-- Non-DOM `@arithmomaniac/sefaria-web-components` subpaths own public raw input types, acquisition capabilities, Reader semantic/session contracts, and reusable pure preparation.
-- Component elements own reactive input snapshots, acquisition selection, cancellation and stale-result suppression, private preparation, layout, interaction, accessibility, theming, and DOM rendering.
-- Integrations own host input, activation policy, external unknown-JSON validation, optional client or capability creation, and application-specific coordination.
+- Non-DOM `@arithmomaniac/sefaria-web-components` subpaths own public raw input types, source capabilities, Reader semantic/session contracts, and reusable pure preparation.
+- Component elements own reactive input snapshots, source selection, cancellation and stale-result suppression, private preparation, layout, interaction, accessibility, theming, and DOM rendering.
+- Integrations own host input, activation policy, external unknown-JSON validation, optional client or loader creation, and application-specific coordination.
 - Specifications own intended behavior.
 - `docs/evidence.md` owns observations and source provenance.
 
@@ -93,13 +93,13 @@ Report structured JSON paths before projection.
 
 Do not add an OpenAPI correction before source review or a runtime contract failure identifies a mismatch.
 
-## Keep acquisition bounded and declarative
+## Keep source bounded and declarative
 
-Every public element can accept `sref` and component-specific raw `data`. For the five non-Reader elements, defined `data` is authoritative and must suppress acquisition, including when it is validly empty or invalid.
+Every public element can accept `sref` and component-specific raw `data`. For the five non-Reader elements, defined `data` is authoritative and must suppress source, including when it is validly empty or invalid.
 
-Elements may accept only the documented tagged acquisition choice. Do not expose `fetch`, a base URL, arbitrary request functions, a host object, or a public prepared rendering model.
+Elements may accept only the documented tagged data source choice. Do not expose `fetch`, a base URL, arbitrary request functions, a host object, or a public prepared rendering model.
 
-The component package owns one lazy default acquisition value per loaded module instance. Import, supplied-data rendering, and explicit per-element acquisition do not realize it. Explicitly disabled or unsupported acquisition must not fall through to browser HTTP.
+The component package owns one lazy default source value per loaded module instance. Import, supplied-data rendering, and explicit per-element source do not realize it. Explicitly disabled or unsupported source must not fall through to browser HTTP.
 
 Element-owned asynchronous work must preserve original failures, publish no stale completion, avoid unhandled rejections, abort eligible work on disconnection, and resume only the still-eligible interrupted phase on reconnection. Ordinary network failures are not automatically retried.
 
@@ -107,7 +107,7 @@ Element-owned asynchronous work must preserve original failures, publish no stal
 
 A composite that already owns a corrected payload must prepare children from that captured data through private pure helpers or a private prepared receiver.
 
-Do not assign child `sref` or invoke child acquisition when the parent already owns the required data.
+Do not assign child `sref` or invoke child source when the parent already owns the required data.
 
 Ten child renderings from one response must use one outer request and zero child requests.
 

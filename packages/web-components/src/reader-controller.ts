@@ -5,7 +5,7 @@ import {
   type SefariaClient,
 } from "@arithmomaniac/sefaria-client";
 
-import type { SefariaAcquisitionCapability } from "./acquisition.js";
+import type { SefariaDataLoader } from "./data-source.js";
 import { validateSuppliedComponentData } from "./component-controller.js";
 import { createConnectionsQuery } from "./connections-request.js";
 import {
@@ -58,7 +58,7 @@ interface ReaderSessionWithRetainedSourceRoot extends ReaderSession {
 }
 
 /** Executes corrected source and connections operations for one reader controller. */
-export interface ReaderControllerDataSource {
+export interface ReaderControllerRecordLoader {
   /** Loads admitted source content for the exact effective request. */
   loadSource(
     request: SourceCardRequest,
@@ -320,9 +320,9 @@ interface ActiveOperation {
 type Listener = (snapshot: ReaderControllerSnapshot) => void;
 
 /** Creates a client-backed reader data source with component request defaults. */
-export function createSefariaReaderDataSource(
+export function createSefariaReaderRecordLoader(
   client: SefariaClient,
-): ReaderControllerDataSource {
+): ReaderControllerRecordLoader {
   return {
     loadSource: async (request, signal, progress) => {
       const response = await acquireSelectedText(
@@ -365,20 +365,18 @@ export function createSefariaReaderDataSource(
   };
 }
 
-/** Creates a host-capability Reader data source without browser fallback. */
-export function createCapabilityReaderDataSource(
-  capability: SefariaAcquisitionCapability,
-): ReaderControllerDataSource {
+/** Creates a host-loader Reader data source without browser fallback. */
+export function createCustomReaderRecordLoader(
+  loader: SefariaDataLoader,
+): ReaderControllerRecordLoader {
   return {
     loadSource: async (request, signal, progress) => {
-      if (capability.getText === undefined) {
-        throw new Error(
-          "The selected acquisition source does not support text.",
-        );
+      if (loader.getText === undefined) {
+        throw new Error("The selected data source does not support text.");
       }
 
       const response = await acquireSelectedText(
-        { kind: "capability", capability },
+        { kind: "custom", loader },
         request.tref,
         serializeSourceCardSelectors(request),
         request.translationLanguage,
@@ -413,12 +411,10 @@ export function createCapabilityReaderDataSource(
       throw new Error(`Unsupported Reader source status ${response.status}.`);
     },
     loadConnections: async (request, projection, signal) => {
-      if (capability.getLinks === undefined) {
-        throw new Error(
-          "The selected acquisition source does not support links.",
-        );
+      if (loader.getLinks === undefined) {
+        throw new Error("The selected data source does not support links.");
       }
-      const response = await capability.getLinks(
+      const response = await loader.getLinks(
         {
           sref: request.tref,
           withText: request.withText !== false,
@@ -453,7 +449,7 @@ export function createCapabilityReaderDataSource(
  */
 export async function loadReaderControllerProgressively(
   request: SourceCardRequest,
-  dataSource: ReaderControllerDataSource,
+  dataSource: ReaderControllerRecordLoader,
   onSource: (controller: ReaderController) => void,
   options: ReaderControllerLoadOptions = {},
   retainPublishedOnFailure = false,
@@ -514,7 +510,7 @@ export async function loadReaderController(
   client: SefariaClient,
   options: ReaderControllerLoadOptions = {},
 ): Promise<ReaderController> {
-  const dataSource = createSefariaReaderDataSource(client);
+  const dataSource = createSefariaReaderRecordLoader(client);
   return await loadReaderControllerProgressively(
     request,
     dataSource,
@@ -534,7 +530,7 @@ export interface ReaderControllerSeedOptions extends ReaderSessionOptions {
 /** Creates a zero-request controller from already admitted reader content. */
 export function createReaderController(
   seed: ReaderEntrySeed,
-  dataSource: ReaderControllerDataSource,
+  dataSource: ReaderControllerRecordLoader,
   options: ReaderControllerSeedOptions = {},
 ): ReaderController {
   requireNavigableSeed(seed);
@@ -543,7 +539,7 @@ export function createReaderController(
 
 class ReaderControllerImpl implements ReaderController {
   #session: ReaderSession;
-  readonly #dataSource: ReaderControllerDataSource;
+  readonly #dataSource: ReaderControllerRecordLoader;
   #task: ReaderControllerTask = { state: "idle" };
   #snapshot: ReaderControllerSnapshot;
   #reader: ReaderViewModel;
@@ -561,7 +557,7 @@ class ReaderControllerImpl implements ReaderController {
 
   constructor(
     seed: ReaderEntrySeed,
-    dataSource: ReaderControllerDataSource,
+    dataSource: ReaderControllerRecordLoader,
     options: ReaderControllerSeedOptions,
   ) {
     requireNavigableSeed(seed);
@@ -1168,7 +1164,7 @@ class ReaderControllerImpl implements ReaderController {
 /** Resolves and qualifies one source using at most two source operations. */
 export async function resolveReaderSource(
   request: SourceCardRequest,
-  dataSource: ReaderControllerDataSource,
+  dataSource: ReaderControllerRecordLoader,
   signal: AbortSignal,
   onEffectiveRequest?: (request: SourceCardRequest) => void,
   progress: ReaderSourceProgress = newSourceProgress(),

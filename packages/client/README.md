@@ -18,14 +18,14 @@ const result = await text.getV3Texts({
 });
 ```
 
-Component consumers can supply an existing client as the element's explicit acquisition source:
+Component consumers can supply an existing client as the element's explicit data source:
 
 ```ts
 import { createSefariaClient } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 
 const card = document.createElement("sefaria-source-card");
-card.acquisition = { kind: "client", client: createSefariaClient() };
+card.source = { kind: "client", client: createSefariaClient() };
 card.sref = "Micah 6:8";
 document.body.append(card);
 ```

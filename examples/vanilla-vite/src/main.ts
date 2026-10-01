@@ -7,7 +7,7 @@ import {
 } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 import type {
-  SefariaAcquisition,
+  SefariaDataSource,
   SefariaSourceCard,
 } from "@arithmomaniac/sefaria-web-components";
 
@@ -50,11 +50,11 @@ const client = createSefariaClient({
     return fetch(requestInput, init);
   },
 });
-const acquisition = createSourceCardAcquisition(client, (ref) => {
+const source = createSourceCardSource(client, (ref) => {
   selectedMetadataRef = ref;
 });
 
-card.acquisition = acquisition;
+card.source = source;
 card.setAttribute("sref", "");
 card.data = validatedPayload;
 card.setAttribute("selectable", "");
@@ -144,16 +144,16 @@ function dispose(): void {
   cardObserver.disconnect();
   card.data = undefined;
   card.setAttribute("sref", "");
-  card.acquisition = { kind: "disabled" };
+  card.source = { kind: "disabled" };
 }
 
-function createSourceCardAcquisition(
+function createSourceCardSource(
   client: SefariaClient,
   selectMetadata: (ref: string) => void,
-): SefariaAcquisition {
+): SefariaDataSource {
   return {
-    kind: "capability",
-    capability: {
+    kind: "custom",
+    loader: {
       getText: async (request, signal) => {
         const result = await text.getV3Texts({
           client,

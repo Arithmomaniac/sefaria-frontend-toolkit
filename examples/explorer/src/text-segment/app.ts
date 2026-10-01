@@ -93,7 +93,7 @@ export function startTextSegmentLiveDemo(
       const result = document.createElement(
         "sefaria-text-segment",
       ) as SefariaTextSegment;
-      result.acquisition = { kind: "client", client };
+      result.source = { kind: "client", client };
       return result;
     },
     load: loadText,
@@ -112,10 +112,10 @@ async function loadText(
   request: TextSegmentRequest,
   signal: AbortSignal,
 ): Promise<string> {
-  let acquisitionError: unknown;
+  let sourceError: unknown;
   const onError = (event: Event): void => {
-    acquisitionError = (event as CustomEvent<{ readonly error: unknown }>)
-      .detail.error;
+    sourceError = (event as CustomEvent<{ readonly error: unknown }>).detail
+      .error;
   };
   const onAbort = (): void => {
     if (result.sref === request.tref) result.setAttribute("sref", "");
@@ -149,7 +149,7 @@ async function loadText(
     }
 
     await result.updateComplete;
-    if (acquisitionError !== undefined) throw acquisitionError;
+    if (sourceError !== undefined) throw sourceError;
     return result.status;
   } finally {
     result.removeEventListener("sefaria-text-segment-error", onError);

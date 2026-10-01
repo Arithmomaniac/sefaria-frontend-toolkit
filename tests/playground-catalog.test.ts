@@ -21,7 +21,7 @@ const expectedEntries = [
   "@arithmomaniac/sefaria-client",
   "@arithmomaniac/sefaria-client/validation",
   "@arithmomaniac/sefaria-web-components",
-  "@arithmomaniac/sefaria-web-components/acquisition",
+  "@arithmomaniac/sefaria-web-components/data-source",
   "@arithmomaniac/sefaria-web-components/bilingual-segment",
   "@arithmomaniac/sefaria-web-components/connections-panel",
   "@arithmomaniac/sefaria-web-components/reader",

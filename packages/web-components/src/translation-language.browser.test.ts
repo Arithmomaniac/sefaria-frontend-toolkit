@@ -63,7 +63,7 @@ for (const Constructor of [
     const element = new Constructor();
     element.setAttribute("translation-language", " French ");
     element.sref = "Micah 6:8";
-    element.acquisition = {
+    element.source = {
       kind: "client",
       client: createSefariaClient({ cache: false, fetch: fetchMock }),
     };
@@ -113,9 +113,9 @@ for (const Constructor of [
     element.setAttribute("translation-language", "french");
     element.setAttribute("translation-fallback", "default");
     element.sref = "Berakhot 2a:1";
-    element.acquisition = {
-      kind: "capability",
-      capability: {
+    element.source = {
+      kind: "custom",
+      loader: {
         getText: async (request) => {
           requested.push([...request.versions]);
           return {
@@ -150,7 +150,7 @@ for (const Constructor of [
     supplied.translationLanguage = "french";
     supplied.setAttribute("translation-fallback", "default");
     supplied.data = captured("berakhotDefault");
-    supplied.acquisition = { kind: "disabled" };
+    supplied.source = { kind: "disabled" };
     document.body.append(supplied);
     await supplied.updateComplete;
     expect(getPreparedState(supplied)).toEqual(getPreparedState(element));
@@ -162,9 +162,9 @@ for (const Constructor of [
     element.setAttribute("translation-language", "french");
     element.setAttribute("translation-fallback", "none");
     element.sref = "Berakhot 2a:1";
-    element.acquisition = {
-      kind: "capability",
-      capability: {
+    element.source = {
+      kind: "custom",
+      loader: {
         getText: async (request) => {
           requested.push([...request.versions]);
           return { payload: missing(), status: 200 };
@@ -200,7 +200,7 @@ for (const Constructor of [
     element.setAttribute("translation-language", "french");
     element.setAttribute("translation-fallback", "maybe");
     element.sref = "Berakhot 2a:1";
-    element.acquisition = { kind: "capability", capability: { getText } };
+    element.source = { kind: "custom", loader: { getText } };
     document.body.append(element);
     await vi.waitFor(() => expect(element.status).toBe("error"));
     expect(element.shadowRoot?.querySelector('[role="alert"]')).not.toBeNull();
@@ -244,7 +244,7 @@ for (const Constructor of [
     const element = new Constructor();
     element.setAttribute("translation-language", "french");
     element.sref = "Micah 6:8";
-    element.acquisition = { kind: "capability", capability: { getText } };
+    element.source = { kind: "custom", loader: { getText } };
     document.body.append(element);
     await element.updateComplete;
     await vi.waitFor(() => expect(element.status).not.toBe("loading"));
@@ -278,9 +278,9 @@ for (const Constructor of [
     element.translationLanguage = "french";
     element.setAttribute("translation-fallback", "default");
     element.sref = "Berakhot 2a:1";
-    element.acquisition = {
-      kind: "capability",
-      capability: {
+    element.source = {
+      kind: "custom",
+      loader: {
         getText: async (request) => {
           requested.push([...request.versions]);
           if (requested.length === 1)
@@ -318,7 +318,7 @@ for (const Constructor of [
     const element = new Constructor();
     element.translationLanguage = "french";
     element.sref = "Micah 6:8";
-    element.acquisition = { kind: "capability", capability: { getText } };
+    element.source = { kind: "custom", loader: { getText } };
     document.body.append(element);
     await vi.waitFor(() => expect(element.status).toBe("ready"));
     const leaves =
@@ -348,9 +348,9 @@ test("SefariaSourceCard materializes default fallback when the request omits it"
   const element = new SefariaSourceCard();
   element.translationLanguage = "french";
   element.sref = "Berakhot 2a:1";
-  element.acquisition = {
-    kind: "capability",
-    capability: {
+  element.source = {
+    kind: "custom",
+    loader: {
       getText: async (request) => {
         requested.push([...request.versions]);
         return {
@@ -385,7 +385,7 @@ test.each([false, true])(
     const element = new SefariaSourceCard();
     element.sref = value.ref;
     element.translationLanguage = "french";
-    element.acquisition = { kind: "capability", capability: { getText } };
+    element.source = { kind: "custom", loader: { getText } };
     document.body.append(element);
     await vi.waitFor(() => expect(element.status).toBe("ready"));
     expect(element.shadowRoot?.querySelectorAll(".item")).toHaveLength(10);
@@ -409,7 +409,7 @@ test("no translation leaves Source Card primary content and an explicit absent s
   const element = new SefariaSourceCard();
   element.sref = value.ref;
   element.translationLanguage = "french";
-  element.acquisition = { kind: "capability", capability: { getText } };
+  element.source = { kind: "custom", loader: { getText } };
   document.body.append(element);
   await vi.waitFor(() => expect(element.status).toBe("ready"));
   expect(getText).toHaveBeenCalledTimes(2);

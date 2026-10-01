@@ -1,7 +1,7 @@
 import { createSefariaClient } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 import type {
-  SefariaAcquisition,
+  SefariaDataSource,
   SefariaSourceCard,
   SourceCardRequest,
 } from "@arithmomaniac/sefaria-web-components";
@@ -16,7 +16,7 @@ export interface SourceCardLiveDemo {
 /** Connects the request form, presets, and display controls to the source card. */
 export function startSourceCardLiveDemo(
   root: Document,
-  acquisition: SefariaAcquisition = {
+  source: SefariaDataSource = {
     kind: "client",
     client: createSefariaClient(),
   },
@@ -45,10 +45,10 @@ export function startSourceCardLiveDemo(
   );
   const result = requireElement<SefariaSourceCard>(root, "#source-card-result");
   let activeLoad = 0;
-  let acquisitionError: unknown;
+  let sourceError: unknown;
   result.addEventListener("sefaria-source-card-error", (event) => {
-    acquisitionError = (event as CustomEvent<{ readonly error: unknown }>)
-      .detail.error;
+    sourceError = (event as CustomEvent<{ readonly error: unknown }>).detail
+      .error;
   });
 
   const applyDisplaySettings = (): void => {
@@ -80,8 +80,8 @@ export function startSourceCardLiveDemo(
     hostError.hidden = true;
     hostError.textContent = "";
     submitButton.disabled = true;
-    acquisitionError = undefined;
-    result.acquisition = acquisition;
+    sourceError = undefined;
+    result.source = source;
     if (result.sref === request.tref) {
       result.setAttribute("sref", "");
       await result.updateComplete;
@@ -106,7 +106,7 @@ export function startSourceCardLiveDemo(
     await waitForTerminalStatus(result, loadId, () => activeLoad);
     if (loadId !== activeLoad) return;
 
-    if (acquisitionError === undefined) {
+    if (sourceError === undefined) {
       requestState.dataset.state = result.status;
       const itemCount =
         result.shadowRoot?.querySelectorAll(".items > [data-position]")
@@ -115,7 +115,7 @@ export function startSourceCardLiveDemo(
         result.status === "ready"
           ? `${request.tref} produced ${itemCount} items. See the edition attribution for the selected language.`
           : `${request.tref} produced ${result.status}.`;
-    } else if (acquisitionError !== undefined) {
+    } else if (sourceError !== undefined) {
       requestState.dataset.state = "error";
       requestState.textContent = `${request.tref} could not complete.`;
       if (!hadCommittedContent) {
@@ -124,9 +124,9 @@ export function startSourceCardLiveDemo(
 
       hostError.hidden = false;
       hostError.textContent =
-        acquisitionError instanceof Error
-          ? acquisitionError.message
-          : String(acquisitionError);
+        sourceError instanceof Error
+          ? sourceError.message
+          : String(sourceError);
     }
     submitButton.disabled = false;
   };

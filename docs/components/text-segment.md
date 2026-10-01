@@ -18,7 +18,7 @@ The supplied project switches between Hebrew and English selected data. `vocaliz
 
 ## Interaction and accessibility
 
-The element emits no data-action events. Current acquisition or validation failures emit `sefaria-text-segment-error` and remain accessible through read-only status. Direction comes from the selected version, not a host-wide language assumption.
+The element emits no data-action events. Current source or validation failures emit `sefaria-text-segment-error` and remain accessible through read-only status. Direction comes from the selected version, not a host-wide language assumption.
 
 ## Exact contract and source
 

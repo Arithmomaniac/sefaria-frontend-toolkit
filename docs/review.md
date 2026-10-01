@@ -16,7 +16,7 @@ This guide defines review gates for the delivered architecture and separately id
 
 ## Browser script distribution
 
-- [ ] The plain-HTML smoke loads the actual production module without an import map, source alias, or custom acquisition.
+- [ ] The plain-HTML smoke loads the actual production module without an import map, source alias, or custom source.
 - [ ] Re-evaluating identical bytes through a distinct URL preserves the registered constructors and throws no error.
 - [ ] Package producer version and commit survive archival retries; partial package publication cannot admit a script record.
 - [ ] All active versions are restored byte-for-byte; missing/corrupt active archives block deployment.
@@ -98,12 +98,12 @@ Review the initial and expanded corrections for:
 - [ ] Client response validation and external-boundary validation use the same generated schemas.
 - [ ] HTML sanitization remains separate from JSON schema validation.
 
-## Declarative component inputs and acquisition
+## Declarative component inputs and source
 
 - [ ] All six public elements accept `sref` and support standalone loading.
 - [ ] The five non-Reader elements accept component-specific raw `data`.
 - [ ] Defined supplied data makes zero requests, including valid empty data.
-- [ ] Invalid supplied data supersedes pending acquisition, replaces prior content with its validation error, and never falls through to `sref`.
+- [ ] Invalid supplied data supersedes pending source, replaces prior content with its validation error, and never falls through to `sref`.
 - [ ] Clearing `data` resumes retained eligible `sref`; clearing both inputs in one synchronous update yields empty state.
 - [ ] Complete endpoint payloads use generated operation/status validation.
 - [ ] Narrow selected fragments and response-shaped slices validate only their declared consumed fields.
@@ -114,15 +114,15 @@ Review the initial and expanded corrections for:
 - [ ] Current failures preserve original causes and structured paths, become accessible state/events, and produce no unhandled rejection.
 - [ ] Superseded work publishes neither success nor failure.
 
-## Shared and per-element acquisition
+## Shared and per-element source
 
-- [ ] One lazy shared acquisition value exists per loaded module instance.
-- [ ] Import, supplied data, and explicit per-element acquisition do not realize it.
+- [ ] One lazy shared source value exists per loaded module instance.
+- [ ] Import, supplied data, and explicit per-element source do not realize it.
 - [ ] Configuration can replace the pending choice before first shared use.
 - [ ] Every configuration call after first shared use fails, including an identical value.
-- [ ] Explicit client, host capability, and disabled choices are distinguishable without heuristic duck typing.
+- [ ] Explicit client, host loader, and disabled choices are distinguishable without heuristic duck typing.
 - [ ] Explicit failure, disablement, or unsupported operation never falls through to browser HTTP.
-- [ ] The client cache remains the only response cache; component acquisition adds no retry, coalescing, persistence, or stale fallback.
+- [ ] The client cache remains the only response cache; component source adds no retry, coalescing, persistence, or stale fallback.
 - [ ] Disconnection invalidates active work while retaining committed content.
 - [ ] Reconnection resumes only still-eligible interrupted work with a new identity.
 - [ ] Reconnecting completed unchanged content makes zero requests.
@@ -133,7 +133,7 @@ Review the initial and expanded corrections for:
 
 - [ ] Prepared rendering types and protocols are absent from supported declarations, metadata, and exports.
 - [ ] `./bindings` and `./reader-controller` remain absent from supported exports and have explicit test dispositions.
-- [ ] `./acquisition` imports without DOM registration.
+- [ ] `./data-source` imports without DOM registration.
 - [ ] Component subpaths expose raw input/options/events rather than public prepared-state factories.
 - [ ] Parent composition uses captured data and private preparation rather than child `sref`.
 - [ ] A parent-intercepted child data action runs one parent default and no child default.
@@ -192,7 +192,7 @@ Review the initial and expanded corrections for:
 - [ ] A one-sided position remains a partial pair instead of being dropped.
 - [ ] Empty inner arrays contribute no blank item.
 - [ ] Scalar-array disagreement at one path is a projection error.
-- [ ] Card items retain positional identity; refs appear only for the reviewed metadata-backed address capability.
+- [ ] Card items retain positional identity; refs appear only for the reviewed metadata-backed address loader.
 - [ ] The payload-derived header makes no second request.
 - [ ] Optional host-supplied raw reference-label data changes only header preparation.
 - [ ] A ten-item card uses one outer request and zero child requests.
@@ -207,7 +207,7 @@ Review the initial and expanded corrections for:
 - [ ] Scalar, range-start, offset, depth-one, Talmud-prefix, and commentary cases use source-backed address metadata.
 - [ ] Empty rows do not renumber later rows or replace the requested first target.
 - [ ] Spanning targets expose only the first server-provided context; unsupported nested shapes remain renderable and explicitly nonselectable.
-- [ ] Malformed consumed offsets preserve text rendering and report structured paths on an unavailable navigation capability.
+- [ ] Malformed consumed offsets preserve text rendering and report structured paths on an unavailable navigation loader.
 - [ ] Every supported item receives a short address label from the same metadata as its canonical target; the element does not parse the ref.
 - [ ] Visible primary and translation sides receive Hebrew and English address labels respectively, including conventional Hebrew 15 and 16 forms.
 - [ ] Address labels follow stacked and side-by-side pair layout, and hiding them preserves a keyboard-accessible selection control without changing event identity.
@@ -246,14 +246,14 @@ Review the initial and expanded corrections for:
 
 - [ ] The composite element owns the outer request.
 - [ ] Child rendering uses captured parent data and private preparation.
-- [ ] The parent does not assign child `sref` or trigger child acquisition.
+- [ ] The parent does not assign child `sref` or trigger child source.
 - [ ] A request spy proves one outer request.
 - [ ] The same spy proves zero child requests.
 - [ ] A ten-child fixture produces ten child renderings from one captured payload.
 
 ## Element rendering and interactions
 
-- [ ] Every public element accepts its documented `sref`, raw `data`, acquisition, visual, and interaction properties.
+- [ ] Every public element accepts its documented `sref`, raw `data`, source, visual, and interaction properties.
 - [ ] No element accepts arbitrary `fetch`, a base URL, or an untyped host.
 - [ ] Private prepared rendering is not writable through a supported property.
 - [ ] Layout and interaction remain element properties.
@@ -270,10 +270,10 @@ Review the initial and expanded corrections for:
 - [ ] Invalid metadata stops before payload validation.
 - [ ] The App validates the unknown payload with the generated TypeScript validator.
 - [ ] The App reports structured paths for invalid payloads.
-- [ ] The App supplies a validated tagged host capability.
+- [ ] The App supplies a validated tagged host loader.
 - [ ] The Reader uses the same private preparation as browser-client mode.
 - [ ] The first render makes zero requests.
-- [ ] Later Reader acquisition uses host-proxied tools only and never falls back to direct HTTP.
+- [ ] Later Reader source uses host-proxied tools only and never falls back to direct HTTP.
 - [ ] One tool result includes useful text content for hosts without App rendering.
 - [ ] The server preserves network and undocumented HTTP failures as tool failures.
 - [ ] Automated repository checks mock the server transport and remain offline.
@@ -292,7 +292,7 @@ Review the initial and expanded corrections for:
 - [ ] Source Card styles remain shadow-isolated; dialog styles are scoped to the host-owned dialog.
 - [ ] Close, supersession, and destroy abort owned work and reject late completion.
 - [ ] Destroy removes only owned listeners and dialog state and restores prior accessibility attributes.
-- [ ] Each new opening makes one v3 request; the same active reference does not restart acquisition.
+- [ ] Each new opening makes one v3 request; the same active reference does not restart source.
 - [ ] CSP, mixed-content, CORS, and restricted-page limitations are documented.
 
 ## Supplied-data editor
@@ -356,12 +356,12 @@ Review the initial and expanded corrections for:
 - [ ] Active runtime and build paths contain no Python dependency or retired demo assembly.
 - [ ] Every package, example, and test-workspace manifest remains private.
 - [ ] Library exports and packed files resolve built artifacts rather than producer source.
-- [ ] Workflow YAML permits only the rollout-enabled green-`main` public prerelease job to use repository-scoped `packages: write`, `github.token`, the `alpha` tag, and the fixed package order; it contains no deployment, long-lived secret, tag trigger, manual release, or other write capability.
+- [ ] Workflow YAML permits only the rollout-enabled green-`main` public prerelease job to use repository-scoped `packages: write`, `github.token`, the `alpha` tag, and the fixed package order; it contains no deployment, long-lived secret, tag trigger, manual release, or other write loader.
 - [ ] The lockfile contains no mirror-specific remote tarball resolution.
 - [ ] Maintained entry documentation distinguishes workspace/local-tarball use from authenticated public GitHub Packages prereleases, states that names may change and npmjs.com/CDN/stable distribution is unavailable, and makes no unsupported official or deployed claim.
 - [ ] Every retained test from the immutable baseline inventory is present in Vitest discovery; every retirement has a precise presentation-only or supersession reason.
 - [ ] Fresh agent setup uses the frozen lockfile, verifies required immutable Git objects, installs Chromium, and proves a headless launch.
-- [ ] Toolkit setup is selected by checked-out package capability rather than one exact branch name.
+- [ ] Toolkit setup is selected by checked-out package loader rather than one exact branch name.
 - [ ] An unrelated checkout skips toolkit setup explicitly; a malformed recognized toolkit fails.
 - [ ] Linux and Windows each run the complete `pnpm check`; the required `check` fails for a failed, canceled, or skipped matrix.
 - [ ] Failure artifacts use an explicit bounded allowlist and exclude authenticated captures, dependencies, credentials, and complete workspaces.

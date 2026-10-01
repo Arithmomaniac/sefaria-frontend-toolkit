@@ -11,11 +11,11 @@ The project addresses four steps between receiving JSON and presenting a reading
 1. `@arithmomaniac/sefaria-client` validates the corrected transport contract and preserves documented HTTP, network, and abort semantics.
 2. `@arithmomaniac/sefaria-text-transform` safely prepares Sefaria's structured text markup and Hebrew vocalization.
 3. Pure `@arithmomaniac/sefaria-web-components` factories project transport payloads into component-specific rendering data.
-4. Declarative Web Components own input precedence, optional acquisition, private preparation, layout, accessibility, interaction, and theming.
+4. Declarative Web Components own input precedence, optional source, private preparation, layout, accessibility, interaction, and theming.
 
 The same pieces support both packaged and host-specific compositions:
 
-| Capability | Example |
+| DataLoader | Example |
 | --- | --- |
 | Text, bilingual, reference, source-card, and connections primitives | [Developer explorer source](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/explorer) |
 | Supported packaged Reader | `examples/reader/controlled.html` |
@@ -32,7 +32,7 @@ The Reader is one composition of the reusable contracts, not the whole product. 
 | --- | --- |
 | `packages/client` | Pinned upstream OpenAPI input, guarded corrections, generated contracts and validators, thin client, and bounded per-client response cache |
 | `packages/text-transform` | Pure sanitization, vocalization, footnotes, and connected-text previews |
-| `packages/web-components` | Declarative elements, component-specific raw input types, tagged acquisition, shared Reader qualification, and the advanced semantic/raw Reader session facade |
+| `packages/web-components` | Declarative elements, component-specific raw input types, tagged source, shared Reader qualification, and the advanced semantic/raw Reader session facade |
 | `examples/explorer` | Authored component states and live developer diagnostics |
 | `examples/reader`, `examples/linked-article`, `examples/mcp-app` | Distinct website, embedding, and host-transport examples |
 | `docs/.vitepress`, `scripts/build-site.mjs` | Local presentation of canonical Markdown and isolated maintained examples |

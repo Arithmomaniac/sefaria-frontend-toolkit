@@ -3,13 +3,13 @@ export {
   type SefariaElementStatus,
 } from "./sefaria-element.js";
 export {
-  configureSefariaAcquisition,
-  type SefariaAcquisition,
-  type SefariaAcquisitionCapability,
-  type SefariaAcquisitionResponse,
-  type SefariaLinksAcquisitionRequest,
-  type SefariaTextAcquisitionRequest,
-} from "./acquisition.js";
+  configureSefariaDataSource,
+  type SefariaDataSource,
+  type SefariaDataLoader,
+  type SefariaDataLoaderResponse,
+  type SefariaLinksLoadRequest,
+  type SefariaTextLoadRequest,
+} from "./data-source.js";
 export type {
   BilingualPairContentLanguage,
   BilingualPairLayout,

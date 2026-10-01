@@ -244,7 +244,7 @@ describe("agent-ready workflow policy", () => {
     );
   });
 
-  it("keeps Copilot setup read-only and capability-based", () => {
+  it("keeps Copilot setup read-only and loader-based", () => {
     const workflow = parseWorkflow(setupSource);
     const jobs = workflow.jobs as RecordValue;
     const setup = jobs["copilot-setup-steps"] as RecordValue;

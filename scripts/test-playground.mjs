@@ -563,14 +563,14 @@ async function runGraphQualification(page, graph) {
       const pureRegistered = customElements.get("sefaria-source-card") !== undefined;
       const client = await import("@arithmomaniac/sefaria-client");
       const validation = await import("@arithmomaniac/sefaria-client/validation");
-      const acquisition = await import("@arithmomaniac/sefaria-web-components/acquisition");
+      const source = await import("@arithmomaniac/sefaria-web-components/data-source");
       const textSegment = await import("@arithmomaniac/sefaria-web-components/text-segment");
       const bilingualSegment = await import("@arithmomaniac/sefaria-web-components/bilingual-segment");
       const connections = await import("@arithmomaniac/sefaria-web-components/connections-panel");
       const reader = await import("@arithmomaniac/sefaria-web-components/reader");
       const readerSession = await import("@arithmomaniac/sefaria-web-components/reader-session");
       const entriesReady = [
-        acquisition.configureSefariaAcquisition,
+        source.configureSefariaDataSource,
         reader.resolveReaderSource,
         readerSession.createReaderSession,
       ].every((value) => typeof value === "function");

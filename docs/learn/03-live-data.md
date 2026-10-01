@@ -36,7 +36,7 @@ form.addEventListener("submit", (event) => {
 An application that needs a particular client can assign one tagged source:
 
 ```ts
-card.acquisition = {
+card.source = {
   kind: "client",
   client: createSefariaClient({ cache: false }),
 };

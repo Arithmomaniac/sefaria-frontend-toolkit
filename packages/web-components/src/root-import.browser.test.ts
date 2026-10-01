@@ -1,6 +1,6 @@
 import { expect, test, vi } from "vitest";
 
-test("imports the browser root without realizing acquisition", async () => {
+test("imports the browser root without realizing source", async () => {
   vi.resetModules();
   const fetchMock = vi.fn<typeof fetch>();
   vi.stubGlobal("fetch", fetchMock);
@@ -53,5 +53,7 @@ test("does not expose prepared state through root exports or element properties"
     root.SefariaReader,
   ]) {
     expect(elementClass.elementProperties.has("viewModel")).toBe(false);
+    expect(elementClass.elementProperties.has("source")).toBe(true);
+    expect(elementClass.elementProperties.has("acquisition")).toBe(false);
   }
 });

@@ -27,7 +27,7 @@ pnpm build
 pnpm dev:vanilla
 ```
 
-That example validates and assigns a supplied `Micah 6:8` payload with zero requests. Its explicit form action clears supplied data and assigns `sref`, letting the element exercise its selected acquisition source. [Get started](docs/get-started.md#installation-status) describes authenticated GitHub Packages installation, while [local package setup](docs/development.md#build-and-pack-the-library-tarballs) covers contributor qualification.
+That example validates and assigns a supplied `Micah 6:8` payload with zero requests. Its explicit form action clears supplied data and assigns `sref`, letting the element exercise its selected data source. [Get started](docs/get-started.md#installation-status) describes authenticated GitHub Packages installation, while [local package setup](docs/development.md#build-and-pack-the-library-tarballs) covers contributor qualification.
 
 ## Choose a path
 
@@ -52,7 +52,7 @@ The [documentation home](docs/README.md) indexes guides, specifications, generat
 1. `@arithmomaniac/sefaria-client` calls reviewed API operations, validates every JSON response, and owns the bounded per-client response cache.
 2. `@arithmomaniac/sefaria-text-transform` performs pure sanitization, vocalization, and footnote work.
 3. All five public elements accept standalone `sref`; the four ordinary elements also accept authoritative component-specific raw `data`.
-4. Elements own acquisition selection, cancellation, lifecycle reconnect, private preparation, read-only status, error events, accessibility, and rendering.
+4. Elements own source selection, cancellation, lifecycle reconnect, private preparation, read-only status, error events, accessibility, and rendering.
 5. Reader local-data capabilities and `reader-session` semantic records support advanced session and MCP hosts without exposing public prepared rendering.
 
 Maintained pages keep their explicit activation gates, so documentation arrival and deep links make no unsolicited Sefaria request. Composite parents prepare children from captured data: one parent request produces zero child requests.
@@ -66,7 +66,7 @@ Read [How declarative components obtain and render data](docs/guides/data-flow.m
 - `examples/explorer`: authored zero-request states plus explicit live component pages.
 - `examples/reader`: supported standalone Reader and a distinct advanced spatial composition.
 - `examples/linked-article`: progressively enhanced native citation links.
-- `examples/mcp-app`: compiled Node transports, AppBridge reference host, zero-request local-capability first render, and a deterministic static fixture preview.
+- `examples/mcp-app`: compiled Node transports, AppBridge reference host, zero-request local-loader first render, and a deterministic static fixture preview.
 
 Run `pnpm build:site` and `pnpm preview:site` to inspect the clean production documentation artifact under `dist/site`. The guarded Pages workflow builds and tests the same artifact under the repository project path before deployment.
 

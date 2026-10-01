@@ -10,9 +10,9 @@ import type { BilingualSegmentViewModel } from "./bilingual-segment.js";
 import type { SourceCardViewModel } from "./source-card.js";
 import micahFixture from "../../../examples/react-vite/src/micah-6-8.json";
 import type {
-  SefariaAcquisition,
-  SefariaTextAcquisitionRequest,
-} from "./acquisition.js";
+  SefariaDataSource,
+  SefariaTextLoadRequest,
+} from "./data-source.js";
 import { SefariaBilingualSegment } from "./bilingual-segment-element.js";
 import { SefariaSourceCard } from "./source-card-element.js";
 
@@ -85,7 +85,7 @@ test("standalone bilingual loading makes one request with both exact role select
   element.sref = "Micah 6:8";
   element.primaryVersionTitle = "Deterministic example Hebrew";
   element.translationVersionTitle = "Deterministic example translation";
-  element.acquisition = {
+  element.source = {
     kind: "client",
     client: createSefariaClient({ cache: false, fetch: fetchMock }),
   };
@@ -105,11 +105,11 @@ test("standalone bilingual loading makes one request with both exact role select
 });
 
 test("removing optional selector attributes restores undefined selectors", async () => {
-  const requests: SefariaTextAcquisitionRequest[] = [];
+  const requests: SefariaTextLoadRequest[] = [];
   const element = new SefariaBilingualSegment();
-  element.acquisition = {
-    kind: "capability",
-    capability: {
+  element.source = {
+    kind: "custom",
+    loader: {
       getText: async (request) => {
         requests.push(request);
         return { payload: textPayload(), status: 200 };
@@ -154,9 +154,9 @@ test("removing sref restores the empty default and aborts active work", async ()
     resolveRequest = resolve;
   });
   const element = new SefariaBilingualSegment();
-  element.acquisition = {
-    kind: "capability",
-    capability: {
+  element.source = {
+    kind: "custom",
+    loader: {
       getText: async (_request, signal) => {
         requestSignal = signal;
         return await response;
@@ -204,7 +204,7 @@ test("standalone source card uses one v3 request and gives captured children no 
   );
   const element = new SefariaSourceCard();
   element.sref = "Micah 6:8";
-  element.acquisition = {
+  element.source = {
     kind: "client",
     client: createSefariaClient({ cache: false, fetch: fetchMock }),
   };
@@ -234,9 +234,9 @@ test("prepares ten source-card children from one parent request", async () => {
   const getText = vi.fn(async () => ({ payload, status: 200 }));
   const element = new SefariaSourceCard();
   element.sref = "Micah 6:8-12";
-  element.acquisition = {
-    kind: "capability",
-    capability: { getText },
+  element.source = {
+    kind: "custom",
+    loader: { getText },
   };
   document.body.append(element);
   await settle(element);
@@ -274,21 +274,21 @@ test("explicit capabilities serve both components without browser fallback", asy
   const fetchMock = vi.fn<typeof fetch>();
   vi.stubGlobal("fetch", fetchMock);
   const getText = vi.fn(
-    async (_request: SefariaTextAcquisitionRequest, _signal: AbortSignal) => ({
+    async (_request: SefariaTextLoadRequest, _signal: AbortSignal) => ({
       payload: textPayload(),
       status: 200,
     }),
   );
-  const acquisition: SefariaAcquisition = {
-    kind: "capability",
-    capability: { getText },
+  const source: SefariaDataSource = {
+    kind: "custom",
+    loader: { getText },
   };
   const bilingual = new SefariaBilingualSegment();
   bilingual.sref = "Micah 6:8";
-  bilingual.acquisition = acquisition;
+  bilingual.source = source;
   const card = new SefariaSourceCard();
   card.sref = "Micah 6:8";
-  card.acquisition = acquisition;
+  card.source = source;
   document.body.append(bilingual, card);
   await Promise.all([settle(bilingual), settle(card)]);
 
@@ -329,7 +329,7 @@ test.each([
     );
     const element = create();
     element.sref = "Micah 6:8";
-    element.acquisition = {
+    element.source = {
       kind: "client",
       client: createSefariaClient({ cache: false, fetch: fetchMock }),
     };
@@ -370,9 +370,9 @@ test.each([
       errors,
     );
     element.sref = "Micah 6:8";
-    element.acquisition = {
-      kind: "capability",
-      capability: {
+    element.source = {
+      kind: "custom",
+      loader: {
         getText: async () => ({ payload: failure, status: 200 }),
       },
     };
@@ -406,10 +406,7 @@ test.each([
   "detached $name input changes reconcile exactly once after reconnect",
   async ({ create }) => {
     const getText = vi.fn(
-      async (
-        _request: SefariaTextAcquisitionRequest,
-        _signal: AbortSignal,
-      ) => ({
+      async (_request: SefariaTextLoadRequest, _signal: AbortSignal) => ({
         payload: textPayload(),
         status: 200,
       }),
@@ -422,9 +419,9 @@ test.each([
 
     element.data = undefined;
     element.sref = "Micah 6:9";
-    element.acquisition = {
-      kind: "capability",
-      capability: { getText },
+    element.source = {
+      kind: "custom",
+      loader: { getText },
     };
     await element.updateComplete;
     expect(getText).not.toHaveBeenCalled();
@@ -494,7 +491,7 @@ test.each([
     );
     const element = create();
     element.sref = "Micah 6:8";
-    element.acquisition = {
+    element.source = {
       kind: "client",
       client: createSefariaClient({ cache: false, fetch: fetchMock }),
     };

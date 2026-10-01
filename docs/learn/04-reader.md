@@ -23,13 +23,13 @@ reader.setAttribute("sref", "Micah 6:8");
 document.body.append(reader);
 ```
 
-Use `reader.acquisition = { kind: "client", client }` when the host needs an explicit client. Later root changes update the `sref` attribute; successful admission begins a fresh root history transaction without replacing the element.
+Use `reader.source = { kind: "client", client }` when the host needs an explicit client. Later root changes update the `sref` attribute; successful admission begins a fresh root history transaction without replacing the element.
 
 Open the <SiteLink to="/examples/reader/controlled.html?tref=Micah%206%3A8">standalone Reader</SiteLink> or the <SiteLink to="/examples/reader/index.html?tref=Micah%206%3A8">spatial Reader</SiteLink>. Both preserve the no-unsolicited-traffic gate.
 
 ## Expected result
 
-- Reader owns source and links acquisition, cancellation, semantic history, Back, breadcrumbs, local connections reprojection, and accessible failures.
+- Reader owns source and links source, cancellation, semantic history, Back, breadcrumbs, local connections reprojection, and accessible failures.
 - `selectedRef`, `currentEntryId`, `rootLoading`, `status`, and `readerError` are public read-only diagnostics.
 - Raw seeds initialize or transactionally replace Reader state; they do not behave like persistent ordinary `data`.
 - The spatial example uses `reader-session` semantic entries and immutable raw records while separately owning panes, pins, compact selection, and pruning.
@@ -42,10 +42,10 @@ The supplied project remains finite. Covered Micah source and links data render 
 
 | Choice | Toolkit owns | Host additionally owns |
 | --- | --- | --- |
-| Standalone Reader | Root workflow, acquisition, semantic history, navigation, loading, errors, and rendering | Activation, optional acquisition source, placement, and lifecycle |
+| Standalone Reader | Root workflow, source, semantic history, navigation, loading, errors, and rendering | Activation, optional data source, placement, and lifecycle |
 | Spatial composition | Reader session semantics and immutable raw records | Pane identity, placement, pins, pruning, timing, and unavailable-state policy |
 
-MCP is an advanced acquisition environment. The App supplies a validated local-data host capability, and continuation remains host-proxied with no browser HTTP fallback.
+MCP is an advanced source environment. The App supplies a validated local-data host loader, and continuation remains host-proxied with no browser HTTP fallback.
 
 ## Exercise
 
