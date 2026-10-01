@@ -34,12 +34,12 @@
             },
             {
               "kind": "field",
-              "name": "acquisition",
+              "name": "source",
               "privacy": "public",
               "type": {
-                "text": "SefariaAcquisition | undefined"
+                "text": "SefariaDataSource | undefined"
               },
-              "description": "Chooses how this element fetches data, instead of the default.",
+              "description": "Where this element gets its data, instead of the shared data source.",
               "default": "undefined"
             },
             {
@@ -376,12 +376,12 @@
             },
             {
               "kind": "field",
-              "name": "acquisition",
+              "name": "source",
               "privacy": "public",
               "type": {
-                "text": "SefariaAcquisition | undefined"
+                "text": "SefariaDataSource | undefined"
               },
-              "description": "Chooses how this element fetches data, instead of the default.",
+              "description": "Where this element gets its data, instead of the shared data source.",
               "default": "undefined"
             },
             {
@@ -709,12 +709,12 @@
             },
             {
               "kind": "field",
-              "name": "acquisition",
+              "name": "source",
               "privacy": "public",
               "type": {
-                "text": "SefariaAcquisition | undefined"
+                "text": "SefariaDataSource | undefined"
               },
-              "description": "Chooses how this element fetches data, instead of the default.",
+              "description": "Where this element gets its data, instead of the shared data source.",
               "default": "undefined"
             },
             {
@@ -1256,12 +1256,12 @@
             },
             {
               "kind": "field",
-              "name": "acquisition",
+              "name": "source",
               "privacy": "public",
               "type": {
-                "text": "SefariaAcquisition | undefined"
+                "text": "SefariaDataSource | undefined"
               },
-              "description": "Chooses how this element fetches data, instead of the default.",
+              "description": "Where this element gets its data, instead of the shared data source.",
               "default": "undefined"
             },
             {
@@ -1685,12 +1685,12 @@
             },
             {
               "kind": "field",
-              "name": "acquisition",
+              "name": "source",
               "privacy": "public",
               "type": {
-                "text": "SefariaAcquisition | undefined"
+                "text": "SefariaDataSource | undefined"
               },
-              "description": "Chooses how this element fetches data, instead of the default.",
+              "description": "Where this element gets its data, instead of the shared data source.",
               "default": "undefined"
             },
             {

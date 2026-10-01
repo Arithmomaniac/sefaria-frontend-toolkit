@@ -2,7 +2,7 @@ export const PUBLIC_ENTRIES = {
   "@arithmomaniac/sefaria-client": "client",
   "@arithmomaniac/sefaria-client/validation": "client-validation",
   "@arithmomaniac/sefaria-web-components": "web-components",
-  "@arithmomaniac/sefaria-web-components/acquisition": "acquisition",
+  "@arithmomaniac/sefaria-web-components/data-source": "data-source",
   "@arithmomaniac/sefaria-web-components/bilingual-segment":
     "bilingual-segment",
   "@arithmomaniac/sefaria-web-components/connections-panel":

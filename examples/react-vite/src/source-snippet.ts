@@ -1,6 +1,6 @@
 export const reactSourceCardSnippet = `const [data, setData] = useState(suppliedPayload);
 const [sref, setSref] = useState("");
-const [acquisition, setAcquisition] = useState({
+const [source, setSource] = useState({
   kind: "client",
   client,
 });
@@ -8,14 +8,14 @@ const [acquisition, setAcquisition] = useState({
 function loadReference(nextSref) {
   setData(undefined);
   setSref(nextSref);
-  setAcquisition({ kind: "client", client });
+  setSource({ kind: "client", client });
 }
 
 return (
   <sefaria-source-card
     data={data}
     sref={sref}
-    acquisition={acquisition}
+    source={source}
     contentLanguage={contentLanguage}
     layout={layout}
     sideOrder={sideOrder}

@@ -19,9 +19,9 @@ const localSource = {
   heSectionRef: source.heRef,
 };
 const links = zCoreLinkResponse.parse(linksPayload);
-reader.acquisition = {
-  kind: "capability",
-  capability: {
+reader.source = {
+  kind: "custom",
+  loader: {
     getText: async (request) => {
       if (
         (request.sref === sourceRequest.tref || request.sref === "Micah 6") &&

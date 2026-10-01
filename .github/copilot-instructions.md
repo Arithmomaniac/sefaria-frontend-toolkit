@@ -10,6 +10,6 @@ Treat repository specifications as intended behavior. Treat the corrected OpenAP
 
 Before a high-risk contract change, state the source authority, data owner, exact failure, and one executable counterexample.
 
-Do not add a generalized domain model, hidden child request, cache beyond the specified bounded default-on per-client response cache, retry, coalescing policy, component-specific client method, public prepared-state input, or acquisition fallback after an explicit source choice.
+Do not add a generalized domain model, hidden child request, cache beyond the specified bounded default-on per-client response cache, retry, coalescing policy, component-specific client method, public prepared-state input, or source fallback after an explicit data source choice.
 
 Mark unimplemented architecture as planned. Do not claim human review without actual review.

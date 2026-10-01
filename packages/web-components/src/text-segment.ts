@@ -158,13 +158,13 @@ export interface TextSegmentValidationErrorViewModel {
   readonly message: string;
 }
 
-/** Standalone acquisition failure for one current text-segment input. */
-export interface TextSegmentAcquisitionErrorViewModel {
+/** Standalone source failure for one current text-segment input. */
+export interface TextSegmentDataSourceErrorViewModel {
   /** State discriminator. */
   readonly state: "error";
   /** Error classification. */
-  readonly errorKind: "acquisition";
-  /** Human-readable acquisition failure. */
+  readonly errorKind: "load";
+  /** Human-readable source failure. */
   readonly message: string;
 }
 
@@ -187,7 +187,7 @@ export type TextSegmentViewModel =
   | TextSegmentEmptyViewModel
   | TextSegmentProjectionErrorViewModel
   | TextSegmentValidationErrorViewModel
-  | TextSegmentAcquisitionErrorViewModel
+  | TextSegmentDataSourceErrorViewModel
   | TextSegmentHttpErrorViewModel;
 
 /** Terminal text-segment state committed by a headless controller. */

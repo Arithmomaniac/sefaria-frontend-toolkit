@@ -36,7 +36,7 @@ import {
   type ComponentControllerSnapshot,
 } from "./component-controller.js";
 
-/** Proven contextual navigation capability, independent of rendered text presence. */
+/** Proven contextual navigation loader, independent of rendered text presence. */
 export type SourceCardNavigation =
   | {
       readonly state: "available";
@@ -139,7 +139,7 @@ export interface SourceCardDataViewModel {
   readonly attributions: readonly SourceCardAttributionViewModel[];
   /** Ordered bilingual items. */
   readonly items: readonly SourceCardItemViewModel[];
-  /** Context capability; absent on older host-constructed view models. */
+  /** Context loader; absent on older host-constructed view models. */
   readonly navigation?: SourceCardNavigation;
 }
 
@@ -153,7 +153,7 @@ export interface SourceCardEmptyViewModel {
   readonly attributions: readonly SourceCardAttributionViewModel[];
   /** Both absent roles, in primary-then-translation order. */
   readonly absent: readonly [BilingualPairAbsentSide, BilingualPairAbsentSide];
-  /** Context capability even when the requested first slot has no text. */
+  /** Context loader even when the requested first slot has no text. */
   readonly navigation?: SourceCardNavigation;
 }
 

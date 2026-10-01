@@ -1,8 +1,8 @@
 import type {
-  SefariaAcquisition,
-  SefariaAcquisitionResponse,
+  SefariaDataSource,
+  SefariaDataLoaderResponse,
   SefariaBilingualSegment,
-  SefariaTextAcquisitionRequest,
+  SefariaTextLoadRequest,
 } from "@arithmomaniac/sefaria-web-components";
 import { beforeEach, expect, test, vi } from "vitest";
 
@@ -10,9 +10,9 @@ import micahFixture from "../../../react-vite/src/micah-6-8.json";
 import { startBilingualSegmentLiveDemo } from "./app.js";
 
 type BilingualLoader = (
-  request: SefariaTextAcquisitionRequest,
+  request: SefariaTextLoadRequest,
   signal: AbortSignal,
-) => Promise<SefariaAcquisitionResponse>;
+) => Promise<SefariaDataLoaderResponse>;
 
 beforeEach(() => {
   document.body.innerHTML = `
@@ -56,7 +56,7 @@ beforeEach(() => {
 
 test("loads a preset through declarative public inputs", async () => {
   const loader = vi.fn<BilingualLoader>(async () => response("First result"));
-  startBilingualSegmentLiveDemo(document, acquisitionFromLoader(loader));
+  startBilingualSegmentLiveDemo(document, sourceFromLoader(loader));
 
   document.querySelector<HTMLButtonElement>("[data-demo-request]")?.click();
   await vi.waitFor(() => expect(requestState().dataset.state).toBe("ready"));
@@ -74,7 +74,7 @@ test("loads a preset through declarative public inputs", async () => {
 
 test("omits an unfilled edition instead of requesting a blank title", async () => {
   const loader = vi.fn<BilingualLoader>(async () => response("Result"));
-  startBilingualSegmentLiveDemo(document, acquisitionFromLoader(loader));
+  startBilingualSegmentLiveDemo(document, sourceFromLoader(loader));
 
   const presets = document.querySelectorAll<HTMLButtonElement>(
     "[data-demo-request]",
@@ -91,7 +91,7 @@ test("omits an unfilled edition instead of requesting a blank title", async () =
 
 test("applies display settings without requesting", () => {
   const loader = vi.fn<BilingualLoader>(async () => response("Result"));
-  startBilingualSegmentLiveDemo(document, acquisitionFromLoader(loader));
+  startBilingualSegmentLiveDemo(document, sourceFromLoader(loader));
 
   const displayForm = document.querySelector<HTMLFormElement>("#display-form");
   selectValue(displayForm, "contentLanguage", "primary");
@@ -106,12 +106,12 @@ test("applies display settings without requesting", () => {
 });
 
 test("aborts the old operation and ignores its stale result", async () => {
-  let resolveFirst!: (value: SefariaAcquisitionResponse) => void;
-  let resolveSecond!: (value: SefariaAcquisitionResponse) => void;
-  const first = new Promise<SefariaAcquisitionResponse>((resolve) => {
+  let resolveFirst!: (value: SefariaDataLoaderResponse) => void;
+  let resolveSecond!: (value: SefariaDataLoaderResponse) => void;
+  const first = new Promise<SefariaDataLoaderResponse>((resolve) => {
     resolveFirst = resolve;
   });
-  const second = new Promise<SefariaAcquisitionResponse>((resolve) => {
+  const second = new Promise<SefariaDataLoaderResponse>((resolve) => {
     resolveSecond = resolve;
   });
   const signals: AbortSignal[] = [];
@@ -119,7 +119,7 @@ test("aborts the old operation and ignores its stale result", async () => {
     signals.push(signal);
     return signals.length === 1 ? await first : await second;
   });
-  startBilingualSegmentLiveDemo(document, acquisitionFromLoader(loader));
+  startBilingualSegmentLiveDemo(document, sourceFromLoader(loader));
 
   const presets = document.querySelectorAll<HTMLButtonElement>(
     "[data-demo-request]",
@@ -141,7 +141,7 @@ test("shows a network failure outside the cleared component", async () => {
   const loader = vi.fn<BilingualLoader>(async () => {
     throw new Error("Network unavailable");
   });
-  startBilingualSegmentLiveDemo(document, acquisitionFromLoader(loader));
+  startBilingualSegmentLiveDemo(document, sourceFromLoader(loader));
 
   document.querySelector<HTMLButtonElement>("[data-demo-request]")?.click();
   await vi.waitFor(() => expect(requestState().dataset.state).toBe("error"));
@@ -152,11 +152,11 @@ test("shows a network failure outside the cleared component", async () => {
   expect(resultElement().status).toBe("error");
 });
 
-function acquisitionFromLoader(loader: BilingualLoader): SefariaAcquisition {
-  return { kind: "capability", capability: { getText: loader } };
+function sourceFromLoader(loader: BilingualLoader): SefariaDataSource {
+  return { kind: "custom", loader: { getText: loader } };
 }
 
-function response(label: string): SefariaAcquisitionResponse {
+function response(label: string): SefariaDataLoaderResponse {
   const payload = structuredClone(micahFixture);
   payload.ref = "Genesis 1:1";
   payload.heRef = "בראשית א׳:א׳";

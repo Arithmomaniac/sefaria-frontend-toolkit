@@ -5,9 +5,9 @@ import type {
   ConnectionsRequest,
 } from "./connections-panel.js";
 import {
-  createSefariaReaderDataSource as createInternalSefariaReaderDataSource,
+  createSefariaReaderRecordLoader as createInternalSefariaReaderRecordLoader,
   resolveReaderSource as resolveInternalReaderSource,
-  type ReaderControllerDataSource,
+  type ReaderControllerRecordLoader,
 } from "./reader-controller.js";
 import {
   getReaderConnectionsRecord,
@@ -22,7 +22,7 @@ import {
 import type { SourceCardRequest } from "./source-card.js";
 
 /** DOM-free raw Reader operations used by shared qualification and hosts. */
-export interface ReaderDataSource {
+export interface ReaderRecordLoader {
   /** Loads one validated source record for an exact source request. */
   loadSource(
     request: SourceCardRequest,
@@ -49,16 +49,16 @@ export interface ReaderResolvedSource {
 }
 
 /** Creates a client-backed raw Reader data source with standard selectors. */
-export function createSefariaReaderDataSource(
+export function createSefariaReaderRecordLoader(
   client: SefariaClient,
-): ReaderDataSource {
-  return publicDataSource(createInternalSefariaReaderDataSource(client));
+): ReaderRecordLoader {
+  return publicDataSource(createInternalSefariaReaderRecordLoader(client));
 }
 
 /** Resolves and qualifies one source using at most two source operations. */
 export async function resolveReaderSource(
   request: SourceCardRequest,
-  dataSource: ReaderDataSource,
+  dataSource: ReaderRecordLoader,
   signal: AbortSignal = new AbortController().signal,
 ): Promise<ReaderResolvedSource> {
   const resolved = await resolveInternalReaderSource(
@@ -79,8 +79,8 @@ export async function resolveReaderSource(
 }
 
 function publicDataSource(
-  dataSource: ReaderControllerDataSource,
-): ReaderDataSource {
+  dataSource: ReaderControllerRecordLoader,
+): ReaderRecordLoader {
   return Object.freeze({
     loadSource: async (request: SourceCardRequest, signal: AbortSignal) =>
       getReaderSourceRecord(await dataSource.loadSource(request, signal)),
@@ -96,8 +96,8 @@ function publicDataSource(
 }
 
 function internalDataSource(
-  dataSource: ReaderDataSource,
-): ReaderControllerDataSource {
+  dataSource: ReaderRecordLoader,
+): ReaderControllerRecordLoader {
   return {
     loadSource: async (request, signal) =>
       admitReaderSourceRecord(await dataSource.loadSource(request, signal)),

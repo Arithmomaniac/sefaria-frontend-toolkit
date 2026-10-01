@@ -8,7 +8,7 @@ import { render } from "vitest-browser-lit";
 import { afterEach, expect, test, vi } from "vitest";
 
 import micahFixture from "../../../examples/react-vite/src/micah-6-8.json";
-import { SefariaTextSegment, type SefariaAcquisition } from "./index.js";
+import { SefariaTextSegment, type SefariaDataSource } from "./index.js";
 
 function textPayload(): CoreV3TextsResponse {
   if (!validateGetV3Texts200(micahFixture)) {
@@ -76,14 +76,14 @@ test("loads sref through an explicit client using the primary API default", asyn
   const fetchMock = vi.fn<typeof fetch>(async () =>
     jsonResponse(textPayload()),
   );
-  const acquisition: SefariaAcquisition = {
+  const source: SefariaDataSource = {
     kind: "client",
     client: createSefariaClient({ cache: false, fetch: fetchMock }),
   };
   const screen = render(html`
     <sefaria-text-segment
       sref="Micah 6:8"
-      .acquisition=${acquisition}
+      .source=${source}
     ></sefaria-text-segment>
   `);
 
@@ -100,7 +100,7 @@ test("loads sref through an explicit client using the primary API default", asyn
   expect(requestUrl.searchParams.get("return_format")).toBe("default");
 });
 
-test("loads through an explicit host capability without browser fallback", async () => {
+test("loads through an explicit host loader without browser fallback", async () => {
   const fetchMock = vi.fn<typeof fetch>();
   vi.stubGlobal("fetch", fetchMock);
   const getText = vi.fn(async () => ({
@@ -110,9 +110,9 @@ test("loads through an explicit host capability without browser fallback", async
   const screen = render(html`
     <sefaria-text-segment
       sref="Micah 6:8"
-      .acquisition=${{
-        kind: "capability",
-        capability: { getText },
+      .source=${{
+        kind: "custom",
+        loader: { getText },
       }}
     ></sefaria-text-segment>
   `);
@@ -136,9 +136,9 @@ test("invalid acquired data leaves an error state and publishes its cause", asyn
   const errors = vi.fn();
   element.addEventListener("sefaria-text-segment-error", errors);
   element.sref = "Micah 6:8";
-  element.acquisition = {
-    kind: "capability",
-    capability: {
+  element.source = {
+    kind: "custom",
+    loader: {
       getText: async () => ({
         payload: { versions: [{ text: 42 }] },
         status: 200,
@@ -156,15 +156,15 @@ test("invalid acquired data leaves an error state and publishes its cause", asyn
   expect(errors.mock.calls[0]?.[0].detail.error).toBeInstanceOf(Error);
 });
 
-test("reports an unsupported explicit capability without browser fallback", async () => {
+test("reports an unsupported explicit loader without browser fallback", async () => {
   const fetchMock = vi.fn<typeof fetch>();
   vi.stubGlobal("fetch", fetchMock);
   const screen = render(html`
     <sefaria-text-segment
       sref="Micah 6:8"
-      .acquisition=${{
-        kind: "capability",
-        capability: {},
+      .source=${{
+        kind: "custom",
+        loader: {},
       }}
     ></sefaria-text-segment>
   `);
@@ -183,13 +183,13 @@ test("invalid supplied data supersedes pending live work without fallback", asyn
         resolveRequest = resolve;
       }),
   );
-  const acquisition: SefariaAcquisition = {
+  const source: SefariaDataSource = {
     kind: "client",
     client: createSefariaClient({ cache: false, fetch: fetchMock }),
   };
   const element = new SefariaTextSegment();
   element.sref = "Micah 6:8";
-  element.acquisition = acquisition;
+  element.source = source;
   document.body.append(element);
   await element.updateComplete;
   expect(fetchMock).toHaveBeenCalledTimes(1);
@@ -215,7 +215,7 @@ test("reconnect resumes an interrupted load without accepting the old completion
   );
   const element = new SefariaTextSegment();
   element.sref = "Micah 6:8";
-  element.acquisition = {
+  element.source = {
     kind: "client",
     client: createSefariaClient({ cache: false, fetch: fetchMock }),
   };
@@ -252,9 +252,9 @@ test("detached input changes reconcile exactly once after reconnect", async () =
 
   element.data = undefined;
   element.sref = "Micah 6:9";
-  element.acquisition = {
-    kind: "capability",
-    capability: { getText },
+  element.source = {
+    kind: "custom",
+    loader: { getText },
   };
   await element.updateComplete;
   expect(getText).not.toHaveBeenCalled();
@@ -276,7 +276,7 @@ test("preserves a network failure cause and does not retry it on reconnect", asy
   });
   const element = new SefariaTextSegment();
   element.sref = "Micah 6:8";
-  element.acquisition = {
+  element.source = {
     kind: "client",
     client: createSefariaClient({ cache: false, fetch: fetchMock }),
   };
@@ -302,9 +302,9 @@ test("preserves a network failure cause and does not retry it on reconnect", asy
 
 test("restores committed content after a rejected live replacement", async () => {
   const failure = new TypeError("replacement unavailable");
-  const acquisition: SefariaAcquisition = {
-    kind: "capability",
-    capability: {
+  const source: SefariaDataSource = {
+    kind: "custom",
+    loader: {
       getText: vi.fn(async () => {
         throw failure;
       }),
@@ -336,7 +336,7 @@ test("restores committed content after a rejected live replacement", async () =>
   });
   element.data = undefined;
   element.sref = "Micah 6:9";
-  element.acquisition = acquisition;
+  element.source = source;
   await element.updateComplete;
   expect(element.status).toBe("loading");
   expect(element.shadowRoot?.textContent).toContain("Loading Micah 6:9");

@@ -40,12 +40,12 @@ For reader-oriented explanations, use the friendly guides rather than the archiv
 | --- | --- |
 | `packages/client` | Delivers all 60 operations in the pinned OpenAPI through 11 tag namespaces, committed corrected TypeScript contracts, reusable transport schemas, Zod validators, JSON and PNG response handling, and a status-aware fetch client with a bounded default-on per-client response cache. The corrected OpenAPI document is temporary generation output. A weekly workflow reports upstream OpenAPI drift in one issue and can hand it to a Copilot triage agent that proposes a draft refresh. |
 | `packages/text-transform` | Delivers DOM-free sanitization, Hebrew vocalization modes, structured footnote extraction, and bounded connected-text previews. |
-| `packages/web-components` | Delivers five declarative elements with standalone `sref`, authoritative raw `data` for Text Segment, Bilingual Segment, and Source Card, local-data capabilities for mutable Reader and Connections Panel flows, tagged acquisition, read-only status and diagnostics, lifecycle reconnect, error events, private preparation, shared raw Reader source qualification, and the supported advanced DOM-free Reader semantic/raw facade. |
+| `packages/web-components` | Delivers five declarative elements with standalone `sref`, authoritative raw `data` for Text Segment, Bilingual Segment, and Source Card, local-data capabilities for mutable Reader and Connections Panel flows, tagged source, read-only status and diagnostics, lifecycle reconnect, error events, private preparation, shared raw Reader source qualification, and the supported advanced DOM-free Reader semantic/raw facade. |
 | `examples/explorer` | Provides one developer surface for supplied-data authored states and click-to-start live pages for text segments, bilingual segments, source cards, and contextual connections. Opening a live route makes no Sefaria request before activation. |
-| `examples/reader` | Demonstrates a regular website host with viewport-height spatial panes over the lower-level reader session and shared browser data source, plus an interactive host that assigns explicit acquisition and `sref` to the supported `<sefaria-reader>` component. |
-| `examples/vanilla-vite` | Exercises installed public client, Source Card raw-data, acquisition, and custom-element registration paths with a validated supplied `Micah 6:8` response followed by an explicit live request. |
+| `examples/reader` | Demonstrates a regular website host with viewport-height spatial panes over the lower-level reader session and shared browser data source, plus an interactive host that assigns explicit source and `sref` to the supported `<sefaria-reader>` component. |
+| `examples/vanilla-vite` | Exercises installed public client, Source Card raw-data, source, and custom-element registration paths with a validated supplied `Micah 6:8` response followed by an explicit live request. |
 | `examples/react-vite` | Demonstrates React 19 declarative custom-element properties and events, supplied-data precedence, standalone `sref`, reversible vocalization, stable identity, and explicit live activation. |
-| `examples/alpine-vite` | Demonstrates the same Source Card flow with Alpine 3.17.2, scalar attribute bindings, property-only raw data and acquisition, events, and destroy cleanup. |
+| `examples/alpine-vite` | Demonstrates the same Source Card flow with Alpine 3.17.2, scalar attribute bindings, property-only raw data and source, events, and destroy cleanup. |
 | `examples/linked-article` | Progressively enhances authored Sefaria anchors with Source Card in a page-owned native modal dialog after eligible activation while preserving native navigation, focus return, visible failures, and cleanup. |
 | `examples/mcp-app` | Exposes shared `get_text` and adaptive `get_links_between_texts` registration through compiled Node stdio and Streamable HTTP transports and a static in-browser MCP host, packages a single-file App, validates corrected payloads and metadata, proves AppBridge request counts and sandbox isolation, and retains the optional authenticated isolated VS Code hierarchy walkthrough with separate explicit chat export. |
 | `examples/playground` | Provides one supplied-data-only HTML/CSS/JavaScript editor for text segment, bilingual segment, source card, connections panel, and Reader projects, with a real locally built public-module graph, opaque preview boundary, and focused Chromium/Firefox/WebKit qualification. |
@@ -68,7 +68,7 @@ The [historical decision record](evidence.md#historical-decision-provenance) exp
 
 These are remaining intended capabilities, not removed plans. A scaffold, command, or specification does not make them delivered.
 
-| Planned capability | Intended result | Contract |
+| Planned loader | Intended result | Contract |
 | --- | --- | --- |
 | Broader compatibility coverage | Extend the small current suite with additional source-backed cases, without promising exhaustive corpus equivalence | [Compatibility evidence](evidence.md#current-focused-compatibility-qualification) |
 
@@ -116,7 +116,7 @@ Run the focused editor qualification:
 pnpm test:playground
 ```
 
-This command builds the real editor graph and production host at both `/` and `/sefaria-frontend-toolkit/`, then checks Chromium, Firefox, and WebKit. It verifies parent and child CSP layers, all five maintained project renders, required declarative element and acquisition entries, local module identity and root registration, zero delivered probe requests across fetch/socket/beacon/image/frame/navigation attempts, visible edits to every HTML/CSS/JavaScript tab, Run/Reset behavior, supported component interactions, explicit Reader coverage failure, one active preview, keyboard tabs, RTL/LTR output, a 390 px layout at 200% equivalent CSS width, and embedding from an ordinary same-origin documentation page. `pnpm setup:agent` installs and launches all three browser engines.
+This command builds the real editor graph and production host at both `/` and `/sefaria-frontend-toolkit/`, then checks Chromium, Firefox, and WebKit. It verifies parent and child CSP layers, all five maintained project renders, required declarative element and source entries, local module identity and root registration, zero delivered probe requests across fetch/socket/beacon/image/frame/navigation attempts, visible edits to every HTML/CSS/JavaScript tab, Run/Reset behavior, supported component interactions, explicit Reader coverage failure, one active preview, keyboard tabs, RTL/LTR output, a 390 px layout at 200% equivalent CSS width, and embedding from an ordinary same-origin documentation page. `pnpm setup:agent` installs and launches all three browser engines.
 
 The generated `dist/site` directory contains the VitePress pages plus allowlisted example routes under `examples/`: playground, explorer, Reader, vanilla, React, linked article, and the live static MCP host. The playground uses only supplied data; the live MCP host proves in-memory protocol, resource, AppBridge, and opaque-sandbox behavior without an external backend; `pnpm dev:mcp` proves the compiled Streamable HTTP topology.
 
@@ -159,7 +159,7 @@ Hosted qualification is still required after authorized publication: check anony
 | --- | --- |
 | `packages/client` | Pinned OpenAPI input, formal guarded overlay, generated contracts, Zod schemas, validators, and tag-namespaced SDK functions |
 | `packages/text-transform` | Pure sanitization, vocalization, and footnotes |
-| `packages/web-components` | Declarative Lit elements, raw public input types, acquisition, shared raw Reader source qualification, and the DOM-free Reader semantic/raw facade |
+| `packages/web-components` | Declarative Lit elements, raw public input types, source, shared raw Reader source qualification, and the DOM-free Reader semantic/raw facade |
 | `tests/compatibility` | Pinned compatibility evidence for retained pure behavior |
 | `examples/explorer` | Supplied-data authored states and opt-in live diagnostics for component primitives and contextual connections |
 | `examples/playground` | Maintained supplied-data editor projects, trusted CodeMirror host, locally built ESM graph, opaque preview confinement, and focused three-browser acceptance |
@@ -196,7 +196,7 @@ The command performs a frozen install, installs Chromium, and launches and close
 
 Preparation can use the network for dependencies and Chromium and fails at the exact unsuccessful step. `pnpm check` remains the offline validation boundary: it does not fetch Git history, refresh fixtures, or contact Sefaria.
 
-GitHub's `.github/workflows/copilot-setup-steps.yml` first checks for `packages/web-components/package.json` with package name `@arithmomaniac/sefaria-web-components`. Toolkit-derived branches prepare normally; an unrelated checkout logs an explicit skip. A checkout that looks like the toolkit but lacks the setup script fails rather than silently skipping. This capability-based behavior must be verified in real cloud sessions after the workflow is active on `main`.
+GitHub's `.github/workflows/copilot-setup-steps.yml` first checks for `packages/web-components/package.json` with package name `@arithmomaniac/sefaria-web-components`. Toolkit-derived branches prepare normally; an unrelated checkout logs an explicit skip. A checkout that looks like the toolkit but lacks the setup script fails rather than silently skipping. This loader-based behavior must be verified in real cloud sessions after the workflow is active on `main`.
 
 Copilot CLI and Desktop do not automatically run the hosted workflow. Run `pnpm setup:agent` in each fresh local worktree. Concurrent Vitest browser runs may begin with port `6338`; Vitest selects another port when it is occupied. Tests on September 15, 2026 confirmed this fallback, so no custom port allocator is required.
 
@@ -382,7 +382,7 @@ Do not edit generated declarations by hand.
 pnpm dev
 ```
 
-The landing page links to authored states and click-to-start live diagnostics. Authored states exercise production elements without requests; live pages use ordinary HTML controls, the production client, tagged acquisition, and declarative elements. Opening the landing page or any live route does not contact Sefaria before **Start live demo**, an example preset, or an authored citation is activated.
+The landing page links to authored states and click-to-start live diagnostics. Authored states exercise production elements without requests; live pages use ordinary HTML controls, the production client, tagged source, and declarative elements. Opening the landing page or any live route does not contact Sefaria before **Start live demo**, an example preset, or an authored citation is activated.
 
 ## Run the interactive text-segment page
 
@@ -416,7 +416,7 @@ pnpm dev:reader
 
 The command serves two linked interactive pages. The root page is a realistic regular-website consumer rather than a component state gallery: its host uses one DOM-free reader session for semantic entries and capture retention, while demo-private state owns ordered pane IDs, parent relationships, compact selection, and the 20-visible-pane limit. Wide containers scroll horizontally across independently scrolling source and connections panes; compact containers show one selected pane and a path switch.
 
-`/controlled.html` demonstrates the ordinary standalone Reader path. The host supplies an explicit client acquisition source, assigns `sref` after activation, observes read-only Reader diagnostics, and keeps one persistent element. Reader owns continuing requests, cancellation, semantic history, Back, breadcrumbs, external root replacement, and local connections projection.
+`/controlled.html` demonstrates the ordinary standalone Reader path. The host supplies an explicit client data source, assigns `sref` after activation, observes read-only Reader diagnostics, and keeps one persistent element. Reader owns continuing requests, cancellation, semantic history, Back, breadcrumbs, external root replacement, and local connections projection.
 
 ## Run the MCP App server
 
@@ -448,7 +448,7 @@ VS Code reads the checked-in `.vscode/mcp.json`. It starts the compiled Node std
 
 The resource URI is `ui://sefaria/source-card.html`. Its MIME type is `text/html;profile=mcp-app`.
 
-The server request is live. The App's local-capability first render makes no duplicate request, and repository tests mock the server transport so `pnpm check` remains offline.
+The server request is live. The App's local-loader first render makes no duplicate request, and repository tests mock the server transport so `pnpm check` remains offline.
 
 Build and stage the App before opening the workspace in VS Code:
 
@@ -504,7 +504,7 @@ The development server shows the authored article page. The native citation is p
 
 The [authored linked-article guide](examples/linked-article.md) covers native fallback, page-owned request lifecycle, strict deterministic transport, and the immutable archive for the retired automatic Linker.
 
-The browser tests exercise Source Card acquisition through a strict fixture fetch that accepts only the expected method, origin, decoded `Micah 6:8` path, and ordered query. Separate Playwright coverage starts the actual page on an assigned loopback port with JavaScript disabled and proves that activation follows the authored Sefaria URL.
+The browser tests exercise Source Card source through a strict fixture fetch that accepts only the expected method, origin, decoded `Micah 6:8` path, and ordered query. Separate Playwright coverage starts the actual page on an assigned loopback port with JavaScript disabled and proves that activation follows the authored Sefaria URL.
 
 ## Build artifacts
 

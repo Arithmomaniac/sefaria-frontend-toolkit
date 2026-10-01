@@ -4,7 +4,7 @@ import {
 } from "@arithmomaniac/sefaria-client";
 import "@arithmomaniac/sefaria-web-components";
 import type {
-  SefariaAcquisition,
+  SefariaDataSource,
   SefariaReader,
 } from "@arithmomaniac/sefaria-web-components";
 
@@ -42,8 +42,8 @@ export function startControlledReader(
   workspace.dataset.surface = "reader";
   workspace.replaceChildren(reader);
 
-  const acquisition: SefariaAcquisition = { kind: "client", client };
-  reader.acquisition = acquisition;
+  const source: SefariaDataSource = { kind: "client", client };
+  reader.source = source;
   let generation = 0;
   let disposed = false;
   let readerFailure: string | undefined;
@@ -73,7 +73,7 @@ export function startControlledReader(
           ? `${reader.selectedRef ?? "Reader"} remains open.`
           : `${attemptedRoot ?? reader.sref} could not be opened.`;
       showError(
-        readerFailure ?? readerAlert(reader) ?? "Reader acquisition failed.",
+        readerFailure ?? readerAlert(reader) ?? "Reader loading failed.",
       );
     } else if (reader.status === "loading") {
       status.textContent = `Opening ${reader.sref}.`;
@@ -130,7 +130,7 @@ export function startControlledReader(
     readerFailure =
       detail.error instanceof Error
         ? detail.error.message
-        : "Reader acquisition failed.";
+        : "Reader loading failed.";
     renderStatus(detail.sref);
   };
   reader.addEventListener("sefaria-reader-source-select", onSourceSelect);

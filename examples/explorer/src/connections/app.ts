@@ -10,7 +10,7 @@ import "@arithmomaniac/sefaria-web-components";
 import type {
   SefariaConnectionsPanel,
   SefariaSourceCard,
-  SefariaAcquisition,
+  SefariaDataSource,
 } from "@arithmomaniac/sefaria-web-components";
 import { setOptionalElementAttribute } from "../../../../demos/live-demo-core.js";
 
@@ -81,9 +81,9 @@ export function startConnectionsDemo(
     | undefined;
 
   sourceReader.setAttribute("selectable", "");
-  const sourceAcquisition = {
-    kind: "capability" as const,
-    capability: {
+  const sourceDataSource = {
+    kind: "custom" as const,
+    loader: {
       getText: async (
         request: {
           readonly sref: string;
@@ -117,10 +117,10 @@ export function startConnectionsDemo(
       },
     },
   };
-  sourceProbe.acquisition = sourceAcquisition;
-  const connectionsAcquisition: SefariaAcquisition = {
-    kind: "capability",
-    capability: {
+  sourceProbe.source = sourceDataSource;
+  const connectionsSource: SefariaDataSource = {
+    kind: "custom",
+    loader: {
       getLinks: async (request, signal) => {
         const result = await related.getLinks({
           client,
@@ -148,7 +148,7 @@ export function startConnectionsDemo(
       },
     },
   };
-  connections.acquisition = connectionsAcquisition;
+  connections.source = connectionsSource;
   connections.showPreviews = showPreviews.checked;
 
   const updateCounts = (): void => {
@@ -192,10 +192,7 @@ export function startConnectionsDemo(
     connections.withText = retained.withText;
     setOptionalElementAttribute(connections, "category", category);
     connections.setAttribute("page", String(page));
-    connections.acquisition = retainedLinksAcquisition(
-      retained,
-      connectionsAcquisition,
-    );
+    connections.source = retainedLinksSource(retained, connectionsSource);
   };
   const loadLinks = async (
     ref: string,
@@ -216,7 +213,7 @@ export function startConnectionsDemo(
             category: connections.category,
             page: connections.page,
           };
-    connections.acquisition = connectionsAcquisition;
+    connections.source = connectionsSource;
     connections.removeAttribute("category");
     connections.setAttribute("page", "0");
     if (connections.sref === ref && connections.withText === withText) {
@@ -256,7 +253,7 @@ export function startConnectionsDemo(
     sourceProbe.setAttribute("sref", ref);
     await waitForSource(sourceProbe, ref, signal);
     if (capturedSource?.sref !== ref) {
-      throw new Error(`Source acquisition did not retain ${ref}.`);
+      throw new Error(`Source source did not retain ${ref}.`);
     }
     return capturedSource.payload;
   };
@@ -327,7 +324,7 @@ export function startConnectionsDemo(
         connections.setAttribute("sref", "");
         await linksOutcome;
         if (expectedOperation === operation) {
-          connections.acquisition = connectionsAcquisition;
+          connections.source = connectionsSource;
           connections.setAttribute("sref", "");
           status.textContent = `${normalizedTarget} could not be opened.`;
           showError(error);
@@ -347,7 +344,7 @@ export function startConnectionsDemo(
         connections.setAttribute("sref", "");
         await linksOutcome;
         if (expectedOperation === operation) {
-          connections.acquisition = connectionsAcquisition;
+          connections.source = connectionsSource;
           connections.setAttribute("sref", "");
           status.textContent = `${normalizedTarget} could not be opened.`;
           showError(error);
@@ -523,7 +520,7 @@ async function waitForSource(
   expectedRef: string,
   signal: AbortSignal,
 ): Promise<void> {
-  let acquisitionError: unknown;
+  let sourceError: unknown;
   const onError = (event: Event): void => {
     const detail = (
       event as CustomEvent<{
@@ -531,7 +528,7 @@ async function waitForSource(
         readonly sref: string;
       }>
     ).detail;
-    if (detail.sref === expectedRef) acquisitionError = detail.error;
+    if (detail.sref === expectedRef) sourceError = detail.error;
   };
   const onAbort = (): void => {
     if (source.sref === expectedRef) source.setAttribute("sref", "");
@@ -545,8 +542,8 @@ async function waitForSource(
         await new Promise((resolve) => setTimeout(resolve));
         continue;
       }
-      if (source.status === "error" && acquisitionError !== undefined) {
-        throw acquisitionError;
+      if (source.status === "error" && sourceError !== undefined) {
+        throw sourceError;
       }
       return;
     }
@@ -564,7 +561,7 @@ async function waitForConnections(
   currentOperation: () => number,
   signal: AbortSignal,
 ): Promise<void> {
-  let acquisitionError: unknown;
+  let sourceError: unknown;
   const onError = (event: Event): void => {
     const detail = (
       event as CustomEvent<{
@@ -572,7 +569,7 @@ async function waitForConnections(
         readonly sref: string;
       }>
     ).detail;
-    if (detail.sref === expectedRef) acquisitionError = detail.error;
+    if (detail.sref === expectedRef) sourceError = detail.error;
   };
   connections.addEventListener("sefaria-connections-panel-error", onError);
   try {
@@ -582,8 +579,8 @@ async function waitForConnections(
         await new Promise((resolve) => setTimeout(resolve));
         continue;
       }
-      if (connections.status === "error" && acquisitionError !== undefined) {
-        throw acquisitionError;
+      if (connections.status === "error" && sourceError !== undefined) {
+        throw sourceError;
       }
       return;
     }
@@ -623,13 +620,13 @@ function requireInput(form: HTMLFormElement, name: string): HTMLInputElement {
   return input;
 }
 
-function retainedLinksAcquisition(
+function retainedLinksSource(
   retained: RetainedLinks,
-  fallback: SefariaAcquisition,
-): SefariaAcquisition {
+  fallback: SefariaDataSource,
+): SefariaDataSource {
   return {
-    kind: "capability",
-    capability: {
+    kind: "custom",
+    loader: {
       getLinks: async (request, signal) => {
         if (
           request.sref === retained.sref &&
@@ -638,12 +635,12 @@ function retainedLinksAcquisition(
           return { payload: retained.payload, status: 200 };
         }
         if (
-          fallback.kind !== "capability" ||
-          fallback.capability.getLinks === undefined
+          fallback.kind !== "custom" ||
+          fallback.loader.getLinks === undefined
         ) {
           throw new Error(`No retained links payload covers ${request.sref}.`);
         }
-        return await fallback.capability.getLinks(request, signal);
+        return await fallback.loader.getLinks(request, signal);
       },
     },
   };

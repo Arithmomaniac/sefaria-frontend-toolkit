@@ -1,7 +1,7 @@
 export {
-  createSefariaReaderDataSource,
+  createSefariaReaderRecordLoader,
   resolveReaderSource,
-  type ReaderDataSource,
+  type ReaderRecordLoader,
   type ReaderResolvedSource,
 } from "./reader-facade.js";
 export type { ReaderPane } from "./reader.js";

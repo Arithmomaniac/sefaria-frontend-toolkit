@@ -9,8 +9,8 @@ import {
 import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
 import { repeat } from "lit/directives/repeat.js";
 
-import type { SefariaAcquisition } from "./acquisition.js";
-import { resolveSefariaAcquisition } from "./acquisition-state.js";
+import type { SefariaDataSource } from "./data-source.js";
+import { resolveSefariaDataSource } from "./data-source-state.js";
 import { optionalStringConverter } from "./attribute-converters.js";
 import {
   bilingualPairStyles,
@@ -49,7 +49,7 @@ export class SefariaSourceCard extends SefariaElement {
   static override properties = {
     sref: { type: String, useDefault: true },
     data: { attribute: false },
-    acquisition: { attribute: false },
+    source: { attribute: false },
     translationLanguage: {
       type: String,
       attribute: "translation-language",
@@ -318,8 +318,8 @@ export class SefariaSourceCard extends SefariaElement {
   declare sref: string;
   /** Sefaria API response data to render. When it's set, the element doesn't fetch anything. */
   declare data: unknown | undefined;
-  /** Chooses how this element fetches data, instead of the default. */
-  declare acquisition: SefariaAcquisition | undefined;
+  /** Where this element gets its data, instead of the shared data source. */
+  declare source: SefariaDataSource | undefined;
   /** Exact title of the edition to show as the primary text. */
   declare primaryVersionTitle: string | undefined;
   /** Exact title of the edition to show as the translation. */
@@ -368,7 +368,7 @@ export class SefariaSourceCard extends SefariaElement {
     super();
     this.sref = "";
     this.data = undefined;
-    this.acquisition = undefined;
+    this.source = undefined;
     this.primaryVersionTitle = undefined;
     this.translationVersionTitle = undefined;
     this.translationLanguage = undefined;
@@ -416,7 +416,7 @@ export class SefariaSourceCard extends SefariaElement {
     if (
       changed.has("sref") ||
       changed.has("data") ||
-      changed.has("acquisition") ||
+      changed.has("source") ||
       changed.has("primaryVersionTitle") ||
       changed.has("translationLanguage") ||
       changed.has("translationFallback") ||
@@ -556,12 +556,12 @@ export class SefariaSourceCard extends SefariaElement {
     try {
       const request = this.#request(sref);
       const versions = serializeSourceCardSelectors(request);
-      const acquisition = resolveSefariaAcquisition(this.acquisition);
-      if (acquisition.kind === "disabled") {
-        throw new Error("Standalone Sefaria acquisition is disabled.");
+      const source = resolveSefariaDataSource(this.source);
+      if (source.kind === "disabled") {
+        throw new Error("Sefaria data loading is disabled.");
       }
       const response = await acquireSelectedText(
-        acquisition,
+        source,
         sref,
         versions,
         request.translationLanguage,
@@ -582,7 +582,7 @@ export class SefariaSourceCard extends SefariaElement {
       if (this.#active !== active) return;
       this.#active = undefined;
       if (active.controller.signal.aborted) return;
-      this.#publishAcquisitionFailure(error, "Source acquisition failed.");
+      this.#publishDataSourceFailure(error, "Source loading failed.");
       this.dispatchEvent(
         new CustomEvent("sefaria-source-card-error", {
           bubbles: true,
@@ -668,7 +668,7 @@ export class SefariaSourceCard extends SefariaElement {
     this.#ownedViewModel = undefined;
   }
 
-  #publishAcquisitionFailure(error: unknown, fallback: string): void {
+  #publishDataSourceFailure(error: unknown, fallback: string): void {
     this.#statusOverride = "error";
     const viewModel = this.#committedViewModel ?? {
       state: "error",

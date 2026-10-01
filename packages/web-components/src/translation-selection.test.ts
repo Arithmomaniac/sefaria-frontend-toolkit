@@ -106,7 +106,7 @@ test.each([400, 404])(
       status,
     }));
     const result = await acquireSelectedText(
-      { kind: "capability", capability: { getText } },
+      { kind: "custom", loader: { getText } },
       "Micah 6:8",
       ["primary", "french"],
       "french",
@@ -125,7 +125,7 @@ test("network failure preserves the original cause and does not fall back", asyn
   });
   await expect(
     acquireSelectedText(
-      { kind: "capability", capability: { getText } },
+      { kind: "custom", loader: { getText } },
       "Micah 6:8",
       ["french"],
       "french",
@@ -140,7 +140,7 @@ test("an acquired default without the requested family or missing warning is not
   const getText = vi.fn(async () => ({ payload: capture(), status: 200 }));
   await expect(
     acquireSelectedText(
-      { kind: "capability", capability: { getText } },
+      { kind: "custom", loader: { getText } },
       "Micah 6:8",
       ["french"],
       "french",
@@ -155,7 +155,7 @@ test("an acquired disabled fallback response without the requested family still 
   const getText = vi.fn(async () => ({ payload: capture(), status: 200 }));
   await expect(
     acquireSelectedText(
-      { kind: "capability", capability: { getText } },
+      { kind: "custom", loader: { getText } },
       "Micah 6:8",
       ["french"],
       "french",
@@ -192,7 +192,7 @@ test("malformed JSON is not permission to fall back", async () => {
   }));
   await expect(
     acquireSelectedText(
-      { kind: "capability", capability: { getText } },
+      { kind: "custom", loader: { getText } },
       "Micah 6:8",
       ["french"],
       "french",
@@ -215,7 +215,7 @@ test("a missing exact title is not a missing-language fallback", async () => {
   ];
   const getText = vi.fn(async () => ({ payload: value, status: 200 }));
   await acquireSelectedText(
-    { kind: "capability", capability: { getText } },
+    { kind: "custom", loader: { getText } },
     "Micah 6:8",
     ["french|Missing edition"],
     "french",
@@ -235,7 +235,7 @@ test("aborting an ignored-abort missing-language response prevents the fallback 
   });
   await expect(
     acquireSelectedText(
-      { kind: "capability", capability: { getText } },
+      { kind: "custom", loader: { getText } },
       "Micah 6:8",
       ["french"],
       "french",

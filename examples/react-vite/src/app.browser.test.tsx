@@ -35,9 +35,7 @@ test("supplies data declaratively, preserves presentation controls, and receives
   expect(fetch).not.toHaveBeenCalled();
   expect(card.data).toEqual(fixture);
   expect(card.sref).toBe("");
-  expect(card.acquisition).toEqual(
-    expect.objectContaining({ kind: "capability" }),
-  );
+  expect(card.source).toEqual(expect.objectContaining({ kind: "custom" }));
   expect(card.getAttribute("data")).toBeNull();
 
   await act(async () => {
@@ -77,7 +75,7 @@ test("supplies data declaratively, preserves presentation controls, and receives
   expect(card.selectedPosition).toEqual([]);
 });
 
-test("activates acquisition only on submit and rejects stale overlapping results", async () => {
+test("activates source only on submit and rejects stale overlapping results", async () => {
   let firstSignal: AbortSignal | undefined;
   let resolveFirst!: (response: Response) => void;
   let requestNumber = 0;
@@ -166,7 +164,7 @@ test("keeps blank validation host-owned without changing an admitted request", a
   await waitForCardReady(requireCard(container));
 });
 
-test("lets the element own acquisition failures without duplicate host announcements", async () => {
+test("lets the element own source failures without duplicate host announcements", async () => {
   const error = new Error("Network unavailable.");
   const fetch = vi.fn(async () => {
     throw error;

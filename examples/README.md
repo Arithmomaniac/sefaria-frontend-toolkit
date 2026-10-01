@@ -34,7 +34,7 @@ Stable built routes use `playground/index.html?project=<id>`. Source and optiona
 
 ## Live data and interaction
 
-The [component explorer](explorer/README.md) keeps live actions separate from supplied-data selection. Each page opens without a Sefaria request; **Start live demo** or an example preset begins the operation. The page assigns `sref` as an attribute only after activation, optionally supplies a tagged acquisition property, and lets the element own loading, cancellation, private preparation, and error presentation.
+The [component explorer](explorer/README.md) keeps live actions separate from supplied-data selection. Each page opens without a Sefaria request; **Start live demo** or an example preset begins the operation. The page assigns `sref` as an attribute only after activation, optionally supplies a tagged source property, and lets the element own loading, cancellation, private preparation, and error presentation.
 
 | Destination | What to try | Public package/subpath |
 | --- | --- | --- |
@@ -45,13 +45,13 @@ The [component explorer](explorer/README.md) keeps live actions separate from su
 
 ## Standalone Reader
 
-Open the [standalone Reader](reader/controlled.html?tref=Micah%206%3A8). The deep link only prefills the reference; **Start live demo** assigns the explicit client acquisition property and `sref` attribute to one persistent `<sefaria-reader>`.
+Open the [standalone Reader](reader/controlled.html?tref=Micah%206%3A8). The deep link only prefills the reference; **Start live demo** assigns the explicit client source property and `sref` attribute to one persistent `<sefaria-reader>`.
 
 ## Custom composition
 
 Open the [spatial Reader workspace](reader/index.html?tref=Micah%206%3A8) to see a website host assume additional responsibility for pane placement, activation, pruning, request cancellation, and session pins while reusing shared raw source qualification and the supported semantic/raw Reader session facade. The route waits for **Start live demo** before loading its prefilled reference. It is intentionally distinct from the standalone Reader rather than a competing supported API.
 
-The [React Vite example](react-vite/README.md) demonstrates React 19 custom-element integration: JSX assigns registered inputs as properties, including rich `data` and `acquisition` values. The [Alpine Vite example](alpine-vite/README.md) demonstrates the same Source Card journey with scalar attributes, property-only rich values, declarative event handling, and destroy cleanup.
+The [React Vite example](react-vite/README.md) demonstrates React 19 custom-element integration: JSX assigns registered inputs as properties, including rich `data` and `source` values. The [Alpine Vite example](alpine-vite/README.md) demonstrates the same Source Card journey with scalar attributes, property-only rich values, declarative event handling, and destroy cleanup.
 
 ## Article and MCP host integration
 

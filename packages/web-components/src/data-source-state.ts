@@ -1,24 +1,22 @@
 import { createSefariaClient } from "@arithmomaniac/sefaria-client";
 
-import type { SefariaAcquisition } from "./acquisition.js";
+import type { SefariaDataSource } from "./data-source.js";
 
-let pending: SefariaAcquisition | undefined;
-let realized: SefariaAcquisition | undefined;
+let pending: SefariaDataSource | undefined;
+let realized: SefariaDataSource | undefined;
 
 /** Replaces the pending shared choice before first realization. */
-export function setPendingSefariaAcquisition(
-  acquisition: SefariaAcquisition,
-): void {
+export function setPendingSefariaDataSource(source: SefariaDataSource): void {
   if (realized !== undefined) {
-    throw new Error("Shared Sefaria acquisition has already been realized.");
+    throw new Error("Shared Sefaria source has already been realized.");
   }
-  pending = acquisition;
+  pending = source;
 }
 
 /** Resolves an explicit override or realizes the module-local shared choice. */
-export function resolveSefariaAcquisition(
-  override?: SefariaAcquisition,
-): SefariaAcquisition {
+export function resolveSefariaDataSource(
+  override?: SefariaDataSource,
+): SefariaDataSource {
   if (override !== undefined) return override;
   if (realized === undefined) {
     realized =

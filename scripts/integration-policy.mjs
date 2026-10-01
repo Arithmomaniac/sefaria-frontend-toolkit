@@ -653,7 +653,7 @@ function validateCopilotSetupWorkflow(workflow, issues, filename) {
     !source.includes("pnpm setup:agent") ||
     source.includes("feature/avilevin/frontend-toolkit-alpha")
   ) {
-    issues.push(`Copilot setup is not toolkit-capability based in ${filename}`);
+    issues.push(`Copilot setup is not toolkit-loader based in ${filename}`);
   }
 }
 

@@ -8,9 +8,9 @@ The documentation site, supplied-data editor, standalone and spatial website Rea
 
 ## Shared rules
 
-Integrations consume built artifacts and public package contracts. They own host input, explicit activation policy, external unknown-JSON validation, optional acquisition creation, placement, and application-specific coordination.
+Integrations consume built artifacts and public package contracts. They own host input, explicit activation policy, external unknown-JSON validation, optional source creation, placement, and application-specific coordination.
 
-An integration assigns component-specific raw `data`, a tagged acquisition capability, or `sref`. It may assign only the documented tagged acquisition choice. It must not give an element arbitrary `fetch`, a base URL, an untyped host, unknown JSON, or public prepared rendering.
+An integration assigns component-specific raw `data`, a tagged data loader, or `sref`. It may assign only the documented tagged data source choice. It must not give an element arbitrary `fetch`, a base URL, an untyped host, unknown JSON, or public prepared rendering.
 
 Unknown server, fixture, stored, user, or MCP JSON passes a public corrected client schema or generated validator before element admission. Validation failures report structured paths.
 
@@ -24,7 +24,7 @@ Transport semantics remain unchanged: documented HTTP payloads retain their type
 
 ## Supplied-data editor
 
-The editor exposes five maintained projects. Each validates fixed corrected payloads and assigns raw component data or local-data acquisition capabilities. It does not retain public controllers, bindings, prepared models, a fetch broker, runtime package installation, CDN loading, service workers, or a live-data fallback.
+The editor exposes five maintained projects. Each validates fixed corrected payloads and assigns raw component data or local-data source capabilities. It does not retain public controllers, bindings, prepared models, a fetch broker, runtime package installation, CDN loading, service workers, or a live-data fallback.
 
 The trusted host owns project selection, editor state, source links, bounded diagnostics, and preview replacement. Edited code runs only in the opaque sandboxed frame under the existing CSP and finite source/asset/message limits.
 
@@ -40,11 +40,11 @@ Request policy and deterministic fixture dispatch classify every permitted decla
 
 ### Standalone components
 
-The vanilla, React, Alpine, and explorer hosts teach supplied `data` first. Their explicit live action clears authoritative data when applicable, assigns `sref`, and optionally supplies an explicit toolkit client acquisition source. The element owns cancellation, stale suppression, private preparation, status, and error events.
+The vanilla, React, Alpine, and explorer hosts teach supplied `data` first. Their explicit live action clears authoritative data when applicable, assigns `sref`, and optionally supplies an explicit toolkit client data source. The element owns cancellation, stale suppression, private preparation, status, and error events.
 
 ### Standalone Reader
 
-The ordinary website Reader uses one persistent `<sefaria-reader>`. After **Start live demo**, the host assigns an explicit client acquisition and `sref`. Later external roots assign a new `sref`; the Reader transactionally admits the new root and starts a fresh root history without replacing the element.
+The ordinary website Reader uses one persistent `<sefaria-reader>`. After **Start live demo**, the host assigns an explicit client source and `sref`. Later external roots assign a new `sref`; the Reader transactionally admits the new root and starts a fresh root history without replacing the element.
 
 The host may place a page-owned action in `toolbar-actions` and read `reader.selectedRef` when it activates. The action adds no request or persistence contract.
 
@@ -52,13 +52,13 @@ The host may place a page-owned action in `toolbar-actions` and read `reader.sel
 
 The spatial example uses one `reader-session` for semantic entries, exact capture coverage, pins, and bounded retention. Its host separately owns pane IDs, placement, compact selection, descendant pruning, cancellation timing, and visible limits.
 
-The spatial host uses semantic `ReaderEntryInfo` and immutable raw `ReaderSourceRecord`/`ReaderConnectionsRecord`; it does not inspect prepared rendering. One parent capture prepares child surfaces without child acquisition.
+The spatial host uses semantic `ReaderEntryInfo` and immutable raw `ReaderSourceRecord`/`ReaderConnectionsRecord`; it does not inspect prepared rendering. One parent capture prepares child surfaces without child source.
 
 ## MCP App
 
-MCP `structuredContent` carries a corrected API payload. Namespaced metadata carries only the operation identity, documented status, and exact request needed to select the validator and serve a local-data capability.
+MCP `structuredContent` carries a corrected API payload. Namespaced metadata carries only the operation identity, documented status, and exact request needed to select the validator and serve a local-data loader.
 
-The first App render validates the unknown boundary and supplies a local-data capability, making zero duplicate requests. Later Reader work uses a tagged host capability whose only transport is a supported host-proxied tool call. The App and elements never fall back to direct Sefaria HTTP.
+The first App render validates the unknown boundary and supplies a local-data loader, making zero duplicate requests. Later Reader work uses a tagged host loader whose only transport is a supported host-proxied tool call. The App and elements never fall back to direct Sefaria HTTP.
 
 The Node tools remain stateless. Reader semantic history and raw records remain in the App/session. `ui/message` is reserved for the separate explicit chat-export action; it is not Reader data transport.
 
@@ -70,7 +70,7 @@ The article retains ordinary Sefaria anchors and native navigation. Eligible unm
 
 The host owns the dialog's accessible name, initial close-button focus, responsive scrollable layout, Escape/button closing, and return of focus to the originating link when it remains connected. Background content is inert while the modal is open. No anchored placement or Popup-specific 20-position truncation remains: the preview uses ordinary Source Card rendering.
 
-The page uses an explicit cache-disabled client acquisition source. Source Card owns validation, private preparation, loading/empty/partial states, cancellation, and stale-result suppression. The same active reference does not restart acquisition. Close and destroy clear the reference and disconnect the active card; reopening starts one fresh request. A changed reference supersedes pending work. Late completion or a queued close from an obsolete opening must not affect a newer preview.
+The page uses an explicit cache-disabled client data source. Source Card owns validation, private preparation, loading/empty/partial states, cancellation, and stale-result suppression. The same active reference does not restart source. Close and destroy clear the reference and disconnect the active card; reopening starts one fresh request. A changed reference supersedes pending work. Late completion or a queued close from an obsolete opening must not affect a newer preview.
 
 Current `sefaria-source-card-error` closes the dialog, returns focus, and announces the original failure in visible host status; only another eligible activation retries. The host removes only its own nodes and listeners and restores any accessibility attributes it replaced on authored links. Destroy is idempotent. Missing originating links do not cause focus errors.
 
@@ -82,9 +82,9 @@ The integration does not detect citations, extract article text, submit a Linker
 
 Examples document `translation-language` separately from presentation-only `content-language` and strict exact-edition titles. The live Source Card explorer demonstrates French Micah 6:8 and unavailable-French Berakhot 2a:1 behind explicit activation. A successful preferred request uses one text operation; unavailable-language fallback uses two, with actual-edition attribution and no child requests.
 
-The MCP demonstration's existing default-only text adapter remains an explicit host limitation for non-default selectors. Unsupported selection must fail visibly without direct browser HTTP or substituted default success. Extending that demonstration's tool contract is separate from the component capability's support for serialized v3 selectors.
+The MCP demonstration's existing default-only text adapter remains an explicit host limitation for non-default selectors. Unsupported selection must fail visibly without direct browser HTTP or substituted default success. Extending that demonstration's tool contract is separate from the component loader's support for serialized v3 selectors.
 
-If an integration already owns corrected data, it supplies raw data for immutable elements or a local-data capability for mutable elements. A parent element or session privately prepares child content from that capture. It must not assign child `sref`.
+If an integration already owns corrected data, it supplies raw data for immutable elements or a local-data loader for mutable elements. A parent element or session privately prepares child content from that capture. It must not assign child `sref`.
 
 Ten child renderings from one parent response require one outer request and zero child requests.
 
@@ -97,7 +97,7 @@ Ten child renderings from one parent response require one outer request and zero
 | Network or abort rejection | Preserve the failure; do not manufacture empty content |
 | Current element failure | Accessible state plus documented error event |
 | Superseded completion | Publish neither success nor failure |
-| Unsupported explicit capability | Fail without browser HTTP fallback |
+| Unsupported explicit loader | Fail without browser HTTP fallback |
 | Uncovered supplied Reader target | Report an explicit host limitation |
 | Disconnection | Abort/invalidate eligible work; reconnect only the still-eligible phase |
 

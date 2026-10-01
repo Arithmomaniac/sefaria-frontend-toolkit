@@ -69,7 +69,7 @@ const packageDefinitions = [
     filename: undefined,
     subpaths: [
       ".",
-      "./acquisition",
+      "./data-source",
       "./bilingual-segment",
       "./connections-panel",
       "./reader",
@@ -297,7 +297,7 @@ async function inspectConsumerResolution(consumer) {
     "@arithmomaniac/sefaria-client/validation",
     "@arithmomaniac/sefaria-client/validators",
     "@arithmomaniac/sefaria-text-transform",
-    "@arithmomaniac/sefaria-web-components/acquisition",
+    "@arithmomaniac/sefaria-web-components/data-source",
     "@arithmomaniac/sefaria-web-components/bilingual-segment",
     "@arithmomaniac/sefaria-web-components/connections-panel",
     "@arithmomaniac/sefaria-web-components/reader",

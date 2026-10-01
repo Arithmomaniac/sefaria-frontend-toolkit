@@ -45,7 +45,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | --- | --- | --- | --- | --- |
 | `sref` | `sref` | `string` | `""` | The Sefaria reference to load when `data` isn't set. |
 | `data` | — | `unknown \| undefined` | `undefined` | Sefaria API response data to render. When it's set, the element doesn't fetch anything. |
-| `acquisition` | — | `SefariaAcquisition \| undefined` | `undefined` | Chooses how this element fetches data, instead of the default. |
+| `source` | — | `SefariaDataSource \| undefined` | `undefined` | Where this element gets its data, instead of the shared data source. |
 | `versionLanguage` | `version-language` | `string \| undefined` | `undefined` | Language of the edition to show, instead of the primary edition. |
 | `versionTitle` | `version-title` | `string \| undefined` | `undefined` | `version-title` alone chooses another edition in the original language. To choose a translation by title, also set `translation-language`. |
 | `translationLanguage` | `translation-language` | `string \| undefined` | `undefined` | Preferred translation language. Can't be combined with `versionLanguage`. |
@@ -80,7 +80,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | --- | --- | --- | --- | --- |
 | `sref` | `sref` | `string` | `""` | The Sefaria reference to load when `data` isn't set. |
 | `data` | — | `unknown \| undefined` | `undefined` | Sefaria API response data to render. When it's set, the element doesn't fetch anything. |
-| `acquisition` | — | `SefariaAcquisition \| undefined` | `undefined` | Chooses how this element fetches data, instead of the default. |
+| `source` | — | `SefariaDataSource \| undefined` | `undefined` | Where this element gets its data, instead of the shared data source. |
 | `primaryVersionTitle` | `primary-version-title` | `string \| undefined` | `undefined` | Exact title of the edition to show as the primary text. |
 | `translationVersionTitle` | `translation-version-title` | `string \| undefined` | `undefined` | Exact title of the edition to show as the translation. |
 | `translationLanguage` | `translation-language` | `string \| undefined` | `undefined` | Preferred translation language. `translationFallback` controls what happens when Sefaria has none. |
@@ -117,7 +117,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | --- | --- | --- | --- | --- |
 | `sref` | `sref` | `string` | `""` | The Sefaria reference to load when `data` isn't set. |
 | `data` | — | `unknown \| undefined` | `undefined` | Sefaria API response data to render. When it's set, the element doesn't fetch anything. |
-| `acquisition` | — | `SefariaAcquisition \| undefined` | `undefined` | Chooses how this element fetches data, instead of the default. |
+| `source` | — | `SefariaDataSource \| undefined` | `undefined` | Where this element gets its data, instead of the shared data source. |
 | `primaryVersionTitle` | `primary-version-title` | `string \| undefined` | `undefined` | Exact title of the edition to show as the primary text. |
 | `translationVersionTitle` | `translation-version-title` | `string \| undefined` | `undefined` | Exact title of the edition to show as the translation. |
 | `translationLanguage` | `translation-language` | `string \| undefined` | `undefined` | Preferred translation language. `translationFallback` controls what happens when Sefaria has none. |
@@ -157,7 +157,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
 | `sref` | `sref` | `string` | `""` | The Sefaria reference to load when `data` isn't set. |
-| `acquisition` | — | `SefariaAcquisition \| undefined` | `undefined` | Chooses how this element fetches data, instead of the default. |
+| `source` | — | `SefariaDataSource \| undefined` | `undefined` | Where this element gets its data, instead of the shared data source. |
 | `withText` | `with-text` | `boolean` | `true` | Whether the links include the connected texts. |
 | `category` | `category` | `string \| undefined` | `undefined` | Category of the loaded links to show. |
 | `page` | `page` | `number` | `0` | Zero-based page of the loaded links to show. |
@@ -190,7 +190,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 | Property | Attribute | Type | Default | Description |
 | --- | --- | --- | --- | --- |
 | `sref` | `sref` | `string` | `""` | The reference the Reader starts from. Navigating inside the Reader doesn't change it. |
-| `acquisition` | — | `SefariaAcquisition \| undefined` | `undefined` | Chooses how this element fetches data, instead of the default. |
+| `source` | — | `SefariaDataSource \| undefined` | `undefined` | Where this element gets its data, instead of the shared data source. |
 | `translationLanguage` | `translation-language` | `string \| undefined` | `undefined` | Preferred translation language, for the starting text and texts you navigate to. |
 | `translationFallback` | `translation-fallback` | `"default" \| "none"` | `"default"` | What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". |
 | `primaryVersionTitle` | `primary-version-title` | `string \| undefined` | `undefined` | Exact title of the primary edition for the starting reference. |

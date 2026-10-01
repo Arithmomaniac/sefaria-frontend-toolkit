@@ -18,7 +18,7 @@ The package names are experimental and subject to change. The packages are publi
 
 ## Browser script source
 
-**Implementation status:** local build and deterministic qualification are implemented, and a P5 release is hosted. New builds produce one self-contained, minified, tree-shaken ES module registering all five remaining elements. Consumers need neither package-registry authentication nor a build step, import map, external runtime dependency, or separate stylesheet. The module preserves the package-root exports and existing element contracts; it does not add acquisition, retry, caching, or rendering policy.
+**Implementation status:** local build and deterministic qualification are implemented, and a P5 release is hosted. New builds produce one self-contained, minified, tree-shaken ES module registering all five remaining elements. Consumers need neither package-registry authentication nor a build step, import map, external runtime dependency, or separate stylesheet. The module preserves the package-root exports and existing element contracts; it does not add source, retry, caching, or rendering policy.
 
 The pinned path is `https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/<package-version>/sefaria-elements.js`. The moving path is `https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js`.
 
@@ -39,7 +39,7 @@ The pinned path is `https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn
 | `sefaria-client.js`         | `@arithmomaniac/sefaria-client`         |
 | `sefaria-text-transform.js` | `@arithmomaniac/sefaria-text-transform` |
 
-Each file name is the unscoped package name. `sefaria-elements.js` is named for the elements it registers. These modules have no side effects, so they are named for the package API they expose. They add no acquisition, retry, caching, or transport policy beyond the package root. They run without an import map. Like the elements module, they also run inside an opaque-origin sandboxed `srcdoc` iframe, where Sefaria requests carry `Origin: null`.
+Each file name is the unscoped package name. `sefaria-elements.js` is named for the elements it registers. These modules have no side effects, so they are named for the package API they expose. They add no source, retry, caching, or transport policy beyond the package root. They run without an import map. Like the elements module, they also run inside an opaque-origin sandboxed `srcdoc` iframe, where Sefaria requests carry `Origin: null`.
 
 ```js
 import {
@@ -53,7 +53,7 @@ import {
 } from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-text-transform.js";
 ```
 
-A module instance is independent: a client module and the elements module do not share a client, cache, or default acquisition. All three modules in a release share one license, notice, source archive, and manifest. Releases retained from before this change keep their elements-only file set.
+A module instance is independent: a client module and the elements module do not share a client, cache, or default source. All three modules in a release share one license, notice, source archive, and manifest. Releases retained from before this change keep their elements-only file set.
 
 Each newly published, fully verified synchronized package release automatically receives a script release with the same version and source commit. Partial package publication must not advertise a script release. The package producer's run ID and attempt own the version; a Pages redeployment does not create a version. Historical package releases are not automatically backfilled.
 
@@ -81,7 +81,7 @@ The build records raw bytes and gzip bytes with fixed compression settings. Meas
 
 ### Script qualification
 
-Required deterministic acceptance uses the actual production artifact on a separate-origin plain HTML host. Only Sefaria HTTP responses may be intercepted with corrected fixtures; custom acquisition, import maps, source aliases, or development transforms cannot substitute for the script path.
+Required deterministic acceptance uses the actual production artifact on a separate-origin plain HTML host. Only Sefaria HTTP responses may be intercepted with corrected fixtures; custom source, import maps, source aliases, or development transforms cannot substitute for the script path.
 
 Acceptance proves standalone Micah 6:8 rendering, all five registrations and absence of Popup and Reference Label in new builds, duplicate evaluation, exact outer/child request counts, supplied-data behavior, visible validation failure, cross-deploy byte identity, explicit retirement, fail-closed archive restoration, and independently recomputed sizes. For the data and text-tool modules, acceptance proves that each module has no unresolved static or dynamic module specifiers. It also proves that each module imports inside a `sandbox="allow-scripts"` `srcdoc` iframe and exposes its package-root exports. It proves that a client request from that iframe carries `Origin: null`. Local checks stay offline and cannot publish their fixture version.
 

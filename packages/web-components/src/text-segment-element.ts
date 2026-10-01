@@ -3,8 +3,8 @@ import { css, html, nothing, type PropertyValues } from "lit";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
 import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
 
-import type { SefariaAcquisition } from "./acquisition.js";
-import { resolveSefariaAcquisition } from "./acquisition-state.js";
+import type { SefariaDataSource } from "./data-source.js";
+import { resolveSefariaDataSource } from "./data-source-state.js";
 import { optionalStringConverter } from "./attribute-converters.js";
 import {
   acquireSelectedText,
@@ -44,7 +44,7 @@ export class SefariaTextSegment extends SefariaElement {
   static override properties = {
     sref: { type: String, useDefault: true },
     data: { attribute: false },
-    acquisition: { attribute: false },
+    source: { attribute: false },
     translationLanguage: {
       type: String,
       attribute: "translation-language",
@@ -140,8 +140,8 @@ export class SefariaTextSegment extends SefariaElement {
   declare sref: string;
   /** Sefaria API response data to render. When it's set, the element doesn't fetch anything. */
   declare data: unknown | undefined;
-  /** Chooses how this element fetches data, instead of the default. */
-  declare acquisition: SefariaAcquisition | undefined;
+  /** Where this element gets its data, instead of the shared data source. */
+  declare source: SefariaDataSource | undefined;
   /** Language of the edition to show, instead of the primary edition. */
   declare versionLanguage: string | undefined;
   /** `version-title` alone chooses another edition in the original language. To choose a translation by title, also set `translation-language`. */
@@ -175,7 +175,7 @@ export class SefariaTextSegment extends SefariaElement {
     super();
     this.sref = "";
     this.data = undefined;
-    this.acquisition = undefined;
+    this.source = undefined;
     this.versionLanguage = undefined;
     this.versionTitle = undefined;
     this.translationLanguage = undefined;
@@ -227,7 +227,7 @@ export class SefariaTextSegment extends SefariaElement {
     if (
       changed.has("sref") ||
       changed.has("data") ||
-      changed.has("acquisition") ||
+      changed.has("source") ||
       changed.has("versionLanguage") ||
       changed.has("translationLanguage") ||
       changed.has("translationFallback") ||
@@ -379,13 +379,13 @@ export class SefariaTextSegment extends SefariaElement {
       const translationFallback = normalizeTranslationFallback(
         this.translationFallback,
       );
-      const acquisition = resolveSefariaAcquisition(this.acquisition);
-      if (acquisition.kind === "disabled") {
-        throw new Error("Standalone Sefaria acquisition is disabled.");
+      const source = resolveSefariaDataSource(this.source);
+      if (source.kind === "disabled") {
+        throw new Error("Sefaria data loading is disabled.");
       }
 
       const response = await acquireSelectedText(
-        acquisition,
+        source,
         sref,
         versions,
         this.translationLanguage,
@@ -402,7 +402,7 @@ export class SefariaTextSegment extends SefariaElement {
       if (this.#active !== active) return;
       this.#active = undefined;
       if (active.controller.signal.aborted) return;
-      this.#publishAcquisitionFailure(error, "Text acquisition failed.");
+      this.#publishDataSourceFailure(error, "Text loading failed.");
       this.dispatchEvent(
         new CustomEvent("sefaria-text-segment-error", {
           bubbles: true,
@@ -554,11 +554,11 @@ export class SefariaTextSegment extends SefariaElement {
     this.#ownedViewModel = undefined;
   }
 
-  #publishAcquisitionFailure(error: unknown, fallback: string): void {
+  #publishDataSourceFailure(error: unknown, fallback: string): void {
     this.#statusOverride = "error";
     const viewModel = this.#committedViewModel ?? {
       state: "error",
-      errorKind: "acquisition",
+      errorKind: "load",
       message: error instanceof Error ? error.message : fallback,
     };
     this.#ownedViewModel = viewModel;

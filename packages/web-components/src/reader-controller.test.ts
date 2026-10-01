@@ -22,7 +22,7 @@ import type { SourceCardRequest } from "./source-card.js";
 import {
   createReaderController,
   loadReaderController,
-  type ReaderControllerDataSource,
+  type ReaderControllerRecordLoader,
   type ReaderControllerError,
 } from "./reader-controller.js";
 
@@ -421,7 +421,7 @@ describe("reader controller initialization", () => {
 
 describe("reader controller state and operations", () => {
   it("starts from admitted source-only, links-only, or paired content without I/O", () => {
-    const dataSource: ReaderControllerDataSource = {
+    const dataSource: ReaderControllerRecordLoader = {
       loadSource: vi.fn(),
       loadConnections: vi.fn(),
     };
@@ -904,7 +904,7 @@ describe("reader controller state and operations", () => {
   });
 
   it("preserves the current entry when later required context fails", async () => {
-    const dataSource: ReaderControllerDataSource = {
+    const dataSource: ReaderControllerRecordLoader = {
       loadSource: vi
         .fn()
         .mockResolvedValueOnce(

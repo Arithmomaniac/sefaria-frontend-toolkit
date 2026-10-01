@@ -21,7 +21,7 @@ applyTo: "packages/client/**,docs/specs/client.md"
 - Validate every JSON response from the public client and media-type check each declared binary response.
 - Reject a contract mismatch with the operation, status, and structured JSON paths.
 - Preserve the original `Response` metadata on a contract mismatch.
-- Keep the public client as a thin configured `@hey-api/client-fetch` capability used by the generated SDK, with only the specified bounded per-client response cache.
+- Keep the public client as a thin configured `@hey-api/client-fetch` loader used by the generated SDK, with only the specified bounded per-client response cache.
 - Accept a configurable base URL and injectable `fetch`.
 - Preserve documented HTTP error payloads and Fetch API network or abort failures.
 - Add JSDoc to every handwritten exported declaration and every exported interface or class property. Document field meanings, failures, and important behavior at the declaration. Link to the package README for longer explanations.
