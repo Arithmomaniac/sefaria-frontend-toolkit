@@ -20,6 +20,7 @@ const directory = path.join(root, "examples", "site-snippets");
 // packages, no Node APIs and no files from the reader's site.
 const runnable = new Set([
   "client-and-text-first-success",
+  "client-check-json",
   "client-errors",
   "client-first-success",
   "prepare-stored-text",

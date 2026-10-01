@@ -40,18 +40,30 @@ The `alpha` address serves the newest build, and it changes without notice. To s
 
 To find versions, open [the list of hosted versions](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/index.html). It shows which versions are active and which version the `alpha` address serves right now. Programs can read the same list as JSON from [catalog.json](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/catalog.json).
 
-Pinned addresses stay available while their version is active. A version can be retired without notice, so check the list when you update your page.
+Pinned addresses stay available while their version is active. A version can be retired without notice.
 
-### Client and text tools
+### The three files
 
-The same address folder also serves the client and the text tools as ES modules. No token is needed. Import them in a module script:
+The same address folder serves three separate files. All three are ES modules. None sets a global, so a plain `<script>` without `type="module"` does not work. Use `<script type="module">` or `import`. No token is needed.
+
+| File | How to load it | What you get |
+| --- | --- | --- |
+| `sefaria-elements.js` | `<script type="module" src="…">` | Loading it registers all five tags. It also exports the element classes and `configureSefariaDataSource`. |
+| `sefaria-client.js` | `import { createSefariaClient, text, validateExternalResponse } from "…"` | Named client functions. It registers nothing. |
+| `sefaria-text-transform.js` | `import { normalizeText, applyVocalization, applyVocalizationToHtml, createTextPreview } from "…"` | Named text functions. It registers nothing. |
+
+For example:
 
 ```js
 import { createSefariaClient } from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-client.js";
 import { normalizeText } from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-text-transform.js";
 ```
 
-Pinning works the same way. Swap lpha for a version number. Older versions only have sefaria-elements.js, so check that the version you pick serves these files. Each module is independent. It does not share a client or cache with the elements module. To use them, see [Data and text tools: start here](/data-and-text-tools/start-here.md).
+To take everything from one file, use `import * as client from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-client.js"`.
+
+There is no combined file. The components file includes its own copy of the client and text tools code. Components need only that one file. A page that also calls the client or text tools directly loads those files too. That code downloads twice.
+
+Pinning works the same way. Swap `alpha` for a version number. To use these files, see [Data and text tools: start here](/data-and-text-tools/start-here.md).
 
 ## Packages
 

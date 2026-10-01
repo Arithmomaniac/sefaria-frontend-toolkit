@@ -155,10 +155,16 @@ function syntaxErrors(javascript: string): string[] {
   return result.status === 0 ? [] : [result.stderr];
 }
 describe("B11 first successes", () => {
-  it("fetches one checked response and shows a validation path", async () => {
+  it("fetches one checked response", async () => {
     const { output, requests } = await runBoth("client-first-success");
     expect(requests).toHaveLength(1);
     expect(output).toContain("Micah 6:8 · he · Miqra according to the Masorah");
+    expect(output.some((line) => line.startsWith("Invalid at"))).toBe(false);
+  });
+
+  it("shows a validation path for damaged stored JSON", async () => {
+    const { output, requests } = await runBoth("client-check-json");
+    expect(requests).toHaveLength(1);
     expect(
       output.some(
         (line) =>

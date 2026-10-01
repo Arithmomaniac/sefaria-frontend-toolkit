@@ -9,8 +9,11 @@ import { toJavaScript } from "./strip-types.mjs";
 const programs = [
   {
     name: "client-first-success",
+    expected: ["Micah 6:8 · he · Miqra according to the Masorah"],
+  },
+  {
+    name: "client-check-json",
     expected: [
-      "Micah 6:8 · he · Miqra according to the Masorah",
       "Invalid at /isSpanning: Invalid input: expected boolean, received string",
     ],
   },

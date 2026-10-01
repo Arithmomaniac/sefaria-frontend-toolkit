@@ -54,17 +54,23 @@ The examples below import the package names. With the CDN route, use the JavaScr
 
 `createSefariaClient()` makes a client for `https://www.sefaria.org`. `text.getV3Texts` is the generated function for Sefaria's texts API (v3). With no `version` option, Sefaria returns the edition marked primary (`isPrimary`). Here that is the Hebrew Masoretic text.
 
-On success, the result has `data`, and the first part prints `Micah 6:8 · he · Miqra according to the Masorah`.
+On success, the result has `data`, and the example prints `Micah 6:8 · he · Miqra according to the Masorah`.
 
 When Sefaria answers with a documented HTTP error, such as 404 for an unknown reference, the result has `error` with the documented error body. Then `data` is undefined. If a response doesn't match the API description, the call throws a `SefariaContractError` instead of returning data. Network failures also throw. They are not turned into empty data.
 
-### Check JSON you got another way
+<span class="learn-more__label">Learn more:</span> [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md) · [The client and Sefaria's API](/concepts/the-client-and-sefarias-api.md) {.learn-more}
 
-The second part checks JSON you got another way, such as from storage or a file. `validateExternalResponse` returns `{ valid, issues }` and does not throw. It prints `Invalid at /isSpanning: Invalid input: expected boolean, received string`. Each issue's `instancePath` is a JSON Pointer into the checked value. It points to the place in the data. It doesn't say how to fix it.
+## Check JSON you already have
+
+<CodeLanguageToggle :snippet="snippets['client-check-json']" />
+
+Use this for JSON that reaches you another way, such as from storage or a file. The example fetches once, stores the response as JSON text, reads it back, and damages one field on purpose.
+
+`validateExternalResponse` returns `{ valid, issues }` and does not throw. The example prints `Invalid at /isSpanning: Invalid input: expected boolean, received string`. Each issue's `instancePath` is a JSON Pointer into the checked value. It points to the place in the data. It doesn't say how to fix it.
 
 Validating isn't cleaning. The check protects your code from a wrong response shape. It doesn't make the text safe to display. See [Clean text and safety](/concepts/clean-text-and-safety.md).
 
-<span class="learn-more__label">Learn more:</span> [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md) · [The client and Sefaria's API](/concepts/the-client-and-sefarias-api.md) {.learn-more}
+<span class="learn-more__label">Learn more:</span> [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md) · [Clean text and safety](/concepts/clean-text-and-safety.md) {.learn-more}
 
 ## Clean text you already have
 
@@ -78,11 +84,11 @@ The first line shows what `normalizeText` did. It is the sanitizer. It removed t
 
 <span class="learn-more__label">Learn more:</span> [Clean up stored Sefaria text](/data-and-text-tools/clean-up-stored-sefaria-text.md) · [Clean text and safety](/concepts/clean-text-and-safety.md) {.learn-more}
 
-## Use both together
+## Fetch and clean text
 
 <CodeLanguageToggle :snippet="snippets['client-and-text-first-success']" />
 
-This asks for `version: ["translation"]`, which returns Sefaria's default translation. That isn't always English. For Micah 6:8 today it is "THE JPS TANAKH: Gender-Sensitive Edition". After you press Run, it prints the edition title, then the cleaned translation text, then a line saying `1 footnote(s) kept separately.`
+This example combines the client and the text tools. It asks for `version: ["translation"]`, which returns Sefaria's default translation. That isn't always English. For Micah 6:8 today it is "THE JPS TANAKH: Gender-Sensitive Edition". After you press Run, it prints the edition title, then the cleaned translation text, then a line saying `1 footnote(s) kept separately.`
 
 Sefaria's poetry `<span class="...">` wrappers are gone. Ordinary formatting such as `<small>` and `<br>` stays. The footnote marker became an empty `<span data-sefaria-note="0">` placeholder. Its content is in `notes[0]`. The example handles one verse. For a range of verses, Sefaria sends `text` as a list, so the example skips any `text` that isn't a string.
 
