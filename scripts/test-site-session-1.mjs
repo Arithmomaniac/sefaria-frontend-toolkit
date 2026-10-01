@@ -198,7 +198,94 @@ export async function runSessionOneSiteChecks({ root, siteBasePath }) {
     await page.close();
   });
   await runShowTextChecks({ root, siteBasePath, localScript });
+  await runSnippetRunChecks({ root, siteBasePath });
   process.stdout.write("Session 1 site checks passed.\n");
+}
+
+/** A text-transform snippet runs offline, only after Run is pressed. */
+async function runSnippetRunChecks({ root, siteBasePath }) {
+  const cdn =
+    "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/";
+  await withSite(root, siteBasePath, async ({ browser, origin, url }) => {
+    const page = await browser.newPage();
+    const served = [];
+    await page.route("**/*", async (route) => {
+      const requestUrl = new URL(route.request().url());
+      if (requestUrl.href.startsWith(cdn)) {
+        const name = requestUrl.pathname.split("/").pop();
+        served.push(name);
+        await route.fulfill({
+          body: await readFile(
+            path.join(root, "dist", "site", "cdn", "local", name),
+            "utf8",
+          ),
+          contentType: "text/javascript",
+          headers: { "access-control-allow-origin": "*" },
+        });
+      } else if (
+        requestUrl.origin === origin ||
+        ["data:", "about:"].includes(requestUrl.protocol)
+      ) {
+        await route.continue();
+      } else {
+        await route.abort("blockedbyclient");
+      }
+    });
+    await page.goto(url("/data-and-text-tools/start-here.html"), {
+      waitUntil: "networkidle",
+    });
+    const toggle = page
+      .locator(".code-language-toggle")
+      .filter({ hasText: "text-transform-first-success.ts" });
+    expectEqual(await toggle.count(), 1, "text-transform snippet toggle");
+    expectEqual(
+      await toggle.locator(".code-language-toggle__console").count(),
+      0,
+      "no output before Run",
+    );
+    expectEqual(
+      await toggle.locator("iframe").count(),
+      0,
+      "no frame before Run",
+    );
+    expectEqual(served.length, 0, "no script request before Run");
+
+    await toggle.getByRole("button", { name: "Run" }).click();
+    const output = toggle.locator(".code-language-toggle__console pre");
+    await output.first().waitFor();
+    await toggle
+      .locator('.code-language-toggle__console[data-state="done"]')
+      .waitFor();
+    expectEqual(
+      await toggle.locator("iframe").getAttribute("sandbox"),
+      "allow-scripts",
+      "snippet frame sandbox",
+    );
+    const first = await output.first().textContent();
+    expectEqual(
+      first.includes('<span data-sefaria-mam="setumah">{ס}</span>') &&
+        !first.includes("onclick"),
+      true,
+      `first output line: ${first}`,
+    );
+    expectEqual(await output.count(), 2, "two output lines");
+    expectEqual(
+      await toggle.locator("pre.is-error").count(),
+      0,
+      "no error lines",
+    );
+    expectEqual(
+      served.join(),
+      "sefaria-text-transform.js",
+      "only the text-transform bundle was requested",
+    );
+    await toggle.getByRole("button", { name: "Run" }).click();
+    await toggle
+      .locator('.code-language-toggle__console[data-state="done"]')
+      .waitFor();
+    expectEqual(await output.count(), 2, "Run again resets the output");
+    await page.close();
+  });
 }
 
 /**

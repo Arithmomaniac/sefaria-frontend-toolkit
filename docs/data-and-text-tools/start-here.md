@@ -75,7 +75,7 @@ THE JPS TANAKH: Gender-Sensitive Edition:
 1 footnote(s) kept separately.
 ```
 
-Sefaria's poetry `<span class="...">` wrappers are gone. Ordinary formatting such as `<small>` and `<br>` stays. The footnote marker became an empty `<span data-sefaria-note="0">` placeholder. Its content is in `notes[0]`. The `typeof version.text !== "string"` check skips text for a whole chapter, which Sefaria sends as a list of strings.
+Sefaria's poetry `<span class="...">` wrappers are gone. Ordinary formatting such as `<small>` and `<br>` stays. The footnote marker became an empty `<span data-sefaria-note="0">` placeholder. Its content is in `notes[0]`. The example handles one verse. For a range of verses, Sefaria sends `text` as a list, so the example skips any `text` that isn't a string.
 
 <span class="learn-more__label">Learn more:</span> [How the toolkit works](/concepts/how-the-toolkit-works.md) · [Give components your own data](/data-and-text-tools/give-components-your-own-data.md) {.learn-more}
 

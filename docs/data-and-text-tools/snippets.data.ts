@@ -7,6 +7,7 @@ export interface SiteSnippet {
   file: string;
   typescript: string;
   javascript: string;
+  runnable?: boolean;
 }
 
 declare const data: Record<string, SiteSnippet>;
@@ -14,6 +15,17 @@ export { data };
 
 const root = path.resolve(import.meta.dirname, "../..");
 const directory = path.join(root, "examples", "site-snippets");
+
+// Snippets that run in a browser: only the client and text-transform
+// packages, no Node APIs and no files from the reader's site.
+const runnable = new Set([
+  "client-and-text-first-success",
+  "client-errors",
+  "client-first-success",
+  "prepare-stored-text",
+  "text-markup-before-after",
+  "text-transform-first-success",
+]);
 
 // Excerpts of existing examples, marked with `// #region <name>` comments.
 const regions = [
@@ -60,6 +72,7 @@ export default {
         file,
         typescript,
         javascript: await toJavaScript(typescript),
+        ...(runnable.has(name.slice(0, -3)) ? { runnable: true } : {}),
       };
     }
     for (const { name, file, region } of regions) {
