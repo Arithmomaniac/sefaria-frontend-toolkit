@@ -486,7 +486,7 @@ try {
       );
     await assertEqual(
       previewLinks[0],
-      "/reference/text-transform.html#createtextpreview",
+      sitePath("/reference/text-transform.html#createtextpreview"),
       "first createTextPreview API link",
     );
     await assertEqual(
