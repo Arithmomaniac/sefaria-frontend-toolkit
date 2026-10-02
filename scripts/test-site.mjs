@@ -732,14 +732,15 @@ async function assertLegacyRedirects() {
       readFile(sourcePath, "utf8"),
       readFile(targetPath, "utf8"),
     ]);
+    const href = sitePath(target);
     if (!targetHtml.includes("<html")) {
       throw new Error(`Legacy redirect target is not built: ${target}`);
     }
     if (
       !stub.includes('name="robots" content="noindex"') ||
-      !stub.includes(`rel="canonical" href="${target}"`) ||
-      !stub.includes(`http-equiv="refresh" content="0; url=${target}"`) ||
-      !stub.includes(`href="${target}"`)
+      !stub.includes(`rel="canonical" href="${href}"`) ||
+      !stub.includes(`http-equiv="refresh" content="0; url=${href}"`) ||
+      !stub.includes(`href="${href}"`)
     ) {
       throw new Error(`Legacy redirect stub is incomplete: ${source}`);
     }
