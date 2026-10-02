@@ -201,18 +201,19 @@ async function writeLegacyRedirects() {
     await access(path.join(site, target.slice(1)));
     const destination = path.join(site, source);
     await mkdir(path.dirname(destination), { recursive: true });
-    const title = `Redirecting to ${target}`;
+    const href = `${siteBasePath}${target.slice(1)}`;
+    const title = `Redirecting to ${href}`;
     const html = `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="robots" content="noindex">
-    <meta http-equiv="refresh" content="0; url=${target}">
-    <link rel="canonical" href="${target}">
+    <meta http-equiv="refresh" content="0; url=${href}">
+    <link rel="canonical" href="${href}">
     <title>${title}</title>
   </head>
   <body>
-    <p>This page moved to <a href="${target}">${target}</a>.</p>
+    <p>This page moved to <a href="${href}">${href}</a>.</p>
   </body>
 </html>
 `;
