@@ -4,6 +4,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { highlightHtml } from "../docs/.vitepress/theme/highlight";
+import { legacyRedirects } from "../docs/.vitepress/redirects.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const deletedPaths = [
@@ -60,6 +61,24 @@ describe("documentation site", () => {
       await expect(access(path.join(root, relativePath))).rejects.toMatchObject(
         { code: "ENOENT" },
       );
+    }
+  });
+
+  it("maps legacy public routes to existing successor pages", async () => {
+    const redirects = Object.entries(legacyRedirects);
+    expect(redirects).toHaveLength(27);
+    for (const [source, target] of redirects) {
+      expect(source).toMatch(/\.html$/u);
+      expect(target).toMatch(/^\/.+\.html$/u);
+      await expect(
+        access(
+          path.join(
+            root,
+            "docs",
+            target.replace(/^\//u, "").replace(/\.html$/u, ".md"),
+          ),
+        ),
+      ).resolves.toBeUndefined();
     }
   });
 

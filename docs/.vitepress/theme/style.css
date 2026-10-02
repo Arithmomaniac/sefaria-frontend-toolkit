@@ -31,6 +31,10 @@
     linear-gradient(180deg, var(--site-paper), var(--vp-c-bg) 52rem);
 }
 
+.VPNavBarExtra .VPSocialLinks {
+  display: none;
+}
+
 .VPHomeHero {
   padding: 1rem 1.5rem 2.5rem;
 }

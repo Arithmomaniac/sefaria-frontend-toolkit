@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import { URL } from "node:url";
@@ -6,6 +6,7 @@ import { URL } from "node:url";
 import { chromium } from "playwright";
 
 import { readSiteBasePath } from "./build-site-plan.mjs";
+import { legacyRedirects } from "../docs/.vitepress/redirects.mjs";
 import { createFixtureResponse } from "./site-fixtures.mjs";
 import { startSitePreview } from "./site-preview-server.mjs";
 
@@ -66,6 +67,8 @@ try {
 
     const builtHtml = (route) =>
       readFile(path.join(root, "dist", "site", route), "utf8");
+    await assertLegacyRedirects();
+    await assertReferencedExampleRoutesExist();
     const flaggedHtml = await builtHtml(
       "use-components/show-an-attributed-passage.html",
     );
@@ -98,6 +101,7 @@ try {
     page.on("pageerror", (error) => pageErrors.push(error.message));
 
     await page.goto(siteUrl, { waitUntil: "networkidle" });
+    await assertNoZeroSizeTabStops(page, "Home at 1280px");
     await assertText(page.locator("h1"), "Sefaria Frontend Toolkit");
     await assertText(
       page.locator("body"),
@@ -430,6 +434,7 @@ try {
       );
     }
     await page.setViewportSize({ width: 390, height: 844 });
+    await assertNoZeroSizeTabStops(page, "Home at 390px");
     for (const tab of ["Checked client data", "Cleaned text"]) {
       await page.getByRole("tab", { name: tab }).click();
       const blocks = await page
@@ -716,6 +721,118 @@ async function routeToolkitRequests(
     }
     await route.abort("blockedbyclient");
   });
+}
+
+async function assertLegacyRedirects() {
+  for (const [source, target] of Object.entries(legacyRedirects)) {
+    const sourcePath = path.join(root, "dist", "site", source);
+    const targetPath = path.join(root, "dist", "site", target.slice(1));
+    const [stub, targetHtml] = await Promise.all([
+      readFile(sourcePath, "utf8"),
+      readFile(targetPath, "utf8"),
+    ]);
+    if (!targetHtml.includes("<html")) {
+      throw new Error(`Legacy redirect target is not built: ${target}`);
+    }
+    if (
+      !stub.includes('name="robots" content="noindex"') ||
+      !stub.includes(`rel="canonical" href="${target}"`) ||
+      !stub.includes(`http-equiv="refresh" content="0; url=${target}"`) ||
+      !stub.includes(`href="${target}"`)
+    ) {
+      throw new Error(`Legacy redirect stub is incomplete: ${source}`);
+    }
+  }
+}
+
+async function assertReferencedExampleRoutesExist() {
+  const pages = await markdownFiles(path.join(root, "docs"));
+  const routes = new Set();
+  for (const file of pages) {
+    const source = await readFile(file, "utf8");
+    for (const match of source.matchAll(
+      /(?:href|src)=["'][^"']*?(\/examples\/[^"'#?)]+)/gu,
+    )) {
+      routes.add(match[1]);
+    }
+    for (const match of source.matchAll(
+      /withBase\(["'](\/examples\/[^"'#?)]+)["']\)/gu,
+    )) {
+      routes.add(match[1]);
+    }
+    for (const match of source.matchAll(
+      /\]\((\/examples\/[^)#?]+)(?:[)#?])/gu,
+    )) {
+      routes.add(match[1]);
+    }
+  }
+  for (const route of routes) {
+    const relative = route.replace(/^\//u, "").replace(/\.md$/u, ".html");
+    const candidates = route.endsWith("/")
+      ? [path.join(root, "dist", "site", relative, "index.html")]
+      : [
+          path.join(root, "dist", "site", relative),
+          path.join(root, "dist", "site", `${relative}.html`),
+          path.join(root, "dist", "site", relative, "index.html"),
+        ];
+    let found = false;
+    for (const candidate of candidates) {
+      try {
+        await readFile(candidate, "utf8");
+        found = true;
+        break;
+      } catch (error) {
+        if (error.code !== "ENOENT") throw error;
+      }
+    }
+    if (!found) {
+      throw new Error(
+        `Referenced example route is missing from dist/site: ${route}`,
+      );
+    }
+  }
+}
+
+async function markdownFiles(directory) {
+  const entries = await readdir(directory, { withFileTypes: true });
+  const files = [];
+  for (const entry of entries) {
+    const full = path.join(directory, entry.name);
+    if (entry.isDirectory()) {
+      if (entry.name !== ".vitepress" && entry.name !== "archive") {
+        files.push(...(await markdownFiles(full)));
+      }
+    } else if (entry.name.endsWith(".md")) {
+      files.push(full);
+    }
+  }
+  return files;
+}
+
+async function assertNoZeroSizeTabStops(page, label) {
+  await page.keyboard.press("Home");
+  const bad = [];
+  for (let index = 0; index < 80; index += 1) {
+    await page.keyboard.press("Tab");
+    const focused = await page.evaluate(() => {
+      const element = globalThis.document.activeElement;
+      if (!element || element === globalThis.document.body) return null;
+      const rect = element.getBoundingClientRect();
+      return {
+        label:
+          element.getAttribute("aria-label") ||
+          element.textContent?.trim() ||
+          element.tagName,
+        width: rect.width,
+        height: rect.height,
+      };
+    });
+    if (!focused) continue;
+    if (focused.width === 0 && focused.height === 0) bad.push(focused.label);
+  }
+  if (bad.length > 0) {
+    throw new Error(`${label} has zero-size tab stops: ${bad.join(", ")}`);
+  }
 }
 
 async function assertText(locator, expected) {

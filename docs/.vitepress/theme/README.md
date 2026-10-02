@@ -4,6 +4,10 @@
 
 Every page-writing session follows these rules.
 
+## Legacy redirects
+
+Deleted public pages stay reachable through static redirect stubs generated from `docs/.vitepress/redirects.mjs`; keep that mapping as the single source of truth, do not add those old routes to navigation or search, and choose the closest current successor page for each entry.
+
 ## Code blocks
 
 - In a Vue component, show code with `<CodeBlock :code lang label?>`. It highlights `json`, `html`, `js`, and `ts` through `highlight.ts`, with no runtime Shiki and no new dependency. Plain highlighting preserves the source text exactly; pass `pretty-breaks` only for intentionally re-laid-out HTML such as Home's cleaned-text `normalizeText` output.

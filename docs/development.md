@@ -124,6 +124,27 @@ The generated `dist/site` directory contains the VitePress pages plus allowliste
 
 The separate Pages workflow runs after successful main-push CI or explicit script retirement, and also supports manual main-only redeployment. It runs the complete repository gate on Ubuntu with the project base, restores retained script artifacts, uploads only `dist/site`, and deploys with `pages: write` and `id-token: write` scoped to the deployment job. Pull requests validate the workflow and both local and project-path contracts without deploying. The previous Reveal.js showcase, booth loop, Pages assembly, QR assets, presentation media, and presentation-only tests remain available through the full-SHA links in the [documentation archive](archive/README.md#september-14-2026-presentation-snapshot).
 
+## Keep the documentation current
+
+The maintainer owns every page by default. Generated reference pages under `docs/reference` belong to their source JSDoc or TSDoc and to the generator in `scripts/reference`. Never edit generated Markdown. Change the source comment or the generator, then run `pnpm reference:generate`.
+
+Update the docs when one of these happens:
+
+- A public API or behavior changes. Update the page, the JSDoc, and the owning spec in the same change.
+- An install or release step changes. Update the install pages and this guide.
+- A live example or site test fails. Fix the example or the page that it proves.
+- A link breaks, a question keeps coming back, or a status claim goes stale. Fix the page or mark the claim as planned.
+
+These checks run in `pnpm check` and catch drift without a person:
+
+- `pnpm reference:check` finds stale generated reference pages.
+- `pnpm check:api-docs` finds missing public API documentation.
+- `pnpm metadata:check` checks public metadata.
+- `pnpm prose:check` lints the prose.
+- `pnpm build:site:bundles` and the site tests check links, examples, and snippets.
+
+A person must check behavior claims. A page that no person has reviewed carries `humanReviewed: false` in its front matter. That value shows a review box. Only a human removes it, after reading the page.
+
 ## Browser script distribution
 
 The script-source implementation is locally qualified and the P5 release is hosted. New builds omit Popup; retained P5 pins keep their original bytes and API. Its [distribution contract](specs/distribution.md#browser-script-source) is separate from authenticated GitHub Packages installation.
