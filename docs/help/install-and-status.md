@@ -25,7 +25,7 @@ The CDN serves three ES-module files from one folder. Choose by goal.
 | `sefaria-client.js` | `import { createSefariaClient, text, validateExternalResponse } from "…"` | Named client functions. It registers nothing. |
 | `sefaria-text-transform.js` | `import { normalizeText, applyVocalization, applyVocalizationToHtml, createTextPreview } from "…"` | Named text functions. It registers nothing. |
 
-All three are ES modules and none sets a global. A plain `<script>` without `type="module"` does not work. Use `<script type="module">` or `import`. No token is needed.
+All three are ES modules and These files don't create a global variable. A plain `<script>` without `type="module"` does not work. Use `<script type="module">` or `import`. No token is needed.
 
 ### Load the files
 
@@ -53,12 +53,12 @@ To use the client and text files, see [Data and text tools: start here](/data-an
 
 ### Newest or pinned version
 
-The `alpha` address serves the newest build, and it changes without notice. To stay on one build, swap `alpha` for a version number in any of the three files. For example:
+The `alpha` address serves the newest build, and it changes without notice. To stay on one build, swap `alpha` for a version number in any of the three files. Older versions may have only the components file. For example:
 
 ```html
 <script
   type="module"
-  src="https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/0.0.0-alpha.36533219551.1/sefaria-elements.js"
+  src="https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/0.0.0-alpha.36918501033.1/sefaria-elements.js"
 ></script>
 ```
 
@@ -109,7 +109,7 @@ The toolkit is experimental and unofficial. It is developed in collaboration wit
 
 ## License and text rights {#license-and-text-rights}
 
-The toolkit is licensed under GPL-3.0-only. Generally, if you distribute a combined work that includes the toolkit, you license that work as a whole under GPLv3. You also provide its corresponding source. Separate programs that are merely distributed alongside it are different. This is not legal advice. Read the [GNU GPL text](https://www.gnu.org/licenses/gpl-3.0.html) and the toolkit's [LICENSE](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/LICENSE), and ask a lawyer if you're unsure. Each script version folder includes `LICENSE.txt` and `THIRD-PARTY-NOTICES.txt`.
+The toolkit is licensed under GPL-3.0-only. If you distribute a combined work that includes the toolkit, you generally license the whole work under GPLv3. You also provide its source. Separate programs that only ship alongside it are different. This is not legal advice. Read the [GNU GPL text](https://www.gnu.org/licenses/gpl-3.0.html) and the toolkit's [LICENSE](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/LICENSE), and ask a lawyer if you're unsure. Each script version folder includes `LICENSE.txt` and `THIRD-PARTY-NOTICES.txt`.
 
 The rights to the texts are separate. Each Sefaria edition has its own license, so check the edition you display. On sefaria.org, open a passage and choose "About this Text" to see the current version's license. Sefaria's [Copyright and Data Use](https://developers.sefaria.org/docs/usage-of-our-name-and-logo) page explains the rules for using its data.
 

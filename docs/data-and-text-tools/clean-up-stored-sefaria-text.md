@@ -38,7 +38,7 @@ The snippet above runs each input through `normalizeText`. The table shows the r
 What each kind of input becomes:
 
 - **Kept as is:** the formatting tags `b`, `strong`, `i`, `em`, `u`, `small`, `sup`, `sub`, and `br`. Their attributes are removed. The one attribute kept on some elements is `dir`, when it is `ltr`, `rtl`, or `auto`.
-- **Unwrapped (tag removed, text kept):** spans without a recognized class (such as Sefaria's poetry classes), unknown tags, and links with no Sefaria reference or topic. A span with an allowed `dir` keeps just that `dir`. The tool drops `href` and `src` attributes, so the output has no links or loaded resources. A web address written in the text itself stays as plain text.
+- **Unwrapped (tag removed, text kept):** spans with no recognized class, unknown tags, and links with no Sefaria reference or topic. A span with an allowed `dir` keeps just that `dir`. The tool drops `href` and `src` attributes, so the output has no links or loaded resources. A web address written in the text itself stays as plain text.
 - **Block tags** such as `p`, `div`, `li`, and `h1` to `h6` are removed, and their text is separated by a space.
 - **`<big>`** becomes `<span style="font-size: larger;">`.
 - **Sefaria markers** become `span` elements with `data-sefaria-*` attributes. They cover Masoretic paragraph and ketiv/qere markers, reference and topic links, footnote placeholders, and inline commentary and overlay markers. Your CSS or renderer can style or read them. [Normalized HTML output](/reference/text-transform.md#normalized-html-output) lists each attribute and its values.

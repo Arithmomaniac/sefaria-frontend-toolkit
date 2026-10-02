@@ -45,7 +45,13 @@ Beyond the two parts, the Reader adds:
 
 ## What your page does
 
-Your page owns where the Reader sits, how big it is, and which reference it opens (`sref`). It also owns the text choices and any extra toolbar buttons. And it owns anything you want to happen outside the Reader, such as bookmarks, analytics, or updating other components.
+Your page owns:
+
+- The layout: where the Reader sits and how big it is.
+- The reference the Reader opens (`sref`).
+- The text choices.
+- Any extra toolbar buttons.
+- Anything outside the Reader, such as bookmarks, analytics, or updating other components.
 
 The Reader's interaction events tell your page what happened. They are cancelable. Call `event.preventDefault()` to stop the Reader's own response. `sefaria-reader-error` is a notification and can't be canceled. See [Reference › Components](/reference/components.md#events) for details on each event.
 

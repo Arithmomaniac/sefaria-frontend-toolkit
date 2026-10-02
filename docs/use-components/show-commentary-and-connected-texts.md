@@ -50,7 +50,7 @@ The panel changes its own category and page when a reader clicks. You can also s
 | `show-previews` | Shows preview text. On by default. |
 | `with-text` | Asks Sefaria to include the connected texts' words for previews. On by default. |
 
-`with-text` and `show-previews` default to on, so the attribute can't turn them off. Set the JavaScript property instead: `panel.withText = false` or `panel.showPreviews = false`. If `withText` is false and previews are shown, the panel shows `Preview text was not requested.` and a `Load previews` button.
+`with-text` and `show-previews` default to on, so an attribute cannot turn them off. To turn them off, set the property: `panel.withText = false` or `panel.showPreviews = false`. If `withText` is false and previews are shown, the panel shows `Preview text was not requested.` and a `Load previews` button.
 
 For every attribute, see [Reference › Components](/reference/components.md#sefaria-connections-panel).
 
@@ -74,7 +74,7 @@ You can cancel the category, page, and preview events. Calling `event.preventDef
 
 ## How many requests it makes
 
-A fresh load makes one request, to Sefaria's links endpoint. Changing `category`, `page`, or `show-previews` makes no request, because the panel reuses the data it already loaded. Changing `with-text` or `sref` loads again. If you loaded without text, choosing `Load previews` makes one more request. With supplied data, the panel makes none.
+A fresh load makes one request, to Sefaria's links endpoint. Changing `category`, `page`, or `show-previews` makes no request, because the panel reuses the data it already loaded. Changing `with-text` or `sref` loads again. If you loaded without text, choosing `Load previews` makes one more request.
 
 ## When there's nothing to show
 
@@ -85,11 +85,10 @@ Read `status` from the element in JavaScript. It is `empty`, `loading`, `ready`,
 | Waiting for Sefaria, with a loading message | `loading` | No |
 | Sefaria can't be reached | `error` | `sefaria-connections-panel-error` |
 | Sefaria says the text isn't a reference, with Sefaria's message | `error` | No |
-| Invalid supplied `data`, with an error | `error` | No |
-| No `sref` and no `data`, nothing shown | `empty` | No |
+| No `sref`, nothing shown | `empty` | No |
 | Sefaria returns no text connections, with a message | `empty` | No |
 
-A failed load keeps the connections already showing. The panel doesn't fall back to `sref` when `data` is invalid. See [the full empty-state detail](/reference/components.md#sefaria-connections-panel). The example has a good reference, a text that isn't a reference, and an empty panel. Choose **Show each status** to log each one's status.
+A failed load keeps the connections already showing. See [the full empty-state detail](/reference/components.md#sefaria-connections-panel). The example has a good reference, a text that isn't a reference, and an empty panel. Choose **Show each status** to log each one's status.
 
 <LiveEditor :code="connectionsPanelStates" title="Read status and listen for errors" />
 
@@ -97,7 +96,7 @@ A failed load keeps the connections already showing. The panel doesn't fall back
 
 ## Use your own data
 
-If you already have Sefaria's links response, set the panel's `data` property to it. The panel then makes no request. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md).
+The panel has no `data` property. To load links from your own storage, give it a custom loader through `source`. See [Give components your own data](/data-and-text-tools/give-components-your-own-data.md).
 
 ## Next steps
 

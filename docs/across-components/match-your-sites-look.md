@@ -15,7 +15,7 @@ import theming from "../../examples/site-snippets/component-theming.html?raw";
 
 This page changes how components look, not which text appears. To change the text, see [Choose what text readers see](/across-components/choose-what-text-readers-see.md).
 
-[Show one passage](/use-components/show-text/show-one-passage.md#match-your-sites-colors-and-fonts) introduces styling for one passage. This page gathers every setting.
+[Show one passage](/use-components/show-text/show-one-passage.md#match-your-site-s-colors-and-fonts) introduces styling for one passage. This page gathers every setting.
 
 Every toolkit component reads the same set of CSS custom properties, called tokens, whose names start with `--sefaria-`. Set a token once and every component in scope picks it up. Tokens pass down to every component inside the element where you set them. Each component uses the tokens that apply to it. You need a page with at least one working component and access to your CSS.
 
@@ -75,7 +75,7 @@ The example scopes a set of tokens to one container and opts in to dark mode. Ch
 
 Components render inside a shadow DOM, a browser feature that keeps a component's markup and styles separate from the page. Your selectors, such as `p { color: red; }`, can't reach inside.
 
-You can style a component through the tokens, through the element's own box (`display`, `margin`, width), and, for the Reader, through its named parts: `sefaria-reader::part(toolbar)`, `::part(history)`, `::part(source-pane)`, and `::part(connections-pane)`. Inherited text settings such as `font-weight` can still pass in.
+You can style every component through the tokens and through the element's own box (`display`, `margin`, width). You can also style the Reader through its named parts: `sefaria-reader::part(toolbar)`, `::part(history)`, `::part(source-pane)`, and `::part(connections-pane)`. Inherited text settings such as `font-weight` can still pass in.
 
 The Reader uses `display: grid`. The other components are `display: block` by default. Set `margin` or `display` on the element itself to place it in your layout.
 

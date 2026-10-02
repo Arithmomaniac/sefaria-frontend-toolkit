@@ -189,7 +189,7 @@ export default withMermaid(
       nav: [
         { text: "Use components", link: "/use-components/start-here.md" },
         {
-          text: "Use data and text tools",
+          text: "Use the data and text tools",
           link: "/data-and-text-tools/start-here.md",
         },
         { text: "Concepts", link: "/concepts/how-the-toolkit-works" },

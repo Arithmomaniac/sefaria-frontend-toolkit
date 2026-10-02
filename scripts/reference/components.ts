@@ -322,7 +322,7 @@ export async function renderComponentsReference(): Promise<string> {
     "",
     "Each element dispatches `CustomEvent`s that bubble and cross shadow roots. Listen for them with `addEventListener` on the element or an ancestor. For a cancelable event, call `preventDefault()` in your listener to stop the element's own action. The element acts after your listener returns.",
     "",
-    "Invalid supplied `data` puts an element into its error state. The Reader reports it with `sefaria-reader-error`. The other elements don't dispatch an error event for it.",
+    "Invalid supplied `data` puts Text Segment, Bilingual Segment and Source Card into their error state. They dispatch no error event for it. Their error events report only failures while loading `sref`. The Reader has no `data` property. It dispatches `sefaria-reader-error` when loading fails or loading is disabled.",
     "",
     "[Make components respond to each other](/across-components/make-components-respond-to-each-other.md) shows how to use them.",
     "",

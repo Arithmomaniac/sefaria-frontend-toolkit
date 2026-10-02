@@ -90,7 +90,7 @@ The first line shows what `normalizeText` did. It is the sanitizer. It removed t
 
 <CodeLanguageToggle :snippet="snippets['client-and-text-first-success']" />
 
-This example combines the client and the text tools. It asks for `version: ["translation"]`, which returns Sefaria's default translation. That isn't always English. For Micah 6:8 today it is "THE JPS TANAKH: Gender-Sensitive Edition". After you press Run, it prints the edition title, then the cleaned translation text, then a line saying `1 footnote(s) kept separately.`
+This example combines the client and the text tools. It asks for `version: ["translation"]`, which returns Sefaria's default translation. Sefaria's default translation is not always English. For Micah 6:8 today it is "THE JPS TANAKH: Gender-Sensitive Edition". After you press Run, it prints the edition title, then the cleaned translation text, then a line saying `1 footnote(s) kept separately.`
 
 Sefaria's poetry `<span class="...">` wrappers are gone. Ordinary formatting such as `<small>` and `<br>` stays. The footnote marker became an empty `<span data-sefaria-note="0">` placeholder. Its content is in `notes[0]`. The example handles one verse. For a range of verses, Sefaria sends `text` as a list, so the example skips any `text` that isn't a string.
 

@@ -11,7 +11,7 @@ import { data as snippets } from "./snippets.data.ts";
 
 # Give components your own data
 
-Components normally load their text from Sefaria. If you already hold the response, or you want your own server to stand between the page and Sefaria, you can change that. There are two cases. With `data`, the element makes no request at all. With a data source, it still loads, and navigates in the Reader, but from the place you choose.
+Components normally load their text from Sefaria. If you already hold the response, you can pass it in as `data`. If you want your own server to stand between the page and Sefaria, you can use a custom loader through `source`. With `data`, the element makes no request at all. With a data source, it still loads, and navigates in the Reader, but from the place you choose.
 
 Three elements accept `data`, because their content doesn't change. Valid `data` is authoritative and makes no requests:
 
@@ -53,7 +53,7 @@ What happens with data that isn't usable:
 - **Valid but empty data.** It is still authoritative. The element shows its empty state and doesn't load `sref`.
 - **Data set back to `undefined`.** A connected element with a non-blank `sref` loads from it again, through its data source.
 
-Supplied data also follows the element's `translation-fallback` setting. It defaults to `none` on Text Segment and Bilingual Segment, and to `default` on Source Card. If the data lacks the translation language you asked for, the element shows the same "No french text." state as a live load would. It never requests the default translation. The [Components reference](/reference/components.md) describes each element's states.
+Supplied data also follows the element's `translation-fallback` setting. It defaults to `none` on Text Segment and Bilingual Segment, and to `default` on Source Card. If the data lacks the translation language you asked for, the setting decides what happens. With `none`, the element shows a missing-language state. With `default`, it shows a fallback translation that is already in the supplied data and notes the substitution. Neither setting makes a request for the missing language. The [Components reference](/reference/components.md) describes each element's states.
 
 To see the failure in your own code as well, read [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md).
 

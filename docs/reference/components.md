@@ -367,7 +367,7 @@ Set an attribute in HTML or a property in JavaScript. If a property has no attri
 
 <ApiEntry id="sefaria-connections-panel-sref" name="sref" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;sref&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;\&quot;\&quot;&quot;,&quot;code&quot;:true}]">
 
-The Sefaria reference to load when `data` isn't set.
+The Sefaria reference whose connections to load.
 
 </ApiEntry>
 
@@ -657,9 +657,9 @@ Requests connection previews. The element loads them unless a listener cancels t
 
 </ApiEntry>
 
-<ApiEntry id="event-sefaria-reader-error" name="sefaria-reader-error" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;error is the original failure. sref is the Reader's requested reference. It can be empty when the failure came from supplied data.&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;No&quot;}]">
+<ApiEntry id="event-sefaria-reader-error" name="sefaria-reader-error" :fields="[{&quot;label&quot;:&quot;Detail&quot;,&quot;value&quot;:&quot;error is the original failure. sref is the reference the Reader was loading when the failure happened.&quot;},{&quot;label&quot;:&quot;Cancelable&quot;,&quot;value&quot;:&quot;No&quot;}]">
 
-Reports a loading failure or a rejection of the starting data.
+Reports a failure while loading the starting text or a text you navigate to, or when loading is disabled.
 
 </ApiEntry>
 
@@ -686,7 +686,7 @@ Style these from your page with `::part(name)`.
 
 Each element dispatches `CustomEvent`s that bubble and cross shadow roots. Listen for them with `addEventListener` on the element or an ancestor. For a cancelable event, call `preventDefault()` in your listener to stop the element's own action. The element acts after your listener returns.
 
-Invalid supplied `data` puts an element into its error state. The Reader reports it with `sefaria-reader-error`. The other elements don't dispatch an error event for it.
+Invalid supplied `data` puts Text Segment, Bilingual Segment and Source Card into their error state. They dispatch no error event for it. Their error events report only failures while loading `sref`. The Reader has no `data` property. It dispatches `sefaria-reader-error` when loading fails or loading is disabled.
 
 [Make components respond to each other](/across-components/make-components-respond-to-each-other.md) shows how to use them.
 

@@ -15,14 +15,14 @@ import react from "../../examples/react-vite/src/site-source-card-to-connections
 
 # Make components respond to each other
 
-Components don't talk to each other directly. Your page connects them with a four-step loop:
+Components don't talk to each other directly. Your page connects them in four steps:
 
 1. A component reports what the reader did through an event.
 2. Your page updates its own state.
 3. Your page sets the other component's inputs, as attributes or properties.
 4. That component redraws or loads.
 
-This page builds the loop with one example. Selecting a verse in a Source Card highlights it and shows that verse's connections in a Connections Panel. The card starts with `Micah 6:8` selected, at position `[2]`. Selecting `Micah 6:7` makes the panel show `Connections for Micah 6:7`.
+This page builds these steps with one example. Selecting a verse in a Source Card highlights it and shows that verse's connections in a Connections Panel. The card starts with `Micah 6:8` selected, at position `[2]`. Positions count from 0, so verse 8 of Micah 6:6-8 is position 2. Selecting `Micah 6:7` makes the panel show `Connections for Micah 6:7`.
 
 Each component's own events are covered in [Show an attributed passage](/use-components/show-an-attributed-passage.md) and [Show commentary and connected texts](/use-components/show-commentary-and-connected-texts.md).
 

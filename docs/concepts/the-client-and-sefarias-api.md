@@ -12,7 +12,7 @@ The toolkit talks to Sefaria through one small piece of code, the client. It is 
 
 ## Where the client's types come from
 
-Sefaria publishes a description of its API in the OpenAPI format. OpenAPI is a standard, machine-readable way to list the addresses you can request and the shape of JSON each one returns. Tools can turn that list into code.
+Sefaria publishes a machine-readable description of its API, in a format called OpenAPI. The toolkit generates its types from that description.
 
 The toolkit keeps a copy of Sefaria's description. It doesn't fetch a new one at build time. The file `packages/client/openapi/upstream.json` holds the exact bytes of `docs/openAPI.json` from the Sefaria-Project repository. The file `packages/client/openapi/source.json` records the repository, the path, the commit SHA, and a SHA-256 checksum. Generation checks the bytes against the checksum. It stops if they differ.
 

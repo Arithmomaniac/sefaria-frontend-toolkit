@@ -14,7 +14,7 @@ Find what you see below, then follow the fix.
 
 Each component has a `status` property with one of four values:
 
-- `empty`: there is nothing to show. There is no input, or the data was prepared successfully and is empty or unresolved.
+- `empty`: there is nothing to show. No `sref` or `data` was given, or the response had no text.
 - `loading`: the element is fetching or preparing text.
 - `ready`: the element prepared something to show. It may be partial.
 - `error`: something failed. A first load failure shows a message. If a later reload fails, the element can keep the previous text while `status` is `error`.
@@ -23,7 +23,7 @@ Check `status` first. Then use the event for the cause.
 
 The element fires `sefaria-<component>-error`, for example `sefaria-source-card-error`, when a live request or its preparation is rejected. The event's `detail` is `{ error, sref }`.
 
-For the four elements other than the Reader, a documented 400 or 404 answer and invalid supplied data show an error without that event. The Reader does fire `sefaria-reader-error` when it rejects a seed you supplied and when its first (root) load fails. See [When there's nothing to show](/use-components/add-the-complete-reader.md#when-there-s-nothing-to-show).
+For the four elements other than the Reader, a documented 400 or 404 answer and invalid supplied data show an error without that event. The Reader has no `data` property. It fires `sefaria-reader-error` when a load fails. See [When there's nothing to show](/use-components/add-the-complete-reader.md#when-there-s-nothing-to-show).
 
 There is no generic ready event, so read `status`.
 
@@ -63,7 +63,7 @@ There is no generic ready event, so read `status`.
 
 ### Your supplied data is invalid
 
-**What you see:** an error message, even though `sref` is set.
+**What you see:** an error message, even though `sref` is set. This applies to Text Segment, Bilingual Segment and Source Card.
 
 **Why:** when you set `data`, the element uses it and does not load by `sref`. If the data is invalid, the element shows an error and does not fall back to `sref`.
 
@@ -73,7 +73,7 @@ There is no generic ready event, so read `status`.
 
 **What you see:** a blank or empty message, and `status` is `empty` or `ready`.
 
-**Why:** with `empty`, there is no input, or the prepared data is empty or unresolved. With `ready`, Sefaria may have returned no text for the edition you asked for. The component then shows an empty message such as "No primary text is available."
+**Why:** with `empty`, no `sref` or `data` was given, or the response had no text. With `ready`, Sefaria may have returned no text for the edition you asked for. The component then shows an empty message such as "No primary text is available."
 
 **Fix:** set `sref` or `data`. If the text is empty, try another reference or edition.
 

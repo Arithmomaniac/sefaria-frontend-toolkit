@@ -403,6 +403,6 @@ it("removes the Reference Label page and routes citations to a plain link", () =
   expect(quickstart).not.toContain("label-a-citation");
   expect(quickstart).toContain('<a href="https://www.sefaria.org/Micah.6.8">');
   expect(read("docs/across-components/match-your-sites-look.md")).toContain(
-    "(/use-components/show-text/show-one-passage.md#match-your-sites-colors-and-fonts)",
+    "(/use-components/show-text/show-one-passage.md#match-your-site-s-colors-and-fonts)",
   );
 });

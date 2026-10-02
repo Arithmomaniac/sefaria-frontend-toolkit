@@ -35,7 +35,7 @@ features:
 
 **Why web components?** A web component is a custom HTML tag, like `<sefaria-source-card>`. The same tag works in plain HTML, React, Alpine, and other frameworks.
 
-<span class="learn-more__label">Learn more:</span> [Using custom elements (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements) Â· [How the toolkit works](/concepts/how-the-toolkit-works.md) {.learn-more}
+<span class="learn-more__label">Learn more:</span> [Using custom elements (MDN)](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_custom_elements) · [How the toolkit works](/concepts/how-the-toolkit-works.md) {.learn-more}
 
 **Should I use this or Sefaria's own tools?** Use Sefaria's API, Linker, source sheets, or data exports when they already do the job. Use this toolkit to put Sefaria texts inside your own JavaScript page or app.
 

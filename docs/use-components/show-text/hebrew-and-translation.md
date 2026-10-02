@@ -42,7 +42,7 @@ Set these attributes on the element. Add them one at a time and choose Run to se
 | `primary-version-title` | An exact edition title | The exact primary edition. It never falls back. | Yes |
 | `translation-version-title` | An exact edition title | The exact translation edition. It never falls back. | Yes |
 
-For every attribute, including `vocalization-mode`, see [Reference › Components](/reference/components.md#sefaria-bilingual-segment). For the styling settings that every component shares, see [Show one passage](/use-components/show-text/show-one-passage.md#match-your-sites-colors-and-fonts).
+For every attribute, including `vocalization-mode`, see [Reference › Components](/reference/components.md#sefaria-bilingual-segment). For the styling settings that every component shares, see [Show one passage](/use-components/show-text/show-one-passage.md#match-your-site-s-colors-and-fonts).
 
 The first element below reads side by side with the translation first, in an exact JPS 1917 edition, with vowel points but no cantillation (`vocalization-mode="nikkud"`). The second stacks the sides and asks for a French translation.
 

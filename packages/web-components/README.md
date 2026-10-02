@@ -12,7 +12,7 @@ The packages are prereleases on GitHub Packages, not npmjs.com. GitHub Packages 
 
 ## Elements
 
-Import the package root once to register every element: `import "@arithmomaniac/sefaria-web-components";`. Each element loads by `sref` or renders data you supply through its `data` property.
+Import the package root once to register every element: `import "@arithmomaniac/sefaria-web-components";`. Each element loads by `sref`. Text Segment, Bilingual Segment and Source Card can also render data you supply through their `data` property.
 
 - `<sefaria-text-segment>`: one passage in one edition
 - `<sefaria-bilingual-segment>`: one passage in its primary edition with a translation

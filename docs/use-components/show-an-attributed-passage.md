@@ -46,11 +46,7 @@ With `translation-fallback="none"`, the card makes one request. The translation 
 
 ## Let readers select a verse
 
-Add the `selectable` attribute. Each selectable verse gets a number button beside each text side that the card shows, normally Hebrew and English. A hidden or missing side has no button. Each button's accessible name is `Show connections for Micah 6:7`, with the verse's own reference. Clicking the verse row works too. Keyboard users press Tab to reach the buttons, then Enter or Space.
-
-A selection fires `sefaria-source-select`. It bubbles and crosses the component boundary, so you can listen on the card or on a parent. Its `event.detail` is `{ position, ref }`, for example `{ position: [1], ref: "Micah 6:7" }`. `position` is a list of numbers that locates the verse in the passage, counting from 0. For a range such as Micah 6:6-8 it is one number, so `[1]` is the second verse.
-
-With `selectable`, each verse in the card is a button readers can choose. Choosing one fires `sefaria-source-select` with the verse's position and reference. The event also works with supplied data and makes no request.
+Add the `selectable` attribute. Each selectable verse gets a number button beside each text side that the card shows, normally Hebrew and English. A hidden or missing side has no button. Each button's accessible name is `Select Micah 6:7`, with the verse's own reference. Clicking the verse row works too. Keyboard users press Tab to reach the buttons, then Enter or Space. A selection fires `sefaria-source-select`. It bubbles and crosses the component boundary, so you can listen on the card or on a parent. The event also works with supplied data and makes no request. Its `event.detail` is `{ position, ref }`, for example `{ position: [1], ref: "Micah 6:7" }`. `position` is a list of numbers that locates the verse in the passage, counting from 0. For a range such as Micah 6:6-8 it is one number, so `[1]` is the second verse.
 
 The card doesn't mark the choice itself. To show it, set `selectedPosition` to `event.detail.position`. The verse then appears selected, with an outline and `aria-pressed`. Setting it doesn't fire the event again.
 

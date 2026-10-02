@@ -87,8 +87,8 @@ interface ConnectionSelectDetail {
  * @eventDetail sefaria-reader-connection-select - `originEntryId` is the entry the Reader was showing. `id` and `targetRef` are the same as in `sefaria-connection-select`.
  * @fires sefaria-reader-connections-preview-request - Requests connection previews. The element loads them unless a listener cancels the event. Call `preventDefault()` to stop the Reader from loading previews.
  * @eventDetail sefaria-reader-connections-preview-request - `originEntryId`
- * @fires sefaria-reader-error - Reports a loading failure or a rejection of the starting data.
- * @eventDetail sefaria-reader-error - `error` is the original failure. `sref` is the Reader's requested reference. It can be empty when the failure came from supplied `data`.
+ * @fires sefaria-reader-error - Reports a failure while loading the starting text or a text you navigate to, or when loading is disabled.
+ * @eventDetail sefaria-reader-error - `error` is the original failure. `sref` is the reference the Reader was loading when the failure happened.
  * @slot toolbar-actions - Host-owned actions placed after the Reader's built-in toolbar controls.
  * @csspart toolbar - Container for compact pane and host action controls.
  * @csspart history - Back and retained-history controls.

@@ -20,7 +20,7 @@ flowchart TD
 
 ## You add a tag
 
-You put the tag on your page. Behind it sit three packages. The client (`@arithmomaniac/sefaria-client`) fetches from Sefaria's API and checks each JSON response against a schema. The text tools (`@arithmomaniac/sefaria-text-transform`) clean text strings and know nothing about the client. The components (`@arithmomaniac/sefaria-web-components`) use both. The elements are standard web components built with [Lit](https://lit.dev).
+You put the tag on your page. Behind it sit three packages. The client (`@arithmomaniac/sefaria-client`) fetches from Sefaria's API and checks each JSON response against a schema. The text tools (`@arithmomaniac/sefaria-text-transform`) clean text strings and know nothing about the client. The components (`@arithmomaniac/sefaria-web-components`) use both. The elements are standard web components built with [Lit](https://lit.dev), a small library for building web components.
 
 Importing the script or the package registers the elements but makes no request of its own. Any tag already on the page with an `sref` then loads as usual. The shared default client is created lazily, the first time an element needs it. Nothing renders on the server. The components run in the browser.
 
@@ -44,7 +44,7 @@ When the text comes from `sref`, the element has to ask Sefaria for it.
 
 ## Asking Sefaria
 
-Two elements are composed of other elements. The Source Card shows a heading and draws its text with Text Segments inside it, and the Reader shows a Source Card and a Connections Panel. A composed element fetches the text once and hands it to the elements inside it. Nesting them doesn't cost extra loading.
+Two elements are composed of other elements. The Source Card shows a heading and draws its text with Text Segments inside it. The Reader shows a Source Card and a Connections Panel. A composed element fetches the text once and hands it to the elements inside it. Nesting them doesn't cost extra loading.
 
 The other elements load their own data when you use them on their own. Those are the Text Segment, Bilingual Segment, and Connections Panel. For how the client handles requests, including its cache, see [The client and Sefaria's API](/concepts/the-client-and-sefarias-api.md).
 
@@ -60,7 +60,7 @@ Once the text is prepared, the element can show it and tell your page how it wen
 
 The element reports through its `status` property, a coarse, element-level summary:
 
-- `empty`: no main content was prepared, either because there is no input or because the data was prepared successfully and is empty. An empty-state message may still show.
+- `empty`: no `sref` or `data` was given, or the response had nothing to show. An empty-state message may still show.
 - `loading`: the element is waiting for data or preparing it.
 - `ready`: something is prepared to show, and it may be partial.
 - `error`: the request, the preparation, or the supplied data failed. A failed later reload can keep the old content on screen while the status is `error`.

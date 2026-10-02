@@ -123,7 +123,7 @@ export class SefariaConnectionsPanel extends SefariaElement {
       }
     `,
   ];
-  /** The Sefaria reference to load when `data` isn't set. */
+  /** The Sefaria reference whose connections to load. */
   declare sref: string;
   /** Where this element gets its data, instead of the shared data source. */
   declare source: SefariaDataSource | undefined;

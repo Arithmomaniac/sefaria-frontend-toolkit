@@ -23,7 +23,7 @@ A web component is a custom HTML tag that the browser understands. After the scr
 
 ## Loading and failure
 
-The card fetches the text from Sefaria when it appears on the page. While it waits, it shows a loading state. If it can't reach Sefaria on that first load, it shows an error message and sends an error event that your code can listen for. It doesn't ship with saved text to show in place of Sefaria's. If a later reload fails after the card has already shown text, the card keeps that text on screen and its `status` becomes `error`.
+The card fetches the text from Sefaria when it appears on the page. While it waits, it shows a loading state. The first load can fail. Then the card shows an error message. It also sends an error event that your code can listen for. The card has no saved text to show instead. A later reload can fail after the card shows text. Then the card keeps that text on screen. Its `status` becomes `error`.
 
 <span class="learn-more__label">Learn more:</span> [Loading, ready, and error states](/concepts/how-the-toolkit-works.md#status) · [Troubleshoot a page](/help/troubleshoot-a-page.md) {.learn-more}
 

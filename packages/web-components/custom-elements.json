@@ -374,7 +374,7 @@
               "type": {
                 "text": "string"
               },
-              "description": "The Sefaria reference to load when `data` isn't set.",
+              "description": "The Sefaria reference whose connections to load.",
               "default": "\"\"",
               "attribute": "sref"
             },
@@ -506,7 +506,7 @@
               "type": {
                 "text": "string"
               },
-              "description": "The Sefaria reference to load when `data` isn't set.",
+              "description": "The Sefaria reference whose connections to load.",
               "default": "\"\"",
               "fieldName": "sref"
             },
@@ -1013,8 +1013,8 @@
             },
             {
               "name": "sefaria-reader-error",
-              "description": "Reports a loading failure or a rejection of the starting data.",
-              "detail": "`error` is the original failure. `sref` is the Reader's requested reference. It can be empty when the failure came from supplied `data`.",
+              "description": "Reports a failure while loading the starting text or a text you navigate to, or when loading is disabled.",
+              "detail": "`error` is the original failure. `sref` is the reference the Reader was loading when the failure happened.",
               "cancelable": false,
               "type": {
                 "text": "CustomEvent"

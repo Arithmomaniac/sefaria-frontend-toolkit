@@ -42,7 +42,7 @@ Strings and booleans can be attributes. Objects and arrays can't, so you set the
 | `data` | Property only | Your own data, so the card makes no request. |
 | `status` | Property, read only | The current state: `empty`, `loading`, `ready`, or `error`. |
 
-React 19 sets a prop as a property when the element has one with that name, so the React file passes `selectedPosition` as a prop. Alpine binds attributes, so the Alpine file sets the property with `x-effect="$el.selectedPosition = ..."`.
+React 19 sets `selectedPosition` as a property, not an attribute, because the element defines that property. Alpine binds attributes, so the Alpine file sets the property with `x-effect="$el.selectedPosition = ..."`.
 
 <span class="learn-more__label">Learn more:</span> [Reference › Components](/reference/components.md#sefaria-source-card) {.learn-more}
 
