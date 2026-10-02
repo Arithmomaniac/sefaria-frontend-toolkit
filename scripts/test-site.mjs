@@ -404,8 +404,9 @@ try {
             ...figure.querySelectorAll(".tok-punct, .tok-tag, .tok-attr"),
           ];
           const visual = [...tokens].sort((a, b) => {
-            const ra = a.getBoundingClientRect();
-            const rb = b.getBoundingClientRect();
+            // A token can wrap across lines; compare where each one starts.
+            const ra = a.getClientRects()[0];
+            const rb = b.getClientRects()[0];
             return Math.abs(ra.top - rb.top) > 4
               ? ra.top - rb.top
               : ra.left - rb.left;
