@@ -50,7 +50,7 @@ The panel changes its own category and page when a reader clicks. You can also s
 | `show-previews` | Shows preview text. On by default. |
 | `with-text` | Asks Sefaria to include the connected texts' words for previews. On by default. |
 
-`with-text` and `show-previews` default to on, so an attribute cannot turn them off. To turn them off, set the property: `panel.withText = false` or `panel.showPreviews = false`. If `withText` is false and previews are shown, the panel shows `Preview text was not requested.` and a `Load previews` button.
+Both options are on by default. To turn them off, use JavaScript: `panel.withText = false` or `panel.showPreviews = false`. Writing the attribute in HTML can only turn them on. If `withText` is false and previews are shown, the panel shows `Preview text was not requested.` and a `Load previews` button.
 
 For every attribute, see [Reference › Components](/reference/components.md#sefaria-connections-panel).
 

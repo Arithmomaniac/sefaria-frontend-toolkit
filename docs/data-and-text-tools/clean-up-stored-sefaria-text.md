@@ -75,7 +75,13 @@ It returns the safe HTML, the footnotes, and the mode you chose. In the PASEQ li
 
 `applyVocalizationToHtml` is not a sanitizer. Given unsafe HTML, it keeps the unsafe tags and attributes. Run `normalizeText` first.
 
-<span class="learn-more__label">Learn more:</span> [Clean text and safety](/concepts/clean-text-and-safety.md) · [Normalized HTML output](/reference/text-transform.md#normalized-html-output) {.learn-more}
+## Get plain text for a language model
+
+`createTextPreview` turns stored HTML into plain text. It normalizes first, so the `text` it returns has no tags. A `<br>` becomes a newline. It stops after 3500 graphemes by default, and `truncated` tells you if it cut the text. Pass a larger positive whole number as the second argument to keep more. `Infinity` is not allowed.
+
+<CodeLanguageToggle :snippet="snippets['plain-text-from-stored-html']" />
+
+`createTextPreview` leaves footnotes out of `text`. To keep them, read `notes` from `normalizeText`. Convert each note's `contentHtml` the same way, as the snippet shows. [Why createTextPreview is different](/concepts/clean-text-and-safety.md#why-createtextpreview-is-different) explains the details. <span class="learn-more__label">Learn more:</span> [Clean text and safety](/concepts/clean-text-and-safety.md) · [Normalized HTML output](/reference/text-transform.md#normalized-html-output) {.learn-more}
 
 ## Next steps
 

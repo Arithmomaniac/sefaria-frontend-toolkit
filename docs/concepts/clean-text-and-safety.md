@@ -76,6 +76,8 @@ Neither one is a sanitizer. If you need both, normalize first, then vocalize.
 
 ## Sorting samples
 
+"Safe to insert" means safe to assign to `innerHTML` (or an equivalent HTML insertion).
+
 | Sample | Safe to insert? | Why |
 | --- | --- | --- |
 | `bodyHtml` from `normalizeText` | Yes | It uses only the fixed elements and attributes. |
