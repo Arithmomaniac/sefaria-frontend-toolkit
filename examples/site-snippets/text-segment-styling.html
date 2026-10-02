@@ -1,0 +1,28 @@
+<script
+  type="module"
+  src="https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
+></script>
+<style>
+  :root {
+    color-scheme: light dark;
+  }
+
+  .styled-passage {
+    --sefaria-surface: light-dark(#fdf3dc, #3a2f1c);
+    --sefaria-fg: light-dark(#5a2d0c, #f6d9a8);
+    --sefaria-font-hebrew: "Frank Ruehl CLM", "David", "Times New Roman", serif;
+    --sefaria-font-english: Georgia, "Times New Roman", serif;
+    --sefaria-font-scale: 1.35;
+  }
+
+  .styled-passage sefaria-text-segment {
+    display: block;
+    padding: 1rem 1.25rem;
+    border-inline-start: 6px solid light-dark(#b5651d, #e0a458);
+    border-radius: 12px;
+    font-style: italic;
+  }
+</style>
+<div class="styled-passage">
+  <sefaria-text-segment sref="Micah 6:8"></sefaria-text-segment>
+</div>

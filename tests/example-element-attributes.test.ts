@@ -179,20 +179,8 @@ describe("example custom-element attributes", () => {
 
 const documentationCases = [
   {
-    file: "docs/learn/01-web-components.md",
-    current: '<sefaria-source-card sref="Micah 6:8" selectable>',
-  },
-  {
-    file: "docs/learn/03-live-data.md",
-    current: 'card.setAttribute("sref", next)',
-  },
-  {
-    file: "docs/learn/04-reader.md",
-    current: 'reader.setAttribute("sref", "Micah 6:8")',
-  },
-  {
-    file: "docs/guides/data-flow.md",
-    current: 'card.setAttribute("sref", "Micah 6:8")',
+    file: "docs/use-components/start-here.md",
+    current: '<sefaria-source-card sref="Micah 6:8"></sefaria-source-card>',
   },
   {
     file: "packages/web-components/README.md",

@@ -50,6 +50,11 @@ export const EXAMPLE_BUILDS = [
     pages: ["index.html", "live.html"],
     mcpApp: true,
   },
+  {
+    route: "weekly-portion",
+    packageName: "@sefaria-example/weekly-portion",
+    pages: ["index.html"],
+  },
 ];
 
 export const SITE_REQUIRED_FILES = [
@@ -60,15 +65,11 @@ export const SITE_REQUIRED_FILES = [
   "cdn/local/LICENSE.txt",
   "cdn/local/THIRD-PARTY-NOTICES.txt",
   "cdn/local/source.tar.gz",
+  "llms.txt",
   "index.html",
-  "learn/01-web-components.html",
-  "learn/02-supplied-data.html",
-  "learn/03-live-data.html",
-  "learn/04-reader.html",
-  "learn/05-customization.html",
-  "learn/06-host-integration.html",
-  "learn/react.html",
-  "learn/alpine.html",
+  "use-components/start-here.html",
+  "data-and-text-tools/start-here.html",
+  "reference/components.html",
   ...EXAMPLE_BUILDS.flatMap(({ route, pages }) =>
     pages.map((page) => `examples/${route}/${page}`),
   ),

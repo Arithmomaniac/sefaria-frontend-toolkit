@@ -66,8 +66,29 @@ interface ConnectionSelectDetail {
 }
 
 /**
- * Controlled or declarative reader surface for one semantic reader entry.
+ * Shows a passage with its connected texts. Readers can move between them.
  *
+ * @empty A Reader that has never had `sref` is blank. Its status is `empty`. A missing pane shows `Source text is not available for this entry.` or `Connections are not available for this entry.` The Reader reports a passage with no text as a source failure, not as an empty Source Card. A valid links response with no text connections shows the Connections Panel's empty message.
+ * @fires sefaria-reader-back - Requests navigation to the previous entry. Call `preventDefault()` to stop the Reader from going back.
+ * @eventDetail sefaria-reader-back - `originEntryId`, the entry the Reader was showing
+ * @fires sefaria-reader-history-activate - Asks to return to one saved history entry. Call `preventDefault()` to stop the Reader from returning to that entry.
+ * @eventDetail sefaria-reader-history-activate - `originEntryId` is the entry the Reader was showing. `entryId` is the history entry chosen. `label` is its label.
+ * @fires sefaria-reader-pane-change - Asks to show a different pane in the compact layout. Call `preventDefault()` to stop the Reader from switching pane.
+ * @eventDetail sefaria-reader-pane-change - `originEntryId` is the entry the Reader was showing. `pane` is `"source"` or `"connections"`.
+ * @fires sefaria-reader-chat-export - Asks your page to send a reference to chat. Call `preventDefault()` to do nothing. The Reader has no default action. Your page handles the export.
+ * @eventDetail sefaria-reader-chat-export - `originEntryId` is the entry the Reader was showing. `targetRef` is the reference to send.
+ * @fires sefaria-reader-source-select - Reports that a reader selected one item in the source card. Call `preventDefault()` to stop the Reader from selecting that segment.
+ * @eventDetail sefaria-reader-source-select - `originEntryId` is the entry the Reader was showing. `position` and `ref` are the same as in `sefaria-source-select`.
+ * @fires sefaria-reader-connections-category-change - Asks to show a different connection category. Call `preventDefault()` to stop the Reader from switching category.
+ * @eventDetail sefaria-reader-connections-category-change - `originEntryId` is the entry the Reader was showing. `category` is the same as in `sefaria-connections-category-change`.
+ * @fires sefaria-reader-connections-page-change - Asks to show a different connection page. Call `preventDefault()` to stop the Reader from changing page.
+ * @eventDetail sefaria-reader-connections-page-change - `originEntryId` is the entry the Reader was showing. `page` is the same as in `sefaria-connections-page-change`.
+ * @fires sefaria-reader-connection-select - Reports that a reader selected one connected reference. Call `preventDefault()` to stop the Reader from opening the connected text.
+ * @eventDetail sefaria-reader-connection-select - `originEntryId` is the entry the Reader was showing. `id` and `targetRef` are the same as in `sefaria-connection-select`.
+ * @fires sefaria-reader-connections-preview-request - Requests connection previews. The element loads them unless a listener cancels the event. Call `preventDefault()` to stop the Reader from loading previews.
+ * @eventDetail sefaria-reader-connections-preview-request - `originEntryId`
+ * @fires sefaria-reader-error - Reports a failure while loading the starting text or a text you navigate to, or when loading is disabled.
+ * @eventDetail sefaria-reader-error - `error` is the original failure. `sref` is the reference the Reader was loading when the failure happened.
  * @slot toolbar-actions - Host-owned actions placed after the Reader's built-in toolbar controls.
  * @csspart toolbar - Container for compact pane and host action controls.
  * @csspart history - Back and retained-history controls.
@@ -415,33 +436,33 @@ export class SefariaReader extends SefariaElement {
     `,
   ];
 
-  /** Requested external Reader root, separate from current navigation. */
+  /** The reference the Reader starts from. Navigating inside the Reader doesn't change it. */
   declare sref: string;
-  /** Optional element-specific data source. */
+  /** Where this element gets its data, instead of the shared data source. */
   declare source: SefariaDataSource | undefined;
-  /** Preferred family used for root and navigated translations. */
+  /** Preferred translation language, for the starting text and texts you navigate to. */
   declare translationLanguage: string | undefined;
-  /** Missing preferred-translation policy. */
+  /** What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". */
   declare translationFallback: "default" | "none";
-  /** Exact primary edition for the external root and its context. */
+  /** Exact title of the primary edition for the starting reference. */
   declare primaryVersionTitle: string | undefined;
-  /** Exact translation edition for the external root and its context. */
+  /** Exact title of the translation edition for the starting reference. */
   declare translationVersionTitle: string | undefined;
-  /** Hides edition attribution on the source card. */
+  /** Hides the edition attribution on the source card. */
   declare hideAttributions: boolean;
-  /** Host-controlled pane selected in compact presentation. */
+  /** Which pane the compact layout shows: `source` or `connections`. */
   declare activePane: ReaderPane;
-  /** Shows an explicit host-mediated chat export action when a target exists. */
+  /** Shows a button that sends the selected reference to your page's chat, when one is selected. */
   declare chatExport: boolean;
-  /** Source-card roles displayed by the controlled reader. */
+  /** Which text the source card shows: `primary`, `translation` or `both`. */
   declare contentLanguage: BilingualPairContentLanguage;
-  /** Source-card bilingual arrangement. */
+  /** How the source card arranges its two texts: `auto`, `stacked` or `side-by-side`. */
   declare layout: BilingualPairLayout;
-  /** First source-card role in side-by-side layout. */
+  /** Which text comes first side by side: `primary-first` or `translation-first`. */
   declare sideOrder: BilingualPairSideOrder;
-  /** Whether captured connection previews are visible. */
+  /** Whether connection previews are shown. */
   declare showConnectionPreviews: boolean;
-  /** Hebrew vocalization preset applied to source and preview text. */
+  /** How much Hebrew vowel and cantillation marking to keep. `none` removes both. */
   declare vocalizationMode: VocalizationMode;
 
   #controller: ReaderController | undefined;
@@ -564,7 +585,7 @@ export class SefariaReader extends SefariaElement {
     super.disconnectedCallback();
   }
 
-  /** Coarse Reader lifecycle state without exposing prepared rendering data. */
+  /** Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
   get status(): SefariaElementStatus {
     const preparedStatus = getPreparedStatus(this);
     if (preparedStatus !== undefined) return preparedStatus;
@@ -573,32 +594,32 @@ export class SefariaReader extends SefariaElement {
     return this.#viewModel === undefined ? "empty" : "ready";
   }
 
-  /** Stable identity of the current retained semantic Reader entry. */
+  /** The ID of the current history entry. */
   get currentEntryId(): string | undefined {
     return this.#viewModel?.currentEntryId;
   }
 
-  /** Exact selected canonical target, when the current entry establishes one. */
+  /** The selected reference, when there is one. */
   get selectedRef(): string | undefined {
     return this.#viewModel?.selectedTarget?.ref;
   }
 
-  /** Whether a root source request is currently pending. */
+  /** Whether the starting text is still loading. */
   get rootLoading(): boolean {
     return this.#rootLoading;
   }
 
-  /** Current Reader failure message, when the latest eligible operation failed. */
+  /** The error message, when the latest action failed. */
   get readerError(): string | undefined {
     return this.#readerError;
   }
 
-  /** Whether Reader Back can activate a retained predecessor. */
+  /** Whether Back can return to an earlier entry. */
   get canGoBack(): boolean {
     return this.#viewModel?.canGoBack ?? false;
   }
 
-  /** Whether bounded retention removed older semantic history. */
+  /** Whether older history entries were dropped to stay within the history limit. */
   get historyTruncated(): boolean {
     return this.#viewModel?.historyTruncated ?? false;
   }

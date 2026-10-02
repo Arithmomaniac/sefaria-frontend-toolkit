@@ -27,6 +27,10 @@ import {
   validateInstalledPath,
   validatePackedPackage,
 } from "./tarball-consumer-validation.mjs";
+import {
+  smokeSiteSnippets,
+  stageSiteSnippetConsumer,
+} from "./site-snippet-consumer.mjs";
 
 const repository = path.resolve(import.meta.dirname, "..");
 const root = await mkdtemp(
@@ -125,6 +129,21 @@ try {
     run("pnpm", ["install", "--frozen-lockfile"], consumer);
     await inspectConsumerResolution(consumer);
   }
+
+  // --- data and text tools: site snippets run offline from the tarballs ---
+  const siteSnippetConsumer = path.join(root, "site-snippets-consumer");
+  await stageSiteSnippetConsumer({
+    repository,
+    consumer: siteSnippetConsumer,
+    dependencies: Object.fromEntries(
+      packageDefinitions
+        .filter((entry) => entry.directory !== "web-components")
+        .map((entry) => [entry.name, `file:../tarballs/${entry.filename}`]),
+    ),
+  });
+  run("pnpm", ["install"], siteSnippetConsumer);
+  smokeSiteSnippets(siteSnippetConsumer);
+  // --- end data and text tools ---
 
   await rm(tarballs, { force: true, recursive: true });
   run("pnpm", ["build"], consumers.vanilla);

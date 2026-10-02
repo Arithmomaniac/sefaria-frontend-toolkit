@@ -52,6 +52,7 @@ describe("repository check runner", () => {
       "TypeScript typecheck",
       "API documentation",
       "Public metadata",
+      "Reference freshness",
       "TypeScript and browser tests",
     ]) {
       expect(names.indexOf(stage), stage).toBeLessThan(firstBrowserStage);
@@ -59,7 +60,10 @@ describe("repository check runner", () => {
     expect(names.indexOf("Documentation site")).toBeLessThan(
       names.indexOf("TypeScript and browser tests"),
     );
-    expect(names).toHaveLength(18);
+    expect(names.indexOf("Reference freshness")).toBe(
+      names.indexOf("Public metadata") + 1,
+    );
+    expect(names).toHaveLength(20);
   });
 
   it("keeps fast site checks from redefining acceptance gates", async () => {
@@ -102,6 +106,8 @@ describe("repository check runner", () => {
       "Workspace builds",
       "TypeScript typecheck",
       "API documentation",
+      "Reference freshness",
+      "Prose lint",
       "Documentation site",
       "Documentation site browser acceptance",
     ]);

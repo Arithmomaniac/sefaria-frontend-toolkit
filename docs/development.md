@@ -28,11 +28,11 @@ The same stage reconciles committed source-stamped inventories containing the 73
 
 For reader-oriented explanations, use the friendly guides rather than the archived demo transcripts:
 
-- [How the pieces fit together](guides/data-flow.md)
-- [Render text](guides/render-text.md)
-- [Text markup](guides/text-markup.md)
-- [Intentional differences from Sefaria](guides/differences.md)
-- [Reader navigation and host boundaries](guides/reader-navigation.md)
+- [How the pieces fit together](concepts/how-the-toolkit-works.md)
+- [Render text](data-and-text-tools/clean-up-stored-sefaria-text.md)
+- [Text markup](concepts/clean-text-and-safety.md)
+- [Intentional differences from Sefaria](concepts/sefarias-own-texts-and-tools.md)
+- [Reader navigation and host boundaries](use-components/add-the-complete-reader.md)
 
 ## Implemented on this baseline
 
@@ -123,6 +123,27 @@ The generated `dist/site` directory contains the VitePress pages plus allowliste
 `pnpm build:site` typechecks each included example before bundling it. `pnpm build:site:bundles` skips those repeated typechecks and is used inside `pnpm check` after workspace builds. Both commands verify required output files and reject a same-origin authored-source fallback. `SITE_BASE_PATH` selects the normalized absolute base used by VitePress, every example bundle, and browser acceptance; local commands default to `/`, while the Pages workflow requires `/sefaria-frontend-toolkit/`.
 
 The separate Pages workflow runs after successful main-push CI or explicit script retirement, and also supports manual main-only redeployment. It runs the complete repository gate on Ubuntu with the project base, restores retained script artifacts, uploads only `dist/site`, and deploys with `pages: write` and `id-token: write` scoped to the deployment job. Pull requests validate the workflow and both local and project-path contracts without deploying. The previous Reveal.js showcase, booth loop, Pages assembly, QR assets, presentation media, and presentation-only tests remain available through the full-SHA links in the [documentation archive](archive/README.md#september-14-2026-presentation-snapshot).
+
+## Keep the documentation current
+
+The maintainer owns every page by default. Generated reference pages under `docs/reference` belong to their source JSDoc or TSDoc and to the generator in `scripts/reference`. Never edit generated Markdown. Change the source comment or the generator, then run `pnpm reference:generate`.
+
+Update the docs when one of these happens:
+
+- A public API or behavior changes. Update the page, the JSDoc, and the owning spec in the same change.
+- An install or release step changes. Update the install pages and this guide.
+- A live example or site test fails. Fix the example or the page that it proves.
+- A link breaks, a question keeps coming back, or a status claim goes stale. Fix the page or mark the claim as planned.
+
+These checks run in `pnpm check` and catch drift without a person:
+
+- `pnpm reference:check` finds stale generated reference pages.
+- `pnpm check:api-docs` finds missing public API documentation.
+- `pnpm metadata:check` checks public metadata.
+- `pnpm prose:check` lints the prose.
+- `pnpm build:site:bundles` and the site tests check links, examples, and snippets.
+
+A person must check behavior claims. A page that no person has reviewed carries `humanReviewed: false` in its front matter. That value shows a review box. Only a human removes it, after reading the page.
 
 ## Browser script distribution
 
@@ -323,7 +344,8 @@ The check fails for changed, missing, or unexpected generated files. `pnpm check
 
 If upstream content differs from an asserted old value, generation stops with an exact path:
 
-```text
+<!-- prettier-ignore -->
+```html
 OpenAPI precondition mismatch for versions-contract at $.paths['/api/texts/versions/{index}']
 expected: SHA-256 <reviewed value>
 actual: <current value>
@@ -501,7 +523,7 @@ pnpm dev:linked-article
 
 The development server shows the authored article page. The native citation is present in static HTML; the module enhancement opens a host-owned native dialog and assigns Source Card `sref` only after an eligible unmodified activation.
 
-The [authored linked-article guide](linked-article.md) covers native fallback, page-owned request lifecycle, strict deterministic transport, and the immutable archive for the retired automatic Linker.
+The [authored linked-article guide](examples/linked-article.md) covers native fallback, page-owned request lifecycle, strict deterministic transport, and the immutable archive for the retired automatic Linker.
 
 The browser tests exercise Source Card source through a strict fixture fetch that accepts only the expected method, origin, decoded `Micah 6:8` path, and ordered query. Separate Playwright coverage starts the actual page on an assigned loopback port with JavaScript disabled and proves that activation follows the authored Sefaria URL.
 
@@ -576,6 +598,8 @@ Run `pnpm package:smoke` to create an isolated Vite consumer, inspect each uncha
 
 Run `pnpm metadata:generate` after changing a public export or element contract. `pnpm metadata:check` rejects stale `packages/web-components/custom-elements.json`, `packages/public-exports.json`, and their readable summaries under `docs/reference/`.
 
+Then run `pnpm reference:generate`. It rebuilds the site's reference pages from those files, the OpenAPI overlay, the client and text-transform source (through TypeDoc), and the hand-written catalogs in `scripts/reference/`. `pnpm reference:check`, part of `pnpm check` and `pnpm check:site`, rejects a stale page. It's separate from the JSDoc coverage in `pnpm check:api-docs`.
+
 Run `pnpm changeset:rehearse` to exercise the pinned private fixed group in a disposable fixture. The current rehearsal proves the observed `0.1.1-alpha.0` to `0.1.1-alpha.1` sequence from a `0.1.0` fixture, synchronized internal dependencies and changelogs, retained private flags, and no automatic commit or tag. It remains a local Changesets qualification and is separate from the run-derived public GitHub Packages prerelease.
 
 ## Package index configuration
@@ -597,6 +621,8 @@ The workspace uses TypeScript 7.0.2 and native Oxlint rules. `pnpm lint` does no
 `pnpm check:api-docs` removes and freshly emits declaration files for handwritten package source and client scripts, then parses those declarations and requires JSDoc on exported declarations, exported interface properties, and public class properties. It ignores generated declarations and compiler-emitted private fields. This output check replaces the former `eslint-plugin-jsdoc` source check because Oxlint's JavaScript-plugin selector engine did not visit an exported class property during qualification.
 
 `@hey-api/openapi-ts` 0.99.0 still uses the TypeScript 6 compiler API. `packages/client` therefore pins TypeScript 6.0.3 for that generator only. Its `build` and `typecheck` scripts explicitly invoke the workspace-root TypeScript 7 compiler. Do not remove the local generator pin or the workspace-root compiler invocation independently; `tests/toolchain-versions.test.ts` enforces both sides of this boundary.
+
+TypeDoc 0.28 also needs the TypeScript 6 compiler API. The generated client and text-transform reference pages use it through `pnpm reference:generate`, so the private `tests/reference-docs` workspace package pins `typedoc`, `typedoc-plugin-markdown` and TypeScript 6.0.3 for that generator only. `tests/toolchain-versions.test.ts` enforces this pin too. Remove the package when TypeDoc supports TypeScript 7 ([TypeStrong/typedoc#3098](https://github.com/TypeStrong/typedoc/issues/3098)).
 
 This arrangement separates four responsibilities: Oxlint performs explicitly configured syntax and source-quality checks, the workspace TypeScript 7 compiler owns typechecking and package output, the API-documentation check owns JSDoc enforcement on freshly emitted public declarations, and the client-local TypeScript 6 compiler exists only inside the OpenAPI generator. It is a qualified compatibility arrangement, not a claim that Oxlint and declaration-output analysis are universally better than ESLint and source-AST plugins.
 

@@ -1,0 +1,22 @@
+{
+  "sefaria-text-segment": {
+    "name": "Text Segment",
+    "howTo": "/use-components/show-text/show-one-passage.md"
+  },
+  "sefaria-bilingual-segment": {
+    "name": "Bilingual Segment",
+    "howTo": "/use-components/show-text/hebrew-and-translation.md"
+  },
+  "sefaria-source-card": {
+    "name": "Source Card",
+    "howTo": "/use-components/show-an-attributed-passage.md"
+  },
+  "sefaria-connections-panel": {
+    "name": "Connections Panel",
+    "howTo": "/use-components/show-commentary-and-connected-texts.md"
+  },
+  "sefaria-reader": {
+    "name": "Reader",
+    "howTo": "/use-components/add-the-complete-reader.md"
+  }
+}

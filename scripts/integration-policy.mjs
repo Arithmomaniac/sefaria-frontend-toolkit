@@ -684,7 +684,7 @@ export function validateDocumentationClaims(files) {
         ),
       );
     const documentsGitHubPackages =
-      filename === "docs/get-started.md" &&
+      filename === "docs/help/install-and-status.md" &&
       source.includes("https://npm.pkg.github.com") &&
       /\bread:packages\b/u.test(source) &&
       /\bnot published on npmjs\.com\b/iu.test(prose) &&

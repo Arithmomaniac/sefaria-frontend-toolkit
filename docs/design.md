@@ -2,7 +2,7 @@
 
 # Design: Generated API Contracts and Declarative Components
 
-For a first explanation with examples, read [How the pieces fit together](guides/data-flow.md). This document is the ownership and dependency reference.
+For a first explanation with examples, read [How the pieces fit together](concepts/how-the-toolkit-works.md). This document is the ownership and dependency reference.
 
 ## Summary
 

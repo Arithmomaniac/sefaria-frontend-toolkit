@@ -42,7 +42,14 @@ export type BilingualSegmentLayout = BilingualPairLayout;
 /** Which role occupies the first side-by-side track. */
 export type BilingualSegmentSideOrder = BilingualPairSideOrder;
 
-/** Custom element that renders supplied or acquired bilingual-segment data. */
+/**
+ * Shows one passage in its primary edition, together with a translation. The primary edition is the one marked `isPrimary`.
+ *
+ * @data `data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
+ * @empty The element shows its empty state when neither side has text. Each missing side has its own message, such as `No primary text is available.` or `No translation text is available.` The element can show the response's warning for that side instead. When only one side is missing, you see the other side's text and the missing side's message. `contentLanguage` filters which sides are shown.
+ * @fires sefaria-bilingual-segment-error - Reports a failure while loading or validating data from `sref`.
+ * @eventDetail sefaria-bilingual-segment-error - `error` is the original failure. `sref` is the reference that was loading.
+ */
 export class SefariaBilingualSegment extends SefariaElement {
   /** Lit property metadata for declarative data and presentation state. */
   static override properties = {
@@ -101,30 +108,30 @@ export class SefariaBilingualSegment extends SefariaElement {
     bilingualPairStyles,
   ];
 
-  /** Reference loaded when authoritative supplied data is absent. */
+  /** The Sefaria reference to load when `data` isn't set. */
   declare sref: string;
-  /** Authoritative corrected response-shaped data. */
+  /** Sefaria API response data to render. When it's set, the element doesn't fetch anything. */
   declare data: unknown | undefined;
-  /** Optional element-specific data source. */
+  /** Where this element gets its data, instead of the shared data source. */
   declare source: SefariaDataSource | undefined;
-  /** Optional exact edition title for the primary role. */
+  /** Exact title of the edition to show as the primary text. */
   declare primaryVersionTitle: string | undefined;
-  /** Optional exact edition title for the translation role. */
+  /** Exact title of the edition to show as the translation. */
   declare translationVersionTitle: string | undefined;
-  /** Preferred translation family. */
+  /** Preferred translation language. `translationFallback` controls what happens when Sefaria has none. */
   declare translationLanguage: string | undefined;
-  /** Missing preferred-translation policy. */
+  /** What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". */
   declare translationFallback: "default" | "none";
 
-  /** Sides the host wants displayed. */
+  /** Which text to show: `primary`, `translation` or `both`. */
   declare contentLanguage: BilingualSegmentContentLanguage;
 
-  /** Requested arrangement of the two sides. */
+  /** How the two texts are arranged: `auto`, `stacked` or `side-by-side`. */
   declare layout: BilingualSegmentLayout;
 
-  /** Requested role order for a side-by-side arrangement. */
+  /** Which text comes first side by side: `primary-first` or `translation-first`. */
   declare sideOrder: BilingualSegmentSideOrder;
-  /** Hebrew vocalization preset applied to both displayed roles. */
+  /** How much Hebrew vowel and cantillation marking to keep. `none` removes both. */
   declare vocalizationMode: VocalizationMode;
 
   #active:
@@ -181,7 +188,7 @@ export class SefariaBilingualSegment extends SefariaElement {
     super.disconnectedCallback();
   }
 
-  /** Coarse lifecycle state without exposing prepared rendering data. */
+  /** Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
   get status(): SefariaElementStatus {
     return this.#statusOverride ?? statusOf(this.#viewModel);
   }

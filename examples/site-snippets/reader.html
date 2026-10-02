@@ -1,0 +1,22 @@
+<script
+  type="module"
+  src="https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
+></script>
+<style>
+  sefaria-reader {
+    height: 28rem;
+  }
+</style>
+<sefaria-reader sref="Micah 6:8">
+  <button type="button" slot="toolbar-actions" id="bookmark">Bookmark</button>
+</sefaria-reader>
+<p id="message"></p>
+<script type="module">
+  const reader = document.querySelector("sefaria-reader");
+  const message = document.querySelector("#message");
+  document.querySelector("#bookmark").addEventListener("click", () => {
+    message.textContent = reader.selectedRef
+      ? `Bookmarked ${reader.selectedRef}.`
+      : "Nothing is selected yet.";
+  });
+</script>

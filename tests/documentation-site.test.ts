@@ -1,781 +1,281 @@
-import { access, readFile } from "node:fs/promises";
+import { access, readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { highlightHtml } from "../docs/.vitepress/theme/highlight";
+import { legacyRedirects } from "../docs/.vitepress/redirects.mjs";
+
 const root = path.resolve(import.meta.dirname, "..");
-const lessons = [
-  "01-web-components.md",
-  "02-supplied-data.md",
-  "03-live-data.md",
-  "04-reader.md",
-  "05-customization.md",
-  "06-host-integration.md",
-  "react.md",
-  "alpine.md",
+const deletedPaths = [
+  "docs/guides",
+  "docs/learn",
+  "docs/components",
+  "docs/components.md",
+  "docs/examples.md",
+  "docs/get-started.md",
+  "docs/linked-article.md",
+  "docs/mcp-app-demo.md",
+  "docs/reference/custom-elements.md",
+  "docs/reference/public-exports.md",
+  "docs/reference/documentation-map.md",
 ];
-const playgroundProjects = [
-  "text-segment",
-  "bilingual-segment",
-  "source-card",
-  "connections-panel",
-  "reader",
-] as const;
 
-describe("documentation learning journey", () => {
-  it.each(lessons)("%s remains complete on GitHub", async (lesson) => {
-    const markdown = await readFile(
-      path.join(root, "docs", "learn", lesson),
-      "utf8",
-    );
+const codeTextContent = (html: string) =>
+  html
+    .replaceAll(/<[^>]+>/g, "")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">")
+    .replaceAll("&amp;", "&");
 
-    for (const heading of [
-      "## Objective",
-      "## Prerequisites",
-      "## Try it",
-      "## Expected result",
-      "## Who owns what",
-      "## Exercise",
-      "## Source and run links",
-      "## Next step",
-    ]) {
-      expect(markdown).toContain(heading);
-    }
-    expect(markdown).toMatch(/```(?:ts|tsx|powershell|html)/);
-    expect(markdown).not.toMatch(/\]\(\/examples\//);
-  });
-
-  it("keeps the built site and source links on maintained destinations", async () => {
+describe("documentation site", () => {
+  it("keeps Home focused without hero actions", async () => {
     const index = await readFile(path.join(root, "docs", "index.md"), "utf8");
-    const config = await readFile(
-      path.join(root, "docs", ".vitepress", "config.ts"),
-      "utf8",
-    );
     const theme = await readFile(
       path.join(root, "docs", ".vitepress", "theme", "index.ts"),
       "utf8",
     );
-    const disclosure = await readFile(
-      path.join(
-        root,
-        "docs",
-        ".vitepress",
-        "theme",
-        "DocumentationDisclosure.vue",
-      ),
+    const statusNote = await readFile(
+      path.join(root, "docs", ".vitepress", "theme", "StatusNote.vue"),
       "utf8",
     );
 
-    expect(index).toContain("<LandingPreview />");
-    expect(index).toContain("Bring Sefaria texts into your product");
-    expect(index).toContain("Try the editor");
-    expect(index).toContain("Experimental and unofficial");
-    expect(index).toContain("installation-status");
-    expect(index).toContain("/examples/playground/index.html");
-    expect(index).not.toContain("Published documentation");
-    expect(config).toContain(
-      '"https://github.com/Arithmomaniac/sefaria-frontend-toolkit"',
+    expect(index).toContain("heroExample: true");
+    expect(index).toContain("statusNote: true");
+    expect(index).not.toContain("actions:");
+    expect(index).not.toContain("Use components � Start here");
+    expect(index).not.toContain("Try without installing");
+    expect(index).toContain("linkText: Use components");
+    expect(index.match(/linkText: Use the data and text tools/g)).toHaveLength(
+      2,
     );
-    expect(config).toContain('const branch = "main"');
-    expect(config).toContain(
-      "pattern: `${repository}/edit/${branch}/docs/:path`",
+    expect(theme).toContain('"home-hero-info-after"');
+    expect(theme).toContain("StatusNote");
+    expect(statusNote).toContain(
+      "Experimental and unofficial. Names and addresses may change.",
     );
-    expect(config).toContain("base: siteBasePath");
-    expect(disclosure).toContain(
-      '"https://arithmomaniac.github.io/sefaria-frontend-toolkit/"',
-    );
-    expect(theme).toContain('"layout-bottom"');
-    expect(theme).toContain("DocumentationDisclosure");
-    expect(disclosure.replace(/\s+/g, " ")).toContain(
-      "Documentation text was written and edited by GitHub Copilot; pending human review.",
-    );
-    for (const label of [
-      "Get started",
-      "Components",
-      "Examples",
-      "Guides",
-      "Reference",
-    ]) {
-      expect(config).toContain(`text: "${label}"`);
-    }
-    expect(config).toContain('search: { provider: "local" }');
-    expect(config).toContain('text: "Task guides"');
-    expect(config).toContain('text: "Advanced explanations"');
-    expect(config).toContain('text: "API reference"');
-    expect(config).not.toContain('text: "Contributing and internals"');
-    for (const repositoryOnlyPath of [
-      '"README.md"',
-      '"archive/**"',
-      '"design.md"',
-      '"development.md"',
-      '"evidence.md"',
-      '"handoff.md"',
-      '"guides/reader-navigation.md"',
-      '"reference/documentation-map.md"',
-      '"review.md"',
-      '"specs/**"',
-    ]) {
-      expect(config).toContain(repositoryOnlyPath);
-    }
   });
 
-  it("provides a component-directory signpost without duplicating the catalog", async () => {
-    const signpost = await readFile(
-      path.join(root, "docs", "components", "index.md"),
-      "utf8",
-    );
-
-    expect(signpost).toContain("[component catalog](../components.md)");
-    expect(signpost).toContain("generated [custom-element");
-    expect(signpost).not.toContain("<PlaygroundEmbed");
-  });
-
-  it("keeps troubleshooting symptom-led and linked from adopter paths", async () => {
-    const troubleshooting = await readFile(
-      path.join(root, "docs", "guides", "troubleshooting.md"),
-      "utf8",
-    );
-    const guides = await readFile(
-      path.join(root, "docs", "guides", "index.md"),
-      "utf8",
-    );
-    const getStarted = await readFile(
-      path.join(root, "docs", "get-started.md"),
-      "utf8",
-    );
-
-    for (const symptom of [
-      "The package cannot be installed",
-      "The custom element is unknown",
-      "A property change has no effect",
-      "The supplied Reader says a target is unavailable",
-      "The editor does not run after an edit",
-      "The browser reports a CSP or blocked-resource error",
-      "A documented HTTP result is confused with a network or schema failure",
-      "A failed or superseded request erased the previous result",
-      "The component remains active after the host removes it",
-    ]) {
-      expect(troubleshooting).toContain(`## ${symptom}`);
-    }
-    expect(troubleshooting).toContain("Do not disable CSP");
-    expect(troubleshooting).toContain("structured issue paths");
-    expect(guides).toContain("[Troubleshooting](troubleshooting.md)");
-    expect(getStarted).toContain("[troubleshooting guide]");
-  });
-
-  it("keeps the numbered lessons contiguous and React optional", async () => {
-    const config = await readFile(
-      path.join(root, "docs", ".vitepress", "config.ts"),
-      "utf8",
-    );
-    const lessonTwo = await readFile(
-      path.join(root, "docs", "learn", "02-supplied-data.md"),
-      "utf8",
-    );
-
-    expect(config).toContain('text: "Frameworks"');
-    expect(config).toContain('"learn/03-live-data.md":');
-    expect(config).toContain('next: lessonLink("4. Use the Reader"');
-    expect(config).toContain('"learn/04-reader.md":');
-    expect(config).toContain('prev: lessonLink("3. Load and interact"');
-    expect(config).toContain('"learn/react.md":');
-    expect(config).toContain('prev: lessonLink("3. Load and interact"');
-    expect(config).toContain('next: lessonLink("4. Use the Reader"');
-    expect(lessonTwo).not.toContain("parallel [React path]");
-  });
-
-  it("catalogs all five current rendering surfaces without inventing APIs", async () => {
-    const catalog = await readFile(
-      path.join(root, "docs", "components.md"),
-      "utf8",
-    );
-    const usageDirectory = await readFile(
-      path.join(root, "docs", "components", "index.md"),
-      "utf8",
-    );
-    const usagePages = Object.fromEntries(
-      await Promise.all(
-        playgroundProjects.map(async (project) => [
-          project,
-          await readFile(
-            path.join(root, "docs", "components", `${project}.md`),
-            "utf8",
-          ),
-        ]),
-      ),
-    );
-
-    for (const [element, subpath] of [
-      ["<sefaria-text-segment>", "text-segment"],
-      ["<sefaria-bilingual-segment>", "bilingual-segment"],
-      ["<sefaria-source-card>", "source-card"],
-      ["<sefaria-connections-panel>", "connections-panel"],
-      ["<sefaria-reader>", "reader"],
-    ]) {
-      expect(catalog).toContain(element);
-      expect(catalog).toContain(
-        `@arithmomaniac/sefaria-web-components/${subpath}`,
-      );
-      expect(usageDirectory).toContain(`${subpath}.md`);
-      expect(usagePages[subpath]).toContain(
-        `/reference/custom-elements.md#sefaria-${subpath}`,
-      );
-      expect(usagePages[subpath]).toContain(
-        `<PlaygroundEmbed project="${subpath}"`,
-      );
-    }
-    expect(catalog).toContain(
-      '<PlaygroundEmbed project="source-card" title="Editable component catalog" :heading-level="2"',
-    );
-    expect(catalog).toContain("Open supplied-data preview");
-    expect(catalog).toContain("maintained supplied-data projects");
-    expect(catalog).toContain("/examples/playground/index.html?project=reader");
-    expect(catalog).toContain("Start with the complete Reader");
-  });
-
-  it("places maintained editable projects in the learning path", async () => {
-    const expectedEmbeds = new Map([
-      ["01-web-components.md", "text-segment"],
-      ["02-supplied-data.md", "source-card"],
-      ["03-live-data.md", "source-card"],
-      ["04-reader.md", "reader"],
-      ["05-customization.md", "source-card"],
-    ]);
-
-    for (const [lesson, project] of expectedEmbeds) {
-      const markdown = await readFile(
-        path.join(root, "docs", "learn", lesson),
-        "utf8",
-      );
-      expect(markdown).toContain(`<PlaygroundEmbed project="${project}"`);
-      expect(markdown).toContain(
-        `/examples/playground/index.html?project=${project}`,
+  it("removes superseded public documentation pages", async () => {
+    for (const relativePath of deletedPaths) {
+      await expect(access(path.join(root, relativePath))).rejects.toMatchObject(
+        { code: "ENOENT" },
       );
     }
   });
 
-  it("uses one base-aware trusted editor wrapper without copying project data", async () => {
-    const theme = await readFile(
-      path.join(root, "docs", ".vitepress", "theme", "index.ts"),
-      "utf8",
-    );
-    const embed = await readFile(
-      path.join(root, "docs", ".vitepress", "theme", "PlaygroundEmbed.vue"),
-      "utf8",
-    );
-
-    expect(theme).toContain(
-      'app.component("PlaygroundEmbed", PlaygroundEmbed)',
-    );
-    expect(embed).toContain("withBase(");
-    expect(embed).toContain(
-      "`/examples/playground/index.html?project=${props.project}`",
-    );
-    expect(embed).toContain('class="playground-embed__frame"');
-    expect(embed).toContain("Component editor:");
-    expect(embed).toContain("props.headingLevel ?? 3");
-    expect(embed).toContain("maintained project on load");
-    expect(embed).toContain("Open full editor");
-    expect(embed).not.toContain("project-catalog");
-    expect(embed).not.toContain("sandbox=");
-  });
-
-  it("keeps embedded editor resource links outside the documentation frame", async () => {
-    const editor = await readFile(
-      path.join(root, "examples", "playground", "index.html"),
-      "utf8",
-    );
-
-    expect(editor.match(/target="_blank"/g)).toHaveLength(3);
-    expect(editor.match(/rel="noreferrer"/g)).toHaveLength(3);
-  });
-
-  it("describes all five implemented components as current", async () => {
-    const dataFlow = await readFile(
-      path.join(root, "docs", "guides", "data-flow.md"),
-      "utf8",
-    );
-
-    expect(dataFlow).toContain(
-      "all five public elements support standalone `sref`",
-    );
-  });
-
-  it("makes the delivered supplied-data editor discoverable", async () => {
-    const examples = await readFile(
-      path.join(root, "docs", "examples.md"),
-      "utf8",
-    );
-    const documentation = await readFile(
-      path.join(root, "docs", "README.md"),
-      "utf8",
-    );
-    const map = await readFile(
-      path.join(root, "docs", "reference", "documentation-map.md"),
-      "utf8",
-    );
-
-    for (const markdown of [examples, documentation, map]) {
-      expect(markdown).toContain("examples/playground");
-    }
-    expect(examples).toContain("Supplied-data component editor");
-    expect(documentation).toContain("Edit a supplied-data component");
-    expect(map).toContain("supplied-data editor");
-  });
-
-  it("uses plain language on the main product paths", async () => {
-    const index = await readFile(path.join(root, "docs", "index.md"), "utf8");
-    const getStarted = await readFile(
-      path.join(root, "docs", "get-started.md"),
-      "utf8",
-    );
-    const components = await readFile(
-      path.join(root, "docs", "components.md"),
-      "utf8",
-    );
-    const examples = await readFile(
-      path.join(root, "docs", "examples.md"),
-      "utf8",
-    );
-    const documentation = await readFile(
-      path.join(root, "docs", "README.md"),
-      "utf8",
-    );
-
-    expect(index).toContain("Bring Sefaria texts into your product");
-    expect(index).toContain("Fetch and validate data");
-    expect(index).toContain("Prepare text you already have");
-    expect(index).toContain("Add a focused reading surface");
-    expect(index).toContain("Build a complete Reader");
-    expect(index).toContain("You can stop at any layer");
-    expect(index).not.toContain("headless TypeScript building blocks");
-    for (const definition of [
-      "A host is the application that owns the component.",
-      "The element path accepts corrected component-specific raw data",
-      "Advanced spatial hosts use the supported `reader-session` semantic/raw facade",
-    ]) {
-      expect(getStarted).toContain(definition);
-    }
-    expect(components).toContain(
-      "The toolkit provides five declarative UI components.",
-    );
-    expect(components).not.toContain("host-admitted Reader view model");
-    expect(examples).toContain("The component editor runs edited code");
-    expect(examples).toContain("isolated preview");
-    expect(documentation).not.toContain("host-mediated tools");
-    expect(documentation).not.toContain("field-level transport definitions");
-  });
-
-  it("presents the client and text transforms as independently useful products", async () => {
-    const index = await readFile(path.join(root, "docs", "index.md"), "utf8");
-    const getStarted = await readFile(
-      path.join(root, "docs", "get-started.md"),
-      "utf8",
-    );
-    const documentation = await readFile(
-      path.join(root, "docs", "README.md"),
-      "utf8",
-    );
-
-    for (const markdown of [index, getStarted, documentation]) {
-      expect(markdown).toContain("@arithmomaniac/sefaria-client");
-      expect(markdown).toContain("@arithmomaniac/sefaria-text-transform");
-    }
-
-    expect(getStarted).toContain("Use the client without components");
-    expect(getStarted).toContain("getV3Texts");
-    expect(getStarted).toContain("loadValidatedText");
-    expect(getStarted).toContain("Use text transforms without the client");
-    expect(getStarted).toContain("createTextPreview");
-    expect(getStarted).toContain(
-      "Use raw component data with your own renderer",
-    );
-    expect(getStarted).toContain(
-      "use the corrected client contracts and text-transform package directly",
-    );
-    expect(documentation).toContain("Package references");
-  });
-
-  it("shows the integration layers visually and preserves the project origin in the repository", async () => {
-    const index = await readFile(path.join(root, "docs", "index.md"), "utf8");
-    const getStarted = await readFile(
-      path.join(root, "docs", "get-started.md"),
-      "utf8",
-    );
-    const documentation = await readFile(
-      path.join(root, "docs", "README.md"),
-      "utf8",
-    );
-    const repositoryReadme = await readFile(
-      path.join(root, "README.md"),
-      "utf8",
-    );
-    const diagramPath = path.join(
-      root,
-      "docs",
-      "images",
-      "integration-depths.svg",
-    );
-    const mobileDiagramPath = path.join(
-      root,
-      "docs",
-      "images",
-      "integration-depths-mobile.svg",
-    );
-    await access(diagramPath);
-    await access(mobileDiagramPath);
-    const diagrams = await Promise.all([
-      readFile(diagramPath, "utf8"),
-      readFile(mobileDiagramPath, "utf8"),
-    ]);
-
-    expect(getStarted).toContain("<picture>");
-    expect(getStarted).toContain(
-      'srcset="./images/integration-depths-mobile.svg"',
-    );
-    expect(getStarted).toContain('src="./images/integration-depths.svg"');
-    expect(getStarted).toContain(
-      'alt="Choose the toolkit layer that matches your product"',
-    );
-    for (const diagram of diagrams) {
-      for (const label of [
-        "Validated transport",
-        "Pure text preparation",
-        "Custom rendering",
-        "Focused components",
-        "Controlled Reader",
-      ]) {
-        expect(diagram).toContain(label);
-      }
-    }
-    expect(diagrams[0]).toContain("Sefaria API or data you already have");
-    expect(diagrams[0]).toContain("Stop at any layer");
-    expect(diagrams[1]).toContain("Sefaria API or data you have");
-    expect(diagrams[1]).toContain("Start with any layer below");
-
-    expect(repositoryReadme).toContain("Microsoft Global Hackathon 2026");
-    expect(repositoryReadme).toContain("Thank you to Microsoft");
-    expect(repositoryReadme).toContain("independently maintained");
-    expect(index).not.toContain("Microsoft Global Hackathon 2026");
-    expect(documentation).not.toContain("Microsoft Global Hackathon 2026");
-  });
-
-  it("separates evaluating and consuming the toolkit from developing its source", async () => {
-    const index = await readFile(path.join(root, "docs", "index.md"), "utf8");
-    const getStarted = await readFile(
-      path.join(root, "docs", "get-started.md"),
-      "utf8",
-    );
-    const documentation = await readFile(
-      path.join(root, "docs", "README.md"),
-      "utf8",
-    );
-
-    expect(index).toContain("Evaluate without cloning");
-    expect(index).toContain("Develop the toolkit itself");
-    expect(getStarted).toContain("Public GitHub Packages");
-    expect(getStarted).toContain("read:packages");
-    expect(getStarted).toContain("not published on npmjs.com");
-    expect(getStarted).toContain("Package names are subject to change");
-    expect(getStarted).toContain(
-      "Public GitHub Packages prereleases are available",
-    );
-    expect(getStarted).not.toContain("planned for activation");
-    expect(getStarted).toContain("Clone the source only to change the toolkit");
-    expect(documentation).toContain("Repository-only documentation");
-    expect(documentation).toContain(
-      "excluded from the public VitePress routes",
-    );
-  });
-
-  it("classifies maintained reader-facing Markdown in the documentation map", async () => {
-    const map = await readFile(
-      path.join(root, "docs", "reference", "documentation-map.md"),
-      "utf8",
-    );
-    const maintainedPaths = [
-      "README.md",
-      "docs/README.md",
-      "docs/index.md",
-      "docs/get-started.md",
-      "docs/components.md",
-      "docs/examples.md",
-      "docs/guides/index.md",
-      ...lessons.map((lesson) => `docs/learn/${lesson}`),
-      "docs/guides/data-flow.md",
-      "docs/guides/differences.md",
-      "docs/guides/reader-navigation.md",
-      "docs/guides/render-text.md",
-      "docs/guides/text-markup.md",
-      "packages/client/README.md",
-      "packages/text-transform/README.md",
-      "packages/web-components/README.md",
-      "examples/README.md",
-      "examples/explorer/README.md",
-      "examples/linked-article/README.md",
-      "examples/react-vite/README.md",
-      "examples/alpine-vite/README.md",
-      "examples/reader/README.md",
-      "examples/vanilla-vite/README.md",
-    ];
-
-    for (const maintainedPath of maintainedPaths) {
-      expect(map).toContain(`\`${maintainedPath}\``);
-    }
-    expect(map).toContain("Contributor");
-    expect(map).toContain("Archive");
-  });
-
-  it("keeps framework paths optional without breaking core lesson paging", async () => {
-    const config = await readFile(
-      path.join(root, "docs", ".vitepress", "config.ts"),
-      "utf8",
-    );
-    const sidebar = config.indexOf("sidebar: {");
-    const stepThree = config.indexOf('link: "/learn/03-live-data.md"', sidebar);
-    const stepFour = config.indexOf('link: "/learn/04-reader.md"', stepThree);
-    const frameworks = config.indexOf('text: "Frameworks"', stepFour);
-
-    expect(sidebar).toBeGreaterThan(-1);
-    expect(stepThree).toBeGreaterThan(-1);
-    expect(stepFour).toBeGreaterThan(stepThree);
-    expect(frameworks).toBeGreaterThan(stepFour);
-    expect(config.slice(stepThree, stepFour)).not.toContain("React path");
-    expect(config.slice(stepThree, stepFour)).not.toContain("Alpine path");
-    expect(config).toContain('"learn/03-live-data.md": {');
-    expect(config).toContain(
-      'next: lessonLink("4. Use the Reader", "/learn/04-reader.md")',
-    );
-    for (const framework of ["react", "alpine"]) {
-      expect(config).toContain(`"learn/${framework}.md": {`);
-      expect(config).toContain(
-        'prev: lessonLink("3. Load and interact", "/learn/03-live-data.md")',
-      );
-      expect(config).toContain(
-        'next: lessonLink("4. Use the Reader", "/learn/04-reader.md")',
-      );
-    }
-  });
-
-  it("documents package builds before direct example development servers", async () => {
-    for (const [filename, command] of [
-      ["README.md", "pnpm dev:vanilla"],
-      [
-        "examples/vanilla-vite/README.md",
-        "pnpm --filter @sefaria-example/vanilla-vite dev",
-      ],
-      [
-        "examples/react-vite/README.md",
-        "pnpm --filter @sefaria-example/react-vite dev",
-      ],
-      [
-        "examples/alpine-vite/README.md",
-        "pnpm --filter @sefaria-example/alpine-vite dev",
-      ],
-      [
-        "examples/reader/README.md",
-        "pnpm --filter @sefaria-example/reader dev",
-      ],
-      ["docs/development.md", "pnpm dev:reader"],
-    ] as const) {
-      const markdown = await readFile(path.join(root, filename), "utf8");
-      expect(markdown.indexOf("pnpm build")).toBeGreaterThanOrEqual(0);
-      expect(markdown.indexOf("pnpm build")).toBeLessThan(
-        markdown.indexOf(command),
-      );
-    }
-  });
-
-  it("keeps supplied-data and React teaching aligned with maintained source", async () => {
-    const suppliedLesson = await readFile(
-      path.join(root, "docs", "learn", "02-supplied-data.md"),
-      "utf8",
-    );
-    const vanillaSource = await readFile(
-      path.join(root, "examples", "vanilla-vite", "src", "main.ts"),
-      "utf8",
-    );
-    const development = await readFile(
-      path.join(root, "docs", "development.md"),
-      "utf8",
-    );
-    expect(suppliedLesson).toContain(
-      "card.data = zCoreV3TextsResponse.parse(payload)",
-    );
-    expect(suppliedLesson).toContain(
-      "No public view model, controller, or binding",
-    );
-    expect(vanillaSource).toContain("card.data = validatedPayload");
-    expect(vanillaSource).toContain('card.setAttribute("sref", sref)');
-    expect(vanillaSource).toContain('status.dataset.requestCount = "0"');
-    expect(suppliedLesson).not.toContain("pnpm-workspace.yaml");
-    expect(development).toContain("pnpm-workspace.yaml");
-    expect(suppliedLesson).not.toContain('"pnpm": {\n    "overrides"');
-
-    const reactLesson = await readFile(
-      path.join(root, "docs", "learn", "react.md"),
-      "utf8",
-    );
-    const reactSource = await readFile(
-      path.join(root, "examples", "react-vite", "src", "app.tsx"),
-      "utf8",
-    );
-    const declarations = await readFile(
-      path.join(root, "examples", "react-vite", "src", "custom-elements.d.ts"),
-      "utf8",
-    );
-    for (const sourceFragment of [
-      "data={data}",
-      "sref={sref}",
-      "source={source}",
-      "onsefaria-source-select={onSourceSelection}",
-    ]) {
-      expect(reactSource).toContain(sourceFragment);
-      expect(reactLesson).toContain(sourceFragment);
-    }
-    expect(reactSource).toContain("setSelected({");
-    expect(declarations).toContain('"sefaria-source-card"');
-    expect(reactLesson).toContain("<sefaria-source-card");
-
-    const alpineLesson = await readFile(
-      path.join(root, "docs", "learn", "alpine.md"),
-      "utf8",
-    );
-    const alpineSource = await readFile(
-      path.join(
-        root,
-        "examples",
-        "alpine-vite",
-        "src",
-        "source-card-example.ts",
-      ),
-      "utf8",
-    );
-    expect(alpineSource).toContain("element.source = source");
-    expect(alpineSource).toContain("card.data = undefined");
-    expect(alpineSource).toContain("this.sref = normalized");
-    expect(alpineLesson).toContain(
-      'element.source = { kind: "client", client }',
-    );
-    expect(alpineLesson).toContain("element.data = undefined");
-    expect(alpineLesson).toContain("this.sref = next");
-  });
-
-  it("teaches current declarative, Reader, and customization behavior", async () => {
-    const lessonsByName = Object.fromEntries(
-      await Promise.all(
-        lessons.map(async (lesson) => [
-          lesson,
-          await readFile(path.join(root, "docs", "learn", lesson), "utf8"),
-        ]),
-      ),
-    );
-    const dataFlow = await readFile(
-      path.join(root, "docs", "guides", "data-flow.md"),
-      "utf8",
-    );
-    const readerNavigation = await readFile(
-      path.join(root, "docs", "guides", "reader-navigation.md"),
-      "utf8",
-    );
-
-    expect(lessonsByName["01-web-components.md"]).toContain(
-      "Properties carry rich objects and arrays",
-    );
-    expect(lessonsByName["02-supplied-data.md"]).toContain(
-      "Defined `data` is authoritative",
-    );
-    expect(lessonsByName["02-supplied-data.md"]).toContain(
-      "accessible validation failure",
-    );
-    expect(lessonsByName["03-live-data.md"]).toContain(
-      "A newer input prevents an older completion from publishing",
-    );
-    expect(lessonsByName["03-live-data.md"]).toContain("vanilla host");
-    expect(lessonsByName["03-live-data.md"]).toContain(
-      'to="/examples/vanilla/index.html"',
-    );
-    expect(lessonsByName["04-reader.md"]).toContain("rootLoading");
-    expect(lessonsByName["04-reader.md"]).toContain("semantic history");
-    expect(lessonsByName["04-reader.md"]).toContain(
-      "Raw seeds initialize or transactionally replace Reader state",
-    );
-    expect(lessonsByName["04-reader.md"]).toContain("reader-session");
-    expect(lessonsByName["06-host-integration.md"]).toContain(
-      "An MCP App is an interactive web interface",
-    );
-    expect(lessonsByName["06-host-integration.md"]).toContain(
-      "**Browser demonstration:**",
-    );
-    expect(lessonsByName["05-customization.md"]).toContain(
-      'slot="toolbar-actions"',
-    );
-    for (const part of [
-      "toolbar",
-      "history",
-      "source-pane",
-      "connections-pane",
-    ]) {
-      expect(lessonsByName["05-customization.md"]).toContain(part);
-    }
-    expect(dataFlow).toContain(
-      "all five public elements support standalone `sref`",
-    );
-    expect(readerNavigation).toContain(
-      "supported advanced semantic/raw facade",
-    );
-    expect(readerNavigation).toContain("## Current limitations");
-    expect(readerNavigation).not.toContain("**Accepted direction:**");
-  });
-
-  it("builds distinct example files instead of fallback responses", async () => {
-    const site = path.join(root, "dist", "site");
-    for (const relativePath of [
-      "index.html",
-      "learn/02-supplied-data.html",
-      "examples/explorer/authored.html",
-      "examples/reader/controlled.html",
-      "examples/react/index.html",
-      "examples/playground/index.html",
-      "examples/alpine/index.html",
-      "examples/mcp-app/index.html",
-    ]) {
+  it("maps legacy public routes to existing successor pages", async () => {
+    const redirects = Object.entries(legacyRedirects);
+    expect(redirects).toHaveLength(27);
+    for (const [source, target] of redirects) {
+      expect(source).toMatch(/\.html$/u);
+      expect(target).toMatch(/^\/.+\.html$/u);
       await expect(
-        access(path.join(site, relativePath)),
+        access(
+          path.join(
+            root,
+            "docs",
+            target.replace(/^\//u, "").replace(/\.html$/u, ".md"),
+          ),
+        ),
       ).resolves.toBeUndefined();
     }
+  });
 
-    const authored = await readFile(
-      path.join(site, "examples", "explorer", "authored.html"),
+  it("keeps custom-container closings on their own line", async () => {
+    const pages = await markdownFiles(["docs"]);
+    for (const page of pages) {
+      const text = await readFile(page, "utf8");
+      expect(text, page).not.toMatch(/\S[ \t]*:::[ \t]*$/mu);
+    }
+  });
+
+  it("keeps new-structure pages free of ASCII-art diagrams", async () => {
+    const pages = await markdownFiles([
+      "docs/across-components",
+      "docs/concepts",
+      "docs/data-and-text-tools",
+      "docs/examples",
+      "docs/help",
+      "docs/reference",
+      "docs/use-components",
+    ]);
+    pages.push(path.join(root, "docs", "index.md"));
+
+    const asciiDiagram =
+      /```(?:text|txt)\r?\n(?=[\s\S]*?(?:[+|][-\s+|]{6,}|[-=]{3,}>\s|\s[|][\s\S]*?[-=]{3,}))/u;
+    const boxDrawing = /[┌┐└┘├┤─│╭╮╰╯═║]/u;
+    for (const page of pages) {
+      const source = await readFile(page, "utf8");
+      expect(source, page).not.toMatch(asciiDiagram);
+      expect(source, page).not.toMatch(boxDrawing);
+    }
+  });
+
+  it("keeps current public routes and contributor-only docs", async () => {
+    for (const relativePath of [
+      "docs/use-components/start-here.md",
+      "docs/data-and-text-tools/start-here.md",
+      "docs/reference/components.md",
+      "docs/reference/package-imports-and-exports.md",
+      "docs/examples/linked-article.md",
+      "docs/specs/components.md",
+      "docs/design.md",
+      "docs/evidence.md",
+      "docs/development.md",
+      "docs/review.md",
+      "docs/README.md",
+      "docs/archive/README.md",
+      "docs/handoff.md",
+    ]) {
+      await expect(
+        access(path.join(root, relativePath)),
+      ).resolves.toBeUndefined();
+    }
+  });
+
+  async function markdownFiles(directories: string[]) {
+    const files: string[] = [];
+    for (const directory of directories) {
+      for (const entry of await readdir(path.join(root, directory), {
+        withFileTypes: true,
+      })) {
+        const fullPath = path.join(root, directory, entry.name);
+        if (entry.isDirectory()) {
+          files.push(
+            ...(await markdownFiles([path.join(directory, entry.name)])),
+          );
+        } else if (entry.name.endsWith(".md")) {
+          files.push(fullPath);
+        }
+      }
+    }
+    return files;
+  }
+
+  it("keeps navigation on current pages", async () => {
+    const config = await readFile(
+      path.join(root, "docs", ".vitepress", "config.ts"),
       "utf8",
     );
-    const source = await readFile(
-      path.join(
-        root,
-        "examples",
-        "explorer",
-        "src",
-        "authored",
-        "development-status.ts",
+    expect(config).toContain(
+      '{ text: "Use components", link: "/use-components/start-here.md" }',
+    );
+    expect(config).toContain('link: "/data-and-text-tools/start-here.md"');
+    expect(config).toContain('link: "/examples/composed-multi-pane-reader"');
+    expect(config).toContain(
+      '{ text: "Reference", link: "/reference/components" }',
+    );
+    expect(config).not.toContain("learningPagers");
+    expect(config).not.toContain("learn/");
+    expect(config).not.toContain("guides/");
+    expect(config).not.toContain("reference/documentation-map");
+  });
+
+  it("reaches every public page from the top navigation or a sidebar", async () => {
+    const config = await readFile(
+      path.join(root, "docs", ".vitepress", "config.ts"),
+      "utf8",
+    );
+    const linked = new Set(
+      [...config.matchAll(/link: "(\/[^"]*)"/g)].map((match) =>
+        match[1]!.replace(/\.md$/, ""),
       ),
-      "utf8",
     );
-    expect(source).toContain(
-      "github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/",
-    );
-    expect(authored).not.toContain('href="/src/');
+    const sections = [
+      "use-components",
+      "data-and-text-tools",
+      "across-components",
+      "concepts",
+      "help",
+      "examples",
+      "reference",
+    ];
+    const missing: string[] = [];
+    for (const section of sections) {
+      const entries = await readdir(path.join(root, "docs", section), {
+        recursive: true,
+      });
+      for (const entry of entries.filter((name) => name.endsWith(".md"))) {
+        const route = `/${section}/${entry.replaceAll("\\", "/").replace(/\.md$/, "")}`;
+        if (!linked.has(route)) {
+          missing.push(route);
+        }
+      }
+    }
+    expect(missing).toEqual([]);
+    for (const text of ["Concepts", "Help"]) {
+      expect(config).toContain(`{ text: "${text}", link:`);
+    }
+    expect(config).toContain('"/across-components/": useComponentsSidebar');
   });
 
-  it("does not retain active presentation assembly", async () => {
-    await expect(
-      access(path.join(root, "demos", "showcase")),
-    ).rejects.toMatchObject({ code: "ENOENT" });
+  it("preserves highlighted HTML source text by default", () => {
+    const source =
+      '<sefaria-source-card sref="Micah 6:8"></sefaria-source-card>';
+    expect(codeTextContent(highlightHtml(source))).toBe(source);
   });
 
-  it("keeps the committed lockfile independent of local registry mirrors", async () => {
-    const lockfile = await readFile(path.join(root, "pnpm-lock.yaml"), "utf8");
-    expect(lockfile).not.toMatch(/tarball:\s+https?:\/\//);
-    expect(lockfile).not.toContain("pkgs.visualstudio.com");
-    expect(lockfile).not.toContain("packagefeedproxy.microsoft.io");
+  it("keeps Learn more lines marked with the shared class", async () => {
+    for (const file of [
+      path.join(root, "docs", "index.md"),
+      path.join(root, "docs", "use-components", "start-here.md"),
+    ]) {
+      const lines = (await readFile(file, "utf8"))
+        .split(/\r?\n/)
+        .filter((line) => line.includes("Learn more"));
+      expect(lines.length, file).toBeGreaterThan(0);
+      for (const line of lines) {
+        expect(line).toMatch(
+          /^<span class="learn-more__label">Learn more:<\/span> .+ \{\.learn-more\}$/,
+        );
+      }
+    }
+  });
+
+  it("flags exactly the unreviewed pages", async () => {
+    const flagged: string[] = [];
+    const walk = async (dir: string): Promise<void> => {
+      for (const entry of await readdir(dir, { withFileTypes: true })) {
+        const full = path.join(dir, entry.name);
+        if (entry.isDirectory()) {
+          if (entry.name !== "node_modules" && entry.name !== ".vitepress") {
+            await walk(full);
+          }
+        } else if (entry.name.endsWith(".md")) {
+          const front = /^---\r?\n([\s\S]*?)\r?\n---/u.exec(
+            await readFile(full, "utf8"),
+          )?.[1];
+          if (front && /^humanReviewed:\s*false\s*$/mu.test(front)) {
+            flagged.push(
+              path
+                .relative(path.join(root, "docs"), full)
+                .replaceAll("\\", "/"),
+            );
+          }
+        }
+      }
+    };
+    await walk(path.join(root, "docs"));
+    expect(flagged.sort()).toEqual(
+      [
+        "use-components/show-an-attributed-passage.md",
+        "use-components/use-with-a-framework.md",
+        "use-components/show-commentary-and-connected-texts.md",
+        "help/troubleshoot-a-page.md",
+        "across-components/match-your-sites-look.md",
+        "across-components/make-components-respond-to-each-other.md",
+        "use-components/start-with-an-ai-assistant.md",
+        "data-and-text-tools/handle-errors-in-your-code.md",
+        "data-and-text-tools/clean-up-stored-sefaria-text.md",
+        "concepts/the-client-and-sefarias-api.md",
+        "concepts/clean-text-and-safety.md",
+        "concepts/sefarias-own-texts-and-tools.md",
+        "examples/composed-multi-pane-reader.md",
+        "examples/linked-article.md",
+        "examples/reader-inside-ai-chat.md",
+        "examples/this-weeks-portion.md",
+      ].sort(),
+    );
   });
 });

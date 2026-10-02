@@ -47,7 +47,16 @@ import {
   type SelectedTextProgress,
 } from "./translation-selection.js";
 
-/** Custom element that renders supplied or acquired source-card data. */
+/**
+ * Shows a passage as a card. The card has a heading, the text in the primary edition, a translation, and the title of each edition shown. When an edition's source is a valid http(s) address, the title links to it. Any other source appears as plain text.
+ *
+ * @data `data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
+ * @empty The element shows its empty state when the response has no text for either side. The card keeps its heading and edition details. It shows why each side is missing, such as `No primary text is available.`
+ * @fires sefaria-source-select - Reports that a reader selected one item in the source card.
+ * @eventDetail sefaria-source-select - `position` is the selected segment's position as an array of numbers. `ref` is its reference.
+ * @fires sefaria-source-card-error - Reports a failure while loading or validating data from `sref`.
+ * @eventDetail sefaria-source-card-error - `error` is the original failure. `sref` is the reference that was loading.
+ */
 export class SefariaSourceCard extends SefariaElement {
   /** Lit property metadata for declarative data and presentation state. */
   static override properties = {
@@ -318,39 +327,39 @@ export class SefariaSourceCard extends SefariaElement {
     bilingualPairStyles,
   ];
 
-  /** Reference loaded when authoritative supplied data is absent. */
+  /** The Sefaria reference to load when `data` isn't set. */
   declare sref: string;
-  /** Authoritative corrected response-shaped data. */
+  /** Sefaria API response data to render. When it's set, the element doesn't fetch anything. */
   declare data: unknown | undefined;
-  /** Optional element-specific data source. */
+  /** Where this element gets its data, instead of the shared data source. */
   declare source: SefariaDataSource | undefined;
-  /** Optional exact edition title for the primary role. */
+  /** Exact title of the edition to show as the primary text. */
   declare primaryVersionTitle: string | undefined;
-  /** Optional exact edition title for the translation role. */
+  /** Exact title of the edition to show as the translation. */
   declare translationVersionTitle: string | undefined;
-  /** Preferred translation family. */
+  /** Preferred translation language. `translationFallback` controls what happens when Sefaria has none. */
   declare translationLanguage: string | undefined;
-  /** Missing preferred-translation policy. */
+  /** What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". */
   declare translationFallback: "default" | "none";
 
-  /** Sides the host wants displayed for every pair. */
+  /** Which text to show: `primary`, `translation` or `both`. */
   declare contentLanguage: BilingualPairContentLanguage;
 
-  /** Requested arrangement for every pair. */
+  /** How each pair of texts is arranged: `auto`, `stacked` or `side-by-side`. */
   declare layout: BilingualPairLayout;
 
-  /** Requested role order for every pair. */
+  /** Which text comes first side by side: `primary-first` or `translation-first`. */
   declare sideOrder: BilingualPairSideOrder;
-  /** Hebrew vocalization preset applied to every displayed text leaf. */
+  /** How much Hebrew vowel and cantillation marking to keep. `none` removes both. */
   declare vocalizationMode: VocalizationMode;
-  /** Whether compact address labels are visible beside rendered text sides. */
+  /** Whether small reference labels are shown beside the texts. */
   declare showAddressLabels: boolean;
-  /** Enables selection controls for items with proven canonical targets. */
+  /** Lets readers select the verses that have their own reference. */
   declare selectable: boolean;
-  /** Host-controlled original position path, never a reference string. */
+  /** Position of the selected verse, as an array of numbers rather than a reference. */
   declare selectedPosition: readonly number[] | undefined;
 
-  /** Whether resolved edition attribution is intentionally omitted. */
+  /** Hides the edition attribution. */
   declare hideAttributions: boolean;
 
   #active:
@@ -411,7 +420,7 @@ export class SefariaSourceCard extends SefariaElement {
     super.disconnectedCallback();
   }
 
-  /** Coarse lifecycle state without exposing prepared rendering data. */
+  /** Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
   get status(): SefariaElementStatus {
     return this.#statusOverride ?? statusOf(this.#viewModel);
   }

@@ -1,4 +1,12 @@
-import { access, copyFile, cp, mkdir, readFile, rm } from "node:fs/promises";
+import {
+  access,
+  copyFile,
+  cp,
+  mkdir,
+  readFile,
+  rm,
+  writeFile,
+} from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
 import console from "node:console";
@@ -19,6 +27,7 @@ import {
 } from "./build-site-cache.mjs";
 import { buildScriptSource } from "./build-script-source.mjs";
 import { runNodeScript, runPackageTool } from "./node-tool.mjs";
+import { legacyRedirects } from "../docs/.vitepress/redirects.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const site = path.join(root, "dist", "site");
@@ -111,6 +120,13 @@ for (const step of createSiteBuildSteps({ skipTypecheck, siteBasePath })) {
     continue;
   }
   if (!examplesOnly) {
+    // EP7: llms.txt lists the site's pages, so it is rendered from the same sources.
+    runPackageTool(
+      "tsx",
+      "tsx",
+      ["scripts/reference/llms.ts", path.join(stagedPublic, "llms.txt")],
+      { cwd: root },
+    );
     runPackageTool("vitepress", "vitepress", ["build", "docs"], {
       cwd: root,
       env: { ...process.env, SITE_BASE_PATH: siteBasePath },
@@ -131,6 +147,7 @@ if (!examplesOnly) {
   for (const relativePath of SITE_REQUIRED_FILES) {
     await access(path.join(site, relativePath));
   }
+  await writeLegacyRedirects();
   await verifyBuiltRoutes();
   if (buildKey !== undefined) {
     await writeSiteBuildKey(site, buildKey);
@@ -176,5 +193,29 @@ async function verifyBuiltRoutes() {
     throw new Error(
       "The authored explorer contains a same-origin source link.",
     );
+  }
+}
+
+async function writeLegacyRedirects() {
+  for (const [source, target] of Object.entries(legacyRedirects)) {
+    await access(path.join(site, target.slice(1)));
+    const destination = path.join(site, source);
+    await mkdir(path.dirname(destination), { recursive: true });
+    const title = `Redirecting to ${target}`;
+    const html = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="robots" content="noindex">
+    <meta http-equiv="refresh" content="0; url=${target}">
+    <link rel="canonical" href="${target}">
+    <title>${title}</title>
+  </head>
+  <body>
+    <p>This page moved to <a href="${target}">${target}</a>.</p>
+  </body>
+</html>
+`;
+    await writeFile(destination, html, "utf8");
   }
 }

@@ -17,105 +17,7 @@ const webComponentsDirectory = path.join(
 const check = process.argv.includes("--check");
 const generatedFiles = {
   customElements: path.join(webComponentsDirectory, "custom-elements.json"),
-  customElementsMarkdown: path.join(
-    repository,
-    "docs",
-    "reference",
-    "custom-elements.md",
-  ),
   exports: path.join(repository, "packages", "public-exports.json"),
-  exportsMarkdown: path.join(
-    repository,
-    "docs",
-    "reference",
-    "public-exports.md",
-  ),
-};
-
-const eventCatalog = {
-  "sefaria-bilingual-segment": [
-    event(
-      "sefaria-bilingual-segment-error",
-      "Reports a current standalone loading or validation failure.",
-    ),
-  ],
-  "sefaria-connections-panel": [
-    event(
-      "sefaria-connections-category-change",
-      "Requests a different captured connection category.",
-    ),
-    event(
-      "sefaria-connections-preview-request",
-      "Requests captured connection previews from the host.",
-    ),
-    event(
-      "sefaria-connections-page-change",
-      "Requests a different page of captured connections.",
-    ),
-    event(
-      "sefaria-connection-select",
-      "Reports selection of one connected reference.",
-    ),
-    event(
-      "sefaria-connections-panel-error",
-      "Reports a current standalone loading or validation failure.",
-    ),
-  ],
-  "sefaria-reader": [
-    event("sefaria-reader-back", "Requests navigation to the previous entry."),
-    event(
-      "sefaria-reader-history-activate",
-      "Requests activation of one retained history entry.",
-    ),
-    event(
-      "sefaria-reader-pane-change",
-      "Requests the visible compact reader pane.",
-    ),
-    event(
-      "sefaria-reader-chat-export",
-      "Requests host-owned export of a reference to chat.",
-    ),
-    event(
-      "sefaria-reader-source-select",
-      "Reports selection of one source-card item.",
-    ),
-    event(
-      "sefaria-reader-connections-category-change",
-      "Requests a different connection category.",
-    ),
-    event(
-      "sefaria-reader-connections-page-change",
-      "Requests a different connection page.",
-    ),
-    event(
-      "sefaria-reader-connection-select",
-      "Reports selection of one connected reference.",
-    ),
-    event(
-      "sefaria-reader-connections-preview-request",
-      "Requests connection previews from the host.",
-    ),
-    event(
-      "sefaria-reader-error",
-      "Reports a current standalone loading or seed-admission failure.",
-    ),
-  ],
-  "sefaria-source-card": [
-    event(
-      "sefaria-source-select",
-      "Reports selection of one source-card item.",
-    ),
-    event(
-      "sefaria-source-card-error",
-      "Reports a current standalone loading or validation failure.",
-    ),
-  ],
-  "sefaria-text-segment": [
-    event(
-      "sefaria-text-segment-error",
-      "Reports a current standalone loading or validation failure.",
-    ),
-  ],
 };
 
 const cssPropertyCatalog = [
@@ -211,29 +113,15 @@ await emit(
   ),
 );
 await emit(
-  generatedFiles.customElementsMarkdown,
-  await formatGenerated(
-    generatedFiles.customElementsMarkdown,
-    renderCustomElementsMarkdown(customElements),
-  ),
-);
-await emit(
   generatedFiles.exports,
   await formatGenerated(
     generatedFiles.exports,
     `${JSON.stringify(publicExports, null, 2)}\n`,
   ),
 );
-await emit(
-  generatedFiles.exportsMarkdown,
-  await formatGenerated(
-    generatedFiles.exportsMarkdown,
-    renderPublicExportsMarkdown(publicExports),
-  ),
-);
 
 process.stdout.write(
-  `Public metadata: ${Object.keys(eventCatalog).length} elements, ${publicExports.packages.reduce((count, packageEntry) => count + packageEntry.exports.length, 0)} package exports\n`,
+  `Public metadata: ${customElements.modules.flatMap((module) => module.declarations).length} elements, ${publicExports.packages.reduce((count, packageEntry) => count + packageEntry.exports.length, 0)} package exports\n`,
 );
 
 async function runAnalyzer() {
@@ -270,13 +158,6 @@ async function buildCustomElementsManifest() {
       sourceEvents.add(match[1]);
     }
   }
-  const documentedEvents = new Set(
-    Object.values(eventCatalog)
-      .flat()
-      .map((entry) => entry.name),
-  );
-  assertSameSet("custom-element events", sourceEvents, documentedEvents);
-
   const tokenSource = await readFile(
     path.join(webComponentsDirectory, "src", "tokens.ts"),
     "utf8",
@@ -300,6 +181,7 @@ async function buildCustomElementsManifest() {
     if (declarations.length === 0) continue;
     const source = await readFile(path.join(repository, module.path), "utf8");
     for (const declaration of declarations) {
+      const reference = parseElementReference(source, declaration);
       verifyElementTemplateContract({
         declaration,
         sourcePath: module.path,
@@ -309,7 +191,16 @@ async function buildCustomElementsManifest() {
         (member) =>
           member.privacy !== "private" && !member.name?.startsWith("#"),
       );
-      declaration.events = eventCatalog[declaration.tagName];
+      declaration.description = reference.description;
+      if (reference.data !== undefined) declaration.data = reference.data;
+      declaration.empty = reference.empty;
+      declaration.events = reference.events.map((entry) => ({
+        name: entry.name,
+        description: entry.description,
+        detail: entry.detail,
+        cancelable: isCancelableEvent(source, entry.name),
+        type: { text: "CustomEvent" },
+      }));
       declaration.slots ??= [];
       declaration.cssParts ??= [];
       declaration.cssProperties =
@@ -339,8 +230,22 @@ async function buildCustomElementsManifest() {
   assertSameSet(
     "registered element tags",
     new Set(tags),
-    new Set(Object.keys(eventCatalog)),
+    new Set([
+      "sefaria-bilingual-segment",
+      "sefaria-connections-panel",
+      "sefaria-reader",
+      "sefaria-source-card",
+      "sefaria-text-segment",
+    ]),
   );
+  const documentedEvents = new Set(
+    modules.flatMap((module) =>
+      module.declarations.flatMap((declaration) =>
+        declaration.events.map((event) => event.name),
+      ),
+    ),
+  );
+  assertSameSet("custom-element events", sourceEvents, documentedEvents);
   return { schemaVersion: "1.0.0", readme: "", modules };
 }
 
@@ -393,109 +298,6 @@ async function buildPublicExportInventory() {
   return { schemaVersion: 1, packages };
 }
 
-function renderCustomElementsMarkdown(manifest) {
-  const lines = [
-    "# Custom elements",
-    "",
-    "This file is generated from the Lit element sources and the bounded event and token catalogs in `scripts/generate-package-metadata.mjs`. Run `pnpm metadata:generate` after changing a public element contract.",
-    "",
-  ];
-  for (const declaration of manifest.modules.flatMap(
-    (module) => module.declarations,
-  )) {
-    lines.push(
-      `## \`<${declaration.tagName}>\``,
-      "",
-      declaration.description ?? "",
-      "",
-    );
-    lines.push("### Properties and attributes", "");
-    lines.push(
-      "| Property | Attribute | Type | Default | Description |",
-      "| --- | --- | --- | --- | --- |",
-    );
-    for (const member of (declaration.members ?? []).filter(
-      (entry) => entry.kind === "field" && entry.privacy !== "private",
-    )) {
-      lines.push(
-        `| \`${member.name}\` | ${member.attribute ? `\`${member.attribute}\`` : "Property only"} | \`${member.type?.text ?? "unknown"}\` | ${member.default ? `\`${member.default}\`` : "-"} | ${member.description ?? ""} |`,
-      );
-    }
-    lines.push("", "### Events", "");
-    if (declaration.events.length === 0) {
-      lines.push("None.", "");
-    } else {
-      lines.push("| Event | Description |", "| --- | --- |");
-      for (const entry of declaration.events) {
-        lines.push(`| \`${entry.name}\` | ${entry.description} |`);
-      }
-      lines.push("");
-    }
-    lines.push("### Slots", "");
-    if (declaration.slots.length === 0) {
-      lines.push("None.", "");
-    } else {
-      lines.push("| Slot | Description |", "| --- | --- |");
-      for (const entry of declaration.slots) {
-        lines.push(
-          `| ${entry.name ? `\`${entry.name}\`` : "Default"} | ${entry.description ?? ""} |`,
-        );
-      }
-      lines.push("");
-    }
-    lines.push("### CSS parts", "");
-    if (declaration.cssParts.length === 0) {
-      lines.push("None.", "");
-    } else {
-      lines.push("| Part | Description |", "| --- | --- |");
-      for (const entry of declaration.cssParts) {
-        lines.push(`| \`${entry.name}\` | ${entry.description ?? ""} |`);
-      }
-      lines.push("");
-    }
-  }
-  lines.push(
-    "## Shared CSS custom properties",
-    "",
-    "| Property | Default | Description |",
-    "| --- | --- | --- |",
-  );
-  for (const entry of cssPropertyCatalog) {
-    lines.push(
-      `| \`${entry.name}\` | \`${entry.default}\` | ${entry.description} |`,
-    );
-  }
-  lines.push(
-    "",
-    "Exception: `<sefaria-text-segment>` defaults to a transparent background. It uses `--sefaria-surface` only when the host sets it on the element or an ancestor.",
-  );
-  return `${lines.join("\n")}\n`;
-}
-
-function renderPublicExportsMarkdown(inventory) {
-  const lines = [
-    "# Public package exports",
-    "",
-    "This file is generated from built declaration files and package export maps. Run `pnpm metadata:generate` after changing a supported subpath.",
-    "",
-  ];
-  for (const packageEntry of inventory.packages) {
-    lines.push(
-      `## \`${packageEntry.name}\``,
-      "",
-      "| Subpath | JavaScript | Types | Declarations |",
-      "| --- | --- | --- | --- |",
-    );
-    for (const entry of packageEntry.exports) {
-      lines.push(
-        `| \`${entry.subpath}\` | \`${entry.import}\` | \`${entry.types}\` | ${entry.declarations.map((name) => `\`${name}\``).join(", ")} |`,
-      );
-    }
-    lines.push("");
-  }
-  return `${lines.join("\n")}\n`;
-}
-
 function normalizeModulePaths(value) {
   if (Array.isArray(value)) return value.map(normalizeModulePaths);
   if (value && typeof value === "object") {
@@ -513,12 +315,111 @@ function normalizeModulePaths(value) {
     .replace(/\.ts$/u, ".js");
 }
 
-function event(name, description) {
-  return { name, description, type: { text: "CustomEvent" } };
-}
-
 function cssProperty(name, description, defaultValue) {
   return { name, description, default: defaultValue };
+}
+
+function parseElementReference(source, declaration) {
+  const className = declaration.name;
+  const classStart = source.search(
+    new RegExp(`export\\s+class\\s+${className}\\b`, "u"),
+  );
+  if (classStart === -1) {
+    throw new Error(`${declaration.tagName} must have class JSDoc.`);
+  }
+  const prefix = source.slice(0, classStart);
+  const comments = [...prefix.matchAll(/\/\*\*([\s\S]*?)\*\//gu)];
+  const comment = comments.at(-1);
+  if (!comment) {
+    throw new Error(`${declaration.tagName} must have class JSDoc.`);
+  }
+  const lines = comment[1]
+    .split(/\r?\n/u)
+    .map((line) => line.replace(/^\s*\*\s?/u, "").trimEnd());
+  const description = [];
+  const events = new Map();
+  let data;
+  let empty;
+  for (const line of lines) {
+    if (line.startsWith("@")) {
+      const tag = /^@(\S+)\s+([\s\S]*)$/u.exec(line);
+      if (!tag) continue;
+      const [, name, value] = tag;
+      if (name === "fires") {
+        const parsed = parseNamedText(value, `${declaration.tagName} @fires`);
+        events.set(parsed.name, { ...events.get(parsed.name), ...parsed });
+      } else if (name === "eventDetail") {
+        const parsed = parseNamedText(
+          value,
+          `${declaration.tagName} @eventDetail`,
+        );
+        events.set(parsed.name, {
+          ...events.get(parsed.name),
+          name: parsed.name,
+          detail: parsed.text,
+        });
+      } else if (name === "data") {
+        data = value.trim();
+      } else if (name === "empty") {
+        empty = value.trim();
+      }
+      continue;
+    }
+    if (line.length > 0) description.push(line);
+  }
+  const missing = [];
+  if (description.join(" ").trim().length === 0) missing.push("summary");
+  if (empty === undefined) missing.push("@empty");
+  for (const [name, event] of events) {
+    if (!event.text) missing.push(`@fires ${name}`);
+    if (!event.detail) missing.push(`@eventDetail ${name}`);
+  }
+  if (events.size === 0) missing.push("@fires");
+  if (
+    [
+      "sefaria-text-segment",
+      "sefaria-bilingual-segment",
+      "sefaria-source-card",
+    ].includes(declaration.tagName) &&
+    data === undefined
+  ) {
+    missing.push("@data");
+  }
+  if (missing.length > 0) {
+    throw new Error(`${declaration.tagName} missing ${missing.join(", ")}.`);
+  }
+  return {
+    description: description.join(" ").trim(),
+    data,
+    empty,
+    events: [...events.values()].map((event) => ({
+      name: event.name,
+      description: event.text,
+      detail: event.detail,
+    })),
+  };
+}
+
+function parseNamedText(value, context) {
+  const parsed = /^(\S+)\s+-\s+(.+)$/u.exec(value.trim());
+  if (!parsed) throw new Error(`${context} must use "name - text".`);
+  return { name: parsed[1], text: parsed[2] };
+}
+
+function isCancelableEvent(source, name) {
+  const viaEmit = source.includes(`#emit("${name}"`);
+  const emitCancelable = /#emit\(name: string[\s\S]*?cancelable: true/u.test(
+    source,
+  );
+  const directStart = source.indexOf(`new CustomEvent("${name}"`);
+  const directEnd =
+    directStart === -1 ? -1 : source.indexOf("}),", directStart);
+  const direct =
+    directStart !== -1 &&
+    /cancelable:\s*true/u.test(
+      source.slice(directStart, directEnd === -1 ? source.length : directEnd),
+    );
+  return direct || (viaEmit && emitCancelable);
 }
 
 function assertSameSet(label, actual, expected) {

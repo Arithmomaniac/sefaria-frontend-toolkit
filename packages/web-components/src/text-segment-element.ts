@@ -38,7 +38,14 @@ import {
 
 const NOTE_PLACEHOLDER_PATTERN = /<span data-sefaria-note="(\d+)"><\/span>/gu;
 
-/** Custom element that renders supplied or acquired text-segment data. */
+/**
+ * Shows the text of one passage in one selected edition.
+ *
+ * @data `data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. It also accepts a `TextSegmentSelectedData` object with `kind: "selected"`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
+ * @empty The element shows its empty state when the chosen edition has no text. The message depends on how the edition was chosen. If the default primary edition is missing, you see `No primary text is available.` If an edition you selected has no text, you can see a message that names that edition. On some paths, the element shows the response's warning instead.
+ * @fires sefaria-text-segment-error - Reports a failure while loading or validating data from `sref`.
+ * @eventDetail sefaria-text-segment-error - `error` is the original failure. `sref` is the reference that was loading.
+ */
 export class SefariaTextSegment extends SefariaElement {
   /** Lit property metadata for declarative data and presentation state. */
   static override properties = {
@@ -136,21 +143,21 @@ export class SefariaTextSegment extends SefariaElement {
     `,
   ];
 
-  /** Reference loaded when authoritative supplied data is absent. */
+  /** The Sefaria reference to load when `data` isn't set. */
   declare sref: string;
-  /** Authoritative corrected response-shaped data. */
+  /** Sefaria API response data to render. When it's set, the element doesn't fetch anything. */
   declare data: unknown | undefined;
-  /** Optional element-specific data source. */
+  /** Where this element gets its data, instead of the shared data source. */
   declare source: SefariaDataSource | undefined;
-  /** Optional language-family selector overriding the primary default. */
+  /** Language of the edition to show, instead of the primary edition. */
   declare versionLanguage: string | undefined;
-  /** Optional exact edition title paired with `versionLanguage`. */
+  /** `version-title` alone chooses another edition in the original language. To choose a translation by title, also set `translation-language`. */
   declare versionTitle: string | undefined;
-  /** Preferred translation family, mutually exclusive with a strict version language. */
+  /** Preferred translation language. Can't be combined with `versionLanguage`. */
   declare translationLanguage: string | undefined;
-  /** Missing preferred-translation policy. */
+  /** What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". */
   declare translationFallback: "default" | "none";
-  /** Hebrew vocalization preset applied only to the displayed safe text. */
+  /** How much Hebrew vowel and cantillation marking to keep. `none` removes both. */
   declare vocalizationMode: VocalizationMode;
 
   #displayViewModel: TextSegmentDataViewModel | undefined;
@@ -183,7 +190,7 @@ export class SefariaTextSegment extends SefariaElement {
     this.vocalizationMode = "taamim_and_nikkud";
   }
 
-  /** Metadata for the currently displayed selected edition. */
+  /** Details of the edition currently shown. */
   get selectedVersion(): TextSegmentSelectedVersionInfo | undefined {
     const viewModel = this.#viewModel;
     return viewModel?.state === "data"
@@ -194,7 +201,7 @@ export class SefariaTextSegment extends SefariaElement {
       : undefined;
   }
 
-  /** Coarse lifecycle state without exposing prepared rendering data. */
+  /** Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
   get status(): SefariaElementStatus {
     return this.#statusOverride ?? statusOf(this.#viewModel);
   }

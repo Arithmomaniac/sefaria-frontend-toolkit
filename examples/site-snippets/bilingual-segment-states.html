@@ -1,0 +1,22 @@
+<script
+  type="module"
+  src="https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
+></script>
+<sefaria-bilingual-segment sref="Micah 6:8"></sefaria-bilingual-segment>
+<sefaria-bilingual-segment sref="Not a book 3:4"></sefaria-bilingual-segment>
+<sefaria-bilingual-segment></sefaria-bilingual-segment>
+<button type="button" id="check">Show each status</button>
+<pre id="log"></pre>
+<script type="module">
+  const log = document.querySelector("#log");
+  document.addEventListener("sefaria-bilingual-segment-error", (event) => {
+    log.textContent += `Error for ${event.detail.sref}: ${event.detail.error.message}\n`;
+  });
+  document.querySelector("#check").addEventListener("click", () => {
+    for (const element of document.querySelectorAll(
+      "sefaria-bilingual-segment",
+    )) {
+      log.textContent += `"${element.sref}" is ${element.status}\n`;
+    }
+  });
+</script>

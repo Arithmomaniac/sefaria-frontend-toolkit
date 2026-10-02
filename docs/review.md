@@ -391,3 +391,5 @@ pnpm check
 After the OpenAPI workflow exists, the complete check must include the offline generation and stale-output check.
 
 For documentation-only changes, run the repository Prettier command and `git diff --check`.
+
+See [Keep the documentation current](development.md#keep-the-documentation-current) for page ownership and freshness rules.

@@ -98,6 +98,7 @@ export async function waitForMcpConnection(
   signal?.throwIfAborted();
 }
 
+// #region reader-acquisition
 /** Creates a Reader data loader backed only by host-proxied tools. */
 export function createMcpReaderSource(
   host: McpReaderToolHost,
@@ -140,6 +141,7 @@ export function createMcpReaderSource(
     },
   };
 }
+// #endregion reader-acquisition
 
 export function createLocalFirstMcpReaderSource(
   fallback: SefariaDataSource,

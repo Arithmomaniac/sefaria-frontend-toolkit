@@ -159,6 +159,68 @@ export async function unpackArtifact(bytes, record, destination) {
   }
 }
 
+const REPOSITORY = "https://github.com/Arithmomaniac/sefaria-frontend-toolkit";
+const escapeHtml = (value) =>
+  String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+
+/** Renders the hosted script-tag versions index (EP6) from the catalog. */
+export function renderVersionsIndex(input) {
+  const catalog = validateCatalog(input);
+  const newestFirst = [...catalog.releases].sort(order).reverse();
+  const alpha = newestFirst.find((entry) => entry.state === "active");
+  const rows = newestFirst.map((entry) => {
+    const commit = `<a href="${REPOSITORY}/commit/${entry.sourceSha}"><code>${entry.sourceSha.slice(0, 7)}</code></a>`;
+    const address =
+      entry.state === "active"
+        ? `<code>${escapeHtml(entry.version)}/sefaria-elements.js</code>`
+        : "Retired; no longer served";
+    const marker = entry === alpha ? " (current <code>alpha</code>)" : "";
+    return `      <tr><td><code>${escapeHtml(entry.version)}</code>${marker}</td><td>${commit}</td><td>${address}</td></tr>`;
+  });
+  const alphaSentence = alpha
+    ? `<code>alpha/sefaria-elements.js</code> currently serves <code>${escapeHtml(alpha.version)}</code>.`
+    : "No version is being served as <code>alpha</code> right now.";
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Script-tag versions · Sefaria Frontend Toolkit</title>
+    <style>
+      body { font-family: system-ui, sans-serif; max-width: 48rem; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+      table { border-collapse: collapse; width: 100%; }
+      th, td { border-bottom: 1px solid #ccc; padding: 0.4rem; text-align: left; vertical-align: top; }
+      .status { border-left: 4px solid #b58100; padding: 0.5rem 0.75rem; background: #fff8e1; color: #3b2f00; }
+    </style>
+  </head>
+  <body>
+    <h1>Script-tag versions</h1>
+    <p class="status"><strong>Experimental and unofficial.</strong> Names and addresses may change.</p>
+    <p>This directory hosts the Sefaria Frontend Toolkit's elements as one script file, <code>sefaria-elements.js</code>, that you add to a page with a <code>&lt;script type="module"&gt;</code> tag. To put your first source on a page, see <a href="../use-components/start-here.html">Use components › Start here</a>.</p>
+    <h2>Choose an address</h2>
+    <ul>
+      <li><strong><code>alpha/sefaria-elements.js</code></strong> points to the newest active version each time the site is deployed, so it can change without warning. ${alphaSentence}</li>
+      <li><strong>A pinned version</strong>, such as <code>${escapeHtml(alpha?.version ?? "0.0.0-alpha.1.1")}/sefaria-elements.js</code>, stays byte-for-byte the same while it's listed as active here. A pinned version may be retired without notice. A retired version is removed the next time the site is deployed, though caches may keep serving it for a while.</li>
+      <li><strong>Your own copy.</strong> To avoid both risks, download a version and serve it from your own site, or install the packages instead. <a href="../help/install-and-status.html">Install and status</a> compares the routes.</li>
+    </ul>
+    <p>Each version keeps its own behavior. An older version can still include the removed Popup and Reference Label elements and lack attributes added since. The site's reference pages describe the newest code. <a href="../reference/package-imports-and-exports.html">Package imports and exports</a> lists the package names.</p>
+    <h2>Versions</h2>
+    <p>Newest first. Each directory also holds the version's <code>manifest.json</code>, <code>LICENSE.txt</code>, <code>THIRD-PARTY-NOTICES.txt</code> and <code>source.tar.gz</code>. <a href="catalog.json">catalog.json</a> has the same list as data.</p>
+    <table>
+      <thead><tr><th>Version</th><th>Source commit</th><th>Address in this directory</th></tr></thead>
+      <tbody>
+${rows.join("\n") || '      <tr><td colspan="3">No versions yet.</td></tr>'}
+      </tbody>
+    </table>
+  </body>
+</html>
+`;
+}
+
 export async function assembleScripts({
   catalog: input,
   destination,
@@ -189,6 +251,10 @@ export async function assembleScripts({
     await writeFile(
       path.join(staging, "catalog.json"),
       `${JSON.stringify({ ...catalog, alpha: latest?.version ?? null }, null, 2)}\n`,
+    );
+    await writeFile(
+      path.join(staging, "index.html"),
+      renderVersionsIndex(catalog),
     );
     // Only replace the owned cdn directory after every retained artifact is verified.
     await rm(destination, { recursive: true, force: true });

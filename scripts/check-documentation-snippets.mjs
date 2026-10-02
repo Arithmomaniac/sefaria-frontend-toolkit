@@ -14,11 +14,10 @@ import process from "node:process";
 const root = path.resolve(import.meta.dirname, "..");
 const compiler = path.join(root, "node_modules", "typescript", "lib", "tsc.js");
 const snippets = [
-  ["packages/client/README.md", "## Ordinary use"],
-  ["packages/web-components/README.md", "## Prebuilt Reader"],
-  ["docs/learn/03-live-data.md", "## Try it"],
-  ["docs/learn/04-reader.md", "## Try it"],
-  ["docs/learn/05-customization.md", "For a headless path"],
+  ["packages/client/IMPLEMENTATION.md", "## Ordinary use"],
+  ["packages/web-components/IMPLEMENTATION.md", "## Prebuilt Reader"],
+  ["docs/use-components/use-with-a-framework.md", "## Install and register"],
+  ["docs/examples/this-weeks-portion.md", "### The card starts empty"],
 ];
 
 const temporaryDirectory = await mkdtemp(

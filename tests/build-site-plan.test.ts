@@ -32,6 +32,7 @@ describe("documentation site build plan", () => {
       "alpine",
       "linked-article",
       "mcp-app",
+      "weekly-portion",
     ]);
   });
 

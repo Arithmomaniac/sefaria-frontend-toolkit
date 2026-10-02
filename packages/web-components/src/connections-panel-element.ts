@@ -24,7 +24,21 @@ import {
   deriveSafeHtmlDisplay,
 } from "./vocalization-display.js";
 
-/** Category summaries and bounded connected-text details from supplied or acquired data. */
+/**
+ * Lists the commentaries and other texts that Sefaria connects to a reference. It groups them by category.
+ *
+ * @empty The element shows its empty state when no text connections remain after the element leaves out sheet links. A response with only sheets is empty too. The message is `No text connections were returned.`
+ * @fires sefaria-connections-category-change - Asks to show a different connection category. Call `preventDefault()` to stop the panel from switching to that category and returning to the first page.
+ * @eventDetail sefaria-connections-category-change - `category` is the chosen category's ID, or `null` for all categories.
+ * @fires sefaria-connections-preview-request - Requests connection previews. The element loads them unless a listener cancels the event. Call `preventDefault()` to stop the panel from loading previews itself. If you don't call it, a panel that loads from `sref` requests the connections again with their text.
+ * @eventDetail sefaria-connections-preview-request - No fields.
+ * @fires sefaria-connections-page-change - Asks to show a different page of connections. Call `preventDefault()` to stop the panel from changing page.
+ * @eventDetail sefaria-connections-page-change - `page` is the zero-based page number.
+ * @fires sefaria-connection-select - Reports that a reader selected one connected reference. Call `preventDefault()` to do nothing. The panel has no default action for this event.
+ * @eventDetail sefaria-connection-select - `id` is the connection's ID. `targetRef` is the connected text's reference.
+ * @fires sefaria-connections-panel-error - Reports a failure while loading or validating data from `sref`.
+ * @eventDetail sefaria-connections-panel-error - `error` is the original failure. `sref` is the reference that was loading.
+ */
 export class SefariaConnectionsPanel extends SefariaElement {
   /** Declarative data, request selection, and presentation properties. */
   static override properties = {
@@ -109,19 +123,19 @@ export class SefariaConnectionsPanel extends SefariaElement {
       }
     `,
   ];
-  /** Reference loaded when authoritative supplied data is absent. */
+  /** The Sefaria reference whose connections to load. */
   declare sref: string;
-  /** Optional element-specific data source. */
+  /** Where this element gets its data, instead of the shared data source. */
   declare source: SefariaDataSource | undefined;
-  /** Whether acquired or supplied links include connected text. */
+  /** Whether the links include the connected texts. */
   declare withText: boolean;
-  /** Exact category projected from the current captured response. */
+  /** Category of the loaded links to show. */
   declare category: string | undefined;
-  /** Zero-based local page projected from the current captured response. */
+  /** Zero-based page of the loaded links to show. */
   declare page: number;
-  /** Hides or reveals captured preview data without requesting it. */
+  /** Shows or hides the text previews already loaded, without fetching more. */
   declare showPreviews: boolean;
-  /** Hebrew vocalization preset applied to safe legacy-channel previews. */
+  /** How much Hebrew vowel and cantillation marking to keep in previews. `none` removes both. */
   declare vocalizationMode: VocalizationMode;
 
   #displayViewModel: ConnectionsViewModel | undefined;
@@ -181,7 +195,7 @@ export class SefariaConnectionsPanel extends SefariaElement {
     super.disconnectedCallback();
   }
 
-  /** Coarse lifecycle state without exposing prepared rendering data. */
+  /** Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`. */
   get status(): SefariaElementStatus {
     return this.#statusOverride ?? statusOf(this.#viewModel);
   }
