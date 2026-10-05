@@ -5,6 +5,7 @@ import DefaultTheme from "vitepress/theme";
 import ApiEntry from "./ApiEntry.vue";
 import CodeLanguageToggle from "./CodeLanguageToggle.vue";
 import DocumentationDisclosure from "./DocumentationDisclosure.vue";
+import DocumentationNotice from "./DocumentationNotice.vue";
 import HeroExample from "./HeroExample.vue";
 import HumanReviewWarning from "./HumanReviewWarning.vue";
 import LandingPreview from "./LandingPreview.vue";
@@ -19,6 +20,7 @@ export default {
   Layout: () => {
     const { frontmatter } = useData();
     return h(DefaultTheme.Layout, null, {
+      "layout-top": () => h(DocumentationNotice),
       "home-hero-info-after": () =>
         frontmatter.value.statusNote
           ? h(StatusNote, { class: "hero-status" })

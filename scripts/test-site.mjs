@@ -1,9 +1,10 @@
 import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
 import process from "node:process";
+import console from "node:console";
 import { URL } from "node:url";
 
-import { chromium } from "playwright";
+import { chromium, firefox, webkit } from "playwright";
 
 import { readSiteBasePath } from "./build-site-plan.mjs";
 import { legacyRedirects } from "../docs/.vitepress/redirects.mjs";
@@ -20,6 +21,9 @@ const siteRouteUrl = (route) => `${origin}${sitePath(route)}`;
 
 try {
   await previewServer.waitUntilReady();
+  for (const engine of [chromium, firefox, webkit]) {
+    await assertDocumentationNotice(engine);
+  }
   const browser = await chromium.launch({ headless: true });
   try {
     // Real response captured by scripts/capture-site-fixture.mjs.
@@ -154,6 +158,15 @@ try {
           scheme === "dark",
         );
       }, colorScheme);
+      await page.waitForFunction(() =>
+        globalThis.document
+          .getAnimations()
+          .every(
+            (animation) =>
+              !(animation instanceof globalThis.CSSTransition) ||
+              animation.playState === "finished",
+          ),
+      );
       const ratio = await page.locator(".VPHomeHero .name").evaluate((name) => {
         const parse = (value) =>
           value
@@ -680,6 +693,501 @@ try {
   }
 } finally {
   await previewServer.close();
+}
+
+async function assertDocumentationNotice(engine) {
+  const browser = await engine.launch({ headless: true });
+  try {
+    const label = (message) =>
+      `${engine.name()} documentation notice: ${message}`;
+    const unhydratedContext = await browser.newContext({
+      javaScriptEnabled: false,
+    });
+    const unhydrated = await unhydratedContext.newPage();
+    await unhydrated.goto(siteRouteUrl("/help/install-and-status.html"), {
+      waitUntil: "networkidle",
+    });
+    await assertEqual(
+      await unhydrated.locator(".documentation-notice").isVisible(),
+      false,
+      label("server-rendered notice is hidden without JavaScript"),
+    );
+    await assertEqual(
+      await unhydrated
+        .locator(".documentation-notice-slot")
+        .evaluate((node) => node.getBoundingClientRect().height),
+      0,
+      label("uninitialized notice reserves no space"),
+    );
+    await unhydratedContext.close();
+
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    const failures = [];
+    const requests = [];
+    page.on("pageerror", (error) => failures.push(error.message));
+    page.on("request", (request) => {
+      if (new URL(request.url()).hostname.endsWith("sefaria.org")) {
+        requests.push(request.url());
+      }
+    });
+    await page.goto(siteRouteUrl("/help/install-and-status.html"), {
+      waitUntil: "networkidle",
+    });
+    const notice = page.locator(".documentation-notice");
+    await notice.waitFor();
+    await assertText(notice, "This documentation is AI-generated.");
+    await assertText(
+      page.locator(".documentation-disclosure"),
+      "AI-generated documentation.",
+    );
+    const initialRequests = requests.length;
+
+    for (const width of [1280, 1000, 390, 320]) {
+      await page.setViewportSize({ width, height: 900 });
+      for (const dark of [false, true]) {
+        await page.evaluate((value) => {
+          globalThis.document.documentElement.classList.toggle("dark", value);
+        }, dark);
+        await page.waitForFunction(() => {
+          const bar = globalThis.document.querySelector(
+            ".documentation-notice",
+          );
+          const height = parseFloat(
+            globalThis
+              .getComputedStyle(globalThis.document.documentElement)
+              .getPropertyValue("--documentation-notice-height"),
+          );
+          return Math.abs(bar.getBoundingClientRect().height - height) < 1;
+        });
+        const geometry = await notice.evaluate((element) => {
+          const box = element.getBoundingClientRect();
+          const nav = globalThis.document
+            .querySelector(".VPNav")
+            .getBoundingClientRect();
+          const heading = globalThis.document
+            .querySelector("h1")
+            .getBoundingClientRect();
+          const background =
+            globalThis.getComputedStyle(element).backgroundColor;
+          const parse = (value) =>
+            value
+              .match(/[\d.]+/g)
+              .slice(0, 3)
+              .map(Number);
+          const luminance = (rgb) =>
+            rgb
+              .map((value) => {
+                const c = value / 255;
+                return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+              })
+              .reduce(
+                (sum, value, index) =>
+                  sum + value * [0.2126, 0.7152, 0.0722][index],
+                0,
+              );
+          const ratios = [
+            element,
+            element.querySelector(".documentation-details__trigger"),
+          ].map((node) => {
+            const levels = [
+              luminance(parse(globalThis.getComputedStyle(node).color)),
+              luminance(parse(background)),
+            ].sort((a, b) => b - a);
+            return (levels[0] + 0.05) / (levels[1] + 0.05);
+          });
+          return {
+            gap: box.top - nav.bottom,
+            height: box.height,
+            headingBelow: heading.top >= box.bottom,
+            fullWidth:
+              Math.abs(
+                box.width - globalThis.document.documentElement.clientWidth,
+              ) < 1,
+            overflow:
+              globalThis.document.documentElement.scrollWidth -
+              globalThis.document.documentElement.clientWidth,
+            background,
+            contrast: Math.min(...ratios),
+          };
+        });
+        await assertEqual(
+          Math.abs(geometry.gap) < 1,
+          true,
+          label(`navigation gap at ${width}px`),
+        );
+        await assertEqual(
+          geometry.headingBelow,
+          true,
+          label(`heading placement at ${width}px`),
+        );
+        await assertEqual(
+          geometry.fullWidth,
+          true,
+          label(`full width at ${width}px`),
+        );
+        await assertEqual(
+          geometry.overflow <= 0,
+          true,
+          label(`overflow at ${width}px`),
+        );
+        await assertEqual(
+          geometry.background,
+          dark ? "rgb(73, 59, 23)" : "rgb(255, 241, 184)",
+          label("yellow background"),
+        );
+        await assertEqual(
+          geometry.contrast >= 4.5,
+          true,
+          label("text and link contrast"),
+        );
+        if (width >= 960) {
+          await assertEqual(
+            geometry.height,
+            40,
+            label("compact desktop height"),
+          );
+        }
+      }
+    }
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.evaluate(() =>
+      globalThis.document.documentElement.classList.remove("dark"),
+    );
+
+    async function assertAnchorVisible(width) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.locator("#hosted-files .header-anchor").click();
+      await page.evaluate(async () => {
+        let previous = globalThis.scrollY;
+        for (let stable = 0; stable < 10;) {
+          await new Promise(globalThis.requestAnimationFrame);
+          const current = globalThis.scrollY;
+          stable = current === previous ? stable + 1 : 0;
+          previous = current;
+        }
+      });
+      const anchorVisible = await page.evaluate(() => {
+        const text = globalThis.document.createRange();
+        text.selectNodeContents(
+          globalThis.document.querySelector("#hosted-files"),
+        );
+        const heading = text.getBoundingClientRect();
+        const headerBottom = Math.max(
+          0,
+          ...[
+            ...globalThis.document.querySelectorAll(
+              ".documentation-notice-slot, .VPLocalNav, .VPNav",
+            ),
+          ]
+            .filter((node) => node.getClientRects().length > 0)
+            .map((node) => node.getBoundingClientRect().bottom),
+        );
+        return (
+          heading.top >= headerBottom &&
+          heading.bottom <= globalThis.innerHeight
+        );
+      });
+      await assertEqual(
+        anchorVisible,
+        true,
+        label(`anchor clears every visible navigation bar at ${width}px`),
+      );
+      await page.evaluate(() => globalThis.scrollTo(0, 0));
+    }
+
+    for (const width of [1280, 1000, 390]) {
+      await assertAnchorVisible(width);
+    }
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await page.evaluate(() => globalThis.scrollTo(0, 0));
+
+    async function openDetails(container) {
+      const trigger = container.getByRole("button", {
+        name: "Learn more",
+        exact: true,
+      });
+      await trigger.focus();
+      await page.keyboard.press("Enter");
+      const dialog = page.getByRole("dialog", {
+        name: "About this documentation",
+      });
+      await dialog.waitFor();
+      await assertEqual(
+        (
+          await dialog.locator(".documentation-details__content").innerText()
+        ).trim().length > 0,
+        true,
+        label("maintainer-authored explanation is visible"),
+      );
+      const fits = await dialog.evaluate((node) => {
+        const box = node.getBoundingClientRect();
+        return (
+          box.left >= 0 &&
+          box.right <= globalThis.innerWidth &&
+          box.top >= 0 &&
+          box.bottom <= globalThis.innerHeight
+        );
+      });
+      await assertEqual(fits, true, label("dialog fits the viewport"));
+      const first = dialog.getByRole("button", {
+        name: "Close documentation details",
+        exact: true,
+      });
+      const last = dialog.getByRole("button", { name: "Close", exact: true });
+      await assertEqual(
+        await first.evaluate(
+          (node) => globalThis.document.activeElement === node,
+        ),
+        true,
+        label("initial dialog focus"),
+      );
+      await page.keyboard.press("Shift+Tab");
+      await assertEqual(
+        await last.evaluate(
+          (node) => globalThis.document.activeElement === node,
+        ),
+        true,
+        label("backward focus containment"),
+      );
+      await page.keyboard.press("Tab");
+      await assertEqual(
+        await first.evaluate(
+          (node) => globalThis.document.activeElement === node,
+        ),
+        true,
+        label("forward focus containment"),
+      );
+      await page.keyboard.press("Escape");
+      await dialog.waitFor({ state: "hidden" });
+      await assertEqual(
+        await trigger.evaluate(
+          (node) => globalThis.document.activeElement === node,
+        ),
+        true,
+        label("Escape focus return"),
+      );
+      for (const closeName of ["Close documentation details", "Close"]) {
+        await trigger.click();
+        await dialog
+          .getByRole("button", { name: closeName, exact: true })
+          .click();
+        await dialog.waitFor({ state: "hidden" });
+        await assertEqual(
+          await trigger.evaluate(
+            (node) => globalThis.document.activeElement === node,
+          ),
+          true,
+          label("button focus return"),
+        );
+      }
+    }
+
+    await openDetails(notice);
+    await openDetails(page.locator(".documentation-disclosure"));
+    await page.setViewportSize({ width: 390, height: 844 });
+    await openDetails(notice);
+    await openDetails(page.locator(".documentation-disclosure"));
+    await page.evaluate(() => globalThis.scrollTo(0, 0));
+    await page.locator(".VPNavBarHamburger").click();
+    await page
+      .locator(".VPNavScreen")
+      .getByRole("link", { name: "Help", exact: true })
+      .waitFor();
+    await page.locator(".VPNavBarHamburger").click();
+    await page.locator(".VPNavScreen").waitFor({ state: "hidden" });
+    await page.locator(".VPLocalNav .menu").click();
+    await page.locator(".VPSidebar.open").waitFor();
+    await page.keyboard.press("Escape");
+    await page.locator(".VPSidebar.open").waitFor({ state: "hidden" });
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await assertEqual(
+      requests.length,
+      initialRequests,
+      label("no requests from details"),
+    );
+    await page.locator(".VPNavBarTitle").click();
+    await notice.waitFor();
+    await notice
+      .getByRole("button", { name: "Dismiss AI documentation notice" })
+      .click();
+    await notice.waitFor({ state: "hidden" });
+    await assertEqual(
+      await page.evaluate(() =>
+        globalThis
+          .getComputedStyle(globalThis.document.documentElement)
+          .getPropertyValue("--documentation-notice-height")
+          .trim(),
+      ),
+      "0px",
+      label("dismissal clears layout offsets"),
+    );
+    await page
+      .locator(".VPNavBarMenu")
+      .getByRole("link", { name: "Use components", exact: true })
+      .click();
+    await assertEqual(
+      await notice.count(),
+      0,
+      label("client navigation preserves dismissal"),
+    );
+    for (const width of [1280, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(siteRouteUrl("/help/install-and-status.html"), {
+        waitUntil: "networkidle",
+      });
+      let releaseBootstrap;
+      const bootstrap = new Promise((resolve) => {
+        releaseBootstrap = resolve;
+      });
+      const deferBootstrap = async (route) => {
+        await bootstrap;
+        await route.continue();
+      };
+      await page.route("**/*.js", deferBootstrap);
+      let headingBefore;
+      try {
+        await page.reload({ waitUntil: "commit" });
+        await notice.waitFor({ state: "attached" });
+        await page.waitForFunction(() =>
+          [
+            ...globalThis.document.querySelectorAll('link[rel="stylesheet"]'),
+          ].every((link) => link.sheet),
+        );
+        await assertEqual(
+          await notice.isVisible(),
+          false,
+          label(`dismissed notice is hidden before hydration at ${width}px`),
+        );
+        await assertEqual(
+          await page
+            .locator(".documentation-notice-slot")
+            .evaluate((node) => node.getBoundingClientRect().height),
+          0,
+          label(`no pre-hydration notice gap at ${width}px`),
+        );
+        headingBefore = await page
+          .locator("h1")
+          .evaluate((node) => node.getBoundingClientRect().top);
+      } finally {
+        releaseBootstrap();
+        await page.unrouteAll({ behavior: "wait" });
+      }
+      await page.waitForLoadState("networkidle");
+      await assertEqual(
+        await page
+          .locator("h1")
+          .evaluate(
+            (node, before) =>
+              Math.abs(node.getBoundingClientRect().top - before) < 1,
+            headingBefore,
+          ),
+        true,
+        label(`dismissed reload has no notice layout shift at ${width}px`),
+      );
+      await assertAnchorVisible(width);
+    }
+    await assertAnchorVisible(1000);
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await assertEqual(
+      await notice.count(),
+      0,
+      label("reload preserves dismissal"),
+    );
+    const nextPage = await context.newPage();
+    await nextPage.goto(
+      siteRouteUrl("/use-components/show-an-attributed-passage.html"),
+      { waitUntil: "networkidle" },
+    );
+    await assertEqual(
+      await nextPage.locator(".documentation-notice").count(),
+      0,
+      label("another tab preserves dismissal"),
+    );
+    await assertText(
+      nextPage.locator(".human-review-warning"),
+      "This page has not been reviewed by a human.",
+    );
+    await assertEqual(
+      await nextPage
+        .locator(".human-review-warning")
+        .getByText("GitHub Copilot")
+        .count(),
+      0,
+      label("no repeated AI attribution"),
+    );
+    await openDetails(page.locator(".documentation-disclosure"));
+    await assertEqual(
+      failures.length,
+      0,
+      label(`page errors ${failures.join("; ")}`),
+    );
+    await context.close();
+
+    const blockedContext = await browser.newContext();
+    await blockedContext.addInitScript(() => {
+      Object.defineProperty(globalThis, "localStorage", {
+        get() {
+          throw new globalThis.DOMException(
+            "Storage blocked for this test",
+            "SecurityError",
+          );
+        },
+      });
+    });
+    const blocked = await blockedContext.newPage();
+    const warnings = [];
+    blocked.on("console", (message) => {
+      if (message.type() === "warning") warnings.push(message.text());
+    });
+    await blocked.goto(siteRouteUrl("/help/install-and-status.html"), {
+      waitUntil: "networkidle",
+    });
+    await blocked.locator(".documentation-notice").waitFor();
+    await blocked
+      .getByRole("button", { name: "Dismiss AI documentation notice" })
+      .click();
+    await assertEqual(
+      await blocked.locator(".documentation-notice").count(),
+      0,
+      label("storage-blocked dismissal"),
+    );
+    await assertEqual(
+      warnings.some((message) =>
+        message.includes("Could not read documentation notice preference"),
+      ),
+      true,
+      label("storage read diagnostic"),
+    );
+    await assertEqual(
+      warnings.some((message) =>
+        message.includes("Could not save documentation notice preference"),
+      ),
+      true,
+      label("storage write diagnostic"),
+    );
+    await blocked
+      .locator(".VPNavBarMenu")
+      .getByRole("link", { name: "Use components", exact: true })
+      .click();
+    await assertEqual(
+      await blocked.locator(".documentation-notice").count(),
+      0,
+      label("storage-blocked client navigation"),
+    );
+    await blockedContext.close();
+
+    const freshContext = await browser.newContext();
+    const fresh = await freshContext.newPage();
+    await fresh.goto(siteRouteUrl("/help/install-and-status.html"), {
+      waitUntil: "networkidle",
+    });
+    await fresh.locator(".documentation-notice").waitFor();
+    await freshContext.close();
+    console.log(label("passed"));
+  } finally {
+    await browser.close();
+  }
 }
 
 async function routeToolkitRequests(

@@ -130,4 +130,16 @@ Example pages embed the complete first-party example apps, such as `/examples/li
 
 ## Human-review warning
 
-A page with `humanReviewed: false` in its front matter shows a warning box under its title (`HumanReviewWarning.vue`, in the `doc-before` slot). It appears in the built HTML. Remove the flag once the maintainer signs off the page. Don't add review notes to the page text.
+A page with `humanReviewed: false` in its front matter shows the sentence "This page has not been reviewed by a human." in a warning box after its H1. The Markdown rule in `docs/.vitepress/config.ts` inserts `HumanReviewWarning.vue`, including in the built HTML. Remove the flag once the maintainer signs off the page. Don't add review notes to the page text.
+
+## AI-documentation notice
+
+`DocumentationNotice.vue` renders the compact yellow bar directly below the main navigation. Dismissal uses the `sefaria-docs:ai-notice-dismissed` localStorage key and persists across later browser visits. If storage is blocked, dismissal still applies for the current visit and a console warning explains that persistence failed. The footer disclosure and page-specific review warnings remain visible.
+
+The bar uses opt-in styling: its base CSS hides it and its height offset starts at zero. Only after reading the saved preference does the mounted component apply `documentation-notice--visible` for an undismissed notice. A dismissed reload therefore shows neither the bar nor a temporary blank gap, even while JavaScript is delayed.
+
+The banner and footer use `DocumentationDetails.vue` for their Learn-more control and accessible native dialog. That file owns the maintainer's explanation text; edit it once to update both entry points. The dialog closes with Escape or either Close control and restores focus to its opener.
+
+The `layout-top` slot supplies the notice; shared CSS puts mobile navigation ahead of it and reserves the fixed desktop header's space. A ResizeObserver publishes the current bar height for sticky local navigation and sidebar offsets, including wrapped mobile copy and dismissal. Keep the bar's vertical spacing compact and do not move it inside the navigation row.
+
+The zero-size `documentation-notice-scroll-target` supplies the anchor-scroll offset without reserving layout space. At 960–1279px it also accounts for VitePress's 48px local-navigation bar when that bar is present and has an outline. Wider screens retain the banner-only offset; mobile falls back to the visible local navigation after the notice scrolls away.

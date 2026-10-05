@@ -29,6 +29,49 @@ const codeTextContent = (html: string) =>
     .replaceAll("&amp;", "&");
 
 describe("documentation site", () => {
+  it("mounts the documentation notice above the existing layout content", async () => {
+    const theme = await readFile(
+      path.join(root, "docs", ".vitepress", "theme", "index.ts"),
+      "utf8",
+    );
+
+    expect(theme).toContain('"layout-top"');
+    expect(theme).toContain("DocumentationNotice");
+    expect(theme).toContain("DocumentationDisclosure");
+  });
+
+  it("keeps the footer disclosure short and its explanation reusable", async () => {
+    const footer = await readFile(
+      path.join(
+        root,
+        "docs",
+        ".vitepress",
+        "theme",
+        "DocumentationDisclosure.vue",
+      ),
+      "utf8",
+    );
+
+    expect(footer).toContain("AI-generated documentation.");
+    expect(footer).toContain("DocumentationDetails");
+    expect(footer).not.toMatch(
+      /<p>\s*AI-generated documentation\.\s*<DocumentationDetails/u,
+    );
+    expect(footer).not.toContain("pending human");
+    expect(footer).toContain("Get support");
+  });
+
+  it("uses a complete sentence without repeated authorship in review warnings", async () => {
+    const warning = await readFile(
+      path.join(root, "docs", ".vitepress", "theme", "HumanReviewWarning.vue"),
+      "utf8",
+    );
+
+    expect(warning).toContain("This page has not been reviewed by a human.");
+    expect(warning).not.toContain("GitHub Copilot");
+    expect(warning).not.toContain("Not reviewed yet");
+  });
+
   it("keeps Home focused without hero actions", async () => {
     const index = await readFile(path.join(root, "docs", "index.md"), "utf8");
     const theme = await readFile(
