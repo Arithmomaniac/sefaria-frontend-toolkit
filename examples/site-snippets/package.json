@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@arithmomaniac/sefaria-client": "workspace:*",
-    "@arithmomaniac/sefaria-text-transform": "workspace:*",
-    "@arithmomaniac/sefaria-web-components": "workspace:*"
+    "@sefaria/api-client": "workspace:*",
+    "@sefaria/text-transform": "workspace:*",
+    "@sefaria/web-components": "workspace:*"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"

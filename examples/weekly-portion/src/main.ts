@@ -1,5 +1,5 @@
-import "@arithmomaniac/sefaria-web-components";
-import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
+import "@sefaria/web-components";
+import type { SefariaSourceCard } from "@sefaria/web-components";
 
 import { showWeeklyPortion } from "./app.js";
 

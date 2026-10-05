@@ -1,1 +1,1 @@
-export * from "@arithmomaniac/sefaria-web-components/data-source";
+export * from "@sefaria/web-components/data-source";

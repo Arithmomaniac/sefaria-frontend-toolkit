@@ -28,7 +28,7 @@ Use the package route if your app already has a build step. Use the CDN route if
 
 ### Packages
 
-Install `@arithmomaniac/sefaria-client`, `@arithmomaniac/sefaria-text-transform`, or both. They are on GitHub Packages, which needs an access token before you can install. [Install and status](/help/install-and-status.md) shows how to set up the token and gives the exact install command for the current version. The packages need Node.js 22.12 or later.
+Install `@sefaria/api-client`, `@sefaria/text-transform`, or both. They are on GitHub Packages, which needs an access token before you can install. [Install and status](/help/install-and-status.md) shows how to set up the token and gives the exact install command for the current version. The packages need Node.js 22.12 or later.
 
 ### No install
 
@@ -39,8 +39,8 @@ Import the client and the text tools straight from the CDN. The client and the t
   import {
     createSefariaClient,
     text,
-  } from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-client.js";
-  import { normalizeText } from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-text-transform.js";
+  } from "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-api-client.js";
+  import { normalizeText } from "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-text-transform.js";
 </script>
 ```
 

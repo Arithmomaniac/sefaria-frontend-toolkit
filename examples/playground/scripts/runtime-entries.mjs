@@ -1,14 +1,12 @@
 export const PUBLIC_ENTRIES = {
-  "@arithmomaniac/sefaria-client": "client",
-  "@arithmomaniac/sefaria-client/validation": "client-validation",
-  "@arithmomaniac/sefaria-web-components": "web-components",
-  "@arithmomaniac/sefaria-web-components/data-source": "data-source",
-  "@arithmomaniac/sefaria-web-components/bilingual-segment":
-    "bilingual-segment",
-  "@arithmomaniac/sefaria-web-components/connections-panel":
-    "connections-panel",
-  "@arithmomaniac/sefaria-web-components/reader": "reader",
-  "@arithmomaniac/sefaria-web-components/reader-session": "reader-session",
-  "@arithmomaniac/sefaria-web-components/source-card": "source-card",
-  "@arithmomaniac/sefaria-web-components/text-segment": "text-segment",
+  "@sefaria/api-client": "client",
+  "@sefaria/api-client/validation": "client-validation",
+  "@sefaria/web-components": "web-components",
+  "@sefaria/web-components/data-source": "data-source",
+  "@sefaria/web-components/bilingual-segment": "bilingual-segment",
+  "@sefaria/web-components/connections-panel": "connections-panel",
+  "@sefaria/web-components/reader": "reader",
+  "@sefaria/web-components/reader-session": "reader-session",
+  "@sefaria/web-components/source-card": "source-card",
+  "@sefaria/web-components/text-segment": "text-segment",
 };

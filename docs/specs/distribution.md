@@ -4,15 +4,15 @@
 
 ## Status
 
-This specification defines the current public prerelease distribution contract. The three existing package records are public, and synchronized release `0.0.0-alpha.35489617787.2` passed hosted publication and installed-consumer qualification on September 20, 2026.
+This specification defines the Sefaria-owned distribution contract. The ownership migration, first publication under the new package names, and hosted qualification are planned until the rollout steps below complete. Historical publication under the former package scope does not qualify these new identities.
 
 ## Package set
 
 The publication set contains exactly:
 
-- `@arithmomaniac/sefaria-client`
-- `@arithmomaniac/sefaria-text-transform`
-- `@arithmomaniac/sefaria-web-components`
+- `@sefaria/api-client`
+- `@sefaria/text-transform`
+- `@sefaria/web-components`
 
 The package names are experimental and subject to change. The packages are published only to the npm-format GitHub Packages registry at `https://npm.pkg.github.com`; they are not published on npmjs.com. The separate browser script source specified below provides anonymous loading without installing those packages.
 
@@ -20,12 +20,12 @@ The package names are experimental and subject to change. The packages are publi
 
 **Implementation status:** local build and deterministic qualification are implemented, and a P5 release is hosted. New builds produce one self-contained, minified, tree-shaken ES module registering all five remaining elements. Consumers need neither package-registry authentication nor a build step, import map, external runtime dependency, or separate stylesheet. The module preserves the package-root exports and existing element contracts; it does not add source, retry, caching, or rendering policy.
 
-The pinned path is `https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/<package-version>/sefaria-elements.js`. The moving path is `https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js`.
+The pinned path is `https://sefaria.github.io/sefaria-frontend-toolkit/cdn/<package-version>/sefaria-elements.js`. The moving path is `https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js`.
 
 ```html
 <script
   type="module"
-  src="https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
+  src="https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
 ></script>
 <sefaria-source-card sref="Micah 6:8"></sefaria-source-card>
 ```
@@ -34,23 +34,23 @@ The pinned path is `https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn
 
 **Implementation status:** local build, deterministic qualification, and hosting are implemented. The `alpha` channel and releases since PR #47 serve all three modules. Older pinned releases serve only `sefaria-elements.js`. Builds produce two self-contained, minified ES modules beside `sefaria-elements.js`. Each one re-exports one package root API.
 
-| File                        | Package root                            |
-| --------------------------- | --------------------------------------- |
-| `sefaria-client.js`         | `@arithmomaniac/sefaria-client`         |
-| `sefaria-text-transform.js` | `@arithmomaniac/sefaria-text-transform` |
+| File                        | Package root              |
+| --------------------------- | ------------------------- |
+| `sefaria-api-client.js`     | `@sefaria/api-client`     |
+| `sefaria-text-transform.js` | `@sefaria/text-transform` |
 
-Each file name is the unscoped package name. `sefaria-elements.js` is named for the elements it registers. These modules have no side effects, so they are named for the package API they expose. They add no source, retry, caching, or transport policy beyond the package root. They run without an import map. Like the elements module, they also run inside an opaque-origin sandboxed `srcdoc` iframe, where Sefaria requests carry `Origin: null`.
+Browser filenames are independent of scoped package names. New client modules use `sefaria-api-client.js`; retained older releases keep `sefaria-client.js`. `sefaria-elements.js` is named for the elements it registers. The data modules add no source, retry, caching, or transport policy beyond the package root. They run without an import map. Like the elements module, they also run inside an opaque-origin sandboxed `srcdoc` iframe, where Sefaria requests carry `Origin: null`.
 
 ```js
 import {
   createSefariaClient,
   text,
   validateExternalResponse,
-} from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-client.js";
+} from "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-api-client.js";
 import {
   normalizeText,
   applyVocalization,
-} from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-text-transform.js";
+} from "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-text-transform.js";
 ```
 
 A module instance is independent: a client module and the elements module do not share a client, cache, or default source. All three modules in a release share one license, notice, source archive, and manifest. Releases retained from before this change keep their elements-only file set.
@@ -71,11 +71,11 @@ The complete assembled site has a conservative publication budget of 1,000,000,0
 
 The moving `alpha` directory contains the exact files of the newest active release, ordered by producer run number and attempt rather than completion time. Retiring the newest release selects the next active release. If none remain, no script alias is served and the catalog reports that state.
 
-Names and URLs may change. The existing Pages location remains the host for retained original URLs; repository redirects are not a substitute for preserving project-site files. This continuity obligation applies only while a version is retained and is not a guarantee of third-party hosting uptime.
+The supported host is `https://sefaria.github.io/sefaria-frontend-toolkit/`. The ownership migration supersedes the earlier promise to preserve the personal-account Pages location: those URLs are no longer supported. Retained releases keep their original bytes at the Sefaria host. Repository redirects do not preserve old project-site URLs.
 
 ### License, source, and size
 
-Each release includes the toolkit's GPL-3.0-only license, full required third-party license notices derived from the actual bundled dependency graph, corresponding-source access, and a manifest identifying its exact source commit, dependency versions, and file hashes. Notices cover the union of dependencies bundled by every module. Manifest schema version 2 lists every module with its own measured size. Restoration still accepts the schema version 1, elements-only manifests of retained releases. Missing license or source evidence blocks publication. Retirement of script serving does not waive applicable source-distribution obligations.
+New releases include the toolkit's MIT license with Sefaria copyright, full required third-party license notices derived from the actual bundled dependency graph, corresponding-source access, and a manifest identifying the exact source commit, dependency versions, and file hashes. Notices cover the union of dependencies bundled by every module. Manifest schema version 3 lists every module with its own measured size and uses `sefaria-api-client.js`. Restoration accepts explicit schema version 1 (elements-only) and version 2 (including `sefaria-client.js`) inventories unchanged. Mixed or unexpected inventories fail validation. Historical GPL releases retain their original license and source obligations. Missing required license or source evidence blocks publication.
 
 The build records raw bytes and gzip bytes with fixed compression settings. Measurement is over the final minified module and is checked against its bytes; it is not a claim about the encoding served by Pages. The initial delivery also records an all-elements versus per-element/shared-chunk comparison, including the complete Source Card dependency closure.
 
@@ -95,9 +95,25 @@ The publication job builds isolated staged packages. A staged manifest sets `pri
 
 ## Release gate and versioning
 
-Only a push to the current `main` head may publish, after the complete Linux and Windows validation matrix and fail-closed `check` job succeed. The one-time rollout gate `PUBLIC_PACKAGES_ENABLED` must also equal `true`; it remains unset while the new workflow lands and is enabled only after all three existing package records are public. The publication job uses repository-scoped `packages: write` and the run's short-lived `GITHUB_TOKEN`; it must not use a long-lived publishing secret.
+Normal publication requires a push to the current `main` head after the complete Linux and Windows validation matrix and fail-closed `check` job succeed. The new rollout gate `SEFARIA_PACKAGES_ENABLED` must equal `true`; an inherited `PUBLIC_PACKAGES_ENABLED` value does not authorize the new namespace. A repository administrator enables the new gate only after all three Sefaria package records are public and correctly linked. The publication job uses repository-scoped `packages: write` and the run's short-lived `GITHUB_TOKEN`; it must not use a long-lived publishing secret.
+
+CI and bootstrap call the same read-only matrix validation workflow and the same package-publication workflow. Each caller retains its fail-closed `check` and explicit main/activation gate. The publication workflow accepts only a required Boolean bootstrap mode, independently enforces that mode's event/main/activation boundary, owns the shared non-cancelable publication concurrency group, and returns the verified producer version. No caller supplies arbitrary commands, registry configuration, or credentials.
+
+### First publication
+
+An explicit main-only bootstrap workflow runs the same complete validation matrix while normal Sefaria publication is disabled. It requires a successful authenticated organization package inventory; an authorization failure or anonymous package-page 404 is not proof that a record is absent. Existing target records must belong to this repository. Bootstrap publishes and verifies an exact synchronized version, including isolated installed-consumer imports, but does not advertise public availability or archive a browser release. It can create initially private records; publish flags do not prove visibility.
+
+A partial attempt is repaired by another explicit attempt with a new version, never by overwriting a version. A Sefaria package administrator confirms or changes visibility and workflow access before a repository administrator enables normal publication. Normal preflight continues to reject absent, private, redirected, or mismatched records.
 
 Every publication uses the immutable prerelease version `0.0.0-alpha.<run-id>.<run-attempt>` and the `alpha` tag. The client publishes first, followed by text transform and Web Components. A failed partial publication is repaired by a later run attempt with a new synchronized version; versions are never overwritten.
+
+## CDN-ready package contents
+
+Each package also ships its corresponding self-contained ES module under `dist/browser`: `sefaria-api-client.js`, `sefaria-text-transform.js`, or `sefaria-elements.js`, with colocated `LICENSE.txt` and `THIRD-PARTY-NOTICES.txt`. A clean build produces these before packing or staging. Ordinary package exports and Node-safe subpaths are unchanged. Qualification loads files extracted from real tarballs through a separate-origin static host, without a bundler, import map, workspace fallback, or CDN transformation.
+
+The package build bundles each browser module once and writes private build evidence under `.artifacts`. Script-release assembly copies those exact package bytes rather than bundling again. It validates fingerprints for the build recipe, module inputs, dependency identities/notices, toolkit license, and packaged browser outputs before using the captured dependency graph for combined notices and source archival. Missing, malformed, or stale evidence fails explicitly and never triggers a fallback build. This private handoff is not packed into the packages or added to the public manifest schema. Retained archives are still restored from their original bytes, not from package builds.
+
+Publication on npmjs.com and delivery through npm-backed CDNs are planned, not enabled by preparing these files. A later launch requires Sefaria npm namespace authority, publishing authorization, a release workflow and version policy, and hosted qualification. GitHub organization membership does not establish npm authority. CDN URLs use the npm package name, version, and file path; third-party retention can outlast package deletion and does not inherit the Pages retirement policy.
 
 ## Visibility and verification
 
@@ -109,7 +125,7 @@ After publishing, verification repeats those checks for the new synchronized ver
 
 ## Consumer authentication
 
-GitHub Packages requires authentication to install public npm-format packages. Consumers configure only the `@arithmomaniac` scope for `https://npm.pkg.github.com` and authenticate with a classic personal access token carrying `read:packages`, or with an authorized repository `GITHUB_TOKEN` in GitHub Actions.
+GitHub Packages requires authentication to install public npm-format packages. Consumers configure only the `@sefaria` scope for `https://npm.pkg.github.com` and authenticate with a classic personal access token carrying `read:packages`, or with an authorized repository `GITHUB_TOKEN` in GitHub Actions.
 
 Documentation must never include a token value or imply anonymous installation. It must distinguish npm-compatible package tooling from npmjs.com publication and must identify the synchronized exact alpha version being installed.
 

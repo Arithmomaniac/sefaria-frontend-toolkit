@@ -1,16 +1,16 @@
 {
-  "name": "@arithmomaniac/sefaria-client",
+  "name": "@sefaria/api-client",
   "version": "0.0.0",
   "description": "Source-backed Sefaria API client with generated contracts, validators, and bounded caching.",
   "private": true,
   "type": "module",
-  "license": "GPL-3.0-only",
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Arithmomaniac/sefaria-frontend-toolkit.git",
+    "url": "git+https://github.com/Sefaria/sefaria-frontend-toolkit.git",
     "directory": "packages/client"
   },
-  "homepage": "https://github.com/Arithmomaniac/sefaria-frontend-toolkit#readme",
+  "homepage": "https://github.com/Sefaria/sefaria-frontend-toolkit#readme",
   "files": [
     "dist",
     "!dist/*.tsbuildinfo",

@@ -2,7 +2,7 @@ import {
   text,
   type CoreV3TextsResponse,
   type CoreV3Version,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 import type { SefariaDataSource } from "./data-source.js";
 import { validateSuppliedComponentData } from "./component-controller.js";
 

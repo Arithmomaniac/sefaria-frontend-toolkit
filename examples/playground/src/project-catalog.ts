@@ -196,7 +196,7 @@ function validateManifest(
   const sourceBaseUrl = value.sourceBaseUrl as string;
   if (
     !sourceBaseUrl.startsWith(
-      "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/",
+      "https://github.com/Sefaria/sefaria-frontend-toolkit/blob/main/",
     )
   ) {
     throw new Error(`Playground project ${id} has an invalid sourceBaseUrl.`);

@@ -1,12 +1,12 @@
 > Created/edited by GitHub Copilot; pending human review.
 
-# `@arithmomaniac/sefaria-text-transform` implementation notes
+# `@sefaria/text-transform` implementation notes
 
-These notes are for maintainers. They were moved unchanged from the package README, which is now a short entry point. For usage, see the [documentation site](https://arithmomaniac.github.io/sefaria-frontend-toolkit/).
+These notes are for maintainers. They were moved unchanged from the package README, which is now a short entry point. For usage, see the [documentation site](https://sefaria.github.io/sefaria-frontend-toolkit/).
 
-`@arithmomaniac/sefaria-text-transform` provides deterministic, DOM-free operations for Sefaria text HTML and Hebrew vocalization.
+`@sefaria/text-transform` provides deterministic, DOM-free operations for Sefaria text HTML and Hebrew vocalization.
 
-The committed source manifest remains private to prevent accidental publication. Public GitHub Packages prereleases are available for authenticated installation; the package name is subject to change, and it is not published on npmjs.com. Follow the repository [installation instructions](../../docs/use-components/start-here.md#installation-status).
+The committed source manifest remains private to prevent accidental publication. First GitHub Packages publication under the Sefaria name is pending qualification; installation will require authentication, and the package is not published on npmjs.com. Follow the repository [installation instructions](../../docs/help/install-and-status.md#packages).
 
 For an illustrated tour of the input, read [Text markup](../../docs/concepts/clean-text-and-safety.md). For the surrounding client and component pipeline, read [How the pieces fit together](../../docs/concepts/how-the-toolkit-works.md).
 
@@ -19,7 +19,7 @@ Components prepare transformed text in this order:
 3. Call `applyVocalizationToHtml` on each safe HTML field when deriving a non-full display mode.
 4. Let the component element decorate local `data-sefaria-note` placeholders from the matching note records.
 
-API validation and HTML sanitation are separate controls. `@arithmomaniac/sefaria-client` validates the JSON response shape; this package restricts markup inside valid string fields.
+API validation and HTML sanitation are separate controls. `@sefaria/api-client` validates the JSON response shape; this package restricts markup inside valid string fields.
 
 ## Implementation notes
 
@@ -44,7 +44,7 @@ Body and note serialization share one output limit. Exceeding eight times the in
 ### Bounded connected-text previews
 
 ```ts
-import { createTextPreview } from "@arithmomaniac/sefaria-text-transform";
+import { createTextPreview } from "@sefaria/text-transform";
 
 const preview = createTextPreview(apiHtml, 3500);
 ```
@@ -54,7 +54,7 @@ The operation runs the normalizer with footnotes and metadata disabled, then ret
 ## Vocalization
 
 ```ts
-import { applyVocalization } from "@arithmomaniac/sefaria-text-transform";
+import { applyVocalization } from "@sefaria/text-transform";
 
 const unpointed = applyVocalization("בְּרֵאשִׁ֖ית", "none");
 ```
@@ -68,7 +68,7 @@ Use `applyVocalizationToHtml` for an already-sanitized HTML fragment. It changes
 ## Text normalization
 
 ```ts
-import { normalizeText } from "@arithmomaniac/sefaria-text-transform";
+import { normalizeText } from "@sefaria/text-transform";
 
 const result = normalizeText(apiText, {
   allowFootnotes: true,

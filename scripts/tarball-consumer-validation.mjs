@@ -11,14 +11,26 @@ export function validatePackedPackage({
   if (manifest.name !== definition.name || manifest.private !== true) {
     throw new Error(`${definition.name} packed manifest is incorrect.`);
   }
+  if (definition.browserFile) {
+    for (const filename of [
+      definition.browserFile,
+      "LICENSE.txt",
+      "THIRD-PARTY-NOTICES.txt",
+    ]) {
+      const archivePath = `package/dist/browser/${filename}`;
+      if (!contents.has(archivePath))
+        throw new Error(
+          `${definition.name} tarball is missing ${archivePath}.`,
+        );
+    }
+  }
   if (
-    definition.name === "@arithmomaniac/sefaria-web-components" &&
-    (manifest.dependencies?.["@arithmomaniac/sefaria-client"] !== "0.0.0" ||
-      manifest.dependencies?.["@arithmomaniac/sefaria-text-transform"] !==
-        "0.0.0")
+    definition.name === "@sefaria/web-components" &&
+    (manifest.dependencies?.["@sefaria/api-client"] !== "0.0.0" ||
+      manifest.dependencies?.["@sefaria/text-transform"] !== "0.0.0")
   ) {
     throw new Error(
-      "@arithmomaniac/sefaria-web-components internal dependency versions were not packed exactly.",
+      "@sefaria/web-components internal dependency versions were not packed exactly.",
     );
   }
   if ([...contents].some((entry) => entry.startsWith("package/src/"))) {
@@ -90,7 +102,7 @@ export function validateConsumerLockfile(lockfile, definitions) {
       );
     }
   }
-  if (/https?:[^\n]*@arithmomaniac\/sefaria-/u.test(lockfile)) {
+  if (/https?:[^\n]*@sefaria\//u.test(lockfile)) {
     throw new Error(
       "Consumer lockfile resolved a toolkit package from a registry.",
     );

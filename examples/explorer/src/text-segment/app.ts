@@ -1,10 +1,7 @@
-import {
-  createSefariaClient,
-  type SefariaClient,
-} from "@arithmomaniac/sefaria-client";
-import "@arithmomaniac/sefaria-web-components";
-import type { SefariaTextSegment } from "@arithmomaniac/sefaria-web-components";
-import type { TextSegmentRequest } from "@arithmomaniac/sefaria-web-components/text-segment";
+import { createSefariaClient, type SefariaClient } from "@sefaria/api-client";
+import "@sefaria/web-components";
+import type { SefariaTextSegment } from "@sefaria/web-components";
+import type { TextSegmentRequest } from "@sefaria/web-components/text-segment";
 
 import {
   setOptionalElementAttribute,

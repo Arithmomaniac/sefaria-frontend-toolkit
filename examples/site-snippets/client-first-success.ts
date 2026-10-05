@@ -1,4 +1,4 @@
-import { createSefariaClient, text } from "@arithmomaniac/sefaria-client";
+import { createSefariaClient, text } from "@sefaria/api-client";
 
 const client = createSefariaClient();
 

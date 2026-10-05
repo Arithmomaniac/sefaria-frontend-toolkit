@@ -1,5 +1,5 @@
 import { css, html, nothing, type CSSResult, type TemplateResult } from "lit";
-import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
+import type { VocalizationMode } from "@sefaria/text-transform";
 
 import { prepared } from "./prepared-state.js";
 import "./text-segment-element.js";

@@ -1,0 +1,74 @@
+name: Publish toolkit packages
+
+on:
+  workflow_call:
+    inputs:
+      bootstrap:
+        required: true
+        type: boolean
+    outputs:
+      version:
+        value: ${{ jobs.publish.outputs.version }}
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    name: publish verified prerelease
+    timeout-minutes: 30
+    if: ${{ github.ref == 'refs/heads/main' && ((inputs.bootstrap && github.event_name == 'workflow_dispatch' && vars.SEFARIA_PACKAGES_ENABLED != 'true') || (!inputs.bootstrap && github.event_name == 'push' && vars.SEFARIA_PACKAGES_ENABLED == 'true')) }}
+    concurrency:
+      group: sefaria-package-publication
+      cancel-in-progress: false
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      version: ${{ steps.release-version.outputs.version }}
+    env:
+      PUBLISH_VERSION: 0.0.0-alpha.${{ github.run_id }}.${{ github.run_attempt }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://npm.pkg.github.com
+          scope: "@sefaria"
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: node scripts/package-publication.mjs stage --version "$PUBLISH_VERSION"
+      - name: Require the current main head
+        run: |
+          git fetch --no-tags --depth=1 origin main
+          test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"
+      - if: ${{ inputs.bootstrap }}
+        run: node scripts/package-publication.mjs bootstrap-preflight
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
+      - if: ${{ !inputs.bootstrap }}
+        run: node scripts/package-publication.mjs preflight
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
+      - run: pnpm publish .artifacts/publish/client --tag alpha --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
+      - run: pnpm publish .artifacts/publish/text-transform --tag alpha --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
+      - run: pnpm publish .artifacts/publish/web-components --tag alpha --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
+      - if: ${{ inputs.bootstrap }}
+        run: node scripts/package-publication.mjs bootstrap-verify --version "$PUBLISH_VERSION"
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
+      - if: ${{ !inputs.bootstrap }}
+        run: node scripts/package-publication.mjs verify --version "$PUBLISH_VERSION"
+        env:
+          NODE_AUTH_TOKEN: ${{ github.token }}
+      - id: release-version
+        run: echo "version=$PUBLISH_VERSION" >> "$GITHUB_OUTPUT"

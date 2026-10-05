@@ -17,7 +17,7 @@ You want a page that shows this week's Torah portion. You don't want to edit the
 
 When the example loads, it looks up the portion for your current local date. Reload the page to update it. It makes one client call to Sefaria's calendar, reads the portion's reference from the answer, and sets that reference on a Source Card.
 
-This is a complete app (Vite and TypeScript) in `examples/weekly-portion`. It loads live when this page opens. You can't edit it here. To read its source, see [the example on GitHub](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/weekly-portion).
+This is a complete app (Vite and TypeScript) in `examples/weekly-portion`. It loads live when this page opens. You can't edit it here. To read its source, see [the example on GitHub](https://github.com/Sefaria/sefaria-frontend-toolkit/tree/main/examples/weekly-portion).
 
 <iframe :src="withBase('/examples/weekly-portion/')" title="This week's portion example" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy" style="width: 100%; height: 640px; border: 1px solid var(--vp-c-divider); border-radius: 8px;"></iframe>
 
@@ -34,12 +34,12 @@ The page holds an empty Source Card. With no `sref`, the card stays blank (its `
 To register the elements, `main.ts` imports the package root. Your own app does the same:
 
 ```ts
-import "@arithmomaniac/sefaria-web-components";
+import "@sefaria/web-components";
 ```
 
 ### The calendar call
 
-The app calls `calendars.getCalendars` from `@arithmomaniac/sefaria-client`. That call goes to Sefaria's `/api/calendars`. You pass `year`, `month` and `day` together, or Sefaria uses today. You pass `diaspora` to pick the reading: `"1"` for the diaspora and `"0"` for Israel. The client checks the response against its schema.
+The app calls `calendars.getCalendars` from `@sefaria/api-client`. That call goes to Sefaria's `/api/calendars`. You pass `year`, `month` and `day` together, or Sefaria uses today. You pass `diaspora` to pick the reading: `"1"` for the diaspora and `"0"` for Israel. The client checks the response against its schema.
 
 <CodeLanguageToggle :snippet="snippets['weekly-portion-calendar-call']" />
 

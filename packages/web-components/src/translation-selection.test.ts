@@ -2,7 +2,7 @@ import { expect, test, vi } from "vitest";
 import {
   createSefariaClient,
   type CoreV3TextsResponse,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 import micah from "../../../examples/react-vite/src/micah-6-8.json";
 import {
   createTextSegmentViewModel,

@@ -1,11 +1,11 @@
-Read https://arithmomaniac.github.io/sefaria-frontend-toolkit/llms.txt first. It describes the Sefaria Frontend Toolkit, a set of web components that show Sefaria texts.
+Read https://sefaria.github.io/sefaria-frontend-toolkit/llms.txt first. It describes the Sefaria Frontend Toolkit, a set of web components that show Sefaria texts.
 
 Build me a page that uses the Sefaria Frontend Toolkit's components to show the passage I describe below. For example, to show Micah 6:8: <sefaria-source-card sref="Micah 6:8"></sefaria-source-card>
 
 Install route:
 
-- If the page has no build step, add this one script tag: <script type="module" src="https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"></script>
-- If the app has a build step, install @arithmomaniac/sefaria-web-components from GitHub Packages and import the package root exactly as: import "@arithmomaniac/sefaria-web-components"; Element subpaths don't register their element; they export types and a few helpers.
+- If the page has no build step, add this one script tag: <script type="module" src="https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"></script>
+- If the app has a build step, install @sefaria/web-components from GitHub Packages and import the package root exactly as: import "@sefaria/web-components"; Element subpaths don't register their element; they export types and a few helpers.
 
 Rules:
 

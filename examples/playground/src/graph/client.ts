@@ -1,1 +1,1 @@
-export * from "@arithmomaniac/sefaria-client";
+export * from "@sefaria/api-client";

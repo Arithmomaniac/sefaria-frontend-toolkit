@@ -9,9 +9,7 @@ export function classifyToolkitManifest(manifest) {
       "packages/web-components/package.json exists but has no package name.",
     );
   }
-  return manifest.name === "@arithmomaniac/sefaria-web-components"
-    ? "toolkit"
-    : "unrelated";
+  return manifest.name === "@sefaria/web-components" ? "toolkit" : "unrelated";
 }
 
 export async function detectToolkitCheckout(

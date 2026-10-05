@@ -1,14 +1,14 @@
 import {
   type ContractIssue,
   validateExternalResponse,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 import {
   type SefariaDataSource,
   SefariaConnectionsPanel,
   SefariaReader,
-} from "@arithmomaniac/sefaria-web-components";
-import { type ConnectionsRequest } from "@arithmomaniac/sefaria-web-components/connections-panel";
-import type { SourceCardRequest } from "@arithmomaniac/sefaria-web-components/source-card";
+} from "@sefaria/web-components";
+import { type ConnectionsRequest } from "@sefaria/web-components/connections-panel";
+import type { SourceCardRequest } from "@sefaria/web-components/source-card";
 
 const SOURCE_CARD_META_KEY = "sefaria/source-card";
 const CONNECTIONS_META_KEY = "sefaria/connections";

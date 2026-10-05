@@ -24,9 +24,9 @@ const RELEASE_SENTENCE =
 const TYPEDOC_TIMEOUT = 120_000;
 const OLDER_PINS = /Older pinned script-tag versions keep their own behavior/u;
 const SCRIPT_INDEX =
-  "Compare the stamp above with the version in the [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/index.html).";
+  "Compare the stamp above with the version in the [script-tag versions index](https://sefaria.github.io/sefaria-frontend-toolkit/cdn/index.html).";
 
-const SITE_URL = "https://arithmomaniac.github.io/sefaria-frontend-toolkit";
+const SITE_URL = "https://sefaria.github.io/sefaria-frontend-toolkit";
 const ROUTES = {
   home: `${SITE_URL}/`,
   b2: `${SITE_URL}/use-components/start-here.html`,
@@ -62,7 +62,9 @@ describe("EP1–EP5 README entry points", () => {
     async (file, routes) => {
       const readme = await read(file);
       expect(readme.split("\n").length).toBeLessThan(90);
-      expect(readme).toMatch(/[Ee]xperimental and unofficial/u);
+      expect(readme).toContain(
+        "community-driven project with Sefaria backing and support",
+      );
       for (const route of routes)
         expect(readme, route).toContain(`(${ROUTES[route]}`);
       expect(readme).not.toMatch(/Genesis 1:1/u);
@@ -75,15 +77,9 @@ describe("EP1–EP5 README entry points", () => {
   );
 
   it.each([
-    ["packages/client/README.md", "@arithmomaniac/sefaria-client"],
-    [
-      "packages/text-transform/README.md",
-      "@arithmomaniac/sefaria-text-transform",
-    ],
-    [
-      "packages/web-components/README.md",
-      "@arithmomaniac/sefaria-web-components",
-    ],
+    ["packages/client/README.md", "@sefaria/api-client"],
+    ["packages/text-transform/README.md", "@sefaria/text-transform"],
+    ["packages/web-components/README.md", "@sefaria/web-components"],
   ])(
     "%s gives the GitHub Packages install caveat and a maintainer link",
     async (file, name) => {
@@ -93,7 +89,7 @@ describe("EP1–EP5 README entry points", () => {
       expect(readme).toContain(name);
       expect(readme).toMatch(/read:packages/u);
       expect(readme).toContain(
-        `https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/${path.posix.dirname(file)}/IMPLEMENTATION.md`,
+        `https://github.com/Sefaria/sefaria-frontend-toolkit/blob/main/${path.posix.dirname(file)}/IMPLEMENTATION.md`,
       );
     },
   );
@@ -124,23 +120,25 @@ describe("EP1–EP5 README entry points", () => {
     ]) {
       expect(readme).toContain(`<${tag}>`);
     }
-    expect(readme).toContain('import "@arithmomaniac/sefaria-web-components";');
+    expect(readme).toContain('import "@sefaria/web-components";');
   });
 
   it("the root README keeps license and links contributors to Development", async () => {
     const readme = await read("README.md");
     expect(readme).toContain("(LICENSE)");
     expect(readme).toContain("(docs/development.md)");
-    expect(readme).toContain("GPL-3.0");
+    expect(readme).toContain("MIT license");
   });
 });
 
 describe("EP7 llms.txt", () => {
   it("states status, the script-tag route, both flows and the required links", async () => {
     const text = await renderLlmsTxt();
-    const site = "https://arithmomaniac.github.io/sefaria-frontend-toolkit";
+    const site = "https://sefaria.github.io/sefaria-frontend-toolkit";
     expect(text).toMatch(/^# Sefaria Frontend Toolkit\n\n> /u);
-    expect(text).toMatch(/experimental and unofficial/u);
+    expect(text).toContain(
+      "experimental and community-driven with Sefaria backing and support",
+    );
     expect(text).toMatch(
       /`alpha` script address serves the newest published script release/u,
     );
@@ -149,7 +147,7 @@ describe("EP7 llms.txt", () => {
       (await read("examples/site-snippets/source-card-script-tag.html")).trim(),
     );
     expect(text).toContain("use the components");
-    expect(text).toContain("`@arithmomaniac/sefaria-client`");
+    expect(text).toContain("`@sefaria/api-client`");
     for (const route of [
       "",
       "use-components/start-here",
@@ -165,7 +163,7 @@ describe("EP7 llms.txt", () => {
         `](${site}/${route === "" ? "" : `${route}.html`})`,
       );
     }
-    expect(text).toContain('import "@arithmomaniac/sefaria-web-components";');
+    expect(text).toContain('import "@sefaria/web-components";');
     expect(text).toContain(
       "For an attributed passage, including a bilingual one, use Source Card.",
     );
@@ -240,7 +238,7 @@ describe("R1 components reference", () => {
     for (const property of declarations[0]!.cssProperties) {
       expect(page).toContain(`name="${property.name}"`);
     }
-    expect(page).toContain('import "@arithmomaniac/sefaria-web-components";');
+    expect(page).toContain('import "@sefaria/web-components";');
     expect(page).toContain(
       '<ApiEntry id="event-sefaria-reader-back" name="sefaria-reader-back"',
     );
@@ -337,7 +335,7 @@ describe("R4 package imports and exports", () => {
     }
     expect(page).toContain("/sefaria-frontend-toolkit/cdn/");
     expect(page).not.toMatch(/0\.0\.0-alpha\.\d/u);
-    expect(page).toContain('import "@arithmomaniac/sefaria-web-components";');
+    expect(page).toContain('import "@sefaria/web-components";');
   });
 });
 

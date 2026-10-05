@@ -1,12 +1,12 @@
 import {
   applyVocalizationToHtml,
   normalizeText,
-} from "@arithmomaniac/sefaria-text-transform";
+} from "@sefaria/text-transform";
 import type {
   NormalizedFootnote,
   PaseqMode,
   VocalizationMode,
-} from "@arithmomaniac/sefaria-text-transform";
+} from "@sefaria/text-transform";
 
 interface DisplayText {
   bodyHtml: string;

@@ -2,7 +2,7 @@ import {
   createSefariaClient,
   text,
   validateExternalResponse,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 
 // Get a response once and keep it as JSON text, as you would in a file or database.
 const { data } = await text.getV3Texts({

@@ -1,4 +1,4 @@
-import { normalizeText } from "@arithmomaniac/sefaria-text-transform";
+import { normalizeText } from "@sefaria/text-transform";
 
 // Each line is markup that can appear in stored Sefaria text.
 const samples = [

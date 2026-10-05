@@ -25,7 +25,10 @@ import {
   createSiteBuildKey,
   writeSiteBuildKey,
 } from "./build-site-cache.mjs";
-import { buildScriptSource } from "./build-script-source.mjs";
+import {
+  buildPackageBrowserModules,
+  buildScriptSource,
+} from "./build-script-source.mjs";
 import { runNodeScript, runPackageTool } from "./node-tool.mjs";
 import { legacyRedirects } from "../docs/.vitepress/redirects.mjs";
 
@@ -68,6 +71,10 @@ if (!examplesOnly) {
 for (const step of createSiteBuildSteps({ skipTypecheck, siteBasePath })) {
   if (step.kind === "pnpm") {
     runPnpm(step.args);
+    continue;
+  }
+  if (step.kind === "package-browser") {
+    await buildPackageBrowserModules();
     continue;
   }
   if (step.kind === "script-source") {

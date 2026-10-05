@@ -39,13 +39,13 @@ Load the script tag with `type="module"`. Need the client or text tools without 
 ```html [Script tag]
 <script
   type="module"
-  src="https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
+  src="https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
 ></script>
 <sefaria-source-card sref="Micah 6:8"></sefaria-source-card>
 ```
 
 ```ts [Package route]
-import "@arithmomaniac/sefaria-web-components";
+import "@sefaria/web-components";
 ```
 
 ```html [Package route HTML]

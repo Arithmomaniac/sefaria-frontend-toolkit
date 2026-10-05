@@ -39,9 +39,9 @@ export async function rehearseChangesets({
       "packages:\n  - packages/*\n",
     );
     for (const [directory, name] of [
-      ["client", "@arithmomaniac/sefaria-client"],
-      ["text-transform", "@arithmomaniac/sefaria-text-transform"],
-      ["web-components", "@arithmomaniac/sefaria-web-components"],
+      ["client", "@sefaria/api-client"],
+      ["text-transform", "@sefaria/text-transform"],
+      ["web-components", "@sefaria/web-components"],
     ]) {
       await mkdir(path.join(fixture, "packages", directory), {
         recursive: true,
@@ -50,11 +50,11 @@ export async function rehearseChangesets({
         name,
         version: "0.1.0",
         private: true,
-        ...(name === "@arithmomaniac/sefaria-web-components"
+        ...(name === "@sefaria/web-components"
           ? {
               dependencies: {
-                "@arithmomaniac/sefaria-client": "^0.1.0",
-                "@arithmomaniac/sefaria-text-transform": "^0.1.0",
+                "@sefaria/api-client": "^0.1.0",
+                "@sefaria/text-transform": "^0.1.0",
               },
             }
           : {}),
@@ -77,7 +77,7 @@ export async function rehearseChangesets({
     await writeChangeset(
       fixture,
       "first-alpha",
-      "@arithmomaniac/sefaria-client",
+      "@sefaria/api-client",
       "Exercise first alpha.",
     );
     await runChangesets(fixture, ["pre", "enter", "alpha"]);
@@ -93,7 +93,7 @@ export async function rehearseChangesets({
     await writeChangeset(
       fixture,
       "second-alpha",
-      "@arithmomaniac/sefaria-text-transform",
+      "@sefaria/text-transform",
       "Exercise subsequent alpha.",
     );
     await runChangesets(fixture, ["version"]);
@@ -110,8 +110,8 @@ export async function rehearseChangesets({
       "packages/web-components/package.json",
     );
     for (const dependency of [
-      "@arithmomaniac/sefaria-client",
-      "@arithmomaniac/sefaria-text-transform",
+      "@sefaria/api-client",
+      "@sefaria/text-transform",
     ]) {
       if (webManifest.dependencies[dependency] !== `^${secondVersions[0]}`) {
         throw new Error(

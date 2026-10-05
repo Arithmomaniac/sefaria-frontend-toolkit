@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { data } from "./release.data";
 
-const repository = "https://github.com/Arithmomaniac/sefaria-frontend-toolkit";
+const repository = "https://github.com/Sefaria/sefaria-frontend-toolkit";
 </script>
 
 <template>

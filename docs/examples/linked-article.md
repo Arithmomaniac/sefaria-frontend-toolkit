@@ -16,7 +16,7 @@ You write articles with hand-written links to Sefaria sources. Readers often wan
 
 This example solves that. A click on a citation opens a small dialog with the passage. The example fetches text only when a preview opens. It leaves your article text untouched.
 
-This is a complete app (Vite and TypeScript) in `examples/linked-article`. It is shown running below. You can't edit it on this page. To read its source, see [the example on GitHub](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/linked-article).
+This is a complete app (Vite and TypeScript) in `examples/linked-article`. It is shown running below. You can't edit it on this page. To read its source, see [the example on GitHub](https://github.com/Sefaria/sefaria-frontend-toolkit/tree/main/examples/linked-article).
 
 <iframe :src="withBase('/examples/linked-article/')" title="Linked article example" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy" style="width: 100%; height: 560px; border: 1px solid var(--vp-c-divider); border-radius: 8px;"></iframe>
 

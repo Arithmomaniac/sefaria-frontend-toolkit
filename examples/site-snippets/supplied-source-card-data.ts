@@ -1,5 +1,5 @@
-import { validateExternalResponse } from "@arithmomaniac/sefaria-client";
-import { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
+import { validateExternalResponse } from "@sefaria/api-client";
+import { SefariaSourceCard } from "@sefaria/web-components";
 
 // A Micah 6:8 response you saved earlier, served from your own site.
 const stored: unknown = await (await fetch("/data/micah-6-8.json")).json();

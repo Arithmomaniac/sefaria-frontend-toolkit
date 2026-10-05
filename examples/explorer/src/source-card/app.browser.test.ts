@@ -3,7 +3,7 @@ import type {
   SefariaDataLoaderResponse,
   SefariaSourceCard,
   SefariaTextLoadRequest,
-} from "@arithmomaniac/sefaria-web-components";
+} from "@sefaria/web-components";
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
 
 import micahFixture from "../../../react-vite/src/micah-6-8.json";

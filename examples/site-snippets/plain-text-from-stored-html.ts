@@ -1,7 +1,4 @@
-import {
-  createTextPreview,
-  normalizeText,
-} from "@arithmomaniac/sefaria-text-transform";
+import { createTextPreview, normalizeText } from "@sefaria/text-transform";
 
 const stored =
   "<b>Line one</b><br>line two<sup class='footnote-marker'>a</sup><i class='footnote'>A note.</i>";

@@ -2,7 +2,7 @@
 
 # Security
 
-This is an experimental project with no support guarantee. Private GitHub Packages prereleases are available for authenticated development, but the toolkit is not a deployed service and is not an official Sefaria or Microsoft product or service.
+This is an experimental, community-driven library with Sefaria backing and support, owned by Sefaria. That does not promise a security response SLA. Publication under the new Sefaria package names is pending qualification; browser examples are hosted on the public documentation site.
 
 ## Reporting a vulnerability
 

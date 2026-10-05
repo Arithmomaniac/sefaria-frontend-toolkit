@@ -1199,7 +1199,7 @@ async function routeToolkitRequests(
     const url = new URL(request.url());
     if (
       url.href ===
-      "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
+      "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
     ) {
       await route.fulfill({
         body: localScript,
@@ -1390,7 +1390,7 @@ async function assertStatusNotes(page, label) {
   for (const note of notes) {
     if (
       note.text !==
-        "Experimental and unofficial. Names and addresses may change. License" ||
+        "A community-driven project with Sefaria backing and support. The toolkit is experimental; names and APIs may change. License" ||
       !note.href?.endsWith(
         "/help/install-and-status.html#license-and-text-rights",
       ) ||

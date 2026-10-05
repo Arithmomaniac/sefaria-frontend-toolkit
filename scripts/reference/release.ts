@@ -15,7 +15,7 @@ export function releaseSection(packageVersion?: string): string {
     "",
     "This page documents the code on the `main` branch, which `alpha` builds are published from. <ReleaseStamp />",
     "",
-    `The \`alpha\` script-tag address serves the newest script release that is still active. Compare the stamp above with the version in the [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/index.html). Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since.${packageNote}`,
+    `The \`alpha\` script-tag address serves the newest script release that is still active. Compare the stamp above with the version in the [script-tag versions index](https://sefaria.github.io/sefaria-frontend-toolkit/cdn/index.html). Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since.${packageNote}`,
   ].join("\n");
 }
 

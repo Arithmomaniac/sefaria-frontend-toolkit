@@ -32,7 +32,7 @@ export default {
           ? h(
               "p",
               { class: "home-acknowledgement" },
-              "This project began at the Microsoft Global Hackathon 2026. Thank you to Microsoft for sponsoring the hackathon and for the time and platform that helped turn the idea into working software.",
+              "This project began at the Microsoft Global Hackathon 2026. Thank you to Microsoft for sponsoring the hackathon and for the time and platform that helped turn the idea into working software. Sefaria now owns the toolkit, which continues as a community-driven open-source project.",
             )
           : null,
         h(DocumentationDisclosure),

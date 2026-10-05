@@ -1,1 +1,1 @@
-export * from "@arithmomaniac/sefaria-web-components/text-segment";
+export * from "@sefaria/web-components/text-segment";

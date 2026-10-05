@@ -20,12 +20,13 @@ import { build } from "vite";
 import { create } from "tar";
 import { z } from "zod";
 import { isMainModule } from "./check.mjs";
+import { isPathWithin } from "./tarball-consumer-validation.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 export const SCRIPT_ENTRY = "sefaria-elements.js";
 export const SCRIPT_ENTRIES = {
   [SCRIPT_ENTRY]: path.join("web-components", "dist", "index.js"),
-  "sefaria-client.js": path.join("client", "dist", "index.js"),
+  "sefaria-api-client.js": path.join("client", "dist", "index.js"),
   "sefaria-text-transform.js": path.join("text-transform", "dist", "index.js"),
 };
 const LEGACY_SCRIPT_FILES = [
@@ -33,6 +34,15 @@ const LEGACY_SCRIPT_FILES = [
   "LICENSE.txt",
   "THIRD-PARTY-NOTICES.txt",
   "source.tar.gz",
+];
+const SCHEMA_TWO_ENTRIES = [
+  SCRIPT_ENTRY,
+  "sefaria-client.js",
+  "sefaria-text-transform.js",
+];
+const SCHEMA_TWO_FILES = [
+  ...SCHEMA_TWO_ENTRIES,
+  ...LEGACY_SCRIPT_FILES.slice(1),
 ];
 export const SCRIPT_FILES = [
   ...Object.keys(SCRIPT_ENTRIES),
@@ -46,6 +56,112 @@ export const measure = (bytes) => ({
   raw: Buffer.byteLength(bytes),
   gzip: gzipSync(bytes, { level: 9 }).length,
 });
+const browserBuildFile = path.join(
+  root,
+  ".artifacts",
+  "package-browser-build.json",
+);
+const licenseFilename = /^(?:licen[sc]e|copying|notice)(?:[.-].*)?$/iu;
+const dependencyIdentity = z.object({
+  name: z.string().min(1),
+  version: z.string().min(1),
+  license: z.string().min(1),
+});
+const repositoryRelativePath = z
+  .string()
+  .min(1)
+  .refine(
+    (relative) =>
+      !path.isAbsolute(relative) &&
+      isPathWithin(root, path.resolve(root, relative)),
+    "Expected a repository-relative path.",
+  );
+const browserBuildSchema = z
+  .object({
+    schemaVersion: z.literal(1),
+    inputs: z
+      .record(repositoryRelativePath, z.string().regex(/^[a-f0-9]{64}$/u))
+      .refine(
+        (inputs) => Object.keys(inputs).length <= 10_000,
+        "Too many build inputs.",
+      ),
+    dependencies: z
+      .array(
+        dependencyIdentity
+          .extend({
+            directory: repositoryRelativePath,
+          })
+          .strict(),
+      )
+      .max(1_000),
+  })
+  .strict();
+
+function packagedBrowserDirectory(relative) {
+  return path.join(root, "packages", path.dirname(relative), "browser");
+}
+
+async function readBrowserBuild(filename) {
+  const evidence = browserBuildSchema.parse(
+    JSON.parse(await readFile(filename, "utf8")),
+  );
+  const required = [
+    "scripts/build-script-source.mjs",
+    "LICENSE",
+    "package.json",
+    "pnpm-lock.yaml",
+    ...Object.values(SCRIPT_ENTRIES).map(
+      (relative) => `packages/${relative.split(path.sep).join("/")}`,
+    ),
+    ...Object.entries(SCRIPT_ENTRIES).flatMap(([entry, relative]) =>
+      [entry, "LICENSE.txt", "THIRD-PARTY-NOTICES.txt"].map((name) =>
+        path
+          .relative(root, path.join(packagedBrowserDirectory(relative), name))
+          .split(path.sep)
+          .join("/"),
+      ),
+    ),
+  ];
+  if (required.some((relative) => evidence.inputs[relative] === undefined)) {
+    throw new Error(
+      "Incomplete packaged browser build evidence. Run pnpm build.",
+    );
+  }
+  for (const [relative, expected] of Object.entries(evidence.inputs)) {
+    if (sha256(await readFile(path.join(root, relative))) !== expected)
+      throw new Error(
+        `Stale packaged browser build: ${relative}. Run pnpm build.`,
+      );
+  }
+  const dependencies = await Promise.all(
+    evidence.dependencies.map(async ({ directory, ...identity }) => {
+      const manifestPath = `${directory}/package.json`;
+      if (evidence.inputs[manifestPath] === undefined)
+        throw new Error(`Missing dependency fingerprint: ${manifestPath}.`);
+      const manifest = dependencyIdentity.parse(
+        JSON.parse(await readFile(path.join(root, manifestPath), "utf8")),
+      );
+      if (JSON.stringify(manifest) !== JSON.stringify(identity))
+        throw new Error(
+          `Stale dependency identity: ${manifestPath}. Run pnpm build.`,
+        );
+      return { directory: path.join(root, directory), manifest };
+    }),
+  );
+  const bundles = Object.fromEntries(
+    await Promise.all(
+      Object.entries(SCRIPT_ENTRIES).map(async ([entry, relative]) => [
+        entry,
+        await readFile(path.join(packagedBrowserDirectory(relative), entry)),
+      ]),
+    ),
+  );
+  return {
+    bundles,
+    dependencies,
+    notices: await dependencyNotices(dependencies),
+  };
+}
 
 export async function bundleElements({
   split = false,
@@ -79,8 +195,6 @@ export async function bundleElements({
           format: "es",
           entryFileNames: split ? "[name].js" : entry,
           chunkFileNames: "shared-[hash].js",
-          banner:
-            "/*! GPL-3.0-only. See LICENSE.txt, THIRD-PARTY-NOTICES.txt and source.tar.gz beside this file. */",
         },
       },
     },
@@ -107,7 +221,14 @@ export async function bundleElements({
   ) {
     throw new Error("Script entry must be self-contained.");
   }
-  return chunks;
+  return chunks.map((chunk) => ({
+    type: chunk.type,
+    fileName: chunk.fileName,
+    imports: chunk.imports,
+    dynamicImports: chunk.dynamicImports,
+    moduleIds: chunk.moduleIds,
+    code: `/*! MIT. Copyright (c) 2026 Sefaria. See LICENSE.txt and THIRD-PARTY-NOTICES.txt beside this file. */\n${chunk.code}`,
+  }));
 }
 
 async function dependencyRoots(chunks) {
@@ -140,6 +261,19 @@ async function dependencyRoots(chunks) {
   );
 }
 
+async function dependencyNotices(dependencies) {
+  return Promise.all(
+    dependencies.map(async ({ directory, manifest }) => {
+      const licenses = (await readdir(directory)).filter((name) =>
+        licenseFilename.test(name),
+      );
+      if (!licenses.length || !manifest.license)
+        throw new Error(`Missing license evidence: ${manifest.name}.`);
+      return `${manifest.name}@${manifest.version} (${manifest.license})\n${(await Promise.all(licenses.map((name) => readFile(path.join(directory, name), "utf8")))).join("\n")}`;
+    }),
+  );
+}
+
 export async function buildScriptSource({
   destination = path.join(root, "dist", "script-source"),
   version = "local",
@@ -149,6 +283,7 @@ export async function buildScriptSource({
     encoding: "utf8",
   }).trim(),
   compare = false,
+  browserBuildManifest = browserBuildFile,
 } = {}) {
   if (
     version !== "local" &&
@@ -157,15 +292,8 @@ export async function buildScriptSource({
     throw new Error("Invalid script version.");
   if (!/^[a-f0-9]{40}$/u.test(sourceSha))
     throw new Error("Invalid source SHA.");
-  const bundles = Object.fromEntries(
-    await Promise.all(
-      Object.keys(SCRIPT_ENTRIES).map(async (entry) => [
-        entry,
-        (await bundleElements({ entry }))[0],
-      ]),
-    ),
-  );
-  const dependencies = await dependencyRoots(Object.values(bundles));
+  const { bundles, dependencies, notices } =
+    await readBrowserBuild(browserBuildManifest);
   await mkdir(destination, { recursive: true });
   const source = await mkdtemp(path.join(tmpdir(), "sefaria-script-source-"));
   try {
@@ -197,16 +325,7 @@ export async function buildScriptSource({
       import.meta.filename,
       path.join(source, "toolkit", "scripts", "build-script-source.mjs"),
     );
-    const notices = [];
     for (const { directory, manifest } of dependencies) {
-      const licenses = (await readdir(directory)).filter((name) =>
-        /^(?:licen[sc]e|copying|notice)(?:[.-].*)?$/iu.test(name),
-      );
-      if (licenses.length === 0 || !manifest.license)
-        throw new Error(`Missing license evidence: ${manifest.name}.`);
-      notices.push(
-        `${manifest.name}@${manifest.version} (${manifest.license})\n${(await Promise.all(licenses.map((name) => readFile(path.join(directory, name), "utf8")))).join("\n")}`,
-      );
       await cp(
         directory,
         path.join(
@@ -235,8 +354,8 @@ export async function buildScriptSource({
       },
       ["SOURCE.txt", "toolkit", "dependencies"],
     );
-    for (const [entry, chunk] of Object.entries(bundles))
-      await writeFile(path.join(destination, entry), chunk.code);
+    for (const [entry, bytes] of Object.entries(bundles))
+      await writeFile(path.join(destination, entry), bytes);
     await cp(path.join(root, "LICENSE"), path.join(destination, "LICENSE.txt"));
     await writeFile(
       path.join(destination, "THIRD-PARTY-NOTICES.txt"),
@@ -251,15 +370,15 @@ export async function buildScriptSource({
       ),
     );
     const manifest = {
-      schemaVersion: 2,
+      schemaVersion: 3,
       version,
       sourceSha,
       entry: SCRIPT_ENTRY,
-      size: measure(bundles[SCRIPT_ENTRY].code),
+      size: measure(bundles[SCRIPT_ENTRY]),
       entries: Object.fromEntries(
-        Object.entries(bundles).map(([entry, chunk]) => [
+        Object.entries(bundles).map(([entry, bytes]) => [
           entry,
-          { size: measure(chunk.code) },
+          { size: measure(bytes) },
         ]),
       ),
       gzipLevel: 9,
@@ -342,6 +461,19 @@ const manifestSchema = z.discriminatedUnion("schemaVersion", [
     ...manifestBase,
     entries: z.strictObject(
       Object.fromEntries(
+        SCHEMA_TWO_ENTRIES.map((name) => [
+          name,
+          z.strictObject({ size: sizeSchema }),
+        ]),
+      ),
+    ),
+    files: hashes(SCHEMA_TWO_FILES),
+  }),
+  z.strictObject({
+    schemaVersion: z.literal(3),
+    ...manifestBase,
+    entries: z.strictObject(
+      Object.fromEntries(
         Object.keys(SCRIPT_ENTRIES).map((name) => [
           name,
           z.strictObject({ size: sizeSchema }),
@@ -353,8 +485,76 @@ const manifestSchema = z.discriminatedUnion("schemaVersion", [
 ]);
 
 /** Files carried by a manifest; retained schema 1 releases are elements-only. */
-export const manifestFiles = (manifest) =>
-  manifest.schemaVersion === 1 ? LEGACY_SCRIPT_FILES : SCRIPT_FILES;
+export const manifestFiles = (manifest) => {
+  switch (manifest.schemaVersion) {
+    case 1:
+      return LEGACY_SCRIPT_FILES;
+    case 2:
+      return SCHEMA_TWO_FILES;
+    case 3:
+      return SCRIPT_FILES;
+    default:
+      throw new Error(
+        `Unsupported script manifest schema: ${manifest.schemaVersion}.`,
+      );
+  }
+};
+
+export async function buildPackageBrowserModules() {
+  const chunks = [];
+  const inputFiles = new Set([
+    import.meta.filename,
+    path.join(root, "LICENSE"),
+    path.join(root, "package.json"),
+    path.join(root, "pnpm-lock.yaml"),
+  ]);
+  for (const [entry, relative] of Object.entries(SCRIPT_ENTRIES)) {
+    const [chunk] = await bundleElements({ entry });
+    chunks.push(chunk);
+    for (const id of chunk.moduleIds) {
+      const filename = id.split("?")[0];
+      if (path.isAbsolute(filename)) inputFiles.add(filename);
+    }
+    const directory = packagedBrowserDirectory(relative);
+    const dependencies = await dependencyRoots([chunk]);
+    const notices = await dependencyNotices(dependencies);
+    await mkdir(directory, { recursive: true });
+    await writeFile(path.join(directory, entry), chunk.code);
+    await cp(path.join(root, "LICENSE"), path.join(directory, "LICENSE.txt"));
+    await writeFile(
+      path.join(directory, "THIRD-PARTY-NOTICES.txt"),
+      notices.join("\n\n--------------------\n\n"),
+    );
+    for (const name of [entry, "LICENSE.txt", "THIRD-PARTY-NOTICES.txt"])
+      inputFiles.add(path.join(directory, name));
+  }
+  const dependencies = await dependencyRoots(chunks);
+  for (const { directory } of dependencies) {
+    inputFiles.add(path.join(directory, "package.json"));
+    for (const name of (await readdir(directory)).filter((name) =>
+      licenseFilename.test(name),
+    ))
+      inputFiles.add(path.join(directory, name));
+  }
+  const inputs = Object.fromEntries(
+    await Promise.all(
+      [...inputFiles].map(async (filename) => [
+        path.relative(root, filename).split(path.sep).join("/"),
+        sha256(await readFile(filename)),
+      ]),
+    ),
+  );
+  const evidence = browserBuildSchema.parse({
+    schemaVersion: 1,
+    inputs,
+    dependencies: dependencies.map(({ directory, manifest }) => ({
+      directory: path.relative(root, directory).split(path.sep).join("/"),
+      ...dependencyIdentity.parse(manifest),
+    })),
+  });
+  await mkdir(path.dirname(browserBuildFile), { recursive: true });
+  await writeFile(browserBuildFile, `${JSON.stringify(evidence, null, 2)}\n`);
+}
 
 export async function verifyScriptSource(directory) {
   const manifest = manifestSchema.parse(
@@ -381,9 +581,13 @@ export async function verifyScriptSource(directory) {
 }
 
 if (isMainModule(import.meta.url, process.argv[1])) {
-  const manifest = await buildScriptSource({
-    version: process.env.SCRIPT_VERSION ?? "local",
-    compare: process.argv.includes("--compare"),
-  });
-  process.stdout.write(`${JSON.stringify(manifest.entries)}\n`);
+  if (process.argv.includes("--packages")) {
+    await buildPackageBrowserModules();
+  } else {
+    const manifest = await buildScriptSource({
+      version: process.env.SCRIPT_VERSION ?? "local",
+      compare: process.argv.includes("--compare"),
+    });
+    process.stdout.write(`${JSON.stringify(manifest.entries)}\n`);
+  }
 }

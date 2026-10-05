@@ -3,7 +3,7 @@ import {
   type ContractIssue,
   type ResponseSelector,
   type SefariaClient,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 
 /** Private mechanical attempt state reused by typed owner controllers. */
 export type ComponentControllerAttempt<TRequest, TLoading> =

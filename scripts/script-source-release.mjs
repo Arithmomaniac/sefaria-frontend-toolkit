@@ -56,6 +56,7 @@ const catalogSchema = z
   );
 const archiveInventories = [
   manifestFiles({ schemaVersion: 1 }),
+  manifestFiles({ schemaVersion: 2 }),
   SCRIPT_FILES,
 ].map((files) => JSON.stringify([...files, "manifest.json"].sort()));
 const catalogBranch = "script-distribution";
@@ -159,7 +160,7 @@ export async function unpackArtifact(bytes, record, destination) {
   }
 }
 
-const REPOSITORY = "https://github.com/Arithmomaniac/sefaria-frontend-toolkit";
+const REPOSITORY = "https://github.com/Sefaria/sefaria-frontend-toolkit";
 const escapeHtml = (value) =>
   String(value)
     .replaceAll("&", "&amp;")
@@ -199,7 +200,7 @@ export function renderVersionsIndex(input) {
   </head>
   <body>
     <h1>Script-tag versions</h1>
-    <p class="status"><strong>Experimental and unofficial.</strong> Names and addresses may change.</p>
+    <p class="status"><strong>Community-driven with Sefaria backing and support.</strong> Names and addresses may change.</p>
     <p>This directory hosts the Sefaria Frontend Toolkit's elements as one script file, <code>sefaria-elements.js</code>, that you add to a page with a <code>&lt;script type="module"&gt;</code> tag. To put your first source on a page, see <a href="../use-components/start-here.html">Use components › Start here</a>.</p>
     <h2>Choose an address</h2>
     <ul>

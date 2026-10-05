@@ -114,7 +114,7 @@ A parent that owns a child data-changing action prevents the child default and e
 
 ## Reader session
 
-`@arithmomaniac/sefaria-web-components/reader-session` is a supported advanced DOM-free semantic/raw facade over immutable Reader navigation.
+`@sefaria/web-components/reader-session` is a supported advanced DOM-free semantic/raw facade over immutable Reader navigation.
 
 It owns stable entry and operation identities, selected source position, presentation, exact capture coverage, completion eligibility, history, pins, transactional root replacement, bounded budgets, and raw transitions. Public `entryInfo`, `sourceRecord`, and `connectionsRecord` access plus `ReaderEntryInfo`, `ReaderSourceRecord`, and `ReaderConnectionsRecord` expose semantic identity, effective requests, documented statuses, coverage, and library-owned immutable raw payloads without exposing prepared child rendering or content.
 
@@ -152,7 +152,7 @@ Owns one source-and-connections workspace plus retained semantic history. Reader
 
 ## Text, direction, and attribution
 
-API HTML passes through `@arithmomaniac/sefaria-text-transform` exactly once before private prepared content reaches rendering. Direction and attribution come from payload data. A validated absolute HTTP(S) source may render as a link; arbitrary source strings do not.
+API HTML passes through `@sefaria/text-transform` exactly once before private prepared content reaches rendering. Direction and attribution come from payload data. A validated absolute HTTP(S) source may render as a link; arbitrary source strings do not.
 
 ## Accessibility and theming
 

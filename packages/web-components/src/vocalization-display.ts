@@ -1,7 +1,7 @@
 import {
   applyVocalizationToHtml,
   type VocalizationMode,
-} from "@arithmomaniac/sefaria-text-transform";
+} from "@sefaria/text-transform";
 
 import type { TextSegmentDataViewModel } from "./text-segment.js";
 

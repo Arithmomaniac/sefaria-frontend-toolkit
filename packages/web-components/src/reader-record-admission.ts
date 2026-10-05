@@ -1,7 +1,7 @@
 import type {
   CoreLinkResponse,
   CoreV3TextsResponse,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 
 import { validateSuppliedComponentData } from "./component-controller.js";
 import {

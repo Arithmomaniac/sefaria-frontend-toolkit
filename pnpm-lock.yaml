@@ -77,10 +77,10 @@ importers:
 
   examples/alpine-vite:
     dependencies:
-      '@arithmomaniac/sefaria-client':
+      '@sefaria/api-client':
         specifier: workspace:*
         version: link:../../packages/client
-      '@arithmomaniac/sefaria-web-components':
+      '@sefaria/web-components':
         specifier: workspace:*
         version: link:../../packages/web-components
       alpinejs:
@@ -89,10 +89,10 @@ importers:
 
   examples/explorer:
     dependencies:
-      '@arithmomaniac/sefaria-client':
+      '@sefaria/api-client':
         specifier: workspace:*
         version: link:../../packages/client
-      '@arithmomaniac/sefaria-web-components':
+      '@sefaria/web-components':
         specifier: workspace:*
         version: link:../../packages/web-components
       lit:
@@ -101,27 +101,27 @@ importers:
 
   examples/linked-article:
     dependencies:
-      '@arithmomaniac/sefaria-client':
+      '@sefaria/api-client':
         specifier: workspace:*
         version: link:../../packages/client
-      '@arithmomaniac/sefaria-web-components':
+      '@sefaria/web-components':
         specifier: workspace:*
         version: link:../../packages/web-components
 
   examples/mcp-app:
     dependencies:
-      '@arithmomaniac/sefaria-client':
-        specifier: workspace:*
-        version: link:../../packages/client
-      '@arithmomaniac/sefaria-web-components':
-        specifier: workspace:*
-        version: link:../../packages/web-components
       '@modelcontextprotocol/ext-apps':
         specifier: 1.7.5
         version: 1.7.5(@modelcontextprotocol/sdk@1.30.0(supports-color@8.1.1)(zod@4.4.3))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(zod@4.4.3)
       '@modelcontextprotocol/sdk':
         specifier: 1.30.0
         version: 1.30.0(supports-color@8.1.1)(zod@4.4.3)
+      '@sefaria/api-client':
+        specifier: workspace:*
+        version: link:../../packages/client
+      '@sefaria/web-components':
+        specifier: workspace:*
+        version: link:../../packages/web-components
       zod:
         specifier: 4.4.3
         version: 4.4.3
@@ -132,12 +132,6 @@ importers:
 
   examples/playground:
     dependencies:
-      '@arithmomaniac/sefaria-client':
-        specifier: workspace:*
-        version: link:../../packages/client
-      '@arithmomaniac/sefaria-web-components':
-        specifier: workspace:*
-        version: link:../../packages/web-components
       '@codemirror/lang-css':
         specifier: ^6.3.1
         version: 6.3.1
@@ -156,6 +150,12 @@ importers:
       '@codemirror/view':
         specifier: ^6.39.17
         version: 6.43.11
+      '@sefaria/api-client':
+        specifier: workspace:*
+        version: link:../../packages/client
+      '@sefaria/web-components':
+        specifier: workspace:*
+        version: link:../../packages/web-components
       codemirror:
         specifier: ^6.0.2
         version: 6.0.2
@@ -165,10 +165,10 @@ importers:
 
   examples/react-vite:
     dependencies:
-      '@arithmomaniac/sefaria-client':
+      '@sefaria/api-client':
         specifier: workspace:*
         version: link:../../packages/client
-      '@arithmomaniac/sefaria-web-components':
+      '@sefaria/web-components':
         specifier: workspace:*
         version: link:../../packages/web-components
       react:
@@ -187,40 +187,40 @@ importers:
 
   examples/reader:
     dependencies:
-      '@arithmomaniac/sefaria-client':
+      '@sefaria/api-client':
         specifier: workspace:*
         version: link:../../packages/client
-      '@arithmomaniac/sefaria-web-components':
+      '@sefaria/web-components':
         specifier: workspace:*
         version: link:../../packages/web-components
 
   examples/site-snippets:
     dependencies:
-      '@arithmomaniac/sefaria-client':
+      '@sefaria/api-client':
         specifier: workspace:*
         version: link:../../packages/client
-      '@arithmomaniac/sefaria-text-transform':
+      '@sefaria/text-transform':
         specifier: workspace:*
         version: link:../../packages/text-transform
-      '@arithmomaniac/sefaria-web-components':
+      '@sefaria/web-components':
         specifier: workspace:*
         version: link:../../packages/web-components
 
   examples/vanilla-vite:
     dependencies:
-      '@arithmomaniac/sefaria-client':
+      '@sefaria/api-client':
         specifier: workspace:*
         version: link:../../packages/client
-      '@arithmomaniac/sefaria-web-components':
+      '@sefaria/web-components':
         specifier: workspace:*
         version: link:../../packages/web-components
 
   examples/weekly-portion:
     dependencies:
-      '@arithmomaniac/sefaria-client':
+      '@sefaria/api-client':
         specifier: workspace:*
         version: link:../../packages/client
-      '@arithmomaniac/sefaria-web-components':
+      '@sefaria/web-components':
         specifier: workspace:*
         version: link:../../packages/web-components
 
@@ -263,10 +263,10 @@ importers:
 
   packages/web-components:
     dependencies:
-      '@arithmomaniac/sefaria-client':
+      '@sefaria/api-client':
         specifier: workspace:*
         version: link:../client
-      '@arithmomaniac/sefaria-text-transform':
+      '@sefaria/text-transform':
         specifier: workspace:*
         version: link:../text-transform
       lit:
@@ -275,10 +275,10 @@ importers:
 
   tests/compatibility:
     dependencies:
-      '@arithmomaniac/sefaria-client':
+      '@sefaria/api-client':
         specifier: workspace:*
         version: link:../../packages/client
-      '@arithmomaniac/sefaria-text-transform':
+      '@sefaria/text-transform':
         specifier: workspace:*
         version: link:../../packages/text-transform
 

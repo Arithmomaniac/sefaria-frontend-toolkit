@@ -1,4 +1,4 @@
-import { createSefariaClient } from "@arithmomaniac/sefaria-client";
+import { createSefariaClient } from "@sefaria/api-client";
 
 import type { SefariaDataSource } from "./data-source.js";
 

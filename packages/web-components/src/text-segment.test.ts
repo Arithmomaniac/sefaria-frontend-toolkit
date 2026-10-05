@@ -6,7 +6,7 @@ import {
   type CoreLinkObject,
   type CoreV3TextsResponse,
   type CoreV3Version,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 import { describe, expect, it, vi } from "vitest";
 
 import spanningFixture from "../../client/test/fixtures/v3-text-spanning-2026-08-29.json";

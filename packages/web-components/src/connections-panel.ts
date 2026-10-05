@@ -5,11 +5,8 @@ import {
   type CoreStringArrayOrNull,
   type GetLinksData,
   type SefariaClient,
-} from "@arithmomaniac/sefaria-client";
-import {
-  createTextPreview,
-  type TextPreview,
-} from "@arithmomaniac/sefaria-text-transform";
+} from "@sefaria/api-client";
+import { createTextPreview, type TextPreview } from "@sefaria/text-transform";
 
 import { createConnectionsQuery } from "./connections-request.js";
 import {

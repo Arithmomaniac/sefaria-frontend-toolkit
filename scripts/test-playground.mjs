@@ -559,16 +559,16 @@ async function runGraphQualification(page, graph) {
     .digest("base64");
   const script = `
     void (async () => { try {
-      const pure = await import("@arithmomaniac/sefaria-web-components/source-card");
+      const pure = await import("@sefaria/web-components/source-card");
       const pureRegistered = customElements.get("sefaria-source-card") !== undefined;
-      const client = await import("@arithmomaniac/sefaria-client");
-      const validation = await import("@arithmomaniac/sefaria-client/validation");
-      const source = await import("@arithmomaniac/sefaria-web-components/data-source");
-      const textSegment = await import("@arithmomaniac/sefaria-web-components/text-segment");
-      const bilingualSegment = await import("@arithmomaniac/sefaria-web-components/bilingual-segment");
-      const connections = await import("@arithmomaniac/sefaria-web-components/connections-panel");
-      const reader = await import("@arithmomaniac/sefaria-web-components/reader");
-      const readerSession = await import("@arithmomaniac/sefaria-web-components/reader-session");
+      const client = await import("@sefaria/api-client");
+      const validation = await import("@sefaria/api-client/validation");
+      const source = await import("@sefaria/web-components/data-source");
+      const textSegment = await import("@sefaria/web-components/text-segment");
+      const bilingualSegment = await import("@sefaria/web-components/bilingual-segment");
+      const connections = await import("@sefaria/web-components/connections-panel");
+      const reader = await import("@sefaria/web-components/reader");
+      const readerSession = await import("@sefaria/web-components/reader-session");
       const entriesReady = [
         source.configureSefariaDataSource,
         reader.resolveReaderSource,
@@ -580,9 +580,9 @@ async function runGraphQualification(page, graph) {
         pure,
         connections,
       ].every((value) => value !== null && typeof value === "object");
-      const root = await import("@arithmomaniac/sefaria-web-components");
+      const root = await import("@sefaria/web-components");
       const registered = customElements.get("sefaria-source-card");
-      const second = await import("@arithmomaniac/sefaria-web-components");
+      const second = await import("@sefaria/web-components");
       parent.postMessage({type:"graph-result", pureRegistered, clientIdentity:client.getResponseContract === validation.getResponseContract, entriesReady:entriesReady && pureEntriesReady, rootRegistered:registered === root.SefariaSourceCard, rootStable:second.SefariaSourceCard === registered},"*");
     } catch (error) {
       parent.postMessage({type:"graph-error", message:error instanceof Error ? error.message : String(error)},"*");

@@ -2,13 +2,13 @@
 
 # Development
 
-This contributor guide describes the current source tree as of September 15, 2026. The repository's specifications define intended behavior; the implementation and tests establish what is currently delivered.
+This contributor guide describes the maintained source tree and Sefaria ownership migration. The repository's specifications define intended behavior; implementation and tests establish what is currently delivered. Hosted publication under the new package identities remains pending until the rollout below completes.
 
 The sections below separate delivered baseline behavior, changes from older plans, and work that remains intended. A runnable command is not proof that the corresponding integration is finished.
 
 ## Replacement repository baseline
 
-The toolkit is maintained on `main` in `Arithmomaniac/sefaria-frontend-toolkit`; implementation pull requests target `main`. Its workflow requires the complete deterministic gate on both Ubuntu and Windows behind the stable `check` status for pull requests and pushes to `main`. Package publication and Pages deployment are separate guarded workflows. Failure-only CI artifacts are restricted to setup/check results and maintained browser diagnostics.
+The toolkit is maintained on `main` in `Sefaria/sefaria-frontend-toolkit`; implementation pull requests target `main`. Its workflow requires the complete deterministic gate on both Ubuntu and Windows behind the stable `check` status for pull requests and pushes to `main`. Package publication and Pages deployment are separate guarded workflows. Failure-only CI artifacts are restricted to setup/check results and maintained browser diagnostics.
 
 The conditional GitHub-hosted Copilot setup workflow exists on the default branch, but real cloud-agent activation and qualification remain separate delivery work. The workflow recognizes the toolkit from its package identity rather than a branch name.
 
@@ -18,11 +18,11 @@ Run the deterministic workflow-policy regression with:
 pnpm test -- tests/workflow-policy.test.ts
 ```
 
-The `integration:check` stage also parses active paths, package manifests, workflow YAML, and the lockfile. It rejects active Python runtime/build files, retired demo assembly, source export fallbacks, non-private manifests, publication or deployment capabilities, credential-like workflow fields, remote tarball resolutions, and unsupported installation, ownership, or deployment claims in maintained entry-point documentation. Historical evidence and immutable archive links are outside those active-path checks.
+The `integration:check` stage also parses active paths, package manifests, workflow YAML, and the lockfile. It rejects active Python runtime/build files, retired demo assembly, source export fallbacks, non-private source manifests, unapproved publication/deployment workflows and credentials, remote tarball resolutions, and unsupported installation claims. The exact guarded CI, bootstrap, reusable validation/publication, Pages, and maintenance workflows are admitted explicitly. Missing reusable workflow definitions also fail the gate. Historical evidence and immutable archive links are outside those active-path checks.
 
 The same stage reconciles committed source-stamped inventories containing the 73 test files from `Arithmomaniac/sefaria-web-components@7bc2d258fac2959beb5252ebdbcbddbaccd0c7b7` and the nine pre-retirement showcase tests from `Arithmomaniac/sefaria-web-components@d7e2d59645ebf7427dcff2cbdd78073e2e7df58c`. It requires every retained destination to appear in Vitest's actual static discovery output and records a specific reason for each presentation-only or superseded retirement. The gate does not query or fetch the source repository's Git objects.
 
-[`IMPLEMENTATION-PLAN.md`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/IMPLEMENTATION-PLAN.md) is a historical bootstrap artifact. Its follow-on waves are complete, and it is not a maintained execution handoff or a normative component or transport specification. Use this development guide for the current baseline and the [repository issues](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/issues) for remaining delivery work.
+[`IMPLEMENTATION-PLAN.md`](https://github.com/Sefaria/sefaria-frontend-toolkit/blob/main/IMPLEMENTATION-PLAN.md) is a historical bootstrap artifact. Its follow-on waves are complete, and it is not a maintained execution handoff or a normative component or transport specification. Use this development guide for the current baseline and the [repository issues](https://github.com/Sefaria/sefaria-frontend-toolkit/issues) for remaining delivery work.
 
 ## Contributor guides
 
@@ -56,13 +56,13 @@ For reader-oriented explanations, use the friendly guides rather than the archiv
 
 These are superseded decisions, not an uncompleted backlog:
 
-- The generalized `@sefaria/model` foundation and broad offline reference parser are no longer the delivery architecture. The corrected OpenAPI contract and thin `@arithmomaniac/sefaria-client` own transport data; elements own private component preparation.
+- The generalized `@sefaria/model` foundation and broad offline reference parser are no longer the delivery architecture. The corrected OpenAPI contract and thin `@sefaria/api-client` own transport data; elements own private component preparation.
 - The earlier unbounded or implicit cache proposal was removed from the baseline. The current client instead implements one bounded, default-on, per-client response cache with explicit opt-out; retries and request coalescing remain excluded.
 - A separate text-range request and view-model stack was replaced by a bounded source-card collection. A single segment is a one-item collection, while a range remains one outer request with card-level reference data.
 - Attribution belongs once at the source-card level for each displayed edition, not inside every repeated text segment.
 - The private `SourceCardData` MCP wire format is superseded. The current integration uses corrected API-shaped JSON, boundary validation, and the same element-owned private preparation as client mode.
 
-The [historical decision record](evidence.md#historical-decision-provenance) explains the sources and supersession behind these changes. Work on other branches is not included in this baseline. Use the [repository issues](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/issues) page for live delivery tracking, not as the definition of a component contract.
+The [historical decision record](evidence.md#historical-decision-provenance) explains the sources and supersession behind these changes. Work on other branches is not included in this baseline. Use the [repository issues](https://github.com/Sefaria/sefaria-frontend-toolkit/issues) page for live delivery tracking, not as the definition of a component contract.
 
 ## Still intended
 
@@ -120,7 +120,7 @@ This command builds the real editor graph and production host at both `/` and `/
 
 The generated `dist/site` directory contains the VitePress pages plus allowlisted example routes under `examples/`: playground, explorer, Reader, vanilla, React, linked article, and the live static MCP host. The playground uses only supplied data; the live MCP host proves in-memory protocol, resource, AppBridge, and opaque-sandbox behavior without an external backend; `pnpm dev:mcp` proves the compiled Streamable HTTP topology.
 
-`pnpm build:site` typechecks each included example before bundling it. `pnpm build:site:bundles` skips those repeated typechecks and is used inside `pnpm check` after workspace builds. Both commands verify required output files and reject a same-origin authored-source fallback. `SITE_BASE_PATH` selects the normalized absolute base used by VitePress, every example bundle, and browser acceptance; local commands default to `/`, while the Pages workflow requires `/sefaria-frontend-toolkit/`.
+`pnpm build:site` rebuilds the libraries and their packaged browser modules before script-source assembly, then typechecks each included example before bundling it. `pnpm build:site:bundles` reuses the browser modules and evidence from `pnpm build`, skips repeated typechecks, and is used inside `pnpm check` after workspace builds. Both commands verify required output files and reject a same-origin authored-source fallback. `SITE_BASE_PATH` selects the normalized absolute base used by VitePress, every example bundle, and browser acceptance; local commands default to `/`, while the Pages workflow requires `/sefaria-frontend-toolkit/`.
 
 The separate Pages workflow runs after successful main-push CI or explicit script retirement, and also supports manual main-only redeployment. It runs the complete repository gate on Ubuntu with the project base, restores retained script artifacts, uploads only `dist/site`, and deploys with `pages: write` and `id-token: write` scoped to the deployment job. Pull requests validate the workflow and both local and project-path contracts without deploying. The previous Reveal.js showcase, booth loop, Pages assembly, QR assets, presentation media, and presentation-only tests remain available through the full-SHA links in the [documentation archive](archive/README.md#september-14-2026-presentation-snapshot).
 
@@ -156,7 +156,7 @@ pnpm build:script-source --compare
 pnpm test:script-source dist/script-source
 ```
 
-The first command writes `dist/script-source/sefaria-elements.js`, `sefaria-client.js`, `sefaria-text-transform.js`, licenses, a corresponding-source archive, a hashed manifest, and a comparison report. The second exercises that exact production artifact from a separate-origin plain HTML page in Chromium, Firefox, and WebKit. `pnpm check` stages the same artifact at `dist/site/cdn/local` and runs the smoke there. `local` is a fixture identity, never a publishable version; Pages restoration replaces the complete local `cdn` directory before upload.
+The first command writes `dist/script-source/sefaria-elements.js`, `sefaria-api-client.js`, `sefaria-text-transform.js`, licenses, a corresponding-source archive, a hashed manifest, and a comparison report. The second exercises that exact production artifact from a separate-origin plain HTML page in Chromium, Firefox, and WebKit. `pnpm check` stages the same artifact at `dist/site/cdn/local` and runs the smoke there. `local` is a fixture identity, never a publishable version; Pages restoration replaces the complete local `cdn` directory before upload.
 
 The script smoke also drives real keyboard and pointer interactions at root and project URL bases: Source Card selection events received by ordinary host JavaScript, selected-state feedback, reversible language/vocalization controls, Reader commentary navigation and Back, narrow-screen pane switching, and no Popup registration or export. The production-site gate separately exercises the linked article's host dialog, Escape/button close, and originating-link focus return in all three browsers. It checks exact request counts after those actions. The pages import only the production bundle; Sefaria HTTP responses use the same bounded fixtures as site acceptance. This proves local interaction behavior, not the live Pages URL or upstream availability.
 
@@ -170,7 +170,7 @@ Restoration reports the complete site's byte size and blocks upload above 1,000,
 
 To retire a version, manually run **Retire script version** on `main` with the exact package version. The workflow records a terminal tombstone and a successful run triggers Pages to omit that path. Retirement is allowed without notice; pins may stop working, and caches may delay removal. Retiring the newest version selects the next active alias; retiring all versions leaves no script alias. The maintenance workflow does not delete the Release/source archive or waive source-distribution obligations. Do not reuse a retired version identifier.
 
-The original Pages location must remain available for retained URLs if names or URLs change. A separate repository can publish later versions without moving the original retained files. Do not rely on repository-name redirects for project-site URLs.
+The supported Pages host is now `https://sefaria.github.io/sefaria-frontend-toolkit/`. The maintainer explicitly retired support for the old personal-account URLs after the ownership transfer. Restore retained artifacts byte-for-byte at the new host; do not rewrite their original licenses or filenames. Schema 1 releases contain only elements, schema 2 includes `sefaria-client.js`, and new schema 3 releases use `sefaria-api-client.js`.
 
 Hosted qualification is still required after authorized publication: check anonymous module loading, MIME/CORS, matching package version, notices/source access, and an older active pin after a later deployment. Local tests do not establish hosted availability.
 
@@ -217,7 +217,7 @@ The command performs a frozen install, installs Chromium, and launches and close
 
 Preparation can use the network for dependencies and Chromium and fails at the exact unsuccessful step. `pnpm check` remains the offline validation boundary: it does not fetch Git history, refresh fixtures, or contact Sefaria.
 
-GitHub's `.github/workflows/copilot-setup-steps.yml` first checks for `packages/web-components/package.json` with package name `@arithmomaniac/sefaria-web-components`. Toolkit-derived branches prepare normally; an unrelated checkout logs an explicit skip. A checkout that looks like the toolkit but lacks the setup script fails rather than silently skipping. This loader-based behavior must be verified in real cloud sessions after the workflow is active on `main`.
+GitHub's `.github/workflows/copilot-setup-steps.yml` first checks for `packages/web-components/package.json` with package name `@sefaria/web-components`. Toolkit-derived branches prepare normally; an unrelated checkout logs an explicit skip. A checkout that looks like the toolkit but lacks the setup script fails rather than silently skipping. This loader-based behavior must be verified in real cloud sessions after the workflow is active on `main`.
 
 Copilot CLI and Desktop do not automatically run the hosted workflow. Run `pnpm setup:agent` in each fresh local worktree. Concurrent Vitest browser runs may begin with port `6338`; Vitest selects another port when it is occupied. Tests on September 15, 2026 confirmed this fallback, so no custom port allocator is required.
 
@@ -384,7 +384,7 @@ Candidate generation does not update `manifest.json`, tests, or other references
 
 ## Generated artifacts
 
-`@arithmomaniac/sefaria-client` commits:
+`@sefaria/api-client` commits:
 
 - the upstream OpenAPI input
 - the complete commit pin
@@ -557,9 +557,9 @@ pnpm build
 $repository = (Resolve-Path .).Path
 $destination = Join-Path $repository ".toolchain\tarballs"
 New-Item -ItemType Directory -Force $destination
-pnpm --filter @arithmomaniac/sefaria-client pack --pack-destination $destination
-pnpm --filter @arithmomaniac/sefaria-text-transform pack --pack-destination $destination
-pnpm --filter @arithmomaniac/sefaria-web-components pack --pack-destination $destination
+pnpm --filter @sefaria/api-client pack --pack-destination $destination
+pnpm --filter @sefaria/text-transform pack --pack-destination $destination
+pnpm --filter @sefaria/web-components pack --pack-destination $destination
 ```
 
 `pnpm --filter ... pack` runs from each package directory, so the absolute destination is intentional. Copy the three emitted tarballs into an external Vite project and use the actual filenames in its `package.json`:
@@ -569,9 +569,9 @@ pnpm --filter @arithmomaniac/sefaria-web-components pack --pack-destination $des
   "private": true,
   "type": "module",
   "dependencies": {
-    "@arithmomaniac/sefaria-client": "file:./arithmomaniac-sefaria-client-0.0.0.tgz",
-    "@arithmomaniac/sefaria-text-transform": "file:./arithmomaniac-sefaria-text-transform-0.0.0.tgz",
-    "@arithmomaniac/sefaria-web-components": "file:./arithmomaniac-sefaria-web-components-0.0.0.tgz"
+    "@sefaria/api-client": "file:./sefaria-api-client-0.0.0.tgz",
+    "@sefaria/text-transform": "file:./sefaria-text-transform-0.0.0.tgz",
+    "@sefaria/web-components": "file:./sefaria-web-components-0.0.0.tgz"
   }
 }
 ```
@@ -580,19 +580,29 @@ Put matching transitive overrides in the external consumer's `pnpm-workspace.yam
 
 ```yaml
 overrides:
-  "@arithmomaniac/sefaria-client": "file:./arithmomaniac-sefaria-client-0.0.0.tgz"
-  "@arithmomaniac/sefaria-text-transform": "file:./arithmomaniac-sefaria-text-transform-0.0.0.tgz"
-  "@arithmomaniac/sefaria-web-components": "file:./arithmomaniac-sefaria-web-components-0.0.0.tgz"
+  "@sefaria/api-client": "file:./sefaria-api-client-0.0.0.tgz"
+  "@sefaria/text-transform": "file:./sefaria-text-transform-0.0.0.tgz"
+  "@sefaria/web-components": "file:./sefaria-web-components-0.0.0.tgz"
 
 allowBuilds:
   esbuild: true
 ```
 
-The committed source manifests remain private. The repository variable `PUBLIC_PACKAGES_ENABLED` is `true` after the September 20, 2026 public-visibility rollout. Both hosted validation platforms and the fail-closed `check` must succeed on a `main` push before the CI publish job stages copies with version `0.0.0-alpha.<run-id>.<run-attempt>`, rewrites toolkit dependencies to that exact version, and verifies the current package configuration before publishing the client, text transform, then Web Components package under the `alpha` tag. The job has repository-scoped `packages: write`; pull requests, failed validation, skipped aggregation, non-`main` refs, a disabled rollout gate, a stale main head, or a failed package preflight cannot publish. Main-push runs are not canceled after publication may have started.
+The committed source manifests remain private. Normal Sefaria publication requires the new repository variable `SEFARIA_PACKAGES_ENABLED=true`; the inherited old rollout variable does not enable it. Both hosted validation platforms and the fail-closed `check` must succeed on a `main` push before the CI publish job stages copies with version `0.0.0-alpha.<run-id>.<run-attempt>`, rewrites toolkit dependencies to that exact version, and verifies the current package configuration before publishing the client, text transform, then Web Components package under the `alpha` tag. The job has repository-scoped `packages: write`; pull requests, failed validation, skipped aggregation, non-`main` refs, a disabled rollout gate, a stale main head, or a failed package preflight cannot publish. Main-push runs are not canceled after publication may have started.
+
+For first publication, explicitly run **Bootstrap Sefaria packages** on current `main` while the new gate is disabled. It validates on Linux and Windows, checks an authenticated Sefaria package inventory, rejects incorrectly linked existing identities, publishes one synchronized version, and verifies an isolated installed consumer. It creates no browser release and makes no public-visibility claim. Missing package authorization fails the workflow rather than silently assuming the package does not exist. A partial attempt needs another explicit run with a new version.
+
+CI and bootstrap share `validate-toolkit.yml` for the matrix and `publish-packages.yml` for staging, current-main verification, ordered publication, and installed-consumer verification. Their top-level fail-closed `check` jobs remain in place. The publisher takes a required Boolean bootstrap mode, enforces its own main/event/activation boundary, serializes both paths through one non-cancelable concurrency group, and forwards the verified run-derived version to CI's browser archival job. Bootstrap remains gated off after activation; removing its entry point and bootstrap-only commands is later cleanup, not part of this first-publication change.
+
+A Sefaria package administrator must confirm package creation policy, repository/Actions access, and public visibility for all three records. A repository administrator then enables `SEFARIA_PACKAGES_ENABLED` and a normal main release qualifies the complete public path. Repository Write access and organization Member status do not establish these administrator permissions. Never use a publishing secret to bypass the workflow token policy.
 
 The staged manifests alone set `private: false`, public access intent, and the GitHub npm registry. Committed manifests retain `private: true`, `0.0.0`, and `workspace:*`. Staging copies only built `dist`, package documentation, the root license, and Web Components metadata. Immediately before the first publish, the preflight authenticates to all three existing registry records, validates each record's current `alpha` version with the expected repository metadata and exact internal dependencies, and requires each anonymous repository package page to return HTTP 200 without following redirects. The records need not already share one `alpha` version, so a later main run can repair a prior publication that stopped between package publishes. GitHub package visibility is persistent package configuration rather than a manifest guarantee, so a new package identity must be created and manually confirmed public before it can be added to this publication set; the preflight intentionally fails when a registry record is absent, private, or redirected. Post-publication verification repeats the metadata and visibility checks for the new exact synchronized version, then installs all three versions into a temporary consumer whose lockfile contains no workspace, link, file, or tarball resolution. The verifier removes its token-referencing `.npmrc` and staged package directories before importing every Node-safe public subpath.
 
-GitHub Packages requires authentication even for public npm-format packages. Consumers configure the `@arithmomaniac` scope for `https://npm.pkg.github.com`, supply a token through `NODE_AUTH_TOKEN`, and request one exact synchronized prerelease version for all three packages. A repository `GITHUB_TOKEN` can install packages when that repository has package access; external users need a classic personal access token with `read:packages`. Do not commit either token or an expanded `.npmrc`. The package names are subject to change, and the packages are not published on npmjs.com.
+GitHub Packages requires authentication even for public npm-format packages. Consumers configure the `@sefaria` scope for `https://npm.pkg.github.com`, supply a token through `NODE_AUTH_TOKEN`, and request one exact synchronized prerelease version for all three packages. A repository `GITHUB_TOKEN` can install packages when that repository has package access; external users need a classic personal access token with `read:packages`. Do not commit either token or an expanded `.npmrc`. The package names are subject to change, and the packages are not published on npmjs.com.
+
+`pnpm build` also writes each package's self-contained browser module under `dist/browser`, with MIT and dependency notices. `pnpm package:smoke` extracts the actual tarballs and loads those files from a separate-origin static host in Chromium, Firefox, and WebKit before the existing framework-consumer qualification. CDN-ready contents are not npm publication: a later launch needs control of the separate npm `@sefaria` namespace, publishing authorization and workflow, a version policy, and hosted CDN checks.
+
+The same build writes private `.artifacts/package-browser-build.json` evidence for those modules. `pnpm build:script-source` reuses their exact bytes and captured dependency graph, verifies current input/output fingerprints, and creates the combined notices, manifest, and source archive without rebundling. If the evidence or an input/output file is missing, malformed, or stale, run `pnpm build` again; assembly does not rebuild silently. The evidence is not shipped in package tarballs. The optional `--compare` mode still builds the explicit split-module comparison. Retained hosted releases continue to restore from their original archives.
 
 Run `pnpm package:smoke` to create an isolated Vite consumer, inspect each unchanged packed manifest and file list, override all three internal toolkit dependencies to their exact `file:` tarballs, inspect the lockfile and installed real paths, remove the producer tarballs, build, import the Node-safe subpaths, and render the source-card path in Chromium. Consumer-side overrides are required for this local private-tarball topology because pnpm otherwise attempts registry resolution for a packed package's internal toolkit dependency.
 

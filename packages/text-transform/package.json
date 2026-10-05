@@ -1,16 +1,16 @@
 {
-  "name": "@arithmomaniac/sefaria-text-transform",
+  "name": "@sefaria/text-transform",
   "version": "0.0.0",
   "description": "Pure Sefaria text normalization, vocalization, footnote, and preview utilities.",
   "private": true,
   "type": "module",
-  "license": "GPL-3.0-only",
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Arithmomaniac/sefaria-frontend-toolkit.git",
+    "url": "git+https://github.com/Sefaria/sefaria-frontend-toolkit.git",
     "directory": "packages/text-transform"
   },
-  "homepage": "https://github.com/Arithmomaniac/sefaria-frontend-toolkit#readme",
+  "homepage": "https://github.com/Sefaria/sefaria-frontend-toolkit#readme",
   "files": [
     "dist",
     "!dist/*.tsbuildinfo",

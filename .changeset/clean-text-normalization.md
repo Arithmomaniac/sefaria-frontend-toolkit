@@ -1,6 +1,6 @@
 ---
-"@arithmomaniac/sefaria-text-transform": minor
-"@arithmomaniac/sefaria-web-components": minor
+"@sefaria/text-transform": minor
+"@sefaria/web-components": minor
 ---
 
 > Created/edited by GitHub Copilot; pending human review.

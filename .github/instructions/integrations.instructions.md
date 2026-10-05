@@ -13,7 +13,7 @@ applyTo: "examples/mcp-app/**,examples/linked-article/**,docs/specs/integrations
 - Prefer direct `sref` or validated raw `data` assignment to public elements.
 - Do not construct or pass public prepared rendering models.
 - Put a corrected API payload in MCP `structuredContent`; when MCP requires an object root for an array-shaped endpoint response, wrap the unchanged payload in the smallest specified integration envelope.
-- Validate unknown MCP or server JSON with a public corrected `@arithmomaniac/sefaria-client` schema or generated validator.
+- Validate unknown MCP or server JSON with a public corrected `@sefaria/api-client` schema or generated validator.
 - Report structured JSON paths before projection.
 - Feed validated server-provided data through the same element-owned private preparation used after source.
 - Make the first MCP render use zero requests.

@@ -6,4 +6,4 @@ This project uses the [Microsoft Open Source Code of Conduct](https://opensource
 
 Questions or reports about conduct in this repository should go to the current maintainer through a contact method published on the [maintainer's GitHub profile](https://github.com/Arithmomaniac). Do not publish sensitive personal details in an issue.
 
-The [Microsoft Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) explains the source policy. Microsoft's contact channels are not reporting routes for this independently maintained repository.
+The [Microsoft Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) explains the source policy. Microsoft's contact channels are not reporting routes for this Sefaria-owned, community-driven repository.

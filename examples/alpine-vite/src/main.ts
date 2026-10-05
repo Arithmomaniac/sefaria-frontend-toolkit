@@ -1,5 +1,5 @@
 import Alpine from "alpinejs";
-import "@arithmomaniac/sefaria-web-components";
+import "@sefaria/web-components";
 
 import { createAlpineSourceCardExample } from "./source-card-example.js";
 import "./style.css";

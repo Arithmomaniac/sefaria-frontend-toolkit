@@ -148,15 +148,11 @@ export async function renderNormalizedOutput(): Promise<string> {
 
 export async function renderTextTransformReference(): Promise<string> {
   const [surface, output] = await Promise.all([
-    renderTypeDoc(
-      "text-transform.ts",
-      "@arithmomaniac/sefaria-text-transform",
-      3,
-    ),
+    renderTypeDoc("text-transform.ts", "@sefaria/text-transform", 3),
     renderNormalizedOutput(),
   ]);
   const body = [
-    "This page lists the names exported by `@arithmomaniac/sefaria-text-transform` and the HTML that `normalizeText` produces. `normalizeText` makes Sefaria's HTML safe to display. Run it before `applyVocalizationToHtml`, which doesn't sanitize. `createTextPreview` accepts raw HTML and normalizes it itself.",
+    "This page lists the names exported by `@sefaria/text-transform` and the HTML that `normalizeText` produces. `normalizeText` makes Sefaria's HTML safe to display. Run it before `applyVocalizationToHtml`, which doesn't sanitize. `createTextPreview` accepts raw HTML and normalizes it itself.",
     "",
     releaseSection(),
     "",
@@ -177,7 +173,7 @@ export async function renderTextTransformReference(): Promise<string> {
     title: "Reference › Text tools",
     heading: "Text tools reference",
     description:
-      "The functions and types exported by @arithmomaniac/sefaria-text-transform, and the HTML that normalizeText produces.",
+      "The functions and types exported by @sefaria/text-transform, and the HTML that normalizeText produces.",
     body,
   });
 }

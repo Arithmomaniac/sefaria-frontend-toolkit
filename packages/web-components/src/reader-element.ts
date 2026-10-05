@@ -5,7 +5,7 @@ import {
   type PropertyValues,
   type TemplateResult,
 } from "lit";
-import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
+import type { VocalizationMode } from "@sefaria/text-transform";
 
 import type {
   BilingualPairContentLanguage,

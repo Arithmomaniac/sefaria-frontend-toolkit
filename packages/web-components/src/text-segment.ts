@@ -4,12 +4,12 @@ import {
   type CoreV3Version,
   type GetV3TextsData,
   type SefariaClient,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 import {
   normalizeText,
   type CommentaryReference,
   type NormalizedFootnote,
-} from "@arithmomaniac/sefaria-text-transform";
+} from "@sefaria/text-transform";
 import {
   ComponentControllerEngine,
   validateSuppliedComponentData,

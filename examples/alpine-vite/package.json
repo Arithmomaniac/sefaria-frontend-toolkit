@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "dependencies": {
-    "@arithmomaniac/sefaria-client": "workspace:*",
-    "@arithmomaniac/sefaria-web-components": "workspace:*",
+    "@sefaria/api-client": "workspace:*",
+    "@sefaria/web-components": "workspace:*",
     "alpinejs": "3.17.2"
   },
   "scripts": {

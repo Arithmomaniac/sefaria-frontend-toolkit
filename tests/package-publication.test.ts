@@ -25,7 +25,7 @@ import {
 } from "../scripts/package-publication.mjs";
 
 const version = "0.0.0-alpha.123456.2";
-const repositoryFullName = "Arithmomaniac/sefaria-frontend-toolkit";
+const repositoryFullName = "Sefaria/sefaria-frontend-toolkit";
 
 describe("public package publication", () => {
   it("derives a unique synchronized version from the run and attempt", () => {
@@ -48,12 +48,12 @@ describe("public package publication", () => {
     const manifest = createPublishManifest({
       definition: PACKAGE_DEFINITIONS[2],
       sourceManifest: {
-        name: "@arithmomaniac/sefaria-web-components",
+        name: "@sefaria/web-components",
         version: "0.0.0",
         private: true,
         dependencies: {
-          "@arithmomaniac/sefaria-client": "workspace:*",
-          "@arithmomaniac/sefaria-text-transform": "workspace:*",
+          "@sefaria/api-client": "workspace:*",
+          "@sefaria/text-transform": "workspace:*",
           lit: "^3.3.3",
         },
       },
@@ -61,7 +61,7 @@ describe("public package publication", () => {
     });
 
     expect(manifest).toMatchObject({
-      name: "@arithmomaniac/sefaria-web-components",
+      name: "@sefaria/web-components",
       version,
       private: false,
       publishConfig: {
@@ -69,28 +69,28 @@ describe("public package publication", () => {
         registry: "https://npm.pkg.github.com",
       },
       dependencies: {
-        "@arithmomaniac/sefaria-client": version,
-        "@arithmomaniac/sefaria-text-transform": version,
+        "@sefaria/api-client": version,
+        "@sefaria/text-transform": version,
         lit: "^3.3.3",
       },
     });
-    expect(manifest.dependencies["@arithmomaniac/sefaria-client"]).not.toBe(
+    expect(manifest.dependencies["@sefaria/api-client"]).not.toBe(
       "workspace:*",
     );
   });
 
   it("uses separate registry and unauthenticated package-page endpoints", () => {
-    expect(createRegistryMetadataUrl("@arithmomaniac/sefaria-client")).toBe(
-      "https://npm.pkg.github.com/@arithmomaniac%2Fsefaria-client",
+    expect(createRegistryMetadataUrl("@sefaria/api-client")).toBe(
+      "https://npm.pkg.github.com/@sefaria%2Fapi-client",
     );
     expect(
       createPackagePageUrl({
         serverUrl: "https://github.com",
         repositoryFullName,
-        packageName: "@arithmomaniac/sefaria-client",
+        packageName: "@sefaria/api-client",
       }),
     ).toBe(
-      "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/pkgs/npm/sefaria-client",
+      "https://github.com/Sefaria/sefaria-frontend-toolkit/pkgs/npm/api-client",
     );
   });
 
@@ -103,7 +103,9 @@ describe("public package publication", () => {
       await writeFile(path.join(root, "LICENSE"), "license\n");
       for (const definition of PACKAGE_DEFINITIONS) {
         const packageRoot = path.join(root, definition.directory);
-        await mkdir(path.join(packageRoot, "dist"), { recursive: true });
+        await mkdir(path.join(packageRoot, "dist", "browser"), {
+          recursive: true,
+        });
         await mkdir(path.join(packageRoot, "src"), { recursive: true });
         await Promise.all([
           writeFile(
@@ -114,16 +116,33 @@ describe("public package publication", () => {
               private: true,
               files: ["dist", "README.md"],
               dependencies:
-                definition.name === "@arithmomaniac/sefaria-web-components"
+                definition.name === "@sefaria/web-components"
                   ? {
-                      "@arithmomaniac/sefaria-client": "workspace:*",
-                      "@arithmomaniac/sefaria-text-transform": "workspace:*",
+                      "@sefaria/api-client": "workspace:*",
+                      "@sefaria/text-transform": "workspace:*",
                     }
                   : {},
             })}\n`,
           ),
           writeFile(path.join(packageRoot, "README.md"), definition.name),
           writeFile(path.join(packageRoot, "dist", "index.js"), "export {};\n"),
+          writeFile(
+            path.join(packageRoot, "dist", "browser", definition.browserFile),
+            "export {};\n",
+          ),
+          writeFile(
+            path.join(packageRoot, "dist", "browser", "LICENSE.txt"),
+            "MIT License\n",
+          ),
+          writeFile(
+            path.join(
+              packageRoot,
+              "dist",
+              "browser",
+              "THIRD-PARTY-NOTICES.txt",
+            ),
+            "MIT dependency\n",
+          ),
           writeFile(path.join(packageRoot, "src", "secret.ts"), "source\n"),
         ]);
         if (definition.customElements) {
@@ -176,11 +195,11 @@ describe("public package publication", () => {
       validatePublishedPackage({
         definition: PACKAGE_DEFINITIONS[0],
         registryMetadata: {
-          name: "@arithmomaniac/sefaria-client",
+          name: "@sefaria/api-client",
           "dist-tags": { alpha: version },
           versions: {
             [version]: {
-              name: "@arithmomaniac/sefaria-client",
+              name: "@sefaria/api-client",
               version,
               repository: {
                 type: "git",
@@ -199,11 +218,11 @@ describe("public package publication", () => {
       validatePublishedPackage({
         definition: PACKAGE_DEFINITIONS[0],
         registryMetadata: {
-          name: "@arithmomaniac/sefaria-client",
+          name: "@sefaria/api-client",
           "dist-tags": { alpha: version },
           versions: {
             [version]: {
-              name: "@arithmomaniac/sefaria-client",
+              name: "@sefaria/api-client",
               version,
               repository: {
                 type: "git",
@@ -235,10 +254,10 @@ describe("public package publication", () => {
               url: `git+https://github.com/${repositoryFullName}.git`,
             },
             dependencies:
-              definition.name === "@arithmomaniac/sefaria-web-components"
+              definition.name === "@sefaria/web-components"
                 ? {
-                    "@arithmomaniac/sefaria-client": version,
-                    "@arithmomaniac/sefaria-text-transform": version,
+                    "@sefaria/api-client": version,
+                    "@sefaria/text-transform": version,
                   }
                 : {},
           },
@@ -340,10 +359,10 @@ describe("public package publication", () => {
                 url: `git+https://github.com/${repositoryFullName}.git`,
               },
               dependencies:
-                definition.name === "@arithmomaniac/sefaria-web-components"
+                definition.name === "@sefaria/web-components"
                   ? {
-                      "@arithmomaniac/sefaria-client": version,
-                      "@arithmomaniac/sefaria-text-transform": version,
+                      "@sefaria/api-client": version,
+                      "@sefaria/text-transform": version,
                     }
                   : {},
             },
@@ -413,7 +432,7 @@ describe("public package publication", () => {
         validateRegistryConsumerLockfile({
           lockfile: JSON.stringify({
             ...exactDependencies,
-            "@arithmomaniac/sefaria-client": invalid,
+            "@sefaria/api-client": invalid,
           }),
           version,
         }),
@@ -423,7 +442,7 @@ describe("public package publication", () => {
       validateRegistryConsumerLockfile({
         lockfile: JSON.stringify({
           ...exactDependencies,
-          "@arithmomaniac/sefaria-client": "0.0.0-alpha.123456.1",
+          "@sefaria/api-client": "0.0.0-alpha.123456.1",
         }),
         version,
       }),

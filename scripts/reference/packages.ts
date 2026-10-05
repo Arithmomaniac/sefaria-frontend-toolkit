@@ -23,9 +23,9 @@ interface Inventory {
 }
 
 const PACKAGE_REFERENCES: Record<string, string> = {
-  "@arithmomaniac/sefaria-client": "/reference/client.md",
-  "@arithmomaniac/sefaria-text-transform": "/reference/text-transform.md",
-  "@arithmomaniac/sefaria-web-components": "/reference/components.md",
+  "@sefaria/api-client": "/reference/client.md",
+  "@sefaria/text-transform": "/reference/text-transform.md",
+  "@sefaria/web-components": "/reference/components.md",
 };
 
 interface PackageManifest {
@@ -35,7 +35,13 @@ interface PackageManifest {
 }
 
 async function packageManifest(name: string): Promise<PackageManifest> {
-  const directory = name.slice("@arithmomaniac/sefaria-".length);
+  const directories: Record<string, string> = {
+    "@sefaria/api-client": "client",
+    "@sefaria/text-transform": "text-transform",
+    "@sefaria/web-components": "web-components",
+  };
+  const directory = directories[name];
+  if (!directory) throw new Error(`Unknown package: ${name}.`);
   return JSON.parse(
     await readFile(
       new URL(`../../packages/${directory}/package.json`, import.meta.url),
@@ -84,12 +90,12 @@ export async function renderPackagesReference(): Promise<string> {
     "Import the web components package root once to register all the elements:",
     "",
     "```js",
-    'import "@arithmomaniac/sefaria-web-components";',
+    'import "@sefaria/web-components";',
     "```",
     "",
-    "Only the package root registers elements. Element subpaths such as `@arithmomaniac/sefaria-web-components/source-card`, `@arithmomaniac/sefaria-web-components/data-source`, and `@arithmomaniac/sefaria-web-components/reader-session` export types and helpers. Import them alongside the package root, not instead of it.",
+    "Only the package root registers elements. Element subpaths such as `@sefaria/web-components/source-card`, `@sefaria/web-components/data-source`, and `@sefaria/web-components/reader-session` export types and helpers. Import them alongside the package root, not instead of it.",
     "",
-    "The client package root re-exports the generated namespaces, contracts, schemas, validators, errors, validation helpers, and client factory. Import `createSefariaClient` from `@arithmomaniac/sefaria-client` or `@arithmomaniac/sefaria-client/client`. Import focused error and validation helpers from `@arithmomaniac/sefaria-client/errors` and `@arithmomaniac/sefaria-client/validation`.",
+    "The client package root re-exports the generated namespaces, contracts, schemas, validators, errors, validation helpers, and client factory. Import `createSefariaClient` from `@sefaria/api-client` or `@sefaria/api-client/client`. Import focused error and validation helpers from `@sefaria/api-client/errors` and `@sefaria/api-client/validation`.",
     "",
   ];
   for (const entry of inventory.packages) {
@@ -104,8 +110,7 @@ export async function renderPackagesReference(): Promise<string> {
     );
     for (const item of entry.exports) {
       const declarations =
-        entry.name === "@arithmomaniac/sefaria-client" &&
-        item.declarations.length > 40
+        entry.name === "@sefaria/api-client" && item.declarations.length > 40
           ? `${item.declarations.length} names; see the [client reference](/reference/client.md)`
           : item.declarations.map((name) => `\`${name}\``).join(", ");
       lines.push(

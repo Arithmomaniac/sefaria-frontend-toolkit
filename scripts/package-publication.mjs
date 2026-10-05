@@ -16,32 +16,36 @@ import process from "node:process";
 import { pathToFileURL } from "node:url";
 
 import YAML from "yaml";
+import { Octokit } from "@octokit/rest";
 
 import { isPathWithin } from "./tarball-consumer-validation.mjs";
 
 const REGISTRY = "https://npm.pkg.github.com";
-const DEFAULT_REPOSITORY = "Arithmomaniac/sefaria-frontend-toolkit";
+const DEFAULT_REPOSITORY = "Sefaria/sefaria-frontend-toolkit";
 const INTERNAL_PACKAGE_NAMES = new Set([
-  "@arithmomaniac/sefaria-client",
-  "@arithmomaniac/sefaria-text-transform",
-  "@arithmomaniac/sefaria-web-components",
+  "@sefaria/api-client",
+  "@sefaria/text-transform",
+  "@sefaria/web-components",
 ]);
 
 export const PACKAGE_DEFINITIONS = [
   {
-    name: "@arithmomaniac/sefaria-client",
+    name: "@sefaria/api-client",
+    browserFile: "sefaria-api-client.js",
     slug: "client",
     directory: "packages/client",
     customElements: false,
   },
   {
-    name: "@arithmomaniac/sefaria-text-transform",
+    name: "@sefaria/text-transform",
+    browserFile: "sefaria-text-transform.js",
     slug: "text-transform",
     directory: "packages/text-transform",
     customElements: false,
   },
   {
-    name: "@arithmomaniac/sefaria-web-components",
+    name: "@sefaria/web-components",
+    browserFile: "sefaria-elements.js",
     slug: "web-components",
     directory: "packages/web-components",
     customElements: true,
@@ -49,21 +53,21 @@ export const PACKAGE_DEFINITIONS = [
 ];
 
 const NODE_SAFE_IMPORTS = [
-  "@arithmomaniac/sefaria-client",
-  "@arithmomaniac/sefaria-client/client",
-  "@arithmomaniac/sefaria-client/contracts",
-  "@arithmomaniac/sefaria-client/errors",
-  "@arithmomaniac/sefaria-client/schemas",
-  "@arithmomaniac/sefaria-client/validation",
-  "@arithmomaniac/sefaria-client/validators",
-  "@arithmomaniac/sefaria-text-transform",
-  "@arithmomaniac/sefaria-web-components/data-source",
-  "@arithmomaniac/sefaria-web-components/bilingual-segment",
-  "@arithmomaniac/sefaria-web-components/connections-panel",
-  "@arithmomaniac/sefaria-web-components/reader",
-  "@arithmomaniac/sefaria-web-components/reader-session",
-  "@arithmomaniac/sefaria-web-components/source-card",
-  "@arithmomaniac/sefaria-web-components/text-segment",
+  "@sefaria/api-client",
+  "@sefaria/api-client/client",
+  "@sefaria/api-client/contracts",
+  "@sefaria/api-client/errors",
+  "@sefaria/api-client/schemas",
+  "@sefaria/api-client/validation",
+  "@sefaria/api-client/validators",
+  "@sefaria/text-transform",
+  "@sefaria/web-components/data-source",
+  "@sefaria/web-components/bilingual-segment",
+  "@sefaria/web-components/connections-panel",
+  "@sefaria/web-components/reader",
+  "@sefaria/web-components/reader-session",
+  "@sefaria/web-components/source-card",
+  "@sefaria/web-components/text-segment",
 ];
 
 export function createPublishVersion(runId, runAttempt) {
@@ -170,7 +174,11 @@ export async function stagePublishPackages({
           ]
         : []),
     ]);
-    await validateStagedPackage(staged, publishManifest);
+    await validateStagedPackage(
+      staged,
+      publishManifest,
+      definition.browserFile,
+    );
   }
 }
 
@@ -189,6 +197,20 @@ export function validatePublishedPackage({
       `${definition.name} public visibility check returned ${publicStatus}.`,
     );
   }
+  validatePackageMetadata({
+    definition,
+    registryMetadata,
+    repositoryFullName,
+    version,
+  });
+}
+
+export function validatePackageMetadata({
+  definition,
+  registryMetadata,
+  repositoryFullName,
+  version,
+}) {
   if (!isRecord(registryMetadata)) {
     throw new Error(`${definition.name} registry metadata is invalid.`);
   }
@@ -319,6 +341,7 @@ async function verifyPublication({
   repositoryFullName,
   serverUrl,
   token,
+  bootstrap = false,
 }) {
   validatePublishVersion(version);
   requirePublicationEnvironment({
@@ -332,7 +355,10 @@ async function verifyPublication({
     token,
   });
   for (const { definition, registryMetadata, publicStatus } of packages) {
-    validatePublishedPackage({
+    const validate = bootstrap
+      ? validatePackageMetadata
+      : validatePublishedPackage;
+    validate({
       definition,
       registryMetadata,
       publicStatus,
@@ -342,6 +368,68 @@ async function verifyPublication({
   }
 
   await verifyRegistryConsumer({ repository, staging, version });
+}
+
+export function validateBootstrapInventory(records, repositoryFullName) {
+  if (!Array.isArray(records))
+    throw new Error("Bootstrap requires an authenticated package inventory.");
+  for (const definition of PACKAGE_DEFINITIONS) {
+    const slug = definition.name.split("/")[1];
+    const existing = records.filter(
+      (record) => record.name === slug || record.name === definition.name,
+    );
+    if (existing.length > 1)
+      throw new Error(`Ambiguous bootstrap identity: ${definition.name}.`);
+    if (
+      existing.length &&
+      (existing[0].package_type !== "npm" ||
+        existing[0].repository?.full_name !== repositoryFullName)
+    )
+      throw new Error(
+        `Bootstrap package is not linked to ${repositoryFullName}: ${definition.name}.`,
+      );
+  }
+}
+
+export async function preflightBootstrap({ repositoryFullName, token }) {
+  requirePublicationEnvironment({
+    repositoryFullName,
+    token,
+    operation: "bootstrap",
+  });
+  if (repositoryFullName !== DEFAULT_REPOSITORY)
+    throw new Error(`Bootstrap requires ${DEFAULT_REPOSITORY}.`);
+  const api = new Octokit({ auth: token });
+  api.hook.before("request", (options) => {
+    options.request.signal = globalThis.AbortSignal.timeout(60_000);
+  });
+  const records = await api.paginate(api.packages.listPackagesForOrganization, {
+    org: "Sefaria",
+    package_type: "npm",
+    per_page: 100,
+  });
+  validateBootstrapInventory(records, repositoryFullName);
+  for (const definition of PACKAGE_DEFINITIONS) {
+    const slug = definition.name.split("/")[1];
+    if (
+      !records.some(
+        (record) => record.name === slug || record.name === definition.name,
+      )
+    )
+      continue;
+    const registryMetadata = await fetchRegistryJson(
+      createRegistryMetadataUrl(definition.name),
+      token,
+    );
+    const version = registryMetadata["dist-tags"]?.alpha;
+    validatePublishVersion(version);
+    validatePackageMetadata({
+      definition,
+      registryMetadata,
+      repositoryFullName,
+      version,
+    });
+  }
 }
 
 async function fetchPackageRecords({ repositoryFullName, serverUrl, token }) {
@@ -417,7 +505,7 @@ async function verifyRegistryConsumer({ repository, staging, version }) {
       writeFile(
         npmrc,
         [
-          "@arithmomaniac:registry=https://npm.pkg.github.com",
+          "@sefaria:registry=https://npm.pkg.github.com",
           "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}",
           "always-auth=true",
           "",
@@ -547,7 +635,7 @@ function validatePublishVersion(version) {
   }
 }
 
-async function validateStagedPackage(staged, manifest) {
+async function validateStagedPackage(staged, manifest, browserFile) {
   const files = await listFiles(staged);
   const forbidden = files.find(
     (filename) =>
@@ -562,6 +650,13 @@ async function validateStagedPackage(staged, manifest) {
   }
   for (const target of collectExportTargets(manifest.exports)) {
     await access(path.join(staged, target.replace(/^\.\//u, "")));
+  }
+  for (const filename of [
+    browserFile,
+    "LICENSE.txt",
+    "THIRD-PARTY-NOTICES.txt",
+  ]) {
+    await access(path.join(staged, "dist", "browser", filename));
   }
 }
 
@@ -624,6 +719,11 @@ if (
     process.stdout.write(
       `Staged ${PACKAGE_DEFINITIONS.length} packages at ${version}.\n`,
     );
+  } else if (command === "bootstrap-preflight") {
+    await preflightBootstrap({
+      repositoryFullName: process.env.GITHUB_REPOSITORY,
+      token: process.env.NODE_AUTH_TOKEN,
+    });
   } else if (command === "preflight") {
     await preflightPublication({
       repositoryFullName: process.env.GITHUB_REPOSITORY ?? DEFAULT_REPOSITORY,
@@ -631,9 +731,9 @@ if (
       token: process.env.NODE_AUTH_TOKEN,
     });
     process.stdout.write(
-      `Preflight verified ${PACKAGE_DEFINITIONS.length} existing private registry packages.\n`,
+      `Preflight verified ${PACKAGE_DEFINITIONS.length} existing public registry packages.\n`,
     );
-  } else if (command === "verify") {
+  } else if (command === "verify" || command === "bootstrap-verify") {
     const version = readArgument("--version");
     await verifyPublication({
       repository,
@@ -642,9 +742,10 @@ if (
       repositoryFullName: process.env.GITHUB_REPOSITORY ?? DEFAULT_REPOSITORY,
       serverUrl: process.env.GITHUB_SERVER_URL ?? "https://github.com",
       token: process.env.NODE_AUTH_TOKEN,
+      bootstrap: command === "bootstrap-verify",
     });
     process.stdout.write(
-      `Verified ${PACKAGE_DEFINITIONS.length} private registry packages at ${version}.\n`,
+      `Verified ${PACKAGE_DEFINITIONS.length} registry packages at ${version}${command === "bootstrap-verify" ? "; public activation remains pending" : ""}.\n`,
     );
   } else {
     throw new Error("Expected the stage, preflight, or verify command.");

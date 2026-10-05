@@ -50,11 +50,10 @@ const options = [
   { value: "js", label: "JavaScript" },
 ] as const;
 
-const cdn =
-  "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha";
+const cdn = "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha";
 const imports = {
-  "@arithmomaniac/sefaria-client": `${cdn}/sefaria-client.js`,
-  "@arithmomaniac/sefaria-text-transform": `${cdn}/sefaria-text-transform.js`,
+  "@sefaria/api-client": `${cdn}/sefaria-api-client.js`,
+  "@sefaria/text-transform": `${cdn}/sefaria-text-transform.js`,
 };
 
 type Line = { kind: "log" | "error"; text: string };

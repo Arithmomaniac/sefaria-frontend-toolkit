@@ -14,6 +14,6 @@
       "path": "../shared/micah-6-8-links.js"
     }
   ],
-  "sourceBaseUrl": "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/projects/connections-panel/",
+  "sourceBaseUrl": "https://github.com/Sefaria/sefaria-frontend-toolkit/blob/main/examples/playground/projects/connections-panel/",
   "liveDemoUrl": "../explorer/connections.html"
 }

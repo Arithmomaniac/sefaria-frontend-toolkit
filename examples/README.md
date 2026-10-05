@@ -10,11 +10,11 @@ The [authored component workbench](explorer/authored.html) renders supplied raw 
 
 | Component | Public subpath | Retained scenarios | Example deep link |
 | --- | --- | --- | --- |
-| Text segment | `@arithmomaniac/sefaria-web-components/text-segment` | populated, loading, empty, error, markup and footnotes | [Populated text](explorer/authored.html?component=text-segment&scenario=data) |
-| Bilingual segment | `@arithmomaniac/sefaria-web-components/bilingual-segment` | populated, loading, partial, empty, error | [One-sided partial data](explorer/authored.html?component=bilingual-segment&scenario=partial) |
-| Source card | `@arithmomaniac/sefaria-web-components/source-card` | one item, range, hidden addresses, one-sided, loading, empty, error, selection | [Range with diagnostics](explorer/authored.html?component=source-card&scenario=many-items&diagnostics=1) |
-| Connections panel | `@arithmomaniac/sefaria-web-components/connections-panel` | summary, detail, metadata-only, loading, empty, error | [Detailed connections](explorer/authored.html?component=connections-panel&scenario=details) |
-| Reader | `@arithmomaniac/sefaria-web-components/reader` | paired, source-only, connections-only, loading, unavailable, truncated history | [Truncated history](explorer/authored.html?component=reader&scenario=truncated-history&width=720) |
+| Text segment | `@sefaria/web-components/text-segment` | populated, loading, empty, error, markup and footnotes | [Populated text](explorer/authored.html?component=text-segment&scenario=data) |
+| Bilingual segment | `@sefaria/web-components/bilingual-segment` | populated, loading, partial, empty, error | [One-sided partial data](explorer/authored.html?component=bilingual-segment&scenario=partial) |
+| Source card | `@sefaria/web-components/source-card` | one item, range, hidden addresses, one-sided, loading, empty, error, selection | [Range with diagnostics](explorer/authored.html?component=source-card&scenario=many-items&diagnostics=1) |
+| Connections panel | `@sefaria/web-components/connections-panel` | summary, detail, metadata-only, loading, empty, error | [Detailed connections](explorer/authored.html?component=connections-panel&scenario=details) |
+| Reader | `@sefaria/web-components/reader` | paired, source-only, connections-only, loading, unavailable, truncated history | [Truncated history](explorer/authored.html?component=reader&scenario=truncated-history&width=720) |
 
 Runnable scenario definitions live in [`explorer/src/authored`](explorer/src/authored/). Selecting an authored scenario never starts a live operation.
 
@@ -38,10 +38,10 @@ The [component explorer](explorer/README.md) keeps live actions separate from su
 
 | Destination | What to try | Public package/subpath |
 | --- | --- | --- |
-| [Text segment](explorer/text-segment.html) | Hebrew, English with footnotes, retained markup, absent language, and wrong granularity | `@arithmomaniac/sefaria-web-components/text-segment` |
-| [Bilingual segment](explorer/bilingual-segment.html) | Exact editions, missing translation, ranges, layout, side order, and displayed languages | `@arithmomaniac/sefaria-web-components/bilingual-segment` |
-| [Source card](explorer/source-card.html) | Bounded live source loading, ranges, side selection, layout, and order | `@arithmomaniac/sefaria-web-components/source-card` |
-| [Connections reader](explorer/connections.html) | Source and connection selection, category/page projection, previews, cancellation, visible errors, and exact request counts | `@arithmomaniac/sefaria-web-components/source-card` and `@arithmomaniac/sefaria-web-components/connections-panel` |
+| [Text segment](explorer/text-segment.html) | Hebrew, English with footnotes, retained markup, absent language, and wrong granularity | `@sefaria/web-components/text-segment` |
+| [Bilingual segment](explorer/bilingual-segment.html) | Exact editions, missing translation, ranges, layout, side order, and displayed languages | `@sefaria/web-components/bilingual-segment` |
+| [Source card](explorer/source-card.html) | Bounded live source loading, ranges, side selection, layout, and order | `@sefaria/web-components/source-card` |
+| [Connections reader](explorer/connections.html) | Source and connection selection, category/page projection, previews, cancellation, visible errors, and exact request counts | `@sefaria/web-components/source-card` and `@sefaria/web-components/connections-panel` |
 
 ## Standalone Reader
 

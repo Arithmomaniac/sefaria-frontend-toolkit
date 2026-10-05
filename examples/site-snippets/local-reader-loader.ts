@@ -1,5 +1,5 @@
-import { SefariaReader } from "@arithmomaniac/sefaria-web-components";
-import type { SefariaDataLoader } from "@arithmomaniac/sefaria-web-components";
+import { SefariaReader } from "@sefaria/web-components";
+import type { SefariaDataLoader } from "@sefaria/web-components";
 
 // A saved Micah 6:8 response. The Reader asks for the chapter too, so serve both refs.
 const stored: unknown = await (await fetch("/data/micah-6-8.json")).json();

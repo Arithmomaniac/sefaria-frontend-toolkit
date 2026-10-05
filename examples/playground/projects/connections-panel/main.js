@@ -1,4 +1,4 @@
-import "@arithmomaniac/sefaria-web-components";
+import "@sefaria/web-components";
 import links from "./links.js";
 
 const panel = requireElement("#connections");

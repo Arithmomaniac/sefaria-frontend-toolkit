@@ -2,7 +2,7 @@ import {
   createSefariaClient,
   zCoreLinkResponse,
   zCoreV3TextsResponse,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 import { html } from "lit";
 import { render } from "vitest-browser-lit";
 import { expect, test, vi } from "vitest";

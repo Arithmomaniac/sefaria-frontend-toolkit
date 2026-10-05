@@ -1,5 +1,5 @@
-import { createSefariaClient } from "@arithmomaniac/sefaria-client";
-import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
+import { createSefariaClient } from "@sefaria/api-client";
+import type { SefariaSourceCard } from "@sefaria/web-components";
 import { afterEach, expect, test, vi } from "vitest";
 
 import micahPayload from "../../vanilla-vite/src/micah-6-8.json";

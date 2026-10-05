@@ -3,7 +3,7 @@ import {
   type CoreLinkResponse,
   type CoreV3TextsResponse,
   validateExternalResponse,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 import type { CallToolResult } from "@modelcontextprotocol/sdk/types.js";
 
 export const RESOURCE_URI = "ui://sefaria/source-card.html";

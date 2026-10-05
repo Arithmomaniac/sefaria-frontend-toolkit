@@ -1,7 +1,4 @@
-import type {
-  CoreV3TextsResponse,
-  CoreV3TextValue,
-} from "@arithmomaniac/sefaria-client";
+import type { CoreV3TextsResponse, CoreV3TextValue } from "@sefaria/api-client";
 import type { SourceCardNavigation } from "./source-card.js";
 
 interface Addresses {

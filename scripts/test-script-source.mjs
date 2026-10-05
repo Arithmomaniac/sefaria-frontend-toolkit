@@ -326,7 +326,7 @@ export async function testScriptSource(directory) {
 }
 
 const dataModules = {
-  "sefaria-client.js": [
+  "sefaria-api-client.js": [
     "createSefariaClient",
     "text",
     "validateExternalResponse",
@@ -347,7 +347,7 @@ async function testDataModules(
   const srcdoc = `<!doctype html><script type="module">
     const report = (value) => parent.postMessage(value, "*");
     try {
-      const client = await import(${JSON.stringify(`${base}/sefaria-client.js`)});
+      const client = await import(${JSON.stringify(`${base}/sefaria-api-client.js`)});
       const transform = await import(${JSON.stringify(`${base}/sefaria-text-transform.js`)});
       const response = await client.text.getV3Texts({ client: client.createSefariaClient(), path: { tref: "Micah 6:8" } });
       report({
@@ -408,8 +408,8 @@ async function testDataModules(
     );
     assert.equal(result.error, undefined, result.error);
     assert.equal(result.origin, "null");
-    for (const name of dataModules["sefaria-client.js"])
-      assert.ok(result.client.includes(name), `sefaria-client.js ${name}`);
+    for (const name of dataModules["sefaria-api-client.js"])
+      assert.ok(result.client.includes(name), `sefaria-api-client.js ${name}`);
     for (const name of dataModules["sefaria-text-transform.js"])
       assert.ok(
         result.transform.includes(name),

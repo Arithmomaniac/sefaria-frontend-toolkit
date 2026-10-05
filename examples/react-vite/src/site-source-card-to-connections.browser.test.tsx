@@ -1,7 +1,7 @@
 import type {
   SefariaConnectionsPanel,
   SefariaSourceCard,
-} from "@arithmomaniac/sefaria-web-components";
+} from "@sefaria/web-components";
 import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, expect, test, vi } from "vitest";

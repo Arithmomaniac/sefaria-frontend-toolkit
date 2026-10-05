@@ -136,7 +136,7 @@ Each item in `issues` has an `instancePath`, such as `/versions/0/text`. It poin
 
 The toolkit is experimental and has one maintainer. There is no promised response time.
 
-To report a problem, [open an issue](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/issues/new) and include:
+To report a problem, [open an issue](https://github.com/Sefaria/sefaria-frontend-toolkit/issues/new) and include:
 
 - the reference, such as `Micah 6:8`
 - the component or function

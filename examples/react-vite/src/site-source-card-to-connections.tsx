@@ -1,4 +1,4 @@
-import "@arithmomaniac/sefaria-web-components";
+import "@sefaria/web-components";
 import { useState } from "react";
 
 export function SourceCardToConnections() {

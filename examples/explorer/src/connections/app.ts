@@ -5,13 +5,13 @@ import {
   type CoreLinkResponse,
   type CoreV3TextsResponse,
   type SefariaClient,
-} from "@arithmomaniac/sefaria-client";
-import "@arithmomaniac/sefaria-web-components";
+} from "@sefaria/api-client";
+import "@sefaria/web-components";
 import type {
   SefariaConnectionsPanel,
   SefariaSourceCard,
   SefariaDataSource,
-} from "@arithmomaniac/sefaria-web-components";
+} from "@sefaria/web-components";
 import { setOptionalElementAttribute } from "../../../../demos/live-demo-core.js";
 
 /** Host controls exposed for browser qualification and manual use. */

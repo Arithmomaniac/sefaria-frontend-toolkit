@@ -1,8 +1,8 @@
 > Created/edited by GitHub Copilot; pending human review.
 
-# `@arithmomaniac/sefaria-web-components` implementation notes
+# `@sefaria/web-components` implementation notes
 
-These notes are for maintainers. They were moved unchanged from the package README, which is now a short entry point. For usage, see the [documentation site](https://arithmomaniac.github.io/sefaria-frontend-toolkit/).
+These notes are for maintainers. They were moved unchanged from the package README, which is now a short entry point. For usage, see the [documentation site](https://sefaria.github.io/sefaria-frontend-toolkit/).
 
 The package provides six declarative Lit elements. Every element accepts standalone `sref`. The five ordinary elements also accept authoritative component-specific raw `data`; Reader accepts transactional raw source/connections seeds. Prepared rendering is private.
 
@@ -12,8 +12,8 @@ The package provides six declarative Lit elements. Every element accepts standal
 import {
   type CoreV3TextsResponse,
   zCoreV3TextsResponse,
-} from "@arithmomaniac/sefaria-client";
-import "@arithmomaniac/sefaria-web-components";
+} from "@sefaria/api-client";
+import "@sefaria/web-components";
 
 import payload from "./micah-6-8.json";
 
@@ -27,7 +27,7 @@ Defined ordinary-element `data` is authoritative, including valid empty and inva
 ## Standalone `sref`
 
 ```ts
-import "@arithmomaniac/sefaria-web-components";
+import "@sefaria/web-components";
 
 const card = document.createElement("sefaria-source-card");
 card.setAttribute("sref", "Micah 6:8");
@@ -39,8 +39,8 @@ The undefined `source` value lazily uses one shared toolkit client per loaded mo
 ## Prebuilt Reader
 
 ```ts
-import { createSefariaClient } from "@arithmomaniac/sefaria-client";
-import "@arithmomaniac/sefaria-web-components";
+import { createSefariaClient } from "@sefaria/api-client";
+import "@sefaria/web-components";
 
 const reader = document.createElement("sefaria-reader");
 reader.source = {
@@ -114,10 +114,10 @@ Supplied data makes zero requests and must include the selected text or metadata
 
 | Goal | Entry point |
 | --- | --- |
-| Register all elements | `@arithmomaniac/sefaria-web-components` |
-| Data-source types/configuration | `@arithmomaniac/sefaria-web-components/data-source` |
+| Register all elements | `@sefaria/web-components` |
+| Data-source types/configuration | `@sefaria/web-components/data-source` |
 | Component raw request/selection types | Component-specific subpath |
-| Shared raw Reader source qualification and raw seed types | `@arithmomaniac/sefaria-web-components/reader` |
-| Advanced semantic/raw Reader facade: history, pins, budgets, entry info, records, and raw transitions | `@arithmomaniac/sefaria-web-components/reader-session` |
+| Shared raw Reader source qualification and raw seed types | `@sefaria/web-components/reader` |
+| Advanced semantic/raw Reader facade: history, pins, budgets, entry info, records, and raw transitions | `@sefaria/web-components/reader-session` |
 
 `./reader-session` remains supported for advanced spatial hosts, and `./reader` supplies the shared DOM-free source-qualification boundary. Neither exposes prepared rendering content. `./bindings` and `./reader-controller` are retired. See [Render text](../../docs/data-and-text-tools/clean-up-stored-sefaria-text.md), [Reader navigation](../../docs/use-components/add-the-complete-reader.md), and the [component specification](../../docs/specs/components.md).

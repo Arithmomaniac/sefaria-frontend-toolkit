@@ -1,7 +1,7 @@
 import {
   applyVocalizationToHtml,
   normalizeText,
-} from "@arithmomaniac/sefaria-text-transform";
+} from "@sefaria/text-transform";
 
 // Sefaria text you already have, for example from a file or a database.
 const stored =

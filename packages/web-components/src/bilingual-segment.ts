@@ -3,7 +3,7 @@ import {
   type CoreV3Version,
   type GetV3TextsData,
   type SefariaClient,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 
 import {
   projectTextSegmentVersion,

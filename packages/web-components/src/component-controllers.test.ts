@@ -3,7 +3,7 @@ import {
   zCoreLinkResponse,
   zCoreV3TextsResponse,
   type SefariaClient,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 import { afterEach, describe, expect, test, vi } from "vitest";
 
 import linksErrorFixture from "../../client/test/fixtures/links-error-2026-08-30.json";

@@ -18,16 +18,16 @@ const expectedIds = [
   "reader",
 ] as const;
 const expectedEntries = [
-  "@arithmomaniac/sefaria-client",
-  "@arithmomaniac/sefaria-client/validation",
-  "@arithmomaniac/sefaria-web-components",
-  "@arithmomaniac/sefaria-web-components/data-source",
-  "@arithmomaniac/sefaria-web-components/bilingual-segment",
-  "@arithmomaniac/sefaria-web-components/connections-panel",
-  "@arithmomaniac/sefaria-web-components/reader",
-  "@arithmomaniac/sefaria-web-components/reader-session",
-  "@arithmomaniac/sefaria-web-components/source-card",
-  "@arithmomaniac/sefaria-web-components/text-segment",
+  "@sefaria/api-client",
+  "@sefaria/api-client/validation",
+  "@sefaria/web-components",
+  "@sefaria/web-components/data-source",
+  "@sefaria/web-components/bilingual-segment",
+  "@sefaria/web-components/connections-panel",
+  "@sefaria/web-components/reader",
+  "@sefaria/web-components/reader-session",
+  "@sefaria/web-components/source-card",
+  "@sefaria/web-components/text-segment",
 ] as const;
 
 describe("playground project catalog", () => {
@@ -91,7 +91,7 @@ describe("playground project catalog", () => {
       expect(project.maintained.css).not.toHaveLength(0);
       expect(project.maintained.javascript).not.toHaveLength(0);
       expect(project.manifest.sourceBaseUrl).toMatch(
-        /^https:\/\/github\.com\/Arithmomaniac\/sefaria-frontend-toolkit\/blob\/main\//u,
+        /^https:\/\/github\.com\/Sefaria\/sefaria-frontend-toolkit\/blob\/main\//u,
       );
     }
   });
@@ -228,7 +228,7 @@ function manifest(id: string) {
     },
     assets: [],
     sourceBaseUrl:
-      "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/projects/source-card/",
+      "https://github.com/Sefaria/sefaria-frontend-toolkit/blob/main/examples/playground/projects/source-card/",
   };
 }
 

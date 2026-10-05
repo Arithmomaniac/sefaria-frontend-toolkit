@@ -2,8 +2,8 @@ import {
   SefariaContractError,
   createSefariaClient,
   text,
-} from "@arithmomaniac/sefaria-client";
-import type { SefariaClient } from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
+import type { SefariaClient } from "@sefaria/api-client";
 
 async function describePassage(
   client: SefariaClient,

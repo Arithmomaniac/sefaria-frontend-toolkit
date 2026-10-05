@@ -4,13 +4,13 @@
 
 ## Status
 
-This specification defines the current `@arithmomaniac/sefaria-text-transform` contract.
+This specification defines the current `@sefaria/text-transform` contract.
 
 The package remains in the architecture because sanitization, vocalization, and footnote handling are pure cross-component operations.
 
 ## Responsibility
 
-`@arithmomaniac/sefaria-text-transform` owns deterministic text changes. It has no network, DOM rendering, API transport, component view-model, or host responsibility.
+`@sefaria/text-transform` owns deterministic text changes. It has no network, DOM rendering, API transport, component view-model, or host responsibility.
 
 Private component preparation calls one normalization operation before text enters render-ready state. That private state retains the full safe text and separate footnote records. Elements can call the vocalization operations only to derive a reversible local presentation from that immutable safe data; they do not reparse an API payload or repeat normalization.
 
@@ -359,7 +359,7 @@ Body, marker, and content serialization share one output budget: eight times the
 
 ## Processing boundary
 
-API schema validation and HTML normalization are different controls. `@arithmomaniac/sefaria-client` validates unknown JSON structure. `@arithmomaniac/sefaria-text-transform` makes approved HTML safe for rendering.
+API schema validation and HTML normalization are different controls. `@sefaria/api-client` validates unknown JSON structure. `@sefaria/text-transform` makes approved HTML safe for rendering.
 
 Private component preparation calls `normalizeText` once and stores `bodyHtml` plus note records in component-specific prepared state. If validated link evidence is supplied, private projection validates unknown `inline_reference` fields, scopes links to the exact base reference and selected edition, and passes only narrow commentary candidates to the transform.
 
@@ -383,7 +383,7 @@ Broad corpus comparison and compatibility publication belong to #14. This packag
 
 ## Completion criteria
 
-`@arithmomaniac/sefaria-text-transform` is complete for Core when:
+`@sefaria/text-transform` is complete for Core when:
 
 - the specification classifies every approved, unwrapped, removed, and deferred markup family
 - evidence identifies whether each family is persisted, API-generated, Web-generated, legacy, live-confirmed, source-only, or synthetic

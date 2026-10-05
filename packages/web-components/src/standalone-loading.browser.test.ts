@@ -2,7 +2,7 @@ import {
   createSefariaClient,
   validateGetV3Texts200,
   type CoreV3TextsResponse,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 import { html } from "lit";
 import { render } from "vitest-browser-lit";
 import { afterEach, expect, test, vi } from "vitest";

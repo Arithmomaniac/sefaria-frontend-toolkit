@@ -2,7 +2,7 @@ import {
   createSefariaClient,
   zCoreV3TextsResponse,
   type CoreV3TextsResponse,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 import { afterEach, expect, test, vi } from "vitest";
 
 import { getPreparedState } from "./prepared-state.js";

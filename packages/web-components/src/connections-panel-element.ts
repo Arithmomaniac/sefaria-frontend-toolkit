@@ -1,8 +1,8 @@
-import { related, type CoreLinkResponse } from "@arithmomaniac/sefaria-client";
+import { related, type CoreLinkResponse } from "@sefaria/api-client";
 import { css, html, nothing, type PropertyValues } from "lit";
 import { repeat } from "lit/directives/repeat.js";
 import { unsafeHTML } from "lit/directives/unsafe-html.js";
-import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
+import type { VocalizationMode } from "@sefaria/text-transform";
 import type { SefariaDataSource } from "./data-source.js";
 import { resolveSefariaDataSource } from "./data-source-state.js";
 import { optionalStringConverter } from "./attribute-converters.js";

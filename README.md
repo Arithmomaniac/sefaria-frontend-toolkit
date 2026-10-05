@@ -4,20 +4,20 @@
 
 Bring [Sefaria](https://www.sefaria.org/)'s texts into your product at the level you need: drop in a tag to show a source, or use the JavaScript tools to fetch checked data and clean its text.
 
-Experimental and unofficial. Names and addresses may change. This is not an official Sefaria product.
+A community-driven project with Sefaria backing and support. The toolkit is experimental; names and APIs may change.
 
 ## Start here
 
-- To show texts with tags on a page, [use the components](https://arithmomaniac.github.io/sefaria-frontend-toolkit/use-components/start-here.html).
-- To fetch checked data or clean text in your own code, [use the data and text tools](https://arithmomaniac.github.io/sefaria-frontend-toolkit/data-and-text-tools/start-here.html).
+- To show texts with tags on a page, [use the components](https://sefaria.github.io/sefaria-frontend-toolkit/use-components/start-here.html).
+- To fetch checked data or clean text in your own code, [use the data and text tools](https://sefaria.github.io/sefaria-frontend-toolkit/data-and-text-tools/start-here.html).
 
 ## Install and status
 
-The packages are prereleases on GitHub Packages and need a token to install. [Install and status](https://arithmomaniac.github.io/sefaria-frontend-toolkit/help/install-and-status.html) explains the choices.
+The packages are moving to the `@sefaria` scope on GitHub Packages and need a token to install. Publication under the new names is pending qualification. [Install and status](https://sefaria.github.io/sefaria-frontend-toolkit/help/install-and-status.html) explains the choices.
 
 ## Documentation
 
-Read the [documentation site](https://arithmomaniac.github.io/sefaria-frontend-toolkit/). Coding assistants can start from [llms.txt](https://arithmomaniac.github.io/sefaria-frontend-toolkit/llms.txt).
+Read the [documentation site](https://sefaria.github.io/sefaria-frontend-toolkit/). Coding assistants can start from [llms.txt](https://sefaria.github.io/sefaria-frontend-toolkit/llms.txt).
 
 ## Contribute
 
@@ -25,8 +25,8 @@ See [Development](docs/development.md).
 
 ## Project origin
 
-This project began as a Microsoft Global Hackathon 2026 project. Thank you to Microsoft for sponsoring the hackathon and providing the time and platform that helped turn the initial idea into working software. The toolkit is now an independently maintained open-source project.
+This project began at the Microsoft Global Hackathon 2026. Thank you to Microsoft for sponsoring the hackathon and for the time and platform that helped turn the idea into working software. Sefaria now owns the toolkit, which continues as a community-driven open-source project.
 
 ## License and attribution
 
-This repository uses the [GPL-3.0 license](LICENSE). It builds on public Sefaria APIs and source evidence documented in [`docs/evidence.md`](docs/evidence.md). Repository work, license inheritance, or historical collaboration context does not imply official Sefaria ownership, maintenance, endorsement, or support.
+Copyright (c) 2026 Sefaria. This repository uses the [MIT license](LICENSE). Third-party dependencies and Sefaria text editions retain their own licenses. Historical published releases retain the license shipped with them. Source provenance is documented in [`docs/evidence.md`](docs/evidence.md).

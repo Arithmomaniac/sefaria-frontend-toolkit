@@ -25,7 +25,7 @@ Register the elements before your framework renders them, so their JavaScript pr
 <StatusNote />
 
 ```ts
-import "@arithmomaniac/sefaria-web-components";
+import "@sefaria/web-components";
 ```
 
 Element subpaths such as `/source-card` don't register their element. They export types and a few helpers. [Install and status](/help/install-and-status.md) covers package installation and versions.

@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { parseDocument } from "yaml";
 import { describe, expect, it } from "vitest";
 
-import { validateWorkflowPolicy } from "../scripts/integration-policy.mjs";
+import { validateWorkflowPolicy as validatePolicySource } from "../scripts/integration-policy.mjs";
 
 const ciSource = readFileSync(
   resolve(process.cwd(), ".github/workflows/ci.yml"),
@@ -13,6 +13,22 @@ const setupSource = readFileSync(
   resolve(process.cwd(), ".github/workflows/copilot-setup-steps.yml"),
   "utf8",
 );
+const validationSource = readFileSync(
+  resolve(process.cwd(), ".github/workflows/validate-toolkit.yml"),
+  "utf8",
+);
+const publisherSource = readFileSync(
+  resolve(process.cwd(), ".github/workflows/publish-packages.yml"),
+  "utf8",
+);
+const reusableWorkflows = {
+  "validate-toolkit.yml": validationSource,
+  "publish-packages.yml": publisherSource,
+};
+
+function validateWorkflowPolicy(workflows: Record<string, string>): string[] {
+  return validatePolicySource({ ...reusableWorkflows, ...workflows });
+}
 
 type RecordValue = Record<string, unknown>;
 
@@ -31,6 +47,96 @@ function parseWorkflow(source: string): RecordValue {
 }
 
 describe("agent-ready workflow policy", () => {
+  it("admits only explicitly gated bootstrap without browser archival", () => {
+    const source = readFileSync(
+      resolve(process.cwd(), ".github/workflows/bootstrap-packages.yml"),
+      "utf8",
+    );
+    expect(
+      validateWorkflowPolicy({ "bootstrap-packages.yml": source }),
+    ).toEqual([]);
+    expect(source).not.toContain("script-source-release.mjs");
+    for (const candidate of [
+      source.replaceAll("github.ref == 'refs/heads/main'", "true"),
+      source.replaceAll("vars.SEFARIA_PACKAGES_ENABLED != 'true'", "true"),
+      source.replace("bootstrap: true", "bootstrap: false"),
+      source.replace("needs: check", "needs: validation"),
+      source.replace("validate-toolkit.yml", "missing-validation.yml"),
+      source.replace("publish-packages.yml", "missing-publication.yml"),
+      source.replace('!= "success"', '== "failure"'),
+      source.replace(
+        "jobs:",
+        "concurrency:\n  group: sefaria-package-publication\n  cancel-in-progress: false\n\njobs:",
+      ),
+      source.replace(
+        "      packages: write",
+        "      packages: write\n      issues: write",
+      ),
+    ]) {
+      expect(
+        validateWorkflowPolicy({ "bootstrap-packages.yml": candidate }).length,
+      ).toBeGreaterThan(0);
+    }
+  });
+  it("rejects missing reusable definitions and bypasses at either publication boundary", () => {
+    expect(validatePolicySource({ "ci.yml": ciSource }).join("\n")).toContain(
+      "missing reusable workflow",
+    );
+    for (const candidate of [
+      ciSource.replace("needs: check", "needs: validation"),
+      ciSource.replace("bootstrap: false", "bootstrap: true"),
+      ciSource.replace("github.event_name == 'push'", "true"),
+      ciSource.replace("vars.SEFARIA_PACKAGES_ENABLED == 'true'", "true"),
+      ciSource.replace("publish-packages.yml", "missing-publisher.yml"),
+    ]) {
+      expect(
+        validateWorkflowPolicy({ "ci.yml": candidate }).length,
+      ).toBeGreaterThan(0);
+    }
+    for (const candidate of [
+      publisherSource.replace("type: boolean", "type: string"),
+      publisherSource.replace("required: true", "required: false"),
+      publisherSource.replace("github.ref == 'refs/heads/main'", "true"),
+      publisherSource.replace(
+        "github.event_name == 'workflow_dispatch'",
+        "true",
+      ),
+      publisherSource.replace(
+        "vars.SEFARIA_PACKAGES_ENABLED != 'true'",
+        "true",
+      ),
+      publisherSource.replace(
+        "vars.SEFARIA_PACKAGES_ENABLED == 'true'",
+        "true",
+      ),
+      publisherSource.replace("bootstrap-preflight", "preflight"),
+      publisherSource.replace("bootstrap-verify", "verify"),
+      publisherSource.replace("if: ${{ !inputs.bootstrap }}", "if: true"),
+      publisherSource.replace(
+        "cancel-in-progress: false",
+        "cancel-in-progress: true",
+      ),
+      publisherSource.replace(
+        "NODE_AUTH_TOKEN: ${{ github.token }}",
+        "NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}",
+      ),
+      publisherSource.replace('scope: "@sefaria"', 'scope: "@unrelated"'),
+      publisherSource.replace("jobs.publish.outputs.version", "github.run_id"),
+      publisherSource.replace("github.run_attempt", "github.run_number"),
+      publisherSource.replace(
+        'test "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"',
+        "true",
+      ),
+      publisherSource.replace(
+        "    runs-on: ubuntu-latest",
+        "    continue-on-error: true\n    runs-on: ubuntu-latest",
+      ),
+    ]) {
+      expect(
+        validateWorkflowPolicy({ "publish-packages.yml": candidate }).length,
+      ).toBeGreaterThan(0);
+    }
+  });
   it("archives browser releases only after verified package publication", () => {
     const workflow = parseWorkflow(ciSource);
     const archive = (workflow.jobs as RecordValue)[
@@ -179,7 +285,8 @@ describe("agent-ready workflow policy", () => {
   it("requires complete Linux and Windows validation behind one check", () => {
     const workflow = parseWorkflow(ciSource);
     const jobs = workflow.jobs as RecordValue;
-    const validation = jobs.validation as RecordValue;
+    const validation = (parseWorkflow(validationSource).jobs as RecordValue)
+      .validation as RecordValue;
     const strategy = validation.strategy as RecordValue;
     const matrix = strategy.matrix as RecordValue;
     const check = jobs.check as RecordValue;
@@ -190,6 +297,9 @@ describe("agent-ready workflow policy", () => {
       "script-source",
       "validation",
     ]);
+    expect(jobs.validation).toEqual({
+      uses: "./.github/workflows/validate-toolkit.yml",
+    });
     expect(strategy["fail-fast"]).toBe(false);
     expect(matrix.os).toEqual(["ubuntu-latest", "windows-latest"]);
     expect(validation["continue-on-error"]).toBeUndefined();
@@ -221,22 +331,25 @@ describe("agent-ready workflow policy", () => {
       "cancel-in-progress": "${{ github.event_name == 'pull_request' }}",
     });
     expect(publish.if).toBe(
-      "${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.PUBLIC_PACKAGES_ENABLED == 'true' }}",
+      "${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.SEFARIA_PACKAGES_ENABLED == 'true' }}",
     );
     expect(publish.needs).toBe("check");
     expect(publish.permissions).toEqual({
       contents: "read",
       packages: "write",
     });
-    expect(JSON.stringify(publish)).toContain("github.run_id");
-    expect(JSON.stringify(publish)).toContain("github.run_attempt");
-    expect(JSON.stringify(publish)).toContain("github.token");
-    expect(JSON.stringify(publish)).toContain("PUBLIC_PACKAGES_ENABLED");
+    expect(publish.uses).toBe("./.github/workflows/publish-packages.yml");
+    expect(publish.with).toEqual({ bootstrap: false });
+    expect(publish.steps).toBeUndefined();
+    expect(publisherSource).toContain("github.run_id");
+    expect(publisherSource).toContain("github.run_attempt");
+    expect(publisherSource).toContain("github.token");
+    expect(JSON.stringify(publish)).toContain("SEFARIA_PACKAGES_ENABLED");
     expect(publish.name).toBe("publish public prerelease");
-    expect(JSON.stringify(publish)).toContain("--access public");
-    expect(JSON.stringify(publish)).not.toContain("--access restricted");
-    expect(JSON.stringify(publish)).not.toContain("secrets.");
-    expect(JSON.stringify(publish)).toContain(
+    expect(publisherSource).toContain("--access public");
+    expect(publisherSource).not.toContain("--access restricted");
+    expect(publisherSource).not.toContain("secrets.");
+    expect(JSON.stringify(parseWorkflow(publisherSource))).toContain(
       'test \\"$(git rev-parse HEAD)\\" = \\"$(git rev-parse origin/main)\\"',
     );
     expect(ciSource).not.toMatch(
@@ -279,19 +392,22 @@ describe("agent-ready workflow policy", () => {
   });
 
   it("rejects missing platforms, conditional checks, permissive aggregation, and secrets", () => {
-    const mutations: Array<[string, string]> = [
+    const mutations: Array<[string, string, string]> = [
       [
-        ciSource.replace("          - windows-latest", ""),
-        "CI must validate Linux and Windows",
+        "validate-toolkit.yml",
+        validationSource.replace("          - windows-latest", ""),
+        "Shared validation must run unconditional complete Linux and Windows checks",
       ],
       [
-        ciSource.replace(
+        "validate-toolkit.yml",
+        validationSource.replace(
           "      - run: pnpm check",
           "      - if: false\n        run: pnpm check",
         ),
-        "CI must run one unconditional pnpm check",
+        "Shared validation must run unconditional complete Linux and Windows checks",
       ],
       [
+        "ci.yml",
         ciSource.replace(
           'if [ "${{ needs.validation.result }}" != "success" ]',
           'if [ "${{ needs.validation.result }}" != "failure" ]',
@@ -299,6 +415,7 @@ describe("agent-ready workflow policy", () => {
         "CI check aggregation is not fail-closed",
       ],
       [
+        "copilot-setup-steps.yml",
         setupSource.replace(
           "run: pnpm setup:agent",
           "env:\n          TOKEN: ${{ secrets.GITHUB_TOKEN }}\n        run: pnpm setup:agent",
@@ -306,6 +423,7 @@ describe("agent-ready workflow policy", () => {
         "secret reference",
       ],
       [
+        "copilot-setup-steps.yml",
         setupSource.replace(
           "  pull_request:\n    paths:\n      - .github/scripts/detect-toolkit.mjs\n      - .github/workflows/copilot-setup-steps.yml\n",
           "",
@@ -314,10 +432,7 @@ describe("agent-ready workflow policy", () => {
       ],
     ];
 
-    for (const [candidate, expected] of mutations) {
-      const filename = candidate.includes("Copilot Setup Steps")
-        ? "copilot-setup-steps.yml"
-        : "ci.yml";
+    for (const [filename, candidate, expected] of mutations) {
       expect(
         validateWorkflowPolicy({ [filename]: candidate }).join("\n"),
       ).toContain(expected);

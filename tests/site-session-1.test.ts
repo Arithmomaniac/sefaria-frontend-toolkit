@@ -205,9 +205,9 @@ describe("Use with a framework page", () => {
 
   it("carries the status note and registers through the package root", () => {
     expect(page).toContain("<StatusNote />");
-    expect(page).toContain('import "@arithmomaniac/sefaria-web-components";');
+    expect(page).toContain('import "@sefaria/web-components";');
     expect(read("examples/react-vite/src/site-source-card.tsx")).toContain(
-      'import "@arithmomaniac/sefaria-web-components";',
+      'import "@sefaria/web-components";',
     );
   });
 

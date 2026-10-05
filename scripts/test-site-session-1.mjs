@@ -11,7 +11,7 @@ import { createFixtureResponse } from "./site-fixtures.mjs";
 import { startSitePreview } from "./site-preview-server.mjs";
 
 const scriptUrl =
-  "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js";
+  "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js";
 
 function fail(message) {
   throw new Error(`[session 1] ${message}`);
@@ -204,8 +204,7 @@ export async function runSessionOneSiteChecks({ root, siteBasePath }) {
 
 /** A text-transform snippet runs offline, only after Run is pressed. */
 async function runSnippetRunChecks({ root, siteBasePath }) {
-  const cdn =
-    "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/";
+  const cdn = "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/";
   await withSite(root, siteBasePath, async ({ browser, origin, url }) => {
     const page = await browser.newPage();
     const served = [];
@@ -300,7 +299,7 @@ export async function runSessionOneLiveChecks({ root, siteBasePath }) {
     const responses = [];
     page.on("response", (response) => {
       const host = new URL(response.url()).host;
-      if (["arithmomaniac.github.io", "www.sefaria.org"].includes(host)) {
+      if (["sefaria.github.io", "www.sefaria.org"].includes(host)) {
         responses.push({
           url: response.url(),
           status: response.status(),

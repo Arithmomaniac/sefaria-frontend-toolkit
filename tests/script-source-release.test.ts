@@ -239,7 +239,7 @@ describe("script-tag versions index (EP6)", () => {
     expect(html).toMatch(/alpha\/sefaria-elements\.js/u);
     expect(html).toMatch(/currently serves <code>0\.0\.0-alpha\.3\.1<\/code>/u);
     expect(html).toMatch(/may be retired without notice/u);
-    expect(html).toMatch(/Experimental and unofficial/u);
+    expect(html).toContain("Community-driven with Sefaria backing and support");
     for (const route of [
       "../use-components/start-here.html",
       "../help/install-and-status.html",

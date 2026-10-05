@@ -63,12 +63,12 @@ Each OpenAPI correction starts with the original Sefaria route, handler, respons
 
 | Owner | Responsibility | Must not own |
 | --- | --- | --- |
-| `@arithmomaniac/sefaria-client` | Pinned OpenAPI input, checksum, guarded overlay, generated contracts, Zod schemas, TypeScript validators, thin client, and bounded per-client response cache | Rendering, component view models, persistent or shared caches, retries, coalescing, stale fallback, or component methods |
-| `@arithmomaniac/sefaria-text-transform` | Pure sanitization, vocalization, and footnote operations | Requests, DOM rendering, or API contract correction |
-| Non-DOM `@arithmomaniac/sefaria-web-components` subpaths | Public raw input and source types, shared raw Reader source qualification, and the advanced Reader semantic/raw facade | A generalized domain facade, retries, coalescing, stale fallback, persistence, or public prepared rendering types |
-| `@arithmomaniac/sefaria-web-components/data-source` | Module-local lazy default configuration and tagged client/host-loader/disabled choices | Global registries, fallback after explicit choice, another response cache, or client mutation |
-| `@arithmomaniac/sefaria-web-components/reader-session` | Supported advanced semantic/raw facade: immutable history, raw transitions, transactional root replacement, stable raw records, entry information, budgets, completion eligibility, presentation, and pins | Prepared rendering/content, browser-default transport, persistence, DOM state, or spatial pane placement |
-| `@arithmomaniac/sefaria-web-components` elements | Reactive input snapshots, source, cancellation, stale suppression, private preparation, layout, interaction, accessibility, theming, DOM rendering, and documented bounded slots or coarse CSS parts | Arbitrary fetch functions, base URLs, untyped hosts, public prepared-state inputs, retries, fallback transport, or private-child part forwarding |
+| `@sefaria/api-client` | Pinned OpenAPI input, checksum, guarded overlay, generated contracts, Zod schemas, TypeScript validators, thin client, and bounded per-client response cache | Rendering, component view models, persistent or shared caches, retries, coalescing, stale fallback, or component methods |
+| `@sefaria/text-transform` | Pure sanitization, vocalization, and footnote operations | Requests, DOM rendering, or API contract correction |
+| Non-DOM `@sefaria/web-components` subpaths | Public raw input and source types, shared raw Reader source qualification, and the advanced Reader semantic/raw facade | A generalized domain facade, retries, coalescing, stale fallback, persistence, or public prepared rendering types |
+| `@sefaria/web-components/data-source` | Module-local lazy default configuration and tagged client/host-loader/disabled choices | Global registries, fallback after explicit choice, another response cache, or client mutation |
+| `@sefaria/web-components/reader-session` | Supported advanced semantic/raw facade: immutable history, raw transitions, transactional root replacement, stable raw records, entry information, budgets, completion eligibility, presentation, and pins | Prepared rendering/content, browser-default transport, persistence, DOM state, or spatial pane placement |
+| `@sefaria/web-components` elements | Reactive input snapshots, source, cancellation, stale suppression, private preparation, layout, interaction, accessibility, theming, DOM rendering, and documented bounded slots or coarse CSS parts | Arbitrary fetch functions, base URLs, untyped hosts, public prepared-state inputs, retries, fallback transport, or private-child part forwarding |
 | Package manifests and generated metadata | Built JavaScript/declaration export maps, tarball contents, custom-elements metadata, and declaration-derived public export inventory | Source aliases, registry publication, or alternate component contracts |
 | Repository integration policy | Active runtime/build path inventory, private manifests, built exports, CI permissions, portable lockfile resolution, maintained documentation claims, and old-to-new test disposition | Product contracts, publication, deployment, or historical-source censorship |
 | Website reader demonstrations | The standalone page assigns `sref` to one persistent Reader; the workspace page owns lower-level session coordination, pane placement, pane pin lifetime, compact selection, and spatial descendant pruning | Public arbitrary-panel contracts or duplicate semantic history |
@@ -80,12 +80,12 @@ Each OpenAPI correction starts with the original Sefaria route, handler, respons
 
 ```mermaid
 flowchart LR
-    API["Sefaria API"] ==>|"external payload"| CLIENT["@arithmomaniac/sefaria-client"]
+    API["Sefaria API"] ==>|"external payload"| CLIENT["@sefaria/api-client"]
     PIN["Pinned OpenAPI + overlay"] -.->|"build-time generation input"| CLIENT
     CLIENT -.->|"type-only generated operation contracts"| ELEMENTS["Declarative Lit elements"]
     CLIENT -->|"runtime corrected payload"| ELEMENTS
     ELEMENTS -->|"validated captured payload"| PURE["Private pure preparation"]
-    XFORM["@arithmomaniac/sefaria-text-transform"] -->|"runtime pure transform"| PURE
+    XFORM["@sefaria/text-transform"] -->|"runtime pure transform"| PURE
     COMPOSITE["Composite private preparation"] -->|"captured-data orchestration"| CHILD["Child private preparation"]
     CHILD -->|"private prepared content"| ELEMENTS
     PURE -->|"private prepared content"| ELEMENTS
@@ -98,7 +98,7 @@ Solid arrows show runtime dependencies. Dotted arrows show build-time or type-on
 
 ## OpenAPI supply chain
 
-`@arithmomaniac/sefaria-client` owns one committed upstream OpenAPI input from Sefaria commit `898feda78d1bd6b24f66305081a54c8cf36406be`. A committed checksum makes accidental input changes visible.
+`@sefaria/api-client` owns one committed upstream OpenAPI input from Sefaria commit `898feda78d1bd6b24f66305081a54c8cf36406be`. A committed checksum makes accidental input changes visible.
 
 An explicit refresh operation can access the network. Ordinary generation reads only committed files.
 
@@ -138,7 +138,7 @@ The source card owns the bounded text collection and renders its bilingual headi
 
 Request warnings remain with the selector-owning factory or composite. A resolved-version projection cannot assign a warning for another request selector.
 
-Raw HTML can enter private preparation only as a field of validated raw data. Preparation uses `@arithmomaniac/sefaria-text-transform` to normalize safety and structure once before constructing private render state. Safe `bodyHtml` and source-ordered note records stay together; normalized HTML is not fed back through the raw-data path.
+Raw HTML can enter private preparation only as a field of validated raw data. Preparation uses `@sefaria/text-transform` to normalize safety and structure once before constructing private render state. Safe `bodyHtml` and source-ordered note records stay together; normalized HTML is not fed back through the raw-data path.
 
 Public data state enters through component-specific raw contracts. The element accepts no arbitrary `fetch`, base URL, untyped host, or public prepared rendering value. It owns source eligibility, private preparation, layout, theme, vocalization display, focus behavior, and other interaction state.
 
@@ -198,7 +198,7 @@ MCP `structuredContent` carries a corrected API payload. Namespaced tool-result 
 
 ## Text processing
 
-`@arithmomaniac/sefaria-text-transform` owns pure sanitization, vocalization, footnote processing, and the HTML parsing these operations require. It does not own API shapes or private component rendering state. Component preparation must not duplicate its parser. See the [text-processing specification](specs/text-processing.md).
+`@sefaria/text-transform` owns pure sanitization, vocalization, footnote processing, and the HTML parsing these operations require. It does not own API shapes or private component rendering state. Component preparation must not duplicate its parser. See the [text-processing specification](specs/text-processing.md).
 
 ## Integrations
 

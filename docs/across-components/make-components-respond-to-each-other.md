@@ -30,7 +30,7 @@ Each component's own events are covered in [Show an attributed passage](/use-com
 
 In React, one state value holds the selection, and it drives both components. When the card reports a selection, the handler stores it. React then re-renders both components. The card gets the new `selectedPosition`. The panel gets the selected verse's `ref` as its `sref`.
 
-This is the tested file `examples/react-vite/src/site-source-card-to-connections.tsx`. It runs in the repository's tests, not on this page. The TypeScript JSX declarations it needs are in [custom-elements.d.ts](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/react-vite/src/custom-elements.d.ts). [Use components with a framework](/use-components/use-with-a-framework.md) explains them.
+This is the tested file `examples/react-vite/src/site-source-card-to-connections.tsx`. It runs in the repository's tests, not on this page. The TypeScript JSX declarations it needs are in [custom-elements.d.ts](https://github.com/Sefaria/sefaria-frontend-toolkit/blob/main/examples/react-vite/src/custom-elements.d.ts). [Use components with a framework](/use-components/use-with-a-framework.md) explains them.
 
 <CodeBlock :code="react.trim()" lang="ts" label="examples/react-vite/src/site-source-card-to-connections.tsx" />
 
