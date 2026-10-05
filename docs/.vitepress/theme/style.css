@@ -12,6 +12,10 @@
   --site-paper: #faf9f7;
   --site-sage: #eee7ed;
   --site-gold: #612854;
+  --documentation-notice-height: 0px;
+  --documentation-notice-bg: #fff1b8;
+  --documentation-notice-text: #32343a;
+  --documentation-notice-link: #71372a;
 }
 
 .dark {
@@ -23,6 +27,178 @@
   --site-paper: #202724;
   --site-sage: #41303e;
   --site-gold: #d7a6cb;
+  --documentation-notice-bg: #493b17;
+  --documentation-notice-text: #f4eff3;
+  --documentation-notice-link: #ffe1dc;
+}
+
+.Layout > .VPNav {
+  order: -1;
+}
+
+.documentation-notice-slot {
+  position: relative;
+  z-index: calc(var(--vp-z-index-nav) - 1);
+  flex-shrink: 0;
+}
+
+.documentation-notice-scroll-target {
+  position: absolute;
+  top: 100%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+@media (min-width: 960px) and (max-width: 1279px) {
+  .Layout:has(> .VPLocalNav:not(.empty)) .documentation-notice-scroll-target {
+    top: calc(100% + 48px);
+  }
+}
+
+.documentation-notice {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 40px;
+  padding: 4px 24px;
+  color: var(--documentation-notice-text);
+  background: var(--documentation-notice-bg);
+  font-size: 14px;
+  line-height: 24px;
+}
+
+.documentation-notice--visible {
+  display: flex;
+}
+
+.documentation-notice__message {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 0.5rem;
+}
+
+.documentation-notice__dismiss,
+.documentation-details__close {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  color: inherit;
+  cursor: pointer;
+}
+
+.documentation-details__trigger {
+  color: var(--vp-c-brand-1);
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.documentation-notice .documentation-details__trigger {
+  color: var(--documentation-notice-link);
+}
+
+.documentation-details__dialog {
+  width: min(34rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 0.8rem;
+  padding: 1.25rem;
+  color: var(--vp-c-text-1);
+  background: var(--vp-c-bg);
+  text-align: left;
+  font-size: 1rem;
+  line-height: 1.6;
+  overflow: auto;
+}
+
+.documentation-details__dialog::backdrop {
+  background: rgb(0 0 0 / 45%);
+}
+
+.documentation-details__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.documentation-details__header h2 {
+  margin: 0;
+  border: 0;
+  padding: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.documentation-details__content {
+  margin: 1.25rem 0;
+}
+
+.documentation-details__content p + p {
+  margin-top: 0.75rem;
+}
+
+.documentation-details__actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.documentation-details__actions button {
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 0.4rem;
+  padding: 0.4rem 1rem;
+  background: var(--vp-c-bg-soft);
+  cursor: pointer;
+}
+
+.documentation-notice button:focus-visible,
+.documentation-disclosure button:focus-visible,
+.documentation-details__dialog button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+@media (max-width: 767px) {
+  .documentation-notice {
+    padding-inline: 12px;
+  }
+
+  .documentation-notice__dismiss {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (min-width: 960px) {
+  .documentation-notice-slot {
+    position: sticky;
+    top: var(--vp-nav-height);
+    margin-top: var(--vp-nav-height);
+  }
+
+  .Layout > .VPContent {
+    padding-top: 0;
+  }
+
+  .Layout > .VPSidebar {
+    top: var(--documentation-notice-height);
+  }
+
+  .Layout > .VPLocalNav {
+    top: calc(var(--vp-nav-height) + var(--documentation-notice-height));
+  }
+
+  .VPDoc .aside-container {
+    top: var(--documentation-notice-height);
+    height: calc(100vh - var(--documentation-notice-height));
+  }
 }
 
 .VPHome {
@@ -453,6 +629,14 @@
 
 .documentation-disclosure p {
   margin: 0;
+}
+
+.documentation-disclosure__notice {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0 0.25rem;
 }
 
 .documentation-disclosure__project {

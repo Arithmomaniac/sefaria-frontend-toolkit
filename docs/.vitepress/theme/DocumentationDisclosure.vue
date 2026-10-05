@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { withBase } from "vitepress";
+
+import DocumentationDetails from "./DocumentationDetails.vue";
 </script>
 
 <template>
@@ -17,9 +19,9 @@ import { withBase } from "vitepress";
         Get support
       </a>
     </p>
-    <p>
-      Documentation text was written and edited by GitHub Copilot; pending human
-      review.
-    </p>
+    <div class="documentation-disclosure__notice">
+      <span>AI-generated documentation.</span>
+      <DocumentationDetails />
+    </div>
   </footer>
 </template>

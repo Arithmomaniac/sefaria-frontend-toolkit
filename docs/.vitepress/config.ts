@@ -91,6 +91,11 @@ export default withMermaid(
       ],
     ],
     cleanUrls: false,
+    scrollOffset: [
+      ".documentation-notice-scroll-target",
+      ".VPLocalNav",
+      ".VPNav",
+    ],
     srcExclude: [
       "README.md",
       "archive/**",
