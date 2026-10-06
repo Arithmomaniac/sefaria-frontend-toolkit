@@ -960,6 +960,11 @@ async function assertDocumentationNotice(engine) {
       );
       await page.keyboard.press("Escape");
       await dialog.waitFor({ state: "hidden" });
+      await page.waitForFunction(
+        (node) => globalThis.document.activeElement === node,
+        await trigger.elementHandle(),
+        { timeout: 5_000 },
+      );
       await assertEqual(
         await trigger.evaluate(
           (node) => globalThis.document.activeElement === node,
@@ -973,6 +978,11 @@ async function assertDocumentationNotice(engine) {
           .getByRole("button", { name: closeName, exact: true })
           .click();
         await dialog.waitFor({ state: "hidden" });
+        await page.waitForFunction(
+          (node) => globalThis.document.activeElement === node,
+          await trigger.elementHandle(),
+          { timeout: 5_000 },
+        );
         await assertEqual(
           await trigger.evaluate(
             (node) => globalThis.document.activeElement === node,
