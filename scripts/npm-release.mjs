@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { Buffer } from "node:buffer";
 import process from "node:process";
 import { createHash } from "node:crypto";
+import { createReadStream } from "node:fs";
 import {
   mkdir,
   mkdtemp,
@@ -13,6 +14,7 @@ import {
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
+import { pipeline } from "node:stream/promises";
 import { pathToFileURL, URL } from "node:url";
 import { Octokit } from "@octokit/rest";
 import { extract, list } from "tar";
@@ -244,24 +246,29 @@ async function boundedFile(filename) {
 export async function inspectNpmTarball(filename, definition, version) {
   const contents = new Set();
   let expandedSize = 0;
-  await list({
-    file: filename,
+  const parser = list({
     strict: true,
     onReadEntry: (entry) => {
       expandedSize += entry.size;
       if (
         !entry.path.startsWith("package/") ||
         entry.path.includes("\\") ||
+        entry.header.path?.includes("\\") ||
         entry.path.split("/").some((part) => part === ".." || part === ".") ||
         contents.has(entry.path) ||
         !["File", "Directory"].includes(entry.type) ||
         expandedSize > 80_000_000 ||
-        contents.size > 4000
-      )
-        throw new Error("Unsafe, duplicate or oversized npm tarball entry.");
+        contents.size >= 4000
+      ) {
+        parser.abort(
+          new Error("Unsafe, duplicate or oversized npm tarball entry."),
+        );
+        return;
+      }
       contents.add(entry.path);
     },
   });
+  await pipeline(createReadStream(filename), parser);
   const root = await mkdtemp(path.join(tmpdir(), "sefaria-npm-inspect-"));
   try {
     await extract({ file: filename, cwd: root, strict: true });

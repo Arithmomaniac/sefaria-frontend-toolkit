@@ -107,6 +107,30 @@ describe("exact release and validation workflow contracts", () => {
     expect(release).not.toContain("actions: read");
   });
 
+  it("disables workspace and npm install hooks in the OIDC publisher", () => {
+    const workflow = YAML.parse(release);
+    const steps = workflow.jobs.publish.steps;
+    expect(steps.map((step: { run?: string }) => step.run)).toContain(
+      "pnpm install --frozen-lockfile --ignore-scripts",
+    );
+    expect(steps.map((step: { run?: string }) => step.run)).toContain(
+      "npm install --global npm@11.5.2 --ignore-scripts",
+    );
+    for (const step of steps.filter((step: { run?: string }) =>
+      /^(?:pnpm|npm) install\b/.test(step.run ?? ""),
+    )) {
+      const mutated = structuredClone(workflow);
+      const index = steps.indexOf(step);
+      mutated.jobs.publish.steps[index].run = step.run.replace(
+        " --ignore-scripts",
+        "",
+      );
+      expect(
+        policy("release-npm.yml", YAML.stringify(mutated)).length,
+      ).toBeGreaterThan(0);
+    }
+  });
+
   it("rejects every named main/manual/approval/permission/source/asset bypass", () => {
     for (const [before, after] of [
       ["workflow_dispatch:", "push:"],

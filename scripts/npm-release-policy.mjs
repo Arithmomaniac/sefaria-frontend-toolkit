@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 
 // Admission is for this exact caller, not a generic permission to publish.
 const WORKFLOW_SHA256 =
-  "f7ae117990e0b35f1c36c48197c317502db81baebc979804a66723bcc4acb244";
+  "18457351e760dcd61c72c31bc61ae56dbd1e8c5658c2a9783f3c96dbedc82630";
 
 export function validateNpmWorkflow(workflow) {
   const digest = createHash("sha256")
