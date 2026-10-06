@@ -146,12 +146,19 @@ export async function rehearseChangesets({
       throw new Error("Changesets created a tag during local versioning.");
     }
 
+    await runChangesets(fixture, ["pre", "exit"]);
+    await runChangesets(fixture, ["version"]);
+    const stableVersions = await readVersions(fixture);
+    assertSynchronized(stableVersions);
+    if (stableVersions[0] !== secondVersions[0].replace(/-alpha\.\d+$/u, ""))
+      throw new Error(`Unexpected stable transition ${stableVersions[0]}.`);
     const result = {
       firstVersion: firstVersions[0],
       secondVersion: secondVersions[0],
+      stableVersion: stableVersions[0],
     };
     process.stdout.write(
-      `Changesets rehearsal: ${result.firstVersion} -> ${result.secondVersion}, fixed libraries synchronized with no commit or tag.\n`,
+      `Changesets rehearsal: ${result.firstVersion} -> ${result.secondVersion} -> ${result.stableVersion}, fixed libraries synchronized with no commit or tag.\n`,
     );
     return result;
   } finally {
@@ -173,7 +180,8 @@ export async function rehearseConcurrentChangesets({
     for (const result of results) {
       if (
         result.firstVersion !== "0.1.1-alpha.0" ||
-        result.secondVersion !== "0.1.1-alpha.1"
+        result.secondVersion !== "0.1.1-alpha.1" ||
+        result.stableVersion !== "0.1.1"
       ) {
         throw new Error(
           `Unexpected Changesets rehearsal versions: ${result.firstVersion} -> ${result.secondVersion}.`,

@@ -6,7 +6,7 @@ These notes are for maintainers. They were moved unchanged from the package READ
 
 `@sefaria/api-client` is the validated transport boundary for the complete 60-operation surface in the pinned Sefaria OpenAPI document. It owns the pinned input, guarded corrections, generated contracts and Zod validators, tag-based namespaces, thin fetch client, and bounded default-on per-client response cache.
 
-The committed source manifest remains private to prevent accidental publication. First GitHub Packages publication under the Sefaria name is pending qualification; installation will require authentication, and the package is not published on npmjs.com. Follow the repository [installation instructions](../../docs/help/install-and-status.md#packages).
+The committed source manifest remains private to prevent accidental publication. Numbered public npm publication under the Sefaria name remains pending hosted qualification. Follow the repository [installation instructions](../../docs/help/install-and-status.md#packages).
 
 ## Ordinary use
 

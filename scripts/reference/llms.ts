@@ -177,6 +177,7 @@ export async function renderLlmsTxt(): Promise<string> {
     "> Web components and TypeScript tools for showing texts from Sefaria's library on your own web pages. The components load and display sources by reference. The client fetches and checks Sefaria API responses, and the text tools make Sefaria's text HTML safe to display (`normalizeText`) and prepare it.",
     "",
     "Status: experimental and community-driven with Sefaria backing and support. Names, packages and hosted addresses may change. The `alpha` script address serves the newest published script release that is still active. A pinned script address stays byte-for-byte the same while it's kept, but it may be retired without notice.",
+    "Numbered public npm releases and exact jsDelivr/UNPKG URLs remain pending publication and hosted qualification. The main source stamp is not a published npm version. Existing Pages scripts are retained unchanged; ordinary main CI publishes no packages or script snapshots.",
     "",
     "Choose a path:",
     "",

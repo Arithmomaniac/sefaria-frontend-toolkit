@@ -5,7 +5,7 @@ Build me a page that uses the Sefaria Frontend Toolkit's components to show the 
 Install route:
 
 - If the page has no build step, add this one script tag: <script type="module" src="https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"></script>
-- If the app has a build step, install @sefaria/web-components from GitHub Packages and import the package root exactly as: import "@sefaria/web-components"; Element subpaths don't register their element; they export types and a few helpers.
+- If the app has a build step, first read the installation/status page. Numbered public npm publication is pending; don't invent package availability or request a GitHub Packages token. Once the exact version is qualified, import the package root exactly as: import "@sefaria/web-components"; Element subpaths don't register their element; they export types and a few helpers.
 
 Rules:
 

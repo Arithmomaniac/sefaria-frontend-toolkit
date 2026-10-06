@@ -13,7 +13,7 @@ A community-driven project with Sefaria backing and support. The toolkit is expe
 
 ## Install and status
 
-The packages are moving to the `@sefaria` scope on GitHub Packages and need a token to install. Publication under the new names is pending qualification. [Install and status](https://sefaria.github.io/sefaria-frontend-toolkit/help/install-and-status.html) explains the choices.
+Public npm releases of `@sefaria/api-client`, `@sefaria/text-transform`, and `@sefaria/web-components` are being prepared. The first numbered release, `0.1.0-alpha.0`, and npm-backed CDN availability are pending qualification, not live install promises. Existing Pages browser releases remain available while retained. [Install and status](https://sefaria.github.io/sefaria-frontend-toolkit/help/install-and-status.html) explains the choices.
 
 ## Documentation
 

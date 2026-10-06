@@ -6,7 +6,7 @@ These notes are for maintainers. They were moved unchanged from the package READ
 
 `@sefaria/text-transform` provides deterministic, DOM-free operations for Sefaria text HTML and Hebrew vocalization.
 
-The committed source manifest remains private to prevent accidental publication. First GitHub Packages publication under the Sefaria name is pending qualification; installation will require authentication, and the package is not published on npmjs.com. Follow the repository [installation instructions](../../docs/help/install-and-status.md#packages).
+The committed source manifest remains private to prevent accidental publication. Numbered public npm publication under the Sefaria name remains pending hosted qualification. Follow the repository [installation instructions](../../docs/help/install-and-status.md#packages).
 
 For an illustrated tour of the input, read [Text markup](../../docs/concepts/clean-text-and-safety.md). For the surrounding client and component pipeline, read [How the pieces fit together](../../docs/concepts/how-the-toolkit-works.md).
 

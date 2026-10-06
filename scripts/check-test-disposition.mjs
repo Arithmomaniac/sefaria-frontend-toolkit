@@ -10,6 +10,7 @@ import {
   EXPECTED_PRE_RETIREMENT_SHOWCASE_TEST_COUNT,
   EXPECTED_RETIRED_TEST_COUNT,
   PRE_RETIREMENT_SHOWCASE_INVENTORY,
+  NPM_RELEASE_TEST_DISPOSITION,
 } from "./test-disposition.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
@@ -43,6 +44,17 @@ const discovered = new Set(
     .map((line) => line.replace(/^\[[^\]]+\]\s+/u, "").trim())
     .filter(Boolean),
 );
+for (const disposition of NPM_RELEASE_TEST_DISPOSITION) {
+  if (!disposition.reason.trim() || !disposition.destinations.length)
+    throw new Error(`Missing npm release disposition: ${disposition.source}.`);
+  for (const destination of disposition.destinations) {
+    await access(path.join(root, destination));
+    if (!discovered.has(destination))
+      throw new Error(
+        `npm release replacement is not discovered: ${destination}.`,
+      );
+  }
+}
 
 let retired = 0;
 for (const baselinePath of baselineTests) {

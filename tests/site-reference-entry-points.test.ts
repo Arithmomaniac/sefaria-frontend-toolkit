@@ -19,7 +19,7 @@ const read = (path: string) =>
   readFile(new URL(`../${path}`, import.meta.url), "utf8");
 
 const RELEASE_SENTENCE =
-  /documents the code on the `main` branch, which `alpha` builds are published from/u;
+  /documents the code on the `main` branch\. The source stamp is not an npm release/u;
 // TypeDoc starts a TypeScript 6 program in a child process.
 const TYPEDOC_TIMEOUT = 120_000;
 const OLDER_PINS = /Older pinned script-tag versions keep their own behavior/u;
@@ -81,13 +81,14 @@ describe("EP1–EP5 README entry points", () => {
     ["packages/text-transform/README.md", "@sefaria/text-transform"],
     ["packages/web-components/README.md", "@sefaria/web-components"],
   ])(
-    "%s gives the GitHub Packages install caveat and a maintainer link",
+    "%s states pending npm publication and gives a maintainer link",
     async (file, name) => {
       const readme = await read(file);
       expect(readme).not.toContain("_authToken");
       expect(readme).toContain("help/install-and-status.html#packages");
       expect(readme).toContain(name);
-      expect(readme).toMatch(/read:packages/u);
+      expect(readme).toMatch(/pending/u);
+      expect(readme).not.toMatch(/read:packages/u);
       expect(readme).toContain(
         `https://github.com/Sefaria/sefaria-frontend-toolkit/blob/main/${path.posix.dirname(file)}/IMPLEMENTATION.md`,
       );
@@ -434,7 +435,7 @@ it("uses package.json descriptions as package summaries", async () => {
       version: string;
     };
     expect(page).toContain(
-      `${manifest.description} Package manifest version: \`${manifest.version}\`. [Reference](`,
+      `${manifest.description} Package manifest version: \`${manifest.version}\`. This is not evidence of publication. [Reference](`,
     );
   }
 });

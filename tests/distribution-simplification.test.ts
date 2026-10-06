@@ -141,8 +141,8 @@ describe("packaged browser build handoff", () => {
 });
 
 describe("shared distribution workflows", () => {
-  it("keeps both entry points behind the same validation and publisher", async () => {
-    for (const filename of ["ci.yml", "bootstrap-packages.yml"]) {
+  it("keeps ordinary CI validation-only while retaining browser evidence", async () => {
+    for (const filename of ["ci.yml"]) {
       const source = await readFile(
         path.join(".github", "workflows", filename),
         "utf8",
@@ -150,9 +150,7 @@ describe("shared distribution workflows", () => {
       expect(source).toContain(
         "uses: ./.github/workflows/validate-toolkit.yml",
       );
-      expect(source).toContain(
-        "uses: ./.github/workflows/publish-packages.yml",
-      );
+      expect(source).not.toContain("publish-packages.yml");
       expect(source).not.toContain("pnpm publish .artifacts/publish/");
       expect(source).not.toContain("pnpm check");
     }

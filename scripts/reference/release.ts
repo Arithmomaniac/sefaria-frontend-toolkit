@@ -13,9 +13,9 @@ export function releaseSection(packageVersion?: string): string {
   return [
     "## Which release this describes",
     "",
-    "This page documents the code on the `main` branch, which `alpha` builds are published from. <ReleaseStamp />",
+    "This page documents the code on the `main` branch. The source stamp is not an npm release or a development snapshot. Numbered npm releases and their CDN URLs remain pending publication and hosted qualification. <ReleaseStamp />",
     "",
-    `The \`alpha\` script-tag address serves the newest script release that is still active. Compare the stamp above with the version in the [script-tag versions index](https://sefaria.github.io/sefaria-frontend-toolkit/cdn/index.html). Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since.${packageNote}`,
+    `The legacy Pages \`alpha\` script-tag address serves the newest retained script release, not every main build. Compare the stamp above with the version in the [script-tag versions index](https://sefaria.github.io/sefaria-frontend-toolkit/cdn/index.html). Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since.${packageNote}`,
   ].join("\n");
 }
 

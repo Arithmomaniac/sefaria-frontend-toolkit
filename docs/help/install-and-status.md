@@ -55,7 +55,7 @@ To use the client and text files, see [Data and text tools: start here](/data-an
 
 ### Newest or pinned version
 
-The `alpha` address serves the newest build, and it changes without notice. To stay on one build, swap `alpha` for a version number in any of the three files. Older versions may have only the components file. For example:
+The legacy Pages `alpha` address serves the newest retained script release, not each new main build. No new Pages snapshots are automatically published while npm delivery is prepared. To stay on one retained release, swap `alpha` for a version number in any of the three files. Older versions may have only the components file. For example:
 
 ```html
 <script
@@ -70,36 +70,30 @@ Pinned addresses stay available while their version is active. A version can be 
 
 ## Packages
 
-The toolkit has three packages: `@sefaria/api-client`, `@sefaria/text-transform`, and `@sefaria/web-components`. First publication under these names is pending qualification. Use the commands below after the Sefaria package pages list a verified synchronized prerelease. They are not published on npmjs.com.
+The toolkit has three packages: `@sefaria/api-client`, `@sefaria/text-transform`, and `@sefaria/web-components`. Public npm publication of `0.1.0-alpha.0` is pending qualification. The command below is planned installation guidance, not a claim that the packages are already live. After all three packages verify, npm installation will be anonymous and need no GitHub token or registry-specific credentials.
 
-GitHub Packages asks for a token, even for public packages. Create a personal access token with the `read:packages` scope ([GitHub's steps](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-to-github-packages)). Then add this to your `.npmrc`. Set `NODE_AUTH_TOKEN` to your token:
-
-```ini
-@sefaria:registry=https://npm.pkg.github.com
-//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
-```
-
-Install an exact version. Copy the newest version number from the [package page on GitHub](https://github.com/Sefaria/sefaria-frontend-toolkit/pkgs/npm/web-components). All three packages share the same version. Leave out the packages you don't need. Yarn and pnpm work too, with their usual install commands.
+All three packages share one reviewed numbered version. Use exact versions and commit your lockfile. Leave out the packages you don't need.
 
 ```sh
-version="0.0.0-alpha.<run-id>.<run-attempt>"
+version="0.1.0-alpha.0"
 npm install "@sefaria/api-client@$version" "@sefaria/text-transform@$version" "@sefaria/web-components@$version"
 ```
 
-The packages also carry an `alpha` tag that follows the newest build. An exact version pins the toolkit release. Commit your lockfile and install from it to fix the other dependencies too. For example, run `npm ci`. pnpm and Yarn 1 read the same `.npmrc` scope line. Yarn 2 and later use their own setting, [`npmScopes`](https://yarnpkg.com/configuration/yarnrc#npmScopes). Types are included, so no `@types` package is needed.
-
-If you get a 401, 403, or `E404` error, check:
-
-- the name of the failing package
-- that your token has the `read:packages` scope
-- that your account has access to the package
-- the tag or version you requested
+The planned prerelease tag is `alpha`. Releases are deliberate reviewed versions, not main-build snapshots. An exact version pins the toolkit release. Use `npm ci`, or your package manager's frozen install, to fix other dependencies too. Types are included, so no `@types` package is needed. A missing version during rollout is not a reason to obtain a GitHub Packages token or choose an unrelated package.
 
 For import paths, see [Package imports and exports](/reference/package-imports-and-exports.md). For framework setup, see [Use with a framework](/use-components/use-with-a-framework.md).
 
-### Future npm and CDN delivery
+### Planned npm CDN delivery
 
-The packages include standalone browser files under `dist/browser`, but publication on npmjs.com is not enabled yet. Once published there, npm-backed CDNs such as jsDelivr and UNPKG can serve those files without a separate upload. The client file is `dist/browser/sefaria-api-client.js`, the text file is `dist/browser/sefaria-text-transform.js`, and the components file is `dist/browser/sefaria-elements.js`. A future launch still needs Sefaria's npm namespace access, publishing authorization, and hosted qualification. Third-party CDNs may retain files after deletion. The Pages retirement policy does not apply to them.
+jsDelivr is the primary planned host. UNPKG is the alternative. These exact-version URLs remain pending hosted qualification. No transformation, import map, or automatic fallback between hosts is used.
+
+| Package module | Planned jsDelivr URL |
+| --- | --- |
+| Client | `https://cdn.jsdelivr.net/npm/@sefaria/api-client@0.1.0-alpha.0/dist/browser/sefaria-api-client.js` |
+| Text tools | `https://cdn.jsdelivr.net/npm/@sefaria/text-transform@0.1.0-alpha.0/dist/browser/sefaria-text-transform.js` |
+| Elements | `https://cdn.jsdelivr.net/npm/@sefaria/web-components@0.1.0-alpha.0/dist/browser/sefaria-elements.js` |
+
+The UNPKG alternative replaces `https://cdn.jsdelivr.net/npm/` with `https://unpkg.com/` and retains the exact package, version and path. Each package colocates `LICENSE.txt` and `THIRD-PARTY-NOTICES.txt` in `dist/browser`. All three modules and both hosts must match the qualified package bytes before cutover. Sefaria npm ownership, initial publication and hosted qualification remain external prerequisites. Existing Pages releases are restored unchanged until a separately approved cutover. Third-party CDNs may retain bytes after deletion and do not inherit the Pages retirement policy.
 
 ## Runtimes
 

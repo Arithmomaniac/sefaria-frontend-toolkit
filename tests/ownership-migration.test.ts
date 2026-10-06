@@ -7,7 +7,6 @@ import {
   SCRIPT_ENTRIES,
   manifestFiles,
 } from "../scripts/build-script-source.mjs";
-import { validateBootstrapInventory } from "../scripts/package-publication.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const repository = "Sefaria/sefaria-frontend-toolkit";
@@ -61,42 +60,6 @@ describe("Sefaria ownership migration", () => {
       "sefaria-client.js",
     );
     expect(() => manifestFiles({ schemaVersion: 99 })).toThrow();
-  });
-
-  it("permits empty and correctly linked partial bootstrap inventories", () => {
-    expect(() => validateBootstrapInventory([], repository)).not.toThrow();
-    for (const visibility of ["private", "public"]) {
-      expect(() =>
-        validateBootstrapInventory(
-          [
-            {
-              name: "api-client",
-              package_type: "npm",
-              visibility,
-              repository: { full_name: repository },
-            },
-          ],
-          repository,
-        ),
-      ).not.toThrow();
-    }
-  });
-
-  it("rejects ambiguous, unavailable, and incorrectly linked bootstrap inventory", () => {
-    const record = {
-      name: "api-client",
-      package_type: "npm",
-      repository: { full_name: repository },
-    };
-    for (const records of [
-      null,
-      [record, record],
-      [{ ...record, repository: { full_name: "different/repository" } }],
-      [{ ...record, repository: undefined }],
-      [{ ...record, package_type: "container" }],
-    ]) {
-      expect(() => validateBootstrapInventory(records, repository)).toThrow();
-    }
   });
 
   it("keeps the README and website origin acknowledgement identical", async () => {

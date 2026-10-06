@@ -19,9 +19,9 @@ Each package ships its own TypeScript types. To choose between the script tag an
 
 ## Which release this describes
 
-This page documents the code on the `main` branch, which `alpha` builds are published from. <ReleaseStamp />
+This page documents the code on the `main` branch. The source stamp is not an npm release or a development snapshot. Numbered npm releases and their CDN URLs remain pending publication and hosted qualification. <ReleaseStamp />
 
-The `alpha` script-tag address serves the newest script release that is still active. Compare the stamp above with the version in the [script-tag versions index](https://sefaria.github.io/sefaria-frontend-toolkit/cdn/index.html). Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since.
+The legacy Pages `alpha` script-tag address serves the newest retained script release, not every main build. Compare the stamp above with the version in the [script-tag versions index](https://sefaria.github.io/sefaria-frontend-toolkit/cdn/index.html). Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since.
 
 <a id="register-the-elements"></a>
 
@@ -39,7 +39,7 @@ The client package root re-exports the generated namespaces, contracts, schemas,
 
 ## `@sefaria/api-client`
 
-Source-backed Sefaria API client with generated contracts, validators, and bounded caching. Package manifest version: `0.0.0`. [Reference](/reference/client.md).
+Source-backed Sefaria API client with generated contracts, validators, and bounded caching. Package manifest version: `0.1.0-alpha.0`. This is not evidence of publication. [Reference](/reference/client.md).
 
 | Import path | Exports |
 | --- | --- |
@@ -53,7 +53,7 @@ Source-backed Sefaria API client with generated contracts, validators, and bound
 
 ## `@sefaria/text-transform`
 
-Pure Sefaria text normalization, vocalization, footnote, and preview utilities. Package manifest version: `0.0.0`. [Reference](/reference/text-transform.md).
+Pure Sefaria text normalization, vocalization, footnote, and preview utilities. Package manifest version: `0.1.0-alpha.0`. This is not evidence of publication. [Reference](/reference/text-transform.md).
 
 | Import path | Exports |
 | --- | --- |
@@ -61,7 +61,7 @@ Pure Sefaria text normalization, vocalization, footnote, and preview utilities. 
 
 ## `@sefaria/web-components`
 
-Declarative Sefaria web components backed by corrected client payloads and safe text transforms. Package manifest version: `0.0.0`. [Reference](/reference/components.md).
+Declarative Sefaria web components backed by corrected client payloads and safe text transforms. Package manifest version: `0.1.0-alpha.0`. This is not evidence of publication. [Reference](/reference/components.md).
 
 | Import path | Exports |
 | --- | --- |

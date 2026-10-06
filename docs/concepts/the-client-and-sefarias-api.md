@@ -8,7 +8,7 @@ humanReviewed: false
 
 # The client and Sefaria's API
 
-The toolkit talks to Sefaria through one small piece of code, the client. It is the workspace package `@sefaria/api-client`. The maintainers publish it to GitHub Packages as a prerelease, not to npm. See [Install and status](/help/install-and-status.md). This page explains where the client's types come from, what it checks, and how its cache behaves. It doesn't teach individual endpoints. For those, see [Sefaria's API reference](https://developers.sefaria.org).
+The toolkit talks to Sefaria through one small piece of code, the client. It is the workspace package `@sefaria/api-client`. Numbered public npm publication remains pending qualification. See [Install and status](/help/install-and-status.md). This page explains where the client's types come from, what it checks, and how its cache behaves. It doesn't teach individual endpoints. For those, see [Sefaria's API reference](https://developers.sefaria.org).
 
 ## Where the client's types come from
 
