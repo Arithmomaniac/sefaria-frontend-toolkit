@@ -3,7 +3,7 @@ import {
   applyVocalizationToHtml,
   normalizeText,
   type PaseqMode,
-} from "@arithmomaniac/sefaria-text-transform";
+} from "@sefaria/text-transform";
 import { describe, expect, it } from "vitest";
 
 import "./no-network.js";

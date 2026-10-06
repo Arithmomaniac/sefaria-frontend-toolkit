@@ -1,5 +1,5 @@
-import { zCoreV3TextsResponse } from "@arithmomaniac/sefaria-client";
-import "@arithmomaniac/sefaria-web-components";
+import { zCoreV3TextsResponse } from "@sefaria/api-client";
+import "@sefaria/web-components";
 import payload from "./micah-6-8.js";
 
 const segment = requireElement("#segment");

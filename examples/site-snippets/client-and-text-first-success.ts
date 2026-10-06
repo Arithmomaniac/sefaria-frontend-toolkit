@@ -1,5 +1,5 @@
-import { createSefariaClient, text } from "@arithmomaniac/sefaria-client";
-import { normalizeText } from "@arithmomaniac/sefaria-text-transform";
+import { createSefariaClient, text } from "@sefaria/api-client";
+import { normalizeText } from "@sefaria/text-transform";
 
 const client = createSefariaClient();
 

@@ -4,11 +4,11 @@ import {
   type CoreV3TextsResponse,
   type SefariaClient,
   zCoreV3TextsResponse,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 import type {
   SefariaDataSource,
   SefariaSourceCard,
-} from "@arithmomaniac/sefaria-web-components";
+} from "@sefaria/web-components";
 
 import payload from "./micah-6-8.json";
 

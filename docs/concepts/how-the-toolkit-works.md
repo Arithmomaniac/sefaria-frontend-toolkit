@@ -20,7 +20,7 @@ flowchart TD
 
 ## You add a tag
 
-You put the tag on your page. Behind it sit three packages. The client (`@arithmomaniac/sefaria-client`) fetches from Sefaria's API and checks each JSON response against a schema. The text tools (`@arithmomaniac/sefaria-text-transform`) clean text strings and know nothing about the client. The components (`@arithmomaniac/sefaria-web-components`) use both. The elements are standard web components built with [Lit](https://lit.dev), a small library for building web components.
+You put the tag on your page. Behind it sit three packages. The client (`@sefaria/api-client`) fetches from Sefaria's API and checks each JSON response against a schema. The text tools (`@sefaria/text-transform`) clean text strings and know nothing about the client. The components (`@sefaria/web-components`) use both. The elements are standard web components built with [Lit](https://lit.dev), a small library for building web components.
 
 Importing the script or the package registers the elements but makes no request of its own. Any tag already on the page with an `sref` then loads as usual. The shared default client is created lazily, the first time an element needs it. Nothing renders on the server. The components run in the browser.
 

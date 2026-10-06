@@ -1,5 +1,5 @@
-import { createSefariaClient } from "@arithmomaniac/sefaria-client";
-import type { SefariaTextSegment } from "@arithmomaniac/sefaria-web-components";
+import { createSefariaClient } from "@sefaria/api-client";
+import type { SefariaTextSegment } from "@sefaria/web-components";
 import { beforeEach, expect, test, vi } from "vitest";
 
 import textFixture from "../../../../packages/client/test/fixtures/v3-connections-genesis-target-2026-09-06.json";

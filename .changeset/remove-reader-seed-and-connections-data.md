@@ -1,5 +1,5 @@
 ---
-"@arithmomaniac/sefaria-web-components": minor
+"@sefaria/web-components": minor
 "@sefaria-example/mcp-app": minor
 ---
 

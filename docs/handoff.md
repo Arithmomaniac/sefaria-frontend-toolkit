@@ -2,22 +2,22 @@
 
 # Source handoff
 
-This repository delivers reusable building blocks for placing Sefaria reading experiences in browser and MCP hosts. It is intentionally not a replacement for Sefaria.org, a stable package release, or a claim of exhaustive corpus compatibility. Authenticated public GitHub Packages prereleases are available; package names are subject to change, and the packages are not published on npmjs.com.
+This repository delivers reusable building blocks for placing Sefaria reading experiences in browser and MCP hosts. It is intentionally not a replacement for Sefaria.org, a stable package release, or a claim of exhaustive corpus compatibility. Sefaria owns this community-driven project and backs and supports it. First GitHub Packages publication under the new Sefaria package names remains pending qualification; the packages are not published on npmjs.com.
 
 ## What is delivered
 
 The project addresses four steps between receiving JSON and presenting a reading experience:
 
-1. `@arithmomaniac/sefaria-client` validates the corrected transport contract and preserves documented HTTP, network, and abort semantics.
-2. `@arithmomaniac/sefaria-text-transform` safely prepares Sefaria's structured text markup and Hebrew vocalization.
-3. Pure `@arithmomaniac/sefaria-web-components` factories project transport payloads into component-specific rendering data.
+1. `@sefaria/api-client` validates the corrected transport contract and preserves documented HTTP, network, and abort semantics.
+2. `@sefaria/text-transform` safely prepares Sefaria's structured text markup and Hebrew vocalization.
+3. Pure `@sefaria/web-components` factories project transport payloads into component-specific rendering data.
 4. Declarative Web Components own input precedence, optional source, private preparation, layout, accessibility, interaction, and theming.
 
 The same pieces support both packaged and host-specific compositions:
 
 | DataLoader | Example |
 | --- | --- |
-| Text, bilingual, reference, source-card, and connections primitives | [Developer explorer source](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/explorer) |
+| Text, bilingual, reference, source-card, and connections primitives | [Developer explorer source](https://github.com/Sefaria/sefaria-frontend-toolkit/tree/main/examples/explorer) |
 | Supported packaged Reader | `examples/reader/controlled.html` |
 | Custom host-owned spatial reading workflow | `examples/reader/index.html` |
 | Reading surfaces embedded in an ordinary page | [Authored linked article](linked-article.md) |

@@ -1,12 +1,9 @@
-import {
-  createSefariaClient,
-  type SefariaClient,
-} from "@arithmomaniac/sefaria-client";
-import "@arithmomaniac/sefaria-web-components";
+import { createSefariaClient, type SefariaClient } from "@sefaria/api-client";
+import "@sefaria/web-components";
 import type {
   SefariaDataSource,
   SefariaSourceCard,
-} from "@arithmomaniac/sefaria-web-components";
+} from "@sefaria/web-components";
 
 const DIALOG_ID = "linked-article-source-preview";
 const LINK_SELECTOR = "a[data-sefaria-ref]";

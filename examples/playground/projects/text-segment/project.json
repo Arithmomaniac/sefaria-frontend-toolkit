@@ -14,6 +14,6 @@
       "path": "../source-card/micah-6-8.js"
     }
   ],
-  "sourceBaseUrl": "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/projects/text-segment/",
+  "sourceBaseUrl": "https://github.com/Sefaria/sefaria-frontend-toolkit/blob/main/examples/playground/projects/text-segment/",
   "liveDemoUrl": "../explorer/text-segment.html"
 }

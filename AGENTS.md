@@ -63,9 +63,9 @@ High-risk changes include public API contracts, OpenAPI corrections, generated o
 
 ## Keep one owner for each concern
 
-- `@arithmomaniac/sefaria-client` owns the pinned OpenAPI input, checksum, guarded overlay, generated contracts, Zod schemas, validators, thin client, and its bounded per-client response cache.
-- `@arithmomaniac/sefaria-text-transform` owns pure sanitization, vocalization, and footnote operations.
-- Non-DOM `@arithmomaniac/sefaria-web-components` subpaths own public raw input types, source capabilities, Reader semantic/session contracts, and reusable pure preparation.
+- `@sefaria/api-client` owns the pinned OpenAPI input, checksum, guarded overlay, generated contracts, Zod schemas, validators, thin client, and its bounded per-client response cache.
+- `@sefaria/text-transform` owns pure sanitization, vocalization, and footnote operations.
+- Non-DOM `@sefaria/web-components` subpaths own public raw input types, source capabilities, Reader semantic/session contracts, and reusable pure preparation.
 - Component elements own reactive input snapshots, source selection, cancellation and stale-result suppression, private preparation, layout, interaction, accessibility, theming, and DOM rendering.
 - Integrations own host input, activation policy, external unknown-JSON validation, optional client or loader creation, and application-specific coordination.
 - Specifications own intended behavior.
@@ -85,7 +85,7 @@ Preserve generated-client and Fetch API semantics. Documented HTTP errors remain
 
 Do not convert a network failure or abort into a success-shaped object.
 
-Validate every JSON response from `@arithmomaniac/sefaria-client`.
+Validate every JSON response from `@sefaria/api-client`.
 
 Validate unknown JSON again when it enters through MCP, a server, a fixture, stored data, or user input.
 

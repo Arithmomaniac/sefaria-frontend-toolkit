@@ -1,25 +1,22 @@
-import {
-  createSefariaClient,
-  type SefariaClient,
-} from "@arithmomaniac/sefaria-client";
-import "@arithmomaniac/sefaria-web-components";
+import { createSefariaClient, type SefariaClient } from "@sefaria/api-client";
+import "@sefaria/web-components";
 import type {
   ConnectionsProjection,
   ConnectionsRequest,
   SefariaConnectionsPanel,
   SefariaSourceCard,
-} from "@arithmomaniac/sefaria-web-components";
+} from "@sefaria/web-components";
 import {
   createSefariaReaderRecordLoader,
   resolveReaderSource,
-} from "@arithmomaniac/sefaria-web-components/reader";
+} from "@sefaria/web-components/reader";
 import {
   createReaderSession,
   type ReaderConnectionsRecord,
   type ReaderEntryInfo,
   type ReaderSession,
   type ReaderTransition,
-} from "@arithmomaniac/sefaria-web-components/reader-session";
+} from "@sefaria/web-components/reader-session";
 
 import {
   addConnectionsPane,

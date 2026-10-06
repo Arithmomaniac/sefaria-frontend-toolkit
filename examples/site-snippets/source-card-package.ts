@@ -1,4 +1,4 @@
-import "@arithmomaniac/sefaria-web-components";
+import "@sefaria/web-components";
 
 // Importing the package root registers every element.
 const card = document.createElement("sefaria-source-card");

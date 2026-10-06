@@ -35,7 +35,7 @@ Both cases start from corrected API-shaped JSON. That is the JSON body Sefaria's
 
 ## Supply data once
 
-Check unknown JSON before you pass it on. `validateExternalResponse` from `@arithmomaniac/sefaria-client` returns `{ valid, issues }`. Each issue has an `instancePath` that points to the place in the response where the problem is.
+Check unknown JSON before you pass it on. `validateExternalResponse` from `@sefaria/api-client` returns `{ valid, issues }`. Each issue has an `instancePath` that points to the place in the response where the problem is.
 
 Then set `data` on the Text Segment, Bilingual Segment, or Source Card. `data` is a JavaScript property, not an HTML attribute, so set it from script. Import elements from the package root, which registers them.
 

@@ -94,8 +94,8 @@ describe("documentation site", () => {
     );
     expect(theme).toContain('"home-hero-info-after"');
     expect(theme).toContain("StatusNote");
-    expect(statusNote).toContain(
-      "Experimental and unofficial. Names and addresses may change.",
+    expect(statusNote.replace(/\s+/gu, " ")).toContain(
+      "A community-driven project with Sefaria backing and support. The toolkit is experimental; names and APIs may change.",
     );
   });
 

@@ -2,7 +2,7 @@ import {
   createSefariaClient,
   validateGetV3Texts200,
   type CoreV3TextsResponse,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 import { afterEach, expect, test, vi } from "vitest";
 import micah from "../../../examples/react-vite/src/micah-6-8.json";
 import captures from "../test/fixtures/translation-preference-2026-09-27.json";

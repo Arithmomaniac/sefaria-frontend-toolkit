@@ -4,7 +4,7 @@ import {
   type CoreV3Version,
   type GetV3TextsData,
   type SefariaClient,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 
 import type {
   BilingualPairAbsentSide,
@@ -27,7 +27,7 @@ import {
   projectTextSegmentValue,
   type TextSegmentDataViewModel,
 } from "./text-segment.js";
-import type { CommentaryReference } from "@arithmomaniac/sefaria-text-transform";
+import type { CommentaryReference } from "@sefaria/text-transform";
 import { sourceCardAddresses } from "./source-card-addresses.js";
 import {
   ComponentControllerEngine,

@@ -1,5 +1,5 @@
 ---
-"@arithmomaniac/sefaria-web-components": patch
+"@sefaria/web-components": patch
 ---
 
 > Created/edited by GitHub Copilot; pending human review.

@@ -1,1 +1,1 @@
-export * from "@arithmomaniac/sefaria-web-components/source-card";
+export * from "@sefaria/web-components/source-card";

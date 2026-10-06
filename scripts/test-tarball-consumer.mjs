@@ -19,6 +19,8 @@ import { fileURLToPath } from "node:url";
 import { chromium } from "playwright";
 import { preview } from "vite";
 import YAML from "yaml";
+import { extract } from "tar";
+import { testPackageBrowserModules } from "./test-package-browser.mjs";
 
 import {
   isPathWithin,
@@ -44,7 +46,8 @@ const consumers = {
 };
 const packageDefinitions = [
   {
-    name: "@arithmomaniac/sefaria-client",
+    name: "@sefaria/api-client",
+    browserFile: "sefaria-api-client.js",
     directory: "client",
     filename: undefined,
     subpaths: [
@@ -58,13 +61,15 @@ const packageDefinitions = [
     ],
   },
   {
-    name: "@arithmomaniac/sefaria-text-transform",
+    name: "@sefaria/text-transform",
+    browserFile: "sefaria-text-transform.js",
     directory: "text-transform",
     filename: undefined,
     subpaths: ["."],
   },
   {
-    name: "@arithmomaniac/sefaria-web-components",
+    name: "@sefaria/web-components",
+    browserFile: "sefaria-elements.js",
     directory: "web-components",
     filename: undefined,
     subpaths: [
@@ -108,6 +113,36 @@ try {
     packageDefinition.filename = emitted[0];
     await inspectTarball(packageDefinition);
   }
+
+  const browserPackages = [];
+  for (const definition of packageDefinitions) {
+    const extracted = path.join(root, "browser-packages", definition.directory);
+    await mkdir(extracted, { recursive: true });
+    await extract({
+      file: path.join(tarballs, definition.filename),
+      cwd: extracted,
+      strict: true,
+    });
+    browserPackages.push({
+      directory: path.join(extracted, "package"),
+      browserFile: definition.browserFile,
+    });
+  }
+  await testPackageBrowserModules({
+    packages: browserPackages,
+    fixture: JSON.parse(
+      await readFile(
+        path.join(
+          repository,
+          "examples",
+          "react-vite",
+          "src",
+          "micah-6-8.json",
+        ),
+        "utf8",
+      ),
+    ),
+  });
 
   await stageConsumer({
     consumer: consumers.vanilla,
@@ -173,7 +208,7 @@ async function inspectTarball(packageDefinition) {
     capture("tar", ["-tf", tarball]).split(/\r?\n/u).filter(Boolean),
   );
   const customElements =
-    packageDefinition.name === "@arithmomaniac/sefaria-web-components"
+    packageDefinition.name === "@sefaria/web-components"
       ? JSON.parse(
           capture("tar", ["-xOf", tarball, "package/custom-elements.json"]),
         )
@@ -289,21 +324,21 @@ async function inspectConsumerResolution(consumer) {
   }
 
   const allNodeSafeImports = [
-    "@arithmomaniac/sefaria-client",
-    "@arithmomaniac/sefaria-client/client",
-    "@arithmomaniac/sefaria-client/contracts",
-    "@arithmomaniac/sefaria-client/errors",
-    "@arithmomaniac/sefaria-client/schemas",
-    "@arithmomaniac/sefaria-client/validation",
-    "@arithmomaniac/sefaria-client/validators",
-    "@arithmomaniac/sefaria-text-transform",
-    "@arithmomaniac/sefaria-web-components/data-source",
-    "@arithmomaniac/sefaria-web-components/bilingual-segment",
-    "@arithmomaniac/sefaria-web-components/connections-panel",
-    "@arithmomaniac/sefaria-web-components/reader",
-    "@arithmomaniac/sefaria-web-components/reader-session",
-    "@arithmomaniac/sefaria-web-components/source-card",
-    "@arithmomaniac/sefaria-web-components/text-segment",
+    "@sefaria/api-client",
+    "@sefaria/api-client/client",
+    "@sefaria/api-client/contracts",
+    "@sefaria/api-client/errors",
+    "@sefaria/api-client/schemas",
+    "@sefaria/api-client/validation",
+    "@sefaria/api-client/validators",
+    "@sefaria/text-transform",
+    "@sefaria/web-components/data-source",
+    "@sefaria/web-components/bilingual-segment",
+    "@sefaria/web-components/connections-panel",
+    "@sefaria/web-components/reader",
+    "@sefaria/web-components/reader-session",
+    "@sefaria/web-components/source-card",
+    "@sefaria/web-components/text-segment",
   ];
   capture(
     "node",
@@ -313,8 +348,8 @@ async function inspectConsumerResolution(consumer) {
       [
         `await Promise.all(${JSON.stringify(allNodeSafeImports)}.map((specifier) => import(specifier)));`,
         "if ('customElements' in globalThis) throw new Error('DOM registration leaked into Node-safe imports');",
-        "try { await import('@arithmomaniac/sefaria-web-components/popup'); throw new Error('Removed Popup subpath remains importable'); } catch (error) { if (error.code !== 'ERR_PACKAGE_PATH_NOT_EXPORTED') throw error; }",
-        "try { await import('@arithmomaniac/sefaria-web-components/ref-label'); throw new Error('Removed Reference Label subpath remains importable'); } catch (error) { if (error.code !== 'ERR_PACKAGE_PATH_NOT_EXPORTED') throw error; }",
+        "try { await import('@sefaria/web-components/popup'); throw new Error('Removed Popup subpath remains importable'); } catch (error) { if (error.code !== 'ERR_PACKAGE_PATH_NOT_EXPORTED') throw error; }",
+        "try { await import('@sefaria/web-components/ref-label'); throw new Error('Removed Reference Label subpath remains importable'); } catch (error) { if (error.code !== 'ERR_PACKAGE_PATH_NOT_EXPORTED') throw error; }",
       ].join(""),
     ],
     consumer,
@@ -325,7 +360,7 @@ async function inspectConsumerResolution(consumer) {
       "--input-type=module",
       "-e",
       [
-        "const clientModule = await import('@arithmomaniac/sefaria-client');",
+        "const clientModule = await import('@sefaria/api-client');",
         `const namespaceNames = ${JSON.stringify([
           "text",
           "index",
@@ -373,18 +408,17 @@ async function inspectConsumerResolution(consumer) {
     [
       "--input-type=module",
       "-e",
-      "console.log(import.meta.resolve('@arithmomaniac/sefaria-web-components/source-card'))",
+      "console.log(import.meta.resolve('@sefaria/web-components/source-card'))",
     ],
     consumer,
   ).trim();
   const transitiveClient = resolveModuleFromParent({
-    specifier: "@arithmomaniac/sefaria-client",
+    specifier: "@sefaria/api-client",
     parentUrl: uiSourceCard,
     cwd: consumer,
   });
   validateInstalledPath({
-    packageName:
-      "@arithmomaniac/sefaria-web-components transitive @arithmomaniac/sefaria-client",
+    packageName: "@sefaria/web-components transitive @sefaria/api-client",
     installedPath: await realpath(fileURLToPath(transitiveClient)),
     consumer: canonicalConsumer,
     repository: canonicalRepository,

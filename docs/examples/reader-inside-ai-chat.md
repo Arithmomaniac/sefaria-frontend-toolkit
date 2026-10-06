@@ -16,7 +16,7 @@ You are building an AI chat tool. When an answer cites Sefaria, you want readers
 
 This example shows the Reader inside an AI chat answer. The chat host runs a server tool that loads the text from Sefaria. The page itself never contacts Sefaria. It uses MCP, the Model Context Protocol, a standard way for AI chat apps to call tools. An MCP App is a small interactive web page tied to a tool. The chat host loads the page and delivers the tool's results to it.
 
-The example is a complete app (Vite and TypeScript) in `examples/mcp-app`. It has an MCP server and an MCP App that shows the toolkit's Reader. You can't edit it on this page. [Read the source on GitHub](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/mcp-app).
+The example is a complete app (Vite and TypeScript) in `examples/mcp-app`. It has an MCP server and an MCP App that shows the toolkit's Reader. You can't edit it on this page. [Read the source on GitHub](https://github.com/Sefaria/sefaria-frontend-toolkit/tree/main/examples/mcp-app).
 
 <iframe :src="withBase('/examples/mcp-app/live.html')" title="Reader inside AI chat, in-browser host" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy" style="width: 100%; height: 640px; border: 1px solid var(--vp-c-divider); border-radius: 8px;"></iframe>
 

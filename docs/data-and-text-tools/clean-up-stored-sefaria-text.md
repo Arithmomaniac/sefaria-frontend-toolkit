@@ -12,7 +12,7 @@ import { data as snippets } from "./snippets.data.ts";
 
 # Clean up stored Sefaria text
 
-You clean stored Sefaria text in two steps. First, `normalizeText` changes the markup. It makes Sefaria's HTML safe and moves footnotes aside. Then the vocalization helpers change characters, such as vowel points and cantillation. Both come from `@arithmomaniac/sefaria-text-transform` and make no network requests.
+You clean stored Sefaria text in two steps. First, `normalizeText` changes the markup. It makes Sefaria's HTML safe and moves footnotes aside. Then the vocalization helpers change characters, such as vowel points and cantillation. Both come from `@sefaria/text-transform` and make no network requests.
 
 ## What changes in the markup
 

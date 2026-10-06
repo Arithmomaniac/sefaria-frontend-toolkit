@@ -2,8 +2,8 @@ import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { reservedTokens } from "./components.js";
 
-const SITE = "https://arithmomaniac.github.io/sefaria-frontend-toolkit";
-const REPOSITORY = "https://github.com/Arithmomaniac/sefaria-frontend-toolkit";
+const SITE = "https://sefaria.github.io/sefaria-frontend-toolkit";
+const REPOSITORY = "https://github.com/Sefaria/sefaria-frontend-toolkit";
 const docs = (route: string) => new URL(`../../docs/${route}`, import.meta.url);
 const snippet = (file: string) =>
   readFile(
@@ -176,18 +176,18 @@ export async function renderLlmsTxt(): Promise<string> {
     "",
     "> Web components and TypeScript tools for showing texts from Sefaria's library on your own web pages. The components load and display sources by reference. The client fetches and checks Sefaria API responses, and the text tools make Sefaria's text HTML safe to display (`normalizeText`) and prepare it.",
     "",
-    "Status: experimental and unofficial; not made by Sefaria. Names, packages and hosted addresses may change. The `alpha` script address serves the newest published script release that is still active. A pinned script address stays byte-for-byte the same while it's kept, but it may be retired without notice.",
+    "Status: experimental and community-driven with Sefaria backing and support. Names, packages and hosted addresses may change. The `alpha` script address serves the newest published script release that is still active. A pinned script address stays byte-for-byte the same while it's kept, but it may be retired without notice.",
     "",
     "Choose a path:",
     "",
-    `- To show Sefaria texts on a page, use the components from \`@arithmomaniac/sefaria-web-components\`. They're HTML elements, so prefer them to calling the API and handling Sefaria's text HTML yourself. For a page with no build step, add this script tag and element, then read ${SITE}/use-components/start-here:`,
+    `- To show Sefaria texts on a page, use the components from \`@sefaria/web-components\`. They're HTML elements, so prefer them to calling the API and handling Sefaria's text HTML yourself. For a page with no build step, add this script tag and element, then read ${SITE}/use-components/start-here:`,
     "",
     "```html",
     scriptTag,
     "```",
     "",
-    `- To work with Sefaria's data in your own code, use \`@arithmomaniac/sefaria-client\` to fetch checked API responses and \`@arithmomaniac/sefaria-text-transform\` and its \`normalizeText\` function to make text HTML safe before you show it. Start at ${SITE}/data-and-text-tools/start-here.`,
-    `- To install the npm packages, or to choose between them and the script tag, read ${SITE}/help/install-and-status. With a bundler, register every element once with \`import "@arithmomaniac/sefaria-web-components";\`. The element subpaths don't register their element.`,
+    `- To work with Sefaria's data in your own code, use \`@sefaria/api-client\` to fetch checked API responses and \`@sefaria/text-transform\` and its \`normalizeText\` function to make text HTML safe before you show it. Start at ${SITE}/data-and-text-tools/start-here.`,
+    `- To install the npm packages, or to choose between them and the script tag, read ${SITE}/help/install-and-status. With a bundler, register every element once with \`import "@sefaria/web-components";\`. The element subpaths don't register their element.`,
     `- Keep attribution. For an attributed passage, including a bilingual one, use Source Card. Text Segment and Bilingual Segment show no attribution. Source Card shows each edition's title with its language name, linked to its source when the source is a valid http(s) address; don't hide it with \`hide-attributions\`, and don't copy text out of a component without its attribution. Reader also shows edition attribution. Only Source Card links it, and none of them shows a license. Connections Panel previews, also inside the Reader, can show "Licenses reported" when Sefaria provides them. See ${SITE}/help/install-and-status.html#license-and-text-rights.`,
     `- Source Card shows both the primary text and the translation by default (\`content-language\` defaults to \`${contentLanguage}\`).`,
     `- Style the elements with the \`--sefaria-*\` settings listed at ${SITE}/reference/components.html#style-settings: ${tokens.map((name) => `\`${name}\``).join(", ")}. Don't invent other names. You can also style an element's own box (\`display\`, \`margin\`, width), and the Reader exposes ${parts.map((name) => `\`::part(${name})\``).join(", ")}. See ${SITE}/across-components/match-your-sites-look.html.`,

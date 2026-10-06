@@ -4,7 +4,8 @@ import { withBase } from "vitepress";
 
 <template>
   <p class="status-note">
-    Experimental and unofficial. Names and addresses may change.
+    A community-driven project with Sefaria backing and support. The toolkit is
+    experimental; names and APIs may change.
     <a :href="withBase('/help/install-and-status.html#license-and-text-rights')"
       >License</a
     >

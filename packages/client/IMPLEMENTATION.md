@@ -1,17 +1,17 @@
 > Created/edited by GitHub Copilot; pending human review.
 
-# `@arithmomaniac/sefaria-client` implementation notes
+# `@sefaria/api-client` implementation notes
 
-These notes are for maintainers. They were moved unchanged from the package README, which is now a short entry point. For usage, see the [documentation site](https://arithmomaniac.github.io/sefaria-frontend-toolkit/).
+These notes are for maintainers. They were moved unchanged from the package README, which is now a short entry point. For usage, see the [documentation site](https://sefaria.github.io/sefaria-frontend-toolkit/).
 
-`@arithmomaniac/sefaria-client` is the validated transport boundary for the complete 60-operation surface in the pinned Sefaria OpenAPI document. It owns the pinned input, guarded corrections, generated contracts and Zod validators, tag-based namespaces, thin fetch client, and bounded default-on per-client response cache.
+`@sefaria/api-client` is the validated transport boundary for the complete 60-operation surface in the pinned Sefaria OpenAPI document. It owns the pinned input, guarded corrections, generated contracts and Zod validators, tag-based namespaces, thin fetch client, and bounded default-on per-client response cache.
 
-The committed source manifest remains private to prevent accidental publication. Public GitHub Packages prereleases are available for authenticated installation; the package name is subject to change, and it is not published on npmjs.com. Follow the repository [installation instructions](../../docs/use-components/start-here.md#installation-status).
+The committed source manifest remains private to prevent accidental publication. First GitHub Packages publication under the Sefaria name is pending qualification; installation will require authentication, and the package is not published on npmjs.com. Follow the repository [installation instructions](../../docs/help/install-and-status.md#packages).
 
 ## Ordinary use
 
 ```ts
-import { createSefariaClient, text } from "@arithmomaniac/sefaria-client";
+import { createSefariaClient, text } from "@sefaria/api-client";
 
 const client = createSefariaClient();
 const result = await text.getV3Texts({
@@ -23,8 +23,8 @@ const result = await text.getV3Texts({
 Component consumers can supply an existing client as the element's explicit acquisition source:
 
 ```ts
-import { createSefariaClient } from "@arithmomaniac/sefaria-client";
-import "@arithmomaniac/sefaria-web-components";
+import { createSefariaClient } from "@sefaria/api-client";
+import "@sefaria/web-components";
 
 const card = document.createElement("sefaria-source-card");
 card.source = { kind: "client", client: createSefariaClient() };
@@ -32,19 +32,19 @@ card.sref = "Micah 6:8";
 document.body.append(card);
 ```
 
-Applications with custom renderers use the validated client contracts directly and can apply `@arithmomaniac/sefaria-text-transform` to text they already own.
+Applications with custom renderers use the validated client contracts directly and can apply `@sefaria/text-transform` to text they already own.
 
 ## Entry points
 
 | Import | Purpose |
 | --- | --- |
-| `@arithmomaniac/sefaria-client` | Tag namespaces, client creation, generated types, validation helpers, and common errors |
-| `@arithmomaniac/sefaria-client/client` | Thin client implementation |
-| `@arithmomaniac/sefaria-client/contracts` | Generated transport declarations |
-| `@arithmomaniac/sefaria-client/schemas` | Generated Zod schemas |
-| `@arithmomaniac/sefaria-client/validators` | Generated operation/status validators |
-| `@arithmomaniac/sefaria-client/validation` | Shared validation helpers |
-| `@arithmomaniac/sefaria-client/errors` | Contract-validation error types |
+| `@sefaria/api-client` | Tag namespaces, client creation, generated types, validation helpers, and common errors |
+| `@sefaria/api-client/client` | Thin client implementation |
+| `@sefaria/api-client/contracts` | Generated transport declarations |
+| `@sefaria/api-client/schemas` | Generated Zod schemas |
+| `@sefaria/api-client/validators` | Generated operation/status validators |
+| `@sefaria/api-client/validation` | Shared validation helpers |
+| `@sefaria/api-client/errors` | Contract-validation error types |
 
 The root exports `text`, `index`, `related`, `calendars`, `lexicon`, `topic`, `term`, `sheets`, `collections`, `misc`, and `ref`. Endpoint functions are available only through those namespaces. JSON responses are validated against generated Zod schemas, while declared PNG responses are media-type checked and returned as `Blob` values.
 

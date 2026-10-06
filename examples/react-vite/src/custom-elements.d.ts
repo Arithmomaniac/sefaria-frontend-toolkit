@@ -1,7 +1,7 @@
 import type {
   SefariaConnectionsPanel,
   SefariaSourceCard,
-} from "@arithmomaniac/sefaria-web-components";
+} from "@sefaria/web-components";
 import type { DetailedHTMLProps, HTMLAttributes, Ref } from "react";
 
 interface SourceSelection {

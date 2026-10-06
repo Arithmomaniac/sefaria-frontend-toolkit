@@ -1,8 +1,8 @@
-import { createSefariaClient } from "@arithmomaniac/sefaria-client";
+import { createSefariaClient } from "@sefaria/api-client";
 import type {
   SefariaConnectionsPanel,
   SefariaSourceCard,
-} from "@arithmomaniac/sefaria-web-components";
+} from "@sefaria/web-components";
 import { beforeEach, expect, test, vi } from "vitest";
 import target from "../../../../packages/client/test/fixtures/v3-connections-genesis-target-2026-09-06.json";
 import context from "../../../../packages/client/test/fixtures/v3-connections-genesis-section-2026-09-06.json";

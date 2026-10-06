@@ -1,0 +1,36 @@
+name: Bootstrap Sefaria packages
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validation:
+    if: ${{ github.ref == 'refs/heads/main' && vars.SEFARIA_PACKAGES_ENABLED != 'true' }}
+    uses: ./.github/workflows/validate-toolkit.yml
+
+  check:
+    name: check
+    if: ${{ always() }}
+    needs: validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every validation platform
+        run: |
+          if [ "${{ needs.validation.result }}" != "success" ]; then
+            echo "Validation result: ${{ needs.validation.result }}"
+            exit 1
+          fi
+
+  publish:
+    name: bootstrap Sefaria prerelease
+    if: ${{ github.ref == 'refs/heads/main' && vars.SEFARIA_PACKAGES_ENABLED != 'true' }}
+    needs: check
+    uses: ./.github/workflows/publish-packages.yml
+    with:
+      bootstrap: true
+    permissions:
+      contents: read
+      packages: write

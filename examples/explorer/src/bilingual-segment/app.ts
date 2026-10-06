@@ -1,10 +1,10 @@
-import { createSefariaClient } from "@arithmomaniac/sefaria-client";
-import "@arithmomaniac/sefaria-web-components";
+import { createSefariaClient } from "@sefaria/api-client";
+import "@sefaria/web-components";
 import type {
   BilingualSegmentRequest,
   SefariaDataSource,
   SefariaBilingualSegment,
-} from "@arithmomaniac/sefaria-web-components";
+} from "@sefaria/web-components";
 import { setOptionalElementAttribute } from "../../../../demos/live-demo-core.js";
 
 /** Controls the interactive live bilingual-segment demonstration. */

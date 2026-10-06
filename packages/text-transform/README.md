@@ -1,14 +1,14 @@
 > Created/edited by GitHub Copilot; pending human review.
 
-# @arithmomaniac/sefaria-text-transform
+# @sefaria/text-transform
 
 Makes Sefaria's HTML safe to display and prepares vowels and footnotes, with no UI and no network. Run `normalizeText` first: it sanitizes. `applyVocalizationToHtml` does not sanitize, and `createTextPreview` normalizes its input itself.
 
-Experimental and unofficial. Names and addresses may change. This is not an official Sefaria product.
+A community-driven project with Sefaria backing and support. The toolkit is experimental; names and APIs may change.
 
 ## Install
 
-The packages are prereleases on GitHub Packages, not npmjs.com. GitHub Packages asks for a token even to download public packages. You need a GitHub personal access token (classic) with `read:packages`. Types are included; no `@types` package is needed. [Install and status › Packages](https://arithmomaniac.github.io/sefaria-frontend-toolkit/help/install-and-status.html#packages) shows the setup and the install command.
+The packages are prereleases on GitHub Packages, not npmjs.com. GitHub Packages asks for a token even to download public packages. You need a GitHub personal access token (classic) with `read:packages`. Types are included; no `@types` package is needed. [Install and status › Packages](https://sefaria.github.io/sefaria-frontend-toolkit/help/install-and-status.html#packages) shows the setup and the install command.
 
 ## First success
 
@@ -18,7 +18,7 @@ The packages are prereleases on GitHub Packages, not npmjs.com. GitHub Packages 
 import {
   applyVocalizationToHtml,
   normalizeText,
-} from "@arithmomaniac/sefaria-text-transform";
+} from "@sefaria/text-transform";
 
 // Sefaria text you already have, for example from a file or a database.
 const stored =
@@ -36,9 +36,9 @@ console.log(withVowels);
 
 ## Next steps
 
-- [Use the data and text tools](https://arithmomaniac.github.io/sefaria-frontend-toolkit/data-and-text-tools/start-here.html)
-- [Clean up stored Sefaria text](https://arithmomaniac.github.io/sefaria-frontend-toolkit/data-and-text-tools/clean-up-stored-sefaria-text.html)
-- [Clean text and safety](https://arithmomaniac.github.io/sefaria-frontend-toolkit/concepts/clean-text-and-safety.html)
-- [Text transform reference](https://arithmomaniac.github.io/sefaria-frontend-toolkit/reference/text-transform.html)
+- [Use the data and text tools](https://sefaria.github.io/sefaria-frontend-toolkit/data-and-text-tools/start-here.html)
+- [Clean up stored Sefaria text](https://sefaria.github.io/sefaria-frontend-toolkit/data-and-text-tools/clean-up-stored-sefaria-text.html)
+- [Clean text and safety](https://sefaria.github.io/sefaria-frontend-toolkit/concepts/clean-text-and-safety.html)
+- [Text transform reference](https://sefaria.github.io/sefaria-frontend-toolkit/reference/text-transform.html)
 
-For maintainers: [IMPLEMENTATION.md](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/text-transform/IMPLEMENTATION.md).
+For maintainers: [IMPLEMENTATION.md](https://github.com/Sefaria/sefaria-frontend-toolkit/blob/main/packages/text-transform/IMPLEMENTATION.md).

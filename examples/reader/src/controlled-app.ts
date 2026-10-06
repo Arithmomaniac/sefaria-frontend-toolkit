@@ -1,12 +1,6 @@
-import {
-  createSefariaClient,
-  type SefariaClient,
-} from "@arithmomaniac/sefaria-client";
-import "@arithmomaniac/sefaria-web-components";
-import type {
-  SefariaDataSource,
-  SefariaReader,
-} from "@arithmomaniac/sefaria-web-components";
+import { createSefariaClient, type SefariaClient } from "@sefaria/api-client";
+import "@sefaria/web-components";
+import type { SefariaDataSource, SefariaReader } from "@sefaria/web-components";
 
 /** Browser controls exposed for qualification of the supported reader path. */
 export interface ControlledReaderDemo {

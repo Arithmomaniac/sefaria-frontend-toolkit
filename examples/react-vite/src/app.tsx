@@ -4,12 +4,12 @@ import {
   type CoreV3TextsResponse,
   type SefariaClient,
   zCoreV3TextsResponse,
-} from "@arithmomaniac/sefaria-client";
-import "@arithmomaniac/sefaria-web-components";
+} from "@sefaria/api-client";
+import "@sefaria/web-components";
 import type {
   SefariaDataSource,
   SefariaSourceCard,
-} from "@arithmomaniac/sefaria-web-components";
+} from "@sefaria/web-components";
 import { useCallback, useRef, useState, type FormEvent } from "react";
 
 import payload from "./micah-6-8.json";

@@ -18,6 +18,6 @@
       "path": "../shared/micah-6-8-links.js"
     }
   ],
-  "sourceBaseUrl": "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/projects/reader/",
+  "sourceBaseUrl": "https://github.com/Sefaria/sefaria-frontend-toolkit/blob/main/examples/playground/projects/reader/",
   "liveDemoUrl": "../reader/controlled.html?tref=Micah%206%3A8"
 }

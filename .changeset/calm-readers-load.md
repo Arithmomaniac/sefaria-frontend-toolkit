@@ -1,5 +1,5 @@
 ---
-"@arithmomaniac/sefaria-web-components": minor
+"@sefaria/web-components": minor
 ---
 
 > Created/edited by GitHub Copilot; pending human review.

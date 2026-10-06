@@ -287,7 +287,7 @@ export async function renderApiCorrections(): Promise<string> {
     "- [Reference › Client](/reference/client.md) lists the generated functions.",
     "- [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md) shows what happens when a response doesn't match the corrected description.",
     "- [Sefaria's developer documentation](https://developers.sefaria.org/) describes the API itself.",
-    "- The corrections are defined in [`packages/client/openapi/overlay.yaml`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/client/openapi/overlay.yaml).",
+    "- The corrections are defined in [`packages/client/openapi/overlay.yaml`](https://github.com/Sefaria/sefaria-frontend-toolkit/blob/main/packages/client/openapi/overlay.yaml).",
   );
   return renderPage({
     title: "Reference › Corrections to Sefaria's API description",

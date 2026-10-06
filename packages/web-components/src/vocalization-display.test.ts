@@ -1,4 +1,4 @@
-import * as transforms from "@arithmomaniac/sefaria-text-transform";
+import * as transforms from "@sefaria/text-transform";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import type { TextSegmentDataViewModel } from "./text-segment.js";

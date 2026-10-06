@@ -15,13 +15,13 @@ import ReleaseStamp from "./ReleaseStamp.vue";
 
 This page lists the attributes, properties, data, empty states, events, and style settings of the toolkit's five elements. The generator builds it from the package's `custom-elements.json`.
 
-The elements are registered when you load the script tag or when you import the package root with `import "@arithmomaniac/sefaria-web-components";`. The element subpaths, such as `@arithmomaniac/sefaria-web-components/source-card`, don't register their element. They export types and a few helpers.
+The elements are registered when you load the script tag or when you import the package root with `import "@sefaria/web-components";`. The element subpaths, such as `@sefaria/web-components/source-card`, don't register their element. They export types and a few helpers.
 
 ## Which release this describes
 
 This page documents the code on the `main` branch, which `alpha` builds are published from. <ReleaseStamp />
 
-The `alpha` script-tag address serves the newest script release that is still active. Compare the stamp above with the version in the [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/index.html). Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since.
+The `alpha` script-tag address serves the newest script release that is still active. Compare the stamp above with the version in the [script-tag versions index](https://sefaria.github.io/sefaria-frontend-toolkit/cdn/index.html). Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since.
 
 ## Elements
 
@@ -103,7 +103,7 @@ Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`.
 
 ### Data
 
-`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. It also accepts a `TextSegmentSelectedData` object with `kind: "selected"`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
+`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@sefaria/api-client`. It also accepts a `TextSegmentSelectedData` object with `kind: "selected"`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
 
 ### Empty state
 
@@ -205,7 +205,7 @@ Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`.
 
 ### Data
 
-`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
+`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@sefaria/api-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
 
 ### Empty state
 
@@ -331,7 +331,7 @@ Loading state: `"empty"`, `"loading"`, `"ready"` or `"error"`.
 
 ### Data
 
-`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
+`data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@sefaria/api-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
 
 ### Empty state
 

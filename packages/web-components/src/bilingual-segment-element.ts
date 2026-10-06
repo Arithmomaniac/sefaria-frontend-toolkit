@@ -1,6 +1,6 @@
-import type { CoreV3TextsResponse } from "@arithmomaniac/sefaria-client";
+import type { CoreV3TextsResponse } from "@sefaria/api-client";
 import { css, html, nothing, type PropertyValues } from "lit";
-import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
+import type { VocalizationMode } from "@sefaria/text-transform";
 
 import type { SefariaDataSource } from "./data-source.js";
 import { resolveSefariaDataSource } from "./data-source-state.js";
@@ -45,7 +45,7 @@ export type BilingualSegmentSideOrder = BilingualPairSideOrder;
 /**
  * Shows one passage in its primary edition, together with a translation. The primary edition is the one marked `isPrimary`.
  *
- * @data `data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
+ * @data `data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@sefaria/api-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
  * @empty The element shows its empty state when neither side has text. Each missing side has its own message, such as `No primary text is available.` or `No translation text is available.` The element can show the response's warning for that side instead. When only one side is missing, you see the other side's text and the missing side's message. `contentLanguage` filters which sides are shown.
  * @fires sefaria-bilingual-segment-error - Reports a failure while loading or validating data from `sref`.
  * @eventDetail sefaria-bilingual-segment-error - `error` is the original failure. `sref` is the reference that was loading.

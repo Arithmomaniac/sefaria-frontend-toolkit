@@ -16,6 +16,8 @@ This guide defines review gates for the delivered architecture and separately id
 
 ## Browser script distribution
 
+- [ ] Script-release modules match packaged browser modules byte-for-byte, without a second bundle build or a missing/stale-evidence fallback.
+- [ ] Reusable publication retains typed mode selection, caller and callee gates, fail-closed matrix aggregation, minimal token permissions, one non-cancelable queue, and verified producer-version forwarding.
 - [ ] The plain-HTML smoke loads the actual production module without an import map, source alias, or custom source.
 - [ ] Re-evaluating identical bytes through a distinct URL preserves the registered constructors and throws no error.
 - [ ] Package producer version and commit survive archival retries; partial package publication cannot admit a script record.
@@ -110,7 +112,7 @@ Review the initial and expanded corrections for:
 - [ ] Candidate collections preserve library-owned edition/role selection and reproject with zero I/O.
 - [ ] Missing selection evidence is distinct from a known no-match.
 - [ ] Supplied and acquired paths produce equal private preparation for the same captured payload and options.
-- [ ] Unsafe HTML passes through `@arithmomaniac/sefaria-text-transform` exactly once.
+- [ ] Unsafe HTML passes through `@sefaria/text-transform` exactly once.
 - [ ] Current failures preserve original causes and structured paths, become accessible state/events, and produce no unhandled rejection.
 - [ ] Superseded work publishes neither success nor failure.
 

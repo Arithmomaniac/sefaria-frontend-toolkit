@@ -9,19 +9,19 @@ describe("library package foundations", () => {
   const packages = [
     [
       "packages/client/package.json",
-      "@arithmomaniac/sefaria-client",
+      "@sefaria/api-client",
       7,
       ["dist", "!dist/*.tsbuildinfo", "README.md"],
     ],
     [
       "packages/text-transform/package.json",
-      "@arithmomaniac/sefaria-text-transform",
+      "@sefaria/text-transform",
       1,
       ["dist", "!dist/*.tsbuildinfo", "README.md"],
     ],
     [
       "packages/web-components/package.json",
-      "@arithmomaniac/sefaria-web-components",
+      "@sefaria/web-components",
       8,
       ["dist", "!dist/*.tsbuildinfo", "README.md", "custom-elements.json"],
     ],
@@ -34,14 +34,14 @@ describe("library package foundations", () => {
 
       expect(manifest.name).toBe(packageName);
       expect(manifest.private).toBe(true);
-      expect(manifest.license).toBe("GPL-3.0-only");
+      expect(manifest.license).toBe("MIT");
       expect(manifest.repository).toEqual({
         type: "git",
-        url: "git+https://github.com/Arithmomaniac/sefaria-frontend-toolkit.git",
+        url: "git+https://github.com/Sefaria/sefaria-frontend-toolkit.git",
         directory: manifestPath.split("/").slice(0, -1).join("/"),
       });
       expect(manifest.homepage).toBe(
-        "https://github.com/Arithmomaniac/sefaria-frontend-toolkit#readme",
+        "https://github.com/Sefaria/sefaria-frontend-toolkit#readme",
       );
       expect(manifest.files).toEqual(files);
 

@@ -2,8 +2,8 @@ import {
   configureSefariaDataSource,
   type SefariaDataSource,
   type SefariaDataLoader,
-} from "@arithmomaniac/sefaria-web-components/data-source";
-import * as root from "@arithmomaniac/sefaria-web-components";
+} from "@sefaria/web-components/data-source";
+import * as root from "@sefaria/web-components";
 import manifest from "../package.json" with { type: "json" };
 import { expect, test } from "vitest";
 

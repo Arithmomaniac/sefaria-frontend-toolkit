@@ -1,10 +1,7 @@
 import Alpine from "alpinejs";
-import {
-  createSefariaClient,
-  zCoreV3TextsResponse,
-} from "@arithmomaniac/sefaria-client";
-import "@arithmomaniac/sefaria-web-components";
-import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
+import { createSefariaClient, zCoreV3TextsResponse } from "@sefaria/api-client";
+import "@sefaria/web-components";
+import type { SefariaSourceCard } from "@sefaria/web-components";
 import { afterEach, expect, test, vi } from "vitest";
 
 import { createMicahFixtureFetch } from "./fixture-transport.js";

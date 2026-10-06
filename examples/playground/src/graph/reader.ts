@@ -1,1 +1,1 @@
-export * from "@arithmomaniac/sefaria-web-components/reader";
+export * from "@sefaria/web-components/reader";

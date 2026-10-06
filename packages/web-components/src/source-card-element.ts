@@ -1,4 +1,4 @@
-import type { CoreV3TextsResponse } from "@arithmomaniac/sefaria-client";
+import type { CoreV3TextsResponse } from "@sefaria/api-client";
 import {
   css,
   html,
@@ -6,7 +6,7 @@ import {
   type PropertyValues,
   type TemplateResult,
 } from "lit";
-import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
+import type { VocalizationMode } from "@sefaria/text-transform";
 import { repeat } from "lit/directives/repeat.js";
 
 import type { SefariaDataSource } from "./data-source.js";
@@ -50,7 +50,7 @@ import {
 /**
  * Shows a passage as a card. The card has a heading, the text in the primary edition, a translation, and the title of each edition shown. When an edition's source is a valid http(s) address, the title links to it. Any other source appears as plain text.
  *
- * @data `data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@arithmomaniac/sefaria-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
+ * @data `data` takes the body of a successful `GET /api/v3/texts/{tref}` response, typed `CoreV3TextsResponse` from `@sefaria/api-client`. When `data` is defined, the element uses it instead of loading `sref`, even when it is invalid. It treats the value as a status 200 response.
  * @empty The element shows its empty state when the response has no text for either side. The card keeps its heading and edition details. It shows why each side is missing, such as `No primary text is available.`
  * @fires sefaria-source-select - Reports that a reader selected one item in the source card.
  * @eventDetail sefaria-source-select - `position` is the selected segment's position as an array of numbers. `ref` is its reference.

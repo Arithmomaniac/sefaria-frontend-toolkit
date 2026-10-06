@@ -1,13 +1,13 @@
 import {
   validateGetV3Texts200,
   type CoreV3TextsResponse,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 import {
   applyVocalization,
   applyVocalizationToHtml,
   normalizeText,
   type PaseqMode,
-} from "@arithmomaniac/sefaria-text-transform";
+} from "@sefaria/text-transform";
 
 import {
   compareText,

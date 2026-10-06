@@ -26,9 +26,9 @@ describe("private Changesets configuration", () => {
     });
     expect(config.fixed).toEqual([
       [
-        "@arithmomaniac/sefaria-client",
-        "@arithmomaniac/sefaria-text-transform",
-        "@arithmomaniac/sefaria-web-components",
+        "@sefaria/api-client",
+        "@sefaria/text-transform",
+        "@sefaria/web-components",
       ],
     ]);
   });

@@ -2,7 +2,7 @@ import {
   calendars,
   createSefariaClient,
   type SefariaClient,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 
 const PORTION_TITLE = "Parashat Hashavua";
 

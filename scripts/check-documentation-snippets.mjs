@@ -27,13 +27,13 @@ try {
   const scopeDirectory = path.join(
     temporaryDirectory,
     "node_modules",
-    "@arithmomaniac",
+    "@sefaria",
   );
   await mkdir(scopeDirectory, { recursive: true });
   for (const [directory, packageName] of [
-    ["client", "sefaria-client"],
-    ["text-transform", "sefaria-text-transform"],
-    ["web-components", "sefaria-web-components"],
+    ["client", "api-client"],
+    ["text-transform", "text-transform"],
+    ["web-components", "web-components"],
   ]) {
     await symlink(
       path.join(root, "packages", directory),

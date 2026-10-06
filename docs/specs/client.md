@@ -4,11 +4,11 @@
 
 ## Status
 
-This specification defines the implemented `@arithmomaniac/sefaria-client` contract.
+This specification defines the implemented `@sefaria/api-client` contract.
 
 ## Responsibility
 
-`@arithmomaniac/sefaria-client` owns the complete public API transport boundary:
+`@sefaria/api-client` owns the complete public API transport boundary:
 
 - the commit-pinned upstream OpenAPI input
 - the checksum for that input
@@ -190,7 +190,7 @@ The public client exports generated namespace objects named `text`, `index`, `re
 The creation contract has this shape:
 
 ```ts
-import { createSefariaClient, text } from "@arithmomaniac/sefaria-client";
+import { createSefariaClient, text } from "@sefaria/api-client";
 
 const client = createSefariaClient({
   baseUrl: "https://www.sefaria.org",
@@ -281,7 +281,7 @@ Reduced deployed captures preserve the nullable version metadata, HTTP 200 error
 
 ## Completion criteria
 
-`@arithmomaniac/sefaria-client` is complete for the pinned OpenAPI scope when:
+`@sefaria/api-client` is complete for the pinned OpenAPI scope when:
 
 - the repository contains the pinned input and checksum
 - ordinary generation uses no network

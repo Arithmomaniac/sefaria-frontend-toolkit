@@ -19,7 +19,7 @@ The toolkit generates the client from Sefaria's published API description, an Op
 
 This page documents the code on the `main` branch, which `alpha` builds are published from. <ReleaseStamp />
 
-The `alpha` script-tag address serves the newest script release that is still active. Compare the stamp above with the version in the [script-tag versions index](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/index.html). Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since.
+The `alpha` script-tag address serves the newest script release that is still active. Compare the stamp above with the version in the [script-tag versions index](https://sefaria.github.io/sefaria-frontend-toolkit/cdn/index.html). Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since.
 
 ## The pinned source
 
@@ -2264,4 +2264,4 @@ Source checks:
 - [Reference › Client](/reference/client.md) lists the generated functions.
 - [Handle errors in your code](/data-and-text-tools/handle-errors-in-your-code.md) shows what happens when a response doesn't match the corrected description.
 - [Sefaria's developer documentation](https://developers.sefaria.org/) describes the API itself.
-- The corrections are defined in [`packages/client/openapi/overlay.yaml`](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/packages/client/openapi/overlay.yaml).
+- The corrections are defined in [`packages/client/openapi/overlay.yaml`](https://github.com/Sefaria/sefaria-frontend-toolkit/blob/main/packages/client/openapi/overlay.yaml).

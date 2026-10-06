@@ -22,10 +22,12 @@ The CDN serves three ES-module files from one folder. Choose by goal.
 | File | How to load it | What you get |
 | --- | --- | --- |
 | `sefaria-elements.js` | `<script type="module" src="…">` | Loading it registers all five tags. It also exports the element classes and `configureSefariaDataSource`. |
-| `sefaria-client.js` | `import { createSefariaClient, text, validateExternalResponse } from "…"` | Named client functions. It registers nothing. |
+| `sefaria-api-client.js` | `import { createSefariaClient, text, validateExternalResponse } from "…"` | Named client functions. It registers nothing. |
 | `sefaria-text-transform.js` | `import { normalizeText, applyVocalization, applyVocalizationToHtml, createTextPreview } from "…"` | Named text functions. It registers nothing. |
 
-All three are ES modules and These files don't create a global variable. A plain `<script>` without `type="module"` does not work. Use `<script type="module">` or `import`. No token is needed.
+All three are ES modules. These files don't create a global variable. A plain `<script>` without `type="module"` does not work. Use `<script type="module">` or `import`. No token is needed.
+
+The client filename changes to `sefaria-api-client.js` in the next qualified Sefaria release. Retained older releases use `sefaria-client.js` instead. Until that release is activated, use an older pinned version with its original client filename rather than the new alpha client URL below.
 
 ### Load the files
 
@@ -34,18 +36,18 @@ To show components, add the elements file:
 ```html
 <script
   type="module"
-  src="https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
+  src="https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
 ></script>
 ```
 
 To call the client or text tools, import them:
 
 ```js
-import { createSefariaClient } from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-client.js";
-import { normalizeText } from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-text-transform.js";
+import { createSefariaClient } from "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-api-client.js";
+import { normalizeText } from "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-text-transform.js";
 ```
 
-To take everything from one file, use `import * as client from "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-client.js"`.
+To take everything from one file, use `import * as client from "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-api-client.js"`.
 
 Components need only `sefaria-elements.js`. It bundles its own copy of the client and text code. If your page also imports the client or text files directly, that shared code downloads twice.
 
@@ -58,30 +60,30 @@ The `alpha` address serves the newest build, and it changes without notice. To s
 ```html
 <script
   type="module"
-  src="https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/0.0.0-alpha.36918501033.1/sefaria-elements.js"
+  src="https://sefaria.github.io/sefaria-frontend-toolkit/cdn/0.0.0-alpha.36918501033.1/sefaria-elements.js"
 ></script>
 ```
 
-To find versions, open [the list of hosted versions](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/index.html). It shows which versions are active and which version the `alpha` address serves right now. Programs can read the same list as JSON from [catalog.json](https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/catalog.json).
+To find versions, open [the list of hosted versions](https://sefaria.github.io/sefaria-frontend-toolkit/cdn/index.html). It shows which versions are active and which version the `alpha` address serves right now. Programs can read the same list as JSON from [catalog.json](https://sefaria.github.io/sefaria-frontend-toolkit/cdn/catalog.json).
 
 Pinned addresses stay available while their version is active. A version can be retired without notice.
 
 ## Packages
 
-The toolkit has three packages: `@arithmomaniac/sefaria-client`, `@arithmomaniac/sefaria-text-transform`, and `@arithmomaniac/sefaria-web-components`. They are published to GitHub Packages as prereleases. They are not published on npmjs.com.
+The toolkit has three packages: `@sefaria/api-client`, `@sefaria/text-transform`, and `@sefaria/web-components`. First publication under these names is pending qualification. Use the commands below after the Sefaria package pages list a verified synchronized prerelease. They are not published on npmjs.com.
 
 GitHub Packages asks for a token, even for public packages. Create a personal access token with the `read:packages` scope ([GitHub's steps](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-npm-registry#authenticating-to-github-packages)). Then add this to your `.npmrc`. Set `NODE_AUTH_TOKEN` to your token:
 
 ```ini
-@arithmomaniac:registry=https://npm.pkg.github.com
+@sefaria:registry=https://npm.pkg.github.com
 //npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
 ```
 
-Install an exact version. Copy the newest version number from the [package page on GitHub](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/pkgs/npm/sefaria-web-components). All three packages share the same version. Leave out the packages you don't need. Yarn and pnpm work too, with their usual install commands.
+Install an exact version. Copy the newest version number from the [package page on GitHub](https://github.com/Sefaria/sefaria-frontend-toolkit/pkgs/npm/web-components). All three packages share the same version. Leave out the packages you don't need. Yarn and pnpm work too, with their usual install commands.
 
 ```sh
 version="0.0.0-alpha.<run-id>.<run-attempt>"
-npm install "@arithmomaniac/sefaria-client@$version" "@arithmomaniac/sefaria-text-transform@$version" "@arithmomaniac/sefaria-web-components@$version"
+npm install "@sefaria/api-client@$version" "@sefaria/text-transform@$version" "@sefaria/web-components@$version"
 ```
 
 The packages also carry an `alpha` tag that follows the newest build. An exact version pins the toolkit release. Commit your lockfile and install from it to fix the other dependencies too. For example, run `npm ci`. pnpm and Yarn 1 read the same `.npmrc` scope line. Yarn 2 and later use their own setting, [`npmScopes`](https://yarnpkg.com/configuration/yarnrc#npmScopes). Types are included, so no `@types` package is needed.
@@ -95,6 +97,10 @@ If you get a 401, 403, or `E404` error, check:
 
 For import paths, see [Package imports and exports](/reference/package-imports-and-exports.md). For framework setup, see [Use with a framework](/use-components/use-with-a-framework.md).
 
+### Future npm and CDN delivery
+
+The packages include standalone browser files under `dist/browser`, but publication on npmjs.com is not enabled yet. Once published there, npm-backed CDNs such as jsDelivr and UNPKG can serve those files without a separate upload. The client file is `dist/browser/sefaria-api-client.js`, the text file is `dist/browser/sefaria-text-transform.js`, and the components file is `dist/browser/sefaria-elements.js`. A future launch still needs Sefaria's npm namespace access, publishing authorization, and hosted qualification. Third-party CDNs may retain files after deletion. The Pages retirement policy does not apply to them.
+
 ## Runtimes
 
 The components need a browser. The client and text tools run in JavaScript runtimes. In other languages, call [Sefaria's API](https://developers.sefaria.org) directly.
@@ -105,11 +111,11 @@ Deno, Bun, and edge runtimes such as Cloudflare Workers are not tested in CI. Th
 
 ## What alpha means
 
-The toolkit is experimental and unofficial. It is developed in collaboration with Sefaria, but it is not an official Sefaria product. One maintainer looks after it. Names and addresses may change. The package names on this page are current as of commit `455f036`.
+A community-driven project with Sefaria backing and support. The toolkit is experimental. Names and APIs may change. Sefaria owns the toolkit. This does not promise a support SLA.
 
 ## License and text rights {#license-and-text-rights}
 
-The toolkit is licensed under GPL-3.0-only. If you distribute a combined work that includes the toolkit, you generally license the whole work under GPLv3. You also provide its source. Separate programs that only ship alongside it are different. This is not legal advice. Read the [GNU GPL text](https://www.gnu.org/licenses/gpl-3.0.html) and the toolkit's [LICENSE](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/LICENSE), and ask a lawyer if you're unsure. Each script version folder includes `LICENSE.txt` and `THIRD-PARTY-NOTICES.txt`.
+New toolkit releases use the [MIT license](https://github.com/Sefaria/sefaria-frontend-toolkit/blob/main/LICENSE), copyright Sefaria. Keep the copyright and permission notice when redistributing the software. Dependencies retain their own licenses and notices. Each script version folder includes `LICENSE.txt` and `THIRD-PARTY-NOTICES.txt`. Older releases retain the original license shipped in that folder, including GPL releases.
 
 The rights to the texts are separate. Each Sefaria edition has its own license, so check the edition you display. On sefaria.org, open a passage and choose "About this Text" to see the current version's license. Sefaria's [Copyright and Data Use](https://developers.sefaria.org/docs/usage-of-our-name-and-logo) page explains the rules for using its data.
 

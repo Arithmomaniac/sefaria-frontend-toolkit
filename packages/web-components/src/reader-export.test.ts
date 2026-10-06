@@ -1,8 +1,8 @@
 import {
   createSefariaReaderRecordLoader,
   resolveReaderSource,
-} from "@arithmomaniac/sefaria-web-components/reader";
-import * as reader from "@arithmomaniac/sefaria-web-components/reader";
+} from "@sefaria/web-components/reader";
+import * as reader from "@sefaria/web-components/reader";
 import { expect, test } from "vitest";
 
 test("exports DOM-free raw Reader source and qualification", () => {

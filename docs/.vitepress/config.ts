@@ -7,7 +7,7 @@ import { withMermaid } from "vitepress-plugin-mermaid";
 import { normalizeSiteBasePath } from "../../scripts/build-site-plan.mjs";
 import { removeLeadingProvenanceBlock } from "./provenance";
 
-const repository = "https://github.com/Arithmomaniac/sefaria-frontend-toolkit";
+const repository = "https://github.com/Sefaria/sefaria-frontend-toolkit";
 const branch = "main";
 const repositoryRoot = path.resolve(import.meta.dirname, "..", "..");
 const siteBasePath = normalizeSiteBasePath(process.env.SITE_BASE_PATH);

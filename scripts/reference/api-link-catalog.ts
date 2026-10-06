@@ -32,9 +32,9 @@ interface PublicExports {
   }[];
 }
 
-const CLIENT_PACKAGE = "@arithmomaniac/sefaria-client";
-const TEXT_TRANSFORM_PACKAGE = "@arithmomaniac/sefaria-text-transform";
-const WEB_COMPONENTS_PACKAGE = "@arithmomaniac/sefaria-web-components";
+const CLIENT_PACKAGE = "@sefaria/api-client";
+const TEXT_TRANSFORM_PACKAGE = "@sefaria/text-transform";
+const WEB_COMPONENTS_PACKAGE = "@sefaria/web-components";
 const CLIENT_REFERENCE_NAMES = new Set([
   "calendars",
   "collections",

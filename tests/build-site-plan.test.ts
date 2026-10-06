@@ -39,7 +39,7 @@ describe("documentation site build plan", () => {
   it("keeps typechecking in standalone builds and skips it after pnpm check", () => {
     expect(createSiteBuildSteps({ skipTypecheck: false })).toContainEqual({
       kind: "pnpm",
-      args: ["--filter", "@arithmomaniac/sefaria-web-components", "build"],
+      args: ["--filter", "@sefaria/web-components", "build"],
     });
     expect(createSiteBuildSteps({ skipTypecheck: false })).toContainEqual({
       kind: "pnpm",
@@ -47,7 +47,7 @@ describe("documentation site build plan", () => {
     });
     expect(createSiteBuildSteps({ skipTypecheck: true })).not.toContainEqual({
       kind: "pnpm",
-      args: ["--filter", "@arithmomaniac/sefaria-web-components", "build"],
+      args: ["--filter", "@sefaria/web-components", "build"],
     });
     expect(createSiteBuildSteps({ skipTypecheck: true })).not.toContainEqual({
       kind: "pnpm",
@@ -82,9 +82,26 @@ describe("documentation site build plan", () => {
     );
   });
 
+  it("produces browser evidence after package cleanup only in standalone builds", () => {
+    const steps = createSiteBuildSteps({ skipTypecheck: false });
+    expect(steps.slice(0, 5)).toEqual([
+      { kind: "pnpm", args: ["--filter", "@sefaria/api-client", "build"] },
+      { kind: "pnpm", args: ["--filter", "@sefaria/text-transform", "build"] },
+      { kind: "pnpm", args: ["--filter", "@sefaria/web-components", "build"] },
+      { kind: "package-browser" },
+      { kind: "script-source" },
+    ]);
+    expect(steps.filter(({ kind }) => kind === "package-browser")).toHaveLength(
+      1,
+    );
+    const prebuilt = createSiteBuildSteps({ skipTypecheck: true });
+    expect(prebuilt[0]).toEqual({ kind: "script-source" });
+    expect(prebuilt).not.toContainEqual({ kind: "package-browser" });
+  });
+
   it("requires real pages rather than accepting an HTML fallback", () => {
     expect(SITE_REQUIRED_FILES).not.toContain("README.html");
-    expect(SITE_REQUIRED_FILES).toContain("cdn/local/sefaria-client.js");
+    expect(SITE_REQUIRED_FILES).toContain("cdn/local/sefaria-api-client.js");
     expect(SITE_REQUIRED_FILES).toContain(
       "cdn/local/sefaria-text-transform.js",
     );

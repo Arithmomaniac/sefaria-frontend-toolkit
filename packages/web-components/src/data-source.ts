@@ -1,4 +1,4 @@
-import type { SefariaClient } from "@arithmomaniac/sefaria-client";
+import type { SefariaClient } from "@sefaria/api-client";
 
 import { setPendingSefariaDataSource } from "./data-source-state.js";
 

@@ -3,7 +3,7 @@ import {
   type CoreLinkResponse,
   type CoreV3TextsResponse,
   type SefariaClient,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 
 import type { SefariaDataLoader } from "./data-source.js";
 import { validateSuppliedComponentData } from "./component-controller.js";

@@ -1,6 +1,6 @@
 import { readFile } from "node:fs/promises";
 
-import { createSefariaClient } from "@arithmomaniac/sefaria-client";
+import { createSefariaClient } from "@sefaria/api-client";
 import { describe, expect, it, vi } from "vitest";
 
 import { showWeeklyPortion } from "./app.js";

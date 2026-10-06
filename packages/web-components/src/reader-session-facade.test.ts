@@ -3,7 +3,7 @@ import {
   zCoreLinkResponse,
   type CoreLinkResponse,
   type CoreV3TextsResponse,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 import { expect, test } from "vitest";
 
 import linksFixture from "../../client/test/fixtures/links-targum-2026-08-30.json";

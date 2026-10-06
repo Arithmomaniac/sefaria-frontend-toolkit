@@ -1,8 +1,5 @@
-import {
-  zCoreLinkResponse,
-  zCoreV3TextsResponse,
-} from "@arithmomaniac/sefaria-client";
-import "@arithmomaniac/sefaria-web-components";
+import { zCoreLinkResponse, zCoreV3TextsResponse } from "@sefaria/api-client";
+import "@sefaria/web-components";
 import sourcePayload from "./micah-6-8.js";
 import linksPayload from "./links.js";
 

@@ -1,7 +1,7 @@
 import type {
   CoreLinkResponse,
   CoreV3TextsResponse,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 
 import type {
   BilingualPairContentLanguage,
@@ -20,7 +20,7 @@ import {
   type SourceCardRequest,
   type SourceCardViewModel,
 } from "./source-card.js";
-import type { VocalizationMode } from "@arithmomaniac/sefaria-text-transform";
+import type { VocalizationMode } from "@sefaria/text-transform";
 import { serializeSourceCardSelectors } from "./source-card-request.js";
 
 const DEFAULT_MAX_ENTRIES = 20;

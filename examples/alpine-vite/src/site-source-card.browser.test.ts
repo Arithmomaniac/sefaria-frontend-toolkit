@@ -1,6 +1,6 @@
 import Alpine from "alpinejs";
-import "@arithmomaniac/sefaria-web-components";
-import type { SefariaSourceCard } from "@arithmomaniac/sefaria-web-components";
+import "@sefaria/web-components";
+import type { SefariaSourceCard } from "@sefaria/web-components";
 import { afterEach, expect, test, vi } from "vitest";
 
 import fixture from "../../../tests/site-fixtures/micah-6-6-8-2026-09-29.json";

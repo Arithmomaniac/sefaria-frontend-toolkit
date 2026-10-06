@@ -59,7 +59,7 @@ export const EXAMPLE_BUILDS = [
 
 export const SITE_REQUIRED_FILES = [
   "cdn/local/sefaria-elements.js",
-  "cdn/local/sefaria-client.js",
+  "cdn/local/sefaria-api-client.js",
   "cdn/local/sefaria-text-transform.js",
   "cdn/local/manifest.json",
   "cdn/local/LICENSE.txt",
@@ -108,15 +108,16 @@ export function createSiteBuildSteps({ skipTypecheck, siteBasePath = "/" }) {
   const steps = [];
   if (!skipTypecheck) {
     for (const packageName of [
-      "@arithmomaniac/sefaria-client",
-      "@arithmomaniac/sefaria-text-transform",
-      "@arithmomaniac/sefaria-web-components",
+      "@sefaria/api-client",
+      "@sefaria/text-transform",
+      "@sefaria/web-components",
     ]) {
       steps.push({
         kind: "pnpm",
         args: ["--filter", packageName, "build"],
       });
     }
+    steps.push({ kind: "package-browser" });
   }
   steps.push({ kind: "script-source" });
   for (const example of EXAMPLE_BUILDS) {

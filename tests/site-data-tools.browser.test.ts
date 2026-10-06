@@ -1,9 +1,6 @@
 import { expect, test, vi } from "vitest";
 
-import type {
-  SefariaReader,
-  SefariaSourceCard,
-} from "@arithmomaniac/sefaria-web-components";
+import type { SefariaReader, SefariaSourceCard } from "@sefaria/web-components";
 
 import micah from "./site-fixtures/micah-6-8-2026-09-28.json";
 import { createMcpReaderSource } from "../examples/mcp-app/src/app.js";

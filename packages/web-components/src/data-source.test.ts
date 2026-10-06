@@ -1,4 +1,4 @@
-import { createSefariaClient } from "@arithmomaniac/sefaria-client";
+import { createSefariaClient } from "@sefaria/api-client";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 describe("shared source", () => {

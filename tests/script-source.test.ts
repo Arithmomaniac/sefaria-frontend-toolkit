@@ -1,4 +1,4 @@
-import { cp, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { cp, mkdtemp, readFile, rename, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -56,15 +56,15 @@ describe("production script source", () => {
     expect(notices).toContain("MIT");
     expect(
       await readFile(path.join(directory, "LICENSE.txt"), "utf8"),
-    ).toContain("GNU GENERAL PUBLIC LICENSE");
+    ).toContain("MIT License");
   });
 
   it("emits self-contained client and text-transform modules in the manifest", async () => {
     const manifest = await verifyScriptSource(directory);
-    expect(manifest.schemaVersion).toBe(2);
+    expect(manifest.schemaVersion).toBe(3);
     expect(Object.keys(manifest.entries)).toEqual([
       "sefaria-elements.js",
-      "sefaria-client.js",
+      "sefaria-api-client.js",
       "sefaria-text-transform.js",
     ]);
     for (const name of Object.keys(manifest.entries)) {
@@ -98,12 +98,12 @@ describe("production script source", () => {
   });
 
   it("rejects a changed client module", async () => {
-    const entry = path.join(directory, "sefaria-client.js");
+    const entry = path.join(directory, "sefaria-api-client.js");
     const original = await readFile(entry);
     try {
       await writeFile(entry, Buffer.concat([original, Buffer.from("\n")]));
       await expect(verifyScriptSource(directory)).rejects.toThrow(
-        "sefaria-client.js",
+        "sefaria-api-client.js",
       );
     } finally {
       await writeFile(entry, original);
@@ -116,11 +116,11 @@ describe("production script source", () => {
       const candidate = path.join(temporary, "release");
       await cp(directory, candidate, { recursive: true });
       const current = await verifyScriptSource(candidate);
-      for (const name of ["sefaria-client.js", "sefaria-text-transform.js"])
+      for (const name of ["sefaria-api-client.js", "sefaria-text-transform.js"])
         await rm(path.join(candidate, name));
       const { entries: _entries, ...rest } = current;
       const files = { ...current.files };
-      delete files["sefaria-client.js"];
+      delete files["sefaria-api-client.js"];
       delete files["sefaria-text-transform.js"];
       await writeFile(
         path.join(candidate, "manifest.json"),
@@ -155,7 +155,7 @@ describe("production script source", () => {
         download: async () => archive,
       });
       await expect(
-        readFile(path.join(temporary, "cdn", "alpha", "sefaria-client.js")),
+        readFile(path.join(temporary, "cdn", "alpha", "sefaria-api-client.js")),
       ).rejects.toThrow();
     } finally {
       await rm(temporary, { recursive: true, force: true });
@@ -190,6 +190,26 @@ describe("production script source", () => {
         const candidate = path.join(temporary, version);
         await cp(directory, candidate, { recursive: true });
         const manifest = await verifyScriptSource(candidate);
+        if (id === 1) {
+          await rename(
+            path.join(candidate, "sefaria-api-client.js"),
+            path.join(candidate, "sefaria-client.js"),
+          );
+          manifest.schemaVersion = 2;
+          manifest.entries["sefaria-client.js"] =
+            manifest.entries["sefaria-api-client.js"];
+          delete manifest.entries["sefaria-api-client.js"];
+          manifest.files["sefaria-client.js"] =
+            manifest.files["sefaria-api-client.js"];
+          delete manifest.files["sefaria-api-client.js"];
+          const historicalLicense =
+            "GNU GENERAL PUBLIC LICENSE\nVersion 3\nHistorical release fixture\n";
+          await writeFile(
+            path.join(candidate, "LICENSE.txt"),
+            historicalLicense,
+          );
+          manifest.files["LICENSE.txt"] = sha256(historicalLicense);
+        }
         manifest.version = version;
         const entry = path.join(candidate, manifest.entry);
         const bytes = Buffer.concat([
@@ -270,6 +290,16 @@ describe("production script source", () => {
         download: async (record: { version: string }) =>
           archives.get(record.version),
       });
+      expect(
+        await readFile(
+          path.join(temporary, "cdn", "alpha", "sefaria-client.js"),
+        ),
+      ).toEqual(
+        await readFile(path.join(temporary, oldVersion, "sefaria-client.js")),
+      );
+      await expect(
+        readFile(path.join(temporary, "cdn", "alpha", "sefaria-api-client.js")),
+      ).rejects.toThrow();
       await expect(
         readFile(
           path.join(temporary, "cdn", newVersion, "sefaria-elements.js"),

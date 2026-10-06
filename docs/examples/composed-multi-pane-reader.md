@@ -20,7 +20,7 @@ On wide screens the panes sit side by side and scroll on their own. Selecting a 
 
 On narrow screens, path buttons choose the visible pane. Returning to an earlier passage removes the panes opened after that passage.
 
-It is a complete app (Vite and TypeScript) in `examples/reader`. You can't edit it on this page. [Read the source on GitHub](https://github.com/Arithmomaniac/sefaria-frontend-toolkit/tree/main/examples/reader).
+It is a complete app (Vite and TypeScript) in `examples/reader`. You can't edit it on this page. [Read the source on GitHub](https://github.com/Sefaria/sefaria-frontend-toolkit/tree/main/examples/reader).
 
 <iframe :src="withBase('/examples/reader/')" title="Composed multi-pane Reader example" sandbox="allow-scripts allow-same-origin allow-popups" loading="lazy" style="width: 100%; height: 640px; border: 1px solid var(--vp-c-divider); border-radius: 8px;"></iframe>
 
@@ -30,7 +30,7 @@ The demo makes no Sefaria request until you choose "Start live demo". The refere
 
 ## How it works
 
-The example uses a Reader session. You create one with `createReaderSession` from `@arithmomaniac/sefaria-web-components/reader-session`. A session is plain data and functions, with no elements. It keeps the reading history, selected passage, and captured source and connections records. It also keeps each connections pane's category and page, and holds pins that keep the session from discarding entries.
+The example uses a Reader session. You create one with `createReaderSession` from `@sefaria/web-components/reader-session`. A session is plain data and functions, with no elements. It keeps the reading history, selected passage, and captured source and connections records. It also keeps each connections pane's category and page, and holds pins that keep the session from discarding entries.
 
 A session doesn't make requests and has no events. You fetch the data yourself and hand it to the session. Each change returns a new session value that you keep. The [complete Reader](/use-components/add-the-complete-reader.md) wraps a session in a controller that also handles loading.
 

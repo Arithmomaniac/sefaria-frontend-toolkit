@@ -45,18 +45,18 @@ describe("B14 Install and status", () => {
     );
   });
 
-  it("states GPL-3.0-only, matching every package manifest", async () => {
+  it("states MIT for new releases, matching every package manifest", async () => {
     const rights = section(await page(), "license-and-text-rights");
-    expect(rights).toContain("GPL-3.0-only");
+    expect(rights).toContain("MIT license");
     const manifests = ["client", "text-transform", "web-components"].map(
       (name) => path.join("packages", name, "package.json"),
     );
     expect(await read("LICENSE")).toMatch(
-      /GNU GENERAL PUBLIC LICENSE\s+Version 3/,
+      /MIT License\s+Copyright \(c\) 2026 Sefaria/,
     );
     for (const manifest of manifests) {
       const json = JSON.parse(await read(manifest)) as { license?: string };
-      expect(json.license, manifest).toBe("GPL-3.0-only");
+      expect(json.license, manifest).toBe("MIT");
     }
   });
 
@@ -314,14 +314,14 @@ describe("B22 Start with an AI assistant", () => {
   it("keeps the prompt pointed at the toolkit, not raw API code", async () => {
     const text = await prompt();
     expect(text).toContain(
-      "https://arithmomaniac.github.io/sefaria-frontend-toolkit/llms.txt",
+      "https://sefaria.github.io/sefaria-frontend-toolkit/llms.txt",
     );
     expect(text).toContain("Micah 6:8");
     expect(text).toContain("<sefaria-source-card");
     expect(text).toContain(
-      "https://arithmomaniac.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js",
+      "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js",
     );
-    expect(text).toContain('import "@arithmomaniac/sefaria-web-components";');
+    expect(text).toContain('import "@sefaria/web-components";');
     expect(text).toMatch(/attribution/i);
     expect(text).not.toMatch(/Genesis 1:1/);
   });
@@ -529,7 +529,7 @@ describe("B15 Troubleshoot a page", () => {
   it("closes with a support section that asks for a useful report", async () => {
     const support = section(await page(), "get-support");
     expect(support).toContain(
-      "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/issues/new",
+      "https://github.com/Sefaria/sefaria-frontend-toolkit/issues/new",
     );
     for (const item of [
       /reference/i,

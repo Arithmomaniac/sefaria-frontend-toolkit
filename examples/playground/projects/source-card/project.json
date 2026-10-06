@@ -14,6 +14,6 @@
       "path": "micah-6-8.js"
     }
   ],
-  "sourceBaseUrl": "https://github.com/Arithmomaniac/sefaria-frontend-toolkit/blob/main/examples/playground/projects/source-card/",
+  "sourceBaseUrl": "https://github.com/Sefaria/sefaria-frontend-toolkit/blob/main/examples/playground/projects/source-card/",
   "liveDemoUrl": "../explorer/source-card.html"
 }

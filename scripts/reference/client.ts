@@ -51,7 +51,7 @@ async function clientSubpathBullets(): Promise<string[]> {
     ),
   ) as PublicExportsInventory;
   const client = inventory.packages.find(
-    (entry) => entry.name === "@arithmomaniac/sefaria-client",
+    (entry) => entry.name === "@sefaria/api-client",
   );
   if (!client) throw new Error("public-exports.json has no client package.");
   return client.exports
@@ -59,7 +59,7 @@ async function clientSubpathBullets(): Promise<string[]> {
     .map(
       (entry) =>
         `- ${entry.declarations.map((name) => `\`${name}\``).join(", ")} from ` +
-        `\`@arithmomaniac/sefaria-client${entry.subpath === "." ? "" : `/${entry.subpath.slice(2)}`}\`.`,
+        `\`@sefaria/api-client${entry.subpath === "." ? "" : `/${entry.subpath.slice(2)}`}\`.`,
     );
 }
 
@@ -151,7 +151,7 @@ async function namespaceTables(): Promise<{
 
 export async function renderClientReference(): Promise<string> {
   const [surface, tables, subpathBullets] = await Promise.all([
-    renderTypeDoc("client.ts", "@arithmomaniac/sefaria-client", 3, [
+    renderTypeDoc("client.ts", "@sefaria/api-client", 3, [
       "createSefariaClient",
       "SefariaClientOptions",
       "SefariaCacheOptions",
@@ -161,7 +161,7 @@ export async function renderClientReference(): Promise<string> {
     clientSubpathBullets(),
   ]);
   const body = [
-    "This page describes how to create a client with `@arithmomaniac/sefaria-client` and set its options. It also describes the error for a response that doesn't match its contract, the validation helpers, and the generated API functions.",
+    "This page describes how to create a client with `@sefaria/api-client` and set its options. It also describes the error for a response that doesn't match its contract, the validation helpers, and the generated API functions.",
     "",
     releaseSection(),
     "",
@@ -187,9 +187,9 @@ export async function renderClientReference(): Promise<string> {
     "",
     "The package root also exports the generated types, schemas, and validators. This page doesn't list them one by one.",
     "",
-    "- **Types**, such as `GetV3TextsData` and `GetV3TextsResponses`, are TypeScript types. The package exports them from the root and from `@arithmomaniac/sefaria-client/contracts`.",
-    "- **Zod schemas** have names starting with `z`, such as `zCoreV3TextsResponse`. The package exports them from the root and from `@arithmomaniac/sefaria-client/schemas`.",
-    "- **Validators** have names such as `validateGetV3Texts200`, which is the function name plus the status. The package exports them from the root and from `@arithmomaniac/sefaria-client/validators`.",
+    "- **Types**, such as `GetV3TextsData` and `GetV3TextsResponses`, are TypeScript types. The package exports them from the root and from `@sefaria/api-client/contracts`.",
+    "- **Zod schemas** have names starting with `z`, such as `zCoreV3TextsResponse`. The package exports them from the root and from `@sefaria/api-client/schemas`.",
+    "- **Validators** have names such as `validateGetV3Texts200`, which is the function name plus the status. The package exports them from the root and from `@sefaria/api-client/validators`.",
     "",
     "[Reference › Package imports and exports](/reference/package-imports-and-exports.md) lists every subpath.",
     "",
@@ -204,7 +204,7 @@ export async function renderClientReference(): Promise<string> {
     title: "Reference › Client",
     heading: "Client reference",
     description:
-      "The client API of @arithmomaniac/sefaria-client, and its generated functions grouped by Sefaria's API sections.",
+      "The client API of @sefaria/api-client, and its generated functions grouped by Sefaria's API sections.",
     body,
   });
 }

@@ -30,7 +30,7 @@ describe("Wave 4 integration policy", () => {
   it("requires private manifests and built package exports", () => {
     const valid = {
       "packages/client/package.json": {
-        name: "@arithmomaniac/sefaria-client",
+        name: "@sefaria/api-client",
         private: true,
         files: ["dist", "README.md"],
         exports: {
@@ -60,11 +60,25 @@ describe("Wave 4 integration policy", () => {
   });
 
   it("parses workflow structure and rejects publication capabilities", async () => {
-    const [workflow, pagesWorkflow, setupWorkflow] = await Promise.all([
+    const [
+      workflow,
+      pagesWorkflow,
+      setupWorkflow,
+      validationWorkflow,
+      publicationWorkflow,
+    ] = await Promise.all([
       readFile(path.join(root, ".github", "workflows", "ci.yml"), "utf8"),
       readFile(path.join(root, ".github", "workflows", "pages.yml"), "utf8"),
       readFile(
         path.join(root, ".github", "workflows", "copilot-setup-steps.yml"),
+        "utf8",
+      ),
+      readFile(
+        path.join(root, ".github", "workflows", "validate-toolkit.yml"),
+        "utf8",
+      ),
+      readFile(
+        path.join(root, ".github", "workflows", "publish-packages.yml"),
         "utf8",
       ),
     ]);
@@ -73,14 +87,16 @@ describe("Wave 4 integration policy", () => {
         "ci.yml": workflow,
         "pages.yml": pagesWorkflow,
         "copilot-setup-steps.yml": setupWorkflow,
+        "validate-toolkit.yml": validationWorkflow,
+        "publish-packages.yml": publicationWorkflow,
       }),
     ).toEqual([]);
     const preflight = "node scripts/package-publication.mjs preflight";
     const firstPublish =
       "pnpm publish .artifacts/publish/client --tag alpha --access public --no-git-checks";
-    expect(workflow.indexOf(preflight)).toBeGreaterThan(-1);
-    expect(workflow.indexOf(preflight)).toBeLessThan(
-      workflow.indexOf(firstPublish),
+    expect(publicationWorkflow.indexOf(preflight)).toBeGreaterThan(-1);
+    expect(publicationWorkflow.indexOf(preflight)).toBeLessThan(
+      publicationWorkflow.indexOf(firstPublish),
     );
     expect(pagesWorkflow).toContain(
       "SITE_BASE_PATH: /sefaria-frontend-toolkit/",
@@ -147,9 +163,8 @@ describe("Wave 4 integration policy", () => {
         /permissions:\r?\n {2}contents: read/u,
         "permissions:\n  contents: write\n  id-token: write",
       )
-      .replace(
-        "- run: pnpm check",
-        "- uses: actions/deploy-pages@v4\n      - run: pnpm publish",
+      .concat(
+        "\n  injected:\n    runs-on: ubuntu-latest\n    steps:\n      - uses: actions/deploy-pages@v4\n      - run: pnpm publish\n",
       );
     expect(validateWorkflowPolicy({ "ci.yml": unsafe })).toEqual(
       expect.arrayContaining([
@@ -224,13 +239,13 @@ describe("Wave 4 integration policy", () => {
     expect(
       validateDocumentationClaims({
         "docs/help/install-and-status.md":
-          'The packages are published on GitHub Packages, not published on npmjs.com. Configure `@arithmomaniac:registry=https://npm.pkg.github.com`, authenticate with a classic token carrying `read:packages`, set `$version`, then run `pnpm add "@arithmomaniac/sefaria-client@$version" "@arithmomaniac/sefaria-text-transform@$version" "@arithmomaniac/sefaria-web-components@$version"`.',
+          'The packages are published on GitHub Packages, not published on npmjs.com. Configure `@sefaria:registry=https://npm.pkg.github.com`, authenticate with a classic token carrying `read:packages`, set `$version`, then run `pnpm add "@sefaria/api-client@$version" "@sefaria/text-transform@$version" "@sefaria/web-components@$version"`.',
       }),
     ).toEqual([]);
     expect(
       validateDocumentationClaims({
         "docs/help/install-and-status.md":
-          'The packages are not published on npmjs.com. Configure `@arithmomaniac:registry=https://npm.pkg.github.com` and use `read:packages`.\n`pnpm add "@arithmomaniac/sefaria-client@$version" "@arithmomaniac/sefaria-text-transform@$version" "@arithmomaniac/sefaria-web-components@$version"`\n`pnpm add @arithmomaniac/sefaria-client`',
+          'The packages are not published on npmjs.com. Configure `@sefaria:registry=https://npm.pkg.github.com` and use `read:packages`.\n`pnpm add "@sefaria/api-client@$version" "@sefaria/text-transform@$version" "@sefaria/web-components@$version"`\n`pnpm add @sefaria/api-client`',
       }),
     ).toEqual([
       "unsupported registry installation command: docs/help/install-and-status.md",
@@ -238,7 +253,7 @@ describe("Wave 4 integration policy", () => {
     expect(
       validateDocumentationClaims({
         "README.md":
-          "This official Sefaria toolkit is deployed documentation.\n```powershell\nnpm install @arithmomaniac/sefaria-client\n```",
+          "This official Sefaria toolkit is deployed documentation.\n```powershell\nnpm install @sefaria/api-client\n```",
       }),
     ).toEqual([
       "unsupported registry installation command: README.md",

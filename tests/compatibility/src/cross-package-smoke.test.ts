@@ -1,11 +1,11 @@
 import {
   validateGetV3Texts200,
   type CoreV3TextsResponse,
-} from "@arithmomaniac/sefaria-client";
+} from "@sefaria/api-client";
 import {
   applyVocalizationToHtml,
   normalizeText,
-} from "@arithmomaniac/sefaria-text-transform";
+} from "@sefaria/text-transform";
 import { expect, it } from "vitest";
 
 import "./no-network.js";
