@@ -1,0 +1,197 @@
+name: Numbered npm release
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Prepare draft assets, publish captured assets, or verify and finalize
+        required: true
+        type: choice
+        options:
+          - prepare
+          - publish
+          - verify-finalize
+      version:
+        description: Exact reviewed Changesets version
+        required: true
+        type: string
+      source:
+        description: Full reviewed current main commit SHA
+        required: true
+        type: string
+      resume:
+        description: Explicitly allow integrity-confirmed existing npm versions
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-release
+  cancel-in-progress: false
+
+env:
+  RELEASE_VERSION: ${{ inputs.version }}
+  RELEASE_SOURCE: ${{ inputs.source }}
+  RELEASE_RESUME: ${{ inputs.resume }}
+
+jobs:
+  guard:
+    if: ${{ github.ref == 'refs/heads/main' && github.event_name == 'workflow_dispatch' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: node scripts/npm-release.mjs assert-source
+
+  prepare:
+    needs: guard
+    if: ${{ inputs.operation == 'prepare' }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: pnpm
+      - run: pnpm setup:agent
+      - run: npm install --global npm@11.5.2
+      - run: node scripts/npm-release.mjs assert-source
+      - run: pnpm check
+        env:
+          SEFARIA_RELEASE_PREPARE: "true"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qualified-npm-${{ runner.os }}
+          path: .artifacts/npm-release/
+          if-no-files-found: error
+          retention-days: 7
+
+  draft:
+    needs: [guard, prepare]
+    if: ${{ always() && needs.guard.result == 'success' && ((inputs.operation == 'prepare' && needs.prepare.result == 'success') || (inputs.operation != 'prepare' && needs.prepare.result == 'skipped')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/download-artifact@v4
+        if: ${{ inputs.operation == 'prepare' }}
+        with:
+          pattern: qualified-npm-*
+          path: .artifacts/platforms
+      - run: node scripts/npm-release.mjs compare-platforms
+        if: ${{ inputs.operation == 'prepare' }}
+      - run: node scripts/npm-release.mjs upload
+        if: ${{ inputs.operation == 'prepare' }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+      - run: node scripts/npm-release.mjs capture
+        if: ${{ inputs.operation != 'prepare' }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - uses: actions/upload-artifact@v4
+        if: ${{ inputs.operation != 'prepare' }}
+        with:
+          name: captured-npm
+          path: .artifacts/npm-release/
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: [guard, draft]
+    if: ${{ always() && inputs.operation == 'publish' && needs.guard.result == 'success' && needs.draft.result == 'success' }}
+    environment: npm-release
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: npm install --global npm@11.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: captured-npm
+          path: .artifacts/npm-release
+      - run: node scripts/npm-release.mjs publish
+
+  verify:
+    needs: [draft, publish]
+    if: ${{ always() && needs.draft.result == 'success' && ((inputs.operation == 'publish' && needs.publish.result == 'success') || (inputs.operation == 'verify-finalize' && needs.publish.result == 'skipped')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: npm install --global npm@11.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: captured-npm
+          path: .artifacts/npm-release
+      - run: node scripts/npm-release.mjs verify
+
+  finalize:
+    needs: [guard, draft, verify]
+    if: ${{ always() && needs.guard.result == 'success' && needs.draft.result == 'success' && needs.verify.result == 'success' }}
+    environment: npm-release
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22.14.0
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: npm install --global npm@11.5.2
+      - uses: actions/download-artifact@v4
+        with:
+          name: captured-npm
+          path: .artifacts/npm-release
+      - run: node scripts/npm-release.mjs finalize
+        env:
+          GITHUB_TOKEN: ${{ github.token }}

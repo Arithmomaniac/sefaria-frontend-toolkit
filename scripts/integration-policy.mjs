@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 
 import YAML from "yaml";
+import { validateNpmWorkflow } from "./npm-release-policy.mjs";
 
 const RETIRED_ACTIVE_PREFIXES = [
   "demos/linker/",
@@ -76,6 +77,17 @@ export function validateWorkflowPolicy(workflows) {
       issues.push(`unsupported workflow structure in ${filename}`);
       continue;
     }
+    if (
+      filename === "release-npm.yml" ||
+      filename.endsWith("/release-npm.yml")
+    ) {
+      issues.push(...validateNpmWorkflow(workflow));
+      continue;
+    }
+    if (/\/?(?:bootstrap-packages|publish-packages)\.yml$/.test(filename)) {
+      issues.push(`retired GitHub Packages workflow in ${filename}`);
+      continue;
+    }
     if (isRecord(workflow)) {
       const events = workflow.on;
       if (!isRecord(events)) {
@@ -92,11 +104,9 @@ export function validateWorkflowPolicy(workflows) {
                 ? ["workflow_dispatch", "workflow_run"]
                 : isRetirementWorkflow(filename)
                   ? ["workflow_dispatch"]
-                  : isBootstrapWorkflow(filename)
-                    ? ["workflow_dispatch"]
-                    : isDriftWorkflow(filename)
-                      ? ["schedule", "workflow_dispatch"]
-                      : ["pull_request", "push"];
+                  : isDriftWorkflow(filename)
+                    ? ["schedule", "workflow_dispatch"]
+                    : ["pull_request", "push"];
         if (JSON.stringify(eventNames) !== JSON.stringify(expectedEvents)) {
           issues.push(`unsupported workflow events in ${filename}`);
         }
@@ -107,12 +117,8 @@ export function validateWorkflowPolicy(workflows) {
         validatePagesWorkflow(workflow, issues, filename);
       } else if (isRetirementWorkflow(filename)) {
         validateRetirementWorkflow(workflow, issues, filename);
-      } else if (isBootstrapWorkflow(filename)) {
-        validateBootstrapWorkflow(workflow, issues, filename);
       } else if (isValidationWorkflow(filename)) {
         validateValidationWorkflow(workflow, issues, filename);
-      } else if (isPublisherWorkflow(filename)) {
-        validatePublisherWorkflow(workflow, issues, filename);
       } else if (isDriftWorkflow(filename)) {
         validateDriftWorkflow(workflow, issues, filename);
       } else if (
@@ -330,7 +336,7 @@ function validateCiWorkflow(workflow, issues, filename) {
   if (
     !isRecord(jobs) ||
     JSON.stringify(Object.keys(jobs).sort()) !==
-      JSON.stringify(["check", "publish", "script-source", "validation"])
+      JSON.stringify(["check", "validation"])
   ) {
     issues.push(`unexpected CI jobs in ${filename}`);
     return;
@@ -338,8 +344,7 @@ function validateCiWorkflow(workflow, issues, filename) {
 
   const validation = jobs.validation;
   const check = jobs.check;
-  const publish = jobs.publish;
-  if (!isRecord(validation) || !isRecord(check) || !isRecord(publish)) {
+  if (!isRecord(validation) || !isRecord(check)) {
     issues.push(`invalid CI jobs in ${filename}`);
     return;
   }
@@ -371,42 +376,6 @@ function validateCiWorkflow(workflow, issues, filename) {
   ) {
     issues.push(`CI check aggregation is not fail-closed in ${filename}`);
   }
-  validatePublishCaller(publish, false, issues, filename);
-  const script = jobs["script-source"];
-  const expectedScript = {
-    name: "archive browser script",
-    "timeout-minutes": 30,
-    needs: "publish",
-    if: "${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.SEFARIA_PACKAGES_ENABLED == 'true' }}",
-    "runs-on": "ubuntu-latest",
-    permissions: { contents: "write" },
-    env: { SCRIPT_VERSION: "${{ needs.publish.outputs.version }}" },
-    steps: [
-      { uses: "actions/checkout@v4" },
-      { uses: "pnpm/action-setup@v4" },
-      {
-        uses: "actions/setup-node@v4",
-        with: { "node-version": 22, cache: "pnpm" },
-      },
-      {
-        uses: "actions/cache@v4",
-        with: {
-          path: "~/.cache/ms-playwright",
-          key: "playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}",
-        },
-      },
-      { run: "pnpm setup:agent" },
-      { run: "pnpm build" },
-      { run: "pnpm build:script-source" },
-      { run: "pnpm test:script-source dist/script-source" },
-      {
-        run: "node scripts/script-source-release.mjs publish",
-        env: { GITHUB_TOKEN: "${{ github.token }}" },
-      },
-    ],
-  };
-  if (!hasOnlyEntries(script, expectedScript))
-    issues.push(`Script archive gate is incorrect in ${filename}`);
 }
 
 function validateRetirementWorkflow(workflow, issues, filename) {
@@ -530,77 +499,6 @@ function validateDriftWorkflow(workflow, issues, filename) {
   }
 }
 
-function isBootstrapWorkflow(filename) {
-  return (
-    filename === "bootstrap-packages.yml" ||
-    filename.endsWith("/bootstrap-packages.yml")
-  );
-}
-
-function validateBootstrapWorkflow(workflow, issues, filename) {
-  const gate =
-    "${{ github.ref == 'refs/heads/main' && vars.SEFARIA_PACKAGES_ENABLED != 'true' }}";
-  const { validation, check, publish } = workflow.jobs ?? {};
-  if (
-    JSON.stringify(Object.keys(workflow.jobs ?? {}).sort()) !==
-      JSON.stringify(["check", "publish", "validation"]) ||
-    JSON.stringify(workflow.permissions) !==
-      JSON.stringify({ contents: "read" }) ||
-    workflow.concurrency !== undefined ||
-    !hasOnlyEntries(validation, {
-      if: gate,
-      uses: "./.github/workflows/validate-toolkit.yml",
-    }) ||
-    check?.if !== "${{ always() }}" ||
-    check?.needs !== "validation" ||
-    JSON.stringify(check).includes("continue-on-error") ||
-    !JSON.stringify(check).includes(
-      'needs.validation.result }}\\" != \\"success\\"',
-    ) ||
-    publish?.if !== gate
-  ) {
-    issues.push(
-      `Bootstrap validation/main/activation gate is incorrect in ${filename}`,
-    );
-    return;
-  }
-  const expectedCheck = {
-    name: "check",
-    if: "${{ always() }}",
-    needs: "validation",
-    "runs-on": "ubuntu-latest",
-    steps: [
-      {
-        name: "Require every validation platform",
-        run: 'if [ "${{ needs.validation.result }}" != "success" ]; then\n  echo "Validation result: ${{ needs.validation.result }}"\n  exit 1\nfi\n',
-      },
-    ],
-  };
-  if (!hasOnlyEntries(check, expectedCheck))
-    issues.push(
-      `Bootstrap check aggregation is not fail-closed in ${filename}`,
-    );
-  validatePublishCaller(publish, true, issues, filename);
-}
-
-function validatePublishCaller(publish, bootstrap, issues, filename) {
-  if (
-    !hasOnlyEntries(publish, {
-      name: bootstrap
-        ? "bootstrap Sefaria prerelease"
-        : "publish public prerelease",
-      if: bootstrap
-        ? "${{ github.ref == 'refs/heads/main' && vars.SEFARIA_PACKAGES_ENABLED != 'true' }}"
-        : "${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.SEFARIA_PACKAGES_ENABLED == 'true' }}",
-      needs: "check",
-      uses: "./.github/workflows/publish-packages.yml",
-      with: { bootstrap },
-      permissions: { contents: "read", packages: "write" },
-    })
-  )
-    issues.push(`Shared publication caller gate is incorrect in ${filename}`);
-}
-
 function isValidationWorkflow(filename) {
   return (
     filename === "validate-toolkit.yml" ||
@@ -608,15 +506,8 @@ function isValidationWorkflow(filename) {
   );
 }
 
-function isPublisherWorkflow(filename) {
-  return (
-    filename === "publish-packages.yml" ||
-    filename.endsWith("/publish-packages.yml")
-  );
-}
-
 function isReusableWorkflow(filename) {
-  return isValidationWorkflow(filename) || isPublisherWorkflow(filename);
+  return isValidationWorkflow(filename);
 }
 
 function validateValidationWorkflow(workflow, issues, filename) {
@@ -669,93 +560,6 @@ function validateValidationWorkflow(workflow, issues, filename) {
   if (!hasOnlyEntries(workflow, expected))
     issues.push(
       `Shared validation must run unconditional complete Linux and Windows checks in ${filename}`,
-    );
-}
-
-function validatePublisherWorkflow(workflow, issues, filename) {
-  const authenticated = (run, condition) => ({
-    ...(condition ? { if: condition } : {}),
-    run,
-    env: { NODE_AUTH_TOKEN: "${{ github.token }}" },
-  });
-  const expected = {
-    name: "Publish toolkit packages",
-    on: {
-      workflow_call: {
-        inputs: { bootstrap: { required: true, type: "boolean" } },
-        outputs: { version: { value: "${{ jobs.publish.outputs.version }}" } },
-      },
-    },
-    permissions: { contents: "read" },
-    jobs: {
-      publish: {
-        name: "publish verified prerelease",
-        "timeout-minutes": 30,
-        if: "${{ github.ref == 'refs/heads/main' && ((inputs.bootstrap && github.event_name == 'workflow_dispatch' && vars.SEFARIA_PACKAGES_ENABLED != 'true') || (!inputs.bootstrap && github.event_name == 'push' && vars.SEFARIA_PACKAGES_ENABLED == 'true')) }}",
-        concurrency: {
-          group: "sefaria-package-publication",
-          "cancel-in-progress": false,
-        },
-        "runs-on": "ubuntu-latest",
-        permissions: { contents: "read", packages: "write" },
-        outputs: { version: "${{ steps.release-version.outputs.version }}" },
-        env: {
-          PUBLISH_VERSION:
-            "0.0.0-alpha.${{ github.run_id }}.${{ github.run_attempt }}",
-        },
-        steps: [
-          { uses: "actions/checkout@v4" },
-          { uses: "pnpm/action-setup@v4" },
-          {
-            uses: "actions/setup-node@v4",
-            with: {
-              "node-version": 22,
-              cache: "pnpm",
-              "registry-url": "https://npm.pkg.github.com",
-              scope: "@sefaria",
-            },
-          },
-          { run: "pnpm install --frozen-lockfile" },
-          { run: "pnpm build" },
-          {
-            run: 'node scripts/package-publication.mjs stage --version "$PUBLISH_VERSION"',
-          },
-          {
-            name: "Require the current main head",
-            run: 'git fetch --no-tags --depth=1 origin main\ntest "$(git rev-parse HEAD)" = "$(git rev-parse origin/main)"\n',
-          },
-          authenticated(
-            "node scripts/package-publication.mjs bootstrap-preflight",
-            "${{ inputs.bootstrap }}",
-          ),
-          authenticated(
-            "node scripts/package-publication.mjs preflight",
-            "${{ !inputs.bootstrap }}",
-          ),
-          ...["client", "text-transform", "web-components"].map((slug) =>
-            authenticated(
-              `pnpm publish .artifacts/publish/${slug} --tag alpha --access public --no-git-checks`,
-            ),
-          ),
-          authenticated(
-            'node scripts/package-publication.mjs bootstrap-verify --version "$PUBLISH_VERSION"',
-            "${{ inputs.bootstrap }}",
-          ),
-          authenticated(
-            'node scripts/package-publication.mjs verify --version "$PUBLISH_VERSION"',
-            "${{ !inputs.bootstrap }}",
-          ),
-          {
-            id: "release-version",
-            run: 'echo "version=$PUBLISH_VERSION" >> "$GITHUB_OUTPUT"',
-          },
-        ],
-      },
-    },
-  };
-  if (!hasOnlyEntries(workflow, expected))
-    issues.push(
-      `Shared publication mode, gates, credentials, dependency order, or version output is incorrect in ${filename}`,
     );
 }
 
@@ -822,16 +626,18 @@ export function validateDocumentationClaims(files) {
       .filter((line) =>
         /(?:npm install|pnpm add|yarn add)\s+["']?@sefaria\//iu.test(line),
       );
-    const documentsGitHubPackages =
+    const documentsPlannedNpm =
       filename === "docs/help/install-and-status.md" &&
-      source.includes("https://npm.pkg.github.com") &&
-      /\bread:packages\b/u.test(source) &&
-      /\bnot published on npmjs\.com\b/iu.test(prose) &&
+      /Public npm publication of `0\.1\.0-alpha\.0` is pending qualification/u.test(
+        prose,
+      ) &&
+      /planned installation guidance/u.test(prose) &&
+      source.includes('version="0.1.0-alpha.0"') &&
       toolkitInstallLines.length === 1 &&
       [...EXPECTED_LIBRARY_NAMES.values()].every((packageName) =>
         toolkitInstallLines[0].includes(`"${packageName}@$version"`),
       );
-    if (toolkitInstallLines.length > 0 && !documentsGitHubPackages) {
+    if (toolkitInstallLines.length > 0 && !documentsPlannedNpm) {
       issues.push(`unsupported registry installation command: ${filename}`);
     }
     for (const line of prose.split(/\r?\n/u)) {
@@ -901,12 +707,6 @@ function walkWorkflow(value, valuePath, issues, filename) {
 
   for (const [key, entry] of Object.entries(value)) {
     const nextPath = [...valuePath, key];
-    const publishToken =
-      isPublisherWorkflow(filename) &&
-      key === "NODE_AUTH_TOKEN" &&
-      valuePath[0] === "jobs" &&
-      valuePath[1] === "publish" &&
-      entry === "${{ github.token }}";
     const pagesIdentityToken =
       key === "id-token" &&
       valuePath[0] === "jobs" &&
@@ -917,32 +717,16 @@ function walkWorkflow(value, valuePath, issues, filename) {
       key === "GITHUB_TOKEN" &&
       entry === "${{ github.token }}" &&
       valuePath[0] === "jobs" &&
-      (((filename === "ci.yml" || filename.endsWith("/ci.yml")) &&
-        valuePath[1] === "script-source") ||
-        (isRetirementWorkflow(filename) && valuePath[1] === "retire") ||
+      ((isRetirementWorkflow(filename) && valuePath[1] === "retire") ||
         (isDriftWorkflow(filename) && valuePath[1] === "detect") ||
         (isPagesWorkflow(filename) && valuePath[1] === "build"));
-    if (
-      CREDENTIAL_NAME.test(key) &&
-      !publishToken &&
-      !pagesIdentityToken &&
-      !scriptToken
-    ) {
+    if (CREDENTIAL_NAME.test(key) && !pagesIdentityToken && !scriptToken) {
       issues.push(
         `publication credential in ${filename}:${nextPath.join(".")}`,
       );
     }
     if (key === "permissions" && isRecord(entry)) {
       for (const [permission, access] of Object.entries(entry)) {
-        const publishPermission =
-          valuePath[0] === "jobs" &&
-          valuePath[1] === "publish" &&
-          (isPublisherWorkflow(filename) ||
-            isBootstrapWorkflow(filename) ||
-            filename === "ci.yml" ||
-            filename.endsWith("/ci.yml")) &&
-          ((permission === "contents" && access === "read") ||
-            (permission === "packages" && access === "write"));
         const pagesPermission =
           isPagesWorkflow(filename) &&
           valuePath[0] === "jobs" &&
@@ -957,9 +741,8 @@ function walkWorkflow(value, valuePath, issues, filename) {
           valuePath[0] === "jobs" &&
           permission === "contents" &&
           access === "write" &&
-          (((filename === "ci.yml" || filename.endsWith("/ci.yml")) &&
-            valuePath[1] === "script-source") ||
-            (isRetirementWorkflow(filename) && valuePath[1] === "retire"));
+          isRetirementWorkflow(filename) &&
+          valuePath[1] === "retire";
         const driftIssuePermission =
           isDriftWorkflow(filename) &&
           valuePath[0] === "jobs" &&
@@ -967,7 +750,6 @@ function walkWorkflow(value, valuePath, issues, filename) {
           permission === "issues" &&
           access === "write";
         if (
-          !publishPermission &&
           !pagesPermission &&
           !scriptPermission &&
           !driftIssuePermission &&
@@ -992,14 +774,7 @@ function walkWorkflow(value, valuePath, issues, filename) {
     if (
       key === "run" &&
       typeof entry === "string" &&
-      PUBLISH_COMMAND.test(entry) &&
-      !(
-        valuePath[0] === "jobs" &&
-        ((isPublisherWorkflow(filename) && valuePath[1] === "publish") ||
-          ((filename === "ci.yml" || filename.endsWith("/ci.yml")) &&
-            valuePath[1] === "script-source" &&
-            entry === "node scripts/script-source-release.mjs publish"))
-      )
+      PUBLISH_COMMAND.test(entry)
     ) {
       issues.push(`publication command in ${filename}:${nextPath.join(".")}`);
     }
@@ -1008,17 +783,11 @@ function walkWorkflow(value, valuePath, issues, filename) {
       typeof entry === "string" &&
       PUBLISH_ACTION.test(entry) &&
       !(
-        (isPagesWorkflow(filename) &&
-          [
-            "actions/upload-pages-artifact@v5",
-            "actions/deploy-pages@v5",
-          ].includes(entry)) ||
-        (valuePath[0] === "jobs" &&
-          valuePath[1] === "publish" &&
-          entry === "./.github/workflows/publish-packages.yml" &&
-          (isBootstrapWorkflow(filename) ||
-            filename === "ci.yml" ||
-            filename.endsWith("/ci.yml")))
+        isPagesWorkflow(filename) &&
+        [
+          "actions/upload-pages-artifact@v5",
+          "actions/deploy-pages@v5",
+        ].includes(entry)
       )
     ) {
       issues.push(

@@ -8,7 +8,7 @@ A community-driven project with Sefaria backing and support. The toolkit is expe
 
 ## Install
 
-The packages are prereleases on GitHub Packages, not npmjs.com. GitHub Packages asks for a token even to download public packages. You need a GitHub personal access token (classic) with `read:packages`. Types are included; no `@types` package is needed. [Install and status › Packages](https://sefaria.github.io/sefaria-frontend-toolkit/help/install-and-status.html#packages) shows the setup and the install command.
+Public npm release `0.1.0-alpha.0` is prepared but remains pending hosted qualification. After release, installation is anonymous and needs no GitHub token. Types are included; no `@types` package is needed. [Install and status › Packages](https://sefaria.github.io/sefaria-frontend-toolkit/help/install-and-status.html#packages) owns current availability and exact-version installation guidance.
 
 ## Elements
 

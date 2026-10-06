@@ -78,7 +78,7 @@ describe("Wave 4 integration policy", () => {
         "utf8",
       ),
       readFile(
-        path.join(root, ".github", "workflows", "publish-packages.yml"),
+        path.join(root, ".github", "workflows", "release-npm.yml"),
         "utf8",
       ),
     ]);
@@ -88,15 +88,14 @@ describe("Wave 4 integration policy", () => {
         "pages.yml": pagesWorkflow,
         "copilot-setup-steps.yml": setupWorkflow,
         "validate-toolkit.yml": validationWorkflow,
-        "publish-packages.yml": publicationWorkflow,
+        "release-npm.yml": publicationWorkflow,
       }),
     ).toEqual([]);
-    const preflight = "node scripts/package-publication.mjs preflight";
-    const firstPublish =
-      "pnpm publish .artifacts/publish/client --tag alpha --access public --no-git-checks";
-    expect(publicationWorkflow.indexOf(preflight)).toBeGreaterThan(-1);
-    expect(publicationWorkflow.indexOf(preflight)).toBeLessThan(
-      publicationWorkflow.indexOf(firstPublish),
+    expect(publicationWorkflow).not.toContain(
+      "node scripts/npm-release.mjs guard",
+    );
+    expect(publicationWorkflow).toContain(
+      "node scripts/npm-release.mjs capture",
     );
     expect(pagesWorkflow).toContain(
       "SITE_BASE_PATH: /sefaria-frontend-toolkit/",
@@ -239,7 +238,7 @@ describe("Wave 4 integration policy", () => {
     expect(
       validateDocumentationClaims({
         "docs/help/install-and-status.md":
-          'The packages are published on GitHub Packages, not published on npmjs.com. Configure `@sefaria:registry=https://npm.pkg.github.com`, authenticate with a classic token carrying `read:packages`, set `$version`, then run `pnpm add "@sefaria/api-client@$version" "@sefaria/text-transform@$version" "@sefaria/web-components@$version"`.',
+          'Public npm publication of `0.1.0-alpha.0` is pending qualification. This is planned installation guidance.\nversion="0.1.0-alpha.0"\nnpm install "@sefaria/api-client@$version" "@sefaria/text-transform@$version" "@sefaria/web-components@$version"',
       }),
     ).toEqual([]);
     expect(

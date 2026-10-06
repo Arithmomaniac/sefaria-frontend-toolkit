@@ -103,7 +103,7 @@ export async function renderPackagesReference(): Promise<string> {
     lines.push(
       `## \`${entry.name}\``,
       "",
-      `${manifest.description} Package manifest version: \`${manifest.version ?? "unknown"}\`. [Reference](${PACKAGE_REFERENCES[entry.name]}).`,
+      `${manifest.description} Package manifest version: \`${manifest.version ?? "unknown"}\`. This is not evidence of publication. [Reference](${PACKAGE_REFERENCES[entry.name]}).`,
       "",
       "| Import path | Exports |",
       "| --- | --- |",

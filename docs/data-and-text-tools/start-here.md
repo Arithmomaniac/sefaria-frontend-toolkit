@@ -28,7 +28,7 @@ Use the package route if your app already has a build step. Use the CDN route if
 
 ### Packages
 
-Install `@sefaria/api-client`, `@sefaria/text-transform`, or both. They are on GitHub Packages, which needs an access token before you can install. [Install and status](/help/install-and-status.md) shows how to set up the token and gives the exact install command for the current version. The packages need Node.js 22.12 or later.
+Use `@sefaria/api-client`, `@sefaria/text-transform`, or both. Numbered public npm publication is pending qualification. [Install and status](/help/install-and-status.md) distinguishes planned exact-version installation from retained Pages scripts and local use. No GitHub Packages token is needed. The packages need Node.js 22.12 or later.
 
 ### No install
 

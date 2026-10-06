@@ -33,6 +33,7 @@ import {
   smokeSiteSnippets,
   stageSiteSnippetConsumer,
 } from "./site-snippet-consumer.mjs";
+import { readHandoff } from "./npm-release.mjs";
 
 const repository = path.resolve(import.meta.dirname, "..");
 const root = await mkdtemp(
@@ -93,7 +94,23 @@ if (isPathWithin(repository, root) || root === repository) {
 
 try {
   await mkdir(tarballs, { recursive: true });
+  const release = process.env.SEFARIA_NPM_ASSETS
+    ? await readHandoff(path.resolve(process.env.SEFARIA_NPM_ASSETS))
+    : undefined;
   for (const packageDefinition of packageDefinitions) {
+    if (release) {
+      const entry = release.manifest.packages.find(
+        (entry) => entry.name === packageDefinition.name,
+      );
+      if (!entry) throw new Error("Missing qualified npm tarball.");
+      packageDefinition.filename = entry.filename;
+      await writeFile(
+        path.join(tarballs, entry.filename),
+        release.assets.get(entry.filename),
+      );
+      await inspectTarball(packageDefinition, true);
+      continue;
+    }
     const before = new Set(await readdir(tarballs));
     run("pnpm", [
       "--filter",
@@ -195,7 +212,7 @@ try {
   await rm(root, { force: true, recursive: true });
 }
 
-async function inspectTarball(packageDefinition) {
+async function inspectTarball(packageDefinition, published = false) {
   if (packageDefinition.filename === undefined) {
     throw new Error(`${packageDefinition.name} did not emit a tarball.`);
   }
@@ -218,6 +235,7 @@ async function inspectTarball(packageDefinition) {
     manifest,
     contents,
     customElements,
+    published,
   });
 }
 

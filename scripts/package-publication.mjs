@@ -1,135 +1,151 @@
-import { spawnSync } from "node:child_process";
-import {
-  access,
-  cp,
-  mkdir,
-  mkdtemp,
-  readFile,
-  readdir,
-  realpath,
-  rm,
-  writeFile,
-} from "node:fs/promises";
-import { tmpdir } from "node:os";
+import { cp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
-import process from "node:process";
-import { pathToFileURL } from "node:url";
+import { z } from "zod";
 
-import YAML from "yaml";
-import { Octokit } from "@octokit/rest";
-
-import { isPathWithin } from "./tarball-consumer-validation.mjs";
-
-const REGISTRY = "https://npm.pkg.github.com";
-const DEFAULT_REPOSITORY = "Sefaria/sefaria-frontend-toolkit";
-const INTERNAL_PACKAGE_NAMES = new Set([
-  "@sefaria/api-client",
-  "@sefaria/text-transform",
-  "@sefaria/web-components",
-]);
-
+export const NPM_REGISTRY = "https://registry.npmjs.org";
+export const REPOSITORY = "Sefaria/sefaria-frontend-toolkit";
 export const PACKAGE_DEFINITIONS = [
   {
     name: "@sefaria/api-client",
     browserFile: "sefaria-api-client.js",
     slug: "client",
     directory: "packages/client",
-    customElements: false,
+    subpaths: [
+      ".",
+      "./client",
+      "./contracts",
+      "./errors",
+      "./schemas",
+      "./validation",
+      "./validators",
+    ],
   },
   {
     name: "@sefaria/text-transform",
     browserFile: "sefaria-text-transform.js",
     slug: "text-transform",
     directory: "packages/text-transform",
-    customElements: false,
+    subpaths: ["."],
   },
   {
     name: "@sefaria/web-components",
     browserFile: "sefaria-elements.js",
     slug: "web-components",
     directory: "packages/web-components",
-    customElements: true,
+    subpaths: [
+      ".",
+      "./data-source",
+      "./bilingual-segment",
+      "./connections-panel",
+      "./reader",
+      "./reader-session",
+      "./source-card",
+      "./text-segment",
+    ],
   },
 ];
 
-const NODE_SAFE_IMPORTS = [
-  "@sefaria/api-client",
-  "@sefaria/api-client/client",
-  "@sefaria/api-client/contracts",
-  "@sefaria/api-client/errors",
-  "@sefaria/api-client/schemas",
-  "@sefaria/api-client/validation",
-  "@sefaria/api-client/validators",
-  "@sefaria/text-transform",
-  "@sefaria/web-components/data-source",
-  "@sefaria/web-components/bilingual-segment",
-  "@sefaria/web-components/connections-panel",
-  "@sefaria/web-components/reader",
-  "@sefaria/web-components/reader-session",
-  "@sefaria/web-components/source-card",
-  "@sefaria/web-components/text-segment",
-];
+export const releaseVersionSchema = z
+  .string()
+  .max(64)
+  .regex(
+    /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)(?:-alpha\.(?:0|[1-9]\d*))?$/,
+  );
+export const sourceShaSchema = z.string().regex(/^[a-f0-9]{40}$/);
 
-export function createPublishVersion(runId, runAttempt) {
-  for (const [label, value] of [
-    ["run ID", runId],
-    ["run attempt", runAttempt],
-  ]) {
-    if (!/^[1-9]\d*$/u.test(value)) {
-      throw new Error(`${label} must be a positive integer.`);
-    }
-  }
-  return `0.0.0-alpha.${runId}.${runAttempt}`;
+export function releaseTag(version) {
+  releaseVersionSchema.parse(version);
+  return version.includes("-alpha.") ? "alpha" : "latest";
 }
 
-export function createRegistryMetadataUrl(packageName) {
-  return `${REGISTRY}/${packageName.replace("/", "%2F")}`;
-}
-
-export function createPackagePageUrl({
-  serverUrl,
-  repositoryFullName,
-  packageName,
-}) {
-  const packageSlug = packageName.split("/").at(-1);
-  return `${serverUrl}/${repositoryFullName}/pkgs/npm/${encodeURIComponent(packageSlug)}`;
+export function tarballFilename(definition, version) {
+  releaseVersionSchema.parse(version);
+  return `${definition.name.slice(1).replace("/", "-")}-${version}.tgz`;
 }
 
 export function createPublishManifest({ definition, sourceManifest, version }) {
-  validatePublishVersion(version);
+  releaseVersionSchema.parse(version);
   if (
     sourceManifest.name !== definition.name ||
-    sourceManifest.private !== true
-  ) {
-    throw new Error(`${definition.name} source manifest must remain private.`);
-  }
-
-  const dependencies = { ...(sourceManifest.dependencies ?? {}) };
-  for (const dependency of INTERNAL_PACKAGE_NAMES) {
-    if (
-      dependency === definition.name ||
-      dependencies[dependency] === undefined
-    ) {
-      continue;
-    }
-    if (dependencies[dependency] !== "workspace:*") {
+    sourceManifest.private !== true ||
+    sourceManifest.version !== version
+  )
+    throw new Error(
+      `${definition.name} must match the private reviewed source version.`,
+    );
+  const dependencies = { ...sourceManifest.dependencies };
+  for (const internal of PACKAGE_DEFINITIONS) {
+    if (dependencies[internal.name] === undefined) continue;
+    if (dependencies[internal.name] !== "workspace:*")
       throw new Error(
-        `${definition.name} must use workspace:* for ${dependency} before staging.`,
+        `${definition.name} must retain workspace:* for ${internal.name}.`,
       );
-    }
-    dependencies[dependency] = version;
+    dependencies[internal.name] = version;
   }
-
   return {
     ...sourceManifest,
-    version,
     private: false,
     dependencies,
-    publishConfig: {
-      access: "public",
-      registry: REGISTRY,
-    },
+    publishConfig: { access: "public", registry: NPM_REGISTRY },
   };
+}
+
+export async function readReleaseState(
+  repository,
+  version,
+  { requireConsumed = true } = {},
+) {
+  releaseVersionSchema.parse(version);
+  const manifests = await Promise.all(
+    PACKAGE_DEFINITIONS.map(async (definition) =>
+      JSON.parse(
+        await readFile(
+          path.join(repository, definition.directory, "package.json"),
+          "utf8",
+        ),
+      ),
+    ),
+  );
+  for (const [index, manifest] of manifests.entries())
+    createPublishManifest({
+      definition: PACKAGE_DEFINITIONS[index],
+      sourceManifest: manifest,
+      version,
+    });
+  if (!requireConsumed) return manifests;
+  if (version.includes("-alpha.")) {
+    const pre = z
+      .object({
+        mode: z.literal("pre"),
+        tag: z.literal("alpha"),
+      })
+      .passthrough()
+      .parse(
+        JSON.parse(
+          await readFile(
+            path.join(repository, ".changeset", "pre.json"),
+            "utf8",
+          ),
+        ),
+      );
+    const pending = (await readdir(path.join(repository, ".changeset"))).filter(
+      (file) => file.endsWith(".md") && file !== "README.md",
+    );
+    if (pre.mode !== "pre" || pending.length)
+      throw new Error(
+        "Unversioned Changesets remain; prepare a reviewed version first.",
+      );
+  } else {
+    const files = await readdir(path.join(repository, ".changeset"));
+    if (
+      files.includes("pre.json") ||
+      files.some((file) => file.endsWith(".md") && file !== "README.md")
+    )
+      throw new Error(
+        "Stable release requires consumed Changesets and exited prerelease state.",
+      );
+  }
+  return manifests;
 }
 
 export async function stagePublishPackages({
@@ -137,23 +153,27 @@ export async function stagePublishPackages({
   destination,
   version,
 }) {
-  validatePublishVersion(version);
-  await rm(destination, { force: true, recursive: true });
+  releaseVersionSchema.parse(version);
+  if (
+    !path
+      .resolve(destination)
+      .startsWith(`${path.resolve(repository)}${path.sep}.artifacts${path.sep}`)
+  )
+    throw new Error("Release staging must stay within repository .artifacts.");
+  await rm(destination, { recursive: true, force: true });
   await mkdir(destination, { recursive: true });
-
   for (const definition of PACKAGE_DEFINITIONS) {
     const source = path.join(repository, definition.directory);
     const staged = path.join(destination, definition.slug);
     const sourceManifest = JSON.parse(
       await readFile(path.join(source, "package.json"), "utf8"),
     );
-    const publishManifest = createPublishManifest({
+    const manifest = createPublishManifest({
       definition,
       sourceManifest,
       version,
     });
-
-    await mkdir(staged, { recursive: true });
+    await mkdir(staged);
     await cp(path.join(source, "dist"), path.join(staged, "dist"), {
       recursive: true,
     });
@@ -163,9 +183,9 @@ export async function stagePublishPackages({
       cp(path.join(repository, "LICENSE"), path.join(staged, "LICENSE")),
       writeFile(
         path.join(staged, "package.json"),
-        `${JSON.stringify(publishManifest, null, 2)}\n`,
+        `${JSON.stringify(manifest, null, 2)}\n`,
       ),
-      ...(definition.customElements
+      ...(definition.slug === "web-components"
         ? [
             cp(
               path.join(source, "custom-elements.json"),
@@ -174,580 +194,49 @@ export async function stagePublishPackages({
           ]
         : []),
     ]);
-    await validateStagedPackage(
-      staged,
-      publishManifest,
-      definition.browserFile,
-    );
-  }
-}
-
-export function validatePublishedPackage({
-  definition,
-  registryMetadata,
-  publicStatus,
-  repositoryFullName,
-  version,
-}) {
-  if (publicStatus !== 200) {
-    if (publicStatus === 404) {
-      throw new Error(`${definition.name} must be public.`);
-    }
-    throw new Error(
-      `${definition.name} public visibility check returned ${publicStatus}.`,
-    );
-  }
-  validatePackageMetadata({
-    definition,
-    registryMetadata,
-    repositoryFullName,
-    version,
-  });
-}
-
-export function validatePackageMetadata({
-  definition,
-  registryMetadata,
-  repositoryFullName,
-  version,
-}) {
-  if (!isRecord(registryMetadata)) {
-    throw new Error(`${definition.name} registry metadata is invalid.`);
-  }
-  if (registryMetadata.name !== definition.name) {
-    throw new Error(`${definition.name} package metadata name is incorrect.`);
-  }
-  if (registryMetadata["dist-tags"]?.alpha !== version) {
-    throw new Error(`${definition.name} alpha tag is not ${version}.`);
-  }
-  const publishedVersion = registryMetadata.versions?.[version];
-  if (
-    !isRecord(publishedVersion) ||
-    publishedVersion.name !== definition.name ||
-    publishedVersion.version !== version
-  ) {
-    throw new Error(`${definition.name}@${version} is not published.`);
-  }
-  const repository =
-    typeof publishedVersion.repository === "string"
-      ? publishedVersion.repository
-      : publishedVersion.repository?.url;
-  if (repository !== `git+https://github.com/${repositoryFullName}.git`) {
-    throw new Error(
-      `${definition.name} is not linked to ${repositoryFullName}.`,
-    );
-  }
-  for (const dependency of INTERNAL_PACKAGE_NAMES) {
+    const files = await listFiles(staged);
     if (
-      dependency !== definition.name &&
-      publishedVersion.dependencies?.[dependency] !== undefined &&
-      publishedVersion.dependencies[dependency] !== version
-    ) {
-      throw new Error(
-        `${definition.name} published ${dependency} at a non-synchronized version.`,
-      );
-    }
-  }
-}
-
-export function validatePublicationPreflight({ packages, repositoryFullName }) {
-  if (
-    !Array.isArray(packages) ||
-    packages.length !== PACKAGE_DEFINITIONS.length
-  ) {
-    throw new Error("Publication preflight requires every package record.");
-  }
-
-  const alphaVersions = [];
-  for (const [index, definition] of PACKAGE_DEFINITIONS.entries()) {
-    const packageRecord = packages[index];
-    if (packageRecord?.definition?.name !== definition.name) {
-      throw new Error(
-        `Publication preflight package order is incorrect at ${definition.name}.`,
-      );
-    }
-    const { registryMetadata, publicStatus } = packageRecord;
-    if (
-      !isRecord(registryMetadata) ||
-      registryMetadata.name !== definition.name
-    ) {
-      throw new Error(`${definition.name} registry metadata is invalid.`);
-    }
-    const packageAlpha = registryMetadata["dist-tags"]?.alpha;
-    validatePublishVersion(packageAlpha);
-    alphaVersions.push(packageAlpha);
-    validatePublishedPackage({
-      definition,
-      registryMetadata,
-      publicStatus,
-      repositoryFullName,
-      version: packageAlpha,
-    });
-  }
-
-  return alphaVersions;
-}
-
-export function validateRegistryConsumerLockfile({ lockfile, version }) {
-  validatePublishVersion(version);
-  if (/\b(?:workspace:|link:|file:)/u.test(lockfile)) {
-    throw new Error("Registry consumer resolved toolkit source or a tarball.");
-  }
-  const parsed = YAML.parse(lockfile);
-  const dependencies =
-    parsed?.importers?.["."]?.dependencies ??
-    parsed?.importers?.[""]?.dependencies ??
-    parsed;
-  for (const definition of PACKAGE_DEFINITIONS) {
-    const resolution = dependencies?.[definition.name];
-    const specifier =
-      typeof resolution === "string" ? resolution : resolution?.specifier;
-    const resolvedVersion =
-      typeof resolution === "string" ? resolution : resolution?.version;
-    const packageVersion =
-      typeof resolvedVersion === "string"
-        ? resolvedVersion.replace(/\(.+$/u, "")
-        : resolvedVersion;
-    if (specifier !== version || packageVersion !== version) {
-      throw new Error(
-        `${definition.name} did not resolve the exact published version.`,
-      );
-    }
-  }
-}
-
-export async function preflightPublication({
-  repositoryFullName,
-  serverUrl,
-  token,
-}) {
-  requirePublicationEnvironment({
-    repositoryFullName,
-    token,
-    operation: "preflight",
-  });
-  const packages = await fetchPackageRecords({
-    repositoryFullName,
-    serverUrl,
-    token,
-  });
-  return validatePublicationPreflight({ packages, repositoryFullName });
-}
-
-async function verifyPublication({
-  repository,
-  staging,
-  version,
-  repositoryFullName,
-  serverUrl,
-  token,
-  bootstrap = false,
-}) {
-  validatePublishVersion(version);
-  requirePublicationEnvironment({
-    repositoryFullName,
-    token,
-    operation: "verification",
-  });
-  const packages = await fetchPackageRecords({
-    repositoryFullName,
-    serverUrl,
-    token,
-  });
-  for (const { definition, registryMetadata, publicStatus } of packages) {
-    const validate = bootstrap
-      ? validatePackageMetadata
-      : validatePublishedPackage;
-    validate({
-      definition,
-      registryMetadata,
-      publicStatus,
-      repositoryFullName,
-      version,
-    });
-  }
-
-  await verifyRegistryConsumer({ repository, staging, version });
-}
-
-export function validateBootstrapInventory(records, repositoryFullName) {
-  if (!Array.isArray(records))
-    throw new Error("Bootstrap requires an authenticated package inventory.");
-  for (const definition of PACKAGE_DEFINITIONS) {
-    const slug = definition.name.split("/")[1];
-    const existing = records.filter(
-      (record) => record.name === slug || record.name === definition.name,
-    );
-    if (existing.length > 1)
-      throw new Error(`Ambiguous bootstrap identity: ${definition.name}.`);
-    if (
-      existing.length &&
-      (existing[0].package_type !== "npm" ||
-        existing[0].repository?.full_name !== repositoryFullName)
-    )
-      throw new Error(
-        `Bootstrap package is not linked to ${repositoryFullName}: ${definition.name}.`,
-      );
-  }
-}
-
-export async function preflightBootstrap({ repositoryFullName, token }) {
-  requirePublicationEnvironment({
-    repositoryFullName,
-    token,
-    operation: "bootstrap",
-  });
-  if (repositoryFullName !== DEFAULT_REPOSITORY)
-    throw new Error(`Bootstrap requires ${DEFAULT_REPOSITORY}.`);
-  const api = new Octokit({ auth: token });
-  api.hook.before("request", (options) => {
-    options.request.signal = globalThis.AbortSignal.timeout(60_000);
-  });
-  const records = await api.paginate(api.packages.listPackagesForOrganization, {
-    org: "Sefaria",
-    package_type: "npm",
-    per_page: 100,
-  });
-  validateBootstrapInventory(records, repositoryFullName);
-  for (const definition of PACKAGE_DEFINITIONS) {
-    const slug = definition.name.split("/")[1];
-    if (
-      !records.some(
-        (record) => record.name === slug || record.name === definition.name,
+      files.some((file) =>
+        /(?:^src\/|\.tsbuildinfo$|\.(?:js|d\.ts)\.map$|\.test\.(?:js|d\.ts)$)/.test(
+          file,
+        ),
       )
     )
-      continue;
-    const registryMetadata = await fetchRegistryJson(
-      createRegistryMetadataUrl(definition.name),
-      token,
-    );
-    const version = registryMetadata["dist-tags"]?.alpha;
-    validatePublishVersion(version);
-    validatePackageMetadata({
-      definition,
-      registryMetadata,
-      repositoryFullName,
-      version,
-    });
-  }
-}
-
-async function fetchPackageRecords({ repositoryFullName, serverUrl, token }) {
-  return Promise.all(
-    PACKAGE_DEFINITIONS.map(async (definition) => {
-      const [registryMetadata, packagePageResponse] = await Promise.all([
-        fetchRegistryJson(createRegistryMetadataUrl(definition.name), token),
-        globalThis.fetch(
-          createPackagePageUrl({
-            serverUrl,
-            repositoryFullName,
-            packageName: definition.name,
-          }),
-          {
-            redirect: "manual",
-            headers: {
-              Accept: "text/html",
-              "User-Agent": "sefaria-frontend-toolkit-publication-verifier",
-            },
-          },
-        ),
-      ]);
-      return {
-        definition,
-        registryMetadata,
-        publicStatus: packagePageResponse.status,
-      };
-    }),
-  );
-}
-
-function requirePublicationEnvironment({
-  repositoryFullName,
-  token,
-  operation,
-}) {
-  if (!token) {
-    throw new Error(
-      `NODE_AUTH_TOKEN is required for publication ${operation}.`,
-    );
-  }
-  if (!repositoryFullName.includes("/")) {
-    throw new Error("GITHUB_REPOSITORY must include an owner and repository.");
-  }
-}
-
-async function verifyRegistryConsumer({ repository, staging, version }) {
-  const root = await mkdtemp(path.join(tmpdir(), "sefaria-registry-consumer-"));
-  const consumer = path.join(root, "consumer");
-  const npmrc = path.join(root, ".npmrc");
-  try {
-    await mkdir(consumer, { recursive: true });
-    await Promise.all([
-      writeFile(
-        path.join(consumer, "package.json"),
-        `${JSON.stringify(
-          {
-            name: "sefaria-private-registry-consumer",
-            version: "0.0.0",
-            private: true,
-            type: "module",
-            dependencies: Object.fromEntries(
-              PACKAGE_DEFINITIONS.map((definition) => [
-                definition.name,
-                version,
-              ]),
-            ),
-          },
-          null,
-          2,
-        )}\n`,
-      ),
-      writeFile(
-        npmrc,
-        [
-          "@sefaria:registry=https://npm.pkg.github.com",
-          "//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}",
-          "always-auth=true",
-          "",
-        ].join("\n"),
-      ),
-    ]);
-
-    const installEnvironment = {
-      ...process.env,
-      NPM_CONFIG_USERCONFIG: npmrc,
-    };
-    runPnpm(["install", "--lockfile-only"], consumer, installEnvironment);
-    runPnpm(["install", "--frozen-lockfile"], consumer, installEnvironment);
-    validateRegistryConsumerLockfile({
-      lockfile: await readFile(path.join(consumer, "pnpm-lock.yaml"), "utf8"),
-      version,
-    });
-
-    const canonicalConsumer = await realpath(consumer);
-    const canonicalRepository = await realpath(repository);
-    for (const definition of PACKAGE_DEFINITIONS) {
-      const manifestPath = path.join(
-        consumer,
-        "node_modules",
-        ...definition.name.split("/"),
-        "package.json",
+      throw new Error(
+        `${definition.name} contains excluded source/build files.`,
       );
-      const manifest = JSON.parse(await readFile(manifestPath, "utf8"));
-      if (
-        !isRecord(manifest) ||
-        manifest.name !== definition.name ||
-        manifest.version !== version ||
-        manifest.private !== false
-      ) {
+    for (const target of exportTargets(manifest.exports))
+      if (!target.startsWith("./dist/") || !files.includes(target.slice(2)))
         throw new Error(
-          `${definition.name} installed manifest does not match the published prerelease.`,
+          `${definition.name} has an invalid or missing export ${target}.`,
         );
-      }
-      for (const dependency of INTERNAL_PACKAGE_NAMES) {
-        if (
-          dependency !== definition.name &&
-          manifest.dependencies?.[dependency] !== undefined &&
-          manifest.dependencies[dependency] !== version
-        ) {
-          throw new Error(
-            `${definition.name} installed ${dependency} at a non-synchronized version.`,
-          );
-        }
-      }
-      const installedPath = await realpath(manifestPath);
-      if (
-        !isPathWithin(canonicalConsumer, installedPath) ||
-        isPathWithin(canonicalRepository, installedPath)
-      ) {
-        throw new Error(
-          `${definition.name} resolved outside the isolated registry consumer.`,
-        );
-      }
-    }
-
-    await Promise.all([
-      rm(npmrc, { force: true }),
-      rm(staging, { force: true, recursive: true }),
-    ]);
-    runNodeImports(NODE_SAFE_IMPORTS, consumer);
-  } finally {
-    await rm(root, { force: true, recursive: true });
+    for (const file of [
+      definition.browserFile,
+      "LICENSE.txt",
+      "THIRD-PARTY-NOTICES.txt",
+    ])
+      if (!files.includes(`dist/browser/${file}`))
+        throw new Error(`${definition.name} lacks browser file ${file}.`);
   }
 }
 
-async function fetchRegistryJson(url, token) {
-  const response = await globalThis.fetch(url, {
-    headers: {
-      Accept: "application/json",
-      Authorization: `Bearer ${token}`,
-      "User-Agent": "sefaria-frontend-toolkit-publication-verifier",
-    },
-  });
-  if (!response.ok) {
-    throw new Error(
-      `GitHub npm registry metadata request failed: ${response.status} ${response.statusText}.`,
-    );
-  }
-  return response.json();
-}
-
-function runPnpm(args, cwd, env = process.env) {
-  const windows = process.platform === "win32";
-  const executable = windows ? (process.env.ComSpec ?? "cmd.exe") : "pnpm";
-  const commandArgs = windows
-    ? ["/d", "/s", "/c", `pnpm ${args.join(" ")}`]
-    : args;
-  const result = spawnSync(executable, commandArgs, {
-    windowsHide: true,
-    cwd,
-    env,
-    stdio: "inherit",
-  });
-  if (result.status !== 0) {
-    throw new Error(`pnpm ${args.join(" ")} failed.`);
-  }
-}
-
-function runNodeImports(specifiers, cwd) {
-  const result = spawnSync(
-    process.execPath,
-    [
-      "--input-type=module",
-      "-e",
-      [
-        `await Promise.all(${JSON.stringify(specifiers)}.map((specifier) => import(specifier)));`,
-        "if ('customElements' in globalThis) throw new Error('DOM registration leaked into Node-safe imports');",
-      ].join(""),
-    ],
-    { cwd, encoding: "utf8", windowsHide: true },
-  );
-  if (result.status !== 0) {
-    throw new Error(`Registry package imports failed: ${result.stderr}`);
-  }
-}
-
-function validatePublishVersion(version) {
-  if (!/^0\.0\.0-alpha\.[1-9]\d*\.[1-9]\d*$/u.test(version)) {
-    throw new Error(
-      "Publish version must match 0.0.0-alpha.<run-id>.<run-attempt>.",
-    );
-  }
-}
-
-async function validateStagedPackage(staged, manifest, browserFile) {
-  const files = await listFiles(staged);
-  const forbidden = files.find(
-    (filename) =>
-      filename.startsWith("src/") ||
-      filename.endsWith(".tsbuildinfo") ||
-      filename.endsWith(".js.map") ||
-      filename.endsWith(".d.ts.map") ||
-      /\.test\.(?:js|d\.ts)$/u.test(filename),
-  );
-  if (forbidden !== undefined) {
-    throw new Error(`${manifest.name} staged forbidden file ${forbidden}.`);
-  }
-  for (const target of collectExportTargets(manifest.exports)) {
-    await access(path.join(staged, target.replace(/^\.\//u, "")));
-  }
-  for (const filename of [
-    browserFile,
-    "LICENSE.txt",
-    "THIRD-PARTY-NOTICES.txt",
-  ]) {
-    await access(path.join(staged, "dist", "browser", filename));
-  }
-}
-
-async function listFiles(directory, prefix = "") {
-  const entries = await readdir(directory, { withFileTypes: true });
+export async function listFiles(directory, prefix = "") {
   const files = [];
-  for (const entry of entries) {
-    const filename = prefix ? `${prefix}/${entry.name}` : entry.name;
-    if (entry.isDirectory()) {
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    if (entry.isSymbolicLink())
+      throw new Error(`Symlink in package: ${entry.name}.`);
+    const relative = prefix ? `${prefix}/${entry.name}` : entry.name;
+    if (entry.isDirectory())
       files.push(
-        ...(await listFiles(path.join(directory, entry.name), filename)),
+        ...(await listFiles(path.join(directory, entry.name), relative)),
       );
-    } else {
-      files.push(filename);
-    }
+    else if (entry.isFile()) files.push(relative);
+    else throw new Error(`Unsupported package file: ${relative}.`);
   }
-  return files;
+  return files.sort();
 }
 
-function collectExportTargets(value, targets = []) {
-  if (typeof value === "string") {
-    targets.push(value);
-  } else if (Array.isArray(value)) {
-    for (const entry of value) collectExportTargets(entry, targets);
-  } else if (isRecord(value)) {
-    for (const entry of Object.values(value)) {
-      collectExportTargets(entry, targets);
-    }
-  }
-  return targets;
-}
-
-function readArgument(name) {
-  const index = process.argv.indexOf(name);
-  if (index === -1 || process.argv[index + 1] === undefined) {
-    throw new Error(`${name} is required.`);
-  }
-  return process.argv[index + 1];
-}
-
-function isRecord(value) {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-}
-
-const entryPath = process.argv[1];
-if (
-  entryPath !== undefined &&
-  import.meta.url === pathToFileURL(path.resolve(entryPath)).href
-) {
-  const command = process.argv[2];
-  const repository = path.resolve(import.meta.dirname, "..");
-  const staging = path.join(repository, ".artifacts", "publish");
-  if (command === "stage") {
-    const version = readArgument("--version");
-    await stagePublishPackages({
-      repository,
-      destination: staging,
-      version,
-    });
-    process.stdout.write(
-      `Staged ${PACKAGE_DEFINITIONS.length} packages at ${version}.\n`,
-    );
-  } else if (command === "bootstrap-preflight") {
-    await preflightBootstrap({
-      repositoryFullName: process.env.GITHUB_REPOSITORY,
-      token: process.env.NODE_AUTH_TOKEN,
-    });
-  } else if (command === "preflight") {
-    await preflightPublication({
-      repositoryFullName: process.env.GITHUB_REPOSITORY ?? DEFAULT_REPOSITORY,
-      serverUrl: process.env.GITHUB_SERVER_URL ?? "https://github.com",
-      token: process.env.NODE_AUTH_TOKEN,
-    });
-    process.stdout.write(
-      `Preflight verified ${PACKAGE_DEFINITIONS.length} existing public registry packages.\n`,
-    );
-  } else if (command === "verify" || command === "bootstrap-verify") {
-    const version = readArgument("--version");
-    await verifyPublication({
-      repository,
-      staging,
-      version,
-      repositoryFullName: process.env.GITHUB_REPOSITORY ?? DEFAULT_REPOSITORY,
-      serverUrl: process.env.GITHUB_SERVER_URL ?? "https://github.com",
-      token: process.env.NODE_AUTH_TOKEN,
-      bootstrap: command === "bootstrap-verify",
-    });
-    process.stdout.write(
-      `Verified ${PACKAGE_DEFINITIONS.length} registry packages at ${version}${command === "bootstrap-verify" ? "; public activation remains pending" : ""}.\n`,
-    );
-  } else {
-    throw new Error("Expected the stage, preflight, or verify command.");
-  }
+export function exportTargets(value) {
+  if (typeof value === "string") return [value];
+  return Object.values(value ?? {}).flatMap(exportTargets);
 }

@@ -17,16 +17,21 @@ This guide defines review gates for the delivered architecture and separately id
 ## Browser script distribution
 
 - [ ] Script-release modules match packaged browser modules byte-for-byte, without a second bundle build or a missing/stale-evidence fallback.
-- [ ] Reusable publication retains typed mode selection, caller and callee gates, fail-closed matrix aggregation, minimal token permissions, one non-cancelable queue, and verified producer-version forwarding.
+- [ ] Ordinary CI publishes nothing, including with either legacy variable enabled; shared Linux/Windows validation and fail-closed aggregation remain.
+- [ ] Actual Changesets inputs produce synchronized numbered versions, including the requested initial `0.1.0-alpha.0`, subsequent alpha and stable transitions, without changing private source/workspace semantics.
+- [ ] The dedicated main-only manual npm caller enforces exact reviewed source/version and minimal per-job permissions. Publication/finalization use native `npm-release` approval; setup confirms the designated Sefaria reviewer and main-only policy, with self-review and administrator bypass allowed and no per-run protection API guard.
+- [ ] Preparation uploads three actual qualified npm tarballs, a bounded reproducible manifest, checksums and exact maintainer commands to one draft release; source archives are never substitutes.
+- [ ] Publication captures those exact assets before approval and invokes neither builder nor packer afterward; npm OIDC belongs only to later automated publication.
 - [ ] The plain-HTML smoke loads the actual production module without an import map, source alias, or custom source.
 - [ ] Re-evaluating identical bytes through a distinct URL preserves the registered constructors and throws no error.
-- [ ] Package producer version and commit survive archival retries; partial package publication cannot admit a script record.
+- [ ] Missing, duplicate, tampered and conflicting assets fail; idempotent preparation never replaces assets. Partial npm publication leaves the draft intact, and explicit resume skips only integrity-confirmed versions.
+- [ ] All three public npm records, exact dependencies, integrity and anonymous consumer pass before the same draft is finalized; alpha is a prerelease, not latest.
 - [ ] All active versions are restored byte-for-byte; missing/corrupt active archives block deployment.
-- [ ] Explicit retirement preserves unrelated records, is terminal, and follows the documented no-notice policy.
+- [ ] Pages restoration and historical archives remain intact during engineering. Retirement and npm-CDN documentation cutover require separate hosted qualification and authorization.
 - [ ] Concurrent catalog updates cannot lose earlier records, and stale aliases cannot win by completion order.
 - [ ] Runtime dependency notices, corresponding source, file hashes, and independently recomputed sizes accompany each release.
-- [ ] Validation stays read-only; only archival/retirement receive repository write permission, and only Pages deployment receives Pages identity permissions.
-- [ ] Hosted availability is not claimed from local checks; original retained URLs do not depend on repository redirects.
+- [ ] Build and validation have no write or OIDC permission; only draft-assets/finalization receive release write permission. Draft-assets owns GET-only preapproval capture because draft visibility requires push access. Only Pages deployment receives Pages identity permissions.
+- [ ] Both planned CDN hosts serve all three exact-version direct browser modules with matching bytes, MIME, CORS and notices before cutover. Hosted availability is not claimed from local checks; retained URLs do not depend on repository redirects.
 
 ## OpenAPI pin and overlay
 
@@ -360,7 +365,7 @@ Review the initial and expanded corrections for:
 - [ ] Library exports and packed files resolve built artifacts rather than producer source.
 - [ ] Workflow YAML permits only the rollout-enabled green-`main` public prerelease job to use repository-scoped `packages: write`, `github.token`, the `alpha` tag, and the fixed package order; it contains no deployment, long-lived secret, tag trigger, manual release, or other write loader.
 - [ ] The lockfile contains no mirror-specific remote tarball resolution.
-- [ ] Maintained entry documentation distinguishes workspace/local-tarball use from authenticated public GitHub Packages prereleases, states that names may change and npmjs.com/CDN/stable distribution is unavailable, and makes no unsupported official or deployed claim.
+- [ ] Maintained entry documentation distinguishes private workspace/local-tarball use, pending numbered public npm releases and retained Pages scripts, states that names may change, and makes no unsupported official or hosted qualification claim.
 - [ ] Every retained test from the immutable baseline inventory is present in Vitest discovery; every retirement has a precise presentation-only or supersession reason.
 - [ ] Fresh agent setup uses the frozen lockfile, verifies required immutable Git objects, installs Chromium, and proves a headless launch.
 - [ ] Toolkit setup is selected by checked-out package loader rather than one exact branch name.

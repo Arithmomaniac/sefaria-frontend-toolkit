@@ -2,6 +2,43 @@ export const BASELINE_TEST_INVENTORY_SOURCE =
   "Arithmomaniac/sefaria-web-components@7bc2d258fac2959beb5252ebdbcbddbaccd0c7b7";
 export const PRE_RETIREMENT_SHOWCASE_INVENTORY_SOURCE =
   "Arithmomaniac/sefaria-web-components@d7e2d59645ebf7427dcff2cbdd78073e2e7df58c";
+export const NPM_RELEASE_INVENTORY_SOURCE =
+  "Sefaria/sefaria-frontend-toolkit@0d11376df384f7bd9b5321146a1ebd95f6f3668b";
+export const NPM_RELEASE_TEST_DISPOSITION = Object.freeze([
+  {
+    source: "tests/package-publication.test.ts",
+    destinations: [
+      "tests/npm-release.test.ts",
+      "tests/npm-release-lifecycle.test.ts",
+    ],
+    reason:
+      "Registry-independent staging, file safety, dependency/version integrity and installed-consumer proof move to npm release qualification. GitHub visibility, authenticated inventory and run-derived versions are intentionally retired.",
+  },
+  {
+    source: "tests/workflow-policy.test.ts",
+    destinations: ["tests/workflow-policy.test.ts"],
+    reason:
+      "Carry shared matrix, fail-closed checks, Pages restoration and narrow credentials forward; replace removed GitHub publishing/bootstrap cases with exact npm caller and asset lifecycle mutation tests.",
+  },
+  {
+    source: "tests/ownership-migration.test.ts",
+    destinations: [
+      "tests/ownership-migration.test.ts",
+      "tests/npm-release-lifecycle.test.ts",
+    ],
+    reason:
+      "Keep names, license and legacy inventories; GitHub package bootstrap identity checks are superseded by exact draft source/tag and npm package identity checks.",
+  },
+  {
+    source: "tests/distribution-simplification.test.ts",
+    destinations: [
+      "tests/distribution-simplification.test.ts",
+      "tests/workflow-policy.test.ts",
+    ],
+    reason:
+      "Retain production browser build-evidence and no-rebundling checks; replace obsolete shared-publisher assertion with validation-only CI.",
+  },
+]);
 
 export const BASELINE_TEST_INVENTORY = Object.freeze([
   "demos/explorer/src/authored/development-status.browser.test.ts",

@@ -4,7 +4,7 @@
 
 Use the [product site](https://sefaria.github.io/sefaria-frontend-toolkit/) for the public learning path and interactive previews. This repository index also links contributor-only specifications, evidence, setup, and review material that is intentionally excluded from VitePress.
 
-The packages are migrating to the Sefaria scope on GitHub Packages; first publication under the new names is pending qualification. Installation will require authentication, and the packages are not published on npmjs.com. The browser examples can be evaluated without cloning; repository development and local-package qualification use the contributor documentation below.
+The packages are preparing synchronized public npm releases; `0.1.0-alpha.0` and npm-backed CDN availability remain pending qualification. Existing Pages browser releases are preserved during this engineering phase. The browser examples can be evaluated without cloning; repository development and local-package qualification use the contributor documentation below.
 
 ## Product documentation
 
@@ -42,5 +42,6 @@ These Markdown files are retained for contributors and auditors but excluded fro
 | Read source provenance and compatibility evidence | [Evidence](evidence.md) |
 | Read normative contracts | [Specifications](specs/client.md) |
 | Read package distribution rules | [Distribution specification](specs/distribution.md) |
+| Configure external npm release prerequisites | [Release administration](release-administration.md) |
 | Find historical removed material | [Documentation archive](archive/README.md) |
 | Resume repository work | [Handoff](handoff.md) |

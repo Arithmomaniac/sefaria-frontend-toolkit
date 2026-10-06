@@ -7,8 +7,9 @@ export function validatePackedPackage({
   manifest,
   contents,
   customElements,
+  published = false,
 }) {
-  if (manifest.name !== definition.name || manifest.private !== true) {
+  if (manifest.name !== definition.name || manifest.private !== !published) {
     throw new Error(`${definition.name} packed manifest is incorrect.`);
   }
   if (definition.browserFile) {
@@ -26,8 +27,8 @@ export function validatePackedPackage({
   }
   if (
     definition.name === "@sefaria/web-components" &&
-    (manifest.dependencies?.["@sefaria/api-client"] !== "0.0.0" ||
-      manifest.dependencies?.["@sefaria/text-transform"] !== "0.0.0")
+    (manifest.dependencies?.["@sefaria/api-client"] !== manifest.version ||
+      manifest.dependencies?.["@sefaria/text-transform"] !== manifest.version)
   ) {
     throw new Error(
       "@sefaria/web-components internal dependency versions were not packed exactly.",
