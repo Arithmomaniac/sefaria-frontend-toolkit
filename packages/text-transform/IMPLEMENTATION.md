@@ -2,11 +2,11 @@
 
 # `@sefaria/text-transform` implementation notes
 
-These notes are for maintainers. They were moved unchanged from the package README, which is now a short entry point. For usage, see the [documentation site](https://sefaria.github.io/sefaria-frontend-toolkit/).
+These notes are for maintainers, extracted from the former package README. For usage, see the [documentation site](https://sefaria.github.io/sefaria-frontend-toolkit/).
 
 `@sefaria/text-transform` provides deterministic, DOM-free operations for Sefaria text HTML and Hebrew vocalization.
 
-The committed source manifest remains private to prevent accidental publication. Numbered public npm publication under the Sefaria name remains pending hosted qualification. Follow the repository [installation instructions](../../docs/help/install-and-status.md#packages).
+The committed source manifest remains private to prevent accidental publication. Isolated public npm staging includes built exports and the standalone `dist/browser/sefaria-text-transform.js` module with exact release metadata. Consumers follow the repository [installation instructions](../../docs/help/install-and-status.md#packages); maintainers follow the [release lifecycle](../../docs/development.md#numbered-npm-releases).
 
 For an illustrated tour of the input, read [Text markup](../../docs/concepts/clean-text-and-safety.md). For the surrounding client and component pipeline, read [How the pieces fit together](../../docs/concepts/how-the-toolkit-works.md).
 

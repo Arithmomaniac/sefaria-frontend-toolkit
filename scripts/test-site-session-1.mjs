@@ -11,7 +11,7 @@ import { createFixtureResponse } from "./site-fixtures.mjs";
 import { startSitePreview } from "./site-preview-server.mjs";
 
 const scriptUrl =
-  "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js";
+  "https://cdn.jsdelivr.net/npm/@sefaria/web-components@0.1.0-alpha.0/dist/browser/sefaria-elements.js";
 
 function fail(message) {
   throw new Error(`[session 1] ${message}`);
@@ -204,14 +204,23 @@ export async function runSessionOneSiteChecks({ root, siteBasePath }) {
 
 /** A text-transform snippet runs offline, only after Run is pressed. */
 async function runSnippetRunChecks({ root, siteBasePath }) {
-  const cdn = "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/";
+  const modules = new Map([
+    [
+      "https://cdn.jsdelivr.net/npm/@sefaria/api-client@0.1.0-alpha.0/dist/browser/sefaria-api-client.js",
+      "sefaria-api-client.js",
+    ],
+    [
+      "https://cdn.jsdelivr.net/npm/@sefaria/text-transform@0.1.0-alpha.0/dist/browser/sefaria-text-transform.js",
+      "sefaria-text-transform.js",
+    ],
+  ]);
   await withSite(root, siteBasePath, async ({ browser, origin, url }) => {
     const page = await browser.newPage();
     const served = [];
     await page.route("**/*", async (route) => {
       const requestUrl = new URL(route.request().url());
-      if (requestUrl.href.startsWith(cdn)) {
-        const name = requestUrl.pathname.split("/").pop();
+      const name = modules.get(requestUrl.href);
+      if (name !== undefined) {
         served.push(name);
         await route.fulfill({
           body: await readFile(
@@ -299,7 +308,7 @@ export async function runSessionOneLiveChecks({ root, siteBasePath }) {
     const responses = [];
     page.on("response", (response) => {
       const host = new URL(response.url()).host;
-      if (["sefaria.github.io", "www.sefaria.org"].includes(host)) {
+      if (["www.sefaria.org", new URL(scriptUrl).host].includes(host)) {
         responses.push({
           url: response.url(),
           status: response.status(),

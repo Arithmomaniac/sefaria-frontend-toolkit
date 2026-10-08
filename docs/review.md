@@ -27,11 +27,11 @@ This guide defines review gates for the delivered architecture and separately id
 - [ ] Missing, duplicate, tampered and conflicting assets fail; idempotent preparation never replaces assets. Partial npm publication leaves the draft intact, and explicit resume skips only integrity-confirmed versions.
 - [ ] All three public npm records, exact dependencies, integrity and anonymous consumer pass before the same draft is finalized; alpha is a prerelease, not latest.
 - [ ] All active versions are restored byte-for-byte; missing/corrupt active archives block deployment.
-- [ ] Pages restoration and historical archives remain intact during engineering. Retirement and npm-CDN documentation cutover require separate hosted qualification and authorization.
+- [ ] Consumer npm-CDN recommendations are deployed only after hosted qualification. Preparing finished-state copy on an unpublished branch records its contingent merge/deploy gate rather than inventing results. Pages restoration and historical archives remain intact; operational retirement requires separate explicit authorization.
 - [ ] Concurrent catalog updates cannot lose earlier records, and stale aliases cannot win by completion order.
 - [ ] Runtime dependency notices, corresponding source, file hashes, and independently recomputed sizes accompany each release.
 - [ ] Build and validation have no write or OIDC permission; only draft-assets/finalization receive release write permission. Draft-assets owns GET-only preapproval capture because draft visibility requires push access. Only Pages deployment receives Pages identity permissions.
-- [ ] Both planned CDN hosts serve all three exact-version direct browser modules with matching bytes, MIME, CORS and notices before cutover. Hosted availability is not claimed from local checks; retained URLs do not depend on repository redirects.
+- [ ] Both CDN hosts serve all three exact-version direct browser modules with matching bytes, MIME, CORS and notices before documentation deployment. Hosted availability is not claimed from local checks; retained URLs do not depend on repository redirects.
 
 ## OpenAPI pin and overlay
 
@@ -363,11 +363,11 @@ Review the initial and expanded corrections for:
 - [ ] Active runtime and build paths contain no Python dependency or retired demo assembly.
 - [ ] Every package, example, and test-workspace manifest remains private.
 - [ ] Library exports and packed files resolve built artifacts rather than producer source.
-- [ ] Workflow YAML permits only the rollout-enabled green-`main` public prerelease job to use repository-scoped `packages: write`, `github.token`, the `alpha` tag, and the fixed package order; it contains no deployment, long-lived secret, tag trigger, manual release, or other write loader.
+- [ ] Ordinary CI publishes nothing. Manual npm release and Pages workflows retain their exact admitted permissions and activation contracts; no GitHub Packages publisher, package-publishing flag or long-lived npm credential is introduced.
 - [ ] The lockfile contains no mirror-specific remote tarball resolution.
-- [ ] Maintained entry documentation distinguishes private workspace/local-tarball use, pending numbered public npm releases and retained Pages scripts, states that names may change, and makes no unsupported official or hosted qualification claim.
+- [ ] Maintained entry documentation distinguishes private workspace/local-tarball use, numbered public npm packages, version-pinned npm CDN modules and historical Pages scripts. It states that APIs may change, preserves Sefaria ownership/support and MIT/hackathon context, and keeps unverified rollout claims in the evidence record.
 - [ ] Every retained test from the immutable baseline inventory is present in Vitest discovery; every retirement has a precise presentation-only or supersession reason.
-- [ ] Fresh agent setup uses the frozen lockfile, verifies required immutable Git objects, installs Chromium, and proves a headless launch.
+- [ ] Fresh agent setup uses the frozen lockfile and committed source-stamped inventories without historical Git objects, installs Chromium/Firefox/WebKit, and proves all three headless launches.
 - [ ] Toolkit setup is selected by checked-out package loader rather than one exact branch name.
 - [ ] An unrelated checkout skips toolkit setup explicitly; a malformed recognized toolkit fails.
 - [ ] Linux and Windows each run the complete `pnpm check`; the required `check` fails for a failed, canceled, or skipped matrix.

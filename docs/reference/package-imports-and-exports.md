@@ -19,9 +19,9 @@ Each package ships its own TypeScript types. To choose between the script tag an
 
 ## Which release this describes
 
-This page documents the code on the `main` branch. The source stamp is not an npm release or a development snapshot. Numbered npm releases and their CDN URLs remain pending publication and hosted qualification. <ReleaseStamp />
+This page documents the code on the `main` branch. The source stamp is not an npm release or a development snapshot. <ReleaseStamp />
 
-The legacy Pages `alpha` script-tag address serves the newest retained script release, not every main build. Compare the stamp above with the version in the [script-tag versions index](https://sefaria.github.io/sefaria-frontend-toolkit/cdn/index.html). Older pinned script-tag versions keep their own behavior for as long as the host keeps them available. An older pin can also lack attributes added since.
+Install an exact npm version or use a version-pinned npm CDN module. The npm `alpha` tag moves between reviewed prereleases. It is not a main-build snapshot. Check the [GitHub Releases](https://github.com/Sefaria/sefaria-frontend-toolkit/releases) for the source and notes of your installed version. Older pinned releases keep their own behavior and can lack APIs added since. [Install and status](/help/install-and-status.md) lists package commands and jsDelivr/UNPKG files.
 
 <a id="register-the-elements"></a>
 

@@ -24,6 +24,10 @@ Register the elements before your framework renders them, so their JavaScript pr
 
 <StatusNote />
 
+```sh
+npm install @sefaria/web-components@0.1.0-alpha.0
+```
+
 ```ts
 import "@sefaria/web-components";
 ```

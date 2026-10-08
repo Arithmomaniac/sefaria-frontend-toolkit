@@ -2,11 +2,11 @@
 
 # `@sefaria/api-client` implementation notes
 
-These notes are for maintainers. They were moved unchanged from the package README, which is now a short entry point. For usage, see the [documentation site](https://sefaria.github.io/sefaria-frontend-toolkit/).
+These notes are for maintainers, extracted from the former package README. For usage, see the [documentation site](https://sefaria.github.io/sefaria-frontend-toolkit/).
 
 `@sefaria/api-client` is the validated transport boundary for the complete 60-operation surface in the pinned Sefaria OpenAPI document. It owns the pinned input, guarded corrections, generated contracts and Zod validators, tag-based namespaces, thin fetch client, and bounded default-on per-client response cache.
 
-The committed source manifest remains private to prevent accidental publication. Numbered public npm publication under the Sefaria name remains pending hosted qualification. Follow the repository [installation instructions](../../docs/help/install-and-status.md#packages).
+The committed source manifest remains private to prevent accidental publication. Isolated public npm staging includes built exports and the standalone `dist/browser/sefaria-api-client.js` module with exact release metadata. Consumers follow the repository [installation instructions](../../docs/help/install-and-status.md#packages); maintainers follow the [release lifecycle](../../docs/development.md#numbered-npm-releases).
 
 ## Ordinary use
 

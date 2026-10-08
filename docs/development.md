@@ -2,7 +2,7 @@
 
 # Development
 
-This contributor guide describes the maintained source tree and Sefaria ownership migration. The repository's specifications define intended behavior; implementation and tests establish what is currently delivered. Hosted publication under the new package identities remains pending until the rollout below completes.
+This contributor guide describes the maintained source tree and npm-only release lifecycle. The repository's specifications define intended behavior; implementation and tests establish what is currently delivered. Public consumers use the synchronized `@sefaria` npm packages and version-pinned npm CDN files from [Install and status](help/install-and-status.md). Provider observations and conditional documentation deployment gates belong in [Evidence](evidence.md#conditional-post-launch-documentation).
 
 The sections below separate delivered baseline behavior, changes from older plans, and work that remains intended. A runnable command is not proof that the corresponding integration is finished.
 
@@ -147,7 +147,7 @@ A person must check behavior claims. A page that no person has reviewed carries 
 
 ## Browser script distribution
 
-The script-source implementation is locally qualified and the P5 release is hosted. New builds omit Popup; retained P5 pins keep their original bytes and API. The [distribution contract](specs/distribution.md#preserved-pages-cdn-and-gated-cutover) preserves restoration during npm release engineering.
+For new browser integrations, use the packaged npm modules through jsDelivr or UNPKG. The legacy Pages script-source path remains implemented for offline browser acceptance and retained archive restoration; changing consumer recommendations does not retire it. New builds omit Popup; retained P5 pins keep their original bytes and API. The [distribution contract](specs/distribution.md#preserved-pages-cdn-and-gated-cutover) defines the separate operational cutover.
 
 After building the workspace, run:
 
@@ -160,7 +160,7 @@ The first command writes `dist/script-source/sefaria-elements.js`, `sefaria-api-
 
 The script smoke also drives real keyboard and pointer interactions at root and project URL bases: Source Card selection events received by ordinary host JavaScript, selected-state feedback, reversible language/vocalization controls, Reader commentary navigation and Back, narrow-screen pane switching, and no Popup registration or export. The production-site gate separately exercises the linked article's host dialog, Escape/button close, and originating-link focus return in all three browsers. It checks exact request counts after those actions. The pages import only the production bundle; Sefaria HTTP responses use the same bounded fixtures as site acceptance. This proves local interaction behavior, not the live Pages URL or upstream availability.
 
-CI no longer publishes package or script archives. Existing browser archives and Pages restoration remain intact until public npm and dual-CDN qualification and a separately approved cutover.
+CI publishes neither packages nor script archives. Existing browser archives and Pages restoration remain intact until a separately authorized operational cutover, even when npm-backed CDN files are the recommended consumer route.
 
 The automation-owned `script-distribution` branch stores `catalog.json`. Do not delete this branch or manually edit active hashes. Existing records and archive bytes remain authoritative; there is no new main-build archival job. Conflicting archived bytes require investigation, not overwrite.
 
@@ -168,11 +168,11 @@ Every Pages deployment reconstructs all active `cdn/<version>` directories from 
 
 Restoration reports the complete site's byte size and blocks upload above 1,000,000,000 bytes, with the largest retained-version directories listed as cleanup candidates. Each retained directory includes its source archive, so growth requires deliberate maintenance; the budget check never retires a version automatically. Every GitHub request has a fresh 60-second deadline. Archive, Pages build, Pages deployment, and retirement jobs have outer limits of 30, 60, 15, and 10 minutes respectively.
 
-The existing **Retire script version** owner records terminal tombstones and triggers Pages omission without deleting historical Release/source archives. Do not execute retirement during pre-publication engineering. Retirement of all active records belongs to the separately authorized post-qualification cutover; pins may then stop working and caches may delay removal. Never reuse a retired version identifier.
+The existing **Retire script version** owner records terminal tombstones and triggers Pages omission without deleting historical Release/source archives. A documentation update is not retirement authorization. Retirement of all active records belongs to the separately authorized post-qualification operational cutover; pins may then stop working and caches may delay removal. Never reuse a retired version identifier.
 
 The supported Pages host is now `https://sefaria.github.io/sefaria-frontend-toolkit/`. The maintainer explicitly retired support for the old personal-account URLs after the ownership transfer. Restore retained artifacts byte-for-byte at the new host; do not rewrite their original licenses or filenames. Schema 1 releases contain only elements, schema 2 includes `sefaria-client.js`, and new schema 3 releases use `sefaria-api-client.js`.
 
-Hosted qualification is still required after authorized publication: check anonymous module loading, MIME/CORS, matching package version, notices/source access, and an older active pin after a later deployment. Local tests do not establish hosted availability.
+Retained Pages qualification checks anonymous module loading, MIME/CORS, matching archive version, notices/source access, and an older active pin after a later deployment. npm CDN qualification instead compares against the captured npm release assets as described below. Local tests do not establish either host's availability.
 
 ## Workspace
 
@@ -213,9 +213,9 @@ After Node.js and the pinned pnpm are available, prepare a fresh toolkit checkou
 pnpm setup:agent
 ```
 
-The command performs a frozen install, installs Chromium, and launches and closes a headless browser. On Linux it also asks Playwright to install Chromium's system dependencies; that can require privileges supplied by the host. It uses the effective package-manager configuration and does not override registries. Historical test inventories are committed with their source repository and complete commit SHA, so setup does not need the original repository's Git objects.
+The command performs a frozen install, installs Chromium, Firefox and WebKit, and launches and closes all three headless browsers. On Linux it also asks Playwright to install their system dependencies; that can require privileges supplied by the host. It uses the effective package-manager configuration and does not override registries. Historical test inventories are committed with their source repository and complete commit SHA, so setup does not need the original repository's Git objects.
 
-Preparation can use the network for dependencies and Chromium and fails at the exact unsuccessful step. `pnpm check` remains the offline validation boundary: it does not fetch Git history, refresh fixtures, or contact Sefaria.
+Preparation can use the network for dependencies and browsers and fails at the exact unsuccessful step. `pnpm check` remains the offline validation boundary: it does not fetch Git history, refresh fixtures, or contact Sefaria.
 
 GitHub's `.github/workflows/copilot-setup-steps.yml` first checks for `packages/web-components/package.json` with package name `@sefaria/web-components`. Toolkit-derived branches prepare normally; an unrelated checkout logs an explicit skip. A checkout that looks like the toolkit but lacks the setup script fails rather than silently skipping. This loader-based behavior must be verified in real cloud sessions after the workflow is active on `main`.
 
@@ -227,8 +227,8 @@ For browser-only TypeScript work, run these commands from the repository root:
 
 ```powershell
 corepack enable
-pnpm install
-pnpm exec playwright install chromium
+pnpm install --frozen-lockfile
+pnpm exec playwright install chromium firefox webkit
 ```
 
 If Corepack is unavailable, install the pinned pnpm release through your approved package-management path, then run the same commands. Do not let a transient executor download an unpinned tool.
@@ -592,17 +592,26 @@ allowBuilds:
 
 GitHub Packages publishing/bootstrap, registry-only checks and both legacy activation flags are removed. Ordinary CI retains shared complete Linux/Windows validation and fail-closed `check`, with no package or script-archive writes.
 
-The installed Changesets CLI consumed the actual pending main-baseline Changesets into synchronized `0.1.0-alpha.0` private library manifests and generated changelogs. The source-stamped fixture in `tests/fixtures/initial-changesets.json` reproduces that exact initial input without historical Git objects during `pnpm check`. Later version PRs use `pnpm exec changeset version` while in alpha mode; stable transitions use `pnpm exec changeset pre exit` followed by `pnpm exec changeset version`. Review the complete synchronized result before release. Keep `private: true` and `workspace:*`.
+The initial numbered version is `0.1.0-alpha.0`, selected by the installed Changesets CLI from the actual pending main-baseline Changesets. The source-stamped fixture in `tests/fixtures/initial-changesets.json` reproduces that exact initial input without historical Git objects during `pnpm check`. For package changes, add a note with the installed `pnpm exec changeset` command. Later version PRs use `pnpm exec changeset version` while in alpha mode; stable transitions use `pnpm exec changeset pre exit` followed by `pnpm exec changeset version`. Review the complete synchronized manifests, dependency versions and changelogs before release. Keep source manifests `private: true` with `workspace:*`; only isolated public staging rewrites them. Documentation-only updates neither authorize a release nor replace assets of an already published version.
 
 The manual `release-npm.yml` caller has `prepare`, `publish`, and `verify-finalize` operations with exact source/version inputs. Preparation runs complete Linux/Windows checks, builds once per platform, packs public npm tarballs and qualifies actual framework/browser consumers. Matching cross-platform bytes are uploaded to one SHA-bound draft GitHub Release with manifest, checksums and maintainer commands. Only draft-assets and finalization receive `contents: write`; preparation receives no npm OIDC. The draft-assets job also owns GET-only capture before approval, because GitHub requires push access to see drafts. Administrators configure and confirm `npm-release` with the designated Sefaria approver and main-only branch rule during setup. Self-review and administrator bypass are allowed; publication/finalization rely on native GitHub approval, with no per-run configuration API guard.
 
 For the first release, an authorized Sefaria npm maintainer downloads and checks that draft's actual `.tgz` assets and publishes with their own account/2FA. Avi needs no npm membership or manual file-transfer role. The draft's `MAINTAINER-COMMANDS.ps1` supplies the exact release link, download/checksum and ordered public npm commands. Source-code archives are not npm packages.
 
-Later publication captures the exact draft assets before environment approval, then uses pinned Node 22.14.0 and npm 11.5.2 with job-scoped OIDC. No rebuild, repack, arbitrary command/registry or permanent token fallback is permitted. Explicit resume verifies every existing exact version before skipping it. Any conflicting bytes/dependencies/source fail; partial publication leaves the draft and assets intact. Verification checks all three npm records, integrity, dependencies, dist-tags and anonymous installed imports before the separate finalization job makes that same release public. Alpha is a prerelease and is not deliberately promoted to latest.
+The later trusted-publishing path is implemented but requires its own provider setup and hosted qualification; successful first publication does not prove it. It captures the exact draft assets before environment approval, then uses pinned Node 22.14.0 and npm 11.5.2 with job-scoped OIDC. No rebuild, repack, arbitrary command/registry or permanent token fallback is permitted. Explicit resume verifies every existing exact version before skipping it. Any conflicting bytes/dependencies/source fail; partial publication leaves the draft and assets intact. Verification checks all three npm records, integrity, dependencies, dist-tags and anonymous installed imports before the separate finalization job makes that same release public. Alpha is a prerelease and is not deliberately promoted to latest.
 
 Local preparation after building uses `RELEASE_VERSION` and `RELEASE_SOURCE` with `pnpm release:prepare`; hosted writes remain separately authorized manual operations. `pnpm package:smoke` also rehearses real public npm staging and the same browser/framework consumers offline, not just the private source packages. It cleans disposable qualification assets; it does not establish hosted availability.
 
-Explicit read-only hosted verification requires downloaded qualified assets. Run `pnpm release:verify` with the exact version/source and `.artifacts/npm-release` assets, then `pnpm release:verify-cdn -- .artifacts/npm-release` to compare all three modules/notices against jsDelivr and UNPKG and exercise real CDN imports and bounded live Micah requests in Chromium, Firefox and WebKit. These commands are not part of offline `pnpm check`. Do not infer CDN readiness from status 200 or local files. No browser-file export-map additions are made without actual UNPKG qualification.
+Explicit read-only hosted verification requires the original downloaded qualified assets, not a rebuild from a later documentation commit. For the initial release, put its six assets in `.artifacts/npm-release` and run on a host with anonymous npm/CDN access:
+
+```powershell
+$env:RELEASE_VERSION = "0.1.0-alpha.0"
+$env:RELEASE_SOURCE = "2d9cade6cc5b517d1ee4189e3a8d6e636cacde90"
+pnpm release:verify
+pnpm release:verify-cdn -- .artifacts/npm-release
+```
+
+For later releases, replace both values with the version and full source SHA from that release's manifest. The CDN command compares all three modules/notices against jsDelivr and UNPKG and exercises real CDN imports and bounded live Micah requests in Chromium, Firefox and WebKit. These commands are not part of offline `pnpm check`. Do not infer readiness from status 200 or local files. No browser-file export-map additions are made without actual UNPKG qualification.
 
 See [Release administration](release-administration.md) for standalone external prerequisites. Sefaria reviewer selection, npm namespace ownership, initial publisher/draft access, native approval behavior and later trusted publishing remain externally owned. The read-only environment inventory is recorded in [Evidence](evidence.md#npm-only-release-engineering); naming the environment alone does not establish its protection.
 

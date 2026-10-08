@@ -238,7 +238,7 @@ describe("Wave 4 integration policy", () => {
     expect(
       validateDocumentationClaims({
         "docs/help/install-and-status.md":
-          'Public npm publication of `0.1.0-alpha.0` is pending qualification. This is planned installation guidance.\nversion="0.1.0-alpha.0"\nnpm install "@sefaria/api-client@$version" "@sefaria/text-transform@$version" "@sefaria/web-components@$version"',
+          "npm install @sefaria/api-client@0.1.0-alpha.0 @sefaria/text-transform@0.1.0-alpha.0 @sefaria/web-components@0.1.0-alpha.0\nnpm install @sefaria/web-components@alpha",
       }),
     ).toEqual([]);
     expect(
@@ -265,5 +265,18 @@ describe("Wave 4 integration policy", () => {
           "The toolkit is deployed publicly.\nThis is not an official Microsoft product.",
       }),
     ).toEqual(["unsupported deployment claim: README.md"]);
+  });
+
+  it.each([
+    "npm install @sefaria/model@0.1.0-alpha.0",
+    "npm install @sefaria/api-client",
+    "npm install @sefaria/api-client@latest",
+    "npm install @sefaria/api-client@0.1.0-alpha.99",
+    "npm install @sefaria/api-client@0.1.0-alpha.0 --registry=https://npm.pkg.github.com",
+    "npm install @sefaria/api-client@0.1.0-alpha.0 && npm publish",
+  ])("rejects unsupported post-launch installation: %s", (command) => {
+    expect(validateDocumentationClaims({ "README.md": command })).toEqual([
+      "unsupported registry installation command: README.md",
+    ]);
   });
 });

@@ -319,7 +319,7 @@ describe("B22 Start with an AI assistant", () => {
     expect(text).toContain("Micah 6:8");
     expect(text).toContain("<sefaria-source-card");
     expect(text).toContain(
-      "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js",
+      "https://cdn.jsdelivr.net/npm/@sefaria/web-components@0.1.0-alpha.0/dist/browser/sefaria-elements.js",
     );
     expect(text).toContain('import "@sefaria/web-components";');
     expect(text).toMatch(/attribution/i);

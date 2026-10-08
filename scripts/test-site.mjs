@@ -529,7 +529,7 @@ try {
     await assertText(page.locator("body"), "use a plain link to Sefaria");
     await assertText(
       page.locator("body"),
-      "The alpha address always loads the newest build.",
+      "The script pins npm release 0.1.0-alpha.0 through jsDelivr.",
     );
     await assertEqual(
       (await page.locator(".vp-doc code", { hasText: "alpha" }).count()) > 0,
@@ -1209,7 +1209,7 @@ async function routeToolkitRequests(
     const url = new URL(request.url());
     if (
       url.href ===
-      "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
+      "https://cdn.jsdelivr.net/npm/@sefaria/web-components@0.1.0-alpha.0/dist/browser/sefaria-elements.js"
     ) {
       await route.fulfill({
         body: localScript,

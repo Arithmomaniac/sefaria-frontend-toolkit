@@ -13,7 +13,23 @@ A community-driven project with Sefaria backing and support. The toolkit is expe
 
 ## Install and status
 
-Public npm releases of `@sefaria/api-client`, `@sefaria/text-transform`, and `@sefaria/web-components` are being prepared. The first numbered release, `0.1.0-alpha.0`, and npm-backed CDN availability are pending qualification, not live install promises. Existing Pages browser releases remain available while retained. [Install and status](https://sefaria.github.io/sefaria-frontend-toolkit/help/install-and-status.html) explains the choices.
+Install the public npm packages at the synchronized alpha version. Leave out packages you don't need:
+
+```sh
+npm install @sefaria/api-client@0.1.0-alpha.0 @sefaria/text-transform@0.1.0-alpha.0 @sefaria/web-components@0.1.0-alpha.0
+```
+
+For a page without a build step:
+
+```html
+<script
+  type="module"
+  src="https://cdn.jsdelivr.net/npm/@sefaria/web-components@0.1.0-alpha.0/dist/browser/sefaria-elements.js"
+></script>
+<sefaria-source-card sref="Micah 6:8"></sefaria-source-card>
+```
+
+No registry token is needed. [Install and status](https://sefaria.github.io/sefaria-frontend-toolkit/help/install-and-status.html) covers pinned jsDelivr and UNPKG files, package imports, and the moving npm `alpha` tag. See the [GitHub Release](https://github.com/Sefaria/sefaria-frontend-toolkit/releases/tag/v0.1.0-alpha.0) for release notes and exact package assets.
 
 ## Documentation
 
