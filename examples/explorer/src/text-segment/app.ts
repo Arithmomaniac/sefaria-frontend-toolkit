@@ -122,17 +122,13 @@ async function loadText(
   try {
     if (
       result.sref === request.tref &&
-      result.versionLanguage === request.version.language &&
+      result.language === request.version.language &&
       result.versionTitle === request.version.versionTitle
     ) {
       result.setAttribute("sref", "");
       await result.updateComplete;
     }
-    setOptionalElementAttribute(
-      result,
-      "version-language",
-      request.version.language,
-    );
+    setOptionalElementAttribute(result, "language", request.version.language);
     setOptionalElementAttribute(
       result,
       "version-title",

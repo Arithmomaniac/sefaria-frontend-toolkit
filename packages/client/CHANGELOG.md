@@ -1,5 +1,9 @@
 # @sefaria/api-client
 
+## 0.1.1-alpha.0
+
+No changes in this release.
+
 ## 0.1.0-alpha.0
 
 ### Minor Changes

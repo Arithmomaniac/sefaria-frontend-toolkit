@@ -36,10 +36,11 @@ const journeyFiles = [
   "examples/react-vite/README.md",
   "examples/alpine-vite/README.md",
 ];
+const manifests = await readJsonFiles(root, manifestFiles);
 
 const issues = [
   ...validateActivePaths(tracked),
-  ...validateManifestPolicy(await readJsonFiles(root, manifestFiles)),
+  ...validateManifestPolicy(manifests),
   ...validateWorkflowPolicy(
     Object.fromEntries(
       await Promise.all(
@@ -62,6 +63,7 @@ const issues = [
         ]),
       ),
     ),
+    manifests["packages/client/package.json"].version,
   ),
   ...(await validateMarkdownLinks(root, journeyFiles)),
 ];

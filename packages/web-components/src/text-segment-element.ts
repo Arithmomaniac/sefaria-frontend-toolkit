@@ -28,7 +28,6 @@ import type {
 import {
   createTextSegmentViewModel,
   projectTextSegmentValue,
-  projectTextSegmentVersion,
 } from "./text-segment.js";
 import {
   assertVocalizationMode,
@@ -52,20 +51,15 @@ export class SefariaTextSegment extends SefariaElement {
     sref: { type: String, useDefault: true },
     data: { attribute: false },
     source: { attribute: false },
-    translationLanguage: {
-      type: String,
-      attribute: "translation-language",
-      converter: optionalStringConverter,
-    },
     translationFallback: {
       type: String,
       attribute: "translation-fallback",
       reflect: true,
       useDefault: true,
     },
-    versionLanguage: {
+    language: {
       type: String,
-      attribute: "version-language",
+      attribute: "language",
       converter: optionalStringConverter,
     },
     versionTitle: {
@@ -149,12 +143,10 @@ export class SefariaTextSegment extends SefariaElement {
   declare data: unknown | undefined;
   /** Where this element gets its data, instead of the shared data source. */
   declare source: SefariaDataSource | undefined;
-  /** Language of the edition to show, instead of the primary edition. */
-  declare versionLanguage: string | undefined;
-  /** `version-title` alone chooses another edition in the original language. To choose a translation by title, also set `translation-language`. */
+  /** Full language-family name, such as `hebrew` or `french`. Omit to show Sefaria's primary edition. */
+  declare language: string | undefined;
+  /** Exact edition in `language`, or among primary editions when no language is set. Exact titles never fall back. */
   declare versionTitle: string | undefined;
-  /** Preferred translation language. Can't be combined with `versionLanguage`. */
-  declare translationLanguage: string | undefined;
   /** What happens when the preferred translation language is missing: `default` loads Sefaria's default translation, `none` shows a status such as "No french text.". */
   declare translationFallback: "default" | "none";
   /** How much Hebrew vowel and cantillation marking to keep. `none` removes both. */
@@ -183,9 +175,8 @@ export class SefariaTextSegment extends SefariaElement {
     this.sref = "";
     this.data = undefined;
     this.source = undefined;
-    this.versionLanguage = undefined;
+    this.language = undefined;
     this.versionTitle = undefined;
-    this.translationLanguage = undefined;
     this.translationFallback = "none";
     this.vocalizationMode = "taamim_and_nikkud";
   }
@@ -235,8 +226,7 @@ export class SefariaTextSegment extends SefariaElement {
       changed.has("sref") ||
       changed.has("data") ||
       changed.has("source") ||
-      changed.has("versionLanguage") ||
-      changed.has("translationLanguage") ||
+      changed.has("language") ||
       changed.has("translationFallback") ||
       changed.has("versionTitle")
     ) {
@@ -395,7 +385,7 @@ export class SefariaTextSegment extends SefariaElement {
         source,
         sref,
         versions,
-        this.translationLanguage,
+        this.language,
         translationFallback,
         active.controller.signal,
         active.progress,
@@ -442,12 +432,20 @@ export class SefariaTextSegment extends SefariaElement {
     if (isSelectedTextSegmentData(payload)) {
       const selected = validateSelectedTextSegmentData(payload);
       if (
-        this.translationLanguage !== undefined &&
+        this.language !== undefined &&
         selected.version.languageFamilyName.toLowerCase() !==
-          normalizeTranslationLanguage(this.translationLanguage)
+          normalizeTranslationLanguage(this.language)
       ) {
         throw new TypeError(
-          "/version: selected data cannot establish preferred-translation fallback coverage.",
+          "/version: selected data does not match the requested language.",
+        );
+      }
+      if (
+        this.versionTitle !== undefined &&
+        selected.version.versionTitle !== this.versionTitle.replaceAll("_", " ")
+      ) {
+        throw new TypeError(
+          "/version/versionTitle: selected data does not match the requested edition.",
         );
       }
       return projectTextSegmentValue(
@@ -460,71 +458,23 @@ export class SefariaTextSegment extends SefariaElement {
       { method: "GET", path: "/api/v3/texts/{tref}", status: 200 },
       payload,
     );
-    if (this.translationLanguage !== undefined) {
-      return createTextSegmentViewModel(validated, {
-        tref: this.sref,
-        version: {
-          translationLanguage: this.translationLanguage,
-          ...(this.versionTitle === undefined
-            ? {}
-            : { versionTitle: this.versionTitle }),
-        },
-        translationFallback,
-      });
-    }
-    if (this.versionLanguage !== undefined) {
-      return createTextSegmentViewModel(validated, {
-        tref: this.sref,
-        version: {
-          language: this.versionLanguage,
-          ...(this.versionTitle === undefined
-            ? {}
-            : { versionTitle: this.versionTitle }),
-        },
-      });
-    }
-
-    const primary = validated.versions.filter(
-      (version) =>
-        version.isPrimary === true &&
-        (this.versionTitle === undefined ||
-          version.versionTitle === this.versionTitle.replaceAll("_", " ")),
-    );
-    if (primary.length === 0) {
-      return {
-        state: "empty",
-        ref: validated.ref,
-        heRef: validated.heRef,
-        message: "No primary text is available.",
-        warnings: [],
-      };
-    }
-    if (primary.length > 1) {
-      return {
-        state: "error",
-        errorKind: "projection",
-        message: `Text segment requires one primary version; found ${primary.length}.`,
-      };
-    }
-    return projectTextSegmentVersion(validated, primary[0]!);
+    return createTextSegmentViewModel(validated, {
+      tref: this.sref,
+      version: {
+        ...(this.language === undefined ? {} : { language: this.language }),
+        ...(this.versionTitle === undefined
+          ? {}
+          : { versionTitle: this.versionTitle }),
+      },
+      translationFallback,
+    });
   }
 
   #serializedVersion(): string {
-    if (
-      this.translationLanguage !== undefined &&
-      this.versionLanguage !== undefined
-    ) {
-      throw new TypeError(
-        "translation-language and version-language cannot be combined.",
-      );
-    }
     const language =
-      this.translationLanguage === undefined
-        ? (this.versionLanguage?.trim().toLowerCase() ?? "primary")
-        : normalizeTranslationLanguage(this.translationLanguage);
-    if (language.length === 0) {
-      throw new TypeError("Text segment version language must not be blank.");
-    }
+      this.language === undefined
+        ? "primary"
+        : normalizeTranslationLanguage(this.language);
     if (this.versionTitle !== undefined && !this.versionTitle.trim()) {
       throw new TypeError("Text segment version title must not be blank.");
     }

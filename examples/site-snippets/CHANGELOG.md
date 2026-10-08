@@ -1,5 +1,14 @@
 # @sefaria-example/site-snippets
 
+## 0.0.1-alpha.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @sefaria/web-components@0.1.1-alpha.0
+  - @sefaria/api-client@0.1.1-alpha.0
+  - @sefaria/text-transform@0.1.1-alpha.0
+
 ## 0.0.1-alpha.0
 
 ### Patch Changes

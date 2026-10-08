@@ -236,10 +236,13 @@ describe("Wave 4 integration policy", () => {
       }),
     ).toEqual([]);
     expect(
-      validateDocumentationClaims({
-        "docs/help/install-and-status.md":
-          'Public npm publication of `0.1.0-alpha.0` is pending qualification. This is planned installation guidance.\nversion="0.1.0-alpha.0"\nnpm install "@sefaria/api-client@$version" "@sefaria/text-transform@$version" "@sefaria/web-components@$version"',
-      }),
+      validateDocumentationClaims(
+        {
+          "docs/help/install-and-status.md":
+            'Public npm publication of `0.1.0-alpha.0` is pending qualification. This is planned installation guidance.\nversion="0.1.0-alpha.0"\nnpm install "@sefaria/api-client@$version" "@sefaria/text-transform@$version" "@sefaria/web-components@$version"',
+        },
+        "0.1.0-alpha.0",
+      ),
     ).toEqual([]);
     expect(
       validateDocumentationClaims({
@@ -266,4 +269,38 @@ describe("Wave 4 integration policy", () => {
       }),
     ).toEqual(["unsupported deployment claim: README.md"]);
   });
+
+  it.each(["0.1.0-alpha.0", "0.1.1-alpha.0", "0.1.1"])(
+    "allows planned installation only for the supplied manifest version %s",
+    (version) => {
+      const filename = "docs/help/install-and-status.md";
+      const source = `Public npm publication of \`${version}\` is pending qualification. This is planned installation guidance.
+version="${version}"
+npm install "@sefaria/api-client@$version" "@sefaria/text-transform@$version" "@sefaria/web-components@$version"`;
+      expect(
+        validateDocumentationClaims({ [filename]: source }, version),
+      ).toEqual([]);
+      for (const changed of [
+        source.replace(`version="${version}"`, 'version="9.9.9"'),
+        source.replace(`\`${version}\``, "`9.9.9`"),
+        source.replace("is pending qualification", "is published"),
+        source.replace(
+          "planned installation guidance",
+          "installation guidance",
+        ),
+        source.replace(' "@sefaria/text-transform@$version"', ""),
+        `${source}\nnpm install @sefaria/api-client`,
+      ]) {
+        expect(
+          validateDocumentationClaims({ [filename]: changed }, version),
+        ).toContain(`unsupported registry installation command: ${filename}`);
+      }
+      expect(validateDocumentationClaims({ [filename]: source })).toContain(
+        `unsupported registry installation command: ${filename}`,
+      );
+      expect(
+        validateDocumentationClaims({ "README.md": source }, version),
+      ).toContain("unsupported registry installation command: README.md");
+    },
+  );
 });

@@ -32,7 +32,7 @@ test("loads a preset through explicit source with declarative version inputs", a
   ]);
   expect(url.searchParams.get("return_format")).toBe("default");
   expect(resultElement().sref).toBe("Obadiah 1:1");
-  expect(resultElement().versionLanguage).toBe("hebrew");
+  expect(resultElement().language).toBe("hebrew");
   expect(resultElement().versionTitle).toBe("Miqra according to the Masorah");
 });
 

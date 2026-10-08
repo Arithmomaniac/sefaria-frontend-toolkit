@@ -81,7 +81,7 @@ There is no generic ready event, so read `status`.
 
 **What you see:** the wrong language, or a message that says the language is missing or that another language is shown.
 
-**Why:** `translation-fallback` decides what happens when Sefaria reports that your `translation-language` is absent. The default depends on the element:
+**Why:** `translation-fallback` decides what happens when Sefaria reports that your requested language is absent. Text Segment uses `language`. Two-sided components use `translation-language`. The default depends on the element:
 
 - Text Segment and Bilingual Segment default to `none`. They make no fallback request. Text Segment shows "No french text." Bilingual Segment keeps the primary side and shows that message on the translation side.
 - Source Card and Reader default to `default`. They load Sefaria's default translation, which isn't always English. They show a notice that names the missing language and the language shown. For example, the notice for French says "french is unavailable" and then names english. This costs one extra request.

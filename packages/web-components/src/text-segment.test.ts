@@ -322,7 +322,7 @@ describe("createTextSegmentViewModel", () => {
     );
   });
 
-  it("returns an empty state and preserves warnings when no version matches", () => {
+  it("returns the missing-language status and preserves warnings when no version matches", () => {
     const payload = sourcePayload();
     payload.warnings = [
       {
@@ -342,7 +342,7 @@ describe("createTextSegmentViewModel", () => {
       state: "empty",
       ref: "Genesis 1:1",
       heRef: "בראשית א׳:א׳",
-      message: "No English version is available.",
+      message: "No english text.",
       warnings: ["No English version is available."],
     });
   });

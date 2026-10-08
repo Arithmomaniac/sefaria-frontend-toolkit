@@ -130,7 +130,7 @@ const cases = [
     file: "examples/explorer/src/text-segment/app.ts",
     forbidden: [
       "result.sref = ",
-      "result.versionLanguage = ",
+      "result.language = ",
       "result.versionTitle = ",
     ],
     required: ['result.setAttribute("sref", request.tref)'],
@@ -156,8 +156,8 @@ const cases = [
   },
   {
     file: "examples/playground/projects/text-segment/main.js",
-    forbidden: ["segment.versionLanguage = ", "segment.versionTitle = "],
-    required: ['segment.setAttribute("version-language"'],
+    forbidden: ["segment.language = ", "segment.versionTitle = "],
+    required: ['segment.setAttribute("language"'],
   },
 ] as const;
 

@@ -617,7 +617,7 @@ export function validateLockfilePolicy(source) {
   return issues;
 }
 
-export function validateDocumentationClaims(files) {
+export function validateDocumentationClaims(files, releaseVersion = undefined) {
   const issues = [];
   for (const [filename, source] of Object.entries(files)) {
     const prose = stripFencedCode(source);
@@ -628,11 +628,13 @@ export function validateDocumentationClaims(files) {
       );
     const documentsPlannedNpm =
       filename === "docs/help/install-and-status.md" &&
-      /Public npm publication of `0\.1\.0-alpha\.0` is pending qualification/u.test(
-        prose,
+      typeof releaseVersion === "string" &&
+      releaseVersion.length > 0 &&
+      prose.includes(
+        `Public npm publication of \`${releaseVersion}\` is pending qualification`,
       ) &&
       /planned installation guidance/u.test(prose) &&
-      source.includes('version="0.1.0-alpha.0"') &&
+      source.includes(`version="${releaseVersion}"`) &&
       toolkitInstallLines.length === 1 &&
       [...EXPECTED_LIBRARY_NAMES.values()].every((packageName) =>
         toolkitInstallLines[0].includes(`"${packageName}@$version"`),

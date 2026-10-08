@@ -55,7 +55,7 @@ Reader owns source and links acquisition, cancellation, semantic history, Back, 
 
 ## Languages and editions
 
-`translation-language="french"` requests French directly. Only Sefaria's missing-language warning permits one additional request for its default translation, which is not necessarily English. An existing but empty French edition stays empty. Exact edition titles never fall back.
+`language="french"` on Text Segment, or `translation-language="french"` on a two-sided component, requests French directly. Only Sefaria's missing-language warning permits one additional request for its default translation when `translation-fallback="default"`, which is not necessarily English. An existing but empty French edition stays empty. Exact edition titles never fall back.
 
 ```html
 <sefaria-source-card
@@ -67,16 +67,13 @@ Reader owns source and links acquisition, cancellation, semantic history, Back, 
   translation-language="french"
   content-language="translation"
 ></sefaria-bilingual-segment>
-<sefaria-text-segment
-  sref="Micah 6:8"
-  translation-language="french"
-></sefaria-text-segment>
+<sefaria-text-segment sref="Micah 6:8" language="french"></sefaria-text-segment>
 <sefaria-reader sref="Micah 6:8" translation-language="french"></sefaria-reader>
 ```
 
 | Element | Presentation language | Acquisition language and editions |
 | --- | --- | --- |
-| Text Segment | One selected text | `translation-language` **or** strict `version-language`; optional `version-title` |
+| Text Segment | One selected text | Optional `language` for original or translated text; optional `version-title` |
 | Bilingual Segment | `content-language`: `both`, `primary`, `translation` | `translation-language`, `primary-version-title`, `translation-version-title` |
 | Source Card | Same as Bilingual Segment | Same as Bilingual Segment |
 | Reader | Same as Bilingual Segment | Same as Bilingual Segment; exact titles apply only to the root and its context |
@@ -94,12 +91,12 @@ For a strict French edition, add its exact title:
 ></sefaria-source-card>
 <sefaria-text-segment
   sref="Micah 6:8"
-  version-language="french"
+  language="french"
   version-title="Bible du Rabbinat 1899 [fr]"
 ></sefaria-text-segment>
 ```
 
-Text Segment rejects simultaneous `version-language` and `translation-language`. Its title alone selects a primary edition. For DOM-free Text Segment requests, use `version: { translationLanguage: "french" }` instead of strict `version: { language: "french" }`.
+Text Segment uses one optional `language` input; omission selects primary. Its title alone selects a primary edition. For DOM-free Text Segment requests, use `version: { language: "french" }` or `version: {}` for primary, with an independent optional `versionTitle`. The former Text Segment `version-language` / `versionLanguage`, `translation-language` / `translationLanguage`, and `version.translationLanguage` are removed without aliases in the next alpha.
 
 Supplied data makes zero requests and must include the selected text or metadata proving the preferred language is absent. Reader carries the preferred language through navigation, but not a root's exact edition titles into unrelated works. Try French Micah and unavailable-French Berakhot in the [Source Card explorer](../../examples/explorer/source-card.html); see the [selection contract](../../docs/specs/components.md#language-and-edition-selection) for errors and request counts.
 

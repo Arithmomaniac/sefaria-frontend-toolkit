@@ -2,6 +2,16 @@
 
 # Evidence
 
+## Unified Text Segment language selection
+
+**Maintainer decision on October 8, 2026:** replace Text Segment's mutually exclusive strict-language and preferred-translation inputs outright in the next alpha. The maintainer then chose the simpler name `language`, rather than `version-language`, for the unified input. One optional `language` selects either original or translated text; omission retains primary selection. Full language-family names remain the transport vocabulary. Exact edition and fallback policy remain independent inputs. This supersedes the Text Segment split recorded under preferred translation selection below, not the translation-side preference on two-sided components.
+
+**Source observation on October 8, 2026:** `text-segment-element.ts` exposes both language properties and rejects their combination; `text-segment.ts` duplicates the distinction in its selection union. The shared preferred-translation helper rejects source editions, which is appropriate for two-sided translation selection but not for one arbitrary selected segment. Unified segment preparation instead matches family evidence regardless of source role, while retaining primary evidence for the omitted-language case. No transport correction, client policy, or upstream behavior change is required.
+
+**Version decision on October 8, 2026:** the maintainer requested the `0.1.1` alpha line for this change. The installed Changesets CLI consumed the note and generated synchronized changelogs and dependent private-workspace updates. Its default next version was `0.1.0-alpha.1`; the installed npm version command then set the three private library manifests to the explicitly requested `0.1.1-alpha.0`, and the newly generated changelog headings and dependency entries were aligned with that target. Prerelease mode remains `alpha`, internal dependencies remain `workspace:*`, and no package publication or source tag was created.
+
+**Version-policy regression on October 8, 2026:** the integration-policy check admitted planned install guidance only for the literal initial version `0.1.0-alpha.0`, rejecting the same qualified wording for `0.1.1-alpha.0`. The policy now receives the current client manifest version from its repository caller and requires both the publication disclaimer and installation variable to match it. It still admits only the designated installation page, one install command, all three pinned packages, and explicit pending-qualification wording. Tests reject absent version authority, mismatched prose or pins, omitted packages, extra commands, and missing qualification language.
+
 ## npm-only release engineering
 
 **Maintainer decision on October 6, 2026:** the approved plan supersedes the GitHub Packages and automatic main-build publishing decisions recorded below. The engineering slice prepares synchronized public npm releases through one manual caller and one draft GitHub Release containing actual npm package assets. The initial authorized Sefaria maintainer uses their own npm account and 2FA; Avi needs no npm membership or manual transfer. Existing Pages restoration and archives remain intact until a separately qualified and authorized CDN cutover.

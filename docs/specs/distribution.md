@@ -1,4 +1,4 @@
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
 
 # Package distribution specification
 
@@ -38,7 +38,7 @@ After all three exact npm records, dependencies, tarball integrity and an isolat
 
 Each package contains its self-contained minified module under `dist/browser`: `sefaria-api-client.js`, `sefaria-text-transform.js`, or `sefaria-elements.js`, with `LICENSE.txt` and full `THIRD-PARTY-NOTICES.txt`. The elements module registers the five remaining elements; duplicate evaluation preserves existing definitions. The modules preserve package APIs and introduce no component, transport, caching or source behavior. No bundler, transformation, import map, external runtime dependency, stylesheet, or runtime CDN fallback is required.
 
-jsDelivr is primary; UNPKG is the alternative. Planned URLs use exact package versions and direct files, for example `https://cdn.jsdelivr.net/npm/@sefaria/web-components@0.1.0-alpha.0/dist/browser/sefaria-elements.js` and `https://unpkg.com/@sefaria/web-components@0.1.0-alpha.0/dist/browser/sefaria-elements.js`. All three modules require independent verification. Do not advertise these URLs as live before qualification.
+jsDelivr is primary; UNPKG is the alternative. Planned URLs use exact package versions and direct files, for example `https://cdn.jsdelivr.net/npm/@sefaria/web-components@0.1.1-alpha.0/dist/browser/sefaria-elements.js` and `https://unpkg.com/@sefaria/web-components@0.1.1-alpha.0/dist/browser/sefaria-elements.js`. All three modules require independent verification. Do not advertise these URLs as live before qualification.
 
 Offline checks use bounded fixtures and real packed bytes, standalone separate-origin browser loading and opaque `sandbox="allow-scripts"` imports. They prove package-root exports, registrations, duplicate evaluation, Micah 6:8 rendering, exact request counts, supplied-data behavior, visible validation failures, notices and recomputed hashes/sizes in Chromium, Firefox and WebKit. Explicit read-only hosted commands separately check anonymous npm installation, both CDN hosts, exact bytes (not only HTTP 200), MIME/CORS, notices and actual browser imports. CDN lag is pending evidence, not permission to transform or substitute another source. Add browser-path exports only if actual export-map qualification requires them, with ordinary export regressions.
 
