@@ -8,7 +8,7 @@ A community-driven project with Sefaria backing and support. The toolkit is expe
 
 ## Install
 
-Public npm release `0.1.0-alpha.0` is prepared but remains pending hosted qualification. After release, installation is anonymous and needs no GitHub token. Types are included; no `@types` package is needed. [Install and status › Packages](https://sefaria.github.io/sefaria-frontend-toolkit/help/install-and-status.html#packages) owns current availability and exact-version installation guidance.
+Public npm release `0.1.1-alpha.0` is prepared but remains pending hosted qualification. After release, installation is anonymous and needs no GitHub token. Types are included; no `@types` package is needed. [Install and status › Packages](https://sefaria.github.io/sefaria-frontend-toolkit/help/install-and-status.html#packages) owns current availability and exact-version installation guidance.
 
 ## First success
 

@@ -12,7 +12,7 @@ In `Sefaria/sefaria-frontend-toolkit`, configure the `npm-release` environment w
 
 Confirm Sefaria controls the `sefaria` npm organization and can publish `@sefaria/api-client`, `@sefaria/text-transform`, and `@sefaria/web-components`. GitHub ownership does not establish npm ownership. Identify an authorized Sefaria npm maintainer with 2FA and access to view/download the draft GitHub Release. Avi needs no npm membership; share no credentials.
 
-After separate authorization, engineering runs preparation for `0.1.0-alpha.0` and provides the exact draft link, verified filenames, checksums and publish commands. The maintainer downloads the actual `.tgz` assets and runs those commands with their own account/2FA in client, text-transform, web-components order. No clone/build/repack or file transfer from Avi is needed. Automatic GitHub source archives are not package assets. Partial publication preserves the draft for explicit integrity-confirmed recovery.
+After separate authorization, engineering runs preparation for the reviewed version (currently `0.1.1-alpha.0`) and provides the exact draft link, verified filenames, checksums and publish commands. The maintainer downloads the actual `.tgz` assets and runs those commands with their own account/2FA in client, text-transform, web-components order. No clone/build/repack or file transfer from Avi is needed. Automatic GitHub source archives are not package assets. Partial publication preserves the draft for explicit integrity-confirmed recovery.
 
 ## Later trusted publishing
 

@@ -43,12 +43,7 @@ describe("LiveEditor", () => {
 const showTextPages = {
   "sefaria-text-segment": {
     file: "docs/use-components/show-text/show-one-passage.md",
-    attributes: [
-      "translation-language",
-      "version-language",
-      "version-title",
-      "vocalization-mode",
-    ],
+    attributes: ["language", "version-title", "vocalization-mode"],
   },
   "sefaria-bilingual-segment": {
     file: "docs/use-components/show-text/hebrew-and-translation.md",
@@ -361,6 +356,18 @@ describe("Across components pages", () => {
     }
     expect(text).not.toMatch(/consonants only/i);
     expect(text).not.toMatch(/```html/);
+  });
+
+  it("separates primary and explicit Text Segment language branches", () => {
+    expect(text).toContain('TSPrimary("Use Sefaria\'s primary language?")');
+    expect(text).toContain("Q2 -->|Text Segment| TSPrimary");
+    expect(text).toContain(
+      'TSPrimary -->|Yes| TSDefault["Omit language; show primary"]',
+    );
+    expect(text).toContain('TSPrimary -->|No| A2["Set language"]');
+    expect(text).toContain("A2 --> Q3");
+    expect(text).not.toMatch(/^\s+TSDefault\s*-->/m);
+    expect(text).toContain('Q3 -->|No| A4["Show selected text"]');
   });
 
   it("shows the coordination loop from tested owner files", () => {

@@ -149,6 +149,11 @@ Review the initial and expanded corrections for:
 
 ### Text segment
 
+- [ ] One optional `language` selects original or translated text; omission selects primary.
+- [ ] The former Text Segment `version-language` / `versionLanguage`, `translation-language` / `translationLanguage`, and DOM-free `version.translationLanguage` are absent.
+- [ ] Family selection, exact title, and fallback policy compose without a public role switch.
+- [ ] Clearing the language returns to primary; selected fragments match explicit family and title.
+
 - [ ] A language-family selector serializes as one `version` value.
 - [ ] An exact edition serializes as one `language|versionTitle` value.
 - [ ] Every request uses `return_format=default`.

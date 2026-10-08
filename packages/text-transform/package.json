@@ -1,6 +1,6 @@
 {
   "name": "@sefaria/text-transform",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.1-alpha.0",
   "description": "Pure Sefaria text normalization, vocalization, footnote, and preview utilities.",
   "private": true,
   "type": "module",

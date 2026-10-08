@@ -1737,14 +1737,14 @@
             },
             {
               "kind": "field",
-              "name": "versionLanguage",
+              "name": "language",
               "privacy": "public",
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Language of the edition to show, instead of the primary edition.",
+              "description": "Full language-family name, such as `hebrew` or `french`. Omit to show Sefaria's primary edition.",
               "default": "undefined",
-              "attribute": "version-language"
+              "attribute": "language"
             },
             {
               "kind": "field",
@@ -1753,20 +1753,9 @@
               "type": {
                 "text": "string | undefined"
               },
-              "description": "`version-title` alone chooses another edition in the original language. To choose a translation by title, also set `translation-language`.",
+              "description": "Exact edition in `language`, or among primary editions when no language is set. Exact titles never fall back.",
               "default": "undefined",
               "attribute": "version-title"
-            },
-            {
-              "kind": "field",
-              "name": "translationLanguage",
-              "privacy": "public",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Preferred translation language. Can't be combined with `versionLanguage`.",
-              "default": "undefined",
-              "attribute": "translation-language"
             },
             {
               "kind": "field",
@@ -1832,15 +1821,6 @@
               "fieldName": "sref"
             },
             {
-              "name": "translation-language",
-              "type": {
-                "text": "string | undefined"
-              },
-              "description": "Preferred translation language. Can't be combined with `versionLanguage`.",
-              "default": "undefined",
-              "fieldName": "translationLanguage"
-            },
-            {
               "name": "translation-fallback",
               "type": {
                 "text": "\"default\" | \"none\""
@@ -1850,20 +1830,20 @@
               "fieldName": "translationFallback"
             },
             {
-              "name": "version-language",
+              "name": "language",
               "type": {
                 "text": "string | undefined"
               },
-              "description": "Language of the edition to show, instead of the primary edition.",
+              "description": "Full language-family name, such as `hebrew` or `french`. Omit to show Sefaria's primary edition.",
               "default": "undefined",
-              "fieldName": "versionLanguage"
+              "fieldName": "language"
             },
             {
               "name": "version-title",
               "type": {
                 "text": "string | undefined"
               },
-              "description": "`version-title` alone chooses another edition in the original language. To choose a translation by title, also set `translation-language`.",
+              "description": "Exact edition in `language`, or among primary editions when no language is set. Exact titles never fall back.",
               "default": "undefined",
               "fieldName": "versionTitle"
             },

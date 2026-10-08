@@ -70,12 +70,12 @@ Pinned addresses stay available while their version is active. A version can be 
 
 ## Packages
 
-The toolkit has three packages: `@sefaria/api-client`, `@sefaria/text-transform`, and `@sefaria/web-components`. Public npm publication of `0.1.0-alpha.0` is pending qualification. The command below is planned installation guidance, not a claim that the packages are already live. After all three packages verify, npm installation will be anonymous and need no GitHub token or registry-specific credentials.
+The toolkit has three packages: `@sefaria/api-client`, `@sefaria/text-transform`, and `@sefaria/web-components`. Public npm publication of `0.1.1-alpha.0` is pending qualification. The command below is planned installation guidance, not a claim that the packages are already live. After all three packages verify, npm installation will be anonymous and need no GitHub token or registry-specific credentials.
 
 All three packages share one reviewed numbered version. Use exact versions and commit your lockfile. Leave out the packages you don't need.
 
 ```sh
-version="0.1.0-alpha.0"
+version="0.1.1-alpha.0"
 npm install "@sefaria/api-client@$version" "@sefaria/text-transform@$version" "@sefaria/web-components@$version"
 ```
 
@@ -89,9 +89,9 @@ jsDelivr is the primary planned host. UNPKG is the alternative. These exact-vers
 
 | Package module | Planned jsDelivr URL |
 | --- | --- |
-| Client | `https://cdn.jsdelivr.net/npm/@sefaria/api-client@0.1.0-alpha.0/dist/browser/sefaria-api-client.js` |
-| Text tools | `https://cdn.jsdelivr.net/npm/@sefaria/text-transform@0.1.0-alpha.0/dist/browser/sefaria-text-transform.js` |
-| Elements | `https://cdn.jsdelivr.net/npm/@sefaria/web-components@0.1.0-alpha.0/dist/browser/sefaria-elements.js` |
+| Client | `https://cdn.jsdelivr.net/npm/@sefaria/api-client@0.1.1-alpha.0/dist/browser/sefaria-api-client.js` |
+| Text tools | `https://cdn.jsdelivr.net/npm/@sefaria/text-transform@0.1.1-alpha.0/dist/browser/sefaria-text-transform.js` |
+| Elements | `https://cdn.jsdelivr.net/npm/@sefaria/web-components@0.1.1-alpha.0/dist/browser/sefaria-elements.js` |
 
 The UNPKG alternative replaces `https://cdn.jsdelivr.net/npm/` with `https://unpkg.com/` and retains the exact package, version and path. Each package colocates `LICENSE.txt` and `THIRD-PARTY-NOTICES.txt` in `dist/browser`. All three modules and both hosts must match the qualified package bytes before cutover. Sefaria npm ownership, initial publication and hosted qualification remain external prerequisites. Existing Pages releases are restored unchanged until a separately approved cutover. Third-party CDNs may retain bytes after deletion and do not inherit the Pages retirement policy.
 

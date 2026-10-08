@@ -1,5 +1,13 @@
 # @sefaria-example/mcp-app
 
+## 0.1.0-alpha.1
+
+### Patch Changes
+
+- Updated dependencies
+  - @sefaria/web-components@0.1.1-alpha.0
+  - @sefaria/api-client@0.1.1-alpha.0
+
 ## 0.1.0-alpha.0
 
 ### Minor Changes

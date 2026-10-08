@@ -3,7 +3,7 @@ title: "Across components › Choose what text readers see"
 description: "Choose the translation, edition, Hebrew vocalization, and sides your readers see, and learn which choices make requests."
 ---
 
-> Created/edited by GitHub Copilot; pending human review.
+> Created/edited by GitHub Copilot with human review/feedback by Avi Levin.
 
 <script setup>
 import LiveEditor from "../.vitepress/theme/LiveEditor.vue";
@@ -36,15 +36,14 @@ Each choice is an HTML attribute. You write it inside the tag.
 ```mermaid
 flowchart TD
   Q1("Need one exact edition?") -->|Yes| A1["Set its title. It never falls back."]
-  Q1 -->|No| Q2
-  subgraph TS["Text Segment only"]
-    direction TB
-    Q2("Could the language be the original, such as Hebrew?")
-    Q2 -->|Yes| A2["version-language (never falls back)"]
-  end
-  Q2 -->|No| A3["translation-language"]
+  Q1 -->|No| Q2("Which component?")
+  Q2 -->|Text Segment| TSPrimary("Use Sefaria's primary language?")
+  TSPrimary -->|Yes| TSDefault["Omit language; show primary"]
+  TSPrimary -->|No| A2["Set language"]
+  Q2 -->|Bilingual, Source Card, Reader| A3["translation-language"]
+  A2 --> Q3
   A3 --> Q3("Is that language missing?")
-  Q3 -->|No| A4["Show that translation"]
+  Q3 -->|No| A4["Show selected text"]
   Q3 -->|Yes| Q4("Is the fallback on?")
   Q4 -->|Yes| A5["Load Sefaria's default translation"]
   Q4 -->|No| A6["Show a status message"]
@@ -65,11 +64,12 @@ These choices change what the component requests.
   <tbody>
     <tr>
       <th scope="row">Show a translation in a language</th>
-      <td colspan="4"><code>translation-language</code></td>
+      <td><code>language</code></td>
+      <td colspan="3"><code>translation-language</code></td>
     </tr>
     <tr>
       <th scope="row">Show any edition in a language, including the original</th>
-      <td><code>version-language</code></td>
+      <td><code>language</code></td>
       <td colspan="3">—</td>
     </tr>
     <tr>
@@ -90,7 +90,7 @@ Supplied `data` on Text Segment, Bilingual Segment, or Source Card makes no requ
 
 ### Choose a translation language
 
-Set `translation-language` to a language name such as `french`. The value ignores case and outer spaces. All four components accept it. On Text Segment, it shows a translation instead of the primary edition, for example `<sefaria-text-segment sref="Micah 6:8" translation-language="french">`. It returns translations only. `version-language` can also return the original.
+Set `language` on Text Segment, or `translation-language` on Bilingual Segment, Source Card, and Reader, to a full language name such as `french`. Both ignore case and outer spaces. Text Segment uses one input for original and translated text, for example `<sefaria-text-segment sref="Micah 6:8" language="french">`. Omit that input for the primary edition. Components with two sides use `translation-language` to choose only their translation side.
 
 ### When Sefaria doesn't have that language
 
@@ -116,14 +116,14 @@ To avoid a fallback, pin one edition by its title. A title picks one edition, wh
 
 | Choice | Picks | Can include the original | Falls back |
 | --- | --- | --- | --- |
-| `translation-language` | A translation in that language | No | Depends on `translation-fallback` |
-| `version-language` | Any edition in that language | Yes | Never |
+| `translation-language` (two-sided components) | A translation in that language | No | Depends on `translation-fallback` |
+| `language` (Text Segment) | Any edition in that language | Yes | Depends on `translation-fallback` |
 | Title attributes | One edition | Depends on the title | Never |
 
 - Bilingual Segment and Source Card: `primary-version-title` pins the primary edition. `translation-version-title` pins the translation.
-- Text Segment: `version-title` alone chooses another edition in the original language, such as a different Hebrew edition. To choose a translation by title, also set `translation-language`.
+- Text Segment: `version-title` alone chooses another primary edition. To choose an edition in a specific language, also set `language`.
 
-On Text Segment, `translation-language` and `version-language` are mutually exclusive. Pick one. `version-language` alone doesn't pin one edition.
+Text Segment has only one language input. `language` alone doesn't pin one edition. `version-title` narrows it to an exact edition.
 
 ## Choose how it's shown
 

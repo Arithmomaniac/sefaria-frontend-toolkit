@@ -35,7 +35,7 @@ test("non-DOM Text Segment supports the same preferred-language request", async 
   translated.actualLanguage = "fr";
   const request = {
     tref: "Micah 6:8",
-    version: { translationLanguage: "french" },
+    version: { language: "french" },
   };
   const client = createSefariaClient({
     cache: false,
@@ -172,7 +172,7 @@ test("disabled fallback still rejects contradictory missing-language evidence", 
   expect(() =>
     createTextSegmentViewModel(value, {
       tref: "Micah 6:8",
-      version: { translationLanguage: "english" },
+      version: { language: "english" },
       translationFallback: "none",
     }),
   ).toThrow("/warnings");

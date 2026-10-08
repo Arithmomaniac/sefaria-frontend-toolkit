@@ -21,20 +21,17 @@ import {
   needsTranslationFallback,
   noTranslationLanguageMessage,
   normalizeTranslationLanguage,
+  normalizeTranslationFallback,
   type TranslationFallback,
-  preferredTranslation,
 } from "./translation-selection.js";
 
 /** Selects one language or exact version for a text-segment request. */
-export type TextSegmentVersionSelection = {
-  /** Full English language-family name accepted by the v3 texts API. */
+export interface TextSegmentVersionSelection {
+  /** Full English language-family name; omission selects Sefaria's primary edition. */
   readonly language?: string;
   /** Exact Sefaria version title, when a specific edition is required. */
   readonly versionTitle?: string;
-} & (
-  | { readonly language: string; readonly translationLanguage?: never }
-  | { readonly translationLanguage: string; readonly language?: never }
-);
+}
 
 /** Input owned by the non-DOM text-segment factories. */
 export interface TextSegmentRequest {
@@ -242,13 +239,6 @@ export interface TextSegmentController {
   dispose(): void;
 }
 
-const RESERVED_VERSION_SELECTORS = new Set([
-  "all",
-  "primary",
-  "source",
-  "translation",
-]);
-
 /**
  * Projects one validated v3 texts response into render-ready segment data.
  */
@@ -258,74 +248,76 @@ export function createTextSegmentViewModel(
   context: TextSegmentProjectionContext = {},
 ): TextSegmentViewModel {
   serializeVersionSelection(request.version);
-  if (request.version.translationLanguage !== undefined) {
-    const family = normalizeTranslationLanguage(
-      request.version.translationLanguage,
-    );
-    if (
-      (request.translationFallback ?? "none") === "none" &&
-      request.version.versionTitle === undefined &&
-      needsTranslationFallback(payload, family)
-    ) {
-      return createEmptyViewModel(
-        payload,
-        noTranslationLanguageMessage(family),
-        true,
-      );
-    }
-    const preferred = preferredTranslation(
-      payload,
-      family,
-      request.version.versionTitle,
-    );
-    if (
-      (request.translationFallback ?? "none") === "none" &&
-      preferred === undefined &&
-      request.version.versionTitle === undefined
-    ) {
-      return createEmptyViewModel(
-        payload,
-        noTranslationLanguageMessage(family),
-        true,
-      );
-    }
-    const candidates =
-      preferred !== undefined
-        ? [preferred]
-        : request.version.versionTitle !== undefined
-          ? []
-          : payload.versions.filter((version) => !version.isSource);
-    if (candidates.length > 1)
-      throw new TypeError(
-        "/versions: more than one default translation was captured.",
-      );
-    const selected = candidates[0];
-    if (selected === undefined)
-      return createEmptyViewModel(
-        payload,
-        (request.translationFallback ?? "none") === "none"
-          ? noTranslationLanguageMessage(family)
-          : "No translation text is available.",
-      );
-    return projectTextSegmentVersion(payload, selected, context);
-  }
-  const language = request.version.language.trim().toLocaleLowerCase("en-US");
+  const fallback = normalizeTranslationFallback(
+    request.translationFallback ?? "none",
+  );
+  const family =
+    request.version.language === undefined
+      ? undefined
+      : normalizeTranslationLanguage(request.version.language);
+  const title = request.version.versionTitle?.replaceAll("_", " ");
   const matches = payload.versions.filter(
     (version) =>
-      version.languageFamilyName.toLocaleLowerCase("en-US") === language &&
-      (request.version.versionTitle === undefined ||
-        version.versionTitle === request.version.versionTitle),
+      (family === undefined
+        ? version.isPrimary === true
+        : version.languageFamilyName.toLowerCase() === family) &&
+      (title === undefined || version.versionTitle === title),
   );
+  if (family !== undefined) {
+    needsTranslationFallback(payload, family);
+    if (
+      matches.length === 0 &&
+      title === undefined &&
+      payload.available_versions.some(
+        (version) => version.languageFamilyName.toLowerCase() === family,
+      )
+    ) {
+      throw new TypeError(
+        "/versions: requested language is available but its text was not captured.",
+      );
+    }
+    if (matches.length === 0 && fallback === "none" && title === undefined) {
+      return createEmptyViewModel(
+        payload,
+        noTranslationLanguageMessage(family),
+        true,
+      );
+    }
+    if (matches.length === 0 && fallback === "default" && title === undefined) {
+      const candidates = payload.versions.filter(
+        (version) => !version.isSource,
+      );
+      if (candidates.length > 1)
+        throw new TypeError(
+          "/versions: more than one default translation was captured.",
+        );
+      const selected = candidates[0];
+      if (selected === undefined)
+        return createEmptyViewModel(
+          payload,
+          "No translation text is available.",
+        );
+      return projectTextSegmentVersion(payload, selected, context);
+    }
+  }
 
   if (matches.length === 0) {
-    return createEmptyViewModel(payload, createRequestEmptyMessage(request));
+    return family === undefined
+      ? {
+          state: "empty",
+          ref: payload.ref,
+          heRef: payload.heRef,
+          message: "No primary text is available.",
+          warnings: [],
+        }
+      : createEmptyViewModel(payload, createRequestEmptyMessage(request));
   }
 
   if (matches.length > 1) {
     return {
       state: "error",
       errorKind: "projection",
-      message: `Text segment requires one matching version; found ${matches.length}.`,
+      message: `Text segment requires one ${family === undefined ? "primary" : "matching"} version; found ${matches.length}.`,
     };
   }
 
@@ -335,9 +327,6 @@ export function createTextSegmentViewModel(
   }
 
   const projected = projectTextSegmentVersion(payload, version, context);
-  if (projected.state === "empty") {
-    return createEmptyViewModel(payload, createRequestEmptyMessage(request));
-  }
   return projected;
 }
 
@@ -573,8 +562,8 @@ async function requestTextSegmentResponse(
     { kind: "client", client },
     request.tref,
     [version],
-    request.version.translationLanguage,
-    request.translationFallback ?? "none",
+    request.version.language,
+    normalizeTranslationFallback(request.translationFallback ?? "none"),
     signal ?? new AbortController().signal,
   );
 }
@@ -631,7 +620,7 @@ function createEmptyViewModel(
 function createRequestEmptyMessage(request: TextSegmentRequest): string {
   const requestedVersion =
     request.version.versionTitle === undefined
-      ? request.version.language
+      ? (request.version.language ?? "primary")
       : `${request.version.language} version "${request.version.versionTitle}"`;
   return `No ${requestedVersion} text is available.`;
 }
@@ -658,26 +647,10 @@ function createSelectedVersionEmptyViewModel(
 function serializeVersionSelection(
   selection: TextSegmentVersionSelection,
 ): string {
-  if (
-    selection.translationLanguage !== undefined &&
-    selection.language !== undefined
-  ) {
-    throw new TypeError(
-      "Strict language and preferred translation cannot be combined.",
-    );
-  }
   const language =
-    selection.translationLanguage === undefined
-      ? selection.language.trim()
-      : normalizeTranslationLanguage(selection.translationLanguage);
-  if (language.length === 0) {
-    throw new TypeError("Text segment language must not be blank.");
-  }
-  if (RESERVED_VERSION_SELECTORS.has(language.toLocaleLowerCase("en-US"))) {
-    throw new TypeError(
-      `Text segment does not support the reserved version selector "${language}".`,
-    );
-  }
+    selection.language === undefined
+      ? "primary"
+      : normalizeTranslationLanguage(selection.language);
 
   if (selection.versionTitle === undefined) {
     return language;

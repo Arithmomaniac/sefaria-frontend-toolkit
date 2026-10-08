@@ -8,7 +8,7 @@ A community-driven project with Sefaria backing and support. The toolkit is expe
 
 ## Install
 
-Public npm release `0.1.0-alpha.0` is prepared but remains pending hosted qualification. After release, installation is anonymous and needs no GitHub token. Types are included; no `@types` package is needed. [Install and status › Packages](https://sefaria.github.io/sefaria-frontend-toolkit/help/install-and-status.html#packages) owns current availability and exact-version installation guidance.
+Public npm release `0.1.1-alpha.0` is prepared but remains pending hosted qualification. After release, installation is anonymous and needs no GitHub token. Types are included; no `@types` package is needed. [Install and status › Packages](https://sefaria.github.io/sefaria-frontend-toolkit/help/install-and-status.html#packages) owns current availability and exact-version installation guidance.
 
 ## Elements
 
@@ -19,6 +19,8 @@ Import the package root once to register every element: `import "@sefaria/web-co
 - `<sefaria-source-card>`: a source with its text and attribution
 - `<sefaria-connections-panel>`: the commentaries and other texts connected to a reference
 - `<sefaria-reader>`: a passage with its connected texts, and navigation between them
+
+Text Segment uses one optional `language` for original or translated text, such as `hebrew` or `french`. Omit it for Sefaria's primary edition. `version-title` chooses an exact edition; `translation-fallback` separately controls missing-language fallback and defaults to `none`. In the next alpha, this replaces Text Segment's former `version-language` and `translation-language` inputs without aliases. Two-sided components retain `translation-language` for their translation side.
 
 ## First success
 

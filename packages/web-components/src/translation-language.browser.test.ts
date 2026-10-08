@@ -57,11 +57,13 @@ for (const Constructor of [
   SefariaBilingualSegment,
   SefariaSourceCard,
 ]) {
+  const languageAttribute =
+    Constructor === SefariaTextSegment ? "language" : "translation-language";
   test(`${Constructor.name} requests the preferred family directly and preserves supplied equivalence`, async () => {
     const capture = captured("micahFrench");
     const fetchMock = vi.fn<typeof fetch>(async () => response(capture));
     const element = new Constructor();
-    element.setAttribute("translation-language", " French ");
+    element.setAttribute(languageAttribute, " French ");
     element.sref = "Micah 6:8";
     element.source = {
       kind: "client",
@@ -99,7 +101,7 @@ for (const Constructor of [
       Constructor === SefariaTextSegment ? ["french"] : ["primary", "french"],
     );
     const supplied = new Constructor();
-    supplied.setAttribute("translation-language", "french");
+    supplied.setAttribute(languageAttribute, "french");
     supplied.data = capture;
     document.body.append(supplied);
     await supplied.updateComplete;
@@ -110,7 +112,7 @@ for (const Constructor of [
   test(`${Constructor.name} falls back only after a missing-language warning`, async () => {
     const requested: string[][] = [];
     const element = new Constructor();
-    element.setAttribute("translation-language", "french");
+    element.setAttribute(languageAttribute, "french");
     element.setAttribute("translation-fallback", "default");
     element.sref = "Berakhot 2a:1";
     element.source = {
@@ -147,7 +149,7 @@ for (const Constructor of [
       expect(element.shadowRoot?.querySelector(".attribution")).toBeNull();
     }
     const supplied = new Constructor();
-    supplied.translationLanguage = "french";
+    supplied.setAttribute(languageAttribute, "french");
     supplied.setAttribute("translation-fallback", "default");
     supplied.data = captured("berakhotDefault");
     supplied.source = { kind: "disabled" };
@@ -159,7 +161,7 @@ for (const Constructor of [
   test(`${Constructor.name} can disable missing-language fallback`, async () => {
     const requested: string[][] = [];
     const element = new Constructor();
-    element.setAttribute("translation-language", "french");
+    element.setAttribute(languageAttribute, "french");
     element.setAttribute("translation-fallback", "none");
     element.sref = "Berakhot 2a:1";
     element.source = {
@@ -197,7 +199,7 @@ for (const Constructor of [
   test(`${Constructor.name} rejects invalid translation fallback`, async () => {
     const getText = vi.fn(async () => ({ payload: missing(), status: 200 }));
     const element = new Constructor();
-    element.setAttribute("translation-language", "french");
+    element.setAttribute(languageAttribute, "french");
     element.setAttribute("translation-fallback", "maybe");
     element.sref = "Berakhot 2a:1";
     element.source = { kind: "custom", loader: { getText } };
@@ -242,7 +244,7 @@ for (const Constructor of [
       status: 200,
     }));
     const element = new Constructor();
-    element.setAttribute("translation-language", "french");
+    element.setAttribute(languageAttribute, "french");
     element.sref = "Micah 6:8";
     element.source = { kind: "custom", loader: { getText } };
     document.body.append(element);
@@ -275,7 +277,7 @@ for (const Constructor of [
       | ((value: { payload: CoreV3TextsResponse; status: number }) => void)
       | undefined;
     const element = new Constructor();
-    element.translationLanguage = "french";
+    element.setAttribute(languageAttribute, "french");
     element.setAttribute("translation-fallback", "default");
     element.sref = "Berakhot 2a:1";
     element.source = {
@@ -316,7 +318,7 @@ for (const Constructor of [
       status: 200,
     }));
     const element = new Constructor();
-    element.translationLanguage = "french";
+    element.setAttribute(languageAttribute, "french");
     element.sref = "Micah 6:8";
     element.source = { kind: "custom", loader: { getText } };
     document.body.append(element);

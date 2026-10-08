@@ -39,7 +39,7 @@ The client package root re-exports the generated namespaces, contracts, schemas,
 
 ## `@sefaria/api-client`
 
-Source-backed Sefaria API client with generated contracts, validators, and bounded caching. Package manifest version: `0.1.0-alpha.0`. This is not evidence of publication. [Reference](/reference/client.md).
+Source-backed Sefaria API client with generated contracts, validators, and bounded caching. Package manifest version: `0.1.1-alpha.0`. This is not evidence of publication. [Reference](/reference/client.md).
 
 | Import path | Exports |
 | --- | --- |
@@ -53,7 +53,7 @@ Source-backed Sefaria API client with generated contracts, validators, and bound
 
 ## `@sefaria/text-transform`
 
-Pure Sefaria text normalization, vocalization, footnote, and preview utilities. Package manifest version: `0.1.0-alpha.0`. This is not evidence of publication. [Reference](/reference/text-transform.md).
+Pure Sefaria text normalization, vocalization, footnote, and preview utilities. Package manifest version: `0.1.1-alpha.0`. This is not evidence of publication. [Reference](/reference/text-transform.md).
 
 | Import path | Exports |
 | --- | --- |
@@ -61,7 +61,7 @@ Pure Sefaria text normalization, vocalization, footnote, and preview utilities. 
 
 ## `@sefaria/web-components`
 
-Declarative Sefaria web components backed by corrected client payloads and safe text transforms. Package manifest version: `0.1.0-alpha.0`. This is not evidence of publication. [Reference](/reference/components.md).
+Declarative Sefaria web components backed by corrected client payloads and safe text transforms. Package manifest version: `0.1.1-alpha.0`. This is not evidence of publication. [Reference](/reference/components.md).
 
 | Import path | Exports |
 | --- | --- |

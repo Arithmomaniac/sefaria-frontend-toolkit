@@ -59,21 +59,15 @@ Where this element gets its data, instead of the shared data source.
 
 </ApiEntry>
 
-<ApiEntry id="sefaria-text-segment-version-language" name="versionLanguage" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;version-language&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
+<ApiEntry id="sefaria-text-segment-language" name="language" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;language&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
 
-Language of the edition to show, instead of the primary edition.
+Full language-family name, such as `hebrew` or `french`. Omit to show Sefaria's primary edition.
 
 </ApiEntry>
 
 <ApiEntry id="sefaria-text-segment-version-title" name="versionTitle" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;version-title&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
 
-`version-title` alone chooses another edition in the original language. To choose a translation by title, also set `translation-language`.
-
-</ApiEntry>
-
-<ApiEntry id="sefaria-text-segment-translation-language" name="translationLanguage" :fields="[{&quot;label&quot;:&quot;Attribute&quot;,&quot;value&quot;:&quot;translation-language&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Type&quot;,&quot;value&quot;:&quot;string | undefined&quot;,&quot;code&quot;:true},{&quot;label&quot;:&quot;Default&quot;,&quot;value&quot;:&quot;undefined&quot;,&quot;code&quot;:true}]">
-
-Preferred translation language. Can't be combined with `versionLanguage`.
+Exact edition in `language`, or among primary editions when no language is set. Exact titles never fall back.
 
 </ApiEntry>
 
