@@ -9,9 +9,9 @@ import { chromium } from "playwright";
 
 import { createFixtureResponse } from "./site-fixtures.mjs";
 import { startSitePreview } from "./site-preview-server.mjs";
+import release from "./npm-documentation-release.json" with { type: "json" };
 
-const scriptUrl =
-  "https://cdn.jsdelivr.net/npm/@sefaria/web-components@0.1.0-alpha.0/dist/browser/sefaria-elements.js";
+const scriptUrl = `https://cdn.jsdelivr.net/npm/@sefaria/web-components@${release.version}/dist/browser/sefaria-elements.js`;
 
 function fail(message) {
   throw new Error(`[session 1] ${message}`);
@@ -206,11 +206,11 @@ export async function runSessionOneSiteChecks({ root, siteBasePath }) {
 async function runSnippetRunChecks({ root, siteBasePath }) {
   const modules = new Map([
     [
-      "https://cdn.jsdelivr.net/npm/@sefaria/api-client@0.1.0-alpha.0/dist/browser/sefaria-api-client.js",
+      `https://cdn.jsdelivr.net/npm/@sefaria/api-client@${release.version}/dist/browser/sefaria-api-client.js`,
       "sefaria-api-client.js",
     ],
     [
-      "https://cdn.jsdelivr.net/npm/@sefaria/text-transform@0.1.0-alpha.0/dist/browser/sefaria-text-transform.js",
+      `https://cdn.jsdelivr.net/npm/@sefaria/text-transform@${release.version}/dist/browser/sefaria-text-transform.js`,
       "sefaria-text-transform.js",
     ],
   ]);

@@ -10,6 +10,7 @@ import { readSiteBasePath } from "./build-site-plan.mjs";
 import { legacyRedirects } from "../docs/.vitepress/redirects.mjs";
 import { createFixtureResponse } from "./site-fixtures.mjs";
 import { startSitePreview } from "./site-preview-server.mjs";
+import release from "./npm-documentation-release.json" with { type: "json" };
 
 const root = path.resolve(import.meta.dirname, "..");
 const siteBasePath = readSiteBasePath(process.argv.slice(2));
@@ -381,6 +382,22 @@ try {
         ?.textContent?.includes("You have been told"),
     );
     await assertText(page.locator("#hero-panel-text"), "You have been told");
+    for (const [panel, packageName] of [
+      ["card", "@sefaria/web-components"],
+      ["data", "@sefaria/api-client"],
+      ["text", "@sefaria/text-transform"],
+    ]) {
+      const install = page.locator(`#hero-panel-${panel}`);
+      await assertText(
+        install,
+        `npm install ${packageName}@${release.version}`,
+      );
+      await assertEqual(
+        await install.locator("a[href*='start-here']").count(),
+        1,
+        `${panel} quick-start link`,
+      );
+    }
     const labels = await page
       .locator("#hero-panel-text figcaption")
       .allTextContents();
@@ -529,7 +546,7 @@ try {
     await assertText(page.locator("body"), "use a plain link to Sefaria");
     await assertText(
       page.locator("body"),
-      "The script pins npm release 0.1.0-alpha.0 through jsDelivr.",
+      `The script pins npm release ${release.version} through jsDelivr.`,
     );
     await assertEqual(
       (await page.locator(".vp-doc code", { hasText: "alpha" }).count()) > 0,
@@ -1209,7 +1226,7 @@ async function routeToolkitRequests(
     const url = new URL(request.url());
     if (
       url.href ===
-      "https://cdn.jsdelivr.net/npm/@sefaria/web-components@0.1.0-alpha.0/dist/browser/sefaria-elements.js"
+      `https://cdn.jsdelivr.net/npm/@sefaria/web-components@${release.version}/dist/browser/sefaria-elements.js`
     ) {
       await route.fulfill({
         body: localScript,

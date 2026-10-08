@@ -6,6 +6,8 @@ humanReviewed: false
 
 > Created/edited by GitHub Copilot; pending human review.
 
+<!-- npm-release-version: 0.1.0-alpha.0 -->
+
 <script setup>
 import LiveEditor from "../.vitepress/theme/LiveEditor.vue";
 import CodeBlock from "../.vitepress/theme/CodeBlock.vue";

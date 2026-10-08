@@ -35,6 +35,7 @@ function choose(next: SnippetLanguage) {
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 
 import CodeBlock from "./CodeBlock.vue";
+import release from "../../../scripts/npm-documentation-release.json";
 
 const props = defineProps<{
   snippet: {
@@ -51,10 +52,8 @@ const options = [
 ] as const;
 
 const imports = {
-  "@sefaria/api-client":
-    "https://cdn.jsdelivr.net/npm/@sefaria/api-client@0.1.0-alpha.0/dist/browser/sefaria-api-client.js",
-  "@sefaria/text-transform":
-    "https://cdn.jsdelivr.net/npm/@sefaria/text-transform@0.1.0-alpha.0/dist/browser/sefaria-text-transform.js",
+  "@sefaria/api-client": `https://cdn.jsdelivr.net/npm/@sefaria/api-client@${release.version}/dist/browser/sefaria-api-client.js`,
+  "@sefaria/text-transform": `https://cdn.jsdelivr.net/npm/@sefaria/text-transform@${release.version}/dist/browser/sefaria-text-transform.js`,
 };
 
 type Line = { kind: "log" | "error"; text: string };

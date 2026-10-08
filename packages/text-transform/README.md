@@ -1,5 +1,7 @@
 > Created/edited by GitHub Copilot; pending human review.
 
+<!-- npm-release-version: 0.1.0-alpha.0 -->
+
 # @sefaria/text-transform
 
 Makes Sefaria's HTML safe to display and prepares vowels and footnotes, with no UI and no network. Run `normalizeText` first: it sanitizes. `applyVocalizationToHtml` does not sanitize, and `createTextPreview` normalizes its input itself.

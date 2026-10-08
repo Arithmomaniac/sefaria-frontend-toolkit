@@ -3,6 +3,7 @@ import path from "node:path";
 
 import YAML from "yaml";
 import { validateNpmWorkflow } from "./npm-release-policy.mjs";
+import release from "./npm-documentation-release.json" with { type: "json" };
 
 const RETIRED_ACTIVE_PREFIXES = [
   "demos/linker/",
@@ -627,9 +628,21 @@ export function validateDocumentationClaims(files) {
         /(?:npm install|pnpm add|yarn add)\s+["']?@sefaria\//iu.test(line),
       );
     const supportedInstall =
-      /^(?:npm install|pnpm add|yarn add)\s+(?:@sefaria\/(?:api-client|text-transform|web-components)@(?:0\.1\.0-alpha\.0|alpha)(?:\s+|$))+$/u;
+      /^(?:npm install|pnpm add|yarn add)\s+(?:@sefaria\/(?:api-client|text-transform|web-components)@[\w.-]+(?:\s+|$))+$/u;
     if (
-      toolkitInstallLines.some((line) => !supportedInstall.test(line.trim()))
+      toolkitInstallLines.some(
+        (line) =>
+          !supportedInstall.test(line.trim()) ||
+          line
+            .trim()
+            .split(/\s+/u)
+            .slice(2)
+            .some(
+              (specifier) =>
+                !specifier.endsWith(`@${release.version}`) &&
+                !specifier.endsWith("@alpha"),
+            ),
+      )
     ) {
       issues.push(`unsupported registry installation command: ${filename}`);
     }

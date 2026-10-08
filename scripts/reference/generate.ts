@@ -1,6 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { buildApiLinkCatalog } from "./api-link-catalog.js";
+import { synchronizeNpmDocumentation } from "./npm-documentation.js";
 import {
   API_CORRECTIONS_PAGE,
   renderApiCorrections,
@@ -27,7 +28,7 @@ const API_LINK_CATALOG = new URL("./api-link-catalog.json", import.meta.url);
 
 async function main(check: boolean): Promise<void> {
   const { readFile } = await import("node:fs/promises");
-  const stale: string[] = [];
+  const stale: string[] = [...(await synchronizeNpmDocumentation(check))];
   for (const page of REFERENCE_PAGES) {
     const expected = await page.render();
     if (check) {

@@ -1,5 +1,7 @@
 > Created/edited by GitHub Copilot; pending human review.
 
+<!-- npm-release-version: 0.1.0-alpha.0 -->
+
 # Sefaria Frontend Toolkit
 
 Bring [Sefaria](https://www.sefaria.org/)'s texts into your product at the level you need: drop in a tag to show a source, or use the JavaScript tools to fetch checked data and clean its text.

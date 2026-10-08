@@ -1,5 +1,7 @@
 > Created/edited by GitHub Copilot; pending human review.
 
+<!-- npm-release-version: 0.1.0-alpha.0 -->
+
 # @sefaria/web-components
 
 Five browser-standard custom elements that show Sefaria texts, each loading by a reference or rendering data you supply.

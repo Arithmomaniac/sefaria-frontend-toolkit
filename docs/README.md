@@ -1,5 +1,7 @@
 > Created/edited by GitHub Copilot; pending human review.
 
+<!-- npm-release-version: 0.1.0-alpha.0 -->
+
 # Documentation
 
 Use the [product site](https://sefaria.github.io/sefaria-frontend-toolkit/) for the public learning path and interactive previews. This repository index also links contributor-only specifications, evidence, setup, and review material that is intentionally excluded from VitePress.

@@ -5,6 +5,8 @@ description: "Put your first Sefaria source on a page with two lines of HTML, or
 
 > Created/edited by GitHub Copilot; pending human review.
 
+<!-- npm-release-version: 0.1.0-alpha.0 -->
+
 # Put your first source on a page
 
 Copy the two lines below into any page that allows a script tag and custom HTML. The first line loads the toolkit's components as a module script. The second line shows `Micah 6:8` as a Source Card, a box that displays the text and says where it comes from.

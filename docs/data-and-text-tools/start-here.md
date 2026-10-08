@@ -9,6 +9,8 @@ import { data as snippets } from "./snippets.data.ts";
 
 > Created/edited by GitHub Copilot; pending human review.
 
+<!-- npm-release-version: 0.1.0-alpha.0 -->
+
 # Fetch data or clean text
 
 This flow uses two independent packages from the toolkit:

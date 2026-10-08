@@ -3,10 +3,14 @@ import { computed, onMounted, ref } from "vue";
 
 import { normalizeText } from "../../../packages/text-transform/dist/index.js";
 import CodeBlock from "./CodeBlock.vue";
+import release from "../../../scripts/npm-documentation-release.json";
 
 type TabName = "card" | "data" | "text";
 
 const activeTab = ref<TabName>("card");
+const elementsScript =
+  `<script type="module" src="https://cdn.jsdelivr.net/npm/@sefaria/web-components@${release.version}/dist/browser/sefaria-elements.js"><` +
+  "/script>";
 const data = ref<unknown>();
 interface CleanedBlock {
   readonly label: string;
@@ -102,6 +106,17 @@ onMounted(async () => {
       <p class="hero-example__fallback">
         If Sefaria can't be reached, the card shows its own error message.
       </p>
+      <p>
+        <code>{{
+          `npm install @sefaria/web-components@${release.version}`
+        }}</code>
+      </p>
+      <CodeBlock code='import "@sefaria/web-components";' lang="js" />
+      <p>Without a build step, use this script instead:</p>
+      <CodeBlock :code="elementsScript" lang="html" />
+      <SiteLink to="/use-components/start-here.md"
+        >Components quick start</SiteLink
+      >
     </div>
     <div
       id="hero-panel-data"
@@ -115,6 +130,16 @@ onMounted(async () => {
       </p>
       <p v-else-if="data === undefined">Loading the data for Micah 6:8…</p>
       <CodeBlock v-else :code="formattedData" lang="json" />
+      <p>
+        <code>{{ `npm install @sefaria/api-client@${release.version}` }}</code>
+      </p>
+      <CodeBlock
+        code='import { createSefariaClient } from "@sefaria/api-client";'
+        lang="js"
+      />
+      <SiteLink to="/data-and-text-tools/start-here.md"
+        >Client quick start</SiteLink
+      >
     </div>
     <div
       id="hero-panel-text"
@@ -137,6 +162,18 @@ onMounted(async () => {
         />
       </div>
       <p v-else>Loading the cleaned text…</p>
+      <p>
+        <code>{{
+          `npm install @sefaria/text-transform@${release.version}`
+        }}</code>
+      </p>
+      <CodeBlock
+        code='import { normalizeText } from "@sefaria/text-transform";'
+        lang="js"
+      />
+      <SiteLink to="/data-and-text-tools/start-here.md"
+        >Text tools quick start</SiteLink
+      >
     </div>
   </section>
 </template>

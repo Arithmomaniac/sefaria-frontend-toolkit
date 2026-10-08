@@ -128,6 +128,8 @@ The separate Pages workflow runs after successful main-push CI or explicit scrip
 
 The maintainer owns every page by default. Generated reference pages under `docs/reference` belong to their source JSDoc or TSDoc and to the generator in `scripts/reference`. Never edit generated Markdown. Change the source comment or the generator, then run `pnpm reference:generate`.
 
+`scripts/npm-documentation-release.json` owns the exact published version recommended by consumer documentation. Advance it only after qualifying the next release, not merely when Changesets advances source manifests. The site runner, landing quick installs and generated assistant index read this input. `pnpm reference:generate` synchronizes current-version literals in stamped consumer Markdown and READMEs. Runnable HTML snippets use their exact elements import as the version anchor, without a maintenance stamp in copyable code. Raw files stay copyable without unresolved placeholders. `pnpm reference:check` rejects stale stamps or output. In a synchronized file, every occurrence of its anchored version is a current recommendation. Keep immutable launch history, release-administration commands, evidence and archived versions outside this synchronization set.
+
 Update the docs when one of these happens:
 
 - A public API or behavior changes. Update the page, the JSDoc, and the owning spec in the same change.
@@ -137,7 +139,7 @@ Update the docs when one of these happens:
 
 These checks run in `pnpm check` and catch drift without a person:
 
-- `pnpm reference:check` finds stale generated reference pages.
+- `pnpm reference:check` finds stale generated reference pages and consumer release-version references.
 - `pnpm check:api-docs` finds missing public API documentation.
 - `pnpm metadata:check` checks public metadata.
 - `pnpm prose:check` lints the prose.

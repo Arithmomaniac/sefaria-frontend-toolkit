@@ -1,6 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { reservedTokens } from "./components.js";
+import release from "../npm-documentation-release.json";
 
 const SITE = "https://sefaria.github.io/sefaria-frontend-toolkit";
 const REPOSITORY = "https://github.com/Sefaria/sefaria-frontend-toolkit";
@@ -177,7 +178,7 @@ export async function renderLlmsTxt(): Promise<string> {
     "> Web components and TypeScript tools for showing texts from Sefaria's library on your own web pages. The components load and display sources by reference. The client fetches and checks Sefaria API responses, and the text tools make Sefaria's text HTML safe to display (`normalizeText`) and prepare it.",
     "",
     "Status: experimental and community-driven with Sefaria backing and support. Sefaria owns the MIT-licensed toolkit, which began at Microsoft Global Hackathon 2026. Names and APIs may change.",
-    "Install public npm packages at exact version 0.1.0-alpha.0. The npm `alpha` tag moves between reviewed prereleases, not main-build snapshots. Browser examples pin the packaged standalone modules through jsDelivr; UNPKG is an explicit alternative, not an automatic fallback. Ordinary main CI publishes no packages or script snapshots.",
+    `Install public npm packages at exact version ${release.version}. The npm \`alpha\` tag moves between reviewed prereleases, not main-build snapshots. Browser examples pin the packaged standalone modules through jsDelivr; UNPKG is an explicit alternative, not an automatic fallback. Ordinary main CI publishes no packages or script snapshots.`,
     "",
     "Choose a path:",
     "",
