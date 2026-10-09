@@ -19,7 +19,7 @@ describe("post-launch documentation", () => {
 npm install @sefaria/web-components@${version}
 https://cdn.jsdelivr.net/npm/@sefaria/web-components@${version}/dist/browser/sefaria-elements.js
 https://unpkg.com/@sefaria/web-components@${version}/dist/browser/sefaria-elements.js
-https://github.com/Sefaria/sefaria-frontend-toolkit/releases/tag/v${version}
+https://www.npmjs.com/package/@sefaria/web-components/v/${version}
 Historical Pages version 0.0.0-alpha.37286368389.1`;
     const rendered = renderNpmDocumentation(source, "0.2.0-alpha.1");
     expect(rendered).not.toContain(version);
@@ -147,18 +147,45 @@ Historical Pages version 0.0.0-alpha.37286368389.1`;
     }
     expect(page).toContain(`npm install @sefaria/api-client@${version}`);
     expect(page).toContain("npm install @sefaria/web-components@alpha");
-    expect(page).toContain(`/releases/tag/v${version}`);
+    expect(page).toContain(`These examples use \`${version}\``);
     expect(page).not.toMatch(/planned installation|pending qualification/i);
   });
 
-  it("keeps launch evidence conditional and Pages retirement separately authorized", async () => {
+  it("keeps consumer delivery on npm without GitHub Release or legacy Pages CDN links", async () => {
+    const references = await readdir(
+      new URL("../docs/reference/", import.meta.url),
+    );
+    const files = [
+      ...(await npmDocumentationFiles()),
+      ...references
+        .filter((file) => file.endsWith(".md"))
+        .map((file) => `docs/reference/${file}`),
+    ];
+    for (const file of files) {
+      const source = await read(file);
+      expect(source, file).not.toContain(
+        "https://github.com/Sefaria/sefaria-frontend-toolkit/releases",
+      );
+      expect(source, file).not.toContain(
+        "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/",
+      );
+    }
+    expect(await renderLlmsTxt()).not.toContain(
+      "https://github.com/Sefaria/sefaria-frontend-toolkit/releases",
+    );
+  });
+
+  it("preserves launch history while separating consumer guidance from release finalization and Pages retirement", async () => {
     const evidence = await read("docs/evidence.md");
     expect(evidence).toContain("37450586664");
     expect(evidence).toContain(
       "publication, verification and finalization were skipped",
     );
     expect(evidence).toContain(
-      "Merge and deploy this documentation only after",
+      "Original rollout condition (superseded for consumer documentation)",
+    );
+    expect(evidence).toContain(
+      "Public GitHub Release finalization is no longer a prerequisite",
     );
     expect(evidence).toContain("separately authorized");
   });

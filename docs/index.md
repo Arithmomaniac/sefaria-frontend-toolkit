@@ -33,7 +33,7 @@ features:
 
 <span class="learn-more__label">Learn more:</span> [Install and status](/help/install-and-status.md) {.learn-more}
 
-**How do I install it?** Use the public `@sefaria` npm packages at `0.1.0-alpha.0`, or copy the version-pinned browser script from [Start here](/use-components/start-here.md). No registry token or build step is needed for the script route. The [GitHub Release](https://github.com/Sefaria/sefaria-frontend-toolkit/releases/tag/v0.1.0-alpha.0) contains notes and exact package assets.
+**How do I install it?** Use the public `@sefaria` npm packages at `0.1.0-alpha.0`, or copy the version-pinned browser script from [Start here](/use-components/start-here.md). No registry token or build step is needed for the script route.
 
 **Is it official?** It is Sefaria-owned and community-driven with Sefaria backing and support. It remains experimental, not a promise of stable APIs or a support SLA. It began at the Microsoft Global Hackathon 2026.
 

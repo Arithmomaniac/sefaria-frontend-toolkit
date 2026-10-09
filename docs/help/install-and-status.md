@@ -77,13 +77,9 @@ For example, the alternative elements import is:
 
 Each package colocates `LICENSE.txt` and `THIRD-PARTY-NOTICES.txt` in `dist/browser`. A pinned npm version identifies package bytes, not a promise of permanent third-party hosting. CDN caches can lag a release or retain bytes after package removal.
 
-### Historical Pages scripts
-
-Older run-numbered Pages scripts are not npm versions. Their moving `cdn/alpha` alias is separate from the npm `alpha` tag and does not follow new npm releases. Existing archives retain their original bytes, filenames and licenses. Schema-2 archives use `sefaria-client.js`, not the current npm filename. Consult the [legacy hosted-version catalog](https://sefaria.github.io/sefaria-frontend-toolkit/cdn/index.html) for retained pins. A Pages version may be retired separately. Use npm-backed CDN URLs for new pages.
-
 ## Packages
 
-The toolkit has three public npm packages: [`@sefaria/api-client`](https://www.npmjs.com/package/@sefaria/api-client), [`@sefaria/text-transform`](https://www.npmjs.com/package/@sefaria/text-transform), and [`@sefaria/web-components`](https://www.npmjs.com/package/@sefaria/web-components). Installation is anonymous and needs no GitHub token or registry-specific credentials. These examples use [`0.1.0-alpha.0`](https://github.com/Sefaria/sefaria-frontend-toolkit/releases/tag/v0.1.0-alpha.0).
+The toolkit has three public npm packages: [`@sefaria/api-client`](https://www.npmjs.com/package/@sefaria/api-client), [`@sefaria/text-transform`](https://www.npmjs.com/package/@sefaria/text-transform), and [`@sefaria/web-components`](https://www.npmjs.com/package/@sefaria/web-components). Installation is anonymous and needs no GitHub token or registry-specific credentials. These examples use `0.1.0-alpha.0`.
 
 All three packages share one reviewed numbered version. Use exact versions and commit your lockfile. Leave out the packages you don't need.
 
@@ -115,7 +111,7 @@ A community-driven project with Sefaria backing and support. The toolkit is expe
 
 ## License and text rights {#license-and-text-rights}
 
-The toolkit uses the [MIT license](https://github.com/Sefaria/sefaria-frontend-toolkit/blob/main/LICENSE), copyright Sefaria. Keep the copyright and permission notice when redistributing the software. Dependencies retain their own licenses and notices. Each package's `dist/browser` folder includes `LICENSE.txt` and `THIRD-PARTY-NOTICES.txt`. Historical Pages releases retain their original licenses, including GPL releases.
+The toolkit uses the [MIT license](https://github.com/Sefaria/sefaria-frontend-toolkit/blob/main/LICENSE), copyright Sefaria. Keep the copyright and permission notice when redistributing the software. Dependencies retain their own licenses and notices. Each package's `dist/browser` folder includes `LICENSE.txt` and `THIRD-PARTY-NOTICES.txt`.
 
 The rights to the texts are separate. Each Sefaria edition has its own license, so check the edition you display. On sefaria.org, open a passage and choose "About this Text" to see the current version's license. Sefaria's [Copyright and Data Use](https://developers.sefaria.org/docs/usage-of-our-name-and-logo) page explains the rules for using its data.
 

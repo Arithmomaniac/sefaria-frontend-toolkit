@@ -19,7 +19,7 @@ The toolkit generates the client from Sefaria's published API description, an Op
 
 This page documents the code on the `main` branch. The source stamp is not an npm release or a development snapshot. <ReleaseStamp />
 
-Install an exact npm version or use a version-pinned npm CDN module. The npm `alpha` tag moves between reviewed prereleases. It is not a main-build snapshot. Check the [GitHub Releases](https://github.com/Sefaria/sefaria-frontend-toolkit/releases) for the source and notes of your installed version. Older pinned releases keep their own behavior and can lack APIs added since. [Install and status](/help/install-and-status.md) lists package commands and jsDelivr/UNPKG files.
+Install an exact npm version or use a version-pinned npm CDN module. The npm `alpha` tag moves between reviewed prereleases. It is not a main-build snapshot. Older pinned releases keep their own behavior and can lack APIs added since. [Install and status](/help/install-and-status.md) lists package commands and jsDelivr/UNPKG files.
 
 ## The pinned source
 

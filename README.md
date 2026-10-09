@@ -31,7 +31,7 @@ For a page without a build step:
 <sefaria-source-card sref="Micah 6:8"></sefaria-source-card>
 ```
 
-No registry token is needed. [Install and status](https://sefaria.github.io/sefaria-frontend-toolkit/help/install-and-status.html) covers pinned jsDelivr and UNPKG files, package imports, and the moving npm `alpha` tag. See the [GitHub Release](https://github.com/Sefaria/sefaria-frontend-toolkit/releases/tag/v0.1.0-alpha.0) for release notes and exact package assets.
+No registry token is needed. [Install and status](https://sefaria.github.io/sefaria-frontend-toolkit/help/install-and-status.html) covers pinned jsDelivr and UNPKG files, package imports, and the moving npm `alpha` tag.
 
 ## Documentation
 

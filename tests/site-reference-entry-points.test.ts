@@ -23,8 +23,8 @@ const RELEASE_SENTENCE =
 // TypeDoc starts a TypeScript 6 program in a child process.
 const TYPEDOC_TIMEOUT = 120_000;
 const OLDER_PINS = /Older pinned releases keep their own behavior/u;
-const SCRIPT_INDEX =
-  "Check the [GitHub Releases](https://github.com/Sefaria/sefaria-frontend-toolkit/releases) for the source and notes of your installed version.";
+const INSTALL_GUIDE =
+  "[Install and status](/help/install-and-status.md) lists package commands and jsDelivr/UNPKG files.";
 
 const SITE_URL = "https://sefaria.github.io/sefaria-frontend-toolkit";
 const ROUTES = {
@@ -316,13 +316,16 @@ describe("R4 package imports and exports", () => {
     expect(page).toBe(await renderPackagesReference());
     expect(page).toMatch(RELEASE_SENTENCE);
     expect(page).toMatch(OLDER_PINS);
-    expect(page).toContain(SCRIPT_INDEX);
+    expect(page).toContain(INSTALL_GUIDE);
+    expect(page).not.toContain(
+      "https://github.com/Sefaria/sefaria-frontend-toolkit/releases",
+    );
     expect(page).not.toContain(
       "The site doesn't compare it with the commit used to build this page, so the two can differ",
     );
   });
 
-  it("lists every import path, links releases and doesn't repeat it", async () => {
+  it("lists every import path and links the installation guide", async () => {
     const page = await read("docs/reference/package-imports-and-exports.md");
     const inventory = JSON.parse(
       await read("packages/public-exports.json"),
@@ -336,7 +339,7 @@ describe("R4 package imports and exports", () => {
         expect(page).toContain(`| \`${path}\``);
       }
     }
-    expect(page).toContain("/sefaria-frontend-toolkit/releases");
+    expect(page).toContain(INSTALL_GUIDE);
     expect(page).not.toMatch(/0\.0\.0-alpha\.\d/u);
     expect(page).toContain('import "@sefaria/web-components";');
   });
