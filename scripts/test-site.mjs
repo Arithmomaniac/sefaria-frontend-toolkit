@@ -382,50 +382,10 @@ try {
         ?.textContent?.includes("You have been told"),
     );
     await assertText(page.locator("#hero-panel-text"), "You have been told");
-    const install = page.locator(".hero-install");
-    await assertEqual(await install.count(), 1, "shared hero install count");
-    await assertText(
-      install,
-      `npm install @sefaria/web-components@${release.version}`,
-    );
-    const npmButton = install.getByRole("button", { name: "npm", exact: true });
-    const cdnButton = install.getByRole("button", {
-      name: "Browser CDN",
-      exact: true,
-    });
-    const choiceStyles = await install
-      .locator(".code-language-toggle__choices")
-      .evaluate((group) => {
-        const buttons = [...group.querySelectorAll("button")];
-        return {
-          display: globalThis.getComputedStyle(group).display,
-          gap:
-            buttons[1].getBoundingClientRect().left -
-            buttons[0].getBoundingClientRect().right,
-          buttons: buttons.map((button) => {
-            const style = globalThis.getComputedStyle(button);
-            return {
-              borderWidth: style.borderWidth,
-              borderColor: style.borderColor,
-              fontWeight: style.fontWeight,
-            };
-          }),
-        };
-      });
-    await assertEqual(choiceStyles.display, "flex", "install route layout");
-    await assertEqual(choiceStyles.gap >= 4, true, "install buttons separated");
     await assertEqual(
-      choiceStyles.buttons[0].borderWidth,
-      "1px",
-      "install button border",
-    );
-    await assertEqual(
-      choiceStyles.buttons[0].borderColor !==
-        choiceStyles.buttons[1].borderColor &&
-        choiceStyles.buttons[0].fontWeight !==
-          choiceStyles.buttons[1].fontWeight,
-      true,
-      "install pressed state is visible",
+      await page.locator(".hero-install").count(),
+      0,
+      "hero install is removed",
     );
     await assertEqual(
       await page
@@ -446,34 +406,6 @@ try {
       ]),
       "feature cards identify their packages",
     );
-    await npmButton.focus();
-    await page.keyboard.press("Tab");
-    await assertEqual(
-      await cdnButton.evaluate(
-        (button) => button === globalThis.document.activeElement,
-      ),
-      true,
-      "CDN keyboard focus",
-    );
-    await assertEqual(
-      await cdnButton.evaluate(
-        (button) => globalThis.getComputedStyle(button).outlineWidth,
-      ),
-      "2px",
-      "CDN visible keyboard focus",
-    );
-    await page.keyboard.press("Enter");
-    await assertEqual(
-      await cdnButton.getAttribute("aria-pressed"),
-      "true",
-      "CDN keyboard selection",
-    );
-    await assertText(
-      install,
-      `https://cdn.jsdelivr.net/npm/@sefaria/web-components@${release.version}/dist/browser/sefaria-elements.js`,
-    );
-    await assertText(install, '<sefaria-source-card sref="Micah 6:8">');
-    await npmButton.click();
     const labels = await page
       .locator("#hero-panel-text figcaption")
       .allTextContents();

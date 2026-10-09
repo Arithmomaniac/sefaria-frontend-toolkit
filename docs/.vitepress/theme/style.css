@@ -41,35 +41,6 @@
   --documentation-notice-link: #ffe1dc;
 }
 
-.hero-install h2 {
-  margin: 0;
-}
-
-.code-language-toggle__choices {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 4px;
-}
-
-.code-language-toggle__choices button {
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 6px;
-  padding: 2px 10px;
-  font-size: 0.85rem;
-  color: var(--vp-c-text-2);
-}
-
-.code-language-toggle__choices button[aria-pressed="true"] {
-  border-color: var(--vp-c-brand-1);
-  color: var(--vp-c-text-1);
-  font-weight: 600;
-}
-
-.code-language-toggle__choices button:focus-visible {
-  outline: 2px solid var(--vp-c-brand-1);
-  outline-offset: 2px;
-}
-
 .Layout > .VPNav {
   order: -1;
 }
@@ -319,8 +290,7 @@
   font-size: 0.9rem;
 }
 
-.VPHome > .hero-example,
-.VPHome > .hero-install {
+.VPHome > .hero-example {
   width: calc(100% - 3rem);
   max-width: 70rem;
   margin: 0 auto 2rem;
@@ -567,7 +537,6 @@
 }
 
 .hero-example,
-.hero-install,
 .snippet-demo {
   display: grid;
   grid-template-columns: minmax(0, 1fr);

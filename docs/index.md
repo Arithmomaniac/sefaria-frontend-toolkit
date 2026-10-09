@@ -8,7 +8,6 @@ hero:
 statusNote: true
 acknowledgement: true
 heroExample: true
-heroInstall: true
 features:
   - title: Show texts with one tag <code class="feature-package">@sefaria/web-components</code>
     details: Add one Source Card tag to your page. It loads the text, shows the attribution, and handles loading and errors.
