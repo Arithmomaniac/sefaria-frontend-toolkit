@@ -22,9 +22,9 @@ const RELEASE_SENTENCE =
   /documents the code on the `main` branch\. The source stamp is not an npm release/u;
 // TypeDoc starts a TypeScript 6 program in a child process.
 const TYPEDOC_TIMEOUT = 120_000;
-const OLDER_PINS = /Older pinned script-tag versions keep their own behavior/u;
-const SCRIPT_INDEX =
-  "Compare the stamp above with the version in the [script-tag versions index](https://sefaria.github.io/sefaria-frontend-toolkit/cdn/index.html).";
+const OLDER_PINS = /Older pinned releases keep their own behavior/u;
+const INSTALL_GUIDE =
+  "[Install and status](/help/install-and-status.md) lists package commands and jsDelivr/UNPKG files.";
 
 const SITE_URL = "https://sefaria.github.io/sefaria-frontend-toolkit";
 const ROUTES = {
@@ -81,13 +81,14 @@ describe("EP1–EP5 README entry points", () => {
     ["packages/text-transform/README.md", "@sefaria/text-transform"],
     ["packages/web-components/README.md", "@sefaria/web-components"],
   ])(
-    "%s states pending npm publication and gives a maintainer link",
+    "%s gives an exact npm installation and a maintainer link",
     async (file, name) => {
       const readme = await read(file);
       expect(readme).not.toContain("_authToken");
       expect(readme).toContain("help/install-and-status.html#packages");
       expect(readme).toContain(name);
-      expect(readme).toMatch(/pending/u);
+      expect(readme).toContain(`npm install ${name}@0.1.0-alpha.0`);
+      expect(readme).not.toMatch(/pending hosted qualification/u);
       expect(readme).not.toMatch(/read:packages/u);
       expect(readme).toContain(
         `https://github.com/Sefaria/sefaria-frontend-toolkit/blob/main/${path.posix.dirname(file)}/IMPLEMENTATION.md`,
@@ -140,10 +141,11 @@ describe("EP7 llms.txt", () => {
     expect(text).toContain(
       "experimental and community-driven with Sefaria backing and support",
     );
-    expect(text).toMatch(
-      /`alpha` script address serves the newest published script release/u,
+    expect(text).toContain(
+      "npm `alpha` tag moves between reviewed prereleases",
     );
-    expect(text).toMatch(/may be retired without notice/u);
+    expect(text).toContain("exact version 0.1.0-alpha.0");
+    expect(text).toContain("UNPKG is an explicit alternative");
     expect(text).toContain(
       (await read("examples/site-snippets/source-card-script-tag.html")).trim(),
     );
@@ -314,13 +316,16 @@ describe("R4 package imports and exports", () => {
     expect(page).toBe(await renderPackagesReference());
     expect(page).toMatch(RELEASE_SENTENCE);
     expect(page).toMatch(OLDER_PINS);
-    expect(page).toContain(SCRIPT_INDEX);
+    expect(page).toContain(INSTALL_GUIDE);
+    expect(page).not.toContain(
+      "https://github.com/Sefaria/sefaria-frontend-toolkit/releases",
+    );
     expect(page).not.toContain(
       "The site doesn't compare it with the commit used to build this page, so the two can differ",
     );
   });
 
-  it("lists every import path, links the versions index and doesn't repeat it", async () => {
+  it("lists every import path and links the installation guide", async () => {
     const page = await read("docs/reference/package-imports-and-exports.md");
     const inventory = JSON.parse(
       await read("packages/public-exports.json"),
@@ -334,7 +339,7 @@ describe("R4 package imports and exports", () => {
         expect(page).toContain(`| \`${path}\``);
       }
     }
-    expect(page).toContain("/sefaria-frontend-toolkit/cdn/");
+    expect(page).toContain(INSTALL_GUIDE);
     expect(page).not.toMatch(/0\.0\.0-alpha\.\d/u);
     expect(page).toContain('import "@sefaria/web-components";');
   });

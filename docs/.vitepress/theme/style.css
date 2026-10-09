@@ -18,6 +18,15 @@
   --documentation-notice-link: #71372a;
 }
 
+.VPFeature .feature-package {
+  display: block;
+  margin-top: 0.5rem;
+  font-family: var(--vp-font-family-mono);
+  font-size: 0.8rem;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
 .dark {
   --vp-c-brand-1: #e6a28f;
   --vp-c-brand-2: #f0b8a8;

@@ -2,7 +2,7 @@
 
 # Examples
 
-These private examples exercise the toolkit's public package entry points from the workspace. They are not published packages or evidence of official Sefaria ownership.
+These private examples exercise the Sefaria-owned toolkit's public package entry points from the workspace. The examples themselves are not published packages. For an external app, install the numbered public libraries from [Install and status](../docs/help/install-and-status.md#packages); for a page without a build step, use its version-pinned jsDelivr or UNPKG modules. The [framework guide](../docs/use-components/use-with-a-framework.md) shows plain JavaScript, React and Alpine integration.
 
 ## Supplied-data component states
 

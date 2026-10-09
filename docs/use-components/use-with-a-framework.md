@@ -6,6 +6,8 @@ humanReviewed: false
 
 > Created/edited by GitHub Copilot; pending human review.
 
+<!-- npm-release-version: 0.1.0-alpha.0 -->
+
 <script setup>
 import LiveEditor from "../.vitepress/theme/LiveEditor.vue";
 import CodeBlock from "../.vitepress/theme/CodeBlock.vue";
@@ -23,6 +25,10 @@ The components are standard custom elements, also called web components. Any fra
 Register the elements before your framework renders them, so their JavaScript properties, such as `selectedPosition`, are ready when the framework sets them. Import the package once at the top of your app, or use the script tag from [Start here](/use-components/start-here.md).
 
 <StatusNote />
+
+```sh
+npm install @sefaria/web-components@0.1.0-alpha.0
+```
 
 ```ts
 import "@sefaria/web-components";

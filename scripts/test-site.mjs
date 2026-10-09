@@ -10,6 +10,7 @@ import { readSiteBasePath } from "./build-site-plan.mjs";
 import { legacyRedirects } from "../docs/.vitepress/redirects.mjs";
 import { createFixtureResponse } from "./site-fixtures.mjs";
 import { startSitePreview } from "./site-preview-server.mjs";
+import release from "./npm-documentation-release.json" with { type: "json" };
 
 const root = path.resolve(import.meta.dirname, "..");
 const siteBasePath = readSiteBasePath(process.argv.slice(2));
@@ -381,6 +382,30 @@ try {
         ?.textContent?.includes("You have been told"),
     );
     await assertText(page.locator("#hero-panel-text"), "You have been told");
+    await assertEqual(
+      await page.locator(".hero-install").count(),
+      0,
+      "hero install is removed",
+    );
+    await assertEqual(
+      await page
+        .locator(".hero-example")
+        .getByText("npm install", { exact: false })
+        .count(),
+      0,
+      "demo tabs have no repeated installation blocks",
+    );
+    await assertEqual(
+      JSON.stringify(
+        await page.locator(".VPFeature .feature-package").allTextContents(),
+      ),
+      JSON.stringify([
+        "@sefaria/web-components",
+        "@sefaria/api-client",
+        "@sefaria/text-transform",
+      ]),
+      "feature cards identify their packages",
+    );
     const labels = await page
       .locator("#hero-panel-text figcaption")
       .allTextContents();
@@ -529,7 +554,7 @@ try {
     await assertText(page.locator("body"), "use a plain link to Sefaria");
     await assertText(
       page.locator("body"),
-      "The alpha address always loads the newest build.",
+      `The script pins npm release ${release.version} through jsDelivr.`,
     );
     await assertEqual(
       (await page.locator(".vp-doc code", { hasText: "alpha" }).count()) > 0,
@@ -1209,7 +1234,7 @@ async function routeToolkitRequests(
     const url = new URL(request.url());
     if (
       url.href ===
-      "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
+      `https://cdn.jsdelivr.net/npm/@sefaria/web-components@${release.version}/dist/browser/sefaria-elements.js`
     ) {
       await route.fulfill({
         body: localScript,

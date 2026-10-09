@@ -5,6 +5,8 @@ description: "Put your first Sefaria source on a page with two lines of HTML, or
 
 > Created/edited by GitHub Copilot; pending human review.
 
+<!-- npm-release-version: 0.1.0-alpha.0 -->
+
 # Put your first source on a page
 
 Copy the two lines below into any page that allows a script tag and custom HTML. The first line loads the toolkit's components as a module script. The second line shows `Micah 6:8` as a Source Card, a box that displays the text and says where it comes from.
@@ -13,7 +15,7 @@ Copy the two lines below into any page that allows a script tag and custom HTML.
 
 <SourceCardSnippet />
 
-The `alpha` address always loads the newest build. For a fixed version, see [Install and status](/help/install-and-status.md).
+The script pins npm release `0.1.0-alpha.0` through jsDelivr. [Install and status](/help/install-and-status.md) lists UNPKG alternatives and explains the moving npm `alpha` tag.
 
 ## What is a web component?
 
@@ -30,7 +32,7 @@ The card fetches the text from Sefaria when it appears on the page. While it wai
 ## Script tag or package
 
 - **Script tag:** one self-contained file, no build step, no token. Use it if your page has no build step, or if you're editing a field in a content management system. It's also the quickest way to try the toolkit.
-- **Package:** for apps with a build step. Numbered public npm publication is pending qualification. See [Install and status](/help/install-and-status.md). Once qualified, you import the component, bundle it with your code, and let your framework control when it loads.
+- **Package:** for apps with a build step. Install `@sefaria/web-components`, import the package root once, and bundle it with your code. Your framework controls when it loads.
 
 Load the script tag with `type="module"`. Need the client or text tools without UI? See [Hosted files](/help/install-and-status.md#hosted-files).
 
@@ -39,9 +41,13 @@ Load the script tag with `type="module"`. Need the client or text tools without 
 ```html [Script tag]
 <script
   type="module"
-  src="https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"
+  src="https://cdn.jsdelivr.net/npm/@sefaria/web-components@0.1.0-alpha.0/dist/browser/sefaria-elements.js"
 ></script>
 <sefaria-source-card sref="Micah 6:8"></sefaria-source-card>
+```
+
+```sh [Package install]
+npm install @sefaria/web-components@0.1.0-alpha.0
 ```
 
 ```ts [Package route]

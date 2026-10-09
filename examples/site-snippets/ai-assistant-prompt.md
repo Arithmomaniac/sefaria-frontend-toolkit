@@ -1,11 +1,17 @@
+> Created/edited by GitHub Copilot; pending human review.
+
+<!-- npm-release-version: 0.1.0-alpha.0 -->
+
+<!-- #region consumer-prompt -->
+
 Read https://sefaria.github.io/sefaria-frontend-toolkit/llms.txt first. It describes the Sefaria Frontend Toolkit, a set of web components that show Sefaria texts.
 
 Build me a page that uses the Sefaria Frontend Toolkit's components to show the passage I describe below. For example, to show Micah 6:8: <sefaria-source-card sref="Micah 6:8"></sefaria-source-card>
 
 Install route:
 
-- If the page has no build step, add this one script tag: <script type="module" src="https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-elements.js"></script>
-- If the app has a build step, first read the installation/status page. Numbered public npm publication is pending; don't invent package availability or request a GitHub Packages token. Once the exact version is qualified, import the package root exactly as: import "@sefaria/web-components"; Element subpaths don't register their element; they export types and a few helpers.
+- If the page has no build step, add this version-pinned script tag: <script type="module" src="https://cdn.jsdelivr.net/npm/@sefaria/web-components@0.1.0-alpha.0/dist/browser/sefaria-elements.js"></script>
+- If the app has a build step, install with npm install @sefaria/web-components@0.1.0-alpha.0 and import the package root exactly as: import "@sefaria/web-components"; No registry token is needed. Element subpaths don't register their element; they export types and a few helpers.
 
 Rules:
 
@@ -16,3 +22,4 @@ Rules:
 - Don't choose a translation language unless I ask. For a language preference, use `translation-language` with a full family name such as `french`; an unavailable language can fall back to Sefaria's default. For an exact Source Card edition, use `translation-version-title`, with the language family when appropriate.
 
 My page: [describe your page here, and say whether it has a build step]
+<!-- #endregion consumer-prompt -->

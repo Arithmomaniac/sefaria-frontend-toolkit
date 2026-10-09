@@ -9,6 +9,8 @@ import { data as snippets } from "./snippets.data.ts";
 
 > Created/edited by GitHub Copilot; pending human review.
 
+<!-- npm-release-version: 0.1.0-alpha.0 -->
+
 # Fetch data or clean text
 
 This flow uses two independent packages from the toolkit:
@@ -28,25 +30,31 @@ Use the package route if your app already has a build step. Use the CDN route if
 
 ### Packages
 
-Use `@sefaria/api-client`, `@sefaria/text-transform`, or both. Numbered public npm publication is pending qualification. [Install and status](/help/install-and-status.md) distinguishes planned exact-version installation from retained Pages scripts and local use. No GitHub Packages token is needed. The packages need Node.js 22.12 or later.
+Use `@sefaria/api-client`, `@sefaria/text-transform`, or both. No registry token is needed. The packages need Node.js 22.12 or later.
+
+```sh
+npm install @sefaria/api-client@0.1.0-alpha.0 @sefaria/text-transform@0.1.0-alpha.0
+```
+
+[Install and status](/help/install-and-status.md) explains exact versions, the npm `alpha` tag, and CDN alternatives.
 
 ### No install
 
-Import the client and the text tools straight from the CDN. The client and the text tools are two ES-module files. Load them with `type="module"` or `import`. This needs no token. It works in a browser page, in Deno, and anywhere else that imports from URLs.
+Import the client and the text tools straight from the CDN. The client and the text tools are two ES-module files. Load them with `type="module"` or `import`. This needs no token and works in browser pages without an install step.
 
 ```html
 <script type="module">
   import {
     createSefariaClient,
     text,
-  } from "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-api-client.js";
-  import { normalizeText } from "https://sefaria.github.io/sefaria-frontend-toolkit/cdn/alpha/sefaria-text-transform.js";
+  } from "https://cdn.jsdelivr.net/npm/@sefaria/api-client@0.1.0-alpha.0/dist/browser/sefaria-api-client.js";
+  import { normalizeText } from "https://cdn.jsdelivr.net/npm/@sefaria/text-transform@0.1.0-alpha.0/dist/browser/sefaria-text-transform.js";
 </script>
 ```
 
 Import named functions, or use `import * as client from "…"` to take a whole file. A plain script tag without `type="module"` won't work.
 
-The `alpha` address serves the newest build, and it changes without notice. To pin a version, see [Install and status](/help/install-and-status.md#hosted-files). That page also lists the components' third file.
+These addresses pin `0.1.0-alpha.0`. [Install and status](/help/install-and-status.md#hosted-files) lists the exact UNPKG alternatives and the components' third file.
 
 The examples below import the package names. With the CDN route, use the JavaScript tab of each example and replace each package name with its CDN address. To try an example without either route, press **Run**. The Run buttons on this page use exactly the CDN files.
 

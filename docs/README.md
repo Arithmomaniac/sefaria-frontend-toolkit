@@ -1,10 +1,12 @@
 > Created/edited by GitHub Copilot; pending human review.
 
+<!-- npm-release-version: 0.1.0-alpha.0 -->
+
 # Documentation
 
 Use the [product site](https://sefaria.github.io/sefaria-frontend-toolkit/) for the public learning path and interactive previews. This repository index also links contributor-only specifications, evidence, setup, and review material that is intentionally excluded from VitePress.
 
-The packages are preparing synchronized public npm releases; `0.1.0-alpha.0` and npm-backed CDN availability remain pending qualification. Existing Pages browser releases are preserved during this engineering phase. The browser examples can be evaluated without cloning; repository development and local-package qualification use the contributor documentation below.
+The three public npm packages share numbered release `0.1.0-alpha.0` under the `alpha` dist-tag. [Install and status](help/install-and-status.md) lists exact-version package commands and jsDelivr/UNPKG browser files. Browser examples can be evaluated without cloning; repository development and release qualification use the contributor documentation below.
 
 ## Product documentation
 

@@ -103,6 +103,7 @@ export default withMermaid(
       "development.md",
       "evidence.md",
       "handoff.md",
+      "release-administration.md",
       "review.md",
       "specs/**",
     ],

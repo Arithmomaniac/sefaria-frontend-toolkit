@@ -27,7 +27,7 @@ The prompt lists both routes. Decide which one fits, then say so under "My page"
 
 You need an AI assistant and a place to paste or host HTML.
 
-<<< ../../examples/site-snippets/ai-assistant-prompt.md{md}
+<<< ../../examples/site-snippets/ai-assistant-prompt.md#consumer-prompt{md}
 
 Copy the prompt, replace the last line with a description of your page and your install route, and paste it into your assistant.
 

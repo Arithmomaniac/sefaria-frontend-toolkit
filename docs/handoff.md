@@ -2,7 +2,7 @@
 
 # Source handoff
 
-This repository delivers reusable building blocks for placing Sefaria reading experiences in browser and MCP hosts. It is intentionally not a replacement for Sefaria.org, a stable package release, or a claim of exhaustive corpus compatibility. Sefaria owns this community-driven project and backs and supports it. Numbered public npm publication and jsDelivr/UNPKG qualification remain pending; existing Pages releases are retained unchanged.
+This repository delivers reusable building blocks for placing Sefaria reading experiences in browser and MCP hosts. It is intentionally not a replacement for Sefaria.org, a stable package release, or a claim of exhaustive corpus compatibility. Sefaria owns this community-driven MIT project, backs and supports it, and preserves its Microsoft Global Hackathon 2026 origin. Consumers use public npm packages and version-pinned jsDelivr/UNPKG modules; [Evidence](evidence.md#conditional-post-launch-documentation) records the conditional merge/deploy gates and observed launch state. Retained Pages archives are not retired by a documentation change.
 
 ## What is delivered
 
@@ -20,9 +20,9 @@ The same pieces support both packaged and host-specific compositions:
 | Text, bilingual, reference, source-card, and connections primitives | [Developer explorer source](https://github.com/Sefaria/sefaria-frontend-toolkit/tree/main/examples/explorer) |
 | Supported packaged Reader | `examples/reader/controlled.html` |
 | Custom host-owned spatial reading workflow | `examples/reader/index.html` |
-| Reading surfaces embedded in an ordinary page | [Authored linked article](linked-article.md) |
-| The Reader delivered through an MCP App | [MCP App demonstration](mcp-app-demo.md) |
-| Guided explanation of the complete story | [Step-by-step learning path](learn/01-web-components.md) and local `pnpm dev:site` presentation |
+| Reading surfaces embedded in an ordinary page | [Authored linked article](examples/linked-article.md) |
+| The Reader delivered through an MCP App | [MCP App demonstration](examples/reader-inside-ai-chat.md) |
+| Guided explanation of the complete story | [Start here](use-components/start-here.md) and local `pnpm dev:site` presentation |
 
 The Reader is one composition of the reusable contracts, not the whole product. The spatial workspace deliberately demonstrates that a host can use lower-level session and component contracts when the packaged composition does not fit its interaction model.
 
@@ -51,21 +51,21 @@ Use this order when evidence conflicts:
 4. Each component's private prepared state defines rendering data.
 5. `docs/evidence.md` records observations and provenance.
 
-The implementation deliberately differs from Sefaria in a small number of documented areas, including sanitizer policy and some interaction choices. Review [Intentional differences](guides/differences.md) before treating visual or text-processing differences as regressions.
+The implementation deliberately differs from Sefaria in a small number of documented areas, including sanitizer policy and some interaction choices. Review [Intentional differences](concepts/sefarias-own-texts-and-tools.md) before treating visual or text-processing differences as regressions.
 
 ## Delivery limits
 
-- All packages are private `0.0.0` workspace packages with built JavaScript and declaration exports. They can be packed and consumed as local tarballs, but this remains a source handoff rather than an npm or CDN distribution.
+- The three libraries share initial npm version `0.1.0-alpha.0` under `alpha`. Source manifests remain private with `workspace:*` resolution; isolated public staging produces exact-version npm dependencies, built JavaScript, declarations and standalone browser modules. The root workspace and examples are not published packages.
 - The project is experimental and has no support or stability guarantee.
 - Compatibility evidence is focused and representative, not exhaustive across the Sefaria corpus.
 - Linker public hosting and broad third-party-site qualification are outside this source delivery.
 - MCP screenshots and acceptance records apply to the named host and captured workflow; they are not a promise about every MCP Apps host.
-- No generalized domain model, retry layer, request coalescing, persistence format, or request-capable element is included.
+- No generalized domain model, retry layer, request coalescing or persistence format is included. Elements may load through their documented tagged source; composites reuse captured data rather than creating child requests.
 
 ## First review path
 
 1. Run the browser setup and `pnpm check` from [Development](development.md).
 2. Open `pnpm dev` for authored and live component exploration.
 3. Run `pnpm dev:reader` to compare the supported Reader with the custom spatial composition.
-4. Read [How the pieces fit together](guides/data-flow.md), then inspect one element from raw input or `sref` through private preparation and rendering.
+4. Read [How the pieces fit together](concepts/how-the-toolkit-works.md), then inspect one element from raw input or `sref` through private preparation and rendering.
 5. Use the specifications and evidence record for contract review rather than reconstructing intent from Git history or a historical presentation.

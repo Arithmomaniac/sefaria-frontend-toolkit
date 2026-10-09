@@ -3,6 +3,7 @@ import path from "node:path";
 
 import YAML from "yaml";
 import { validateNpmWorkflow } from "./npm-release-policy.mjs";
+import release from "./npm-documentation-release.json" with { type: "json" };
 
 const RETIRED_ACTIVE_PREFIXES = [
   "demos/linker/",
@@ -626,18 +627,23 @@ export function validateDocumentationClaims(files) {
       .filter((line) =>
         /(?:npm install|pnpm add|yarn add)\s+["']?@sefaria\//iu.test(line),
       );
-    const documentsPlannedNpm =
-      filename === "docs/help/install-and-status.md" &&
-      /Public npm publication of `0\.1\.0-alpha\.0` is pending qualification/u.test(
-        prose,
-      ) &&
-      /planned installation guidance/u.test(prose) &&
-      source.includes('version="0.1.0-alpha.0"') &&
-      toolkitInstallLines.length === 1 &&
-      [...EXPECTED_LIBRARY_NAMES.values()].every((packageName) =>
-        toolkitInstallLines[0].includes(`"${packageName}@$version"`),
-      );
-    if (toolkitInstallLines.length > 0 && !documentsPlannedNpm) {
+    const supportedInstall =
+      /^(?:npm install|pnpm add|yarn add)\s+(?:@sefaria\/(?:api-client|text-transform|web-components)@[\w.-]+(?:\s+|$))+$/u;
+    if (
+      toolkitInstallLines.some(
+        (line) =>
+          !supportedInstall.test(line.trim()) ||
+          line
+            .trim()
+            .split(/\s+/u)
+            .slice(2)
+            .some(
+              (specifier) =>
+                !specifier.endsWith(`@${release.version}`) &&
+                !specifier.endsWith("@alpha"),
+            ),
+      )
+    ) {
       issues.push(`unsupported registry installation command: ${filename}`);
     }
     for (const line of prose.split(/\r?\n/u)) {
