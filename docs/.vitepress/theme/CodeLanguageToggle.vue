@@ -187,26 +187,6 @@ const label = computed(() =>
   margin: 16px 0;
 }
 
-.code-language-toggle__choices {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 4px;
-}
-
-.code-language-toggle__choices button {
-  border: 1px solid var(--vp-c-divider);
-  border-radius: 6px;
-  padding: 2px 10px;
-  font-size: 0.85rem;
-  color: var(--vp-c-text-2);
-}
-
-.code-language-toggle__choices button[aria-pressed="true"] {
-  border-color: var(--vp-c-brand-1);
-  color: var(--vp-c-text-1);
-  font-weight: 600;
-}
-
 .code-language-toggle__choices .code-language-toggle__run {
   margin-inline-start: auto;
   border-color: var(--vp-c-brand-1);
@@ -250,10 +230,5 @@ const label = computed(() =>
 .code-language-toggle__status {
   margin: 0;
   color: var(--vp-c-text-2);
-}
-
-.code-language-toggle__choices button:focus-visible {
-  outline: 2px solid var(--vp-c-brand-1);
-  outline-offset: 2px;
 }
 </style>

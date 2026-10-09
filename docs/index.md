@@ -8,16 +8,17 @@ hero:
 statusNote: true
 acknowledgement: true
 heroExample: true
+heroInstall: true
 features:
-  - title: Show texts with one tag
+  - title: Show texts with one tag <code class="feature-package">@sefaria/web-components</code>
     details: Add one Source Card tag to your page. It loads the text, shows the attribution, and handles loading and errors.
     link: /use-components/start-here.md
     linkText: Use components
-  - title: Get checked data
+  - title: Get checked data <code class="feature-package">@sefaria/api-client</code>
     details: The client fetches Sefaria data and checks its shape before your code uses it.
     link: /data-and-text-tools/start-here.md
     linkText: Use the data and text tools
-  - title: Clean text safely
+  - title: Clean text safely <code class="feature-package">@sefaria/text-transform</code>
     details: The text tools clean up Sefaria's markup, vowels, and footnotes for display.
     link: /data-and-text-tools/start-here.md
     linkText: Use the data and text tools

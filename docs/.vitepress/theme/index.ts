@@ -7,6 +7,7 @@ import CodeLanguageToggle from "./CodeLanguageToggle.vue";
 import DocumentationDisclosure from "./DocumentationDisclosure.vue";
 import DocumentationNotice from "./DocumentationNotice.vue";
 import HeroExample from "./HeroExample.vue";
+import HeroInstall from "./HeroInstall.vue";
 import HumanReviewWarning from "./HumanReviewWarning.vue";
 import LandingPreview from "./LandingPreview.vue";
 import PlaygroundEmbed from "./PlaygroundEmbed.vue";
@@ -25,8 +26,10 @@ export default {
         frontmatter.value.statusNote
           ? h(StatusNote, { class: "hero-status" })
           : null,
-      "home-hero-after": () =>
+      "home-hero-after": () => [
+        frontmatter.value.heroInstall ? h(HeroInstall) : null,
         frontmatter.value.heroExample ? h(HeroExample) : null,
+      ],
       "layout-bottom": () => [
         frontmatter.value.acknowledgement
           ? h(

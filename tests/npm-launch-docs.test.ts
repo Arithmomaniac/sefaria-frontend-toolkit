@@ -57,18 +57,23 @@ Historical Pages version 0.0.0-alpha.37286368389.1`;
     expect(await renderLlmsTxt()).not.toContain("npm-release-version");
   });
 
-  it("keeps hackathon history off the license page and supplies all three hero install routes", async () => {
+  it("keeps hackathon history off the license page and supplies one shared hero install with named library cards", async () => {
     expect(await read("docs/help/install-and-status.md")).not.toContain(
       "Microsoft Global Hackathon",
     );
     expect(await read("README.md")).toContain("Microsoft Global Hackathon");
     const hero = await read("docs/.vitepress/theme/HeroExample.vue");
+    expect(hero).not.toContain("npm install");
+    const install = await read("docs/.vitepress/theme/HeroInstall.vue");
+    expect(install).toContain("npm install @sefaria/web-components@");
+    expect(install).toContain("npm-documentation-release.json");
+    expect(install).toContain('to="/use-components/start-here.md"');
+    const landing = await read("docs/index.md");
     for (const definition of PACKAGE_DEFINITIONS) {
-      expect(hero).toContain(`npm install ${definition.name}@`);
+      expect(landing).toContain(
+        `<code class="feature-package">${definition.name}</code>`,
+      );
     }
-    expect(hero).toContain("npm-documentation-release.json");
-    expect(hero).toContain('to="/use-components/start-here.md"');
-    expect(hero).toContain('to="/data-and-text-tools/start-here.md"');
   });
 
   it("excludes provenance from the copyable consumer prompt without deleting its header", async () => {
